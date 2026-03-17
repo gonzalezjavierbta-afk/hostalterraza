@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro · Terraza Hostal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#181815;--ink2:#52524d;--ink3:#9a9a94;
+  --paper:#f9f9f6;--surface:#f2f2ee;--border:#e2e2da;
+  --gold:#c8a96e;--gold-d:#a8893e;--gold-bg:#fdf6e8;--gold-border:#e8d5a0;
+  --teal:#0d6e6e;--teal-bg:#e0f4f4;--teal-border:#7ecece;
+  --green:#2d6a4f;--green-bg:#d8f3dc;--green-border:#74c69d;
+  --red:#9b2226;--red-bg:#fde8e8;--red-border:#fca5a5;
+  --r:12px;--rsm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400}
+.pub-card{background:#fff;border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.pub-head{background:var(--ink);padding:2rem;text-align:center;position:relative;overflow:hidden}
+.pub-head::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(200,169,110,.35),transparent 70%)}
+.pub-head h2{color:#fff;font-size:24px;position:relative}
+.ev-name{color:var(--gold);font-size:16px;margin-top:.4rem;position:relative;font-weight:500}
+.ev-fecha{color:rgba(255,255,255,.5);font-size:13px;margin-top:.2rem;position:relative}
+.ev-desc{color:rgba(255,255,255,.45);font-size:12px;margin-top:.3rem;position:relative;font-style:italic}
+.pub-body{padding:1.75rem}
+.pub-field{margin-bottom:1rem}
+.pub-field label{display:block;font-size:11px;font-weight:500;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+input,select{border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);outline:none;width:100%;transition:border .15s}
+input:focus{border-color:var(--gold)}
+.pub-submit{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:var(--rsm);font-size:16px;font-family:'DM Serif Display',serif;cursor:pointer;transition:opacity .15s;margin-top:.5rem}
+.pub-submit:hover{opacity:.85}
+.pub-submit:disabled{opacity:.4;cursor:not-allowed}
+.alert{padding:9px 13px;border-radius:var(--rsm);font-size:13px;margin-bottom:.9rem}
+.a-err{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-wrap{padding:2rem;text-align:center}
+.suc-icon{width:56px;height:56px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1rem}
+.ticket{background:var(--surface);border-radius:var(--r);padding:1.25rem;margin:1rem 0;border:1px dashed var(--border);position:relative}
+.ticket::before,.ticket::after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;border:1px solid var(--border);position:absolute;top:50%;transform:translateY(-50%)}
+.ticket::before{left:-9px}.ticket::after{right:-9px}
+.qr-ticket{display:inline-block;background:#fff;padding:10px;border-radius:8px;margin:.75rem 0;border:1px solid var(--border)}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;margin-bottom:.5rem}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+.info-screen{padding:2.5rem 2rem;text-align:center}
+.info-icon{font-size:36px;margin-bottom:.75rem}
+.info-screen h3{font-size:18px;margin-bottom:.5rem}
+.info-screen p{color:var(--ink3);font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="pub-card">
+
+  <!-- Cargando -->
+  <div id="s-loading">
+    <div class="pub-head"><h2>Terraza · Hostal</h2></div>
+    <div class="info-screen">
+      <div style="width:36px;height:36px;border:3px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto"></div>
+      <p style="margin-top:1rem;color:var(--ink3);font-size:13px">Cargando evento…</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="s-error" style="display:none">
+    <div class="pub-head"><h2>Terraza · Hostal</h2></div>
+    <div class="info-screen">
+      <div class="info-icon">⚠️</div>
+      <h3>Evento no encontrado</h3>
+      <p>El link no corresponde a ningún evento activo.<br>Pide al hostal el link correcto.</p>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div id="s-form" style="display:none">
+    <div class="pub-head">
+      <h2>Registro de invitados</h2>
+      <div class="ev-name" id="ev-nombre"></div>
+      <div class="ev-fecha" id="ev-fecha"></div>
+      <div class="ev-desc"  id="ev-desc"></div>
+    </div>
+    <div class="pub-body">
+      <div id="form-alert"></div>
+      <div class="pub-field"><label>Nombre completo *</label><input id="f-nombre" placeholder="Tu nombre completo" autocomplete="name"></div>
+      <div class="pub-field"><label>Cédula / Documento *</label><input id="f-cedula" placeholder="Número de documento" inputmode="numeric"></div>
+      <div class="pub-field"><label>Teléfono *</label><input id="f-tel" placeholder="Número de celular" type="tel" inputmode="numeric"></div>
+      <button class="pub-submit" id="submit-btn" onclick="registrar()">Confirmar inscripción →</button>
+    </div>
+  </div>
+
+  <!-- Éxito + QR -->
+  <div id="s-success" style="display:none">
+    <div class="pub-head">
+      <h2>¡Inscripción confirmada!</h2>
+      <div class="ev-name"  id="suc-ev-nombre"></div>
+      <div class="ev-fecha" id="suc-ev-fecha"></div>
+    </div>
+    <div class="success-wrap">
+      <div class="suc-icon">✓</div>
+      <p style="font-size:13px;color:var(--ink3)">Guarda este QR — es tu entrada.<br>Muéstralo en la puerta de la terraza.</p>
+      <div class="ticket">
+        <span class="badge badge-teal">Invitado</span>
+        <div id="suc-nombre" style="font-family:'DM Serif Display',serif;font-size:20px;margin:.3rem 0"></div>
+        <div class="qr-ticket" id="suc-qr"></div>
+        <div id="suc-code" style="font-family:monospace;font-size:12px;color:var(--ink3);letter-spacing:.08em"></div>
+      </div>
+      <p style="font-size:11px;color:var(--ink3);margin-top:.5rem;line-height:1.6">Código personal e intransferible · uso único</p>
+    </div>
+  </div>
+
+  <!-- Ya registrado -->
+  <div id="s-duplicate" style="display:none">
+    <div class="pub-head"><h2>Ya estás registrado</h2></div>
+    <div class="info-screen">
+      <div class="info-icon">✓</div>
+      <h3>Tu inscripción ya existe</h3>
+      <p>Esta cédula ya fue registrada para este evento.<br>Si perdiste tu QR, contacta al hostal.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ⚠️  REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES
+//  Los encuentras en Supabase → Project Settings → API
+// ══════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
+// ══════════════════════════════════════════════════
+
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const UID = () => Math.random().toString(36).substr(2,8).toUpperCase();
+let eventoActual = null;
+
+function show(id) {
+  ['s-loading','s-error','s-form','s-success','s-duplicate']
+    .forEach(s => document.getElementById(s).style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
+async function init() {
+  const evId = new URLSearchParams(window.location.search).get('evento');
+  if (!evId) { show('s-error'); return; }
+  const { data, error } = await SB.from('eventos').select('*').eq('id', evId).single();
+  if (error || !data) { show('s-error'); return; }
+  eventoActual = data;
+  document.getElementById('ev-nombre').textContent = data.nombre;
+  document.getElementById('ev-fecha').textContent  = data.fecha + (data.hora ? ' · ' + data.hora : '');
+  document.getElementById('ev-desc').textContent   = data.descripcion || '';
+  document.getElementById('suc-ev-nombre').textContent = data.nombre;
+  document.getElementById('suc-ev-fecha').textContent  = data.fecha + (data.hora ? ' · ' + data.hora : '');
+  document.title = 'Registro · ' + data.nombre;
+  show('s-form');
+}
+
+async function registrar() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const cedula = document.getElementById('f-cedula').value.trim();
+  const tel    = document.getElementById('f-tel').value.trim();
+  if (!nombre || !cedula || !tel) { alrt('Completa todos los campos.'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Registrando…';
+  const { data: dup } = await SB.from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', eventoActual.id);
+  if (dup && dup.length > 0) { btn.disabled=false; btn.textContent='Confirmar inscripción →'; show('s-duplicate'); return; }
+  const qr = 'QR-' + UID();
+  const { error } = await SB.from('inscritos').insert({
+    tipo:'invitado', nombre, cedula, telefono:tel, cliente_id:null,
+    evento_id:eventoActual.id, evento_nombre:eventoActual.nombre,
+    evento_fecha:eventoActual.fecha, qr_code:qr, used:false,
+    hora_ingreso:null, fecha_ingreso:null
+  });
+  btn.disabled=false; btn.textContent='Confirmar inscripción →';
+  if (error) { alrt('Error: ' + error.message); return; }
+  document.getElementById('suc-nombre').textContent = nombre;
+  document.getElementById('suc-code').textContent   = qr;
+  const qd = document.getElementById('suc-qr'); qd.innerHTML = '';
+  try { new QRCode(qd,{text:qr,width:180,height:180,colorDark:'#181815',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H}); }
+  catch(e) { qd.textContent = qr; }
+  show('s-success');
+}
+
+function alrt(msg) {
+  const el = document.getElementById('form-alert');
+  el.innerHTML = `<div class="alert a-err">${msg}</div>`;
+  setTimeout(() => el.innerHTML='', 4000);
+}
+
+init();
+</script>
+</body>
+</html>
