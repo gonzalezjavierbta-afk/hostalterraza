@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Control de entrada · Terraza</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#181815;--ink2:#52524d;--ink3:#9a9a94;
+  --paper:#f9f9f6;--surface:#f2f2ee;--border:#e2e2da;
+  --gold:#c8a96e;--gold-d:#a8893e;--gold-bg:#fdf6e8;--gold-border:#e8d5a0;
+  --teal:#0d6e6e;--teal-bg:#e0f4f4;--teal-border:#7ecece;
+  --green:#2d6a4f;--green-bg:#d8f3dc;--green-border:#74c69d;
+  --red:#9b2226;--red-bg:#fde8e8;--red-border:#fca5a5;
+  --amber:#92400e;--amber-bg:#fef3c7;--amber-border:#fcd34d;
+  --r:12px;--rsm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+h1,h2{font-family:'DM Serif Display',serif;font-weight:400}
+
+/* LOADING / ERROR */
+.full-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;flex-direction:column;text-align:center;gap:1rem}
+.spin{width:36px;height:36px;border:3px solid rgba(200,169,110,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;max-width:340px;width:100%}
+.error-icon{font-size:32px;margin-bottom:.5rem}
+.error-card h3{font-size:18px;margin-bottom:.4rem}
+.error-card p{font-size:13px;color:var(--ink3);line-height:1.6}
+
+/* MAIN SCANNER UI */
+.scanner-page{max-width:500px;margin:0 auto;padding:0}
+
+/* Header */
+.scanner-header{background:var(--ink);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.scanner-brand{font-family:'DM Serif Display',serif;color:var(--gold);font-size:16px}
+.scanner-event-name{font-size:12px;color:rgba(255,255,255,.5);margin-top:1px}
+.exp-badge{font-size:11px;padding:3px 8px;border-radius:20px;background:rgba(200,169,110,.15);color:var(--gold);border:1px solid rgba(200,169,110,.25)}
+
+/* Counter */
+.counter-bar{background:#fff;border-bottom:1px solid var(--border);padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.counter-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--green)}
+.counter-label{font-size:12px;color:var(--ink3);margin-top:1px}
+.counter-breakdown{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.badge-gold{background:var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border)}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+
+/* Scanner area */
+.scanner-body{padding:1.25rem}
+
+/* Mode toggle */
+.mode-toggle{display:flex;gap:6px;margin-bottom:1rem}
+.mode-btn{flex:1;padding:9px;border-radius:var(--rsm);border:1px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:.15s;background:var(--surface);color:var(--ink2)}
+.mode-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* Camera */
+#camera-container{position:relative;background:#000;border-radius:var(--r);overflow:hidden;margin-bottom:1rem;aspect-ratio:1;display:none}
+#camera-container.active{display:block}
+#camera-video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.cam-frame{width:65%;aspect-ratio:1;border:2px solid var(--gold);border-radius:var(--r);box-shadow:0 0 0 9999px rgba(0,0,0,.45)}
+.cam-line{position:absolute;width:65%;height:2px;background:var(--gold);opacity:.7;animation:scanline 2s ease-in-out infinite}
+@keyframes scanline{0%,100%{top:18%}50%{top:82%}}
+.cam-status{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:12px}
+
+/* Manual input */
+.scan-display{background:var(--ink);border-radius:var(--r);padding:1.25rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden}
+.scan-display::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(200,169,110,.15),transparent 60%)}
+.scan-lbl{color:rgba(255,255,255,.4);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;position:relative}
+.scan-in{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:12px 16px;font-size:16px;color:#fff;font-family:monospace;text-align:center;width:100%;position:relative;letter-spacing:.1em;outline:none}
+.scan-in:focus{border-color:var(--gold)}
+.scan-in::placeholder{color:rgba(255,255,255,.2);font-size:13px;letter-spacing:.04em}
+.scan-btn{margin-top:.75rem;width:100%;padding:12px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-family:'DM Serif Display',serif;cursor:pointer;position:relative;transition:.15s}
+.scan-btn:hover{background:var(--gold-d)}
+.scan-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Results */
+.res-card{border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;animation:si .2s ease}
+.res-ok{background:var(--green-bg);border:1px solid var(--green-border)}
+.res-err{background:var(--red-bg);border:1px solid var(--red-border)}
+.res-warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+@keyframes si{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.res-name{font-family:'DM Serif Display',serif;font-size:20px;margin:.2rem 0}
+
+/* Verify */
+.verify-card{border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;animation:si .2s ease;background:#fff;border:1px solid var(--gold-border)}
+.verify-person{display:flex;align-items:center;gap:12px;margin-bottom:.9rem}
+.verify-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:18px;flex-shrink:0}
+.va-frecuente{background:var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border)}
+.va-invitado{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+.verify-name{font-family:'DM Serif Display',serif;font-size:19px;line-height:1.2}
+.verify-sub{font-size:13px;color:var(--ink2);margin-top:2px}
+.doc-row{background:rgba(0,0,0,.04);border-radius:var(--rsm);padding:.7rem 1rem;margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.doc-label{font-size:11px;color:var(--ink3);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.doc-value{font-family:monospace;font-size:15px;color:var(--ink);font-weight:500;letter-spacing:.06em}
+.verify-note{font-size:13px;color:var(--ink2);padding:.7rem 1rem;background:rgba(200,169,110,.1);border-radius:var(--rsm);border-left:3px solid var(--gold);margin-bottom:.9rem}
+.verify-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.verify-btns button{padding:10px;border-radius:var(--rsm);border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
+.btn-permit{background:var(--green);color:#fff}
+.btn-permit:hover{opacity:.85}
+.btn-deny{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+
+/* Log */
+.log-section{margin-top:1.25rem}
+.log-title{font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem}
+.log-row{display:flex;gap:10px;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--surface)}
+.log-row:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.log-name{font-size:13px;font-weight:500}
+.log-sub{font-size:11px;color:var(--ink3)}
+.empty{color:var(--ink3);font-size:13px;padding:1rem;text-align:center}
+
+/* Cam error */
+.cam-err{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--rsm);padding:9px 13px;font-size:13px;color:var(--amber);margin-bottom:1rem;display:none}
+
+/* Expiry warning */
+.exp-warn{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--rsm);padding:9px 13px;font-size:13px;color:var(--amber);text-align:center;margin-bottom:1rem}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="full-screen" id="s-loading">
+  <div class="spin"></div>
+  <p style="font-size:13px;color:var(--ink3)">Verificando acceso…</p>
+</div>
+
+<!-- ERROR / EXPIRADO -->
+<div class="full-screen" id="s-error" style="display:none">
+  <div class="error-card">
+    <div class="error-icon">🔒</div>
+    <h3 id="err-title">Acceso no válido</h3>
+    <p id="err-msg">Este link no es válido o ha expirado. Pide al administrador un nuevo link para esta noche.</p>
+  </div>
+</div>
+
+<!-- SCANNER PRINCIPAL -->
+<div id="s-scanner" style="display:none">
+
+  <div class="scanner-header">
+    <div>
+      <div class="scanner-brand">Terraza · Hostal</div>
+      <div class="scanner-event-name" id="hdr-event">Cargando evento…</div>
+    </div>
+    <div class="exp-badge" id="hdr-exp">–</div>
+  </div>
+
+  <div class="counter-bar">
+    <div>
+      <div class="log-title" style="margin:0 0 2px">Ingresos hoy</div>
+      <div class="counter-num" id="cnt-num">0</div>
+      <div class="counter-breakdown" id="cnt-breakdown"></div>
+    </div>
+    <div style="text-align:right">
+      <div class="log-sub" id="cnt-last"></div>
+    </div>
+  </div>
+
+  <div class="scanner-body">
+    <div id="exp-warn" class="exp-warn" style="display:none"></div>
+
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btn-cam" onclick="setMode('cam')">📷 Cámara</button>
+      <button class="mode-btn" id="btn-manual" onclick="setMode('manual')">⌨️ Manual</button>
+    </div>
+
+    <!-- Camera error -->
+    <div class="cam-err" id="cam-err"></div>
+
+    <!-- Camera view -->
+    <div id="camera-container" class="active">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="cam-overlay">
+        <div class="cam-frame"></div>
+        <div class="cam-line"></div>
+      </div>
+      <div class="cam-status" id="cam-status">Apunta al QR del asistente</div>
+    </div>
+
+    <!-- Manual input -->
+    <div class="scan-display" id="manual-display" style="display:none">
+      <div class="scan-lbl">Código QR del asistente</div>
+      <input class="scan-in" id="sc-in" placeholder="Escribe o pega el código" onkeydown="if(event.key==='Enter')processScan()">
+      <button class="scan-btn" id="scan-btn" onclick="processScan()">Validar QR</button>
+    </div>
+
+    <!-- Result / Verify -->
+    <div id="sc-res"></div>
+
+    <!-- Log -->
+    <div class="log-section">
+      <div class="log-title">Últimas entradas</div>
+      <div id="sc-log"><div class="empty">Sin movimientos aún</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
+// ══════════════════════════════════════════════════
+
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const NOW = () => new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+const TODAY = () => new Date().toLocaleDateString('es-CO');
+
+let tokenData = null;
+let eventoId  = null;
+let pendingVerify = null;
+let cameraStream = null;
+let scannerInterval = null;
+let currentMode = 'cam';
+let lastScanned = '';
+let lastScannedTime = 0;
+let expCheckInterval = null;
+
+function show(id) {
+  ['s-loading','s-error','s-scanner'].forEach(s => {
+    document.getElementById(s).style.display = 'none';
+  });
+  document.getElementById(id).style.display = 'block';
+}
+
+function showError(title, msg) {
+  document.getElementById('err-title').textContent = title;
+  document.getElementById('err-msg').textContent = msg;
+  show('s-error');
+}
+
+// ── INIT ─────────────────────────────────────────
+async function init() {
+  const token = new URLSearchParams(window.location.search).get('token');
+  if (!token) { showError('Link inválido', 'Este link no contiene un código de acceso válido.'); return; }
+
+  const { data, error } = await SB.from('scanner_tokens')
+    .select('*').eq('token', token).single();
+
+  if (error || !data) { showError('Token no encontrado', 'Este link no existe. Pide al administrador un nuevo link.'); return; }
+
+  const now = new Date();
+  const expira = new Date(data.expira_en);
+
+  if (now > expira) {
+    showError('Link expirado', `Este link expiró el ${expira.toLocaleDateString('es-CO')} a las ${expira.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}. Pide al admin un nuevo link.`);
+    return;
+  }
+
+  tokenData = data;
+  eventoId  = data.evento_id;
+
+  // Load event name
+  const { data: ev } = await SB.from('eventos').select('nombre,fecha,hora').eq('id', eventoId).single();
+
+  document.getElementById('hdr-event').textContent = ev ? ev.nombre + ' · ' + ev.fecha : 'Evento';
+  document.title = 'Entrada · ' + (ev?.nombre || 'Evento');
+
+  // Show expiry time
+  const minLeft = Math.round((expira - now) / 60000);
+  const hrsLeft = Math.floor(minLeft / 60);
+  const mLeft   = minLeft % 60;
+  const expStr  = hrsLeft > 0 ? `${hrsLeft}h ${mLeft}m` : `${mLeft}m`;
+  document.getElementById('hdr-exp').textContent = 'Expira en ' + expStr;
+
+  // Warn if < 30 min left
+  if (minLeft < 30) {
+    const warn = document.getElementById('exp-warn');
+    warn.textContent = `⚠ Este link expira en ${expStr}. Pide al admin renovarlo.`;
+    warn.style.display = 'block';
+  }
+
+  // Check expiry every minute
+  expCheckInterval = setInterval(() => {
+    if (new Date() > expira) {
+      clearInterval(expCheckInterval);
+      showError('Link expirado', 'El acceso de esta noche ha terminado.');
+    }
+  }, 60000);
+
+  await updateCounter();
+  show('s-scanner');
+  startCamera();
+
+  // Realtime updates
+  SB.channel('scanner-live').on('postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 'inscritos', filter: `evento_id=eq.${eventoId}` },
+    () => updateCounter()
+  ).subscribe();
+}
+
+// ── COUNTER ──────────────────────────────────────
+async function updateCounter() {
+  const { data } = await SB.from('inscritos').select('tipo,hora_ingreso,nombre')
+    .eq('evento_id', eventoId).eq('used', true).order('hora_ingreso', {ascending: false});
+  const list = data || [];
+  const frecs = list.filter(i => i.tipo === 'frecuente').length;
+  const invs  = list.filter(i => i.tipo === 'invitado').length;
+  document.getElementById('cnt-num').textContent = list.length;
+  document.getElementById('cnt-last').textContent = list.length > 0
+    ? 'Último: ' + list[0].nombre + ' · ' + list[0].hora_ingreso : '';
+  document.getElementById('cnt-breakdown').innerHTML = list.length > 0
+    ? `<span class="badge badge-gold">★ ${frecs}</span><span class="badge badge-teal">◎ ${invs}</span>` : '';
+}
+
+// ── CAMERA ───────────────────────────────────────
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-cam').classList.toggle('active', mode === 'cam');
+  document.getElementById('btn-manual').classList.toggle('active', mode === 'manual');
+  document.getElementById('camera-container').classList.toggle('active', mode === 'cam');
+  document.getElementById('manual-display').style.display = mode === 'manual' ? 'block' : 'none';
+  if (mode === 'cam') startCamera();
+  else stopCamera();
+}
+
+async function startCamera() {
+  const errDiv = document.getElementById('cam-err');
+  errDiv.style.display = 'none';
+  if (!('BarcodeDetector' in window)) {
+    errDiv.innerHTML = '⚠️ Tu navegador no soporta cámara. Usa <strong>Chrome Android</strong> o el modo Manual.';
+    errDiv.style.display = 'block';
+    document.getElementById('camera-container').classList.remove('active');
+    return;
+  }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }
+    });
+    const video = document.getElementById('camera-video');
+    video.srcObject = cameraStream;
+    await video.play();
+    startDetection(video);
+  } catch(e) {
+    let msg = '⚠️ No se pudo acceder a la cámara.';
+    if (e.name === 'NotAllowedError') msg = '⚠️ Permiso de cámara denegado. Acepta el permiso e intenta de nuevo.';
+    errDiv.innerHTML = msg + ' Usa el modo <strong>Manual</strong>.';
+    errDiv.style.display = 'block';
+    document.getElementById('camera-container').classList.remove('active');
+  }
+}
+
+function startDetection(video) {
+  const detector = new BarcodeDetector({ formats: ['qr_code'] });
+  if (scannerInterval) clearInterval(scannerInterval);
+  scannerInterval = setInterval(async () => {
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+    try {
+      const codes = await detector.detect(video);
+      if (codes.length > 0) {
+        const val = codes[0].rawValue;
+        const now = Date.now();
+        if (val === lastScanned && now - lastScannedTime < 3000) return;
+        lastScanned = val; lastScannedTime = now;
+        document.getElementById('cam-status').textContent = '✓ ' + val;
+        clearInterval(scannerInterval);
+        setTimeout(() => startDetection(video), 3000);
+        document.getElementById('sc-in').value = val;
+        await processScan();
+      }
+    } catch(e) {}
+  }, 300);
+}
+
+function stopCamera() {
+  if (scannerInterval) { clearInterval(scannerInterval); scannerInterval = null; }
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+}
+
+// ── SCAN & VERIFY ─────────────────────────────────
+async function processScan() {
+  const code = document.getElementById('sc-in').value.trim().toUpperCase();
+  const res  = document.getElementById('sc-res');
+  if (!code) { res.innerHTML = '<div style="color:var(--red);font-size:13px;padding:.5rem 0">Ingresa un código.</div>'; return; }
+
+  const btn = document.getElementById('scan-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Verificando…'; }
+
+  const { data, error } = await SB.from('inscritos').select('*').eq('qr_code', code).single();
+  if (btn) { btn.disabled = false; btn.textContent = 'Validar QR'; }
+  document.getElementById('sc-in').value = '';
+
+  if (error || !data) {
+    res.innerHTML = `<div class="res-card res-err">
+      <div style="font-size:16px;font-weight:500;color:var(--red)">✗ Código no encontrado</div>
+      <div style="font-size:13px;margin-top:.2rem;opacity:.8">El código <strong>${code}</strong> no existe.</div>
+    </div>`;
+    addLog('✗ Inválido', 'Código: ' + code, '#fca5a5'); return;
+  }
+
+  if (data.evento_id !== eventoId) {
+    res.innerHTML = `<div class="res-card res-warn">
+      <div style="font-size:16px;font-weight:500">⚠ Evento incorrecto</div>
+      <div class="res-name">${data.nombre}</div>
+      <div style="font-size:13px;opacity:.8">Inscrito en <strong>${data.evento_nombre}</strong>, no en este evento.</div>
+    </div>`;
+    return;
+  }
+
+  if (data.used) {
+    res.innerHTML = `<div class="res-card res-err">
+      <div style="font-size:16px;font-weight:500;color:var(--red)">✗ QR ya utilizado</div>
+      <div class="res-name">${data.nombre}</div>
+      <div style="font-size:13px;opacity:.8">Ya ingresó a las <strong>${data.hora_ingreso}</strong> del <strong>${data.fecha_ingreso}</strong>.</div>
+    </div>`;
+    addLog('✗ Ya usado', data.nombre, '#fca5a5'); return;
+  }
+
+  // Valid → show verify card
+  pendingVerify = data;
+  showVerify(data);
+}
+
+function showVerify(ins) {
+  const ini = ins.nombre.split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
+  const tipoBadge = ins.tipo === 'frecuente'
+    ? '<span class="badge badge-gold">★ Cliente frecuente</span>'
+    : '<span class="badge badge-teal">◎ Invitado</span>';
+  const avatarClass = ins.tipo === 'frecuente' ? 'va-frecuente' : 'va-invitado';
+  document.getElementById('sc-res').innerHTML = `<div class="verify-card">
+    <div class="verify-person">
+      <div class="verify-avatar ${avatarClass}">${ini}</div>
+      <div>
+        ${tipoBadge}
+        <div class="verify-name">${ins.nombre}</div>
+        <div class="verify-sub">${ins.evento_nombre}</div>
+      </div>
+    </div>
+    <div class="doc-row">
+      <span class="doc-label">Documento registrado</span>
+      <span class="doc-value">${ins.cedula}</span>
+    </div>
+    <div class="verify-note">Pide el documento físico y confirma que el número <strong>${ins.cedula}</strong> coincide.</div>
+    <div class="verify-btns">
+      <button class="btn-permit" onclick="confirmEntry()">✓ Verificado · Permitir</button>
+      <button class="btn-deny" onclick="denyEntry()">✗ No coincide · Denegar</button>
+    </div>
+  </div>`;
+}
+
+async function confirmEntry() {
+  if (!pendingVerify) return;
+  const ins = pendingVerify; pendingVerify = null;
+  const hora = NOW(), fecha = TODAY();
+  const { error } = await SB.from('inscritos')
+    .update({ used: true, hora_ingreso: hora, fecha_ingreso: fecha })
+    .eq('id', ins.id);
+  if (error) {
+    document.getElementById('sc-res').innerHTML = `<div class="res-card res-err"><div style="font-size:15px;color:var(--red)">Error al registrar</div><div style="font-size:12px">${error.message}</div></div>`;
+    return;
+  }
+  await SB.from('logs').insert({ hora, fecha, nombre:ins.nombre, cedula:ins.cedula, evento:ins.evento_nombre, tipo:ins.tipo, resultado:'Ingreso' });
+  const tipoBadge = ins.tipo === 'frecuente'
+    ? '<span class="badge badge-gold">★ Frecuente</span>'
+    : '<span class="badge badge-teal">◎ Invitado</span>';
+  document.getElementById('sc-res').innerHTML = `<div class="res-card res-ok">
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:.2rem">${tipoBadge}</div>
+    <div style="font-size:16px;font-weight:500;color:var(--green)">✓ Acceso permitido</div>
+    <div class="res-name">${ins.nombre}</div>
+    <div style="font-size:12px;color:var(--green);opacity:.8">${ins.cedula} · ${hora}</div>
+    <div style="font-size:11px;margin-top:.35rem;opacity:.5">QR cancelado — uso único</div>
+  </div>`;
+  addLog('✓ ' + ins.nombre, ins.tipo === 'frecuente' ? '★ Frecuente' : '◎ Invitado', '#74c69d');
+  await updateCounter();
+}
+
+async function denyEntry() {
+  if (!pendingVerify) return;
+  const ins = pendingVerify; pendingVerify = null;
+  await SB.from('logs').insert({ hora:NOW(), fecha:TODAY(), nombre:ins.nombre, cedula:ins.cedula, evento:ins.evento_nombre, tipo:ins.tipo, resultado:'Denegado' });
+  document.getElementById('sc-res').innerHTML = `<div class="res-card res-err">
+    <div style="font-size:16px;font-weight:500;color:var(--red)">✗ Acceso denegado</div>
+    <div class="res-name">${ins.nombre}</div>
+    <div style="font-size:13px;opacity:.8">Documento no coincide. QR no consumido.</div>
+  </div>`;
+  addLog('✗ Denegado · ' + ins.nombre, 'Documento no coincide', '#fca5a5');
+}
+
+function addLog(nom, sub, color) {
+  const el = document.getElementById('sc-log');
+  const prev = el.innerHTML.includes('Sin movimientos') ? '' : el.innerHTML;
+  el.innerHTML = `<div class="log-row">
+    <div class="log-dot" style="background:${color}"></div>
+    <div><div class="log-name">${nom}</div><div class="log-sub">${sub} · ${NOW()}</div></div>
+  </div>` + prev;
+}
+
+init();
+</script>
+</body>
+</html>
