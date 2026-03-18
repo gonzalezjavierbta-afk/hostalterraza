@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Perfil · Terraza Hostal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#181815;--ink2:#52524d;--ink3:#9a9a94;
+  --paper:#f9f9f6;--surface:#f2f2ee;--border:#e2e2da;
+  --gold:#c8a96e;--gold-d:#a8893e;--gold-bg:#fdf6e8;--gold-border:#e8d5a0;
+  --green:#2d6a4f;--green-bg:#d8f3dc;--green-border:#74c69d;
+  --red:#9b2226;--red-bg:#fde8e8;
+  --teal:#0d6e6e;--teal-bg:#e0f4f4;--teal-border:#7ecece;
+  --r:14px;--rsm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400}
+
+/* NAV */
+.nav{background:var(--ink);padding:.75rem 1.5rem;display:flex;align-items:center;gap:12px}
+.nav-brand{font-family:'DM Serif Display',serif;color:var(--gold);font-size:16px;margin-right:auto}
+.nav-back{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.15);transition:.15s}
+.nav-back:hover{color:#fff;border-color:rgba(255,255,255,.35)}
+
+/* LAYOUT */
+.wrap{max-width:700px;margin:0 auto;padding:2rem 1.5rem}
+
+/* HERO */
+.hero{display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap}
+.avatar{width:80px;height:80px;border-radius:50%;background:var(--gold-bg);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:28px;color:var(--gold-d);flex-shrink:0}
+.hero-info{flex:1}
+.hero-name{font-size:28px;margin-bottom:.2rem}
+.hero-meta{font-size:13px;color:var(--ink3);margin-top:.2rem}
+.vip-badge{display:inline-flex;align-items:center;gap:4px;background:var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:500;margin-top:.5rem}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-title{font-size:12px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+.field-row{display:flex;align-items:flex-start;gap:12px;padding:.6rem 0;border-bottom:1px solid var(--surface)}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:12px;color:var(--ink3);width:130px;flex-shrink:0;padding-top:2px}
+.field-val{font-size:14px;color:var(--ink);flex:1}
+.field-edit{font-size:12px;color:var(--gold-d);cursor:pointer;margin-left:auto;padding:2px 8px;border-radius:4px;border:1px solid var(--gold-border);background:var(--gold-bg)}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.stat-box{background:var(--surface);border-radius:var(--rsm);padding:.9rem 1rem;text-align:center}
+.stat-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--ink);line-height:1}
+.stat-lbl{font-size:11px;color:var(--ink3);margin-top:4px}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+.tag-add{background:var(--surface);color:var(--ink3);border:1px dashed var(--border);cursor:pointer}
+
+/* HISTORIAL */
+.ev-row{display:flex;align-items:center;gap:12px;padding:.7rem 0;border-bottom:1px solid var(--surface)}
+.ev-row:last-child{border-bottom:none}
+.ev-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.ev-name{flex:1;font-size:14px;font-weight:500}
+.ev-date{font-size:12px;color:var(--ink3)}
+.ev-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.ev-badge-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.ev-badge-no{background:var(--surface);color:var(--ink3);border:1px solid var(--border)}
+
+/* NOTA */
+textarea{width:100%;border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:80px;outline:none;color:var(--ink)}
+textarea:focus{border-color:var(--gold)}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{position:relative;width:42px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:12px;cursor:pointer;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--gold)}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);border:1px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:.15s;background:#fff;color:var(--ink)}
+.btn:hover{background:var(--surface)}
+.btn-gold{background:var(--gold);color:#fff;border-color:var(--gold)}.btn-gold:hover{background:var(--gold-d)}
+.btn-red{color:var(--red);border-color:var(--red-bg)}.btn-red:hover{background:var(--red-bg)}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{color:var(--ink3);font-size:13px;padding:1rem 0;text-align:center}
+.alert-ok{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--rsm);padding:8px 12px;font-size:13px;color:var(--green);margin-bottom:.75rem}
+.alert-err{background:var(--red-bg);border:1px solid #fca5a5;border-radius:var(--rsm);padding:8px 12px;font-size:13px;color:var(--red);margin-bottom:.75rem}
+
+/* LOADING/ERROR */
+.full{min-height:80vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.75rem;text-align:center;padding:2rem}
+.spin-lg{width:36px;height:36px;border:3px solid rgba(200,169,110,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Terraza · Hostal</div>
+  <a href="/admin.html" class="nav-back">← Volver al admin</a>
+</nav>
+
+<div id="s-loading" class="full">
+  <div class="spin-lg"></div>
+  <p style="font-size:13px;color:var(--ink3)">Cargando perfil…</p>
+</div>
+
+<div id="s-error" class="full" style="display:none">
+  <div style="font-size:32px;margin-bottom:.5rem">⚠</div>
+  <h3>Cliente no encontrado</h3>
+  <p style="font-size:13px;color:var(--ink3)">El perfil no existe o fue eliminado.</p>
+</div>
+
+<div id="s-content" style="display:none">
+<div class="wrap">
+
+  <div id="save-alert"></div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="avatar" id="p-avatar"></div>
+    <div class="hero-info">
+      <h1 class="hero-name" id="p-nombre"></h1>
+      <div class="hero-meta" id="p-meta"></div>
+      <div id="p-vip-badge" style="display:none" class="vip-badge">★ Cliente VIP</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+      <div class="toggle-wrap">
+        <span style="font-size:13px;color:var(--ink2)">VIP</span>
+        <label class="toggle"><input type="checkbox" id="vip-toggle" onchange="toggleVIP(this.checked)"><div class="toggle-slider"></div></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-num" id="p-total-ev">—</div>
+      <div class="stat-lbl">Eventos totales</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="p-asistio">—</div>
+      <div class="stat-lbl">Asistió a</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="p-ultima">—</div>
+      <div class="stat-lbl">Última visita</div>
+    </div>
+  </div>
+
+  <!-- INFO DE CONTACTO -->
+  <div class="card">
+    <div class="card-title">Información</div>
+    <div class="field-row">
+      <div class="field-label">Cédula</div>
+      <div class="field-val" id="p-cedula"></div>
+    </div>
+    <div class="field-row">
+      <div class="field-label">Teléfono</div>
+      <div class="field-val" id="p-tel"></div>
+    </div>
+    <div class="field-row" id="p-email-row" style="display:none">
+      <div class="field-label">Email</div>
+      <div class="field-val" id="p-email"></div>
+    </div>
+    <div class="field-row" id="p-ig-row" style="display:none">
+      <div class="field-label">Instagram</div>
+      <div class="field-val" id="p-ig"></div>
+    </div>
+  </div>
+
+  <!-- GÉNEROS FAVORITOS -->
+  <div class="card">
+    <div class="card-title">Géneros favoritos</div>
+    <div class="tags" id="p-tags">
+      <span class="empty" style="padding:.25rem 0">Sin géneros registrados</span>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:8px;flex-wrap:wrap">
+      <select id="tag-select" style="flex:1;padding:7px 10px;border-radius:var(--rsm);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper)">
+        <option value="">+ Agregar género</option>
+        <option value="jazz">Jazz</option>
+        <option value="salsa">Salsa</option>
+        <option value="rock">Rock</option>
+        <option value="electrónica">Electrónica</option>
+        <option value="cumbia">Cumbia</option>
+        <option value="reggaeton">Reggaeton</option>
+        <option value="vallenato">Vallenato</option>
+        <option value="hip-hop">Hip-hop</option>
+        <option value="clásica">Clásica</option>
+        <option value="pop">Pop</option>
+      </select>
+      <button class="btn btn-gold" onclick="addTag()">Agregar</button>
+    </div>
+  </div>
+
+  <!-- NOTA INTERNA -->
+  <div class="card">
+    <div class="card-title">Nota interna del admin</div>
+    <textarea id="p-nota" placeholder="Escribe una nota sobre este cliente…" rows="3"></textarea>
+    <div style="margin-top:.6rem;display:flex;justify-content:flex-end">
+      <button class="btn btn-gold" onclick="guardarNota()">Guardar nota</button>
+    </div>
+  </div>
+
+  <!-- INSTAGRAM -->
+  <div class="card">
+    <div class="card-title">Instagram</div>
+    <div style="display:flex;gap:8px">
+      <input id="ig-input" placeholder="@usuario" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:14px">
+      <button class="btn btn-gold" onclick="guardarIG()">Guardar</button>
+    </div>
+  </div>
+
+  <!-- HISTORIAL DE EVENTOS -->
+  <div class="card">
+    <div class="card-title">Historial de eventos</div>
+    <div id="p-historial"><div class="empty">Cargando historial…</div></div>
+  </div>
+
+  <!-- PELIGRO -->
+  <div class="card" style="border-color:var(--red-bg)">
+    <div class="card-title" style="color:var(--red)">Zona de peligro</div>
+    <button class="btn btn-red" onclick="eliminarCliente()">Eliminar cliente permanentemente</button>
+  </div>
+
+</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let cliente = null;
+let clienteTags = [];
+
+function show(id) {
+  ['s-loading','s-error','s-content'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? (id==='s-content'?'block':'flex') : 'none';
+  });
+}
+
+async function init() {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) { show('s-error'); return; }
+
+  const { data, error } = await SB.from('clientes').select('*').eq('id', id).single();
+  if (error || !data) { show('s-error'); return; }
+  cliente = data;
+  clienteTags = data.tags || [];
+
+  // Llenar hero
+  const ini = data.nombre.split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
+  document.getElementById('p-avatar').textContent = ini;
+  document.getElementById('p-nombre').textContent = data.nombre;
+  document.getElementById('p-meta').textContent =
+    (data.cedula || '') + (data.telefono ? ' · ' + data.telefono : '');
+  document.title = data.nombre + ' · Terraza';
+
+  if (data.vip) {
+    document.getElementById('p-vip-badge').style.display = 'inline-flex';
+    document.getElementById('vip-toggle').checked = true;
+  }
+
+  // Info
+  document.getElementById('p-cedula').textContent = data.cedula || '—';
+  document.getElementById('p-tel').textContent    = data.telefono || '—';
+  if (data.email) {
+    document.getElementById('p-email').textContent = data.email;
+    document.getElementById('p-email-row').style.display = 'flex';
+  }
+  if (data.instagram) {
+    document.getElementById('p-ig').textContent = data.instagram;
+    document.getElementById('p-ig-row').style.display = 'flex';
+    document.getElementById('ig-input').value = data.instagram;
+  }
+
+  // Nota
+  if (data.nota) document.getElementById('p-nota').value = data.nota;
+
+  // Tags
+  renderTags();
+
+  // Cargar historial de inscritos
+  const { data: inscritos } = await SB.from('inscritos')
+    .select('*').eq('cliente_id', id).order('created_at', {ascending:false});
+  const list = inscritos || [];
+
+  const asistidos = list.filter(i => i.used).length;
+  document.getElementById('p-total-ev').textContent = list.length;
+  document.getElementById('p-asistio').textContent  = asistidos;
+
+  // Última visita
+  const ultVisita = data.ultima_visita ||
+    (list.filter(i=>i.used)[0]?.fecha_ingreso) ||
+    (list[0]?.evento_fecha) || null;
+  document.getElementById('p-ultima').textContent = ultVisita
+    ? formatDate(ultVisita) : '—';
+
+  // Historial
+  const hist = document.getElementById('p-historial');
+  if (!list.length) {
+    hist.innerHTML = '<div class="empty">Sin eventos registrados</div>';
+  } else {
+    hist.innerHTML = list.map(i => `
+      <div class="ev-row">
+        <div class="ev-dot" style="background:${i.used?'var(--green)':'var(--ink3)'}"></div>
+        <div class="ev-name">${i.evento_nombre}</div>
+        <div class="ev-date">${formatDate(i.evento_fecha)}</div>
+        <span class="ev-badge ${i.used?'ev-badge-ok':'ev-badge-no'}">${i.used?'✓ Asistió':'No asistió'}</span>
+      </div>`).join('');
+  }
+
+  show('s-content');
+}
+
+function formatDate(f) {
+  if (!f) return '—';
+  const parts = f.includes('-') ? f.split('-') : f.split('/').reverse();
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+}
+
+function renderTags() {
+  const wrap = document.getElementById('p-tags');
+  if (!clienteTags.length) {
+    wrap.innerHTML = '<span style="font-size:13px;color:var(--ink3)">Sin géneros registrados</span>';
+    return;
+  }
+  wrap.innerHTML = clienteTags.map(t => `
+    <span class="tag">${t}
+      <span onclick="removeTag('${t}')" style="margin-left:6px;cursor:pointer;opacity:.6;font-size:14px;line-height:1">×</span>
+    </span>`).join('');
+}
+
+async function addTag() {
+  const sel = document.getElementById('tag-select');
+  const val = sel.value;
+  if (!val || clienteTags.includes(val)) { sel.value=''; return; }
+  clienteTags = [...clienteTags, val];
+  sel.value = '';
+  renderTags();
+  await SB.from('clientes').update({ tags: clienteTags }).eq('id', cliente.id);
+}
+
+async function removeTag(tag) {
+  clienteTags = clienteTags.filter(t => t !== tag);
+  renderTags();
+  await SB.from('clientes').update({ tags: clienteTags }).eq('id', cliente.id);
+}
+
+async function toggleVIP(val) {
+  document.getElementById('p-vip-badge').style.display = val ? 'inline-flex' : 'none';
+  await SB.from('clientes').update({ vip: val }).eq('id', cliente.id);
+  showAlert(val ? '★ Marcado como VIP' : 'VIP removido', 'ok');
+}
+
+async function guardarNota() {
+  const nota = document.getElementById('p-nota').value.trim();
+  await SB.from('clientes').update({ nota }).eq('id', cliente.id);
+  showAlert('Nota guardada', 'ok');
+}
+
+async function guardarIG() {
+  const ig = document.getElementById('ig-input').value.trim();
+  await SB.from('clientes').update({ instagram: ig || null }).eq('id', cliente.id);
+  document.getElementById('p-ig').textContent = ig;
+  document.getElementById('p-ig-row').style.display = ig ? 'flex' : 'none';
+  showAlert('Instagram guardado', 'ok');
+}
+
+async function eliminarCliente() {
+  if (!confirm(`¿Eliminar permanentemente a ${cliente.nombre}? Esta acción no se puede deshacer.`)) return;
+  await SB.from('inscritos').update({ cliente_id: null }).eq('cliente_id', cliente.id);
+  await SB.from('clientes').delete().eq('id', cliente.id);
+  window.location.href = '/admin.html';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('save-alert');
+  el.innerHTML = `<div class="alert-${type}" style="margin-bottom:1rem">${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 2500);
+}
+
+init();
+</script>
+</body>
+</html>
