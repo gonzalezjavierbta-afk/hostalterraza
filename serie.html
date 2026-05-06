@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Serie · Terraza Hostal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c8a96e;--gold-d:#a8893e;
+  --green:#2d6a4f;--green-bg:#d8f3dc;--green-border:#74c69d;
+  --red:#9b2226;--red-bg:#fde8e8;
+  --teal:#0d6e6e;--teal-bg:#e0f4f4;
+  --r:14px;--rsm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:#fff}
+
+/* LOADING */
+#s-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.75rem}
+.spin{width:36px;height:36px;border:3px solid rgba(200,169,110,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ERROR */
+#s-error{display:none;min-height:100vh;align-items:center;justify-content:center;padding:2rem}
+.err-card{background:#1a1a17;border:1px solid #333;border-radius:20px;padding:2.5rem;text-align:center;max-width:360px;width:100%}
+
+/* HERO */
+.hero{position:relative;padding:3rem 1.5rem 2rem;max-width:540px;margin:0 auto}
+.hero-bg{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.5),rgba(0,0,0,.92) 70%,#0a0a08)}
+.hero-content{position:relative;z-index:1}
+.hero-brand{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2.5rem}
+.hero-eyebrow{font-size:11px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(32px,8vw,52px);line-height:1.1;margin-bottom:.75rem}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.65;margin-top:.5rem}
+.hero-divider{width:36px;height:2px;background:var(--gold);margin:.75rem 0;opacity:.6}
+
+/* SESIONES */
+.sessions-wrap{position:relative;z-index:1;max-width:540px;margin:0 auto;padding:0 1.5rem 3rem}
+.sec-label{font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+.session-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s}
+.session-card:hover{background:rgba(255,255,255,.07);border-color:rgba(200,169,110,.4)}
+.session-card.selected{background:rgba(200,169,110,.08);border-color:var(--gold)}
+.session-card.past{opacity:.45}
+.session-num{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0}
+.session-num.selected{background:var(--gold);color:#0a0a08}
+.session-info{flex:1}
+.session-date{font-size:14px;font-weight:500}
+.session-meta{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px}
+.session-count{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.4);flex-shrink:0}
+.session-count.active{background:rgba(200,169,110,.15);color:var(--gold)}
+
+/* FORM */
+.form-section{position:relative;z-index:1;max-width:540px;margin:0 auto;padding:0 1.5rem 3rem}
+.form-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:1.75rem;backdrop-filter:blur(10px)}
+.selected-session-badge{background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:8px;padding:.6rem 1rem;margin-bottom:1.25rem;font-size:13px;color:var(--gold)}
+.form-title{font-size:12px;font-weight:500;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.25rem}
+.fg{margin-bottom:.85rem}
+.fg label{display:block;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.fg input,.fg select{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:var(--rsm);padding:11px 13px;font-size:14px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:.15s}
+.fg input::placeholder{color:rgba(255,255,255,.22)}
+.fg input:focus,.fg select:focus{border-color:var(--gold);background:rgba(255,255,255,.1)}
+.fg select option{background:#1a1a17;color:#fff}
+.submit-btn{width:100%;padding:14px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-family:'Playfair Display',serif;letter-spacing:.04em;cursor:pointer;transition:.15s;margin-top:.5rem}
+.submit-btn:hover{background:var(--gold-d)}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed}
+.alert-err{background:rgba(155,34,38,.2);border:1px solid rgba(252,165,165,.3);border-radius:var(--rsm);padding:9px 13px;font-size:13px;color:#fca5a5;margin-bottom:.85rem}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+
+/* TICKET */
+#s-success{display:none;min-height:100vh;background:#0a0a08;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+.success-head{text-align:center;margin-bottom:1.5rem}
+.success-head h2{font-family:'Playfair Display',serif;font-size:26px}
+.success-head p{font-size:13px;color:rgba(255,255,255,.4);margin-top:.4rem}
+#ticket-card{width:100%;max-width:370px;background:#0F0F0F;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.tk-strip{height:7px;background:var(--gold);width:100%}
+.tk-header{padding:16px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.tk-hostal{font-weight:700;font-size:14px;color:var(--gold);letter-spacing:.04em}
+.tk-terraza{font-weight:300;font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.06em;margin-top:1px}
+.tk-badge{background:var(--gold);border-radius:5px;padding:3px 10px;font-weight:700;font-size:10px;color:#0F0F0F;letter-spacing:.06em}
+.tk-divider{height:1px;background:#2D2D2A;margin:10px 20px 0}
+.tk-event{padding:10px 20px 0}
+.tk-ev-lbl{font-size:9px;font-weight:500;color:#646460;letter-spacing:.1em;margin-bottom:2px}
+.tk-ev1{font-weight:700;font-size:22px;color:#fff;line-height:1.1}
+.tk-ev2{font-weight:700;font-size:22px;color:var(--gold);line-height:1.1}
+.tk-session{padding:6px 20px 0;font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.04em}
+.tk-inforow{padding:8px 20px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.tk-info-block label{font-size:9px;font-weight:500;color:#646460;letter-spacing:.1em;display:block;margin-bottom:1px}
+.tk-info-block span{font-weight:700;font-size:13px;color:#fff}
+.tk-qr-area{padding:12px 20px 4px;text-align:center}
+.tk-qr-wrap{display:inline-block;background:#fff;border-radius:8px;padding:10px}
+.tk-qr-label{font-size:8px;color:#646460;letter-spacing:.08em;margin-top:4px}
+.tk-guest{padding:8px 20px 0}
+.tk-guest-lbl{font-size:9px;font-weight:500;color:#646460;letter-spacing:.1em;margin-bottom:2px}
+.tk-guest-name{font-weight:700;font-size:18px;color:#fff}
+.tk-ref{font-size:9px;color:rgba(255,255,255,.3);margin-top:3px;letter-spacing:.04em}
+.tk-tipo{display:inline-flex;align-items:center;margin-top:5px;border:1.5px solid var(--gold);border-radius:5px;padding:2px 8px;font-size:9px;font-weight:500;color:var(--gold);letter-spacing:.06em}
+.tk-code{padding:6px 20px 12px;font-size:9px;color:#444;letter-spacing:.04em}
+.dl-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:370px;padding:13px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:14px;font-family:'Playfair Display',serif;letter-spacing:.04em;cursor:pointer;margin-top:1.25rem;transition:.15s}
+.dl-btn:hover{background:var(--gold-d)}
+
+/* DUPLICATE */
+#s-duplicate{display:none;min-height:100vh;background:#0a0a08;align-items:center;justify-content:center;padding:2rem}
+</style>
+</head>
+<body>
+
+<div id="s-loading">
+  <div class="spin"></div>
+  <p style="font-size:13px;color:rgba(255,255,255,.35)">Cargando…</p>
+</div>
+
+<div id="s-error" style="display:none;flex">
+  <div class="err-card">
+    <div style="font-size:28px;margin-bottom:.5rem">⚠</div>
+    <h3 style="font-size:18px;margin-bottom:.4rem">Serie no encontrada</h3>
+    <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.6">El link no corresponde a ninguna serie activa.</p>
+  </div>
+</div>
+
+<div id="s-main" style="display:none">
+  <div class="hero-bg" id="hero-bg"></div>
+
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-brand">Terraza · Hostal</div>
+      <div class="hero-eyebrow">Serie de eventos</div>
+      <h1 class="hero-title" id="s-titulo"></h1>
+      <div class="hero-divider"></div>
+      <p class="hero-desc" id="s-desc"></p>
+    </div>
+  </div>
+
+  <div class="sessions-wrap">
+    <div class="sec-label">Selecciona una sesión para registrarte</div>
+    <div id="sessions-list"></div>
+  </div>
+
+  <div class="form-section" id="form-section" style="display:none">
+    <!-- Banner de invitador -->
+    <div id="inv-banner" style="display:none;background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.25);border-radius:var(--rsm);padding:.6rem 1rem;margin-bottom:.75rem;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.75)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <span>Invitado por <strong id="inv-banner-nombre" style="color:#c8a96e"></strong></span>
+    </div>
+    <div class="form-card">
+      <div class="selected-session-badge" id="selected-badge">Sesión seleccionada</div>
+      <div class="form-title">Datos de registro</div>
+      <div id="form-alert"></div>
+      <!-- Tabs nuevo / ya registrado -->
+      <div style="display:flex;gap:0;margin-bottom:1.25rem;border-radius:var(--rsm);overflow:hidden;border:1px solid rgba(255,255,255,.15)">
+        <button id="tab-nuevo" onclick="setModo('nuevo')" style="flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--gold);color:#fff">Registro nuevo</button>
+        <button id="tab-existe" onclick="setModo('existe')" style="flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)">Ya estoy registrado</button>
+      </div>
+
+      <!-- Modo nuevo -->
+      <div id="modo-nuevo">
+        <div class="fg"><label>Nombre completo *</label><input id="f-nombre" placeholder="Tu nombre completo" autocomplete="name"></div>
+        <div class="fg"><label>Cédula / Documento *</label><input id="f-cedula" placeholder="Número de documento" inputmode="numeric"></div>
+        <div class="fg"><label>Teléfono *</label>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <div style="position:relative;flex-shrink:0">
+              <select id="f-pais-codigo" onchange="onPaisChangeSerie()"
+                style="appearance:none;-webkit-appearance:none;padding:11px 28px 11px 10px;height:100%;border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);background:rgba(255,255,255,.07);color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;min-width:90px;outline:none">
+                <option value="+57" data-pais="Colombia">🇨🇴 +57</option>
+                <option value="+1" data-pais="Estados Unidos">🇺🇸 +1</option>
+                <option value="+52" data-pais="México">🇲🇽 +52</option>
+                <option value="+54" data-pais="Argentina">🇦🇷 +54</option>
+                <option value="+56" data-pais="Chile">🇨🇱 +56</option>
+                <option value="+51" data-pais="Perú">🇵🇪 +51</option>
+                <option value="+58" data-pais="Venezuela">🇻🇪 +58</option>
+                <option value="+593" data-pais="Ecuador">🇪🇨 +593</option>
+                <option value="+591" data-pais="Bolivia">🇧🇴 +591</option>
+                <option value="+598" data-pais="Uruguay">🇺🇾 +598</option>
+                <option value="+595" data-pais="Paraguay">🇵🇾 +595</option>
+                <option value="+506" data-pais="Costa Rica">🇨🇷 +506</option>
+                <option value="+507" data-pais="Panamá">🇵🇦 +507</option>
+                <option value="+503" data-pais="El Salvador">🇸🇻 +503</option>
+                <option value="+502" data-pais="Guatemala">🇬🇹 +502</option>
+                <option value="+504" data-pais="Honduras">🇭🇳 +504</option>
+                <option value="+505" data-pais="Nicaragua">🇳🇮 +505</option>
+                <option value="+34" data-pais="España">🇪🇸 +34</option>
+                <option value="+44" data-pais="Reino Unido">🇬🇧 +44</option>
+                <option value="+33" data-pais="Francia">🇫🇷 +33</option>
+                <option value="+49" data-pais="Alemania">🇩🇪 +49</option>
+                <option value="+39" data-pais="Italia">🇮🇹 +39</option>
+                <option value="+55" data-pais="Brasil">🇧🇷 +55</option>
+                <option value="+1-CA" data-pais="Canadá">🇨🇦 +1</option>
+                <option value="+61" data-pais="Australia">🇦🇺 +61</option>
+              </select>
+              <span style="position:absolute;right:7px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:10px;color:rgba(255,255,255,.4)">▼</span>
+            </div>
+            <input id="f-tel" placeholder="Número sin código de país" type="tel" inputmode="numeric"
+              style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none">
+          </div>
+          <input type="hidden" id="f-pais-nombre" value="Colombia">
+        </div>
+        <div class="fg" id="campo-email-serie" style="display:none"><label>Correo electrónico</label><input id="f-email" type="email" placeholder="tu@email.com" autocomplete="email"
+          style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none"></div>
+        <div class="fg" id="campo-edad-serie" style="display:none"><label>Edad</label><input id="f-edad" type="number" placeholder="Tu edad" inputmode="numeric" min="1" max="120"
+          style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none"></div>
+        <div class="fg" id="campo-nota-serie" style="display:none"><label>Nota (opcional)</label><input id="f-nota" placeholder="Algo que quieras decirnos"
+          style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none"></div>
+        <button class="submit-btn" id="submit-btn" onclick="registrar()">Confirmar asistencia →</button>
+      </div>
+
+      <!-- Modo existente -->
+      <div id="modo-existe" style="display:none">
+        <div id="paso-verificar">
+          <div class="fg"><label>Cédula *</label><input id="ex-cedula" placeholder="Número de documento" inputmode="numeric"></div>
+          <div class="fg"><label>Teléfono *</label><input id="ex-tel" placeholder="Número de celular" type="tel" inputmode="numeric"></div>
+          <button class="submit-btn" id="verify-btn" onclick="verificarExistente()">Verificar mis datos →</button>
+        </div>
+        <div id="paso-confirmar" style="display:none">
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--rsm);padding:1rem;margin-bottom:1rem">
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em">Encontramos tu registro</div>
+            <div id="conf-nombre" style="font-size:18px;font-weight:500"></div>
+            <div id="conf-meta" style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px"></div>
+          </div>
+          <button class="submit-btn" id="confirm-btn" onclick="inscribirExistente()">✓ Inscribirme a esta sesión →</button>
+          <button onclick="resetVerif()" style="width:100%;margin-top:.5rem;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:rgba(255,255,255,.5);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer">No soy yo · Intentar de nuevo</button>
+        </div>
+        <div id="paso-noencontrado" style="display:none;text-align:center;padding:1rem 0">
+          <div style="font-size:24px;margin-bottom:.4rem">🔍</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:.4rem">No encontramos tu registro</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:1rem">Usa el formulario de registro nuevo.</p>
+          <button onclick="setModo('nuevo')" style="padding:9px 20px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:13px;cursor:pointer">Registrarme →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="s-success">
+  <div class="success-head">
+    <h2>¡Te esperamos!</h2>
+    <p>Tu entrada personal está lista.</p>
+  </div>
+  <div id="ticket-card">
+    <div class="tk-strip"></div>
+    <div class="tk-header">
+      <div><div class="tk-hostal">HOSTAL</div><div class="tk-terraza">TERRAZA</div></div>
+      <div class="tk-badge">ENTRADA</div>
+    </div>
+    <div class="tk-divider"></div>
+    <div class="tk-event">
+      <div class="tk-ev-lbl">SERIE</div>
+      <div class="tk-ev1" id="tk-ev1"></div>
+      <div class="tk-ev2" id="tk-ev2"></div>
+    </div>
+    <div class="tk-session" id="tk-session"></div>
+    <div class="tk-inforow">
+      <div class="tk-info-block"><label>FECHA</label><span id="tk-fecha"></span></div>
+      <div class="tk-info-block"><label>HORA</label><span id="tk-hora"></span></div>
+      <div class="tk-info-block"><label>SESIÓN</label><span id="tk-num"></span></div>
+    </div>
+    <div class="tk-divider" style="margin-top:10px"></div>
+    <div class="tk-qr-area">
+      <div class="tk-qr-wrap"><div id="tk-qr"></div></div>
+      <div class="tk-qr-label">CÓDIGO QR DE ENTRADA · USO ÚNICO</div>
+    </div>
+    <div class="tk-divider"></div>
+    <div class="tk-guest">
+      <div class="tk-guest-lbl">ASISTENTE</div>
+      <div class="tk-guest-name" id="tk-nombre"></div>
+      <div class="tk-ref" id="tk-ref"></div>
+      <div class="tk-tipo" id="tk-tipo">◎ INVITADO</div>
+    </div>
+    <div class="tk-code" id="tk-code"></div>
+    <div class="tk-strip"></div>
+  </div>
+  <button class="dl-btn" onclick="descargar()" style="margin-top:1.5rem">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Descargar mi entrada
+  </button>
+  <button id="btn-wa-ticket" onclick="enviarTicketWASerie()"
+    style="display:none;align-items:center;justify-content:center;gap:7px;width:100%;max-width:370px;padding:10px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:.6rem">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Enviar por WhatsApp
+  </button>
+  <div id="email-status" style="display:none;margin-top:.75rem;padding:.6rem 1rem;border-radius:8px;font-size:13px;text-align:center;max-width:370px;width:100%"></div>
+  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.75rem">
+    Muestra el QR en la puerta · Uso único y personal
+  </p>
+  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.6rem">Muestra este QR en la puerta · Uso único por sesión</p>
+</div>
+
+<div id="s-duplicate" style="display:none;flex">
+  <div style="text-align:center;padding:2rem 1.5rem;width:100%;max-width:420px">
+    <div style="font-size:28px;margin-bottom:.5rem">✓</div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:.4rem;color:#fff">Ya estás registrado</h3>
+    <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:1.25rem;line-height:1.6">
+      Tu entrada ya fue generada. Puedes recuperarla aquí.
+    </p>
+    <div id="dup-loading" style="margin:1rem auto"><div style="width:32px;height:32px;border:3px solid rgba(200,169,110,.2);border-top-color:#c8a96e;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto"></div></div>
+    <div id="dup-ticket-wrap" style="display:none">
+      <div id="dup-ticket-card" style="background:#0F0F0F;border-radius:16px;overflow:hidden;margin-bottom:1.25rem;max-width:370px;margin-left:auto;margin-right:auto">
+        <div style="height:7px;background:#c8a96e"></div>
+        <div style="padding:16px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div><div style="font-weight:700;font-size:13px;color:#c8a96e">HOSTAL</div><div style="font-weight:300;font-size:11px;color:rgba(255,255,255,.4)">TERRAZA</div></div>
+            <div style="background:#c8a96e;border-radius:5px;padding:3px 10px;font-weight:700;font-size:10px;color:#0F0F0F">ENTRADA</div>
+          </div>
+          <div style="height:1px;background:#2D2D2A;margin-bottom:10px"></div>
+          <div style="font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:4px">EVENTO</div>
+          <div id="dup-ev-nombre" style="font-weight:700;font-size:20px;color:#fff;line-height:1.2;margin-bottom:4px"></div>
+          <div id="dup-sesion-nombre" style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:10px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div><div style="font-size:10px;color:#646460;margin-bottom:2px">FECHA</div><div style="font-weight:700;font-size:14px;color:#fff" id="dup-fecha"></div></div>
+            <div><div style="font-size:10px;color:#646460;margin-bottom:2px">HORA</div><div style="font-weight:700;font-size:14px;color:#fff" id="dup-hora"></div></div>
+          </div>
+          <div style="height:1px;background:#2D2D2A;margin-bottom:12px"></div>
+          <div style="text-align:center">
+            <div id="dup-qr-box" style="display:inline-block;background:#fff;border-radius:8px;padding:10px;margin-bottom:6px"></div>
+            <div style="font-size:9px;color:#646460;letter-spacing:.08em">CÓDIGO QR DEL ASISTENTE</div>
+          </div>
+          <div style="height:1px;background:#2D2D2A;margin:10px 0"></div>
+          <div style="font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:3px">ASISTENTE</div>
+          <div id="dup-nombre" style="font-weight:700;font-size:17px;color:#fff"></div>
+        </div>
+        <div style="height:7px;background:#c8a96e"></div>
+      </div>
+      <button onclick="descargarDupSerie()"
+        style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:370px;padding:13px;background:#c8a96e;color:#fff;border:none;border-radius:var(--rsm);font-size:14px;font-family:'Playfair Display',serif;cursor:pointer;margin-top:.5rem">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar mi entrada
+      </button>
+    </div>
+    <div id="dup-no-encontrado" style="display:none">
+      <p style="font-size:13px;color:rgba(255,255,255,.45)">No encontramos tu registro. Contacta al hostal.</p>
+    </div>
+    <button onclick="show('s-main')" style="margin-top:1rem;padding:9px 18px;background:transparent;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">← Ver otras sesiones</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const TODAY = () => new Date().toLocaleDateString('es-CO');
+const NOW   = () => new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+const UID   = () => (crypto.randomUUID ? crypto.randomUUID().replace(/-/g,'').toUpperCase() : Math.random().toString(36).substr(2,9).toUpperCase()+Math.random().toString(36).substr(2,9).toUpperCase());
+
+let serieActual    = null;
+let sesionesActuales = [];
+let sesionSeleccionada = null;
+let _qrDataUrl = null; // QR dataUrl generado una sola vez
+let clienteEncontrado  = null;
+let refCodigo = '';
+let refNombre = '';
+const TIPOS_VALIDOS = ['invitado','frecuente','artista','produccion','pago'];
+let tipoActual = 'invitado';
+let _serieEmailReq = false;
+
+function show(id) {
+  ['s-loading','s-error','s-main','s-success','s-duplicate'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = s === id ? (s==='s-main'?'block':'flex') : 'none';
+  });
+  if (id === 's-duplicate') cargarQRRecuperadoSerie();
+}
+
+let _serieTicketData = {};
+
+async function cargarQRRecuperadoSerie() {
+  document.getElementById('dup-loading').style.display = 'block';
+  document.getElementById('dup-ticket-wrap').style.display = 'none';
+  document.getElementById('dup-no-encontrado').style.display = 'none';
+
+  const cedula = (document.getElementById('reg-cedula')?.value ||
+                  document.getElementById('ex-cedula')?.value || '').trim();
+  const sesId  = sesionSeleccionada?.id;
+
+  if (!cedula || !sesId) {
+    document.getElementById('dup-loading').style.display = 'none';
+    document.getElementById('dup-no-encontrado').style.display = 'block';
+    return;
+  }
+
+  const { data } = await SB.from('inscritos').select('*')
+    .eq('cedula', cedula).eq('evento_id', sesId).maybeSingle();
+
+  document.getElementById('dup-loading').style.display = 'none';
+  if (!data) { document.getElementById('dup-no-encontrado').style.display = 'block'; return; }
+
+  document.getElementById('dup-nombre').textContent      = data.nombre.toUpperCase();
+  document.getElementById('dup-ev-nombre').textContent   = (serieActual?.nombre||'').toUpperCase();
+  document.getElementById('dup-sesion-nombre').textContent = sesionSeleccionada?.nombre||'';
+  document.getElementById('dup-fecha').textContent       = formatFechaCorta(sesionSeleccionada?.fecha);
+  document.getElementById('dup-hora').textContent        = sesionSeleccionada?.hora || '—';
+
+  // Generar QR en div oculto
+  const qd = document.getElementById('dup-qr-box');
+  qd.innerHTML = '';
+  _qrDataUrl = null;
+  _serieTicketData = { qr: data.qr_code, nombre: data.nombre, telefono: data.telefono };
+
+  await new Promise(resolve => {
+    try {
+      const tmpDiv = document.createElement('div');
+      tmpDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:180px;height:180px;visibility:hidden';
+      document.body.appendChild(tmpDiv);
+      new QRCode(tmpDiv, { text: data.qr_code, width: 180, height: 180, colorDark: '#0F0F0F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+      setTimeout(() => {
+        let dataUrl = null;
+        const cv = tmpDiv.querySelector('canvas');
+        const im = tmpDiv.querySelector('img');
+        if (cv) { try { dataUrl = cv.toDataURL('image/png'); } catch(e) {} }
+        if (!dataUrl && im?.src) dataUrl = im.src;
+        document.body.removeChild(tmpDiv);
+        if (dataUrl) {
+          _qrDataUrl = dataUrl;
+          const img = document.createElement('img');
+          img.src = dataUrl; img.style.cssText = 'width:150px;height:150px;display:block';
+          qd.appendChild(img);
+        } else { qd.textContent = data.qr_code; }
+        resolve();
+      }, 700);
+    } catch(e) { qd.textContent = data.qr_code; resolve(); }
+  });
+
+  document.getElementById('dup-ticket-wrap').style.display = 'block';
+}
+
+async function descargarDupSerie() {
+  const btn = document.querySelector('#s-duplicate button');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generando…'; }
+  try {
+    const cv = await _generarTicketCanvasSerie(_serieTicketData.qr);
+    const dataUrl = cv.toDataURL('image/png');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      const w = window.open();
+      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">Mantén presionado → Guardar en Fotos</p></body></html>`);
+      w.document.close();
+    } else {
+      const a = document.createElement('a'); a.href = dataUrl;
+      a.download = 'entrada-recuperada.png'; a.click();
+    }
+  } catch(e) { alert('Para guardar: mantén presionado el ticket y elige "Guardar imagen".'); }
+  if (btn) { btn.disabled = false; btn.textContent = 'Descargar mi entrada'; }
+}
+
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const slug   = params.get('slug') || location.pathname.split('/s/')[1];
+  const id     = params.get('id');
+  refCodigo    = (params.get('ref') || '').toUpperCase();
+  const tipoParam = (params.get('tipo') || '').toLowerCase();
+  tipoActual = TIPOS_VALIDOS.includes(tipoParam) ? tipoParam : 'invitado';
+
+  if (!slug && !id) { show('s-error'); return; }
+
+  // Cargar serie
+  let q = SB.from('series').select('*,organizaciones(color_primario,logo_url,nombre_app)');
+  if (slug) q = q.eq('slug', slug);
+  else      q = q.eq('id', id);
+  const { data: serie } = await q.maybeSingle();
+  if (!serie) { show('s-error'); return; }
+  serieActual = serie;
+
+  // Aplicar branding de la organización
+  const org = serie.organizaciones;
+  if (org?.color_primario) document.documentElement.style.setProperty('--gold', org.color_primario);
+  if (org?.nombre_app) {
+    document.title = serie.nombre + ' · ' + org.nombre_app;
+  } else {
+    document.title = serie.nombre + ' · Terraza';
+  }
+  if (refCodigo) {
+    const { data: inv } = await SB.from('invitadores')
+      .select('nombre,codigo').eq('codigo', refCodigo).maybeSingle();
+    if (inv) {
+      refNombre = inv.nombre; refCodigo = inv.codigo;
+      const banner = document.getElementById('inv-banner');
+      const bannerNom = document.getElementById('inv-banner-nombre');
+      if (banner && bannerNom) { bannerNom.textContent = refNombre; banner.style.display = 'flex'; }
+    }
+    else { refCodigo = ''; }
+  }
+
+  // Cargar sesiones de la serie
+  const { data: sesiones } = await SB.from('eventos')
+    .select('*').eq('serie_id', serie.id)
+    .order('sesion_num', { ascending: true });
+  sesionesActuales = sesiones || [];
+
+  // Llenar hero
+  document.getElementById('s-titulo').innerHTML =
+    serie.nombre.split(' ').length > 1
+      ? serie.nombre.split(' ').slice(0,-1).join(' ') + '<br><em>' + serie.nombre.split(' ').slice(-1)[0] + '</em>'
+      : serie.nombre;
+  if (serie.descripcion) document.getElementById('s-desc').textContent = serie.descripcion;
+  const bg = document.getElementById('hero-bg');
+  if (serie.imagen_url) { bg.style.backgroundImage = `url(${serie.imagen_url})`; }
+  else { bg.style.background = `linear-gradient(135deg, #1a1a2e, ${serie.color||'#c8a96e'}66)`; }
+
+  // Contar inscritos por sesión
+  const { data: counts } = await SB.from('inscritos')
+    .select('evento_id').in('evento_id', sesionesActuales.map(s=>s.id));
+  const countMap = {};
+  (counts||[]).forEach(i => countMap[i.evento_id] = (countMap[i.evento_id]||0)+1);
+
+  // Renderizar sesiones
+  const now = new Date();
+  const list = document.getElementById('sessions-list');
+  list.innerHTML = sesionesActuales.map(s => {
+    const fecha = new Date(s.fecha + 'T12:00:00');
+    const past = fecha < now;
+    const n = countMap[s.id] || 0;
+    const fechaStr = fecha.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+    return `<div class="session-card${past?' past':''}" onclick="${past?'':''} selectSesion('${s.id}')" id="card-${s.id}">
+      <div class="session-num" id="num-${s.id}">${s.sesion_num||'?'}</div>
+      <div class="session-info">
+        <div class="session-date">${fechaStr.charAt(0).toUpperCase()+fechaStr.slice(1)}</div>
+        <div class="session-meta">${s.hora||''} ${s.ubicacion?'· '+s.ubicacion:''} ${past?'· Pasada':''}</div>
+      </div>
+      <div class="session-count ${n>0?'active':''}" id="cnt-${s.id}">${n} inscritos</div>
+    </div>`;
+  }).join('');
+
+  show('s-main');
+}
+
+function selectSesion(id) {
+  sesionSeleccionada = sesionesActuales.find(s => s.id === id);
+  if (!sesionSeleccionada) return;
+
+  // Highlight seleccionada
+  sesionesActuales.forEach(s => {
+    document.getElementById('card-'+s.id)?.classList.remove('selected');
+    document.getElementById('num-'+s.id)?.classList.remove('selected');
+  });
+  document.getElementById('card-'+id).classList.add('selected');
+  document.getElementById('num-'+id).classList.add('selected');
+
+  // Mostrar form
+  const fecha = new Date(sesionSeleccionada.fecha+'T12:00:00');
+  const fechaStr = fecha.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('selected-badge').innerHTML =
+    `📅 <strong>Sesión ${sesionSeleccionada.sesion_num}</strong> — ${fechaStr.charAt(0).toUpperCase()+fechaStr.slice(1)}` +
+    (refNombre ? ` · <span style="color:var(--gold)">Invitado por ${refNombre}</span>` : '');
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('form-alert').innerHTML = '';
+
+  // Scroll al form
+  setTimeout(() => {
+    document.getElementById('form-section').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 100);
+
+  // Mostrar campos opcionales según form_campos de la sesión
+  _serieEmailReq = sesionSeleccionada?.form_campos?.email || false;
+  const emailField = document.getElementById('campo-email-serie');
+  if (emailField) emailField.style.display = _serieEmailReq ? 'block' : 'none';
+
+  const edadField = document.getElementById('campo-edad-serie');
+  if (edadField) edadField.style.display = sesionSeleccionada?.form_campos?.edad ? 'block' : 'none';
+
+  const notaField = document.getElementById('campo-nota-serie');
+  if (notaField) notaField.style.display = sesionSeleccionada?.form_campos?.nota ? 'block' : 'none';
+}
+
+function setModo(modo) {
+  const esNuevo = modo === 'nuevo';
+  document.getElementById('modo-nuevo').style.display  = esNuevo ? 'block' : 'none';
+  document.getElementById('modo-existe').style.display = esNuevo ? 'none'  : 'block';
+  document.getElementById('tab-nuevo').style.cssText   = `flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:${esNuevo?'var(--gold)':'rgba(255,255,255,.06)'};color:${esNuevo?'#fff':'rgba(255,255,255,.5)'}`;
+  document.getElementById('tab-existe').style.cssText  = `flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:${esNuevo?'rgba(255,255,255,.06)':'var(--gold)'};color:${esNuevo?'rgba(255,255,255,.5)':'#fff'}`;
+  document.getElementById('form-alert').innerHTML = '';
+}
+
+
+// ── Rate limiting anti-spam ───────────────────────────
+const _COOLDOWN_MS = 30000; // 30 segundos entre submissions
+
+function _checkRateLimit() {
+  const last = parseInt(localStorage.getItem('ht_last_submit') || '0');
+  const now  = Date.now();
+  if (now - last < _COOLDOWN_MS) {
+    const resta = Math.ceil((_COOLDOWN_MS - (now - last)) / 1000);
+    return resta; // devuelve segundos que faltan
+  }
+  return 0; // ok
+}
+
+function _setRateLimit() {
+  localStorage.setItem('ht_last_submit', Date.now().toString());
+}
+
+function _startCooldownTimer(btn, originalText) {
+  let secs = Math.ceil(_COOLDOWN_MS / 1000);
+  btn.disabled = true;
+  btn.textContent = `Espera ${secs}s…`;
+  const interval = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(interval);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    } else {
+      btn.textContent = `Espera ${secs}s…`;
+    }
+  }, 1000);
+}
+async function registrar() {
+  // Rate limit: evitar spam de registros
+  const _wait = _checkRateLimit();
+  if (_wait > 0) {
+    alrt(`Espera ${_wait} segundos antes de intentar de nuevo.`);
+    return;
+  }
+  if (!sesionSeleccionada) { alrt('Selecciona una sesión primero.'); return; }
+  const nombre   = document.getElementById('f-nombre').value.trim();
+  const cedula   = document.getElementById('f-cedula').value.trim();
+  const telRaw   = document.getElementById('f-tel').value.trim();
+  const tel      = getTelCompletoSerie();
+  const emailVal = (document.getElementById('f-email')?.value || '').trim() || null;
+  const pais     = getPaisNombreSerie();
+
+  if (!nombre || !cedula || !telRaw) { alrt('Completa todos los campos.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Registrando…';
+
+  // Verificar duplicado
+  const { data:dup } = await SB.from('inscritos').select('id')
+    .eq('cedula', cedula).eq('evento_id', sesionSeleccionada.id);
+  if (dup&&dup.length>0) { btn.disabled=false; btn.textContent='Confirmar asistencia →'; show('s-duplicate'); return; }
+
+  // Verificar aforo máximo si está configurado
+  if (sesionSeleccionada.aforo_max) {
+    const { count:totalIns } = await SB.from('inscritos')
+      .select('*',{count:'exact',head:true}).eq('evento_id', sesionSeleccionada.id);
+    if (totalIns !== null && totalIns >= sesionSeleccionada.aforo_max) {
+      btn.disabled=false; btn.textContent='Confirmar asistencia →';
+      alrt(`Esta sesión ha alcanzado su capacidad máxima de ${sesionSeleccionada.aforo_max} personas.`);
+      return;
+    }
+  }
+
+  const qr = 'QR-'+UID();
+  const edadVal = parseInt(document.getElementById('f-edad')?.value || '') || null;
+  const notaVal = (document.getElementById('f-nota')?.value || '').trim() || null;
+  const { error } = await SB.from('inscritos').insert({
+    tipo:          tipoActual, nombre, cedula, telefono: tel,
+    email:         emailVal,
+    edad:          edadVal,
+    nota_asis:     notaVal,
+    ciudad:        pais,
+    evento_id:     sesionSeleccionada.id,
+    evento_nombre: sesionSeleccionada.nombre,
+    evento_fecha:  sesionSeleccionada.fecha,
+    qr_code: qr, used: false,
+    fecha_inscripcion: TODAY(), hora_inscripcion: NOW(),
+    ref_codigo: refCodigo || null,
+    ref_nombre: refNombre || null,
+    org_id:     serieActual?.org_id || null,
+  });
+
+  btn.disabled=false; btn.textContent='Confirmar asistencia →';
+  if (error) { alrt('Error: '+error.message); return; }
+
+  _setRateLimit(); // cooldown anti-spam
+
+  // Actualizar contador en la UI
+  const cntEl = document.getElementById('cnt-'+sesionSeleccionada.id);
+  if (cntEl) {
+    const cur = parseInt(cntEl.textContent)||0;
+    cntEl.textContent = (cur+1)+' inscritos';
+    cntEl.classList.add('active');
+  }
+
+  _serieTicketData = { qr, nombre, telefono: tel,
+    serieNombre: serieActual?.nombre, sesionNombre: sesionSeleccionada?.nombre,
+    fecha: sesionSeleccionada?.fecha, hora: sesionSeleccionada?.hora };
+  show('s-success');
+  await llenarTicket(nombre, qr, tipoActual);
+  // Notificaciones: WhatsApp + email
+  if (tel) document.getElementById('btn-wa-ticket').style.display = 'flex';
+  if (emailVal) await enviarNotificacionesSerie(nombre, qr, emailVal);
+}
+
+// Verificar usuario existente
+let _existente = null;
+async function verificarExistente() {
+  const cedula = document.getElementById('ex-cedula').value.trim();
+  const telRaw = document.getElementById('ex-tel').value.trim();
+  const tel    = ((document.getElementById('f-pais-codigo')?.value || '+57').replace('-CA','')) + telRaw.replace(/\D/g,'');
+  if (!cedula||!telRaw) { alrt('Ingresa cédula y teléfono.'); return; }
+
+  const btn = document.getElementById('verify-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Verificando…';
+
+  // Buscar en clientes o inscritos anteriores
+  const { data:cli } = await SB.from('clientes').select('*').eq('cedula',cedula).eq('telefono',tel).limit(1);
+  let persona = null;
+  if (cli&&cli.length>0) {
+    persona = {nombre:cli[0].nombre,cedula,telefono:tel,cliente_id:cli[0].id,tipo:cli[0].tipo_default||'frecuente'};
+  } else {
+    const {data:ins} = await SB.from('inscritos').select('nombre,cedula,telefono,cliente_id,tipo')
+      .eq('cedula',cedula).eq('telefono',tel).limit(1);
+    if (ins&&ins.length>0) persona={nombre:ins[0].nombre,cedula,telefono:tel,cliente_id:ins[0].cliente_id||null,tipo:ins[0].tipo||'invitado'};
+  }
+
+  btn.disabled=false; btn.textContent='Verificar mis datos →';
+
+  if (!persona) {
+    document.getElementById('paso-verificar').style.display='none';
+    document.getElementById('paso-noencontrado').style.display='block';
+    return;
+  }
+
+  // Verificar duplicado en esta sesión
+  const {data:dup} = await SB.from('inscritos').select('id')
+    .eq('cedula',cedula).eq('evento_id',sesionSeleccionada.id);
+  if (dup&&dup.length>0) { show('s-duplicate'); return; }
+
+  _existente = persona;
+  document.getElementById('conf-nombre').textContent = persona.nombre;
+  document.getElementById('conf-meta').textContent   = `Cédula: ${cedula} · Tel: ${telRaw}`;
+  document.getElementById('paso-verificar').style.display='none';
+  document.getElementById('paso-confirmar').style.display='block';
+}
+
+async function inscribirExistente() {
+  if (!_existente||!sesionSeleccionada) return;
+  const btn = document.getElementById('confirm-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Inscribiendo…';
+
+  const qr = 'QR-'+UID();
+  const { error } = await SB.from('inscritos').insert({
+    tipo:         tipoActual || _existente.tipo || 'invitado',
+    nombre:       _existente.nombre,
+    cedula:       _existente.cedula,
+    telefono:     _existente.telefono,
+    ciudad:       getPaisNombreSerie(),
+    cliente_id:   _existente.cliente_id||null,
+    evento_id:    sesionSeleccionada.id,
+    evento_nombre:sesionSeleccionada.nombre,
+    evento_fecha: sesionSeleccionada.fecha,
+    qr_code:qr, used:false,
+    fecha_inscripcion: TODAY(), hora_inscripcion: NOW(),
+    ref_codigo:refCodigo||null,
+    ref_nombre:refNombre||null,
+  });
+
+  btn.disabled=false; btn.textContent='✓ Inscribirme a esta sesión →';
+  if (error) { alrt('Error: '+error.message); return; }
+
+  _serieTicketData = { qr, nombre: _existente.nombre, telefono: _existente.telefono,
+    serieNombre: serieActual?.nombre, sesionNombre: sesionSeleccionada?.nombre,
+    fecha: sesionSeleccionada?.fecha, hora: sesionSeleccionada?.hora };
+  show('s-success');
+  await llenarTicket(_existente.nombre, qr, _existente.tipo||'invitado');
+  if (_existente.telefono) document.getElementById('btn-wa-ticket').style.display = 'flex';
+}
+
+function resetVerif() {
+  _existente=null;
+  document.getElementById('ex-cedula').value='';
+  document.getElementById('ex-tel').value='';
+  document.getElementById('paso-verificar').style.display='block';
+  document.getElementById('paso-confirmar').style.display='none';
+  document.getElementById('paso-noencontrado').style.display='none';
+}
+
+async function llenarTicket(nombre, qr, tipo) {
+  const ev  = serieActual?.nombre || '';
+  const words = ev.split(' ');
+  const mid = Math.ceil(words.length/2);
+  document.getElementById('tk-ev1').textContent = words.slice(0,mid).join(' ').toUpperCase();
+  document.getElementById('tk-ev2').textContent = (words.slice(mid).join(' ')||ev).toUpperCase();
+  document.getElementById('tk-session').textContent =
+    sesionSeleccionada?.nombre ? sesionSeleccionada.nombre.toUpperCase() : '';
+  document.getElementById('tk-fecha').textContent = formatFechaCorta(sesionSeleccionada?.fecha);
+  document.getElementById('tk-hora').textContent  = sesionSeleccionada?.hora || '—';
+  document.getElementById('tk-num').textContent   = 'N°'+( sesionSeleccionada?.sesion_num||'?');
+  document.getElementById('tk-nombre').textContent = nombre.toUpperCase();
+  document.getElementById('tk-ref').textContent   = refNombre ? 'Invitado por '+refNombre : '';
+  document.getElementById('tk-code').textContent  = `USO ÚNICO · ${qr}`;
+
+  const tipoMap={invitado:'◎ INVITADO',frecuente:'★ FRECUENTE',artista:'🎵 ARTISTA',produccion:'🎬 PRODUCCIÓN',pago:'💳 POR PAGO'};
+  document.getElementById('tk-tipo').textContent = tipoMap[tipo]||'◎ INVITADO';
+
+  // Generar QR UNA SOLA VEZ en div oculto y almacenar dataUrl
+  _qrDataUrl = null;
+  const qd = document.getElementById('tk-qr'); qd.innerHTML='';
+  _qrDataUrl = await new Promise(resolve => {
+    try {
+      const tmpDiv = document.createElement('div');
+      tmpDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:200px;height:200px;visibility:hidden';
+      document.body.appendChild(tmpDiv);
+      new QRCode(tmpDiv, { text: qr, width: 200, height: 200, colorDark: '#0F0F0F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+      setTimeout(() => {
+        let dataUrl = null;
+        const cv = tmpDiv.querySelector('canvas');
+        const im = tmpDiv.querySelector('img');
+        if (cv) { try { dataUrl = cv.toDataURL('image/png'); } catch(e) {} }
+        if (!dataUrl && im?.src) dataUrl = im.src;
+        document.body.removeChild(tmpDiv);
+        resolve(dataUrl);
+      }, 700);
+    } catch(e) { resolve(null); }
+  });
+
+  // Mostrar en el ticket como <img> — no canvas en el DOM
+  if (_qrDataUrl) {
+    const img = document.createElement('img');
+    img.src = _qrDataUrl;
+    img.style.cssText = 'width:160px;height:160px;display:block';
+    qd.appendChild(img);
+  } else {
+    qd.textContent = qr;
+  }
+}
+
+// ── Canvas API ticket generator para serie ──
+function _roundRectS(ctx, x, y, w, h, r) {
+  if (typeof r === 'number') r = {tl:r, tr:r, bl:r, br:r};
+  ctx.beginPath();
+  ctx.moveTo(x+r.tl,y); ctx.lineTo(x+w-r.tr,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r.tr); ctx.lineTo(x+w,y+h-r.br);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r.br,y+h); ctx.lineTo(x+r.bl,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r.bl); ctx.lineTo(x,y+r.tl);
+  ctx.quadraticCurveTo(x,y,x+r.tl,y); ctx.closePath();
+}
+
+async function _generarTicketCanvasSerie(qr) {
+  const W=540, PAD=30, H=620;
+  const GOLD='#C8A96E', DARK='#0F0F0F', WHITE='#FFFFFF', MUTED='#646460', LINE='#2D2D2A';
+
+  const ev1   = document.getElementById('tk-ev1')?.textContent || '';
+  const ev2   = document.getElementById('tk-ev2')?.textContent || '';
+  const sesNom= document.getElementById('tk-session')?.textContent || '';
+  const fecha = document.getElementById('tk-fecha')?.textContent || '';
+  const hora  = document.getElementById('tk-hora')?.textContent  || '';
+  const nom   = document.getElementById('tk-nombre')?.textContent || '';
+  const tipo  = document.getElementById('tk-tipo')?.textContent   || '';
+  const code  = document.getElementById('tk-code')?.textContent   || '';
+  const numS  = document.getElementById('tk-num')?.textContent    || '';
+
+  const qrSrc = _qrDataUrl || null;
+
+  const cv = document.createElement('canvas');
+  cv.width=W; cv.height=H;
+  const ctx = cv.getContext('2d');
+
+  ctx.fillStyle=DARK; _roundRectS(ctx,0,0,W,H,18); ctx.fill();
+  ctx.fillStyle=GOLD; _roundRectS(ctx,0,0,W,10,{tl:18,tr:18,bl:0,br:0}); ctx.fill();
+
+  ctx.fillStyle=GOLD; ctx.font='bold 22px sans-serif'; ctx.fillText('HOSTAL',PAD,52);
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='300 13px sans-serif'; ctx.fillText('TERRAZA',PAD,70);
+  ctx.fillStyle=DARK; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+  _roundRectS(ctx,W-PAD-90,36,90,26,5); ctx.fillStyle=GOLD; ctx.fill();
+  ctx.fillStyle=DARK; ctx.fillText('ENTRADA',W-PAD-45,54); ctx.textAlign='left';
+
+  ctx.strokeStyle=LINE; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD,84); ctx.lineTo(W-PAD,84); ctx.stroke();
+
+  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif'; ctx.fillText('SERIE',PAD,108);
+  ctx.fillStyle=WHITE; ctx.font='bold 28px sans-serif'; ctx.fillText(ev1,PAD,144);
+  ctx.fillStyle=GOLD;  ctx.font='bold 28px sans-serif'; ctx.fillText(ev2,PAD,178);
+  if (sesNom) { ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='400 14px sans-serif'; ctx.fillText(sesNom,PAD,200); }
+
+  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif';
+  ctx.fillText('FECHA',PAD,225); ctx.fillText('HORA',W/2+10,225); ctx.fillText('SESIÓN',W*3/4+10,225);
+  ctx.fillStyle=WHITE; ctx.font='bold 16px sans-serif';
+  ctx.fillText(fecha,PAD,245); ctx.fillText(hora,W/2+10,245); ctx.fillText(numS,W*3/4+10,245);
+
+  ctx.strokeStyle=LINE; ctx.beginPath(); ctx.moveTo(PAD,260); ctx.lineTo(W-PAD,260); ctx.stroke();
+
+  const QS=170, QX=(W-QS)/2, QY=274;
+  ctx.fillStyle=WHITE; _roundRectS(ctx,QX-12,QY-12,QS+24,QS+24,10); ctx.fill();
+  if (qrSrc) {
+    await new Promise(res => {
+      const img=new Image(); img.onload=()=>{ctx.drawImage(img,QX,QY,QS,QS);res();}; img.onerror=res; img.src=qrSrc;
+    });
+  }
+  ctx.fillStyle=MUTED; ctx.font='300 11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('CÓDIGO QR DEL ASISTENTE',W/2,QY+QS+28); ctx.textAlign='left';
+
+  const dY=QY+QS+44;
+  ctx.strokeStyle=LINE; ctx.beginPath(); ctx.moveTo(PAD,dY); ctx.lineTo(W-PAD,dY); ctx.stroke();
+  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif'; ctx.fillText('ASISTENTE',PAD,dY+22);
+  ctx.fillStyle=WHITE; ctx.font='bold 22px sans-serif'; ctx.fillText(nom,PAD,dY+50);
+  ctx.strokeStyle=GOLD; ctx.lineWidth=1.5;
+  const tW=ctx.measureText(tipo).width+22;
+  _roundRectS(ctx,PAD,dY+64,tW,24,5); ctx.stroke();
+  ctx.fillStyle=GOLD; ctx.font='500 11px sans-serif'; ctx.fillText(tipo,PAD+11,dY+80);
+  ctx.fillStyle='#444'; ctx.font='300 10px sans-serif'; ctx.fillText(code,PAD,dY+104);
+  ctx.fillStyle=GOLD; _roundRectS(ctx,0,H-10,W,10,{tl:0,tr:0,bl:18,br:18}); ctx.fill();
+  return cv;
+}
+
+async function descargar() {
+  const btn = document.querySelector('.dl-btn');
+  if (btn) { btn.disabled=true; btn.textContent='Generando…'; }
+  try {
+    const cv = await _generarTicketCanvasSerie(_serieTicketData?.qr || document.getElementById('tk-code')?.textContent?.replace('USO ÚNICO · ',''));
+    const dataUrl = cv.toDataURL('image/png');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      const w = window.open();
+      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">Mantén presionado → Guardar en Fotos</p></body></html>`);
+      w.document.close();
+    } else {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'entrada-'+(serieActual?.nombre||'serie').replace(/\s+/g,'-').toLowerCase()+'-s'+(sesionSeleccionada?.sesion_num||'')+'.png';
+      a.click();
+    }
+  } catch(e) { alert('Para guardar: mantén presionado el ticket y elige "Guardar imagen".'); }
+  if (btn) { btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar mi entrada'; }
+}
+
+async function enviarTicketWASerie() {
+  const { qr, nombre, telefono } = _serieTicketData;
+  if (!qr) return;
+  const btn = document.getElementById('btn-wa-ticket');
+  if (btn) { btn.disabled=true; btn.textContent='Preparando…'; }
+
+  const texto = [
+    `🎟️ *Tu entrada — ${serieActual?.nombre}*`,
+    `Sesión: ${sesionSeleccionada?.nombre||''}`,
+    `📅 ${formatFechaCorta(sesionSeleccionada?.fecha)}${sesionSeleccionada?.hora?' · '+sesionSeleccionada.hora:''}`,
+    `🔑 Código QR: *${qr}*`,
+    `Muestra este código en la entrada. Personal e intransferible.`,
+    `_Terraza Hostal_`,
+  ].filter(Boolean).join('\n');
+
+  const tel = (telefono||'').replace(/\D/g,'');
+  const waUrl = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : `https://wa.me/?text=${encodeURIComponent(texto)}`;
+
+  try {
+    const cv = await _generarTicketCanvasSerie(qr);
+    cv.toBlob(async (blob) => {
+      const file = new File([blob], `entrada-${serieActual?.nombre||'serie'}.png`, { type:'image/png' });
+      if (navigator.canShare && navigator.canShare({ files:[file] })) {
+        try { await navigator.share({ files:[file], text:texto, title:`Tu entrada — ${serieActual?.nombre}` }); if(btn){btn.disabled=false;btn.textContent='Enviar por WhatsApp';} return; }
+        catch(e) {}
+      }
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='mi-entrada.png'; a.click();
+      setTimeout(()=>window.open(waUrl,'_blank'),800);
+      if(btn){btn.disabled=false;btn.textContent='Enviar por WhatsApp';}
+    }, 'image/png');
+  } catch(e) { window.open(waUrl,'_blank'); if(btn){btn.disabled=false;} }
+}
+
+function formatFechaCorta(f) {
+  if (!f) return '—';
+  const p = f.includes('-') ? f.split('-') : f.split('/').reverse();
+  return `${p[2]}/${p[1]}/${p[0]}`;
+}
+// ── Selector de país / teléfono ──────────────────────
+function onPaisChangeSerie() {
+  const sel = document.getElementById('f-pais-codigo');
+  const opt = sel.options[sel.selectedIndex];
+  const pais = opt.getAttribute('data-pais') || opt.text.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g,'').trim();
+  document.getElementById('f-pais-nombre').value = pais;
+}
+
+function getTelCompletoSerie() {
+  const codigo = (document.getElementById('f-pais-codigo')?.value || '+57').replace('-CA','');
+  const numero = (document.getElementById('f-tel')?.value || '').trim().replace(/\D/g,'');
+  return codigo + numero;
+}
+
+function getPaisNombreSerie() {
+  return document.getElementById('f-pais-nombre')?.value || 'Colombia';
+}
+
+// ── Notificaciones post-registro ─────────────────────
+async function enviarNotificacionesSerie(nombre, qr, emailAddr) {
+  if (!emailAddr || !sesionSeleccionada) return;
+  const statusEl = document.getElementById('email-status');
+  if (!statusEl) return;
+  statusEl.style.display = 'block';
+  statusEl.style.cssText = 'display:block;margin-top:.75rem;padding:.6rem 1rem;border-radius:8px;font-size:13px;text-align:center;max-width:370px;width:100%;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)';
+  statusEl.textContent = '📧 Enviando confirmación…';
+  try {
+    const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
+    const res = await fetch(fnUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({
+        email:        emailAddr,
+        nombre,
+        qrCode:       qr,
+        eventoNombre: (serieActual?.nombre || '') + (sesionSeleccionada?.nombre ? ' — ' + sesionSeleccionada.nombre : ''),
+        eventoFecha:  sesionSeleccionada.fecha,
+        eventoHora:   sesionSeleccionada.hora || '',
+        eventoLugar:  sesionSeleccionada.ubicacion || 'Terraza Hostal',
+      }),
+    });
+    if (res.ok) {
+      statusEl.style.background = 'rgba(45,106,79,.25)';
+      statusEl.style.color = '#74c69d';
+      statusEl.textContent = `✓ Confirmación enviada a ${emailAddr}`;
+    } else {
+      statusEl.style.display = 'none';
+    }
+  } catch(e) {
+    statusEl.style.display = 'none';
+  }
+}
+
+function alrt(msg) {
+  const el = document.getElementById('form-alert');
+  el.innerHTML = `<div class="alert-err">${msg}</div>`;
+  setTimeout(()=>el.innerHTML='',4000);
+}
+
+init();
+</script>
+</body>
+</html>
