@@ -7,7 +7,7 @@
 <meta property="og:title" content="Terraza Hostal">
 <meta property="og:description" content="Regístrate para el evento">
 <meta property="og:image" id="og-img" content="">
-<!-- CRITICAL: Set theme BEFORE any CSS renders to avoid layout recalc -->
+<!-- CRITICAL: Set theme AND hero height synchronously before first paint -->
 <script>
 (function(){
   var slug = new URLSearchParams(window.location.search).get('slug') || '';
@@ -18,7 +18,25 @@
   else if (s.indexOf('neon-cult') >= 0     || s.indexOf('neon_cult') >= 0)     theme = 'neon-cult';
   else if (s.indexOf('cinematic') >= 0     || s.indexOf('interactive') >= 0)   theme = 'interactive-cinematic';
   if (!theme) { try { theme = sessionStorage.getItem('ld_theme'); } catch(e){} }
-  if (theme) document.documentElement.setAttribute('data-theme-pending', theme);
+  if (theme) {
+    document.documentElement.setAttribute('data-theme-pending', theme);
+    // Inject a <style> block immediately so CSS applies before first paint
+    // This works even before the external stylesheet loads
+    if (theme === 'arthouse') {
+      var style = document.createElement('style');
+      style.id = 'arthouse-critical';
+      style.textContent = [
+        '.hero{height:100vh!important;height:100svh!important;overflow:hidden!important;',
+        'position:relative!important;display:flex!important;flex-direction:column!important;',
+        'min-height:600px!important}',
+        '.hero-content{flex:1!important;display:flex!important;flex-direction:column!important;',
+        'justify-content:flex-end!important;width:100%!important;max-width:none!important;',
+        'margin:0!important;padding:0!important;position:relative!important;z-index:3!important}',
+        '#ev-cartel-wrap,#ev-desc,#ev-video-wrap{display:none!important}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+  }
 })();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Cinzel:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
