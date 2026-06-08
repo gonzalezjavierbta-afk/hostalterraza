@@ -35,7 +35,7 @@
   --r:14px;--rsm:8px;
 }
 body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:#fff}
-html,body{height:100%;overflow-x:hidden}
+html{overflow-x:hidden}
 
 /* ── LOADING ── */
 #s-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.75rem}
@@ -1162,10 +1162,17 @@ function aplicarConfiguracionLanding(config) {
   const cfg = {..._LD_DEFAULT,...config};
   const root = document.documentElement;
 
-  // 1. Theme
+  // 1. Theme + immediate hero height
   if (cfg.theme) {
     document.body.setAttribute('data-theme', cfg.theme);
     _ldCurrentTheme = cfg.theme;
+    // Apply hero height IMMEDIATELY when theme is set (before layout)
+    if (cfg.theme === 'arthouse') {
+      const h = document.querySelector('.hero');
+      if (h) h.style.cssText += ';height:100vh;height:100svh;min-height:600px;overflow:hidden;display:flex;flex-direction:column;';
+      const hc = document.querySelector('.hero-content');
+      if (hc) hc.style.cssText += ';flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;max-width:none;margin:0;padding:0;position:relative;z-index:3;';
+    }
     // Marcar activo en el switcher
     document.querySelectorAll('.ld-theme-btn').forEach(b => {
       const isActive = b.dataset.theme === cfg.theme;
@@ -1510,8 +1517,14 @@ async function init() {
     }
     if (earlyTheme) {
       document.body.setAttribute('data-theme', earlyTheme);
-      document.body.classList.add('theme-' + earlyTheme.replace(/-/g,'_').replace('_','').replace('_','')); // extra hook
       document.documentElement.removeAttribute('data-theme-pending');
+      // Apply hero height immediately via inline style
+      if (earlyTheme === 'arthouse') {
+        const h = document.querySelector('.hero');
+        if (h) h.style.cssText = 'height:100vh;height:100svh;min-height:600px;overflow:hidden;position:relative;display:flex;flex-direction:column;';
+        const hc = document.querySelector('.hero-content');
+        if (hc) hc.style.cssText = 'flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;max-width:none;margin:0;padding:0;position:relative;z-index:3;';
+      }
     }
   }
 
