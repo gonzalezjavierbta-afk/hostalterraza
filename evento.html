@@ -140,6 +140,12 @@ input,select,textarea{font-size:16px!important} /* Prevent iOS zoom */
   --ld-overlay:linear-gradient(to bottom,rgba(0,0,0,.45) 0%,rgba(0,0,0,.6) 40%,rgba(0,0,0,.92) 75%,rgba(0,0,0,.98) 100%);
 }
 
+/* ── CRITICAL: Hero fullscreen before JS fires ────────── */
+body[data-theme="arthouse"] .hero{height:100vh!important;height:100svh!important;height:100dvh!important;min-height:600px!important;overflow:hidden!important;position:relative!important;display:flex!important;flex-direction:column!important}
+body[data-theme="arthouse"] .hero-content{position:relative!important;z-index:3!important;flex:1!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+body[data-theme="arthouse"] #s-main{overflow-x:hidden}
+/* ─────────────────────────────────────────────────────── */
+
 /* ═══════════════════════════════════════════════════════
    THEME: ARTHOUSE — A24 / MUBI Style
    ═══════════════════════════════════════════════════════ */
@@ -933,9 +939,10 @@ let _qrDataUrl = null; // QR dataUrl generado una sola vez, reutilizado
 function show(id) {
   ['s-loading','s-error','s-main','s-success','s-duplicate'].forEach(s => {
     const el = document.getElementById(s);
-    const isBlock = ['s-main'].includes(s);
-    const isFlex  = ['s-error','s-success','s-duplicate'].includes(s);
-    el.style.display = s===id ? (isBlock?'block':isFlex?'flex':'flex') : 'none';
+    if (!el) return;
+    if (s !== id) { el.style.display = 'none'; return; }
+    // s-main: use block normally; arthouse may need block too (hero is inside)
+    el.style.display = 'block';
   });
   if (id === 's-duplicate') cargarQRRecuperado();
 }
@@ -1439,6 +1446,21 @@ async function init() {
   const tipoParam = params.get('tipo') || 'invitado';
   tipoActual = TIPOS_VALIDOS.includes(tipoParam) ? tipoParam : 'invitado';
   refCodigo  = (params.get('ref') || '').toUpperCase();
+
+  // ── Aplicar tema INMEDIATAMENTE (antes de cargar datos) ──
+  // Esto garantiza que el CSS correcto se aplique antes del primer render
+  {
+    const sl = (slug||'').toLowerCase();
+    let earlyTheme = null;
+    if      (sl.includes('arthouse'))                                       earlyTheme = 'arthouse';
+    else if (sl.includes('premiere-gold') || sl.includes('premiere_gold')) earlyTheme = 'premiere-gold';
+    else if (sl.includes('neon-cult')     || sl.includes('neon_cult'))     earlyTheme = 'neon-cult';
+    else if (sl.includes('cinematic')     || sl.includes('interactive'))   earlyTheme = 'interactive-cinematic';
+    if (!earlyTheme) {
+      try { earlyTheme = sessionStorage.getItem('ld_theme') || null; } catch(e) {}
+    }
+    if (earlyTheme) document.body.setAttribute('data-theme', earlyTheme);
+  }
 
   // Si hay código de invitador, buscar su nombre
   if (refCodigo) {
