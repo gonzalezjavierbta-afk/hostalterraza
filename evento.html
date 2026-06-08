@@ -7,6 +7,20 @@
 <meta property="og:title" content="Terraza Hostal">
 <meta property="og:description" content="Regístrate para el evento">
 <meta property="og:image" id="og-img" content="">
+<!-- CRITICAL: Set theme BEFORE any CSS renders to avoid layout recalc -->
+<script>
+(function(){
+  var slug = new URLSearchParams(window.location.search).get('slug') || '';
+  var s = slug.toLowerCase();
+  var theme = null;
+  if      (s.indexOf('arthouse') >= 0)                                          theme = 'arthouse';
+  else if (s.indexOf('premiere-gold') >= 0 || s.indexOf('premiere_gold') >= 0) theme = 'premiere-gold';
+  else if (s.indexOf('neon-cult') >= 0     || s.indexOf('neon_cult') >= 0)     theme = 'neon-cult';
+  else if (s.indexOf('cinematic') >= 0     || s.indexOf('interactive') >= 0)   theme = 'interactive-cinematic';
+  if (!theme) { try { theme = sessionStorage.getItem('ld_theme'); } catch(e){} }
+  if (theme) document.documentElement.setAttribute('data-theme-pending', theme);
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Cinzel:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
@@ -141,8 +155,31 @@ input,select,textarea{font-size:16px!important} /* Prevent iOS zoom */
   --ld-overlay:linear-gradient(to bottom,rgba(0,0,0,.45) 0%,rgba(0,0,0,.6) 40%,rgba(0,0,0,.92) 75%,rgba(0,0,0,.98) 100%);
 }
 
-/* ── CRITICAL: Hero fullscreen before JS fires ────────── */
-body[data-theme="arthouse"] #s-main{overflow-x:hidden}
+/* ── CRITICAL: Hero uses html[data-theme-pending] set in <head> ── */
+html[data-theme-pending="arthouse"] body,
+body[data-theme="arthouse"]{
+  /* Ensure page scrolls normally */
+}
+html[data-theme-pending="arthouse"] .hero,
+body[data-theme="arthouse"] .hero{
+  height:100vh;height:100svh;height:100dvh;min-height:600px;
+  overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
+}
+html[data-theme-pending="arthouse"] .hero-content,
+body[data-theme="arthouse"] .hero-content{
+  position:relative;z-index:3;flex:1;
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  width:100%;max-width:none;margin:0;padding:0;
+}
+/* Also pre-hide elements that Arthouse replaces */
+html[data-theme-pending="arthouse"] #ev-cartel-wrap,
+html[data-theme-pending="arthouse"] #ev-desc,
+html[data-theme-pending="arthouse"] #ev-video-wrap,
+html[data-theme-pending="arthouse"] .hero-brand{
+  display:none!important;
+}
 /* ─────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
@@ -1445,18 +1482,25 @@ async function init() {
   refCodigo  = (params.get('ref') || '').toUpperCase();
 
   // ── Aplicar tema INMEDIATAMENTE (antes de cargar datos) ──
-  // Esto garantiza que el CSS correcto se aplique antes del primer render
+  // data-theme-pending fue puesto en <html> por el script inline del <head>
+  // Transferirlo al <body> para activar todo el CSS del tema
   {
+    const pendingTheme = document.documentElement.getAttribute('data-theme-pending');
     const sl = (slug||'').toLowerCase();
-    let earlyTheme = null;
-    if      (sl.includes('arthouse'))                                       earlyTheme = 'arthouse';
-    else if (sl.includes('premiere-gold') || sl.includes('premiere_gold')) earlyTheme = 'premiere-gold';
-    else if (sl.includes('neon-cult')     || sl.includes('neon_cult'))     earlyTheme = 'neon-cult';
-    else if (sl.includes('cinematic')     || sl.includes('interactive'))   earlyTheme = 'interactive-cinematic';
+    let earlyTheme = pendingTheme;
+    if (!earlyTheme) {
+      if      (sl.includes('arthouse'))                                       earlyTheme = 'arthouse';
+      else if (sl.includes('premiere-gold') || sl.includes('premiere_gold')) earlyTheme = 'premiere-gold';
+      else if (sl.includes('neon-cult')     || sl.includes('neon_cult'))     earlyTheme = 'neon-cult';
+      else if (sl.includes('cinematic')     || sl.includes('interactive'))   earlyTheme = 'interactive-cinematic';
+    }
     if (!earlyTheme) {
       try { earlyTheme = sessionStorage.getItem('ld_theme') || null; } catch(e) {}
     }
-    if (earlyTheme) document.body.setAttribute('data-theme', earlyTheme);
+    if (earlyTheme) {
+      document.body.setAttribute('data-theme', earlyTheme);
+      document.documentElement.removeAttribute('data-theme-pending');
+    }
   }
 
   // Si hay código de invitador, buscar su nombre
