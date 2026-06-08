@@ -35,7 +35,7 @@
   --r:14px;--rsm:8px;
 }
 body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:#fff}
-html,body{height:100%}
+html,body{height:100%;overflow-x:hidden}
 
 /* ── LOADING ── */
 #s-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.75rem}
@@ -161,10 +161,11 @@ body[data-theme="arthouse"]{
   /* Ensure page scrolls normally */
 }
 html[data-theme-pending="arthouse"] .hero,
-body[data-theme="arthouse"] .hero{
+body[data-theme="arthouse"] .hero,
+body.theme-arthouse .hero{
   height:100vh;height:100svh;height:100dvh;min-height:600px;
   overflow:hidden;position:relative;
-  display:flex;flex-direction:column;
+  display:flex!important;flex-direction:column;
 }
 html[data-theme-pending="arthouse"] .hero-content,
 body[data-theme="arthouse"] .hero-content{
@@ -1354,6 +1355,16 @@ function _ldInitParallax() {
 function _ldInitArthouse(cfg) {
   const content = cfg?.content || {};
 
+  // Force hero fullscreen via inline style (bypasses all CSS cascade issues)
+  const heroEl = document.querySelector('.hero');
+  if (heroEl) {
+    heroEl.style.cssText = 'height:100vh;height:100svh;height:100dvh;min-height:600px;overflow:hidden;position:relative;display:flex;flex-direction:column;';
+  }
+  const heroContent = document.querySelector('.hero-content');
+  if (heroContent) {
+    heroContent.style.cssText = 'position:relative;z-index:3;flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;max-width:none;margin:0;padding:0;';
+  }
+
   // Show brand top bar
   const brandTop = document.getElementById('at-brand-top');
   if (brandTop) brandTop.style.display = 'flex';
@@ -1499,6 +1510,7 @@ async function init() {
     }
     if (earlyTheme) {
       document.body.setAttribute('data-theme', earlyTheme);
+      document.body.classList.add('theme-' + earlyTheme.replace(/-/g,'_').replace('_','').replace('_','')); // extra hook
       document.documentElement.removeAttribute('data-theme-pending');
     }
   }
