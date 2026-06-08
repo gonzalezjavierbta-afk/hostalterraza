@@ -150,6 +150,16 @@ body[data-theme="arthouse"]{
   --ld-glow:none;--ld-radius:0px;background:#f2ede4;color:#0d0d0b;
 }
 body[data-theme="arthouse"] #s-main{background:#f2ede4;color:#0d0d0b}
+/* Hide hero elements that Arthouse replaces with modules */
+body[data-theme="arthouse"] #ev-cartel-wrap{display:none!important}
+body[data-theme="arthouse"] #ev-video-wrap{display:none!important}
+body[data-theme="arthouse"] #ev-desc{display:none!important}
+body[data-theme="arthouse"] .hero-brand{display:none!important}
+/* Counter pill stays visible in hero */
+body[data-theme="arthouse"] #ev-counter{display:none!important}
+/* Hero must be EXACTLY viewport height */
+body[data-theme="arthouse"] .hero{height:100vh;height:100svh;height:100dvh;min-height:600px;position:relative;display:flex;flex-direction:column;overflow:hidden}
+body[data-theme="arthouse"] .hero-content{position:relative;z-index:3;display:flex;flex-direction:column;flex:1;justify-content:flex-end;width:100%;max-width:none;margin:0;padding:0;overflow:visible}
 /* Hero fullscreen */
 body[data-theme="arthouse"] .hero{position:relative;height:100svh;height:100dvh;min-height:100vh;display:flex;flex-direction:column}
 body[data-theme="arthouse"] .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:grayscale(70%) contrast(1.05);overflow:hidden}
@@ -1238,7 +1248,10 @@ function _ldSetupTrailer(url, thumbOverride) {
   if (ytM) {
     const vid = ytM[1];
     thumb.src = thumbOverride || `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
-    thumb.onerror = () => { thumb.src=`https://img.youtube.com/vi/${vid}/hqdefault.jpg`; };
+    thumb.onerror = () => {
+      thumb.onerror = null;
+      thumb.src = `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+    };
     iframe.dataset.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0&modestbranding=1`;
   } else if (viM) {
     thumb.src = thumbOverride || '';
@@ -1503,19 +1516,21 @@ async function init() {
   // Background — imagen del evento como fondo cinematográfico
   const bg = document.getElementById('hero-bg');
   if (data.imagen_url) {
-    // Con imagen: fondo visual inmersivo
     bg.style.backgroundImage = `url('${data.imagen_url}')`;
     bg.style.backgroundSize = 'cover';
-    bg.style.backgroundPosition = 'center top';
+    bg.style.backgroundPosition = 'center 20%';
     bg.classList.remove('no-img');
-    // También mostrar como cartel en la sección de contenido
-    const imgWrap = document.getElementById('ev-cartel-wrap');
-    if (imgWrap) {
-      document.getElementById('ev-cartel-img').src = data.imagen_url;
-      imgWrap.style.display = 'block';
+    // Cartel solo en temas sin carrusel (no en Arthouse)
+    const slugLower2 = (slug||'').toLowerCase();
+    const isArthouse = data.config_landing?.theme === 'arthouse' || slugLower2.includes('arthouse');
+    if (!isArthouse) {
+      const imgWrap = document.getElementById('ev-cartel-wrap');
+      if (imgWrap) {
+        document.getElementById('ev-cartel-img').src = data.imagen_url;
+        imgWrap.style.display = 'block';
+      }
     }
   } else {
-    // Sin imagen: gradiente de color
     bg.classList.add('no-img');
     if (data.color_primario) {
       bg.style.background = `linear-gradient(150deg, #0e0e0c 0%, ${data.color_primario}44 100%)`;
@@ -1585,15 +1600,18 @@ async function init() {
     document.getElementById('ev-lugar-row').style.display = 'flex';
   }
 
-  // Descripción — respetar saltos de línea y formato
+  // Descripción — solo en hero si NO es Arthouse (Arthouse usa módulo propio)
   if (data.descripcion) {
-    const descEl = document.getElementById('ev-desc');
-    // Convertir saltos de línea a <br> para respetar el formato
-    descEl.innerHTML = data.descripcion
-      .split('\n')
-      .map(line => line.trim() ? `<span>${esc(line)}</span>` : '<br>')
-      .join('<br>');
-    descEl.style.display = 'block';
+    const slugLower3 = (slug||'').toLowerCase();
+    const isArthouse3 = (cfgLanding?.theme === 'arthouse') || slugLower3.includes('arthouse');
+    if (!isArthouse3) {
+      const descEl = document.getElementById('ev-desc');
+      descEl.innerHTML = data.descripcion
+        .split('\n')
+        .map(line => line.trim() ? `<span>${esc(line)}</span>` : '<br>')
+        .join('<br>');
+      descEl.style.display = 'block';
+    }
   }
 
   // Video — mostrar link directo en lugar de embed para evitar Error 153
