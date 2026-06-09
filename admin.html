@@ -629,6 +629,102 @@ tr:hover td{background:var(--surface)}
       <div class="ch">Nuevo evento</div>
       <div id="ev-alert"></div>
 
+      <!-- ══ PASO 1: PLANTILLA VISUAL (primero) ══════════════ -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:.75rem">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink2)">🎬 Plantilla visual de la página pública</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Elige primero el estilo visual — define qué módulos aparecen en la página del evento</div>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" id="ev-landing-activa" style="width:14px;height:14px;accent-color:var(--gold)"
+              onchange="toggleLandingConfig(this.checked)">
+            Activar plantilla
+          </label>
+        </div>
+        <div id="ev-landing-config" style="display:none">
+          <!-- Selector de themes -->
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Selecciona una plantilla</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem" id="ev-theme-cards">
+            <div class="ld-theme-card" data-theme="arthouse" onclick="seleccionarTheme('arthouse')"
+              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
+                <div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div>
+                <span style="font-size:12px;font-weight:600;color:#0d0d0b">Arthouse</span>
+              </div>
+              <div style="font-size:10px;color:#555;line-height:1.4">A24 · MUBI · Editorial blanco/negro</div>
+            </div>
+            <div class="ld-theme-card" data-theme="premiere-gold" onclick="seleccionarTheme('premiere-gold')"
+              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a1408,#2d2210)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
+                <div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 5px #d4af37"></div>
+                <span style="font-size:12px;font-weight:600;color:#d4af37">Premiere Gold</span>
+              </div>
+              <div style="font-size:10px;color:#a08040;line-height:1.4">Gala · Ovation · Negro y dorado</div>
+            </div>
+            <div class="ld-theme-card" data-theme="neon-cult" onclick="seleccionarTheme('neon-cult')"
+              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#08030d,#120820)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
+                <div style="width:10px;height:10px;border-radius:50%;background:#bf00ff;box-shadow:0 0 7px #bf00ff"></div>
+                <span style="font-size:12px;font-weight:600;color:#bf00ff">Neon Cult</span>
+              </div>
+              <div style="font-size:10px;color:#8040a0;line-height:1.4">NEON · Experimental · VHS</div>
+            </div>
+            <div class="ld-theme-card" data-theme="interactive-cinematic" onclick="seleccionarTheme('interactive-cinematic')"
+              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#080c0f,#0d1820)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
+                <div style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 5px #4fc3f7"></div>
+                <span style="font-size:12px;font-weight:600;color:#4fc3f7">Cinematic</span>
+              </div>
+              <div style="font-size:10px;color:#3080a0;line-height:1.4">Multimedia · Inmersiva</div>
+            </div>
+          </div>
+          <!-- Módulos -->
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Módulos activos</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:.85rem">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-trailer" style="width:13px;height:13px;accent-color:var(--gold)"> 🎬 Tráiler</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-countdown" style="width:13px;height:13px;accent-color:var(--gold)"> ⏱ Cuenta regresiva</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sinopsis" style="width:13px;height:13px;accent-color:var(--gold)"> 📝 Sinopsis</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-director" style="width:13px;height:13px;accent-color:var(--gold)"> 🎥 Director</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-gallery" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Galería</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-aforo" checked style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Disponibilidad</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-dresscode" style="width:13px;height:13px;accent-color:var(--gold)"> 👗 Dress code</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sponsors" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Patrocinadores</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-faq" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ</label>
+          </div>
+          <!-- Efectos -->
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Efectos</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.85rem">
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-grain" style="width:13px;height:13px;accent-color:var(--gold)"> Grano</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-glow" checked style="width:13px;height:13px;accent-color:var(--gold)"> Glow</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-vhs" style="width:13px;height:13px;accent-color:var(--gold)"> VHS</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-parallax" style="width:13px;height:13px;accent-color:var(--gold)"> Parallax</label>
+          </div>
+          <!-- Contenido de módulos -->
+          <div id="ld-contenido-campos">
+            <div id="ld-campo-sinopsis" style="display:none" class="fg"><label style="font-size:12px">Sinopsis</label><textarea id="ld-sinopsis-text" rows="3" placeholder="Descripción larga del evento..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-trailer" style="display:none" class="fg"><label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label><input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px"></div>
+            <div id="ld-campo-director" style="display:none">
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500;margin-top:.5rem">👤 Datos del director</div>
+              <div class="grid2">
+                <div class="fg"><label style="font-size:11px">Nombre</label><input id="ld-dir-nombre" placeholder="Nombre del director" style="font-size:12px"></div>
+                <div class="fg"><label style="font-size:11px">Rol</label><input id="ld-dir-rol" placeholder="Director" value="Director" style="font-size:12px"></div>
+                <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">URL de foto</label><input id="ld-dir-foto" type="url" placeholder="https://..." style="font-size:12px"></div>
+                <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">Biografía</label><textarea id="ld-dir-bio" rows="2" placeholder="Breve biografía..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+              </div>
+            </div>
+            <div id="ld-campo-gallery" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 8)</label><textarea id="ld-gallery-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-dresscode" style="display:none" class="fg"><label style="font-size:12px">Dress code</label><input id="ld-dresscode-val" placeholder="Ej. Formal · Elegante · All black"></div>
+            <div id="ld-campo-sponsors" style="display:none" class="fg"><label style="font-size:12px">Patrocinadores (separados por coma)</label><input id="ld-sponsors-val" placeholder="Ej. Aguila, Spotify, Davivienda"></div>
+            <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+          </div>
+          <div id="ld-preview-badge" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:.4rem .75rem;font-size:12px;color:var(--ink3);margin-top:.5rem">
+            <span style="color:var(--gold)">●</span> Plantilla: <strong id="ld-preview-theme-name">—</strong>
+          </div>
+        </div>
+      </div>
+      <!-- ════════════════════════════════════════════════════ -->
+
       <!-- Toggle único / serie -->
       <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);margin-bottom:1.25rem;width:fit-content">
         <button id="ev-tab-unico" onclick="setEvTipo('unico')"
@@ -684,9 +780,11 @@ tr:hover td{background:var(--surface)}
       <!-- Imagen + Video (lado a lado) -->
       <div class="grid2" style="margin-top:.75rem;align-items:start">
 
-        <!-- Imagen -->
+        <!-- Imagen hero (fondo) -->
         <div class="fg">
-        <label>Imagen del evento (cartel / portada)</label>
+        <label>🖼 Imagen de fondo (hero)
+          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:4px">Se usa como fondo cinematográfico de la página</span>
+        </label>
 
         <!-- Tab: Archivo o URL -->
         <div style="display:flex;gap:0;margin-bottom:.4rem;border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden;width:fit-content">
@@ -737,6 +835,21 @@ tr:hover td{background:var(--surface)}
           <button onclick="clearImagen()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
         </div>
         <input type="hidden" id="ev-img" value="">
+        </div>
+
+        <!-- Imagen poster / afiche (visible en la página) -->
+        <div class="fg">
+          <label>🎭 Poster / Afiche del evento
+            <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:4px">Se muestra como imagen del cartel dentro del contenido</span>
+          </label>
+          <input id="ev-poster-url" type="url"
+            placeholder="https://... (URL del poster o afiche)"
+            oninput="handlePosterUrl(this.value)"
+            style="font-family:monospace;font-size:12px">
+          <div id="ev-poster-preview" style="margin-top:.4rem;display:none">
+            <img id="ev-poster-thumb" style="max-height:120px;border-radius:6px;border:1px solid var(--border);object-fit:contain" src="">
+            <button onclick="clearPoster()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:2px 8px;font-size:11px;cursor:pointer;color:var(--ink3)">✕ Quitar</button>
+          </div>
         </div>
 
         <!-- Video (tráiler / URL embed) -->
@@ -813,170 +926,6 @@ tr:hover td{background:var(--surface)}
         </div>
       </div>
 
-      <!-- ══ LANDING PAGE CINEMATOGRÁFICA ══════════════════════ -->
-      <div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:.85rem">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--ink2)">🎬 Plantilla visual de la página del evento</div>
-            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Elige cómo se verá la página pública. Si no activas, usa el estilo predeterminado.</div>
-          </div>
-          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;flex-shrink:0">
-            <input type="checkbox" id="ev-landing-activa" style="width:14px;height:14px;accent-color:var(--gold)"
-              onchange="toggleLandingConfig(this.checked)">
-            Activar
-          </label>
-        </div>
-
-        <div id="ev-landing-config" style="display:none">
-
-          <!-- Selector de themes -->
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Selecciona una plantilla</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem" id="ev-theme-cards">
-
-            <div class="ld-theme-card" data-theme="arthouse" onclick="seleccionarTheme('arthouse')"
-              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
-                <div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div>
-                <span style="font-size:12px;font-weight:600;color:#0d0d0b">Arthouse</span>
-              </div>
-              <div style="font-size:10px;color:#555;line-height:1.4">A24 · MUBI<br>Blanco/negro, editorial</div>
-            </div>
-
-            <div class="ld-theme-card" data-theme="premiere-gold" onclick="seleccionarTheme('premiere-gold')"
-              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a1408,#2d2210)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
-                <div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 5px #d4af37"></div>
-                <span style="font-size:12px;font-weight:600;color:#d4af37">Premiere Gold</span>
-              </div>
-              <div style="font-size:10px;color:#a08040;line-height:1.4">Gala · Ovation<br>Negro y dorado</div>
-            </div>
-
-            <div class="ld-theme-card" data-theme="neon-cult" onclick="seleccionarTheme('neon-cult')"
-              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#08030d,#120820)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
-                <div style="width:10px;height:10px;border-radius:50%;background:#bf00ff;box-shadow:0 0 7px #bf00ff"></div>
-                <span style="font-size:12px;font-weight:600;color:#bf00ff">Neon Cult</span>
-              </div>
-              <div style="font-size:10px;color:#8040a0;line-height:1.4">NEON · Experimental<br>Neón, VHS, glitch</div>
-            </div>
-
-            <div class="ld-theme-card" data-theme="interactive-cinematic" onclick="seleccionarTheme('interactive-cinematic')"
-              style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#080c0f,#0d1820)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem">
-                <div style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 5px #4fc3f7"></div>
-                <span style="font-size:12px;font-weight:600;color:#4fc3f7">Cinematic</span>
-              </div>
-              <div style="font-size:10px;color:#3080a0;line-height:1.4">An Evening Film<br>Multimedia, inmersiva</div>
-            </div>
-          </div>
-
-          <!-- Módulos activables -->
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Módulos de la página</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:.85rem">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-trailer" style="width:13px;height:13px;accent-color:var(--gold)"> 🎬 Tráiler
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-countdown" style="width:13px;height:13px;accent-color:var(--gold)"> ⏱ Cuenta regresiva
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-sinopsis" style="width:13px;height:13px;accent-color:var(--gold)"> 📝 Sinopsis
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-director" style="width:13px;height:13px;accent-color:var(--gold)"> 🎥 Director
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-gallery" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Galería
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-aforo" checked style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Disponibilidad
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-dresscode" style="width:13px;height:13px;accent-color:var(--gold)"> 👗 Dress code
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-sponsors" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Patrocinadores
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)">
-              <input type="checkbox" id="ld-mod-faq" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ
-            </label>
-          </div>
-
-          <!-- Efectos -->
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Efectos</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.85rem">
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
-              <input type="checkbox" id="ld-fx-grain" style="width:13px;height:13px;accent-color:var(--gold)"> Grano
-            </label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
-              <input type="checkbox" id="ld-fx-glow" checked style="width:13px;height:13px;accent-color:var(--gold)"> Glow
-            </label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
-              <input type="checkbox" id="ld-fx-vhs" style="width:13px;height:13px;accent-color:var(--gold)"> VHS
-            </label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
-              <input type="checkbox" id="ld-fx-parallax" style="width:13px;height:13px;accent-color:var(--gold)"> Parallax
-            </label>
-          </div>
-
-          <!-- Contenido -->
-          <div id="ld-contenido-campos">
-            <div id="ld-campo-sinopsis" style="display:none" class="fg">
-              <label style="font-size:12px">Sinopsis</label>
-              <textarea id="ld-sinopsis-text" rows="3" placeholder="Descripción larga del evento..."
-                style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>
-            </div>
-            <div id="ld-campo-sinopsis-poster" style="display:none" class="fg">
-              <label style="font-size:12px">URL del poster / afiche (opcional)</label>
-              <input id="ld-poster-url" type="url" placeholder="https://... (ratio 2:3, ej. poster de película)" style="font-size:12px">
-              <div style="font-size:11px;color:var(--ink3);margin-top:3px">Se muestra a la izquierda de la sinopsis en template Arthouse.</div>
-            </div>
-            <div id="ld-campo-trailer" style="display:none" class="fg">
-              <label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label>
-              <input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px">
-            </div>
-            <div id="ld-campo-director" style="display:none">
-              <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">👤 Datos del director</div>
-              <div class="grid2">
-                <div class="fg"><label style="font-size:11px">Nombre</label><input id="ld-dir-nombre" placeholder="Nombre del director" style="font-size:12px"></div>
-                <div class="fg"><label style="font-size:11px">Rol</label><input id="ld-dir-rol" placeholder="Director" value="Director" style="font-size:12px"></div>
-                <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">URL de foto</label>
-                  <input id="ld-dir-foto" type="url" placeholder="https://..." style="font-size:12px">
-                </div>
-                <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">Biografía</label>
-                  <textarea id="ld-dir-bio" rows="2" placeholder="Breve biografía del director..."
-                    style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>
-                </div>
-              </div>
-            </div>
-            <div id="ld-campo-gallery" style="display:none" class="fg">
-              <label style="font-size:12px">URLs de imágenes para galería</label>
-              <textarea id="ld-gallery-urls" rows="3" placeholder="Una URL por línea:&#10;https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg"
-                style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>
-              <div style="font-size:11px;color:var(--ink3);margin-top:3px">Una URL de imagen por línea. Máximo 6 imágenes recomendado.</div>
-            </div>
-            <div id="ld-campo-dresscode" style="display:none" class="fg">
-              <label style="font-size:12px">Dress code</label>
-              <input id="ld-dresscode-val" placeholder="Ej. Formal · Elegante · All black">
-            </div>
-            <div id="ld-campo-sponsors" style="display:none" class="fg">
-              <label style="font-size:12px">Patrocinadores (separados por coma)</label>
-              <input id="ld-sponsors-val" placeholder="Ej. Aguila, Spotify, Davivienda">
-            </div>
-            <div id="ld-campo-faq" style="display:none" class="fg">
-              <label style="font-size:12px">FAQ — formato: Pregunta|Respuesta (una por línea)</label>
-              <textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm."
-                style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>
-            </div>
-          </div>
-
-          <!-- Preview badge -->
-          <div id="ld-preview-badge" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:.4rem .75rem;font-size:12px;color:var(--ink3)">
-            <span style="color:var(--gold)">●</span> Plantilla: <strong id="ld-preview-theme-name">—</strong>
-          </div>
-        </div>
-      </div>
-      <!-- ═════════════════════════════════════════════════════ -->
 
       <div style="margin-top:1rem">
         <button class="btn btn-gold" id="btn-crear-ev" onclick="crearEvento()">Crear evento</button>
@@ -2244,7 +2193,7 @@ function _buildConfigLanding() {
     },
     content: {
       sinopsis:    val('ld-sinopsis-text') || null,
-      poster_url:  val('ld-poster-url')   || null,
+      poster_url:  val('ev-poster-url')   || null,
       trailer_url: val('ld-trailer-url')   || null,
       dresscode:   val('ld-dresscode-val') || null,
       ...(director           ? {director}           : {}),
@@ -3985,6 +3934,7 @@ async function _crearEventoUnico(n) {
       custom: getCamposCustom(),
     },
     aforo_max: parseInt(document.getElementById('ev-aforo')?.value) || null,
+    ...(document.getElementById('ev-poster-url')?.value.trim() ? {poster_url: document.getElementById('ev-poster-url').value.trim()} : {}),
     ...(typeof _buildConfigLanding === 'function' && _buildConfigLanding() ? {config_landing: _buildConfigLanding()} : {}),
     org_id:    ORG_ID,
   }).select().single();
@@ -7176,12 +7126,38 @@ function stopCamera() {
 // SUBIDA DE IMAGEN A SUPABASE STORAGE
 // ════════════════════════════════════════════════════
 
+
 function handleImgDrop(e) {
   e.preventDefault();
   document.getElementById('img-upload-zone').style.borderColor = 'var(--border)';
   const file = e.dataTransfer.files[0];
   if (file) handleImgFile(file);
 }
+
+let _posterUrlTimer = null;
+function handlePosterUrl(url) {
+  clearTimeout(_posterUrlTimer);
+  if (!url.trim()) { clearPoster(); return; }
+  _posterUrlTimer = setTimeout(() => {
+    const img = new Image();
+    img.onload = () => {
+      document.getElementById('ev-poster-thumb').src = url;
+      document.getElementById('ev-poster-preview').style.display = 'flex';
+      document.getElementById('ev-poster-preview').style.alignItems = 'center';
+    };
+    img.onerror = () => {
+      const inp = document.getElementById('ev-poster-url');
+      if (inp) { inp.style.borderColor='var(--red)'; setTimeout(()=>{ inp.style.borderColor=''; },2000); }
+    };
+    img.src = url;
+  }, 500);
+}
+function clearPoster() {
+  document.getElementById('ev-poster-url').value = '';
+  document.getElementById('ev-poster-thumb').src = '';
+  document.getElementById('ev-poster-preview').style.display = 'none';
+}
+
 
 function imgSwitchTab(tab) {
   const isUpload = tab === 'upload';

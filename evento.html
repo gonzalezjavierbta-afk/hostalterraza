@@ -317,7 +317,7 @@ body[data-theme="arthouse"] .ld-faq-item{border-bottom:1px solid rgba(0,0,0,.08)
     <div class="hero-bg" id="hero-bg"></div>
     <div class="hero-content">
       <div class="at-hero-inner">
-      <div class="hero-brand">Terraza · Hostal</div>
+      <div class="hero-brand" id="hero-brand-main"></div>
       <div>
         <div class="hero-eyebrow">Próximo evento</div>
         <h1 class="hero-title" id="ev-title"></h1>
@@ -352,14 +352,14 @@ body[data-theme="arthouse"] .ld-faq-item{border-bottom:1px solid rgba(0,0,0,.08)
           <div class="counter-dot"></div>
           <span id="ev-counter-txt">0 personas registradas</span>
         </div>
-      </div>
-    </div>
-  </div>
+      </div><!-- end at-hero-inner -->
+    </div><!-- end hero-content -->
+  </div><!-- end hero -->
 
   <!-- FORM -->
   <!-- ══ MÓDULOS CINEMATOGRÁFICOS ══════════════════════════ -->
   <div class="at-brand-top" id="at-brand-top" style="position:absolute;top:0;left:0;right:0;z-index:10;padding:1.5rem 2rem;display:none;align-items:center">
-    <span class="at-brand-logo" id="at-brand-name">TERRAZA</span>
+    <span class="at-brand-logo" id="at-brand-name"></span>
   </div>
   <div class="at-scroll-hint" style="display:none" id="at-scroll-hint">Scroll</div>
 
@@ -1039,11 +1039,15 @@ async function init() {
   if (org?.color_primario) {
     document.documentElement.style.setProperty('--gold', org.color_primario);
   }
-  // Guardar nombre de org para el ticket canvas
-  const orgNombreCompleto = org?.nombre_app || org?.nombre || 'Hostal Terraza';
+  // Aplicar branding de la organización
+  const orgNombreCompleto = org?.nombre_app || org?.nombre || 'Terraza Hostal';
   const partes = orgNombreCompleto.split(/\s+/);
-  eventoActual.org_nombre = partes[0] || 'HOSTAL';
-  eventoActual.org_sub    = partes.slice(1).join(' ') || 'TERRAZA';
+  eventoActual.org_nombre = partes[0] || 'TERRAZA';
+  eventoActual.org_sub    = partes.slice(1).join(' ') || '';
+
+  // Actualizar brand en hero (solo una vez, dinámico)
+  const heroB = document.getElementById('hero-brand-main');
+  if (heroB) heroB.textContent = orgNombreCompleto.toUpperCase();
 
   if (org?.nombre_app) {
     document.title = data.nombre + ' · ' + org.nombre_app;
@@ -1059,20 +1063,27 @@ async function init() {
     if (logoEl) { logoEl.src = org.logo_url; logoEl.style.display = 'block'; }
   }
 
-  // Background — siempre gradiente de color, nunca imagen como fondo
+  // Imagen hero → fondo cinematográfico
   const bg = document.getElementById('hero-bg');
-  bg.classList.add('no-img');
-  if (data.color_primario) {
-    bg.style.background = `linear-gradient(150deg, #0e0e0c 0%, ${data.color_primario}44 100%)`;
+  if (data.imagen_url) {
+    bg.style.backgroundImage      = `url('${data.imagen_url}')`;
+    bg.style.backgroundSize       = 'cover';
+    bg.style.backgroundPosition   = 'center top';
+    bg.classList.remove('no-img');
+  } else {
+    bg.classList.add('no-img');
+    if (data.color_primario)
+      bg.style.background = `linear-gradient(150deg,#0e0e0c 0%,${data.color_primario}44 100%)`;
   }
 
-  // Imagen del evento — mostrar como cartel junto a la descripción
-  if (data.imagen_url) {
+  // Poster / afiche → imagen visible en el contenido
+  // Prioridad: config_landing.content.poster_url > imagen_url (si no hay hero separada)
+  const posterUrl = data.config_landing?.content?.poster_url
+    || (!data.imagen_url ? null : null)   // solo mostrar cartel si es diferente al hero
+    || null;
+  if (posterUrl) {
     const imgWrap = document.getElementById('ev-cartel-wrap');
-    if (imgWrap) {
-      document.getElementById('ev-cartel-img').src = data.imagen_url;
-      imgWrap.style.display = 'block';
-    }
+    if (imgWrap) { document.getElementById('ev-cartel-img').src = posterUrl; imgWrap.style.display = 'block'; }
   }
 
   // Título
