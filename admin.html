@@ -739,7 +739,13 @@ tr:hover td{background:var(--surface)}
 
       <!-- Campos comunes -->
       <div class="grid2">
-        <div class="fg"><label>Nombre *</label><input id="ev-n" placeholder="Ej. Jueves de Jazz"></div>
+        <div class="fg"><label>Nombre del evento *</label><input id="ev-n" placeholder="Ej. Jueves de Jazz · Noche Electrónica"></div>
+        <div class="fg">
+          <label>Nombre a mostrar en la página pública
+            <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:4px">Si el nombre del evento es diferente al título de la película/artista</span>
+          </label>
+          <input id="ev-titulo-display" placeholder="Ej. ZZZZZ · nueva etapa (deja vacío para usar el nombre del evento)">
+        </div>
         <div class="fg" id="ev-fecha-wrap"><label>Fecha *</label><input type="date" id="ev-f"></div>
         <div class="fg"><label>Hora</label><input type="time" id="ev-h"></div>
         <div class="fg"><label>Ubicación</label><input id="ev-ubic" placeholder="Ej. Terraza piso 3 · Cra 5 #10-20, Bogotá"></div>
@@ -2193,7 +2199,8 @@ function _buildConfigLanding() {
     },
     content: {
       sinopsis:    val('ld-sinopsis-text') || null,
-      poster_url:  val('ev-poster-url')   || null,
+      poster_url:  val('ev-poster-url')    || null,
+      titulo_display: val('ev-titulo-display') || null,
       trailer_url: val('ld-trailer-url')   || null,
       dresscode:   val('ld-dresscode-val') || null,
       ...(director           ? {director}           : {}),
