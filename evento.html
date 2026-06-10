@@ -55,18 +55,93 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 
 /* ── HERO ── */
 #s-main{display:none}
-.hero{position:relative;min-height:100vh;display:flex;flex-direction:column}
-
-/* Imagen de fondo */
-.hero-bg{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center top;background-repeat:no-repeat}
-.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.45) 0%,rgba(0,0,0,.6) 40%,rgba(0,0,0,.92) 75%,rgba(0,0,0,.98) 100%)}
-
-/* Sin imagen: gradiente de color del evento */
-.hero-bg.no-img{background:linear-gradient(135deg,#1a1a2e 0%,#2c1654 100%)}
-.hero-bg.no-img::after{background:linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.85))}
-
-.hero-content{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;padding:3rem 1.5rem 2rem;max-width:520px;margin:0 auto;width:100%}
-
+/* ── HERO FULLSCREEN — info abajo-izquierda ─────────────── */
+.hero{
+  position:relative;
+  height:100vh;
+  min-height:580px;
+  display:flex;
+  flex-direction:column;
+  /* scroll continúa después del hero — NO overflow:hidden */
+}
+.hero-bg{
+  position:absolute;   /* absolute, no fixed — no rompe scroll */
+  inset:0;
+  z-index:0;
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+}
+.hero-bg::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  /* gradiente que se oscurece hacia abajo para legibilidad */
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.15) 0%,
+    rgba(0,0,0,.3)  30%,
+    rgba(0,0,0,.75) 65%,
+    rgba(0,0,0,.97) 100%
+  );
+}
+.hero-bg.no-img{
+  background:linear-gradient(150deg,#0f0f14 0%,#1e1430 60%,#0a0a10 100%);
+}
+.hero-bg.no-img::after{
+  background:none;
+}
+/* CONTENIDO: ocupa todo el hero, info se empuja al fondo */
+.hero-content{
+  position:relative;
+  z-index:1;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;          /* info anclada abajo */
+  padding:0 1.75rem 2.5rem;
+  width:100%;
+  max-width:600px;                    /* izquierda, no centrado */
+  margin:0;                           /* izquierda alineada */
+  box-sizing:border-box;
+}
+/* Branding arriba-izquierda */
+.hero-brand{
+  position:absolute;
+  top:1.5rem;
+  left:1.75rem;
+  z-index:2;
+  font-size:11px;
+  color:rgba(255,255,255,.45);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+/* Scroll indicator */
+.hero-scroll-hint{
+  position:absolute;
+  bottom:1.5rem;
+  right:1.75rem;
+  z-index:2;
+  font-size:10px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.3);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.hero-scroll-hint::after{
+  content:'';
+  display:block;
+  width:1px;
+  height:28px;
+  background:rgba(255,255,255,.25);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse{
+  0%,100%{opacity:.25;transform:scaleY(1)}
+  50%{opacity:.7;transform:scaleY(1.15)}
+}
 /* Header */
 .hero-brand{font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.1em;text-transform:uppercase;margin-bottom:auto;padding-bottom:3rem}
 
@@ -315,60 +390,60 @@ body[data-theme="arthouse"] .ld-faq-item{border-bottom:1px solid rgba(0,0,0,.08)
 <!-- MAIN PAGE -->
 <div id="s-main">
   <div class="hero">
+    <!-- Slides carousel (Arthouse) -->
     <div class="at-hero-slides" id="at-hero-slides" style="display:none"></div>
+    <!-- Imagen de fondo -->
     <div class="hero-bg" id="hero-bg"></div>
+    <!-- Branding arriba izquierda -->
+    <div class="hero-brand" id="hero-brand-main"></div>
+    <!-- Scroll hint abajo derecha -->
+    <div class="hero-scroll-hint">scroll</div>
+    <!-- Contenido anclado abajo izquierda -->
     <div class="hero-content">
-      <div class="at-hero-inner">
-      <div class="hero-brand" id="hero-brand-main"></div>
-      <div>
-        <div class="hero-eyebrow">Próximo evento</div>
-        <h1 class="hero-title" id="ev-title"></h1>
-        <div class="hero-divider"></div>
-        <div class="hero-meta">
-          <div class="meta-row">
-            <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            <span id="ev-fecha"></span>
-          </div>
-          <div class="meta-row" id="ev-hora-row" style="display:none">
-            <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <span id="ev-hora"></span>
-          </div>
-          <div class="meta-row" id="ev-lugar-row" style="display:none">
-            <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            <span id="ev-lugar"></span>
-          </div>
+      <div class="hero-eyebrow" id="ev-eyebrow">Próximo evento</div>
+      <h1 class="hero-title" id="ev-title"></h1>
+      <div class="hero-divider"></div>
+      <div class="hero-meta">
+        <div class="meta-row">
+          <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span id="ev-fecha"></span>
         </div>
-        <p class="hero-desc" id="ev-desc" style="display:none;white-space:pre-line;line-height:1.7;color:rgba(255,255,255,.75);font-size:14px;margin-top:.75rem"></p>
-
-        <!-- Cartel del evento -->
-        <div id="ev-cartel-wrap" style="display:none;margin-top:1rem">
-          <img id="ev-cartel-img" alt="Cartel del evento"
-            style="width:100%;max-width:360px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:block">
+        <div class="meta-row" id="ev-hora-row" style="display:none">
+          <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span id="ev-hora"></span>
         </div>
-
-        <!-- Video / Tráiler -->
-        <div id="ev-video-wrap" style="display:none;margin-top:1rem;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+        <div class="meta-row" id="ev-lugar-row" style="display:none">
+          <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <span id="ev-lugar"></span>
         </div>
-
-        <div class="counter-pill" id="ev-counter" style="display:none">
-          <div class="counter-dot"></div>
-          <span id="ev-counter-txt">0 personas registradas</span>
-        </div>
-      </div><!-- end at-hero-inner -->
+      </div>
+      <div class="counter-pill" id="ev-counter" style="display:none">
+        <div class="counter-dot"></div>
+        <span id="ev-counter-txt">0 personas registradas</span>
+      </div>
     </div><!-- end hero-content -->
   </div><!-- end hero -->
 
-  <!-- FORM -->
-  <!-- ══ MÓDULOS CINEMATOGRÁFICOS ══════════════════════════ -->
+  <!-- at-brand-top (Arthouse) -->
   <div class="at-brand-top" id="at-brand-top" style="position:absolute;top:0;left:0;right:0;z-index:10;padding:1.5rem 2rem;display:none;align-items:center">
     <span class="at-brand-logo" id="at-brand-name"></span>
   </div>
+
+  <!-- ══ DESCRIPCIÓN ══════════════════════════════════════════ -->
+  <div class="ld-module" id="mod-descripcion">
+    <div class="ld-eyebrow">Sobre el evento</div>
+    <p class="ld-sinopsis-text" id="at-desc-text" style="font-size:15px;line-height:1.85;color:rgba(255,255,255,.75);font-style:normal;white-space:pre-wrap"></p>
+  </div>
+
+  <!-- Poster y video cortos (sin módulo, solo si existen) -->
+  <div id="ev-cartel-wrap" style="display:none;max-width:520px;margin:0 auto;padding:0 1.5rem 1.5rem">
+    <img id="ev-cartel-img" alt="Cartel del evento"
+      style="width:100%;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);display:block">
+  </div>
+  <div id="ev-video-wrap" style="display:none;max-width:520px;margin:0 auto;padding:0 1.5rem 1.5rem;border-radius:12px;overflow:hidden"></div>
+  <p class="hero-desc" id="ev-desc" style="display:none;max-width:520px;margin:0 auto;padding:0 1.5rem;white-space:pre-line;line-height:1.7;color:rgba(255,255,255,.75);font-size:14px"></p>
   <div class="at-scroll-hint" style="display:none" id="at-scroll-hint">Scroll</div>
 
-  <div class="ld-module hidden" id="mod-descripcion">
-    <div class="at-desc-label" id="at-desc-label">Sobre el evento</div>
-    <p class="at-desc-text" id="at-desc-text"></p>
-  </div>
   <div class="ld-module hidden" id="mod-trailer">
     <div class="ld-trailer-wrap">
       <img class="ld-trailer-thumb" id="ld-trailer-thumb" src="" alt="" loading="lazy">
