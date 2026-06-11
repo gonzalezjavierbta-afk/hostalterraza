@@ -110,12 +110,12 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
-  padding:0 2.5rem 3.5rem;    /* left margin matches A24 breathing room */
+  padding:0 2.5rem 3.5rem 2.5rem;  /* top right bottom LEFT */
   max-width:680px;             /* constrains text width for readability */
   box-sizing:border-box;
 }
 @media(max-width:600px){
-  .hero-content{ padding:0 1.5rem 2.5rem; max-width:100%; }
+  .hero-content{ padding:0 1.5rem 2.5rem 1.5rem; max-width:100%; }
 }
 
 .hero-eyebrow{
@@ -195,24 +195,11 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
   0%,100%{opacity:.5;transform:scale(1)}
   50%{opacity:1;transform:scale(1.3)}
 }
-/* Header */
-.hero-brand{font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.1em;text-transform:uppercase;margin-bottom:auto;padding-bottom:3rem}
-
-/* Event info */
-.hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
-.hero-title{font-family:'Playfair Display',serif;font-size:clamp(36px,9vw,58px);line-height:1.1;margin-bottom:1rem}
-.hero-title em{font-style:italic;color:var(--gold)}
-.hero-divider{width:40px;height:2px;background:var(--gold);margin:.75rem 0 1.25rem;opacity:.7}
-
-.hero-meta{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.75rem}
-.meta-row{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-size:14px}
-.meta-icon{width:16px;height:16px;opacity:.55;flex-shrink:0}
+/* ── Event meta (non-duplicate) ── */
+.hero-meta{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem}
+.meta-row{display:flex;align-items:center;gap:.6rem;font-size:13px;color:rgba(255,255,255,.6);font-weight:400}
+.meta-icon{width:14px;height:14px;flex-shrink:0;opacity:.5}
 .hero-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.65;margin-top:.75rem;font-style:italic}
-
-/* Counter */
-.counter-pill{display:inline-flex;align-items:center;gap:6px;margin-top:1rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:5px 14px;font-size:13px;color:rgba(255,255,255,.65)}
-.counter-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* ── FORM CARD ── */
 .form-section{position:relative;z-index:1;background:#0a0a08;padding:2rem 1.5rem 3rem;max-width:520px;margin:0 auto;width:100%}
@@ -483,10 +470,10 @@ body[data-theme="arthouse"] .ld-faq-item{border-bottom:1px solid rgba(0,0,0,.08)
   </div>
 
   <!-- ══ DESCRIPCIÓN ══════════════════════════════════════════ -->
-  <div id="mod-descripcion" style="background:#fff;padding:4rem 2.5rem 4rem">
-    <div style="max-width:600px">
-      <div style="font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#999;margin-bottom:1.5rem">Sobre el evento</div>
-      <p id="at-desc-text" style="font-family:'Playfair Display',serif;font-size:clamp(16px,2.2vw,21px);line-height:1.9;color:#222;font-style:italic;margin:0;white-space:pre-wrap"></p>
+  <div id="mod-descripcion" style="background:#fff;padding:4rem 2.5rem">
+    <div style="max-width:640px;margin:0">
+      <div style="font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#bbb;margin-bottom:1.75rem">Sobre el evento</div>
+      <p id="at-desc-text" style="font-family:'Playfair Display',serif;font-size:clamp(17px,2.2vw,22px);line-height:1.85;color:#1a1a1a;font-style:italic;margin:0;white-space:pre-wrap;text-align:left"></p>
     </div>
   </div>
 
@@ -497,7 +484,6 @@ body[data-theme="arthouse"] .ld-faq-item{border-bottom:1px solid rgba(0,0,0,.08)
   </div>
   <div id="ev-video-wrap" style="display:none;max-width:520px;margin:0 auto;padding:0 1.5rem 1.5rem;border-radius:12px;overflow:hidden"></div>
   <p class="hero-desc" id="ev-desc" style="display:none;max-width:520px;margin:0 auto;padding:0 1.5rem;white-space:pre-line;line-height:1.7;color:rgba(255,255,255,.75);font-size:14px"></p>
-  <div class="at-scroll-hint" style="display:none" id="at-scroll-hint">Scroll</div>
 
   <div class="ld-module hidden" id="mod-trailer">
     <div class="ld-trailer-wrap">
