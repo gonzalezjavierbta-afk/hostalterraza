@@ -362,8 +362,12 @@ body[data-theme="premiere-gold"] #mod-descripcion > div > div:first-child{
   font-family:'Cinzel',serif; color:var(--pg-accent); letter-spacing:.3em;
 }
 body[data-theme="premiere-gold"] #at-desc-text{
-  font-family:'Playfair Display',serif; color:var(--pg-text);
-  text-align:center; font-style:italic;
+  font-family:'Playfair Display',serif; color:var(--pg-text)!important;
+  text-align:center; font-style:italic; background:transparent;
+}
+body[data-theme="premiere-gold"] #mod-descripcion > div > div:first-child{
+  font-family:'Cinzel',serif; font-size:10px; letter-spacing:.3em;
+  text-transform:uppercase; color:var(--pg-accent); margin-bottom:1.75rem;
 }
 
 /* Countdown — elegante, grande, Ovation-style */
@@ -408,24 +412,20 @@ body[data-theme="premiere-gold"] #mod-gallery{
   background:var(--pg-surface); padding:5rem 2.5rem;
   border-top:1px solid var(--pg-border);
 }
-body[data-theme="premiere-gold"] .ld-gallery-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:3px; margin-top:2rem;
-  grid-template-rows:auto;
+body[data-theme="premiere-gold"] #mod-gallery .ld-eyebrow{
+  font-family:'Cinzel',serif; color:var(--pg-accent); letter-spacing:.25em;
+  text-align:center; display:block; margin-bottom:.5rem;
 }
-body[data-theme="premiere-gold"] .ld-gallery-img{
-  aspect-ratio:3/4; /* vertical como tarjetas */
-  object-fit:cover; width:100%; display:block;
-  filter:brightness(.85) sepia(.15);
-  transition:filter .3s ease, transform .3s ease;
+body[data-theme="premiere-gold"] #mod-gallery .ld-section-title{
+  font-family:'Cinzel',serif; color:var(--pg-text); text-align:center; border:none;
+  margin-bottom:0;
 }
-body[data-theme="premiere-gold"] .ld-gallery-img:first-child{
-  grid-column:1/-1; aspect-ratio:21/9; /* primera a ancho completo */
+/* at-gallery-hero oculto para PG — todo va en grid */
+body[data-theme="premiere-gold"] #at-gallery-hero{ display:none!important; }
+body[data-theme="premiere-gold"] #at-gallery-grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:2.5rem;
 }
-body[data-theme="premiere-gold"] .ld-gallery-img:hover{
-  filter:brightness(1) sepia(0); transform:scale(1.01);
-}
+body[data-theme="premiere-gold"] #at-gallery-dots{ display:none!important; }
 
 /* Tráiler — contenido, NO fullscreen */
 body[data-theme="premiere-gold"] #mod-trailer{
@@ -446,15 +446,32 @@ body[data-theme="premiere-gold"] #mod-trailer .ld-play-icon svg{ color:#000; }
 /* Sinopsis */
 body[data-theme="premiere-gold"] #mod-sinopsis{
   background:var(--pg-surface); padding:5rem 2.5rem;
-  border-top:1px solid var(--pg-border); text-align:center;
+  border-top:1px solid var(--pg-border); text-align:left;
 }
-body[data-theme="premiere-gold"] #mod-sinopsis .ld-eyebrow{
+body[data-theme="premiere-gold"] #mod-sinopsis .at-sinopsis-inner{
+  max-width:900px; margin:0 auto;
+  display:grid; grid-template-columns:260px 1fr; gap:3.5rem; align-items:start;
+}
+@media(max-width:700px){
+  body[data-theme="premiere-gold"] #mod-sinopsis .at-sinopsis-inner{ grid-template-columns:1fr; gap:2rem; }
+}
+body[data-theme="premiere-gold"] .at-poster-img{
+  width:100%; aspect-ratio:2/3; object-fit:cover; display:block;
+  border-radius:2px;
+  box-shadow:0 8px 40px rgba(0,0,0,.7), 0 0 0 1px var(--pg-border);
+}
+body[data-theme="premiere-gold"] .at-sinopsis-right .ld-eyebrow{
   font-family:'Cinzel',serif; color:var(--pg-accent); letter-spacing:.25em;
+  display:block; margin-bottom:1.25rem;
+}
+body[data-theme="premiere-gold"] #ld-sinopsis-titulo{
+  font-family:'Cinzel',serif; font-size:clamp(22px,4vw,34px);
+  color:var(--pg-text)!important; margin-bottom:1.5rem;
+  padding-bottom:1rem; border-bottom:1px solid var(--pg-border);
 }
 body[data-theme="premiere-gold"] #mod-sinopsis .ld-sinopsis-text{
-  max-width:580px; margin:0 auto;
-  font-family:'Playfair Display',serif; font-size:clamp(15px,2vw,19px);
-  line-height:1.9; color:var(--pg-text); text-align:center; font-style:italic;
+  font-family:'Playfair Display',serif; font-size:clamp(14px,1.8vw,17px);
+  line-height:1.9; color:var(--pg-muted); font-style:italic; text-align:left;
 }
 
 /* Aforo */
@@ -2378,6 +2395,22 @@ function _ldInitPremiereGold(cfg) {
   document.body.style.background = bg;
   const sm = document.getElementById('s-main');
   if (sm) sm.style.background = bg;
+
+  // Ensure hero bg image is applied (may have been cleared by theme init)
+  const heroBg = document.getElementById('hero-bg');
+  if (heroBg && eventoActual?.imagen_url) {
+    heroBg.style.backgroundImage = `url('${eventoActual.imagen_url}')`;
+    heroBg.style.backgroundSize  = 'cover';
+    heroBg.style.backgroundPosition = 'center center';
+    heroBg.classList.remove('no-img');
+  }
+
+  // Apply accent to border variables
+  const hex = accentRaw.replace('#','');
+  const rh=parseInt(hex.slice(0,2),16), gh=parseInt(hex.slice(2,4),16), bh=parseInt(hex.slice(4,6),16);
+  root.style.setProperty('--pg-border', `rgba(${rh},${gh},${bh},.22)`);
+  root.style.setProperty('--pg-muted',  `rgba(240,234,216,.5)`);
+  root.style.setProperty('--pg-text',   '#f0ead8');
 }
 
 function _ldInitArthouse(cfg) {
@@ -2446,17 +2479,38 @@ function _ldInitArthouse(cfg) {
   if (cfg?.modules?.gallery && gallery.length > 0) {
     const modG = document.getElementById('mod-gallery');
     if (modG) modG.classList.remove('hidden');
-    const heroImg = document.getElementById('at-gallery-hero');
-    if (heroImg) { heroImg.src = gallery[0]; heroImg.style.display = 'block'; }
-    const grid = document.getElementById('at-gallery-grid');
-    if (grid && gallery.length > 1) {
-      grid.innerHTML = gallery.slice(1).map(url =>
-        `<img class="at-gallery-thumb" src="${url}" loading="lazy" alt="">`).join('');
-    }
-    const dots = document.getElementById('at-gallery-dots');
-    if (dots && gallery.length > 1) {
-      dots.innerHTML = gallery.map((_,i) =>
-        `<div class="at-gallery-dot${i===0?' active':''}" onclick="atGalleryDot(${i})"></div>`).join('');
+    const isPG = cfg.theme === 'premiere-gold';
+    if (isPG) {
+      // Premiere Gold: masonry card grid
+      const grid = document.getElementById('at-gallery-grid');
+      if (grid) {
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:2.5rem';
+        grid.innerHTML = gallery.map((url, i) =>
+          `<div style="position:relative;overflow:hidden;${i===0?'grid-column:1/-1;':''}">
+            <img src="${url}" loading="lazy" alt="" style="width:100%;aspect-ratio:${i===0?'21/9':'3/4'};object-fit:cover;display:block;transition:transform .4s ease,filter .4s ease;filter:brightness(.85);" 
+              onmouseover="this.style.transform='scale(1.03)';this.style.filter='brightness(1)'"
+              onmouseout="this.style.transform='';this.style.filter='brightness(.85)'">
+          </div>`
+        ).join('');
+      }
+      const heroImg = document.getElementById('at-gallery-hero');
+      if (heroImg) heroImg.style.display = 'none';
+      const dots = document.getElementById('at-gallery-dots');
+      if (dots) dots.style.display = 'none';
+    } else {
+      // Arthouse: hero + grid + dots
+      const heroImg = document.getElementById('at-gallery-hero');
+      if (heroImg) { heroImg.src = gallery[0]; heroImg.style.display = 'block'; }
+      const grid = document.getElementById('at-gallery-grid');
+      if (grid && gallery.length > 1) {
+        grid.innerHTML = gallery.slice(1).map(url =>
+          `<img class="at-gallery-thumb" src="${url}" loading="lazy" alt="">`).join('');
+      }
+      const dots = document.getElementById('at-gallery-dots');
+      if (dots && gallery.length > 1) {
+        dots.innerHTML = gallery.map((_,i) =>
+          `<div class="at-gallery-dot${i===0?' active':''}" onclick="atGalleryDot(${i})"></div>`).join('');
+      }
     }
   }
   // Poster
