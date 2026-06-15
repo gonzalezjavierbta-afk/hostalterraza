@@ -1,4 +1,5 @@
-<!-- EVENTO_VERSION:v1542b4c4 -->
+<!-- EVENTO_VERSION:v2395a93b -->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -58,9 +59,9 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 #s-main{display:none}
 /* ── HERO — A24 style, fullscreen, info bottom-left ─────── */
 .hero{position:relative;height:100vh;min-height:580px;display:flex;flex-direction:column}
-.hero-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center center;background-repeat:no-repeat}
+.hero-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center center;background-repeat:no-repeat;background-image:var(--hero-img-url,none)}
 .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1) 0%,rgba(0,0,0,.25) 30%,rgba(0,0,0,.7) 65%,rgba(0,0,0,.96) 100%)}
-.hero-bg.no-img{background:linear-gradient(150deg,#0f0f14 0%,#1a1228 60%,#0a0a10 100%)}
+.hero-bg.no-img{background-image:none;background:linear-gradient(150deg,#0f0f14 0%,#1a1228 60%,#0a0a10 100%)}
 .hero-bg.no-img::after{background:none}
 
 /* Branding — top-left absolute */
@@ -1334,7 +1335,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v1542b4c4 | premiere-gold support: YES | isPG: check cfg.theme');
+  console.log('[evento.html] VERSION=v2395a93b | hero-bg:setAttribute | PG:✅');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -1419,13 +1420,17 @@ async function init() {
     if (logoEl) { logoEl.src = org.logo_url; logoEl.style.display = 'block'; }
   }
 
-  // Imagen hero → fondo cinematográfico
+  // Imagen hero → fondo cinematográfico (usar setAttribute para sobrevivir tema CSS)
   const bg = document.getElementById('hero-bg');
   if (data.imagen_url) {
-    bg.style.backgroundImage      = `url('${data.imagen_url}')`;
-    bg.style.backgroundSize       = 'cover';
-    bg.style.backgroundPosition   = 'center top';
+    // setAttribute sobrevive cualquier override de CSS de tema
+    bg.setAttribute('style',
+      `background-image:url('${data.imagen_url}');` +
+      'background-size:cover;background-position:center center;' +
+      'background-repeat:no-repeat;position:absolute;inset:0;z-index:0;'
+    );
     bg.classList.remove('no-img');
+    document.documentElement.style.setProperty('--hero-img-url', `url('${data.imagen_url}')`);
   } else {
     bg.classList.add('no-img');
     if (data.color_primario)
@@ -2398,12 +2403,14 @@ function _ldInitPremiereGold(cfg) {
   const sm = document.getElementById('s-main');
   if (sm) sm.style.background = bg;
 
-  // Ensure hero bg image is applied (may have been cleared by theme init)
+  // Re-apply hero bg image (CSS theme may have overridden it)
   const heroBg = document.getElementById('hero-bg');
   if (heroBg && eventoActual?.imagen_url) {
-    heroBg.style.backgroundImage = `url('${eventoActual.imagen_url}')`;
-    heroBg.style.backgroundSize  = 'cover';
-    heroBg.style.backgroundPosition = 'center center';
+    heroBg.setAttribute('style',
+      `background-image:url('${eventoActual.imagen_url}');` +
+      'background-size:cover;background-position:center center;' +
+      'background-repeat:no-repeat;position:absolute;inset:0;z-index:0;'
+    );
     heroBg.classList.remove('no-img');
   }
 
