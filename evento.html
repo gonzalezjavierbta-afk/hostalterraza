@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v00c27c96 -->
+<!-- EVENTO_VERSION:v0a9675b5 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -194,12 +194,17 @@ body[data-theme="arthouse"] .at-desc-label{font-family:'Inter',sans-serif;font-s
 body[data-theme="arthouse"] .at-desc-text{font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,22px);line-height:1.85;color:#555;max-width:680px;margin:0 auto;font-style:italic}
 /* Trailer full width */
 body[data-theme="arthouse"] #mod-trailer{background:#000;padding:0;border:none;overflow:hidden}
-body[data-theme="arthouse"] #mod-trailer .ld-trailer-wrap{border-radius:0;box-shadow:none;aspect-ratio:16/9;width:100%}
+body[data-theme="arthouse"] #mod-trailer .ld-trailer-wrap{border-radius:0;box-shadow:none;aspect-ratio:16/9;width:100%;max-width:none}
 body[data-theme="arthouse"] #mod-trailer .ld-trailer-thumb{width:100%;height:100%;object-fit:cover;filter:grayscale(30%)}
 body[data-theme="arthouse"] #mod-trailer .ld-play-icon{background:#fff;box-shadow:none}
 body[data-theme="arthouse"] #mod-trailer .ld-play-icon svg{color:#000}
 /* Countdown */
 body[data-theme="arthouse"] #mod-countdown{background:#0d0d0b;color:#fff;padding:4rem 2rem;text-align:center;border:none}
+body[data-theme="arthouse"] #mod-countdown .ld-eyebrow{color:rgba(255,255,255,.45);text-align:center;display:block;margin-bottom:1.5rem}
+body[data-theme="arthouse"] #mod-countdown .ld-cd-grid{max-width:480px;margin:0 auto}
+body[data-theme="arthouse"] #mod-countdown .ld-cd-block{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:2px}
+body[data-theme="arthouse"] #mod-countdown .ld-cd-num{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(28px,9vw,52px)}
+body[data-theme="arthouse"] #mod-countdown .ld-cd-label{color:rgba(255,255,255,.4)}
 body[data-theme="arthouse"] #mod-countdown .ld-eyebrow{color:rgba(255,255,255,.35);display:block;text-align:center;margin-bottom:2rem}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-grid{max-width:480px;margin:0 auto}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-block{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:0}
@@ -207,7 +212,7 @@ body[data-theme="arthouse"] #mod-countdown .ld-cd-num{font-family:'Playfair Disp
 body[data-theme="arthouse"] #mod-countdown .ld-cd-label{color:rgba(255,255,255,.3)}
 /* Sinopsis + Poster */
 body[data-theme="arthouse"] #mod-sinopsis{background:#f2ede4;padding:5rem 2rem;border:none}
-body[data-theme="arthouse"] #mod-sinopsis .at-sinopsis-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:240px 1fr;gap:4rem;align-items:start}
+body[data-theme="arthouse"] #mod-sinopsis .at-sinopsis-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:3rem;align-items:start}
 @media(max-width:700px){body[data-theme="arthouse"] #mod-sinopsis .at-sinopsis-inner{grid-template-columns:1fr;gap:2rem}}
 body[data-theme="arthouse"] .at-poster-img{width:100%;aspect-ratio:2/3;object-fit:cover;box-shadow:4px 8px 32px rgba(0,0,0,.15)}
 body[data-theme="arthouse"] .at-sinopsis-right .ld-eyebrow{color:#bbb;display:block;margin-bottom:1rem}
@@ -620,10 +625,11 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
 .hidden{display:none!important}
 .ld-module{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:2rem 1.5rem;border-top:1px solid rgba(255,255,255,.1)}
 .ld-eyebrow{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.5rem;font-family:'DM Sans',sans-serif}
+/* Countdown base — neutral, overridden per theme */
 .ld-cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:.75rem}
-.ld-cd-block{text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.75rem .5rem}
-.ld-cd-num{font-family:'Playfair Display',serif;font-size:clamp(24px,8vw,40px);line-height:1;color:#fff;display:block}
-.ld-cd-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:4px;display:block}
+.ld-cd-block{text-align:center;border-radius:8px;padding:.75rem .5rem}
+.ld-cd-num{font-family:'Playfair Display',serif;font-size:clamp(24px,8vw,40px);line-height:1;display:block}
+.ld-cd-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px;display:block;opacity:.6}
 .ld-trailer-wrap{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9}
 .ld-trailer-thumb{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
 .ld-trailer-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);cursor:pointer;transition:background .2s}
@@ -747,7 +753,7 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
   </div>
   <div class="ld-module hidden" id="mod-sinopsis">
     <div class="at-sinopsis-inner">
-      <div><img class="at-poster-img" id="at-poster-img" src="" alt="" loading="lazy" style="display:none"></div>
+      <div id="at-poster-col" style="display:none"><img class="at-poster-img" id="at-poster-img" src="" alt="" loading="lazy"></div>
       <div class="at-sinopsis-right">
         <span class="ld-eyebrow">Sinopsis</span>
         <div id="ld-sinopsis-titulo" style="font-family:'Playfair Display',serif;font-size:clamp(26px,5vw,40px);line-height:1.15;color:#0d0d0b;margin-bottom:1.5rem"></div>
@@ -1337,7 +1343,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v00c27c96 | T1:✅ T2:isolated | earlyTheme:removed');
+  console.log('[evento.html] VERSION=v0a9675b5 | T1:✅ T2:✅ poster:✅ countdown:✅');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -1439,14 +1445,16 @@ async function init() {
       bg.style.background = `linear-gradient(150deg,#0e0e0c 0%,${data.color_primario}44 100%)`;
   }
 
-  // Poster / afiche → imagen visible en el contenido
-  // Prioridad: config_landing.content.poster_url > imagen_url (si no hay hero separada)
-  const posterUrl = data.config_landing?.content?.poster_url
-    || (!data.imagen_url ? null : null)   // solo mostrar cartel si es diferente al hero
-    || null;
+  // Poster URL → sinopsis poster (left column) + cartel wrap
+  const posterUrl = data.config_landing?.content?.poster_url || null;
   if (posterUrl) {
+    // Show in sinopsis left column
+    const posterCol = document.getElementById('at-poster-col');
+    const posterImg = document.getElementById('at-poster-img');
+    if (posterCol && posterImg) { posterImg.src = posterUrl; posterCol.style.display = 'block'; }
+    // Also show in cartel wrap if exists
     const imgWrap = document.getElementById('ev-cartel-wrap');
-    if (imgWrap) { document.getElementById('ev-cartel-img').src = posterUrl; imgWrap.style.display = 'block'; }
+    if (imgWrap) { const ci = document.getElementById('ev-cartel-img'); if(ci) ci.src = posterUrl; imgWrap.style.display = 'block'; }
   }
 
   // Título — puede ser diferente al nombre del evento
@@ -2410,6 +2418,26 @@ function _ldInitPremiereGold(cfg) {
   root.style.setProperty('--pg-border', `rgba(${rh},${gh},${bh},.22)`);
   root.style.setProperty('--pg-muted',  `rgba(240,234,216,.5)`);
   root.style.setProperty('--pg-text',   '#f0ead8');
+
+  // Inject a <style> tag for hero-bg image — highest priority short of !important
+  if (eventoActual?.imagen_url) {
+    const imgUrl = eventoActual.imagen_url;
+    let st = document.getElementById('pg-hero-style');
+    if (!st) { st = document.createElement('style'); st.id = 'pg-hero-style'; document.head.appendChild(st); }
+    st.textContent = `
+      #hero-bg {
+        background-image: url('${imgUrl}') !important;
+        background-size: cover !important;
+        background-position: center center !important;
+      }
+      body[data-theme="premiere-gold"] #hero-bg {
+        background-image: url('${imgUrl}') !important;
+        background-size: cover !important;
+        background-position: center center !important;
+        background-color: transparent !important;
+      }
+    `;
+  }
 }
 
 function _ldInitArthouse(cfg) {
