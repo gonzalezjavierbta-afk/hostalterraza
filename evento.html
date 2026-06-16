@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v2395a93b -->
+<!-- EVENTO_VERSION:v00c27c96 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -274,10 +274,12 @@ body[data-theme="premiere-gold"]{
   --pg-muted:    rgba(240,234,216,.45);
   --pg-border:   rgba(212,175,55,.18);
   --pg-glow:     0 0 40px color-mix(in srgb, var(--pg-accent) 30%, transparent);
-  background: var(--pg-bg);
   color: var(--pg-text);
+  /* NO background on body — set via JS on #s-main only to not fight hero-bg */
 }
 body[data-theme="premiere-gold"] #s-main{ background: var(--pg-bg); }
+/* hero-bg keeps its JS-applied background-image regardless of theme */
+body[data-theme="premiere-gold"] #hero-bg{ background-color: var(--pg-bg); }
 
 /* ── HERO centrado ──────────────────────────────────────── */
 body[data-theme="premiere-gold"] .hero{
@@ -1335,7 +1337,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v2395a93b | hero-bg:setAttribute | PG:✅');
+  console.log('[evento.html] VERSION=v00c27c96 | T1:✅ T2:isolated | earlyTheme:removed');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -1564,20 +1566,8 @@ async function init() {
 
   show('s-main');
 
-  // ── Detect theme (slug → sessionStorage → config_landing) ──
-  {
-    const sl = (slug||'').toLowerCase();
-    let earlyTheme = document.documentElement.getAttribute('data-theme-early') || null;
-    if (!earlyTheme) {
-      if      (sl.includes('arthouse'))      earlyTheme = 'arthouse';
-      else if (sl.includes('premiere-gold')) earlyTheme = 'premiere-gold';
-      else if (sl.includes('neon-cult'))     earlyTheme = 'neon-cult';
-      else if (sl.includes('cinematic')||sl.includes('interactive')) earlyTheme = 'interactive-cinematic';
-    }
-    if (!earlyTheme) { try { earlyTheme = sessionStorage.getItem('ld_theme'); } catch(e){} }
-    if (earlyTheme) { document.body.setAttribute('data-theme', earlyTheme); _ldCurrentTheme = earlyTheme; }
-    document.documentElement.removeAttribute('data-theme-early');
-  }
+  // Theme is ONLY applied via config_landing.theme — never guessed from slug
+  // This prevents T2 CSS from interfering with T1 events
 
   // ── Apply config_landing if exists ──
   if (data.config_landing) {
