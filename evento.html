@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v0a9675b5 -->
+<!-- EVENTO_VERSION:v3ecdb655 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -205,11 +205,6 @@ body[data-theme="arthouse"] #mod-countdown .ld-cd-grid{max-width:480px;margin:0 
 body[data-theme="arthouse"] #mod-countdown .ld-cd-block{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:2px}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-num{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(28px,9vw,52px)}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-label{color:rgba(255,255,255,.4)}
-body[data-theme="arthouse"] #mod-countdown .ld-eyebrow{color:rgba(255,255,255,.35);display:block;text-align:center;margin-bottom:2rem}
-body[data-theme="arthouse"] #mod-countdown .ld-cd-grid{max-width:480px;margin:0 auto}
-body[data-theme="arthouse"] #mod-countdown .ld-cd-block{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:0}
-body[data-theme="arthouse"] #mod-countdown .ld-cd-num{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(28px,9vw,52px)}
-body[data-theme="arthouse"] #mod-countdown .ld-cd-label{color:rgba(255,255,255,.3)}
 /* Sinopsis + Poster */
 body[data-theme="arthouse"] #mod-sinopsis{background:#f2ede4;padding:5rem 2rem;border:none}
 body[data-theme="arthouse"] #mod-sinopsis .at-sinopsis-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:3rem;align-items:start}
@@ -1343,7 +1338,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v0a9675b5 | T1:✅ T2:✅ poster:✅ countdown:✅');
+  console.log('[evento.html] VERSION=v3ecdb655 | T1:desc+trailer+cd fixed');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -2294,7 +2289,9 @@ function aplicarConfiguracionLanding(cfg) {
 }
 
 function _ldRenderContent(content, cfg) {
-  if (cfg.modules?.trailer && content.trailer_url) _ldSetupTrailer(content.trailer_url, content.trailer_thumb);
+  // Trailer: use config content.trailer_url OR evento.video_url as fallback
+  const _trailerUrl = content.trailer_url || eventoActual?.video_url || null;
+  if (cfg.modules?.trailer && _trailerUrl) _ldSetupTrailer(_trailerUrl, content.trailer_thumb);
   if (cfg.modules?.countdown) {
     const target = content.countdown_date || (eventoActual?.fecha && eventoActual?.hora
       ? eventoActual.fecha + 'T' + eventoActual.hora : null);
@@ -2464,12 +2461,16 @@ function _ldInitArthouse(cfg) {
     formSec.insertBefore(lbl, formSec.firstChild);
   }
   // Descripcion from event data
-  // mod-descripcion shows sinopsis from config_landing (NOT short descripcion)
-  const _sinopsisText = eventoActual?.config_landing?.content?.sinopsis || null;
-  if (_sinopsisText) {
+  // mod-descripcion shows evento.descripcion (short description field from admin)
+  // Sinopsis (long text) goes in mod-sinopsis, NOT here
+  const _descripcionCorta = eventoActual?.descripcion || null;
+  if (_descripcionCorta) {
     const modDesc = document.getElementById('mod-descripcion');
-    const txtEl = document.getElementById('at-desc-text');
-    if (modDesc && txtEl) { txtEl.textContent = _sinopsisText; modDesc.classList.remove('hidden'); }
+    const txtEl   = document.getElementById('at-desc-text');
+    if (modDesc && txtEl) {
+      txtEl.textContent = _descripcionCorta;
+      modDesc.style.display = 'block';  // always show if descripcion exists
+    }
   }
   // Aforo
   if (eventoActual?.aforo_max) {
