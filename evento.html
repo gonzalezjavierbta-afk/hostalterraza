@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v2882c995 -->
+<!-- EVENTO_VERSION:v71f25a8b -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -1338,7 +1338,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v2882c995 | wrap:hidden | cd:4cols');
+  console.log('[evento.html] VERSION=v71f25a8b | trailer:preload | no-black-box');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -2329,19 +2329,32 @@ function _ldSetupTrailer(url, thumbOverride) {
   const btn    = document.getElementById('ld-trailer-btn');
   const iframe = document.getElementById('ld-trailer-iframe');
   if (!thumb || !iframe) return;
-  // Show the wrap first
-  if (wrap) wrap.style.display = 'block';
+
+  const _showTrailer = () => {
+    if (wrap) wrap.style.display = 'block';
+    if (btn)  btn.style.display  = 'flex';
+    thumb.style.display = 'block';
+  };
+  const _hideTrailer = () => {
+    // Thumbnail failed — hide everything, don't show black box
+    if (wrap) wrap.style.display = 'none';
+    if (btn)  btn.style.display  = 'none';
+    thumb.style.display = 'none';
+  };
+
   if (ytM) {
     const vid = ytM[1];
-    thumb.src = thumbOverride || `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
-    thumb.style.display = 'block';
-    thumb.onerror = () => { thumb.onerror = null; thumb.style.display = 'none'; };
-    iframe.dataset.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
+    const src = thumbOverride || `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+    // Pre-load image before showing the wrap
+    const testImg = new Image();
+    testImg.onload  = () => { thumb.src = src; iframe.dataset.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`; _showTrailer(); };
+    testImg.onerror = () => { _hideTrailer(); };
+    testImg.src = src;
   } else if (viM) {
-    if (thumbOverride) { thumb.src = thumbOverride; thumb.style.display = 'block'; }
     iframe.dataset.src = `https://player.vimeo.com/video/${viM[1]}?autoplay=1`;
+    if (thumbOverride) { thumb.src = thumbOverride; }
+    _showTrailer();
   }
-  if (btn) btn.style.display = 'flex';
 }
 
 function ldPlayTrailer() {
