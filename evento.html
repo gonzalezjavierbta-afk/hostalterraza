@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v99afd2b4 -->
+<!-- EVENTO_VERSION:v2882c995 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -727,9 +727,9 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
   <p class="hero-desc" id="ev-desc" style="display:none;max-width:520px;margin:0 auto;padding:0 1.5rem;white-space:pre-line;line-height:1.7;color:rgba(255,255,255,.75);font-size:14px"></p>
 
   <div class="ld-module hidden" id="mod-trailer">
-    <div class="ld-trailer-wrap">
+    <div class="ld-trailer-wrap" id="ld-trailer-wrap" style="display:none">
       <img class="ld-trailer-thumb" id="ld-trailer-thumb" src="" alt="" loading="lazy" style="display:none">
-      <div class="ld-trailer-btn" id="ld-trailer-btn" onclick="ldPlayTrailer()">
+      <div class="ld-trailer-btn" id="ld-trailer-btn" onclick="ldPlayTrailer()" style="display:none">
         <div class="ld-play-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="margin-left:3px;color:#000"><path d="M8 5v14l11-7z"/></svg>
         </div>
@@ -1338,7 +1338,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v99afd2b4 | trailer:fixed | cd:4cols');
+  console.log('[evento.html] VERSION=v2882c995 | wrap:hidden | cd:4cols');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -2324,10 +2324,13 @@ function _ldRenderContent(content, cfg) {
 function _ldSetupTrailer(url, thumbOverride) {
   const ytM = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   const viM = url.match(/vimeo\.com\/(\d+)/);
+  const wrap   = document.getElementById('ld-trailer-wrap');
   const thumb  = document.getElementById('ld-trailer-thumb');
   const btn    = document.getElementById('ld-trailer-btn');
   const iframe = document.getElementById('ld-trailer-iframe');
   if (!thumb || !iframe) return;
+  // Show the wrap first
+  if (wrap) wrap.style.display = 'block';
   if (ytM) {
     const vid = ytM[1];
     thumb.src = thumbOverride || `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
