@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v3ecdb655 -->
+<!-- EVENTO_VERSION:v99afd2b4 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -201,7 +201,7 @@ body[data-theme="arthouse"] #mod-trailer .ld-play-icon svg{color:#000}
 /* Countdown */
 body[data-theme="arthouse"] #mod-countdown{background:#0d0d0b;color:#fff;padding:4rem 2rem;text-align:center;border:none}
 body[data-theme="arthouse"] #mod-countdown .ld-eyebrow{color:rgba(255,255,255,.45);text-align:center;display:block;margin-bottom:1.5rem}
-body[data-theme="arthouse"] #mod-countdown .ld-cd-grid{max-width:480px;margin:0 auto}
+body[data-theme="arthouse"] #mod-countdown .ld-cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:480px;margin:0 auto}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-block{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:2px}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-num{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(28px,9vw,52px)}
 body[data-theme="arthouse"] #mod-countdown .ld-cd-label{color:rgba(255,255,255,.4)}
@@ -627,7 +627,7 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
 .ld-cd-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px;display:block;opacity:.6}
 .ld-trailer-wrap{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9}
 .ld-trailer-thumb{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
-.ld-trailer-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);cursor:pointer;transition:background .2s}
+.ld-trailer-btn{position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.35);cursor:pointer;transition:background .2s}
 .ld-trailer-btn:hover{background:rgba(0,0,0,.15)}
 .ld-play-icon{width:60px;height:60px;border-radius:50%;background:rgba(200,169,110,.9);display:flex;align-items:center;justify-content:center;transition:transform .2s}
 .ld-trailer-btn:hover .ld-play-icon{transform:scale(1.1)}
@@ -728,8 +728,8 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
 
   <div class="ld-module hidden" id="mod-trailer">
     <div class="ld-trailer-wrap">
-      <img class="ld-trailer-thumb" id="ld-trailer-thumb" src="" alt="" loading="lazy">
-      <div class="ld-trailer-btn" onclick="ldPlayTrailer()">
+      <img class="ld-trailer-thumb" id="ld-trailer-thumb" src="" alt="" loading="lazy" style="display:none">
+      <div class="ld-trailer-btn" id="ld-trailer-btn" onclick="ldPlayTrailer()">
         <div class="ld-play-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="margin-left:3px;color:#000"><path d="M8 5v14l11-7z"/></svg>
         </div>
@@ -1338,7 +1338,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v3ecdb655 | T1:desc+trailer+cd fixed');
+  console.log('[evento.html] VERSION=v99afd2b4 | trailer:fixed | cd:4cols');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -2324,19 +2324,21 @@ function _ldRenderContent(content, cfg) {
 function _ldSetupTrailer(url, thumbOverride) {
   const ytM = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   const viM = url.match(/vimeo\.com\/(\d+)/);
-  const thumb = document.getElementById('ld-trailer-thumb');
+  const thumb  = document.getElementById('ld-trailer-thumb');
+  const btn    = document.getElementById('ld-trailer-btn');
   const iframe = document.getElementById('ld-trailer-iframe');
   if (!thumb || !iframe) return;
   if (ytM) {
     const vid = ytM[1];
-    // Use hqdefault directly (always exists); maxresdefault often 404s
     thumb.src = thumbOverride || `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
-    thumb.onerror = () => { thumb.onerror = null; /* fallback: hide thumb, show play only */ };
+    thumb.style.display = 'block';
+    thumb.onerror = () => { thumb.onerror = null; thumb.style.display = 'none'; };
     iframe.dataset.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
   } else if (viM) {
-    thumb.src = thumbOverride || '';
+    if (thumbOverride) { thumb.src = thumbOverride; thumb.style.display = 'block'; }
     iframe.dataset.src = `https://player.vimeo.com/video/${viM[1]}?autoplay=1`;
   }
+  if (btn) btn.style.display = 'flex';
 }
 
 function ldPlayTrailer() {
