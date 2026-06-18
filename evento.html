@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v71f25a8b -->
+<!-- EVENTO_VERSION:v826d8a6e -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -1338,7 +1338,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v71f25a8b | trailer:preload | no-black-box');
+  console.log('[evento.html] VERSION=v826d8a6e | ev-video-wrap:skip-on-template');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -1492,9 +1492,8 @@ async function init() {
     descEl.style.display = 'block';
   }
 
-  // Video — mostrar link directo en lugar de embed para evitar Error 153
-  // (muchos videos tienen el embedding deshabilitado por su dueño)
-  if (data.video_url) {
+  // Video — mostrar solo si NO hay config_landing (los templates usan mod-trailer)
+  if (data.video_url && !data.config_landing) {
     const videoWrap = document.getElementById('ev-video-wrap');
     if (videoWrap) {
       const yt = data.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
