@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v10de61c2 -->
+<!-- EVENTO_VERSION:ve05a61de -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -279,7 +279,12 @@ body[data-theme="premiere-gold"]{
 }
 body[data-theme="premiere-gold"] #s-main{ background: var(--pg-bg); }
 /* hero-bg keeps its JS-applied background-image regardless of theme */
-/* hero-bg background-image set via JS setAttribute — do not override */
+/* hero-bg: JS setAttribute wins, CSS var as fallback */
+body[data-theme="premiere-gold"] .hero-bg{
+  background-image: var(--hero-img-url, none) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+}
 
 /* ── HERO centrado ──────────────────────────────────────── */
 body[data-theme="premiere-gold"] .hero{
@@ -634,6 +639,21 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
 .ld-trailer-btn:hover .ld-play-icon{transform:scale(1.1)}
 .ld-trailer-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:none}
 .ld-sinopsis-text{font-size:clamp(14px,1.8vw,17px);line-height:1.9;color:rgba(255,255,255,.72);white-space:pre-wrap;max-width:600px}
+
+/* mod-descripcion base (default dark theme) */
+.ld-desc-module{padding:4rem 2.5rem;background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.08)}
+.ld-desc-inner{max-width:520px;margin:0 auto}
+.ld-desc-eyebrow{font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1.75rem;text-align:center}
+.ld-desc-text{font-family:'Playfair Display',serif;font-size:clamp(17px,2.2vw,22px);line-height:1.85;color:rgba(255,255,255,.85);font-style:italic;margin:0;white-space:pre-wrap;text-align:center}
+/* T1 Arthouse — white bg, dark text */
+body[data-theme="arthouse"] .ld-desc-module{background:#fff;border-top:none}
+body[data-theme="arthouse"] .ld-desc-eyebrow{color:#bbb}
+body[data-theme="arthouse"] .ld-desc-text{color:#1a1a1a}
+/* T2 Premiere Gold — dark surface, gold eyebrow, cream text */
+body[data-theme="premiere-gold"] .ld-desc-module{background:var(--pg-surface,#141208);border-top:1px solid var(--pg-border,rgba(212,175,55,.18));padding:5rem 2.5rem}
+body[data-theme="premiere-gold"] .ld-desc-eyebrow{color:var(--pg-accent,#d4af37);font-family:'Cinzel',serif;letter-spacing:.3em}
+body[data-theme="premiere-gold"] .ld-desc-text{color:var(--pg-text,#f0ead8);font-family:'Playfair Display',serif}
+@media(max-width:600px){.ld-desc-module{padding:3rem 1.5rem}}
 #mod-sinopsis{padding:4rem 2.5rem;max-width:none;border-top:1px solid rgba(255,255,255,.08)}
 @media(max-width:600px){#mod-sinopsis{padding:3rem 1.5rem}#mod-descripcion{padding:3rem 1.5rem!important}}
 .ld-director-card{display:flex;gap:1rem;align-items:flex-start;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:1rem}
@@ -712,10 +732,10 @@ body[data-theme="premiere-gold"] .ld-eyebrow{ color:var(--pg-muted); }
   </div>
 
   <!-- ══ DESCRIPCIÓN ══════════════════════════════════════════ -->
-  <div id="mod-descripcion" style="background:#fff;padding:4rem 2.5rem">
-    <div style="max-width:520px;margin:0 auto">
-      <div style="font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#bbb;margin-bottom:1.75rem;text-align:center">Sobre el evento</div>
-      <p id="at-desc-text" style="font-family:'Playfair Display',serif;font-size:clamp(17px,2.2vw,22px);line-height:1.85;color:#1a1a1a;font-style:italic;margin:0;white-space:pre-wrap;text-align:center"></p>
+  <div id="mod-descripcion" class="ld-desc-module">
+    <div class="ld-desc-inner">
+      <div class="ld-desc-eyebrow">Sobre el evento</div>
+      <p id="at-desc-text" class="ld-desc-text"></p>
     </div>
   </div>
 
@@ -1339,7 +1359,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v10de61c2 | T2:hero+desc+poster+trailer fixed');
+  console.log('[evento.html] VERSION=ve05a61de | desc:class | PG:hero-css-var | T1:white');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
