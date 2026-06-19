@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:ve8b2041e -->
+<!-- EVENTO_VERSION:v10de61c2 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -279,7 +279,7 @@ body[data-theme="premiere-gold"]{
 }
 body[data-theme="premiere-gold"] #s-main{ background: var(--pg-bg); }
 /* hero-bg keeps its JS-applied background-image regardless of theme */
-body[data-theme="premiere-gold"] #hero-bg{ background-color: var(--pg-bg); }
+/* hero-bg background-image set via JS setAttribute — do not override */
 
 /* ── HERO centrado ──────────────────────────────────────── */
 body[data-theme="premiere-gold"] .hero{
@@ -369,10 +369,7 @@ body[data-theme="premiere-gold"] #at-desc-text{
   font-family:'Playfair Display',serif; color:var(--pg-text)!important;
   text-align:center; font-style:italic; background:transparent;
 }
-body[data-theme="premiere-gold"] #mod-descripcion > div > div:first-child{
-  font-family:'Cinzel',serif; font-size:10px; letter-spacing:.3em;
-  text-transform:uppercase; color:var(--pg-accent); margin-bottom:1.75rem;
-}
+
 
 /* Countdown — elegante, grande, Ovation-style */
 body[data-theme="premiere-gold"] #mod-countdown{
@@ -440,6 +437,10 @@ body[data-theme="premiere-gold"] #mod-trailer .ld-trailer-wrap{
   max-width:640px; margin:0 auto;
   border-radius:4px; overflow:hidden;
   box-shadow:0 8px 60px rgba(0,0,0,.6), 0 0 0 1px var(--pg-border);
+  display:block !important;  /* override hidden default when shown */
+}
+body[data-theme="premiere-gold"] #mod-trailer #ld-trailer-wrap{
+  max-width:640px; margin:0 auto; border-radius:4px; overflow:hidden;
 }
 body[data-theme="premiere-gold"] #mod-trailer .ld-play-icon{
   background:var(--pg-accent);
@@ -1338,7 +1339,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=ve8b2041e | T2:rAF-hero | T1:stable');
+  console.log('[evento.html] VERSION=v10de61c2 | T2:hero+desc+poster+trailer fixed');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -1440,16 +1441,17 @@ async function init() {
       bg.style.background = `linear-gradient(150deg,#0e0e0c 0%,${data.color_primario}44 100%)`;
   }
 
-  // Poster URL → sinopsis poster (left column) + cartel wrap
+  // Poster URL → sinopsis left column only (NOT in ev-cartel-wrap for templates)
   const posterUrl = data.config_landing?.content?.poster_url || null;
   if (posterUrl) {
-    // Show in sinopsis left column
     const posterCol = document.getElementById('at-poster-col');
     const posterImg = document.getElementById('at-poster-img');
     if (posterCol && posterImg) { posterImg.src = posterUrl; posterCol.style.display = 'block'; }
-    // Also show in cartel wrap if exists
-    const imgWrap = document.getElementById('ev-cartel-wrap');
-    if (imgWrap) { const ci = document.getElementById('ev-cartel-img'); if(ci) ci.src = posterUrl; imgWrap.style.display = 'block'; }
+    // ev-cartel-wrap only for events WITHOUT config_landing (basic events)
+    if (!data.config_landing) {
+      const imgWrap = document.getElementById('ev-cartel-wrap');
+      if (imgWrap) { const ci = document.getElementById('ev-cartel-img'); if(ci) ci.src = posterUrl; imgWrap.style.display = 'block'; }
+    }
   }
 
   // Título — puede ser diferente al nombre del evento
