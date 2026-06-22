@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:vcbf1e3c5 -->
+<!-- EVENTO_VERSION:v9d0f68b7 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -1356,7 +1356,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=vcbf1e3c5 | T1:white-desc | T2:hero-css+trailer-center');
+  console.log('[evento.html] VERSION=v9d0f68b7 | hero-debug:ON');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -1452,8 +1452,10 @@ async function init() {
     );
     bg.classList.remove('no-img');
     document.documentElement.style.setProperty('--hero-img-url', `url('${data.imagen_url}')`);
+    console.log('[hero-bg] imagen_url:', data.imagen_url, '| --hero-img-url set ✅');
   } else {
     bg.classList.add('no-img');
+    console.log('[hero-bg] NO imagen_url — using gradient fallback');
     if (data.color_primario)
       bg.style.background = `linear-gradient(150deg,#0e0e0c 0%,${data.color_primario}44 100%)`;
   }
