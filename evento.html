@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v9d0f68b7 -->
+<!-- EVENTO_VERSION:v46a3e2cf -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -1356,7 +1356,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v9d0f68b7 | hero-debug:ON');
+  console.log('[evento.html] VERSION=v46a3e2cf | gallery:T2-cards | T1:slides');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -2331,6 +2331,38 @@ function _ldRenderContent(content, cfg) {
     const el = document.getElementById('ld-dresscode-text'); if (el) el.textContent = content.dresscode;
   }
   if (cfg.modules?.aforo) _ldRenderAforo();
+  // Gallery — tarjetas para T2 (premiere-gold), slides para T1 (arthouse)
+  if (cfg.modules?.gallery && content.gallery?.length) {
+    const modG = document.getElementById('mod-gallery');
+    if (modG) modG.classList.remove('hidden');
+    const isPG = cfg.theme === 'premiere-gold';
+    const grid = document.getElementById('at-gallery-grid');
+    const heroImg = document.getElementById('at-gallery-hero');
+    const dots = document.getElementById('at-gallery-dots');
+    if (isPG && grid) {
+      // T2: tarjetas 3 columnas, primera a ancho completo
+      if (heroImg) heroImg.style.display = 'none';
+      if (dots) dots.style.display = 'none';
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:2rem';
+      grid.innerHTML = content.gallery.map((url, i) =>
+        `<div style="overflow:hidden;${i===0?'grid-column:1/-1;':''}" >
+          <img src="${url}" loading="lazy" alt="Imagen ${i+1}"
+            style="width:100%;aspect-ratio:${i===0?'21/9':'3/4'};object-fit:cover;display:block;
+              transition:transform .4s ease,filter .4s ease;filter:brightness(.85)"
+            onmouseover="this.style.transform='scale(1.03)';this.style.filter='brightness(1)'"
+            onmouseout="this.style.transform='';this.style.filter='brightness(.85)'">
+        </div>`
+      ).join('');
+    } else if (!isPG) {
+      // T1 Arthouse: hero image + grid
+      if (heroImg) { heroImg.src = content.gallery[0]; heroImg.style.display = 'block'; }
+      if (grid && content.gallery.length > 1) {
+        grid.innerHTML = content.gallery.slice(1).map(url =>
+          `<img class="at-gallery-thumb" src="${url}" loading="lazy" alt="">`
+        ).join('');
+      }
+    }
+  }
   if (cfg.modules?.sponsors && content.sponsors?.length) {
     const grid = document.getElementById('ld-sponsors-grid');
     if (grid) { grid.className = 'at-sponsors-grid'; grid.innerHTML = content.sponsors.map(s => s.startsWith('http') ? `<img class="at-sponsor-logo" src="${s}" alt="" loading="lazy">` : `<span class="at-sponsor-name">${s}</span>`).join(''); }
