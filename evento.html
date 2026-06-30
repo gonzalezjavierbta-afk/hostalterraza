@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v1e6560ed -->
+<!-- EVENTO_VERSION:v9b59a63c -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3421,7 +3421,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v1e6560ed | html-fixed | fecha-sentinel');
+  console.log('[evento.html] VERSION=v9b59a63c | modules:type-gated | no-leak');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4356,18 +4356,55 @@ function aplicarConfiguracionLanding(cfg) {
   // 2. Colors
   const root = document.documentElement;
   if (cfg.colors?.accent) { root.style.setProperty('--gold', cfg.colors.accent); root.style.setProperty('--ld-accent', cfg.colors.accent); }
-  // 3. Modules
+
+  // Determine event type from theme — only activate modules belonging to this type
+  const _THEME_TYPE_MAP = {
+    'arthouse':'cinematografia','premiere-gold':'cinematografia',
+    'neon-cult-cine':'cinematografia','interactive-cine':'cinematografia',
+    'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
+    'underground':'fiesta','elegant-cocktail':'fiesta',
+    'solidario-moderno':'campana','urgente-impactante':'campana',
+    'tech-futurista':'campana','vintage-organico':'campana',
+  };
+  const _tipoEvento = _THEME_TYPE_MAP[cfg.theme] || 'cinematografia';
+
+  // 3. Modules — gated by type so a stale field from another type never leaks
   const mods = cfg.modules || {};
   const setMod = (id, v) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', !v); };
-  setMod('mod-trailer',       mods.trailer);
-  setMod('mod-countdown',     mods.countdown);
-  setMod('mod-sinopsis',      mods.sinopsis);
-  setMod('mod-meet-director', mods.meet_director);
-  setMod('mod-gallery',       mods.gallery);
-  setMod('mod-dresscode',     mods.dresscode);
-  setMod('mod-aforo',         mods.aforo);
-  setMod('mod-sponsors',      mods.sponsors);
-  setMod('mod-faq',           mods.faq);
+
+  if (_tipoEvento === 'cinematografia') {
+    setMod('mod-trailer',       mods.trailer);
+    setMod('mod-countdown',     mods.countdown);
+    setMod('mod-sinopsis',      mods.sinopsis);
+    setMod('mod-meet-director', mods.meet_director);
+    setMod('mod-gallery',       mods.gallery);
+    setMod('mod-dresscode',     mods.dresscode);
+    setMod('mod-aforo',         mods.aforo);
+    setMod('mod-sponsors',      mods.sponsors);
+    setMod('mod-faq',           mods.faq);
+  } else if (_tipoEvento === 'fiesta') {
+    setMod('mod-countdown',     mods.countdown);
+    setMod('mod-gallery',       mods.gallery);
+    setMod('mod-dresscode',     mods.dresscode);
+    setMod('mod-aforo',         mods.aforo);
+    setMod('mod-sponsors',      mods.sponsors);
+    setMod('mod-faq',           mods.faq);
+    // DJ Lineup, Playlist, Guest List, Ubicación se manejan en _ldRenderContent si existen
+  } else if (_tipoEvento === 'campana') {
+    // Campaña usa SOLO sus propios módulos — el resto queda explícitamente oculto
+    setMod('mod-trailer', false);
+    setMod('mod-sinopsis', false);
+    setMod('mod-meet-director', false);
+    setMod('mod-dresscode', false);
+    setMod('mod-aforo', false);
+    setMod('mod-countdown', !!mods.countdown);
+    setMod('mod-gallery',   !!mods.gallery);
+    setMod('mod-sponsors',  !!mods.sponsors);
+    setMod('mod-faq',       !!mods.faq);
+    // Historia, Objetivo, Impacto, Equipo, Testimonios, Actualizaciones, Contacto
+    // se activan dentro de _ldRenderCampana()
+  }
+
   // 4. Effects
   const fx = cfg.effects || {};
   document.body.classList.toggle('fx-grain', !!fx.grain);
@@ -4379,7 +4416,7 @@ function aplicarConfiguracionLanding(cfg) {
   // Campaign modules (P9-P12)
   const _campanaThemes = ['solidario-moderno','urgente-impactante','tech-futurista','vintage-organico'];
   if (_campanaThemes.includes(cfg.theme)) _ldRenderCampana(cfg.content || {}, cfg);
-  // 6. Arthouse init
+  // 6. Theme-specific init
   if      (cfg.theme === 'arthouse')          _ldInitArthouse(cfg);
   else if (cfg.theme === 'premiere-gold')     _ldInitPremiereGold(cfg);
   else if (cfg.theme === 'neon-cult-cine')    _ldInitNeonCult(cfg);
@@ -4395,15 +4432,25 @@ function aplicarConfiguracionLanding(cfg) {
 }
 
 function _ldRenderContent(content, cfg) {
-  // Trailer: use config content.trailer_url OR evento.video_url as fallback
+  const _THEME_TYPE_MAP2 = {
+    'arthouse':'cinematografia','premiere-gold':'cinematografia',
+    'neon-cult-cine':'cinematografia','interactive-cine':'cinematografia',
+    'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
+    'underground':'fiesta','elegant-cocktail':'fiesta',
+    'solidario-moderno':'campana','urgente-impactante':'campana',
+    'tech-futurista':'campana','vintage-organico':'campana',
+  };
+  const _esCinematografia = (_THEME_TYPE_MAP2[cfg.theme] || 'cinematografia') === 'cinematografia';
+
+  // Trailer y Sinopsis son exclusivos de Cinematografía — nunca se renderizan para otros tipos
   const _trailerUrl = content.trailer_url || eventoActual?.video_url || null;
-  if (cfg.modules?.trailer && _trailerUrl) _ldSetupTrailer(_trailerUrl, content.trailer_thumb);
+  if (_esCinematografia && cfg.modules?.trailer && _trailerUrl) _ldSetupTrailer(_trailerUrl, content.trailer_thumb);
   if (cfg.modules?.countdown) {
     const target = content.countdown_date || (eventoActual?.fecha && eventoActual?.hora
       ? eventoActual.fecha + 'T' + eventoActual.hora : null);
     if (target) _ldStartCountdown(target);
   }
-  if (cfg.modules?.sinopsis && content.sinopsis) {
+  if (_esCinematografia && cfg.modules?.sinopsis && content.sinopsis) {
     const el = document.getElementById('ld-sinopsis-text'); if (el) el.textContent = content.sinopsis;
     const tit = document.getElementById('ld-sinopsis-titulo'); if (tit) tit.textContent = content.sinopsis_titulo || eventoActual?.nombre || '';
   }
