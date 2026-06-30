@@ -799,13 +799,17 @@ tr:hover td{background:var(--surface)}
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
 
             <!-- CAMPOS CAMPAÑA -->
-            <div id="ld-campo-historia" style="display:none" class="fg"><label style="font-size:12px">Historia de la causa</label><textarea id="ld-historia-val" rows="4" placeholder="Describe el contexto y la urgencia de la causa..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-historia" style="display:none">
+              <div class="fg"><label style="font-size:12px">Título de la historia</label><input id="ld-historia-titulo" placeholder="Ej. Historia de la causa" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:12px">Historia de la causa</label><textarea id="ld-historia-val" rows="4" placeholder="Describe el contexto y la urgencia de la causa..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            </div>
             <div id="ld-campo-objetivo" style="display:none">
               <div class="grid2">
                 <div class="fg"><label style="font-size:12px">Meta económica ($)</label><input id="ld-objetivo-meta" type="number" placeholder="60000" style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:12px">Recaudado actual ($)</label><input id="ld-objetivo-actual" type="number" placeholder="32600" style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:12px">URL botón donar</label><input id="ld-objetivo-url" type="url" placeholder="https://..." style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:12px">Texto botón</label><input id="ld-objetivo-btn" placeholder="DONAR AHORA" style="font-size:12px"></div>
+                <div class="fg" style="grid-column:1/-1"><label style="font-size:12px">Texto motivacional</label><input id="ld-donate-text" placeholder="Tu apoyo hace la diferencia" style="font-size:12px"></div>
               </div>
             </div>
             <div id="ld-campo-impacto" style="display:none" class="fg"><label style="font-size:12px">Impacto — ítem|valor|icono-emoji (uno por línea)</label><textarea id="ld-impacto-val" rows="3" placeholder="Niños educados|100+|🎓&#10;Familias apoyadas|50+|👨‍👩‍👧&#10;Comunidades|10+|🏘️" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
@@ -2237,6 +2241,16 @@ function seleccionarTheme(theme) {
   const modDiv = document.getElementById('mods-' + tipo);
   if (modDiv) modDiv.style.display = 'block';
 
+  // Campañas: Fecha y Ubicación son opcionales (algunas campañas no tienen fecha/lugar fijo)
+  const fechaLabel = document.querySelector('#ev-fecha-wrap label');
+  const fechaInput = document.getElementById('ev-f');
+  if (fechaLabel) {
+    fechaLabel.textContent = tipo === 'campana' ? 'Fecha (opcional)' : 'Fecha *';
+  }
+  if (fechaInput) {
+    fechaInput.placeholder = tipo === 'campana' ? 'Sin fecha límite' : '';
+  }
+
   // Preview badge
   const names = {
     'arthouse':'P1 · Arthouse','premiere-gold':'P2 · Premiere Gold',
@@ -2347,10 +2361,12 @@ function _buildConfigLanding() {
       ubicacion:   val('ld-ubicacion-val')  || null,
       // Campaña
       historia:    val('ld-historia-val')   || null,
+      historia_titulo: val('ld-historia-titulo') || null,
       objetivo_meta:   val('ld-objetivo-meta')   ? Number(val('ld-objetivo-meta'))   : null,
       objetivo_actual: val('ld-objetivo-actual')  ? Number(val('ld-objetivo-actual')) : null,
       objetivo_url:    val('ld-objetivo-url')    || null,
       objetivo_btn:    val('ld-objetivo-btn')    || null,
+      donate_text:     val('ld-donate-text')     || null,
       impacto:     val('ld-impacto-val')    ? val('ld-impacto-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{label:p[0]?.trim(),valor:p[1]?.trim(),emoji:p[2]?.trim()};}) : undefined,
       equipo:      val('ld-equipo-val')     ? val('ld-equipo-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{nombre:p[0]?.trim(),rol:p[1]?.trim(),foto:p[2]?.trim()};}) : undefined,
       testimonios: val('ld-testimonios-val')? val('ld-testimonios-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{texto:p[0]?.trim(),autor:p[1]?.trim()};}) : undefined,
@@ -4068,7 +4084,12 @@ async function crearEvento() {
 
 async function _crearEventoUnico(n) {
   const f = document.getElementById('ev-f').value;
-  if (!f) { alrt('ev-alert','La fecha es obligatoria.','err'); return; }
+  // Fecha es obligatoria SOLO para Cinematografía y Fiesta — Campañas pueden no tener fecha fija
+  const _tipoActual = (typeof _THEME_TYPE !== 'undefined' && _ldThemeSeleccionado)
+    ? _THEME_TYPE[_ldThemeSeleccionado] : null;
+  if (!f && _tipoActual !== 'campana') {
+    alrt('ev-alert','La fecha es obligatoria.','err'); return;
+  }
 
   const slug = n.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -4077,7 +4098,7 @@ async function _crearEventoUnico(n) {
     + '-' + Math.random().toString(36).substr(2,4);
 
   const {data:ev, error} = await SB.from('eventos').insert({
-    nombre: n, fecha: f, slug,
+    nombre: n, fecha: f || null, slug,
     hora: document.getElementById('ev-h').value||null,
     descripcion: document.getElementById('ev-d').value.trim()||null,
     ubicacion: document.getElementById('ev-ubic').value.trim()||null,
