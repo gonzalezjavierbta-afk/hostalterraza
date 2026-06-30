@@ -1,9 +1,9 @@
-<!-- EVENTO_VERSION:v5a337ebf -->
+<!-- EVENTO_VERSION:v1e6560ed -->
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet"> rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Evento · Terraza Hostal</title>
@@ -3421,7 +3421,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v5a337ebf | P9:premium | Poppins:loaded');
+  console.log('[evento.html] VERSION=v1e6560ed | html-fixed | fecha-sentinel');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -3555,8 +3555,9 @@ async function init() {
     eyebrowEl.textContent = tieneDisplayDistinto ? data.nombre : 'Próximo evento';
   }
 
-  // Fecha — ocultar la fila completa si no hay fecha (campañas sin fecha límite)
-  const fd = formatFecha(data.fecha);
+  // Fecha — ocultar la fila completa si no hay fecha o es el placeholder de campaña sin fecha
+  const _esFechaPlaceholder = data.fecha === '2099-12-31';
+  const fd = (!data.fecha || _esFechaPlaceholder) ? '' : formatFecha(data.fecha);
   const fechaRow = document.getElementById('ev-fecha')?.closest('.meta-row');
   if (fd) {
     document.getElementById('ev-fecha').textContent = fd;

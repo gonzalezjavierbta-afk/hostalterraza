@@ -4090,6 +4090,11 @@ async function _crearEventoUnico(n) {
   if (!f && _tipoActual !== 'campana') {
     alrt('ev-alert','La fecha es obligatoria.','err'); return;
   }
+  // NOTA: la columna 'fecha' en Supabase tiene NOT NULL constraint.
+  // Hasta que se ejecute el ALTER TABLE para permitir NULL, usamos un placeholder
+  // muy lejano para campañas sin fecha — esto NO se muestra en la página pública
+  // porque evento.html oculta la fila de fecha cuando es este valor centinela.
+  const _fechaParaGuardar = f || (_tipoActual === 'campana' ? '2099-12-31' : f);
 
   const slug = n.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -4098,7 +4103,7 @@ async function _crearEventoUnico(n) {
     + '-' + Math.random().toString(36).substr(2,4);
 
   const {data:ev, error} = await SB.from('eventos').insert({
-    nombre: n, fecha: f || null, slug,
+    nombre: n, fecha: _fechaParaGuardar, slug,
     hora: document.getElementById('ev-h').value||null,
     descripcion: document.getElementById('ev-d').value.trim()||null,
     ubicacion: document.getElementById('ev-ubic').value.trim()||null,
