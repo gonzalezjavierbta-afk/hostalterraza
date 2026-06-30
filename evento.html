@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v9b59a63c -->
+<!-- EVENTO_VERSION:v477744f8 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3421,7 +3421,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v9b59a63c | modules:type-gated | no-leak');
+  console.log('[evento.html] VERSION=v477744f8 | debug:verbose | error-visible');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -3668,8 +3668,16 @@ async function init() {
   if (data.config_landing) {
     try {
       const cfg = typeof data.config_landing === 'string' ? JSON.parse(data.config_landing) : data.config_landing;
+      console.log('[config_landing] theme:', cfg?.theme, '| modules:', cfg?.modules, '| raw:', cfg);
+      if (!cfg?.theme) {
+        console.warn('[config_landing] ⚠️ Sin "theme" definido — la página se mostrará sin estilos de plantilla. Edita el evento en el admin y selecciona una plantilla.');
+      }
       aplicarConfiguracionLanding(cfg);
-    } catch(e) { console.warn('[init] config_landing:', e.message); }
+    } catch(e) {
+      console.error('[init] config_landing ERROR:', e.message, e.stack);
+    }
+  } else {
+    console.log('[config_landing] Este evento no tiene config_landing — usa el estilo base sin plantilla.');
   }
   // No default theme — without config_landing the page uses base dark style
 }
@@ -4411,24 +4419,32 @@ function aplicarConfiguracionLanding(cfg) {
   document.body.classList.toggle('fx-glow',  !!fx.glow);
   document.body.classList.toggle('fx-vhs',   !!fx.vhs);
   // 5. Content
-  _ldRenderContent(cfg.content || {}, cfg);
+  try {
+    _ldRenderContent(cfg.content || {}, cfg);
+  } catch(e) { console.error('[aplicarConf] _ldRenderContent ERROR:', e.message, e.stack); }
 
   // Campaign modules (P9-P12)
   const _campanaThemes = ['solidario-moderno','urgente-impactante','tech-futurista','vintage-organico'];
-  if (_campanaThemes.includes(cfg.theme)) _ldRenderCampana(cfg.content || {}, cfg);
+  if (_campanaThemes.includes(cfg.theme)) {
+    try {
+      _ldRenderCampana(cfg.content || {}, cfg);
+    } catch(e) { console.error('[aplicarConf] _ldRenderCampana ERROR:', e.message, e.stack); }
+  }
   // 6. Theme-specific init
-  if      (cfg.theme === 'arthouse')          _ldInitArthouse(cfg);
-  else if (cfg.theme === 'premiere-gold')     _ldInitPremiereGold(cfg);
-  else if (cfg.theme === 'neon-cult-cine')    _ldInitNeonCult(cfg);
-  else if (cfg.theme === 'interactive-cine')  _ldInitInteractiveCinematic(cfg);
-  else if (cfg.theme === 'underground')       _ldInitUnderground(cfg);
-  else if (cfg.theme === 'elegant-cocktail')  _ldInitElegantCocktail(cfg);
-  else if (cfg.theme === 'solidario-moderno')  _ldInitCampana(cfg);
-  else if (cfg.theme === 'urgente-impactante') _ldInitCampana(cfg);
-  else if (cfg.theme === 'tech-futurista')     _ldInitCampana(cfg);
-  else if (cfg.theme === 'vintage-organico')   _ldInitCampana(cfg);
-  else if (cfg.theme === 'tropical-hostel')   _ldInitTropicalHostel(cfg);
-  else if (cfg.theme === 'rooftop-sunset')    _ldInitRooftopSunset(cfg);
+  try {
+    if      (cfg.theme === 'arthouse')          _ldInitArthouse(cfg);
+    else if (cfg.theme === 'premiere-gold')     _ldInitPremiereGold(cfg);
+    else if (cfg.theme === 'neon-cult-cine')    _ldInitNeonCult(cfg);
+    else if (cfg.theme === 'interactive-cine')  _ldInitInteractiveCinematic(cfg);
+    else if (cfg.theme === 'underground')       _ldInitUnderground(cfg);
+    else if (cfg.theme === 'elegant-cocktail')  _ldInitElegantCocktail(cfg);
+    else if (cfg.theme === 'solidario-moderno')  _ldInitCampana(cfg);
+    else if (cfg.theme === 'urgente-impactante') _ldInitCampana(cfg);
+    else if (cfg.theme === 'tech-futurista')     _ldInitCampana(cfg);
+    else if (cfg.theme === 'vintage-organico')   _ldInitCampana(cfg);
+    else if (cfg.theme === 'tropical-hostel')   _ldInitTropicalHostel(cfg);
+    else if (cfg.theme === 'rooftop-sunset')    _ldInitRooftopSunset(cfg);
+  } catch(e) { console.error('[aplicarConf] theme-init ERROR for theme="'+cfg.theme+'":', e.message, e.stack); }
 }
 
 function _ldRenderContent(content, cfg) {
