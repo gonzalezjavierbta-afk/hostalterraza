@@ -80,10 +80,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .badge-teal{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
 .badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
 .badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
-.ld-theme-card{transition:.15s;cursor:pointer}
-.ld-theme-card:hover{opacity:.85;transform:scale(1.01)}
-.ld-theme-card.selected{border-color:var(--gold)!important;box-shadow:0 0 0 1px var(--gold)}
-
+.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.5rem}
@@ -629,208 +626,6 @@ tr:hover td{background:var(--surface)}
       <div class="ch">Nuevo evento</div>
       <div id="ev-alert"></div>
 
-      <!-- ══ PASO 1: PLANTILLA VISUAL (primero) ══════════════ -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:.75rem">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--ink2)">🎬 Plantilla visual de la página pública</div>
-            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Elige primero el estilo visual — define qué módulos aparecen en la página del evento</div>
-          </div>
-          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;flex-shrink:0">
-            <input type="checkbox" id="ev-landing-activa" style="width:14px;height:14px;accent-color:var(--gold)"
-              onchange="toggleLandingConfig(this.checked)">
-            Activar plantilla
-          </label>
-        </div>
-        <div id="ev-landing-config" style="display:none">
-          <!-- Selector de themes -->
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">🎬 Cinematografía</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" id="ev-theme-cards">
-            <div class="ld-theme-card" data-theme="arthouse" onclick="seleccionarTheme('arthouse')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div><span style="font-size:12px;font-weight:600;color:#0d0d0b">P1 · Arthouse</span></div>
-              <div style="font-size:10px;color:#555">A24 · MUBI · Editorial blanco/negro</div>
-            </div>
-            <div class="ld-theme-card" data-theme="premiere-gold" onclick="seleccionarTheme('premiere-gold')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a1408,#2d2210)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 5px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">P2 · Premiere Gold</span></div>
-              <div style="font-size:10px;color:#a08040">Gala · Ovation · Negro y dorado</div>
-            </div>
-            <div class="ld-theme-card" data-theme="neon-cult-cine" onclick="seleccionarTheme('neon-cult-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#08030d,#120820)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#bf00ff;box-shadow:0 0 7px #bf00ff"></div><span style="font-size:12px;font-weight:600;color:#bf00ff">P3 · Neon Cult Cine</span></div>
-              <div style="font-size:10px;color:#8040a0">Experimental · Por definir</div>
-            </div>
-            <div class="ld-theme-card" data-theme="interactive-cine" onclick="seleccionarTheme('interactive-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#080c0f,#0d1820)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 5px #4fc3f7"></div><span style="font-size:12px;font-weight:600;color:#4fc3f7">P4 · Interactive Cine</span></div>
-              <div style="font-size:10px;color:#3080a0">Multimedia · Por definir</div>
-            </div>
-          </div>
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem">🎉 Fiesta</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem">
-            <div class="ld-theme-card" data-theme="tropical-hostel" onclick="seleccionarTheme('tropical-hostel')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f1f0f,#1a3010)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-size:12px;font-weight:600;color:#4ade80">P5 · Tropical Hostel</span></div>
-              <div style="font-size:10px;color:#2d7040">Selina · Naturaleza · Mochileros</div>
-            </div>
-            <div class="ld-theme-card" data-theme="rooftop-sunset" onclick="seleccionarTheme('rooftop-sunset')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0a00,#2d1800)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 5px #f59e0b"></div><span style="font-size:12px;font-weight:600;color:#f59e0b">P6 · Rooftop Sunset</span></div>
-              <div style="font-size:10px;color:#a06010">Edition Hotels · Golden Hour</div>
-            </div>
-            <div class="ld-theme-card" data-theme="underground" onclick="seleccionarTheme('underground')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a0000,#1a0000)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2d55;box-shadow:0 0 7px #ff2d55"></div><span style="font-size:12px;font-weight:600;color:#ff2d55">P7 · Underground</span></div>
-              <div style="font-size:10px;color:#a01030">Boiler Room · RA.co · Techno</div>
-            </div>
-            <div class="ld-theme-card" data-theme="elegant-cocktail" onclick="seleccionarTheme('elegant-cocktail')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f2efe9,#e8e3d8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#8b7355"></div><span style="font-size:12px;font-weight:600;color:#3a3530">P8 · Elegant Cocktail</span></div>
-              <div style="font-size:10px;color:#7a7570">Aman · Standard Hotels · VIP</div>
-            </div>
-          </div>
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem">📣 Campaña</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem">
-            <div class="ld-theme-card" data-theme="solidario-moderno" onclick="seleccionarTheme('solidario-moderno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a1628,#0d2040)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;box-shadow:0 0 5px #3b82f6"></div><span style="font-size:12px;font-weight:600;color:#3b82f6">P9 · Solidario Moderno</span></div>
-              <div style="font-size:10px;color:#4060a0">Azul · Esperanza · ONG profesional</div>
-            </div>
-            <div class="ld-theme-card" data-theme="urgente-impactante" onclick="seleccionarTheme('urgente-impactante')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0000,#2d0000)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 5px #ef4444"></div><span style="font-size:12px;font-weight:600;color:#ef4444">P10 · Urgente & Impactante</span></div>
-              <div style="font-size:10px;color:#a03030">Rojo · Emergencia · Urgencia</div>
-            </div>
-            <div class="ld-theme-card" data-theme="tech-futurista" onclick="seleccionarTheme('tech-futurista')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#001428,#001e3c)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#06b6d4;box-shadow:0 0 5px #06b6d4"></div><span style="font-size:12px;font-weight:600;color:#06b6d4">P11 · Tech & Futurista</span></div>
-              <div style="font-size:10px;color:#0080a0">Cyan · Innovación · Tecnología</div>
-            </div>
-            <div class="ld-theme-card" data-theme="vintage-organico" onclick="seleccionarTheme('vintage-organico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5efe0,#e8dcc8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#6b7c3c"></div><span style="font-size:12px;font-weight:600;color:#4a5c2a">P12 · Vintage & Orgánico</span></div>
-              <div style="font-size:10px;color:#7a7050">Verde · Raíces · Comunidad</div>
-            </div>
-          </div>
-          <!-- ══ MÓDULOS DINÁMICOS POR TIPO ══ -->
-          <div id="ld-modulos-wrap">
-
-            <!-- CINEMATOGRAFÍA -->
-            <div id="mods-cinematografia" class="mods-tipo" style="display:none">
-              <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Módulos</div>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:.85rem">
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-trailer" style="width:13px;height:13px;accent-color:var(--gold)"> 🎬 Tráiler</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-countdown" style="width:13px;height:13px;accent-color:var(--gold)"> ⏱ Cuenta regresiva</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sinopsis" style="width:13px;height:13px;accent-color:var(--gold)"> 📝 Sinopsis</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-director" style="width:13px;height:13px;accent-color:var(--gold)"> 🎥 Director</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-gallery" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Galería</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-aforo" checked style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Disponibilidad</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-dresscode" style="width:13px;height:13px;accent-color:var(--gold)"> 👗 Dress code</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sponsors" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Patrocinadores</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-faq" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ</label>
-              </div>
-            </div>
-
-            <!-- FIESTA -->
-            <div id="mods-fiesta" class="mods-tipo" style="display:none">
-              <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Módulos</div>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:.85rem">
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-dj-lineup" style="width:13px;height:13px;accent-color:var(--gold)"> 🎧 DJ Lineup</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-countdown" style="width:13px;height:13px;accent-color:var(--gold)"> ⏱ Countdown</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-gallery" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Galería</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-playlist" style="width:13px;height:13px;accent-color:var(--gold)"> 🎵 Playlist</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-dresscode" style="width:13px;height:13px;accent-color:var(--gold)"> 👗 Dress code</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-guest-list" style="width:13px;height:13px;accent-color:var(--gold)"> 📋 Guest list</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-aforo" checked style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Aforo</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-faq" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-ubicacion" style="width:13px;height:13px;accent-color:var(--gold)"> 📍 Ubicación</label>
-              </div>
-            </div>
-
-            <!-- CAMPAÑA -->
-            <div id="mods-campana" class="mods-tipo" style="display:none">
-              <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Módulos</div>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:.85rem">
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-historia" checked style="width:13px;height:13px;accent-color:var(--gold)"> 📖 Historia de la causa</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-objetivo" checked style="width:13px;height:13px;accent-color:var(--gold)"> 💰 Objetivo económico</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-impacto" checked style="width:13px;height:13px;accent-color:var(--gold)"> ✨ Impacto de la donación</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-gallery" checked style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Galería</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-equipo" style="width:13px;height:13px;accent-color:var(--gold)"> 👥 Equipo / Organización</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-testimonios" style="width:13px;height:13px;accent-color:var(--gold)"> 💬 Testimonios</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-actualizaciones" style="width:13px;height:13px;accent-color:var(--gold)"> 📢 Actualizaciones</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sponsors" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Sponsors / Aliados</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-faq" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ</label>
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-contacto" style="width:13px;height:13px;accent-color:var(--gold)"> 📞 Contacto</label>
-              </div>
-            </div>
-
-          </div><!-- end ld-modulos-wrap -->
-
-          <!-- Efectos -->
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Efectos</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.85rem">
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-grain" style="width:13px;height:13px;accent-color:var(--gold)"> Grano</label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-glow" checked style="width:13px;height:13px;accent-color:var(--gold)"> Glow</label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-vhs" style="width:13px;height:13px;accent-color:var(--gold)"> VHS</label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-parallax" style="width:13px;height:13px;accent-color:var(--gold)"> Parallax</label>
-          </div>
-
-          <!-- Contenido de módulos — compartido por todos los tipos -->
-          <div id="ld-contenido-campos">
-            <!-- CAMPOS CINEMATOGRAFÍA -->
-            <div id="ld-campo-sinopsis" style="display:none">
-              <div class="fg"><label style="font-size:12px">Sinopsis</label>
-                <textarea id="ld-sinopsis-text" rows="3" placeholder="Descripción larga del evento..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>
-              </div>
-              <div class="fg"><label style="font-size:12px">Nombre a mostrar en la página
-                  <span style="font-size:11px;color:var(--ink3);font-weight:400"> — si el título es distinto al nombre del evento</span>
-                </label>
-                <input id="ev-titulo-display" placeholder="Ej. ZZZZZ (deja vacío para usar el nombre del evento)" style="font-size:12px">
-              </div>
-            </div>
-            <div id="ld-campo-trailer" style="display:none" class="fg"><label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label><input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px"></div>
-            <div id="ld-campo-director" style="display:none">
-              <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500;margin-top:.5rem">👤 Datos del director</div>
-              <div class="grid2">
-                <div class="fg"><label style="font-size:11px">Nombre</label><input id="ld-dir-nombre" placeholder="Nombre del director" style="font-size:12px"></div>
-                <div class="fg"><label style="font-size:11px">Rol</label><input id="ld-dir-rol" placeholder="Director" value="Director" style="font-size:12px"></div>
-                <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">URL de foto</label><input id="ld-dir-foto" type="url" placeholder="https://..." style="font-size:12px"></div>
-                <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">Biografía</label><textarea id="ld-dir-bio" rows="2" placeholder="Breve biografía..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-              </div>
-            </div>
-            <div id="ld-campo-gallery" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 8)</label><textarea id="ld-gallery-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-dresscode" style="display:none" class="fg"><label style="font-size:12px">Dress code</label><input id="ld-dresscode-val" placeholder="Ej. Formal · Elegante · All black"></div>
-            <div id="ld-campo-sponsors" style="display:none" class="fg"><label style="font-size:12px">Patrocinadores (separados por coma)</label><input id="ld-sponsors-val" placeholder="Ej. Aguila, Spotify, Davivienda"></div>
-            <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-
-            <!-- CAMPOS FIESTA -->
-            <div id="ld-campo-dj-lineup" style="display:none" class="fg"><label style="font-size:12px">DJ Lineup (nombre — hora, uno por línea)</label><textarea id="ld-dj-lineup-val" rows="3" placeholder="DJ Nombre — 10pm&#10;DJ Otro — 12am" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
-            <div id="ld-campo-guest-list" style="display:none" class="fg"><label style="font-size:12px">Instrucciones Guest List</label><input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario"></div>
-            <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
-
-            <!-- CAMPOS CAMPAÑA -->
-            <div id="ld-campo-historia" style="display:none">
-              <div class="fg"><label style="font-size:12px">Título de la historia</label><input id="ld-historia-titulo" placeholder="Ej. Historia de la causa" style="font-size:12px"></div>
-              <div class="fg"><label style="font-size:12px">Historia de la causa</label><textarea id="ld-historia-val" rows="4" placeholder="Describe el contexto y la urgencia de la causa..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            </div>
-            <div id="ld-campo-objetivo" style="display:none">
-              <div class="grid2">
-                <div class="fg"><label style="font-size:12px">Meta económica ($)</label><input id="ld-objetivo-meta" type="number" placeholder="60000" style="font-size:12px"></div>
-                <div class="fg"><label style="font-size:12px">Recaudado actual ($)</label><input id="ld-objetivo-actual" type="number" placeholder="32600" style="font-size:12px"></div>
-                <div class="fg"><label style="font-size:12px">URL botón donar</label><input id="ld-objetivo-url" type="url" placeholder="https://..." style="font-size:12px"></div>
-                <div class="fg"><label style="font-size:12px">Texto botón</label><input id="ld-objetivo-btn" placeholder="DONAR AHORA" style="font-size:12px"></div>
-                <div class="fg" style="grid-column:1/-1"><label style="font-size:12px">Texto motivacional</label><input id="ld-donate-text" placeholder="Tu apoyo hace la diferencia" style="font-size:12px"></div>
-              </div>
-            </div>
-            <div id="ld-campo-impacto" style="display:none" class="fg"><label style="font-size:12px">Impacto — ítem|valor|icono-emoji (uno por línea)</label><textarea id="ld-impacto-val" rows="3" placeholder="Niños educados|100+|🎓&#10;Familias apoyadas|50+|👨‍👩‍👧&#10;Comunidades|10+|🏘️" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-equipo" style="display:none" class="fg"><label style="font-size:12px">Equipo — Nombre|Rol|URL-foto (uno por línea)</label><textarea id="ld-equipo-val" rows="3" placeholder="María López|Directora|https://foto.jpg&#10;Carlos Ramírez|Coordinador|" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-testimonios" style="display:none" class="fg"><label style="font-size:12px">Testimonios — Texto|Nombre-Rol (uno por línea)</label><textarea id="ld-testimonios-val" rows="3" placeholder="Gracias a su ayuda...|Ana, Beneficiaria&#10;Mi hijo ahora tiene acceso...|Rosa, Madre" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-actualizaciones" style="display:none" class="fg"><label style="font-size:12px">Actualizaciones — Fecha|Texto (una por línea)</label><textarea id="ld-actualizaciones-val" rows="3" placeholder="Hoy|Llegamos a 200 familias con alimentos&#10;2 días atrás|Brindamos atención médica" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-contacto" style="display:none">
-              <div class="grid2">
-                <div class="fg"><label style="font-size:12px">Email de contacto</label><input id="ld-contacto-email" type="email" placeholder="info@causa.org" style="font-size:12px"></div>
-                <div class="fg"><label style="font-size:12px">Teléfono / WhatsApp</label><input id="ld-contacto-tel" placeholder="+57 300 123 4567" style="font-size:12px"></div>
-                <div class="fg" style="grid-column:1/-1"><label style="font-size:12px">Dirección</label><input id="ld-contacto-dir" placeholder="Bogotá, Colombia" style="font-size:12px"></div>
-              </div>
-            </div>
-          </div>
-          <div id="ld-preview-badge" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:.4rem .75rem;font-size:12px;color:var(--ink3);margin-top:.5rem">
-            <span style="color:var(--gold)">●</span> Plantilla: <strong id="ld-preview-theme-name">—</strong>
-          </div>
-        </div>
-      </div>
-      <!-- ════════════════════════════════════════════════════ -->
-
       <!-- Toggle único / serie -->
       <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);margin-bottom:1.25rem;width:fit-content">
         <button id="ev-tab-unico" onclick="setEvTipo('unico')"
@@ -845,7 +640,7 @@ tr:hover td{background:var(--surface)}
 
       <!-- Campos comunes -->
       <div class="grid2">
-        <div class="fg"><label>Nombre del evento *</label><input id="ev-n" placeholder="Ej. Jueves de Jazz · Noche Electrónica"></div>
+        <div class="fg"><label>Nombre *</label><input id="ev-n" placeholder="Ej. Jueves de Jazz"></div>
         <div class="fg" id="ev-fecha-wrap"><label>Fecha *</label><input type="date" id="ev-f"></div>
         <div class="fg"><label>Hora</label><input type="time" id="ev-h"></div>
         <div class="fg"><label>Ubicación</label><input id="ev-ubic" placeholder="Ej. Terraza piso 3 · Cra 5 #10-20, Bogotá"></div>
@@ -886,76 +681,29 @@ tr:hover td{background:var(--surface)}
       <!-- Imagen + Video (lado a lado) -->
       <div class="grid2" style="margin-top:.75rem;align-items:start">
 
-        <!-- Imagen hero (fondo) -->
+        <!-- Imagen -->
         <div class="fg">
-        <label>🖼 Imagen de fondo (hero)
-          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:4px">Se usa como fondo cinematográfico de la página</span>
-        </label>
-
-        <!-- Tab: Archivo o URL -->
-        <div style="display:flex;gap:0;margin-bottom:.4rem;border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden;width:fit-content">
-          <button id="img-tab-upload" onclick="imgSwitchTab('upload')"
-            style="padding:4px 12px;font-size:11px;font-weight:500;background:var(--gold);color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">
-            📁 Subir archivo
-          </button>
-          <button id="img-tab-url" onclick="imgSwitchTab('url')"
-            style="padding:4px 12px;font-size:11px;font-weight:500;background:transparent;color:var(--ink3);border:none;cursor:pointer;font-family:'DM Sans',sans-serif">
-            🔗 Pegar URL
-          </button>
-        </div>
-
-        <!-- Panel: subir archivo -->
-        <div id="img-panel-upload">
-          <div id="img-upload-zone" onclick="document.getElementById('ev-img-file').click()"
-            style="border:2px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center;cursor:pointer;transition:.15s;background:var(--surface)"
-            ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
-            ondragleave="this.style.borderColor='var(--border)'" ondrop="handleImgDrop(event)">
-            <input type="file" id="ev-img-file" accept="image/*" style="display:none" onchange="handleImgFile(this.files[0])">
-            <div id="img-upload-placeholder">
-              <div style="font-size:20px;margin-bottom:.25rem">🖼️</div>
-              <div style="font-size:13px;font-weight:500;color:var(--ink2)">Arrastra una imagen o haz clic</div>
-              <div style="font-size:11px;color:var(--ink3);margin-top:.2rem">JPG, PNG · Máx. 5 MB</div>
-            </div>
-            <div id="img-upload-loading" style="display:none">
-              <span class="spinner" style="border-color:rgba(0,0,0,.15);border-top-color:var(--gold)"></span>
-              <span style="font-size:13px;color:var(--ink2);margin-left:6px">Subiendo…</span>
-            </div>
+        <label>Imagen del evento (cartel / portada)</label>
+        <div id="img-upload-zone" onclick="document.getElementById('ev-img-file').click()"
+          style="border:2px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center;cursor:pointer;transition:.15s;background:var(--surface)"
+          ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
+          ondragleave="this.style.borderColor='var(--border)'" ondrop="handleImgDrop(event)">
+          <input type="file" id="ev-img-file" accept="image/*" style="display:none" onchange="handleImgFile(this.files[0])">
+          <div id="img-upload-placeholder">
+            <div style="font-size:20px;margin-bottom:.25rem">🖼️</div>
+            <div style="font-size:13px;font-weight:500;color:var(--ink2)">Arrastra una imagen o haz clic</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:.2rem">JPG, PNG · Máx. 5 MB</div>
+          </div>
+          <div id="img-upload-loading" style="display:none">
+            <span class="spinner" style="border-color:rgba(0,0,0,.15);border-top-color:var(--gold)"></span>
+            <span style="font-size:13px;color:var(--ink2);margin-left:6px">Subiendo…</span>
           </div>
         </div>
-
-        <!-- Panel: pegar URL -->
-        <div id="img-panel-url" style="display:none">
-          <input id="ev-img-url-input" type="url"
-            placeholder="https://ejemplo.com/imagen.jpg"
-            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-size:12px;font-family:monospace;background:var(--surface);color:var(--ink1)"
-            oninput="handleImgUrl(this.value)">
-          <div style="font-size:11px;color:var(--ink3);margin-top:.3rem">
-            Pega la URL pública de la imagen. Funciona con Cloudinary, Imgur, Unsplash, Google Drive (enlace directo), etc.
-          </div>
-        </div>
-
-        <!-- Preview compartido -->
         <div id="ev-img-preview" style="margin-top:.5rem;display:none;position:relative">
-          <img id="ev-img-thumb" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)" src="">
-          <div style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px" id="ev-img-source-label">Archivo</div>
+          <img id="ev-img-thumb" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)" src="">
           <button onclick="clearImagen()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
         </div>
         <input type="hidden" id="ev-img" value="">
-        </div>
-
-        <!-- Imagen poster / afiche (visible en la página) -->
-        <div class="fg">
-          <label>🎭 Poster / Afiche del evento
-            <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:4px">Se muestra como imagen del cartel dentro del contenido</span>
-          </label>
-          <input id="ev-poster-url" type="url"
-            placeholder="https://... (URL del poster o afiche)"
-            oninput="handlePosterUrl(this.value)"
-            style="font-family:monospace;font-size:12px">
-          <div id="ev-poster-preview" style="margin-top:.4rem;display:none">
-            <img id="ev-poster-thumb" style="max-height:120px;border-radius:6px;border:1px solid var(--border);object-fit:contain" src="">
-            <button onclick="clearPoster()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:2px 8px;font-size:11px;cursor:pointer;color:var(--ink3)">✕ Quitar</button>
-          </div>
         </div>
 
         <!-- Video (tráiler / URL embed) -->
@@ -1031,7 +779,6 @@ tr:hover td{background:var(--surface)}
           <button type="button" class="btn btn-ghost btn-sm" onclick="addPuntoRow()" style="margin-top:.25rem">+ Agregar punto</button>
         </div>
       </div>
-
 
       <div style="margin-top:1rem">
         <button class="btn btn-gold" id="btn-crear-ev" onclick="crearEvento()">Crear evento</button>
@@ -2207,182 +1954,7 @@ function goPg(p) {
 }
 
 
-// ══ LANDING PAGE CINEMATOGRÁFICA — CONFIGURADOR ═══════════
-let _ldThemeSeleccionado = null;
-
-function toggleLandingConfig(activa) {
-  document.getElementById('ev-landing-config').style.display = activa ? 'block' : 'none';
-  if (activa && !_ldThemeSeleccionado) seleccionarTheme('arthouse');
-}
-
-// Map theme → event type for dynamic modules
-const _THEME_TYPE = {
-  'arthouse':'cinematografia','premiere-gold':'cinematografia',
-  'neon-cult-cine':'cinematografia','interactive-cine':'cinematografia',
-  'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
-  'underground':'fiesta','elegant-cocktail':'fiesta',
-  'solidario-moderno':'campana','urgente-impactante':'campana',
-  'tech-futurista':'campana','vintage-organico':'campana',
-};
-
-function seleccionarTheme(theme) {
-  _ldThemeSeleccionado = theme;
-
-  // Mark active card
-  document.querySelectorAll('.ld-theme-card').forEach(b => {
-    const active = b.dataset.theme === theme;
-    b.style.outline     = active ? '2px solid var(--gold,#c8a96e)' : '';
-    b.style.borderColor = active ? 'var(--gold,#c8a96e)' : '';
-  });
-
-  // Show modules for the correct type
-  const tipo = _THEME_TYPE[theme] || 'cinematografia';
-  document.querySelectorAll('.mods-tipo').forEach(d => d.style.display = 'none');
-  const modDiv = document.getElementById('mods-' + tipo);
-  if (modDiv) modDiv.style.display = 'block';
-
-  // Campañas: Fecha y Ubicación son opcionales (algunas campañas no tienen fecha/lugar fijo)
-  const fechaLabel = document.querySelector('#ev-fecha-wrap label');
-  const fechaInput = document.getElementById('ev-f');
-  if (fechaLabel) {
-    fechaLabel.textContent = tipo === 'campana' ? 'Fecha (opcional)' : 'Fecha *';
-  }
-  if (fechaInput) {
-    fechaInput.placeholder = tipo === 'campana' ? 'Sin fecha límite' : '';
-  }
-
-  // Preview badge
-  const names = {
-    'arthouse':'P1 · Arthouse','premiere-gold':'P2 · Premiere Gold',
-    'neon-cult-cine':'P3 · Neon Cult Cine','interactive-cine':'P4 · Interactive Cine',
-    'tropical-hostel':'P5 · Tropical Hostel','rooftop-sunset':'P6 · Rooftop Sunset',
-    'underground':'P7 · Underground','elegant-cocktail':'P8 · Elegant Cocktail',
-    'solidario-moderno':'P9 · Solidario Moderno','urgente-impactante':'P10 · Urgente & Impactante',
-    'tech-futurista':'P11 · Tech & Futurista','vintage-organico':'P12 · Vintage & Orgánico',
-  };
-  const badge  = document.getElementById('ld-preview-badge');
-  const nameEl = document.getElementById('ld-preview-theme-name');
-  if (badge)  badge.style.display  = 'block';
-  if (nameEl) nameEl.textContent   = names[theme] || theme;
-
-  try { sessionStorage.setItem('ld_theme', theme); } catch(e) {}
-}
-
-// Mostrar/ocultar campos de contenido según módulos activos
-(function() {
-  const modMap = {
-    // Cinematografía
-    'ld-mod-sinopsis':  'ld-campo-sinopsis',
-    'ld-mod-trailer':   'ld-campo-trailer',
-    'ld-mod-director':  'ld-campo-director',
-    'ld-mod-gallery':   'ld-campo-gallery',
-    'ld-mod-dresscode': 'ld-campo-dresscode',
-    'ld-mod-sponsors':  'ld-campo-sponsors',
-    'ld-mod-faq':       'ld-campo-faq',
-    // Fiesta
-    'ld-mod-dj-lineup':  'ld-campo-dj-lineup',
-    'ld-mod-playlist':   'ld-campo-playlist',
-    'ld-mod-guest-list': 'ld-campo-guest-list',
-    'ld-mod-ubicacion':  'ld-campo-ubicacion',
-    // Campaña
-    'ld-mod-historia':        'ld-campo-historia',
-    'ld-mod-objetivo':        'ld-campo-objetivo',
-    'ld-mod-impacto':         'ld-campo-impacto',
-    'ld-mod-equipo':          'ld-campo-equipo',
-    'ld-mod-testimonios':     'ld-campo-testimonios',
-    'ld-mod-actualizaciones': 'ld-campo-actualizaciones',
-    'ld-mod-contacto':        'ld-campo-contacto',
-  };
-  document.addEventListener('change', e => {
-    const campo = modMap[e.target?.id];
-    if (!campo) return;
-    const el = document.getElementById(campo);
-    if (el) el.style.display = e.target.checked ? 'block' : 'none';
-    // Also show poster campo when sinopsis is checked
-    if (e.target?.id === 'ld-mod-sinopsis') {
-      const posterCampo = document.getElementById('ld-campo-sinopsis-poster');
-      if (posterCampo) posterCampo.style.display = e.target.checked ? 'block' : 'none';
-    }
-  });
-})();
-
-function _buildConfigLanding() {
-  const activa = document.getElementById('ev-landing-activa')?.checked;
-  if (!activa || !_ldThemeSeleccionado) return null;
-
-  const get = id => document.getElementById(id);
-  const chk = id => get(id)?.checked || false;
-  const val = id => (get(id)?.value || '').trim();
-
-  const faqRaw   = val('ld-faq-val');
-  const faq      = faqRaw ? faqRaw.split('\n').filter(l => l.includes('|')).map(l => {
-    const [q, ...rest] = l.split('|'); return { q: q.trim(), a: rest.join('|').trim() };
-  }) : [];
-  const sponsors = val('ld-sponsors-val') ? val('ld-sponsors-val').split(',').map(s=>s.trim()).filter(Boolean) : [];
-  const gallery  = val('ld-gallery-urls') ? val('ld-gallery-urls').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8) : [];
-  const director = (val('ld-dir-nombre') || val('ld-dir-bio')) ? {
-    nombre: val('ld-dir-nombre') || null,
-    rol:    val('ld-dir-rol')    || 'Director',
-    bio:    val('ld-dir-bio')    || null,
-    foto:   val('ld-dir-foto')   || null,
-  } : null;
-
-  const cfg = {
-    theme: _ldThemeSeleccionado,
-    colors: { accent: val('ev-color-hex') || '#c8a96e' },
-    modules: {
-      trailer:       chk('ld-mod-trailer'),
-      countdown:     chk('ld-mod-countdown'),
-      sinopsis:      chk('ld-mod-sinopsis'),
-      meet_director: chk('ld-mod-director'),
-      gallery:       chk('ld-mod-gallery'),
-      dresscode:     chk('ld-mod-dresscode'),
-      aforo:         chk('ld-mod-aforo'),
-      sponsors:      chk('ld-mod-sponsors'),
-      faq:           chk('ld-mod-faq'),
-    },
-    effects: {
-      grain:    chk('ld-fx-grain'),
-      glow:     chk('ld-fx-glow'),
-      vhs:      chk('ld-fx-vhs'),
-      parallax: chk('ld-fx-parallax'),
-    },
-    content: {
-      // Cinematografía
-      sinopsis:       val('ld-sinopsis-text')    || null,
-      poster_url:     val('ev-poster-url')       || null,
-      titulo_display: val('ev-titulo-display')   || null,
-      trailer_url:    val('ld-trailer-url')      || null,
-      dresscode:      val('ld-dresscode-val')    || null,
-      // Fiesta
-      dj_lineup:   val('ld-dj-lineup-val')  ? val('ld-dj-lineup-val').split('\n').filter(Boolean) : undefined,
-      playlist_url:val('ld-playlist-url')   || null,
-      guest_list:  val('ld-guest-list-val') || null,
-      ubicacion:   val('ld-ubicacion-val')  || null,
-      // Campaña
-      historia:    val('ld-historia-val')   || null,
-      historia_titulo: val('ld-historia-titulo') || null,
-      objetivo_meta:   val('ld-objetivo-meta')   ? Number(val('ld-objetivo-meta'))   : null,
-      objetivo_actual: val('ld-objetivo-actual')  ? Number(val('ld-objetivo-actual')) : null,
-      objetivo_url:    val('ld-objetivo-url')    || null,
-      objetivo_btn:    val('ld-objetivo-btn')    || null,
-      donate_text:     val('ld-donate-text')     || null,
-      impacto:     val('ld-impacto-val')    ? val('ld-impacto-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{label:p[0]?.trim(),valor:p[1]?.trim(),emoji:p[2]?.trim()};}) : undefined,
-      equipo:      val('ld-equipo-val')     ? val('ld-equipo-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{nombre:p[0]?.trim(),rol:p[1]?.trim(),foto:p[2]?.trim()};}) : undefined,
-      testimonios: val('ld-testimonios-val')? val('ld-testimonios-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{texto:p[0]?.trim(),autor:p[1]?.trim()};}) : undefined,
-      actualizaciones: val('ld-actualizaciones-val')? val('ld-actualizaciones-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{fecha:p[0]?.trim(),texto:p[1]?.trim()};}) : undefined,
-      contacto:    (val('ld-contacto-email')||val('ld-contacto-tel')) ? {email:val('ld-contacto-email'),tel:val('ld-contacto-tel'),dir:val('ld-contacto-dir')} : null,
-      ...(director           ? {director}           : {}),
-      ...(gallery.length     ? {gallery}             : {}),
-      ...(sponsors.length    ? {sponsors}            : {}),
-      ...(faq.length         ? {faq}                 : {}),
-    },
-  };
-  Object.keys(cfg.content).forEach(k => { if (cfg.content[k] === null) delete cfg.content[k]; });
-  return cfg;
-}
-
-// ══════════════════════════════════════════════════════════
+// ══ PANEL GLOBAL — SISTEMA ════════════════════════════
 let _gaOrgs    = [];
 let _gaConteos = {};
 let _gaOrgEdit = null;
@@ -4084,17 +3656,7 @@ async function crearEvento() {
 
 async function _crearEventoUnico(n) {
   const f = document.getElementById('ev-f').value;
-  // Fecha es obligatoria SOLO para Cinematografía y Fiesta — Campañas pueden no tener fecha fija
-  const _tipoActual = (typeof _THEME_TYPE !== 'undefined' && _ldThemeSeleccionado)
-    ? _THEME_TYPE[_ldThemeSeleccionado] : null;
-  if (!f && _tipoActual !== 'campana') {
-    alrt('ev-alert','La fecha es obligatoria.','err'); return;
-  }
-  // NOTA: la columna 'fecha' en Supabase tiene NOT NULL constraint.
-  // Hasta que se ejecute el ALTER TABLE para permitir NULL, usamos un placeholder
-  // muy lejano para campañas sin fecha — esto NO se muestra en la página pública
-  // porque evento.html oculta la fila de fecha cuando es este valor centinela.
-  const _fechaParaGuardar = f || (_tipoActual === 'campana' ? '2099-12-31' : f);
+  if (!f) { alrt('ev-alert','La fecha es obligatoria.','err'); return; }
 
   const slug = n.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -4103,7 +3665,7 @@ async function _crearEventoUnico(n) {
     + '-' + Math.random().toString(36).substr(2,4);
 
   const {data:ev, error} = await SB.from('eventos').insert({
-    nombre: n, fecha: _fechaParaGuardar, slug,
+    nombre: n, fecha: f, slug,
     hora: document.getElementById('ev-h').value||null,
     descripcion: document.getElementById('ev-d').value.trim()||null,
     ubicacion: document.getElementById('ev-ubic').value.trim()||null,
@@ -4120,8 +3682,6 @@ async function _crearEventoUnico(n) {
       custom: getCamposCustom(),
     },
     aforo_max: parseInt(document.getElementById('ev-aforo')?.value) || null,
-    ...(document.getElementById('ev-poster-url')?.value.trim() ? {poster_url: document.getElementById('ev-poster-url').value.trim()} : {}),
-    ...(typeof _buildConfigLanding === 'function' && _buildConfigLanding() ? {config_landing: _buildConfigLanding()} : {}),
     org_id:    ORG_ID,
   }).select().single();
 
@@ -7312,68 +6872,11 @@ function stopCamera() {
 // SUBIDA DE IMAGEN A SUPABASE STORAGE
 // ════════════════════════════════════════════════════
 
-
 function handleImgDrop(e) {
   e.preventDefault();
   document.getElementById('img-upload-zone').style.borderColor = 'var(--border)';
   const file = e.dataTransfer.files[0];
   if (file) handleImgFile(file);
-}
-
-let _posterUrlTimer = null;
-function handlePosterUrl(url) {
-  clearTimeout(_posterUrlTimer);
-  if (!url.trim()) { clearPoster(); return; }
-  _posterUrlTimer = setTimeout(() => {
-    const img = new Image();
-    img.onload = () => {
-      document.getElementById('ev-poster-thumb').src = url;
-      document.getElementById('ev-poster-preview').style.display = 'flex';
-      document.getElementById('ev-poster-preview').style.alignItems = 'center';
-    };
-    img.onerror = () => {
-      const inp = document.getElementById('ev-poster-url');
-      if (inp) { inp.style.borderColor='var(--red)'; setTimeout(()=>{ inp.style.borderColor=''; },2000); }
-    };
-    img.src = url;
-  }, 500);
-}
-function clearPoster() {
-  document.getElementById('ev-poster-url').value = '';
-  document.getElementById('ev-poster-thumb').src = '';
-  document.getElementById('ev-poster-preview').style.display = 'none';
-}
-
-
-function imgSwitchTab(tab) {
-  const isUpload = tab === 'upload';
-  document.getElementById('img-panel-upload').style.display = isUpload ? 'block' : 'none';
-  document.getElementById('img-panel-url').style.display    = isUpload ? 'none'  : 'block';
-  const btnUpload = document.getElementById('img-tab-upload');
-  const btnUrl    = document.getElementById('img-tab-url');
-  if (btnUpload) { btnUpload.style.background = isUpload ? 'var(--gold)' : 'transparent'; btnUpload.style.color = isUpload ? '#fff' : 'var(--ink3)'; }
-  if (btnUrl)    { btnUrl.style.background    = isUpload ? 'transparent' : 'var(--gold)'; btnUrl.style.color    = isUpload ? 'var(--ink3)' : '#fff'; }
-}
-
-let _imgUrlTimer = null;
-function handleImgUrl(url) {
-  clearTimeout(_imgUrlTimer);
-  if (!url.trim()) { clearImagen(); return; }
-  _imgUrlTimer = setTimeout(() => {
-    const img = new Image();
-    img.onload = () => {
-      document.getElementById('ev-img').value = url;
-      document.getElementById('ev-img-thumb').src = url;
-      document.getElementById('ev-img-preview').style.display = 'block';
-      const lbl = document.getElementById('ev-img-source-label');
-      if (lbl) lbl.textContent = 'URL externa';
-    };
-    img.onerror = () => {
-      const inp = document.getElementById('ev-img-url-input');
-      if (inp) { inp.style.borderColor = 'var(--red)'; setTimeout(() => { inp.style.borderColor = ''; }, 2000); }
-    };
-    img.src = url;
-  }, 600);
 }
 
 async function handleImgFile(file) {
@@ -7469,8 +6972,6 @@ function clearImagen() {
   document.getElementById('img-upload-zone').style.borderColor = 'var(--border)';
   document.getElementById('img-upload-zone').style.background = 'var(--surface)';
   document.getElementById('ev-img-file').value = '';
-  const urlInp = document.getElementById('ev-img-url-input');
-  if (urlInp) urlInp.value = '';
 }
 </script>
 </body>
