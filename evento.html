@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:ve144f774 -->
+<!-- EVENTO_VERSION:v9022f2ad -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -2036,6 +2036,11 @@ body[data-theme="premiere-gold"] .ld-desc-text{color:var(--pg-text,#f0ead8);font
    Crowdfunding premium · Mobile First · Charity:Water style
    ════════════════════════════════════════════════════════════ */
 
+body[data-theme="solidario-moderno"],
+body[data-theme="solidario-moderno"] body{
+  background: #fafaf8 !important;
+  color: #111827 !important;
+}
 body[data-theme="solidario-moderno"]{
   --sm-accent:     var(--ld-accent, #2d7a4f);
   --sm-accent-lt:  color-mix(in srgb, var(--sm-accent) 12%, #fff);
@@ -3426,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=ve144f774 | campana-modules:fixed | setMod:all-types');
+  console.log('[evento.html] VERSION=v9022f2ad | SM:body-bg-fixed | campana:desc-hidden');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4405,10 +4410,11 @@ function aplicarConfiguracionLanding(cfg) {
     // DJ Lineup, Playlist, Guest List, Ubicación se manejan en _ldRenderContent si existen
   } else if (_tipoEvento === 'campana') {
     // Forzar ocultos todos los módulos de Cinematografía
-    setMod('mod-trailer', false);
-    setMod('mod-sinopsis', false);
+    setMod('mod-descripcion',   false);
+    setMod('mod-trailer',       false);
+    setMod('mod-sinopsis',      false);
     setMod('mod-meet-director', false);
-    setMod('mod-dresscode', false);
+    setMod('mod-dresscode',     false);
     // Módulos compartidos opcionales
     setMod('mod-countdown', !!mods.countdown);
     setMod('mod-gallery',   !!mods.gallery);
@@ -4717,6 +4723,23 @@ function _ldInitCampana(cfg) {
   const accent = cfg?.colors?.accent || null;
   const root   = document.documentElement;
   if (accent) root.style.setProperty('--ld-accent', accent);
+
+  // Force correct background/color on body via JS (beats base CSS rule)
+  if (theme === 'solidario-moderno') {
+    document.body.style.setProperty('background', '#fafaf8', 'important');
+    document.body.style.setProperty('color', '#111827', 'important');
+  } else if (theme === 'vintage-organico') {
+    document.body.style.setProperty('background', '#f5efe0', 'important');
+    document.body.style.setProperty('color', '#2c2416', 'important');
+  } else if (theme === 'urgente-impactante') {
+    document.body.style.setProperty('background', '#0a0a0a', 'important');
+    document.body.style.setProperty('color', '#f5f5f5', 'important');
+  } else if (theme === 'tech-futurista') {
+    document.body.style.setProperty('background', '#001428', 'important');
+    document.body.style.setProperty('color', '#e0f2fe', 'important');
+  }
+  const sm = document.getElementById('s-main');
+  if (sm) sm.style.cssText += ';background:inherit;color:inherit';
 
   // Hero bg for themes that use it
   if (['urgente-impactante','tech-futurista'].includes(theme)) {
