@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v9022f2ad -->
+<!-- EVENTO_VERSION:v970f27f1 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v9022f2ad | SM:body-bg-fixed | campana:desc-hidden');
+  console.log('[evento.html] VERSION=v970f27f1 | P9:render-always | logs:verbose');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4765,144 +4765,182 @@ function _ldInitCampana(cfg) {
 
 // ── Campaign content renderer ─────────────────────────────
 function _ldRenderCampana(content, cfg) {
-  const fmt = n => '$' + Number(n).toLocaleString('es-CO');
+  const fmt = n => '$' + (Number(n)||0).toLocaleString('es-CO');
   const setMod = (id, show) => {
     const el = document.getElementById(id);
-    if (el) { el.classList.toggle('hidden', !show); }
+    if (el) el.classList.toggle('hidden', !show);
   };
+  const mods = cfg.modules || {};
+  const co   = content || {};
 
-  // Historia
-  if (cfg.modules?.historia && content.historia) {
+  console.log('[_ldRenderCampana] content keys:', Object.keys(co));
+  console.log('[_ldRenderCampana] modules:', mods);
+
+  // Historia — muestra si módulo activo, con o sin contenido
+  if (mods.historia) {
     setMod('mod-historia', true);
-    const tit = document.getElementById('sm-historia-titulo');
+    const tit  = document.getElementById('sm-historia-titulo');
     const body = document.getElementById('sm-historia-body');
     const imgWrap = document.getElementById('sm-historia-img-wrap');
-    const img = document.getElementById('sm-historia-img');
-    if (tit) tit.textContent = content.historia_titulo || 'Historia de la causa';
-    if (body) body.innerHTML = content.historia.replace(/\n/g,'<br>');
+    const img  = document.getElementById('sm-historia-img');
+    if (tit)  tit.textContent  = co.historia_titulo || 'Historia de la causa';
+    if (body) body.innerHTML   = (co.historia || '').replace(/\n/g,'<br>');
     if (img && eventoActual?.imagen_url && imgWrap) {
       img.src = eventoActual.imagen_url;
       imgWrap.style.display = 'block';
     }
+    console.log('[campana] mod-historia rendered ✅');
   }
 
   // Objetivo / Barra de progreso
-  if (cfg.modules?.objetivo && content.objetivo_meta) {
+  if (mods.objetivo) {
     setMod('mod-objetivo', true);
-    const meta    = Number(content.objetivo_meta)   || 0;
-    const actual  = Number(content.objetivo_actual) || 0;
-    const pct     = meta > 0 ? Math.min(Math.round(actual / meta * 100), 100) : 0;
-    const recEl   = document.getElementById('sm-recaudado');
-    const metaEl  = document.getElementById('sm-meta');
-    const pctEl   = document.getElementById('sm-pct');
-    const fill    = document.getElementById('sm-progress-fill');
-    const btnEl   = document.getElementById('sm-donate-btn');
-    const txtEl   = document.getElementById('sm-donate-text');
-    if (recEl)  recEl.textContent  = fmt(actual);
-    if (metaEl) metaEl.textContent = fmt(meta);
-    if (pctEl)  pctEl.textContent  = pct + '%';
-    if (fill)   setTimeout(() => { fill.style.width = pct + '%'; fill.setAttribute('aria-valuenow', pct); }, 400);
-    if (btnEl && content.objetivo_url) btnEl.href = content.objetivo_url;
-    if (btnEl && content.objetivo_btn) btnEl.textContent = content.objetivo_btn;
-    if (txtEl && content.donate_text) txtEl.textContent = content.donate_text;
+    const meta   = Number(co.objetivo_meta)   || 0;
+    const actual = Number(co.objetivo_actual) || 0;
+    const pct    = meta > 0 ? Math.min(Math.round(actual/meta*100),100) : 0;
+    const el = (id) => document.getElementById(id);
+    if (el('sm-recaudado')) el('sm-recaudado').textContent = fmt(actual);
+    if (el('sm-meta'))      el('sm-meta').textContent      = fmt(meta);
+    if (el('sm-pct'))       el('sm-pct').textContent       = pct + '%';
+    if (el('sm-progress-fill')) setTimeout(()=>{ el('sm-progress-fill').style.width = pct+'%'; }, 400);
+    if (el('sm-donate-btn') && co.objetivo_url) el('sm-donate-btn').href = co.objetivo_url;
+    if (el('sm-donate-btn') && co.objetivo_btn) el('sm-donate-btn').textContent = co.objetivo_btn;
+    if (el('sm-donate-text') && co.donate_text) el('sm-donate-text').textContent = co.donate_text;
+    console.log('[campana] mod-objetivo rendered ✅ pct='+pct+'%');
   }
 
   // Impacto
-  if (cfg.modules?.impacto && content.impacto?.length) {
+  if (mods.impacto) {
     setMod('mod-impacto', true);
     const grid = document.getElementById('sm-impact-grid');
-    if (grid) grid.innerHTML = content.impacto.map(item => `
-      <div class="sm-impact-card">
-        <span class="sm-impact-card__emoji">${item.emoji || '✨'}</span>
-        <span class="sm-impact-card__num">${item.valor || ''}</span>
-        <span class="sm-impact-card__label">${item.label || ''}</span>
-      </div>`).join('');
+    if (grid && co.impacto?.length) {
+      grid.innerHTML = co.impacto.map(item => `
+        <div class="sm-impact-card">
+          <span class="sm-impact-card__emoji">${item.emoji||'✨'}</span>
+          <span class="sm-impact-card__num">${item.valor||''}</span>
+          <span class="sm-impact-card__label">${item.label||''}</span>
+        </div>`).join('');
+    } else if (grid) {
+      grid.innerHTML = '<p style="color:var(--sm-ink3);text-align:center;padding:1rem">Agrega ítems de impacto en el admin.</p>';
+    }
+    console.log('[campana] mod-impacto rendered ✅');
   }
 
   // Galería
-  if (cfg.modules?.gallery && content.gallery?.length) {
+  if (mods.gallery && co.gallery?.length) {
     const modG = document.getElementById('mod-gallery');
     if (modG) modG.classList.remove('hidden');
     const grid = document.getElementById('at-gallery-grid');
-    const hero = document.getElementById('at-gallery-hero');
-    const dots = document.getElementById('at-gallery-dots');
-    if (hero) hero.style.display = 'none';
-    if (dots) dots.style.display = 'none';
-    if (grid) grid.innerHTML = content.gallery.map((url,i) =>
-      `<img class="sm-gallery-img" src="${url}" loading="lazy" alt="Foto ${i+1}">`).join('');
+    if (grid) {
+      document.getElementById('at-gallery-hero')?.setAttribute('style','display:none');
+      document.getElementById('at-gallery-dots')?.setAttribute('style','display:none');
+      grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:2rem';
+      grid.innerHTML = co.gallery.map((url,i)=>
+        `<img class="sm-gallery-img" src="${url}" loading="lazy" alt="Foto ${i+1}">`
+      ).join('');
+    }
+    console.log('[campana] mod-gallery rendered ✅');
   }
 
   // Equipo
-  if (cfg.modules?.equipo && content.equipo?.length) {
+  if (mods.equipo) {
     setMod('mod-equipo', true);
     const grid = document.getElementById('sm-team-grid');
-    if (grid) grid.innerHTML = content.equipo.map(m => {
-      const initials = (m.nombre||'').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-      return `<div class="sm-team-card">
-        ${m.foto
-          ? `<img class="sm-team-card__photo" src="${m.foto}" loading="lazy" alt="${m.nombre}">`
-          : `<div class="sm-team-card__initials">${initials}</div>`}
-        <div class="sm-team-card__name">${m.nombre||''}</div>
-        <div class="sm-team-card__role">${m.rol||''}</div>
-      </div>`;
-    }).join('');
+    if (grid && co.equipo?.length) {
+      grid.innerHTML = co.equipo.map(m => {
+        const initials = (m.nombre||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        return `<div class="sm-team-card">
+          ${m.foto
+            ? `<img class="sm-team-card__photo" src="${m.foto}" loading="lazy" alt="${m.nombre}">`
+            : `<div class="sm-team-card__initials">${initials}</div>`}
+          <div class="sm-team-card__name">${m.nombre||''}</div>
+          <div class="sm-team-card__role">${m.rol||''}</div>
+        </div>`;
+      }).join('');
+    } else if (grid) {
+      grid.innerHTML = '<p style="color:var(--sm-ink3);text-align:center;padding:1rem">Agrega miembros del equipo en el admin.</p>';
+    }
+    console.log('[campana] mod-equipo rendered ✅');
   }
 
   // Testimonios
-  if (cfg.modules?.testimonios && content.testimonios?.length) {
+  if (mods.testimonios) {
     setMod('mod-testimonios', true);
     const grid = document.getElementById('sm-testimonios-grid');
-    if (grid) grid.innerHTML = content.testimonios.map(t => `
-      <div class="sm-testimonio-card">
-        <p class="sm-testimonio-card__text">${t.texto||''}</p>
-        <span class="sm-testimonio-card__autor">— ${t.autor||''}</span>
-      </div>`).join('');
+    if (grid && co.testimonios?.length) {
+      grid.innerHTML = co.testimonios.map(t=>`
+        <div class="sm-testimonio-card">
+          <p class="sm-testimonio-card__text">${t.texto||''}</p>
+          <span class="sm-testimonio-card__autor">— ${t.autor||''}</span>
+        </div>`).join('');
+    } else if (grid) {
+      grid.innerHTML = '<p style="color:var(--sm-ink3);text-align:center;padding:1rem">Agrega testimonios en el admin.</p>';
+    }
+    console.log('[campana] mod-testimonios rendered ✅');
   }
 
   // Actualizaciones
-  if (cfg.modules?.actualizaciones && content.actualizaciones?.length) {
+  if (mods.actualizaciones) {
     setMod('mod-actualizaciones', true);
     const grid = document.getElementById('sm-updates-grid');
-    if (grid) grid.innerHTML = content.actualizaciones.map(u => `
-      <div class="sm-update-card">
-        <div class="sm-update-card__date">${u.fecha||''}</div>
-        <div class="sm-update-card__text">${u.texto||''}</div>
-      </div>`).join('');
+    if (grid && co.actualizaciones?.length) {
+      grid.innerHTML = co.actualizaciones.map(u=>`
+        <div class="sm-update-card">
+          <div class="sm-update-card__date">${u.fecha||''}</div>
+          <div class="sm-update-card__text">${u.texto||''}</div>
+        </div>`).join('');
+    } else if (grid) {
+      grid.innerHTML = '<p style="color:var(--sm-ink3);text-align:center;padding:1rem">Agrega actualizaciones en el admin.</p>';
+    }
+    console.log('[campana] mod-actualizaciones rendered ✅');
   }
 
   // Sponsors
-  if (cfg.modules?.sponsors && content.sponsors?.length) {
+  if (mods.sponsors && co.sponsors?.length) {
     const modS = document.getElementById('mod-sponsors');
-    if (modS) { modS.classList.remove('hidden'); }
-    const grid = modS?.querySelector('.ld-sponsors-grid');
-    if (grid) grid.innerHTML = content.sponsors.map(s => `<div class="ld-sponsor-item">${s}</div>`).join('');
+    if (modS) modS.classList.remove('hidden');
+    let grid = modS?.querySelector('.ld-sponsors-grid');
+    if (!grid) { grid = document.createElement('div'); grid.className='ld-sponsors-grid'; modS?.appendChild(grid); }
+    if (grid) grid.innerHTML = co.sponsors.map(s=>`<div class="ld-sponsor-item">${s}</div>`).join('');
+    console.log('[campana] mod-sponsors rendered ✅');
   }
 
   // FAQ
-  if (cfg.modules?.faq && content.faq?.length) {
+  if (mods.faq && co.faq?.length) {
     const modF = document.getElementById('mod-faq');
     if (modF) modF.classList.remove('hidden');
     let list = document.getElementById('ld-faq-list');
-    if (!list) { list = document.createElement('div'); list.id='ld-faq-list'; modF?.appendChild(list); }
-    if (list) list.innerHTML = content.faq.map((f,i) => `
+    if (!list) { list=document.createElement('div'); list.id='ld-faq-list'; modF?.appendChild(list); }
+    if (list) list.innerHTML = co.faq.map(f=>`
       <div class="ld-faq-item">
         <div class="ld-faq-q" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block';this.querySelector('.ld-faq-icon').textContent=this.nextElementSibling.style.display==='block'?'−':'+'">
           ${f.q} <span class="ld-faq-icon">+</span>
         </div>
         <div class="ld-faq-a" style="display:none">${f.a}</div>
       </div>`).join('');
+    console.log('[campana] mod-faq rendered ✅');
   }
 
   // Contacto
-  if (cfg.modules?.contacto && content.contacto) {
+  if (mods.contacto) {
     setMod('mod-contacto', true);
     const card = document.getElementById('sm-contacto-card');
-    const ct = content.contacto;
-    if (card) card.innerHTML = [
-      ct.email ? `<div class="sm-contacto-item"><span class="sm-contacto-item__icon">✉️</span><div><div class="sm-contacto-item__label">Email</div><div class="sm-contacto-item__val">${ct.email}</div></div></div>` : '',
-      ct.tel   ? `<div class="sm-contacto-item"><span class="sm-contacto-item__icon">📞</span><div><div class="sm-contacto-item__label">Teléfono</div><div class="sm-contacto-item__val">${ct.tel}</div></div></div>` : '',
-      ct.dir   ? `<div class="sm-contacto-item" style="grid-column:1/-1"><span class="sm-contacto-item__icon">📍</span><div><div class="sm-contacto-item__label">Dirección</div><div class="sm-contacto-item__val">${ct.dir}</div></div></div>` : '',
-    ].filter(Boolean).join('');
+    const ct = co.contacto || {};
+    if (card) {
+      const items = [
+        ct.email ? `<div class="sm-contacto-item"><span class="sm-contacto-item__icon">✉️</span><div><div class="sm-contacto-item__label">Email</div><div class="sm-contacto-item__val">${ct.email}</div></div></div>` : '',
+        ct.tel   ? `<div class="sm-contacto-item"><span class="sm-contacto-item__icon">📞</span><div><div class="sm-contacto-item__label">Teléfono</div><div class="sm-contacto-item__val">${ct.tel}</div></div></div>` : '',
+        ct.dir   ? `<div class="sm-contacto-item" style="grid-column:1/-1"><span class="sm-contacto-item__icon">📍</span><div><div class="sm-contacto-item__label">Dirección</div><div class="sm-contacto-item__val">${ct.dir}</div></div></div>` : '',
+      ].filter(Boolean);
+      card.innerHTML = items.length ? items.join('') : '<p style="color:var(--sm-ink3);text-align:center;padding:1rem">Agrega información de contacto en el admin.</p>';
+    }
+    console.log('[campana] mod-contacto rendered ✅');
+  }
+
+  // Aforo
+  if (mods.aforo) {
+    setMod('mod-aforo', true);
+    console.log('[campana] mod-aforo rendered ✅');
   }
 }
 
