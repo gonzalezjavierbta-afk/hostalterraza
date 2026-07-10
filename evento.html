@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v970f27f1 -->
+<!-- EVENTO_VERSION:v76c25b5a -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v970f27f1 | P9:render-always | logs:verbose');
+  console.log('[evento.html] VERSION=v76c25b5a | campana:hide-all-first | aforo+desc:guarded');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4409,18 +4409,14 @@ function aplicarConfiguracionLanding(cfg) {
     setMod('mod-faq',           mods.faq);
     // DJ Lineup, Playlist, Guest List, Ubicación se manejan en _ldRenderContent si existen
   } else if (_tipoEvento === 'campana') {
-    // Forzar ocultos todos los módulos de Cinematografía
-    setMod('mod-descripcion',   false);
-    setMod('mod-trailer',       false);
-    setMod('mod-sinopsis',      false);
-    setMod('mod-meet-director', false);
-    setMod('mod-dresscode',     false);
-    // Módulos compartidos opcionales
-    setMod('mod-countdown', !!mods.countdown);
-    setMod('mod-gallery',   !!mods.gallery);
-    setMod('mod-sponsors',  !!mods.sponsors);
-    setMod('mod-faq',       !!mods.faq);
-    // Módulos exclusivos de Campaña — activar según config_landing.modules
+    // Primero ocultar ABSOLUTAMENTE TODOS los módulos
+    const _allMods = ['mod-descripcion','mod-trailer','mod-countdown','mod-sinopsis',
+     'mod-meet-director','mod-dresscode','mod-aforo','mod-sponsors','mod-faq','mod-gallery',
+     'mod-historia','mod-objetivo','mod-impacto','mod-equipo',
+     'mod-testimonios','mod-actualizaciones','mod-contacto'];
+    _allMods.forEach(id => setMod(id, false));
+
+    // Luego activar SOLO los de campaña habilitados
     setMod('mod-historia',        !!mods.historia);
     setMod('mod-objetivo',        !!mods.objetivo);
     setMod('mod-impacto',         !!mods.impacto);
@@ -4428,8 +4424,12 @@ function aplicarConfiguracionLanding(cfg) {
     setMod('mod-testimonios',     !!mods.testimonios);
     setMod('mod-actualizaciones', !!mods.actualizaciones);
     setMod('mod-contacto',        !!mods.contacto);
-    // Aforo: opcional para campañas
-    setMod('mod-aforo', !!mods.aforo);
+    setMod('mod-gallery',         !!mods.gallery);
+    setMod('mod-sponsors',        !!mods.sponsors);
+    setMod('mod-faq',             !!mods.faq);
+    setMod('mod-countdown',       !!mods.countdown);
+    setMod('mod-aforo',           !!mods.aforo);
+
     console.log('[campana] módulos activos:', {
       historia: !!mods.historia, objetivo: !!mods.objetivo,
       impacto: !!mods.impacto, equipo: !!mods.equipo,
@@ -5062,19 +5062,21 @@ function _ldInitArthouse(cfg) {
     formSec.insertBefore(lbl, formSec.firstChild);
   }
   // Descripcion from event data
-  // mod-descripcion shows evento.descripcion (short description field from admin)
-  // Sinopsis (long text) goes in mod-sinopsis, NOT here
+  // mod-descripcion shows descripcion (short field) — ONLY for non-campaign themes
+  const _campanaThemesDesc = ['solidario-moderno','urgente-impactante','tech-futurista','vintage-organico'];
+  const _isCampanaDesc = _campanaThemesDesc.includes(data.config_landing?.theme);
   const _descripcionCorta = eventoActual?.descripcion || null;
-  if (_descripcionCorta) {
+  if (_descripcionCorta && !_isCampanaDesc) {
     const modDesc = document.getElementById('mod-descripcion');
     const txtEl   = document.getElementById('at-desc-text');
     if (modDesc && txtEl) {
       txtEl.textContent = _descripcionCorta;
-      modDesc.style.display = 'block';  // always show if descripcion exists
+      modDesc.style.display = 'block';
     }
   }
-  // Aforo
-  if (eventoActual?.aforo_max) {
+  // Aforo — solo para Cinematografía y Fiesta, nunca para Campaña
+  const _campanaThemesAforo = ['solidario-moderno','urgente-impactante','tech-futurista','vintage-organico'];
+  if (eventoActual?.aforo_max && !_campanaThemesAforo.includes(eventoActual?.config_landing?.theme)) {
     const modAforo = document.getElementById('mod-aforo');
     if (modAforo) { modAforo.classList.remove('hidden'); _ldRenderAforo(); }
   }
