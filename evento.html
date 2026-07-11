@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:va365d3ca -->
+<!-- EVENTO_VERSION:v394b55cc -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -2812,7 +2812,7 @@ body[data-theme="vintage-organico"] .fg input,.fg select{border-radius:4px;borde
   <!-- ══ CAMPAIGN MODULES (P9-P12) ══════════════════════════ -->
 
   <!-- Historia de la causa -->
-  <div class="ld-module hidden" id="mod-historia">
+  <div class="ld-module" id="mod-historia" style="display:none">
     <div class="sm-story">
       <div class="sm-story__text">
         <div class="ld-eyebrow">Historia de la causa</div>
@@ -2826,7 +2826,7 @@ body[data-theme="vintage-organico"] .fg input,.fg select{border-radius:4px;borde
   </div>
 
   <!-- Objetivo económico + barra de progreso -->
-  <div class="ld-module hidden" id="mod-objetivo">
+  <div class="ld-module" id="mod-objetivo" style="display:none">
     <div class="sm-progress-wrap">
       <div class="sm-progress-stats">
         <div class="sm-progress-stat">
@@ -2853,25 +2853,25 @@ body[data-theme="vintage-organico"] .fg input,.fg select{border-radius:4px;borde
   </div>
 
   <!-- Impacto de la donación -->
-  <div class="ld-module hidden" id="mod-impacto">
+  <div class="ld-module" id="mod-impacto" style="display:none">
     <div class="ld-eyebrow" style="text-align:center">Impacto de tu donación</div>
     <div class="sm-impact-grid" id="sm-impact-grid"></div>
   </div>
 
   <!-- Equipo / Organización -->
-  <div class="ld-module hidden" id="mod-equipo">
+  <div class="ld-module" id="mod-equipo" style="display:none">
     <div class="ld-eyebrow" style="text-align:center">Equipo / Organización</div>
     <div class="sm-team-grid" id="sm-team-grid"></div>
   </div>
 
   <!-- Testimonios -->
-  <div class="ld-module hidden" id="mod-testimonios">
+  <div class="ld-module" id="mod-testimonios" style="display:none">
     <div class="ld-eyebrow" style="text-align:center">Testimonios</div>
     <div class="sm-testimonios-grid" id="sm-testimonios-grid"></div>
   </div>
 
   <!-- Actualizaciones -->
-  <div class="ld-module hidden" id="mod-actualizaciones">
+  <div class="ld-module" id="mod-actualizaciones" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
       <div class="ld-eyebrow" style="margin-bottom:0">Actualizaciones</div>
     </div>
@@ -2879,7 +2879,7 @@ body[data-theme="vintage-organico"] .fg input,.fg select{border-radius:4px;borde
   </div>
 
   <!-- Contacto -->
-  <div class="ld-module hidden" id="mod-contacto">
+  <div class="ld-module" id="mod-contacto" style="display:none">
     <div class="ld-eyebrow" style="text-align:center">Contacto</div>
     <div class="sm-contacto-card" id="sm-contacto-card"></div>
   </div>
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=va365d3ca | CSS:BALANCED | hidden:FIXED | P9:READY');
+  console.log('[evento.html] VERSION=v394b55cc | campana:style.display | NO-class-hidden');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4409,33 +4409,34 @@ function aplicarConfiguracionLanding(cfg) {
     setMod('mod-faq',           mods.faq);
     // DJ Lineup, Playlist, Guest List, Ubicación se manejan en _ldRenderContent si existen
   } else if (_tipoEvento === 'campana') {
-    // Primero ocultar ABSOLUTAMENTE TODOS los módulos
-    const _allMods = ['mod-descripcion','mod-trailer','mod-countdown','mod-sinopsis',
-     'mod-meet-director','mod-dresscode','mod-aforo','mod-sponsors','mod-faq','mod-gallery',
-     'mod-historia','mod-objetivo','mod-impacto','mod-equipo',
-     'mod-testimonios','mod-actualizaciones','mod-contacto'];
-    _allMods.forEach(id => setMod(id, false));
+    // Para campaña usamos style.display directo — más robusto que classList.hidden
+    const showMod  = id => { const e=document.getElementById(id); if(e) e.style.display='block'; };
+    const hideMod  = id => { const e=document.getElementById(id); if(e) e.style.display='none'; };
 
-    // Luego activar SOLO los de campaña habilitados
-    setMod('mod-historia',        !!mods.historia);
-    setMod('mod-objetivo',        !!mods.objetivo);
-    setMod('mod-impacto',         !!mods.impacto);
-    setMod('mod-equipo',          !!mods.equipo);
-    setMod('mod-testimonios',     !!mods.testimonios);
-    setMod('mod-actualizaciones', !!mods.actualizaciones);
-    setMod('mod-contacto',        !!mods.contacto);
-    setMod('mod-gallery',         !!mods.gallery);
-    setMod('mod-sponsors',        !!mods.sponsors);
-    setMod('mod-faq',             !!mods.faq);
-    setMod('mod-countdown',       !!mods.countdown);
-    setMod('mod-aforo',           !!mods.aforo);
+    // Ocultar TODOS los módulos que no pertenecen a campaña
+    ['mod-descripcion','mod-trailer','mod-countdown','mod-sinopsis',
+     'mod-meet-director','mod-dresscode','mod-aforo','mod-sponsors',
+     'mod-faq','mod-gallery'].forEach(hideMod);
+
+    // Activar los de campaña según config
+    if (!!mods.historia)        showMod('mod-historia');        else hideMod('mod-historia');
+    if (!!mods.objetivo)        showMod('mod-objetivo');        else hideMod('mod-objetivo');
+    if (!!mods.impacto)         showMod('mod-impacto');         else hideMod('mod-impacto');
+    if (!!mods.equipo)          showMod('mod-equipo');          else hideMod('mod-equipo');
+    if (!!mods.testimonios)     showMod('mod-testimonios');     else hideMod('mod-testimonios');
+    if (!!mods.actualizaciones) showMod('mod-actualizaciones'); else hideMod('mod-actualizaciones');
+    if (!!mods.contacto)        showMod('mod-contacto');        else hideMod('mod-contacto');
+    if (!!mods.gallery)         showMod('mod-gallery');         else hideMod('mod-gallery');
+    if (!!mods.sponsors)        showMod('mod-sponsors');        else hideMod('mod-sponsors');
+    if (!!mods.faq)             showMod('mod-faq');             else hideMod('mod-faq');
+    if (!!mods.countdown)       showMod('mod-countdown');       else hideMod('mod-countdown');
+    if (!!mods.aforo)           showMod('mod-aforo');           else hideMod('mod-aforo');
 
     console.log('[campana] módulos activos:', {
       historia: !!mods.historia, objetivo: !!mods.objetivo,
       impacto: !!mods.impacto, equipo: !!mods.equipo,
       testimonios: !!mods.testimonios, actualizaciones: !!mods.actualizaciones,
       contacto: !!mods.contacto, gallery: !!mods.gallery,
-      sponsors: !!mods.sponsors, faq: !!mods.faq,
     });
 
     // DEBUG: verify each module visibility state after setMod
@@ -4782,12 +4783,58 @@ function _ldInitCampana(cfg) {
 }
 
 // ── Campaign content renderer ─────────────────────────────
+
+function _ldInitCampana(cfg) {
+  const theme  = cfg?.theme || '';
+  const accent = cfg?.colors?.accent || null;
+  const root   = document.documentElement;
+  if (accent) root.style.setProperty('--ld-accent', accent);
+
+  // Force correct background/color on body via JS (beats base CSS rule)
+  if (theme === 'solidario-moderno') {
+    document.body.style.setProperty('background', '#fafaf8', 'important');
+    document.body.style.setProperty('color', '#111827', 'important');
+  } else if (theme === 'vintage-organico') {
+    document.body.style.setProperty('background', '#f5efe0', 'important');
+    document.body.style.setProperty('color', '#2c2416', 'important');
+  } else if (theme === 'urgente-impactante') {
+    document.body.style.setProperty('background', '#0a0a0a', 'important');
+    document.body.style.setProperty('color', '#f5f5f5', 'important');
+  } else if (theme === 'tech-futurista') {
+    document.body.style.setProperty('background', '#001428', 'important');
+    document.body.style.setProperty('color', '#e0f2fe', 'important');
+  }
+  const sm = document.getElementById('s-main');
+  if (sm) sm.style.cssText += ';background:inherit;color:inherit';
+
+  // Hero bg for themes that use it
+  if (['urgente-impactante','tech-futurista'].includes(theme)) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const heroBg = document.getElementById('hero-bg');
+      if (heroBg && eventoActual?.imagen_url) {
+        heroBg.setAttribute('style',
+          `background-image:url('${eventoActual.imagen_url}');` +
+          'background-size:cover;background-position:center;' +
+          'position:absolute;inset:0;z-index:0;');
+      }
+    }));
+  }
+
+  // Show description in hero (Solidario Moderno / Vintage Orgánico)
+  const descEl = document.getElementById('at-desc-text');
+  const descMod = document.getElementById('mod-descripcion');
+  if (descEl && eventoActual?.descripcion) {
+    descEl.textContent = eventoActual.descripcion;
+    if (descMod) descMod.style.display = 'block';
+  }
+}
+
+// ── Campaign content renderer ─────────────────────────────
 function _ldRenderCampana(content, cfg) {
   const fmt = n => '$' + (Number(n)||0).toLocaleString('es-CO');
-  const setMod = (id, show) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('hidden', !show);
-  };
+  // Use style.display directly — más robusto que classList
+  const showMod = id => { const e=document.getElementById(id); if(e) e.style.display='block'; };
+  const hideMod = id => { const e=document.getElementById(id); if(e) e.style.display='none'; };
   const mods = cfg.modules || {};
   const co   = content || {};
 
