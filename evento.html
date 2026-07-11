@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:vd95291b7 -->
+<!-- EVENTO_VERSION:v0f2554a7 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=vd95291b7 | color-mix:removed | campana:CSS-fixed');
+  console.log('[evento.html] VERSION=v0f2554a7 | campana:debug-visibility | P9:v5');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4437,6 +4437,24 @@ function aplicarConfiguracionLanding(cfg) {
       contacto: !!mods.contacto, gallery: !!mods.gallery,
       sponsors: !!mods.sponsors, faq: !!mods.faq,
     });
+
+    // DEBUG: verify each module visibility state after setMod
+    setTimeout(() => {
+      const _debugMods = ['mod-descripcion','mod-trailer','mod-countdown','mod-sinopsis',
+        'mod-meet-director','mod-dresscode','mod-aforo','mod-sponsors','mod-faq','mod-gallery',
+        'mod-historia','mod-objetivo','mod-impacto','mod-equipo',
+        'mod-testimonios','mod-actualizaciones','mod-contacto'];
+      _debugMods.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isHidden = el.classList.contains('hidden');
+        const computed = window.getComputedStyle(el).display;
+        if (!isHidden || computed !== 'none') {
+          console.warn(`[campana:debug] ${id} — hasHidden:${isHidden} computed:${computed} — VISIBLE!`);
+        }
+      });
+      console.log('[campana:debug] visibility check complete');
+    }, 500);
   }
 
   // 4. Effects
