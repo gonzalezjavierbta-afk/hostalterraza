@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:vc7fe36d3 -->
+<!-- EVENTO_VERSION:v9d6356c7 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=vc7fe36d3 | showMod:defined | P9:final');
+  console.log('[evento.html] VERSION=v9d6356c7 | SM:CSS-injected-JS | P9:bulletproof');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4742,6 +4742,72 @@ function _ldInitCampana(cfg) {
   const accent = cfg?.colors?.accent || null;
   const root   = document.documentElement;
   if (accent) root.style.setProperty('--ld-accent', accent);
+
+  // Inject SM styles directly — bulletproof fallback independent of main <style> block
+  if (theme === 'solidario-moderno') {
+    const _smAccent = accent || '#2d7a4f';
+    const _smAccentRgb = _smAccent.replace('#','').match(/../g)?.map(x=>parseInt(x,16)) || [45,122,79];
+    const [r,g,b] = _smAccentRgb;
+    let st = document.getElementById('_sm-injected-css');
+    if (!st) { st = document.createElement('style'); st.id = '_sm-injected-css'; document.head.appendChild(st); }
+    st.textContent = `
+      body[data-theme="solidario-moderno"] { background:#fafaf8!important; color:#111827!important; font-family:'Inter','DM Sans',sans-serif!important; }
+      body[data-theme="solidario-moderno"] #s-main { background:#fafaf8!important; }
+      body[data-theme="solidario-moderno"] .ld-module { max-width:none!important; margin:0!important; width:100%!important; box-sizing:border-box!important; background:#fafaf8; padding:4rem 2.5rem; }
+      body[data-theme="solidario-moderno"] #mod-historia { background:#ffffff!important; }
+      body[data-theme="solidario-moderno"] #mod-objetivo { background:#fafaf8!important; }
+      body[data-theme="solidario-moderno"] #mod-impacto  { background:rgba(${r},${g},${b},.08)!important; }
+      body[data-theme="solidario-moderno"] #mod-equipo   { background:#fafaf8!important; }
+      body[data-theme="solidario-moderno"] #mod-testimonios { background:#ffffff!important; }
+      body[data-theme="solidario-moderno"] #mod-actualizaciones { background:#fafaf8!important; }
+      body[data-theme="solidario-moderno"] #mod-contacto { background:rgba(${r},${g},${b},.08)!important; }
+      body[data-theme="solidario-moderno"] .sm-story { display:grid; grid-template-columns:1fr 360px; gap:3rem; max-width:1100px; margin:0 auto; align-items:start; }
+      body[data-theme="solidario-moderno"] .sm-story__body { font-size:16px; line-height:1.8; color:#374151; }
+      body[data-theme="solidario-moderno"] .sm-section-title { font-family:'Poppins','Inter',sans-serif; font-size:clamp(22px,3.5vw,34px); font-weight:700; color:#111827; margin:0 0 1.25rem; }
+      body[data-theme="solidario-moderno"] .sm-progress-wrap { max-width:680px; margin:0 auto; background:#fff; border-radius:16px; padding:2.5rem; box-shadow:0 4px 24px rgba(0,0,0,.08); }
+      body[data-theme="solidario-moderno"] .sm-progress-stats { display:grid; grid-template-columns:1fr auto 1fr; gap:1rem; margin-bottom:1.5rem; }
+      body[data-theme="solidario-moderno"] .sm-progress-stat__label { font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#6b7280; margin-bottom:.3rem; }
+      body[data-theme="solidario-moderno"] .sm-progress-stat__val { font-family:'Poppins',sans-serif; font-size:clamp(22px,4vw,32px); font-weight:700; color:#111827; line-height:1; }
+      body[data-theme="solidario-moderno"] .sm-progress-stat__pct { font-family:'Poppins',sans-serif; font-size:clamp(28px,5vw,44px); font-weight:800; color:${_smAccent}; line-height:1; text-align:center; }
+      body[data-theme="solidario-moderno"] .sm-progress-bar { height:10px; background:rgba(${r},${g},${b},.12); border-radius:50px; overflow:hidden; margin-bottom:2rem; }
+      body[data-theme="solidario-moderno"] .sm-progress-bar__fill { height:100%; background:${_smAccent}; border-radius:50px; transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+      body[data-theme="solidario-moderno"] .sm-donate-cta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding-top:1.5rem; border-top:1px solid #e5e7eb; }
+      body[data-theme="solidario-moderno"] .sm-btn--primary { display:inline-flex; align-items:center; gap:6px; background:${_smAccent}; color:#fff; font-family:'Inter',sans-serif; font-weight:600; font-size:15px; padding:14px 28px; border-radius:50px; border:none; cursor:pointer; text-decoration:none; box-shadow:0 4px 16px rgba(${r},${g},${b},.35); }
+      body[data-theme="solidario-moderno"] .sm-impact-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin-top:2rem; max-width:900px; margin-left:auto; margin-right:auto; }
+      body[data-theme="solidario-moderno"] .sm-impact-card { background:#fff; border-radius:16px; padding:2rem 1.5rem; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+      body[data-theme="solidario-moderno"] .sm-impact-card__emoji { font-size:32px; margin-bottom:.75rem; display:block; }
+      body[data-theme="solidario-moderno"] .sm-impact-card__num { font-family:'Poppins',sans-serif; font-size:clamp(24px,4vw,36px); font-weight:800; color:${_smAccent}; display:block; line-height:1; }
+      body[data-theme="solidario-moderno"] .sm-impact-card__label { font-size:13px; color:#6b7280; margin-top:.4rem; font-weight:500; }
+      body[data-theme="solidario-moderno"] .sm-team-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-top:2rem; max-width:1000px; margin-left:auto; margin-right:auto; }
+      body[data-theme="solidario-moderno"] .sm-team-card { background:#fff; border-radius:16px; padding:2rem 1.5rem; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+      body[data-theme="solidario-moderno"] .sm-team-card__photo { width:80px; height:80px; border-radius:50%; object-fit:cover; margin:0 auto 1rem; display:block; }
+      body[data-theme="solidario-moderno"] .sm-team-card__initials { width:80px; height:80px; border-radius:50%; background:rgba(${r},${g},${b},.12); color:${_smAccent}; font-family:'Poppins',sans-serif; font-size:22px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; }
+      body[data-theme="solidario-moderno"] .sm-team-card__name { font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; color:#111827; margin-bottom:.25rem; }
+      body[data-theme="solidario-moderno"] .sm-team-card__role { font-size:12px; color:${_smAccent}; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+      body[data-theme="solidario-moderno"] .sm-testimonios-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:2rem; }
+      body[data-theme="solidario-moderno"] .sm-testimonio-card { background:#fafaf8; border-radius:16px; padding:2rem; box-shadow:0 2px 12px rgba(0,0,0,.06); border-left:4px solid ${_smAccent}; }
+      body[data-theme="solidario-moderno"] .sm-testimonio-card__text { font-size:15px; line-height:1.7; color:#374151; font-style:italic; margin-bottom:1.25rem; }
+      body[data-theme="solidario-moderno"] .sm-testimonio-card__autor { font-weight:600; font-size:14px; color:#111827; display:block; }
+      body[data-theme="solidario-moderno"] .sm-updates-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:1rem; }
+      body[data-theme="solidario-moderno"] .sm-update-card { background:#fff; border-radius:16px; padding:1.75rem; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+      body[data-theme="solidario-moderno"] .sm-update-card__date { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:${_smAccent}; margin-bottom:.75rem; }
+      body[data-theme="solidario-moderno"] .sm-update-card__text { font-size:14px; line-height:1.65; color:#374151; }
+      body[data-theme="solidario-moderno"] .sm-contacto-card { max-width:640px; margin:1.5rem auto 0; background:#fff; border-radius:16px; padding:2.5rem; box-shadow:0 4px 24px rgba(0,0,0,.08); display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+      body[data-theme="solidario-moderno"] .sm-contacto-item { display:flex; align-items:flex-start; gap:.75rem; }
+      body[data-theme="solidario-moderno"] .sm-contacto-item__label { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#6b7280; margin-bottom:.2rem; }
+      body[data-theme="solidario-moderno"] .sm-contacto-item__val { font-size:14px; color:#374151; }
+      body[data-theme="solidario-moderno"] .ld-eyebrow { font-family:'Inter',sans-serif; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:${_smAccent}; margin-bottom:1.25rem; display:block; }
+      body[data-theme="solidario-moderno"] .submit-btn { background:${_smAccent}!important; color:#fff!important; border-radius:50px!important; font-weight:700!important; }
+      @media(max-width:768px){
+        body[data-theme="solidario-moderno"] .sm-story { grid-template-columns:1fr; }
+        body[data-theme="solidario-moderno"] .sm-impact-grid { grid-template-columns:repeat(2,1fr); }
+        body[data-theme="solidario-moderno"] .sm-team-grid { grid-template-columns:repeat(2,1fr); }
+        body[data-theme="solidario-moderno"] .sm-updates-grid { grid-template-columns:1fr; }
+        body[data-theme="solidario-moderno"] .sm-contacto-card { grid-template-columns:1fr; }
+      }
+    `;
+    console.log('[SM] CSS injected via JS ✅ accent:', _smAccent);
+  }
 
   // Force correct background/color on body via JS (beats base CSS rule)
   if (theme === 'solidario-moderno') {
