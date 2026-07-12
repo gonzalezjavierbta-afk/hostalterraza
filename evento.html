@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v9d6356c7 -->
+<!-- EVENTO_VERSION:v651481c9 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v9d6356c7 | SM:CSS-injected-JS | P9:bulletproof');
+  console.log('[evento.html] VERSION=v651481c9 | setMod:FIXED | dups:GONE | P9:v9');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4849,147 +4849,6 @@ function _ldInitCampana(cfg) {
 }
 
 // ── Campaign content renderer ─────────────────────────────
-
-function _ldInitCampana(cfg) {
-  const theme  = cfg?.theme || '';
-  const accent = cfg?.colors?.accent || null;
-  const root   = document.documentElement;
-  if (accent) root.style.setProperty('--ld-accent', accent);
-
-  // Force correct background/color on body via JS (beats base CSS rule)
-  if (theme === 'solidario-moderno') {
-    document.body.style.setProperty('background', '#fafaf8', 'important');
-    document.body.style.setProperty('color', '#111827', 'important');
-  } else if (theme === 'vintage-organico') {
-    document.body.style.setProperty('background', '#f5efe0', 'important');
-    document.body.style.setProperty('color', '#2c2416', 'important');
-  } else if (theme === 'urgente-impactante') {
-    document.body.style.setProperty('background', '#0a0a0a', 'important');
-    document.body.style.setProperty('color', '#f5f5f5', 'important');
-  } else if (theme === 'tech-futurista') {
-    document.body.style.setProperty('background', '#001428', 'important');
-    document.body.style.setProperty('color', '#e0f2fe', 'important');
-  }
-  const sm = document.getElementById('s-main');
-  if (sm) sm.style.cssText += ';background:inherit;color:inherit';
-
-  // Hero bg for themes that use it
-  if (['urgente-impactante','tech-futurista'].includes(theme)) {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const heroBg = document.getElementById('hero-bg');
-      if (heroBg && eventoActual?.imagen_url) {
-        heroBg.setAttribute('style',
-          `background-image:url('${eventoActual.imagen_url}');` +
-          'background-size:cover;background-position:center;' +
-          'position:absolute;inset:0;z-index:0;');
-      }
-    }));
-  }
-
-  // Show description in hero (Solidario Moderno / Vintage Orgánico)
-  const descEl = document.getElementById('at-desc-text');
-  const descMod = document.getElementById('mod-descripcion');
-  if (descEl && eventoActual?.descripcion) {
-    descEl.textContent = eventoActual.descripcion;
-    if (descMod) descMod.style.display = 'block';
-  }
-}
-
-// ── Campaign content renderer ─────────────────────────────
-
-function _ldInitCampana(cfg) {
-  const theme  = cfg?.theme || '';
-  const accent = cfg?.colors?.accent || null;
-  const root   = document.documentElement;
-  if (accent) root.style.setProperty('--ld-accent', accent);
-
-  // Force correct background/color on body via JS (beats base CSS rule)
-  if (theme === 'solidario-moderno') {
-    document.body.style.setProperty('background', '#fafaf8', 'important');
-    document.body.style.setProperty('color', '#111827', 'important');
-  } else if (theme === 'vintage-organico') {
-    document.body.style.setProperty('background', '#f5efe0', 'important');
-    document.body.style.setProperty('color', '#2c2416', 'important');
-  } else if (theme === 'urgente-impactante') {
-    document.body.style.setProperty('background', '#0a0a0a', 'important');
-    document.body.style.setProperty('color', '#f5f5f5', 'important');
-  } else if (theme === 'tech-futurista') {
-    document.body.style.setProperty('background', '#001428', 'important');
-    document.body.style.setProperty('color', '#e0f2fe', 'important');
-  }
-  const sm = document.getElementById('s-main');
-  if (sm) sm.style.cssText += ';background:inherit;color:inherit';
-
-  // Hero bg for themes that use it
-  if (['urgente-impactante','tech-futurista'].includes(theme)) {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const heroBg = document.getElementById('hero-bg');
-      if (heroBg && eventoActual?.imagen_url) {
-        heroBg.setAttribute('style',
-          `background-image:url('${eventoActual.imagen_url}');` +
-          'background-size:cover;background-position:center;' +
-          'position:absolute;inset:0;z-index:0;');
-      }
-    }));
-  }
-
-  // Show description in hero (Solidario Moderno / Vintage Orgánico)
-  const descEl = document.getElementById('at-desc-text');
-  const descMod = document.getElementById('mod-descripcion');
-  if (descEl && eventoActual?.descripcion) {
-    descEl.textContent = eventoActual.descripcion;
-    if (descMod) descMod.style.display = 'block';
-  }
-}
-
-// ── Campaign content renderer ─────────────────────────────
-
-function _ldInitCampana(cfg) {
-  const theme  = cfg?.theme || '';
-  const accent = cfg?.colors?.accent || null;
-  const root   = document.documentElement;
-  if (accent) root.style.setProperty('--ld-accent', accent);
-
-  // Force correct background/color on body via JS (beats base CSS rule)
-  if (theme === 'solidario-moderno') {
-    document.body.style.setProperty('background', '#fafaf8', 'important');
-    document.body.style.setProperty('color', '#111827', 'important');
-  } else if (theme === 'vintage-organico') {
-    document.body.style.setProperty('background', '#f5efe0', 'important');
-    document.body.style.setProperty('color', '#2c2416', 'important');
-  } else if (theme === 'urgente-impactante') {
-    document.body.style.setProperty('background', '#0a0a0a', 'important');
-    document.body.style.setProperty('color', '#f5f5f5', 'important');
-  } else if (theme === 'tech-futurista') {
-    document.body.style.setProperty('background', '#001428', 'important');
-    document.body.style.setProperty('color', '#e0f2fe', 'important');
-  }
-  const sm = document.getElementById('s-main');
-  if (sm) sm.style.cssText += ';background:inherit;color:inherit';
-
-  // Hero bg for themes that use it
-  if (['urgente-impactante','tech-futurista'].includes(theme)) {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const heroBg = document.getElementById('hero-bg');
-      if (heroBg && eventoActual?.imagen_url) {
-        heroBg.setAttribute('style',
-          `background-image:url('${eventoActual.imagen_url}');` +
-          'background-size:cover;background-position:center;' +
-          'position:absolute;inset:0;z-index:0;');
-      }
-    }));
-  }
-
-  // Show description in hero (Solidario Moderno / Vintage Orgánico)
-  const descEl = document.getElementById('at-desc-text');
-  const descMod = document.getElementById('mod-descripcion');
-  if (descEl && eventoActual?.descripcion) {
-    descEl.textContent = eventoActual.descripcion;
-    if (descMod) descMod.style.display = 'block';
-  }
-}
-
-// ── Campaign content renderer ─────────────────────────────
 function _ldRenderCampana(content, cfg) {
   const fmt = n => '$' + (Number(n)||0).toLocaleString('es-CO');
   // Use style.display directly — bulletproof, no CSS dependency
@@ -5003,7 +4862,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Historia — muestra si módulo activo, con o sin contenido
   if (mods.historia) {
-    setMod('mod-historia', true);
+    showMod('mod-historia');
     const tit  = document.getElementById('sm-historia-titulo');
     const body = document.getElementById('sm-historia-body');
     const imgWrap = document.getElementById('sm-historia-img-wrap');
@@ -5019,7 +4878,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Objetivo / Barra de progreso
   if (mods.objetivo) {
-    setMod('mod-objetivo', true);
+    showMod('mod-objetivo');
     const meta   = Number(co.objetivo_meta)   || 0;
     const actual = Number(co.objetivo_actual) || 0;
     const pct    = meta > 0 ? Math.min(Math.round(actual/meta*100),100) : 0;
@@ -5036,7 +4895,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Impacto
   if (mods.impacto) {
-    setMod('mod-impacto', true);
+    showMod('mod-impacto');
     const grid = document.getElementById('sm-impact-grid');
     if (grid && co.impacto?.length) {
       grid.innerHTML = co.impacto.map(item => `
@@ -5069,7 +4928,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Equipo
   if (mods.equipo) {
-    setMod('mod-equipo', true);
+    showMod('mod-equipo');
     const grid = document.getElementById('sm-team-grid');
     if (grid && co.equipo?.length) {
       grid.innerHTML = co.equipo.map(m => {
@@ -5090,7 +4949,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Testimonios
   if (mods.testimonios) {
-    setMod('mod-testimonios', true);
+    showMod('mod-testimonios');
     const grid = document.getElementById('sm-testimonios-grid');
     if (grid && co.testimonios?.length) {
       grid.innerHTML = co.testimonios.map(t=>`
@@ -5106,7 +4965,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Actualizaciones
   if (mods.actualizaciones) {
-    setMod('mod-actualizaciones', true);
+    showMod('mod-actualizaciones');
     const grid = document.getElementById('sm-updates-grid');
     if (grid && co.actualizaciones?.length) {
       grid.innerHTML = co.actualizaciones.map(u=>`
@@ -5148,7 +5007,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Contacto
   if (mods.contacto) {
-    setMod('mod-contacto', true);
+    showMod('mod-contacto');
     const card = document.getElementById('sm-contacto-card');
     const ct = co.contacto || {};
     if (card) {
@@ -5164,7 +5023,7 @@ function _ldRenderCampana(content, cfg) {
 
   // Aforo
   if (mods.aforo) {
-    setMod('mod-aforo', true);
+    showMod('mod-aforo');
     console.log('[campana] mod-aforo rendered ✅');
   }
 }
