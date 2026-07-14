@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:vc43cced4 -->
+<!-- EVENTO_VERSION:v7a08be80 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3431,7 +3431,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=vc43cced4 | SM:CSS-v2 | P9:LISTO');
+  console.log('[evento.html] VERSION=v7a08be80 | hero:redesign | gallery:fixed | P9:v10');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4430,7 +4430,8 @@ function aplicarConfiguracionLanding(cfg) {
     if (!!mods.sponsors)        showMod('mod-sponsors');        else hideMod('mod-sponsors');
     if (!!mods.faq)             showMod('mod-faq');             else hideMod('mod-faq');
     if (!!mods.countdown)       showMod('mod-countdown');       else hideMod('mod-countdown');
-    if (!!mods.aforo)           showMod('mod-aforo');           else hideMod('mod-aforo');
+    hideMod('mod-aforo');  // Campañas no usan aforo
+    hideMod('mod-descripcion');  // Campañas usan historia en lugar de descripcion
 
     console.log('[campana] módulos activos:', {
       historia: !!mods.historia, objetivo: !!mods.objetivo,
@@ -4811,11 +4812,91 @@ function _ldInitCampana(cfg) {
       body[data-theme="solidario-moderno"] .ld-faq-item{border:1.5px solid #e5e7eb;border-radius:10px;margin-bottom:.75rem;overflow:hidden}
       body[data-theme="solidario-moderno"] .ld-faq-q{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#111827;padding:1.25rem 1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
       body[data-theme="solidario-moderno"] .ld-faq-a{font-size:14px;line-height:1.7;color:#374151;padding:0 1.5rem 1.25rem}
-      body[data-theme="solidario-moderno"] .submit-btn{background:var(--sm-a)!important;color:#fff!important;border-radius:50px!important;font-weight:700!important;padding:14px 32px!important}
+      body[data-theme="solidario-moderno"] .submit-btn{background:var(--sm-a)!important;color:#fff!important;border-radius:50px!important;font-weight:700!important;padding:14px 32px!important;box-shadow:0 4px 16px rgba(var(--sm-ar),.3)!important;transition:all .2s!important}
+      body[data-theme="solidario-moderno"] .submit-btn:hover{transform:scale(1.02)!important;box-shadow:0 8px 24px rgba(var(--sm-ar),.4)!important}
       body[data-theme="solidario-moderno"] .form-section{background:#fafaf8!important}
       body[data-theme="solidario-moderno"] .fg label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280}
       body[data-theme="solidario-moderno"] .fg input,body[data-theme="solidario-moderno"] .fg select{border-radius:10px;border:1.5px solid #e5e7eb;background:#fff;color:#111827;font-size:15px;padding:12px 16px}
+      body[data-theme="solidario-moderno"] #mod-gallery{background:#fff!important;padding:4rem 2.5rem}
+      body[data-theme="solidario-moderno"] #at-gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:2rem}
+      body[data-theme="solidario-moderno"] #at-gallery-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;transition:transform .3s,box-shadow .3s;cursor:pointer;display:block}
+      body[data-theme="solidario-moderno"] #at-gallery-grid img:hover{transform:scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+      @media(max-width:768px){body[data-theme="solidario-moderno"] #at-gallery-grid{grid-template-columns:repeat(3,1fr)}}
+      @media(max-width:480px){body[data-theme="solidario-moderno"] #at-gallery-grid{grid-template-columns:repeat(2,1fr)}}
       body[data-theme="solidario-moderno"] .hero-eyebrow{color:var(--sm-a)!important}
+      /* SM HERO REDESIGN — basado en referencia */
+      body[data-theme="solidario-moderno"] .hero{
+        min-height:85vh!important; height:auto!important;
+        background:#ffffff!important;
+        display:flex!important; flex-direction:column!important;
+        justify-content:center!important; align-items:center!important;
+        text-align:center!important; padding:5rem 2rem 4rem!important;
+        position:relative!important; overflow:hidden!important;
+      }
+      body[data-theme="solidario-moderno"] .hero::before{
+        content:''!important; position:absolute!important; inset:0!important;
+        background:radial-gradient(ellipse at 50% 30%, rgba(var(--sm-ar),.06) 0%, transparent 70%)!important;
+        pointer-events:none!important; z-index:0!important;
+      }
+      body[data-theme="solidario-moderno"] .hero-bg{display:none!important}
+      body[data-theme="solidario-moderno"] .hero-content{
+        position:relative!important; z-index:1!important;
+        max-width:760px!important; margin:0 auto!important;
+        padding:0!important; flex:none!important;
+        display:flex!important; flex-direction:column!important;
+        align-items:center!important;
+      }
+      body[data-theme="solidario-moderno"] .hero-eyebrow{
+        display:inline-flex!important; align-items:center!important; gap:6px!important;
+        font-family:'Inter',sans-serif!important; font-size:11px!important;
+        font-weight:600!important; letter-spacing:.18em!important;
+        text-transform:uppercase!important; color:var(--sm-a)!important;
+        background:rgba(var(--sm-ar),.08)!important;
+        border:1px solid rgba(var(--sm-ar),.2)!important;
+        padding:6px 14px!important; border-radius:50px!important;
+        margin-bottom:1.75rem!important;
+      }
+      body[data-theme="solidario-moderno"] .hero-title{
+        font-family:'Poppins','Inter',sans-serif!important;
+        font-size:clamp(36px,6vw,72px)!important;
+        font-weight:700!important; line-height:1.08!important;
+        letter-spacing:-.02em!important; color:#111111!important;
+        margin:0 0 1.5rem!important; text-align:center!important;
+        font-style:normal!important;
+      }
+      body[data-theme="solidario-moderno"] .hero-title em{
+        font-style:normal!important; color:var(--sm-a)!important;
+      }
+      body[data-theme="solidario-moderno"] .hero-divider{display:none!important}
+      body[data-theme="solidario-moderno"] .hero-meta{
+        margin-bottom:2.25rem!important; gap:.4rem!important;
+        align-items:center!important; justify-content:center!important;
+      }
+      body[data-theme="solidario-moderno"] .meta-row{
+        font-family:'Inter',sans-serif!important; font-size:15px!important;
+        color:#666!important; font-weight:400!important; line-height:1.65!important;
+        max-width:520px!important; text-align:center!important;
+        display:flex!important; align-items:center!important; gap:.5rem!important;
+      }
+      body[data-theme="solidario-moderno"] .meta-icon{color:rgba(var(--sm-ar),.5)!important}
+      body[data-theme="solidario-moderno"] .counter-pill{
+        margin-top:.75rem!important; background:rgba(var(--sm-ar),.08)!important;
+        border:1px solid rgba(var(--sm-ar),.2)!important; color:var(--sm-a)!important;
+        border-radius:50px!important; font-size:13px!important;
+        font-weight:500!important; padding:7px 16px!important;
+      }
+      body[data-theme="solidario-moderno"] .counter-dot{
+        background:var(--sm-a)!important;
+        box-shadow:0 0 6px rgba(var(--sm-ar),.4)!important;
+      }
+      /* Decorative green circles - charity:water style */
+      body[data-theme="solidario-moderno"] .hero::after{
+        content:''!important; position:absolute!important;
+        width:400px!important; height:400px!important;
+        border-radius:50%!important; border:1px solid rgba(var(--sm-ar),.08)!important;
+        top:-100px!important; right:-100px!important; pointer-events:none!important;
+        z-index:0!important;
+      }
       body[data-theme="solidario-moderno"] .counter-pill{background:rgba(var(--sm-ar),.1)!important;border:1.5px solid rgba(var(--sm-ar),.25)!important;color:var(--sm-a)!important;border-radius:50px!important}
       @media(max-width:768px){
         body[data-theme="solidario-moderno"] .sm-story{grid-template-columns:1fr}
@@ -4827,6 +4908,37 @@ function _ldInitCampana(cfg) {
       }
     `;
     console.log('[SM] CSS injected via JS ✅ accent:', _smAccent);
+
+    // Inject hero CTA buttons for SM (Donar ahora + Ver video if video exists)
+    requestAnimationFrame(() => {
+      const heroContent = document.querySelector('body[data-theme="solidario-moderno"] .hero-content');
+      if (heroContent && !document.getElementById('sm-hero-cta-wrap')) {
+        // Get donate URL from config
+        const donateUrl = cfg?.content?.objetivo_url || '#';
+        const videoUrl  = eventoActual?.video_url || cfg?.content?.trailer_url || null;
+        const ctaWrap = document.createElement('div');
+        ctaWrap.id = 'sm-hero-cta-wrap';
+        ctaWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;margin-top:.25rem';
+        ctaWrap.innerHTML = `
+          <a href="${donateUrl}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:8px;background:var(--sm-a);color:#fff;
+              font-family:'Inter',sans-serif;font-weight:600;font-size:15px;padding:15px 30px;
+              border-radius:50px;text-decoration:none;box-shadow:0 4px 16px rgba(${_smAccentRgb.join(',')}, .35);
+              transition:all .2s">
+            Donar ahora
+          </a>
+          ${videoUrl ? `<a href="${videoUrl}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:8px;background:transparent;color:#444;
+              font-family:'Inter',sans-serif;font-weight:500;font-size:14px;padding:15px 22px;
+              border-radius:50px;border:1.5px solid #e5e7eb;text-decoration:none;transition:all .2s">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:var(--sm-a)"><path d="M8 5v14l11-7z"/></svg>
+            Ver video
+          </a>` : ''}
+        `;
+        heroContent.appendChild(ctaWrap);
+        console.log('[SM] Hero CTA injected ✅');
+      }
+    });
   }
 
   // Force correct background/color on body via JS (beats base CSS rule)
@@ -4930,10 +5042,10 @@ function _ldRenderCampana(content, cfg) {
     console.log('[campana] mod-impacto rendered ✅');
   }
 
-  // Galería
+  // Galería — mostrar con tarjetas estilo SM
   if (mods.gallery && co.gallery?.length) {
     const modG = document.getElementById('mod-gallery');
-    if (modG) modG.classList.remove('hidden');
+    if (modG) { modG.style.display = 'block'; modG.style.background = '#fff'; }
     const grid = document.getElementById('at-gallery-grid');
     if (grid) {
       document.getElementById('at-gallery-hero')?.setAttribute('style','display:none');
