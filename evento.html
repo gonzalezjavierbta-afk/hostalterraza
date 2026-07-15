@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:vbfd259e5 -->
+<!-- EVENTO_VERSION:vbd66fa57 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -2667,6 +2667,298 @@ body[data-theme="vintage-organico"] .fg input,.fg select{border-radius:4px;borde
 @media(max-width:600px){body[data-theme="vintage-organico"] #mod-countdown .ld-cd-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ═══════════════════════════════════════════════════════ */══════════════════ */
+/* ════════════════════════════════════════════════════════════
+   P6 · ROOFTOP SUNSET — Gala · Edition Hotels · Ovation
+   Cinzel + Playfair Display · Negro cálido + Oro
+   Hero centrado cinematográfico · Gallery 3/4 · Mood sunset
+   ════════════════════════════════════════════════════════════ */
+
+body[data-theme="rooftop-sunset"]{
+  --rs-bg:      #0d0a04;
+  --rs-surface: #14100a;
+  --rs-card:    #1c1710;
+  --rs-accent:  var(--ld-accent, #d4af37);
+  --rs-gold:    #d4af37;
+  --rs-text:    #f0ead8;
+  --rs-muted:   rgba(240,234,216,.45);
+  --rs-border:  rgba(212,175,55,.18);
+  --rs-cinzel:  'Cinzel', Georgia, serif;
+  --rs-playfair:'Playfair Display', Georgia, serif;
+  background: var(--rs-bg);
+  color: var(--rs-text);
+  font-family: 'DM Sans', sans-serif;
+}
+body[data-theme="rooftop-sunset"] #s-main{ background:var(--rs-bg); }
+
+/* ── HERO ─────────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] .hero{
+  height:100vh; min-height:600px;
+  display:flex; flex-direction:column; position:relative; overflow:hidden;
+}
+body[data-theme="rooftop-sunset"] .hero-bg{
+  position:absolute; inset:0; z-index:0;
+  background-size:cover; background-position:center center;
+  background-image:var(--hero-img-url,none);
+}
+body[data-theme="rooftop-sunset"] .hero-bg::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(13,10,4,.45) 0%,
+    rgba(13,10,4,.55) 35%,
+    rgba(13,10,4,.85) 70%,
+    rgba(13,10,4,.97) 100%
+  );
+}
+body[data-theme="rooftop-sunset"] .hero-brand{
+  position:absolute; top:2rem; left:2.5rem; z-index:2;
+  font-family:var(--rs-cinzel); font-size:10px; font-weight:400;
+  letter-spacing:.35em; text-transform:uppercase; color:rgba(212,175,55,.5);
+}
+body[data-theme="rooftop-sunset"] .hero-content{
+  position:relative; z-index:1; flex:1;
+  display:flex; flex-direction:column;
+  justify-content:flex-end; align-items:flex-start;
+  padding:0 2.5rem 4rem 2.5rem; max-width:800px; box-sizing:border-box;
+}
+body[data-theme="rooftop-sunset"] .hero-eyebrow{
+  font-family:var(--rs-cinzel); font-size:10px; font-weight:400;
+  letter-spacing:.35em; text-transform:uppercase;
+  color:var(--rs-accent); margin-bottom:1.25rem;
+}
+body[data-theme="rooftop-sunset"] .hero-title{
+  font-family:var(--rs-cinzel); font-size:clamp(32px,6vw,68px);
+  font-weight:700; line-height:1.05; letter-spacing:.04em;
+  text-transform:uppercase; color:#fff; margin:0 0 1.25rem;
+}
+body[data-theme="rooftop-sunset"] .hero-divider{
+  width:32px; height:1px; background:var(--rs-accent);
+  margin:0 0 1.5rem; opacity:.8;
+  box-shadow:0 0 8px rgba(212,175,55,.4);
+}
+body[data-theme="rooftop-sunset"] .hero-meta{ gap:.5rem; margin-bottom:1.5rem; }
+body[data-theme="rooftop-sunset"] .meta-row{
+  font-family:var(--rs-playfair); font-size:14px; font-style:italic;
+  color:var(--rs-muted); display:flex; align-items:center; gap:.6rem;
+}
+body[data-theme="rooftop-sunset"] .meta-icon{ opacity:.35; }
+body[data-theme="rooftop-sunset"] .counter-pill{
+  background:rgba(212,175,55,.08); border:1px solid var(--rs-border);
+  border-radius:2px; font-size:12px; color:var(--rs-muted);
+  letter-spacing:.06em; font-family:var(--rs-cinzel);
+}
+body[data-theme="rooftop-sunset"] .counter-dot{
+  background:var(--rs-accent); box-shadow:0 0 6px rgba(212,175,55,.5);
+}
+
+/* ── DESCRIPCIÓN ──────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] .ld-desc-module{
+  background:var(--rs-surface); padding:5rem 2.5rem;
+  border-top:1px solid var(--rs-border);
+}
+body[data-theme="rooftop-sunset"] .ld-desc-eyebrow{
+  font-family:var(--rs-cinzel); color:var(--rs-accent);
+  letter-spacing:.25em; text-align:left; font-size:10px;
+}
+body[data-theme="rooftop-sunset"] .ld-desc-text{
+  font-family:var(--rs-playfair); font-size:clamp(17px,2vw,22px);
+  color:rgba(240,234,216,.85); font-style:italic; text-align:left; line-height:1.8;
+}
+
+/* ── MÓDULOS BASE ─────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] .ld-module{
+  background:var(--rs-bg); padding:5rem 2.5rem;
+  border-top:1px solid var(--rs-border);
+  max-width:none; margin:0; width:100%; box-sizing:border-box;
+}
+body[data-theme="rooftop-sunset"] .ld-eyebrow{
+  font-family:var(--rs-cinzel); font-size:10px; font-weight:400;
+  letter-spacing:.3em; text-transform:uppercase;
+  color:var(--rs-accent); margin-bottom:1.5rem; display:block;
+}
+body[data-theme="rooftop-sunset"] .ld-section-title{
+  font-family:var(--rs-cinzel); font-weight:700; text-transform:uppercase;
+  color:var(--rs-text); letter-spacing:.12em; border:none;
+}
+
+/* ── COUNTDOWN ────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-countdown{
+  background:var(--rs-surface); text-align:center; padding:5rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] #mod-countdown .ld-eyebrow{
+  text-align:center; margin-bottom:2.5rem;
+}
+body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:1rem; max-width:600px; margin:0 auto;
+}
+body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-block{
+  background:rgba(212,175,55,.06); border:1px solid var(--rs-border);
+  border-radius:2px; padding:2rem .75rem;
+}
+body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-num{
+  font-family:var(--rs-cinzel); font-size:clamp(36px,8vw,64px);
+  font-weight:700; color:var(--rs-accent); display:block; line-height:1;
+}
+body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-label{
+  font-family:var(--rs-cinzel); font-size:9px; letter-spacing:.25em;
+  color:var(--rs-muted); display:block; margin-top:.5rem; text-transform:uppercase;
+}
+
+/* ── GALERÍA ──────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-gallery{
+  background:var(--rs-bg); padding:5rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] #at-gallery-grid{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:8px; margin-top:1.5rem;
+}
+body[data-theme="rooftop-sunset"] #at-gallery-hero{ display:none!important; }
+body[data-theme="rooftop-sunset"] #at-gallery-dots{ display:none!important; }
+
+/* ── DJ LINEUP ────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-dj-lineup{
+  background:var(--rs-surface); padding:5rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-dj-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1rem; margin-top:1.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-dj-card{
+  background:rgba(212,175,55,.06); border:1px solid var(--rs-border);
+  border-radius:2px; padding:1.5rem; text-align:center;
+  transition:background .2s, border-color .2s;
+}
+body[data-theme="rooftop-sunset"] .ld-dj-card:hover{
+  background:rgba(212,175,55,.1); border-color:rgba(212,175,55,.35);
+}
+body[data-theme="rooftop-sunset"] .ld-dj-name{
+  font-family:var(--rs-cinzel); font-size:16px; font-weight:600;
+  color:var(--rs-text); letter-spacing:.08em; margin-bottom:.35rem;
+}
+body[data-theme="rooftop-sunset"] .ld-dj-time{
+  font-family:var(--rs-playfair); font-size:13px; font-style:italic;
+  color:var(--rs-accent);
+}
+
+/* ── PLAYLIST ─────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-playlist{
+  background:var(--rs-bg); padding:5rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-playlist-wrap{
+  max-width:640px; margin-top:1.5rem;
+}
+
+/* ── GUEST LIST ───────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-guest-list{
+  background:var(--rs-surface); padding:4rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-guest-list-text{
+  font-family:var(--rs-playfair); font-size:16px; font-style:italic;
+  color:var(--rs-muted); line-height:1.7; max-width:600px;
+}
+
+/* ── DRESS CODE ───────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-dresscode{
+  background:var(--rs-bg); padding:4rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-dresscode-badge{
+  background:rgba(212,175,55,.08); border:1px solid var(--rs-border);
+  border-radius:2px; color:var(--rs-text);
+  font-family:var(--rs-cinzel); letter-spacing:.15em;
+}
+
+/* ── AFORO ────────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-aforo{
+  background:var(--rs-surface); padding:4rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-aforo-bar{
+  background:rgba(212,175,55,.1); border-radius:0;
+}
+body[data-theme="rooftop-sunset"] .ld-aforo-bar-fill{
+  background:var(--rs-accent); border-radius:0;
+}
+
+/* ── UBICACIÓN ────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-ubicacion{
+  background:var(--rs-bg); padding:4rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-ubicacion-text{
+  font-family:var(--rs-playfair); font-size:16px; font-style:italic;
+  color:var(--rs-muted); max-width:500px;
+}
+
+/* ── SPONSORS ─────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-sponsors{
+  background:var(--rs-surface); padding:4rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-sponsor-item{
+  background:rgba(212,175,55,.05); border:1px solid var(--rs-border);
+  border-radius:2px; font-family:var(--rs-cinzel);
+  letter-spacing:.1em; color:var(--rs-muted); font-size:11px;
+}
+
+/* ── FAQ ──────────────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] #mod-faq{
+  background:var(--rs-bg); padding:5rem 2.5rem;
+}
+body[data-theme="rooftop-sunset"] #ld-faq-list{
+  max-width:680px; margin:1.5rem 0 0;
+}
+body[data-theme="rooftop-sunset"] .ld-faq-item{
+  border-color:var(--rs-border); border-radius:0;
+  margin-bottom:.5rem;
+}
+body[data-theme="rooftop-sunset"] .ld-faq-q{
+  font-family:var(--rs-cinzel); color:var(--rs-text);
+  font-weight:400; letter-spacing:.06em; font-size:13px;
+}
+body[data-theme="rooftop-sunset"] .ld-faq-a{
+  color:var(--rs-muted); font-family:var(--rs-playfair);
+  font-style:italic; font-size:14px;
+}
+
+/* ── FORMULARIO ───────────────────────────────────────────── */
+body[data-theme="rooftop-sunset"] .form-section{
+  background:var(--rs-surface); padding:5rem 2.5rem 4rem;
+  border-top:1px solid var(--rs-border);
+}
+body[data-theme="rooftop-sunset"] .form-section > *{
+  max-width:480px; margin-left:auto; margin-right:auto; display:block;
+}
+body[data-theme="rooftop-sunset"] .fg label{
+  font-family:var(--rs-cinzel); font-size:9px; font-weight:400;
+  letter-spacing:.25em; color:var(--rs-accent);
+}
+body[data-theme="rooftop-sunset"] .fg input,
+body[data-theme="rooftop-sunset"] .fg select{
+  background:transparent; border:none;
+  border-bottom:1px solid var(--rs-border);
+  border-radius:0; color:var(--rs-text);
+  font-family:var(--rs-playfair); padding:8px 0;
+}
+body[data-theme="rooftop-sunset"] .fg input:focus,
+body[data-theme="rooftop-sunset"] .fg select:focus{
+  border-bottom-color:var(--rs-accent); outline:none;
+}
+body[data-theme="rooftop-sunset"] .submit-btn{
+  background:var(--rs-accent); color:#0d0a04;
+  border-radius:0; font-family:var(--rs-cinzel);
+  font-weight:700; letter-spacing:.2em; font-size:11px;
+  text-transform:uppercase;
+  transition:opacity .2s;
+}
+body[data-theme="rooftop-sunset"] .submit-btn:hover{ opacity:.85; }
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:768px){
+  body[data-theme="rooftop-sunset"] .hero-content{ padding:0 1.5rem 3rem; }
+  body[data-theme="rooftop-sunset"] .ld-module{ padding:3.5rem 1.5rem; }
+  body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{ grid-template-columns:repeat(2,1fr); }
+  body[data-theme="rooftop-sunset"] #at-gallery-grid{ grid-template-columns:repeat(2,1fr); }
+}
+
+
 </style>
 </head>
 <body>
@@ -3457,7 +3749,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=vbfd259e5 | P6:rooftop | fiesta:10-mods | P9:stable');
+  console.log('[evento.html] VERSION=vbd66fa57 | P6:CSS-inside-style | no-code-leak');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -5549,294 +5841,4 @@ function atGalleryDot(idx) {
 
 </script>
 </body>
-</html>/* ════════════════════════════════════════════════════════════
-   P6 · ROOFTOP SUNSET — Gala · Edition Hotels · Ovation
-   Cinzel + Playfair Display · Negro cálido + Oro
-   Hero centrado cinematográfico · Gallery 3/4 · Mood sunset
-   ════════════════════════════════════════════════════════════ */
-
-body[data-theme="rooftop-sunset"]{
-  --rs-bg:      #0d0a04;
-  --rs-surface: #14100a;
-  --rs-card:    #1c1710;
-  --rs-accent:  var(--ld-accent, #d4af37);
-  --rs-gold:    #d4af37;
-  --rs-text:    #f0ead8;
-  --rs-muted:   rgba(240,234,216,.45);
-  --rs-border:  rgba(212,175,55,.18);
-  --rs-cinzel:  'Cinzel', Georgia, serif;
-  --rs-playfair:'Playfair Display', Georgia, serif;
-  background: var(--rs-bg);
-  color: var(--rs-text);
-  font-family: 'DM Sans', sans-serif;
-}
-body[data-theme="rooftop-sunset"] #s-main{ background:var(--rs-bg); }
-
-/* ── HERO ─────────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] .hero{
-  height:100vh; min-height:600px;
-  display:flex; flex-direction:column; position:relative; overflow:hidden;
-}
-body[data-theme="rooftop-sunset"] .hero-bg{
-  position:absolute; inset:0; z-index:0;
-  background-size:cover; background-position:center center;
-  background-image:var(--hero-img-url,none);
-}
-body[data-theme="rooftop-sunset"] .hero-bg::after{
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(
-    to bottom,
-    rgba(13,10,4,.45) 0%,
-    rgba(13,10,4,.55) 35%,
-    rgba(13,10,4,.85) 70%,
-    rgba(13,10,4,.97) 100%
-  );
-}
-body[data-theme="rooftop-sunset"] .hero-brand{
-  position:absolute; top:2rem; left:2.5rem; z-index:2;
-  font-family:var(--rs-cinzel); font-size:10px; font-weight:400;
-  letter-spacing:.35em; text-transform:uppercase; color:rgba(212,175,55,.5);
-}
-body[data-theme="rooftop-sunset"] .hero-content{
-  position:relative; z-index:1; flex:1;
-  display:flex; flex-direction:column;
-  justify-content:flex-end; align-items:flex-start;
-  padding:0 2.5rem 4rem 2.5rem; max-width:800px; box-sizing:border-box;
-}
-body[data-theme="rooftop-sunset"] .hero-eyebrow{
-  font-family:var(--rs-cinzel); font-size:10px; font-weight:400;
-  letter-spacing:.35em; text-transform:uppercase;
-  color:var(--rs-accent); margin-bottom:1.25rem;
-}
-body[data-theme="rooftop-sunset"] .hero-title{
-  font-family:var(--rs-cinzel); font-size:clamp(32px,6vw,68px);
-  font-weight:700; line-height:1.05; letter-spacing:.04em;
-  text-transform:uppercase; color:#fff; margin:0 0 1.25rem;
-}
-body[data-theme="rooftop-sunset"] .hero-divider{
-  width:32px; height:1px; background:var(--rs-accent);
-  margin:0 0 1.5rem; opacity:.8;
-  box-shadow:0 0 8px rgba(212,175,55,.4);
-}
-body[data-theme="rooftop-sunset"] .hero-meta{ gap:.5rem; margin-bottom:1.5rem; }
-body[data-theme="rooftop-sunset"] .meta-row{
-  font-family:var(--rs-playfair); font-size:14px; font-style:italic;
-  color:var(--rs-muted); display:flex; align-items:center; gap:.6rem;
-}
-body[data-theme="rooftop-sunset"] .meta-icon{ opacity:.35; }
-body[data-theme="rooftop-sunset"] .counter-pill{
-  background:rgba(212,175,55,.08); border:1px solid var(--rs-border);
-  border-radius:2px; font-size:12px; color:var(--rs-muted);
-  letter-spacing:.06em; font-family:var(--rs-cinzel);
-}
-body[data-theme="rooftop-sunset"] .counter-dot{
-  background:var(--rs-accent); box-shadow:0 0 6px rgba(212,175,55,.5);
-}
-
-/* ── DESCRIPCIÓN ──────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] .ld-desc-module{
-  background:var(--rs-surface); padding:5rem 2.5rem;
-  border-top:1px solid var(--rs-border);
-}
-body[data-theme="rooftop-sunset"] .ld-desc-eyebrow{
-  font-family:var(--rs-cinzel); color:var(--rs-accent);
-  letter-spacing:.25em; text-align:left; font-size:10px;
-}
-body[data-theme="rooftop-sunset"] .ld-desc-text{
-  font-family:var(--rs-playfair); font-size:clamp(17px,2vw,22px);
-  color:rgba(240,234,216,.85); font-style:italic; text-align:left; line-height:1.8;
-}
-
-/* ── MÓDULOS BASE ─────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] .ld-module{
-  background:var(--rs-bg); padding:5rem 2.5rem;
-  border-top:1px solid var(--rs-border);
-  max-width:none; margin:0; width:100%; box-sizing:border-box;
-}
-body[data-theme="rooftop-sunset"] .ld-eyebrow{
-  font-family:var(--rs-cinzel); font-size:10px; font-weight:400;
-  letter-spacing:.3em; text-transform:uppercase;
-  color:var(--rs-accent); margin-bottom:1.5rem; display:block;
-}
-body[data-theme="rooftop-sunset"] .ld-section-title{
-  font-family:var(--rs-cinzel); font-weight:700; text-transform:uppercase;
-  color:var(--rs-text); letter-spacing:.12em; border:none;
-}
-
-/* ── COUNTDOWN ────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-countdown{
-  background:var(--rs-surface); text-align:center; padding:5rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] #mod-countdown .ld-eyebrow{
-  text-align:center; margin-bottom:2.5rem;
-}
-body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:1rem; max-width:600px; margin:0 auto;
-}
-body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-block{
-  background:rgba(212,175,55,.06); border:1px solid var(--rs-border);
-  border-radius:2px; padding:2rem .75rem;
-}
-body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-num{
-  font-family:var(--rs-cinzel); font-size:clamp(36px,8vw,64px);
-  font-weight:700; color:var(--rs-accent); display:block; line-height:1;
-}
-body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-label{
-  font-family:var(--rs-cinzel); font-size:9px; letter-spacing:.25em;
-  color:var(--rs-muted); display:block; margin-top:.5rem; text-transform:uppercase;
-}
-
-/* ── GALERÍA ──────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-gallery{
-  background:var(--rs-bg); padding:5rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] #at-gallery-grid{
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:8px; margin-top:1.5rem;
-}
-body[data-theme="rooftop-sunset"] #at-gallery-hero{ display:none!important; }
-body[data-theme="rooftop-sunset"] #at-gallery-dots{ display:none!important; }
-
-/* ── DJ LINEUP ────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-dj-lineup{
-  background:var(--rs-surface); padding:5rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-dj-grid{
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:1rem; margin-top:1.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-dj-card{
-  background:rgba(212,175,55,.06); border:1px solid var(--rs-border);
-  border-radius:2px; padding:1.5rem; text-align:center;
-  transition:background .2s, border-color .2s;
-}
-body[data-theme="rooftop-sunset"] .ld-dj-card:hover{
-  background:rgba(212,175,55,.1); border-color:rgba(212,175,55,.35);
-}
-body[data-theme="rooftop-sunset"] .ld-dj-name{
-  font-family:var(--rs-cinzel); font-size:16px; font-weight:600;
-  color:var(--rs-text); letter-spacing:.08em; margin-bottom:.35rem;
-}
-body[data-theme="rooftop-sunset"] .ld-dj-time{
-  font-family:var(--rs-playfair); font-size:13px; font-style:italic;
-  color:var(--rs-accent);
-}
-
-/* ── PLAYLIST ─────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-playlist{
-  background:var(--rs-bg); padding:5rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-playlist-wrap{
-  max-width:640px; margin-top:1.5rem;
-}
-
-/* ── GUEST LIST ───────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-guest-list{
-  background:var(--rs-surface); padding:4rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-guest-list-text{
-  font-family:var(--rs-playfair); font-size:16px; font-style:italic;
-  color:var(--rs-muted); line-height:1.7; max-width:600px;
-}
-
-/* ── DRESS CODE ───────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-dresscode{
-  background:var(--rs-bg); padding:4rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-dresscode-badge{
-  background:rgba(212,175,55,.08); border:1px solid var(--rs-border);
-  border-radius:2px; color:var(--rs-text);
-  font-family:var(--rs-cinzel); letter-spacing:.15em;
-}
-
-/* ── AFORO ────────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-aforo{
-  background:var(--rs-surface); padding:4rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-aforo-bar{
-  background:rgba(212,175,55,.1); border-radius:0;
-}
-body[data-theme="rooftop-sunset"] .ld-aforo-bar-fill{
-  background:var(--rs-accent); border-radius:0;
-}
-
-/* ── UBICACIÓN ────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-ubicacion{
-  background:var(--rs-bg); padding:4rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-ubicacion-text{
-  font-family:var(--rs-playfair); font-size:16px; font-style:italic;
-  color:var(--rs-muted); max-width:500px;
-}
-
-/* ── SPONSORS ─────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-sponsors{
-  background:var(--rs-surface); padding:4rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-sponsor-item{
-  background:rgba(212,175,55,.05); border:1px solid var(--rs-border);
-  border-radius:2px; font-family:var(--rs-cinzel);
-  letter-spacing:.1em; color:var(--rs-muted); font-size:11px;
-}
-
-/* ── FAQ ──────────────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] #mod-faq{
-  background:var(--rs-bg); padding:5rem 2.5rem;
-}
-body[data-theme="rooftop-sunset"] #ld-faq-list{
-  max-width:680px; margin:1.5rem 0 0;
-}
-body[data-theme="rooftop-sunset"] .ld-faq-item{
-  border-color:var(--rs-border); border-radius:0;
-  margin-bottom:.5rem;
-}
-body[data-theme="rooftop-sunset"] .ld-faq-q{
-  font-family:var(--rs-cinzel); color:var(--rs-text);
-  font-weight:400; letter-spacing:.06em; font-size:13px;
-}
-body[data-theme="rooftop-sunset"] .ld-faq-a{
-  color:var(--rs-muted); font-family:var(--rs-playfair);
-  font-style:italic; font-size:14px;
-}
-
-/* ── FORMULARIO ───────────────────────────────────────────── */
-body[data-theme="rooftop-sunset"] .form-section{
-  background:var(--rs-surface); padding:5rem 2.5rem 4rem;
-  border-top:1px solid var(--rs-border);
-}
-body[data-theme="rooftop-sunset"] .form-section > *{
-  max-width:480px; margin-left:auto; margin-right:auto; display:block;
-}
-body[data-theme="rooftop-sunset"] .fg label{
-  font-family:var(--rs-cinzel); font-size:9px; font-weight:400;
-  letter-spacing:.25em; color:var(--rs-accent);
-}
-body[data-theme="rooftop-sunset"] .fg input,
-body[data-theme="rooftop-sunset"] .fg select{
-  background:transparent; border:none;
-  border-bottom:1px solid var(--rs-border);
-  border-radius:0; color:var(--rs-text);
-  font-family:var(--rs-playfair); padding:8px 0;
-}
-body[data-theme="rooftop-sunset"] .fg input:focus,
-body[data-theme="rooftop-sunset"] .fg select:focus{
-  border-bottom-color:var(--rs-accent); outline:none;
-}
-body[data-theme="rooftop-sunset"] .submit-btn{
-  background:var(--rs-accent); color:#0d0a04;
-  border-radius:0; font-family:var(--rs-cinzel);
-  font-weight:700; letter-spacing:.2em; font-size:11px;
-  text-transform:uppercase;
-  transition:opacity .2s;
-}
-body[data-theme="rooftop-sunset"] .submit-btn:hover{ opacity:.85; }
-
-/* ── RESPONSIVE ───────────────────────────────────────────── */
-@media(max-width:768px){
-  body[data-theme="rooftop-sunset"] .hero-content{ padding:0 1.5rem 3rem; }
-  body[data-theme="rooftop-sunset"] .ld-module{ padding:3.5rem 1.5rem; }
-  body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{ grid-template-columns:repeat(2,1fr); }
-  body[data-theme="rooftop-sunset"] #at-gallery-grid{ grid-template-columns:repeat(2,1fr); }
-}
-
+</html>
