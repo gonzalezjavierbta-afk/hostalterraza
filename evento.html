@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:vf89c9b1c -->
+<!-- EVENTO_VERSION:v4a9b0cda -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3751,7 +3751,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=vf89c9b1c | P6:CSS-fixed | fiesta:complete');
+  console.log('[evento.html] VERSION=v4a9b0cda | P6:debug-verbose');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4721,6 +4721,7 @@ function aplicarConfiguracionLanding(cfg) {
     setMod('mod-sponsors',      mods.sponsors);
     setMod('mod-faq',           mods.faq);
   } else if (_tipoEvento === 'fiesta') {
+    console.log('[fiesta] activando módulos | theme:', cfg.theme, '| mods:', JSON.stringify(mods));
     // Ocultar módulos de cinematografía
     setMod('mod-trailer',       false);
     setMod('mod-sinopsis',      false);
