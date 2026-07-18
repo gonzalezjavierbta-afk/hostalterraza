@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v4a9b0cda -->
+<!-- EVENTO_VERSION:ve94e8470 -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3751,7 +3751,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v4a9b0cda | P6:debug-verbose');
+  console.log('[evento.html] VERSION=ve94e8470 | P6:CSS-injected-JS | P9:stable');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -5170,10 +5170,88 @@ function _ldInitRooftopSunset(cfg) {
   root.style.setProperty('--ld-accent', accent);
   root.style.setProperty('--rs-accent', accent);
 
+  // Force body via JS — beats base CSS rule
   document.body.style.setProperty('background', '#0d0a04', 'important');
   document.body.style.setProperty('color', '#f0ead8', 'important');
   const sm = document.getElementById('s-main');
-  if (sm) sm.style.background = '#0d0a04';
+  if (sm) { sm.style.setProperty('background', '#0d0a04', 'important'); }
+
+  // Parse accent color for rgba usage
+  const hex = accent.replace('#','');
+  const ar = parseInt(hex.slice(0,2),16)||212;
+  const ag = parseInt(hex.slice(2,4),16)||175;
+  const ab = parseInt(hex.slice(4,6),16)||55;
+
+  // Inject P6 CSS via JS — same pattern as P9, bulletproof
+  let st = document.getElementById('_rs-injected-css');
+  if (!st) { st = document.createElement('style'); st.id = '_rs-injected-css'; document.head.appendChild(st); }
+  st.textContent = `
+    body[data-theme="rooftop-sunset"]{background:#0d0a04!important;color:#f0ead8!important;font-family:'DM Sans',sans-serif!important}
+    body[data-theme="rooftop-sunset"] #s-main{background:#0d0a04!important}
+    body[data-theme="rooftop-sunset"] .ld-module{background:#0d0a04;padding:5rem 2.5rem;border-top:1px solid rgba(${ar},${ag},${ab},.18);max-width:none!important;margin:0!important;width:100%!important;box-sizing:border-box!important;color:#f0ead8}
+    body[data-theme="rooftop-sunset"] .ld-eyebrow{font-family:'Cinzel',Georgia,serif!important;font-size:10px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:${accent};margin-bottom:1.5rem;display:block}
+    body[data-theme="rooftop-sunset"] .ld-section-title{font-family:'Cinzel',Georgia,serif!important;color:#f0ead8;letter-spacing:.12em;text-transform:uppercase;border:none}
+    /* Countdown */
+    body[data-theme="rooftop-sunset"] #mod-countdown{background:#14100a!important;text-align:center}
+    body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:600px;margin:1.5rem auto 0}
+    body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-block{background:rgba(${ar},${ag},${ab},.06);border:1px solid rgba(${ar},${ag},${ab},.18);border-radius:2px;padding:2rem .75rem}
+    body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-num{font-family:'Cinzel',Georgia,serif;font-size:clamp(36px,8vw,64px);font-weight:700;color:${accent};display:block;line-height:1}
+    body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-label{font-family:'Cinzel',Georgia,serif;font-size:9px;letter-spacing:.25em;color:rgba(240,234,216,.45);display:block;margin-top:.5rem;text-transform:uppercase}
+    /* Gallery */
+    body[data-theme="rooftop-sunset"] #mod-gallery{background:#0d0a04!important}
+    body[data-theme="rooftop-sunset"] #at-gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:1.5rem}
+    body[data-theme="rooftop-sunset"] #at-gallery-hero{display:none!important}
+    body[data-theme="rooftop-sunset"] #at-gallery-dots{display:none!important}
+    /* DJ Lineup */
+    body[data-theme="rooftop-sunset"] #mod-dj-lineup{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] .ld-dj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1.5rem}
+    body[data-theme="rooftop-sunset"] .ld-dj-card{background:rgba(${ar},${ag},${ab},.06);border:1px solid rgba(${ar},${ag},${ab},.18);border-radius:2px;padding:1.5rem;text-align:center;transition:background .2s}
+    body[data-theme="rooftop-sunset"] .ld-dj-card:hover{background:rgba(${ar},${ag},${ab},.12)}
+    body[data-theme="rooftop-sunset"] .ld-dj-name{font-family:'Cinzel',Georgia,serif;font-size:16px;font-weight:600;color:#f0ead8;letter-spacing:.08em;margin-bottom:.35rem}
+    body[data-theme="rooftop-sunset"] .ld-dj-time{font-family:'Playfair Display',Georgia,serif;font-size:13px;font-style:italic;color:${accent}}
+    /* Aforo */
+    body[data-theme="rooftop-sunset"] #mod-aforo{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] .ld-aforo-bar{background:rgba(${ar},${ag},${ab},.1);border-radius:0}
+    body[data-theme="rooftop-sunset"] .ld-aforo-bar-fill{background:${accent};border-radius:0}
+    /* Guest list */
+    body[data-theme="rooftop-sunset"] #mod-guest-list{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] .ld-guest-list-text{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-style:italic;color:rgba(240,234,216,.7);line-height:1.7;max-width:600px}
+    /* Playlist */
+    body[data-theme="rooftop-sunset"] #mod-playlist{background:#0d0a04!important}
+    body[data-theme="rooftop-sunset"] .ld-playlist-wrap{max-width:640px;margin-top:1.5rem}
+    /* Dress code */
+    body[data-theme="rooftop-sunset"] #mod-dresscode{background:#0d0a04!important}
+    body[data-theme="rooftop-sunset"] .ld-dresscode-badge{background:rgba(${ar},${ag},${ab},.08);border:1px solid rgba(${ar},${ag},${ab},.18);border-radius:2px;color:#f0ead8;font-family:'Cinzel',Georgia,serif;letter-spacing:.15em}
+    /* Ubicacion */
+    body[data-theme="rooftop-sunset"] #mod-ubicacion{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] .ld-ubicacion-text{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-style:italic;color:rgba(240,234,216,.7);max-width:500px}
+    /* Sponsors */
+    body[data-theme="rooftop-sunset"] #mod-sponsors{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] .ld-sponsor-item{background:rgba(${ar},${ag},${ab},.05);border:1px solid rgba(${ar},${ag},${ab},.18);border-radius:2px;font-family:'Cinzel',Georgia,serif;letter-spacing:.1em;color:rgba(240,234,216,.45);font-size:11px}
+    /* FAQ */
+    body[data-theme="rooftop-sunset"] #mod-faq{background:#0d0a04!important}
+    body[data-theme="rooftop-sunset"] #ld-faq-list{max-width:680px;margin:1.5rem 0 0}
+    body[data-theme="rooftop-sunset"] .ld-faq-item{border-color:rgba(${ar},${ag},${ab},.18);border-radius:0;margin-bottom:.5rem}
+    body[data-theme="rooftop-sunset"] .ld-faq-q{font-family:'Cinzel',Georgia,serif;color:#f0ead8;font-size:13px;letter-spacing:.06em;padding:1.25rem 1.5rem}
+    body[data-theme="rooftop-sunset"] .ld-faq-a{color:rgba(240,234,216,.55);font-family:'Playfair Display',Georgia,serif;font-style:italic;padding:0 1.5rem 1.25rem}
+    /* Form */
+    body[data-theme="rooftop-sunset"] .form-section{background:#14100a!important;border-top:1px solid rgba(${ar},${ag},${ab},.18)}
+    body[data-theme="rooftop-sunset"] .form-section>*{max-width:480px;margin-left:auto;margin-right:auto;display:block}
+    body[data-theme="rooftop-sunset"] .fg label{font-family:'Cinzel',Georgia,serif;font-size:9px;letter-spacing:.25em;color:${accent}}
+    body[data-theme="rooftop-sunset"] .fg input,body[data-theme="rooftop-sunset"] .fg select{background:transparent;border:none;border-bottom:1px solid rgba(${ar},${ag},${ab},.18);border-radius:0;color:#f0ead8;font-family:'Playfair Display',Georgia,serif;padding:8px 0}
+    body[data-theme="rooftop-sunset"] .fg input:focus,body[data-theme="rooftop-sunset"] .fg select:focus{border-bottom-color:${accent};outline:none}
+    body[data-theme="rooftop-sunset"] .submit-btn{background:${accent}!important;color:#0d0a04!important;border-radius:0!important;font-family:'Cinzel',Georgia,serif!important;font-weight:700!important;letter-spacing:.2em!important;font-size:11px!important;text-transform:uppercase!important}
+    /* Desc */
+    body[data-theme="rooftop-sunset"] .ld-desc-module{background:#14100a!important;padding:5rem 2.5rem;border-top:1px solid rgba(${ar},${ag},${ab},.18)}
+    body[data-theme="rooftop-sunset"] .ld-desc-text{font-family:'Playfair Display',Georgia,serif;color:rgba(240,234,216,.85);font-style:italic;font-size:clamp(17px,2vw,22px);line-height:1.8}
+    body[data-theme="rooftop-sunset"] .ld-desc-eyebrow{font-family:'Cinzel',Georgia,serif;color:${accent};letter-spacing:.25em}
+    @media(max-width:768px){
+      body[data-theme="rooftop-sunset"] .ld-module{padding:3.5rem 1.5rem}
+      body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{grid-template-columns:repeat(2,1fr)}
+      body[data-theme="rooftop-sunset"] #at-gallery-grid{grid-template-columns:repeat(2,1fr)}
+    }
+  `;
+  console.log('[T6] CSS injected via JS ✅ accent:', accent);
 
   // Hero bg — double rAF
   requestAnimationFrame(() => requestAnimationFrame(() => {
