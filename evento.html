@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:ve94e8470 -->
+<!-- EVENTO_VERSION:v32a7b49e -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3751,7 +3751,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=ve94e8470 | P6:CSS-injected-JS | P9:stable');
+  console.log('[evento.html] VERSION=v32a7b49e | P6:style.display | fiesta:complete');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -4721,29 +4721,30 @@ function aplicarConfiguracionLanding(cfg) {
     setMod('mod-sponsors',      mods.sponsors);
     setMod('mod-faq',           mods.faq);
   } else if (_tipoEvento === 'fiesta') {
-    console.log('[fiesta] activando módulos | theme:', cfg.theme, '| mods:', JSON.stringify(mods));
-    // Ocultar módulos de cinematografía
-    setMod('mod-trailer',       false);
-    setMod('mod-sinopsis',      false);
-    setMod('mod-meet-director', false);
-    setMod('mod-descripcion',   false);
-    // Activar módulos de fiesta según config
-    setMod('mod-countdown',   mods.countdown);
-    setMod('mod-gallery',     mods.gallery);
-    setMod('mod-dresscode',   mods.dresscode);
-    setMod('mod-aforo',       mods.aforo);
-    setMod('mod-sponsors',    mods.sponsors);
-    setMod('mod-faq',         mods.faq);
-    setMod('mod-dj-lineup',   mods.dj_lineup);
-    setMod('mod-playlist',    mods.playlist);
-    setMod('mod-guest-list',  mods.guest_list);
-    setMod('mod-ubicacion',   mods.ubicacion);
-    console.log('[fiesta] módulos activos:', {
-      countdown:mods.countdown, gallery:mods.gallery, dresscode:mods.dresscode,
-      aforo:mods.aforo, sponsors:mods.sponsors, faq:mods.faq,
-      dj_lineup:mods.dj_lineup, playlist:mods.playlist,
-      guest_list:mods.guest_list, ubicacion:mods.ubicacion,
-    });
+    // style.display directo — mismo patron que campana
+    const _showF = id => { const e=document.getElementById(id); if(e) e.style.display='block'; };
+    const _hideF = id => { const e=document.getElementById(id); if(e) e.style.display='none'; };
+
+    // Ocultar TODOS los modulos que no son de fiesta
+    ['mod-descripcion','mod-trailer','mod-sinopsis','mod-meet-director',
+     'mod-historia','mod-objetivo','mod-impacto','mod-equipo',
+     'mod-testimonios','mod-actualizaciones','mod-contacto'].forEach(_hideF);
+
+    // Activar modulos de fiesta segun config
+    mods.countdown  ? _showF('mod-countdown')  : _hideF('mod-countdown');
+    mods.gallery    ? _showF('mod-gallery')    : _hideF('mod-gallery');
+    mods.dresscode  ? _showF('mod-dresscode')  : _hideF('mod-dresscode');
+    mods.aforo      ? _showF('mod-aforo')      : _hideF('mod-aforo');
+    mods.sponsors   ? _showF('mod-sponsors')   : _hideF('mod-sponsors');
+    mods.faq        ? _showF('mod-faq')        : _hideF('mod-faq');
+    mods.dj_lineup  ? _showF('mod-dj-lineup')  : _hideF('mod-dj-lineup');
+    mods.playlist   ? _showF('mod-playlist')   : _hideF('mod-playlist');
+    mods.guest_list ? _showF('mod-guest-list') : _hideF('mod-guest-list');
+    mods.ubicacion  ? _showF('mod-ubicacion')  : _hideF('mod-ubicacion');
+
+    console.log('[fiesta] modulos: countdown=' + !!mods.countdown +
+      ' dj=' + !!mods.dj_lineup + ' aforo=' + !!mods.aforo +
+      ' guest=' + !!mods.guest_list + ' ubicacion=' + !!mods.ubicacion);
   } else if (_tipoEvento === 'campana') {
     // Para campaña usamos style.display directo — más robusto que classList.hidden
     const showMod  = id => { const e=document.getElementById(id); if(e) e.style.display='block'; };
@@ -4849,9 +4850,12 @@ function _ldRenderContent(content, cfg) {
   const _trailerUrl = content.trailer_url || eventoActual?.video_url || null;
   if (_esCinematografia && cfg.modules?.trailer && _trailerUrl) _ldSetupTrailer(_trailerUrl, content.trailer_thumb);
   if (cfg.modules?.countdown) {
-    const target = content.countdown_date || (eventoActual?.fecha && eventoActual?.hora
-      ? eventoActual.fecha + 'T' + eventoActual.hora : null);
+    const _esCentinela = eventoActual?.fecha === '2099-12-31';
+    const target = content.countdown_date ||
+      (!_esCentinela && eventoActual?.fecha && eventoActual?.hora
+        ? eventoActual.fecha + 'T' + eventoActual.hora : null);
     if (target) _ldStartCountdown(target);
+    else { const el=document.getElementById('mod-countdown'); if(el) el.style.display='none'; }
   }
   if (_esCinematografia && cfg.modules?.sinopsis && content.sinopsis) {
     const el = document.getElementById('ld-sinopsis-text'); if (el) el.textContent = content.sinopsis;
@@ -5211,6 +5215,10 @@ function _ldInitRooftopSunset(cfg) {
     body[data-theme="rooftop-sunset"] .ld-dj-time{font-family:'Playfair Display',Georgia,serif;font-size:13px;font-style:italic;color:${accent}}
     /* Aforo */
     body[data-theme="rooftop-sunset"] #mod-aforo{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] #mod-aforo .ld-aforo-stats{color:#f0ead8;font-family:'Cinzel',Georgia,serif;font-size:13px;letter-spacing:.06em}
+    body[data-theme="rooftop-sunset"] #mod-aforo .ld-aforo-num{font-family:'Cinzel',Georgia,serif;font-size:clamp(28px,5vw,42px);font-weight:700;color:${accent}}
+    body[data-theme="rooftop-sunset"] #mod-dresscode{background:#14100a!important}
+    body[data-theme="rooftop-sunset"] #mod-dresscode .ld-dresscode-badge{background:rgba(${ar},${ag},${ab},.08);border:1px solid rgba(${ar},${ag},${ab},.25);color:#f0ead8;font-family:'Cinzel',Georgia,serif;letter-spacing:.15em;padding:10px 20px;display:inline-block}
     body[data-theme="rooftop-sunset"] .ld-aforo-bar{background:rgba(${ar},${ag},${ab},.1);border-radius:0}
     body[data-theme="rooftop-sunset"] .ld-aforo-bar-fill{background:${accent};border-radius:0}
     /* Guest list */
@@ -5828,7 +5836,9 @@ function _ldInitArthouse(cfg) {
   // Descripcion from event data
   // mod-descripcion shows descripcion (short field) — ONLY for non-campaign themes
   const _campanaThemesDesc = ['solidario-moderno','urgente-impactante','tech-futurista','vintage-organico'];
-  const _isCampanaDesc = _campanaThemesDesc.includes(data.config_landing?.theme);
+  const _fiestaThemesDesc = ['tropical-hostel','rooftop-sunset','underground','elegant-cocktail'];
+  const _isCampanaDesc = _campanaThemesDesc.includes(data.config_landing?.theme) ||
+                         _fiestaThemesDesc.includes(data.config_landing?.theme);
   const _descripcionCorta = eventoActual?.descripcion || null;
   if (_descripcionCorta && !_isCampanaDesc) {
     const modDesc = document.getElementById('mod-descripcion');
@@ -5839,8 +5849,12 @@ function _ldInitArthouse(cfg) {
     }
   }
   // Aforo — solo para Cinematografía y Fiesta, nunca para Campaña
+  // Aforo auto-show: only when theme explicitly enables it via modules
+  // For fiesta and campana, aforo is controlled by config_landing.modules.aforo
   const _campanaThemesAforo = ['solidario-moderno','urgente-impactante','tech-futurista','vintage-organico'];
-  if (eventoActual?.aforo_max && !_campanaThemesAforo.includes(eventoActual?.config_landing?.theme)) {
+  const _fiestaThemesAforo  = ['tropical-hostel','rooftop-sunset','underground','elegant-cocktail'];
+  const _temaActual = eventoActual?.config_landing?.theme || '';
+  if (eventoActual?.aforo_max && !_campanaThemesAforo.includes(_temaActual) && !_fiestaThemesAforo.includes(_temaActual)) {
     const modAforo = document.getElementById('mod-aforo');
     if (modAforo) { modAforo.classList.remove('hidden'); _ldRenderAforo(); }
   }
