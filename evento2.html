@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox de Diseño · Sistema QR</title>
+    <title>Sandbox: Fiesta Sofisticada · Sistema QR</title>
     
-    <!-- Fuentes sugeridas para 2026 -->
+    <!-- Tipografía premium Geist sugerida para 2026 [1] -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     
-    <!-- Librerías Core (Supabase y Generador QR Seguro) -->
+    <!-- Librerías de backend y seguridad [2, 3] -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
-        /* ESTILOS BASE DEL SISTEMA (No editar aquí) */
+        /* ================================================================
+           ESTILOS BASE (No tocar para mantener compatibilidad)
+           ================================================================ */
         :root {
-            --main-bg: #0a0a0a;
-            --gold: #c8a96e; /* Color primario de la organización [5] */
+            --main-bg: #050505;
+            --gold: #ff007f; /* Color por defecto del sandbox */
             --text-color: #ffffff;
         }
         body {
@@ -25,116 +27,181 @@
             color: var(--text-color);
             font-family: 'Geist', sans-serif;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        section { display: none; padding: 4rem 10%; } /* Ocultos por defecto [2] */
+        section { display: none; padding: 5rem 10%; position: relative; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
+        
+        /* Contenedor universal para videos */
+        #video-container iframe, #video-container img { width: 100%; border-radius: 15px; aspect-ratio: 16/9; }
     </style>
 
     <!-- ================================================================
-         1. SANDBOX STYLES (EDITA AQUÍ TUS NORMAS DE CSS)
-         Este bloque tiene prioridad sobre cualquier estilo previo. 
+         SANDBOX STYLES: PLANTILLA FIESTA SOFISTICADA VIBRANTE
+         Edita este bloque para cambiar la apariencia visual de la plantilla.
          ================================================================ -->
     <style id="sandbox-styles">
-        /* Reglas aplicadas solo cuando el body tiene la clase .tpl-sandbox */
+        /* 1. Fondo con degradado radial para profundidad */
         body.tpl-sandbox {
-            background: linear-gradient(180deg, #000 0%, #1a1a1a 100%);
+            background: radial-gradient(circle at top right, #1a001a 0%, #050505 100%);
         }
 
-        /* Ejemplo: Título principal cinematográfico [6, 7] */
+        /* 2. Título Hero: Estilo editorial asimétrico con efecto Glow */
+        .tpl-sandbox .hero {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10%;
+        }
+
         .tpl-sandbox .hero-title {
-            font-size: clamp(3rem, 10vw, 6rem);
-            text-align: center;
+            font-weight: 900;
+            font-size: clamp(3.5rem, 12vw, 8rem);
+            line-height: 0.85;
+            letter-spacing: -5px;
             text-transform: uppercase;
-            letter-spacing: -2px;
-            margin-bottom: 1rem;
-            color: var(--gold); /* Cambia --gold en la sección de variables */
+            margin: 0;
+            background: linear-gradient(to bottom, var(--gold), #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5)); /* Efecto neón */
         }
 
-        /* Ejemplo: Ajuste de módulos de la nueva plantilla */
-        .tpl-sandbox #modulo-lineup {
-            border: 1px solid rgba(200, 169, 110, 0.3);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.02);
+        /* 3. Módulo DJ Lineup: Lista minimalista con micro-interacciones */
+        .tpl-sandbox #modulo-lineup h2 { 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
         }
 
-        /* NOTA: Para añadir una nueva sección, crea el ID aquí y en el HTML abajo */
+        .tpl-sandbox .lineup-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .tpl-sandbox .lineup-item:hover {
+            color: var(--gold);
+            padding-left: 2rem;
+            background: rgba(255, 0, 127, 0.05);
+        }
+
+        /* 4. Botón de Registro Sofisticado */
+        .tpl-sandbox #btn-submit {
+            width: 100%;
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-radius: 4px; /* Estilo más cuadrado/brutalista */
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(255, 0, 127, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .tpl-sandbox #btn-submit:hover {
+            transform: scale(1.02);
+        }
+
+        /* 5. Estilo para la Sinopsis (Storytelling) */
+        .tpl-sandbox #event-description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 
-<body class="tpl-sandbox"> <!-- FORZADO: Siempre carga como Sandbox [prompt] -->
+<body class="tpl-sandbox"> <!-- Clase forzada para priorizar el CSS del sandbox [instrucciones] -->
 
-    <div id="loader" class="loading-overlay">Cargando experiencia...</div>
+    <div id="loader" class="loading-overlay">Sincronizando vibras...</div>
 
-    <!-- CONTENEDOR HERO -->
+    <!-- HEADER / HERO -->
     <header class="hero">
-        <h1 id="event-title" class="hero-title">--</h1>
-        <p id="event-date">--</p>
+        <h1 id="event-title" class="hero-title">CARGANDO...</h1>
+        <p id="event-date" style="font-weight: 500; letter-spacing: 4px; margin-top: 2rem; opacity: 0.6;">--/--/--</p>
     </header>
 
-    <!-- MÓDULO: TRÁILER (YouTube optimizado) [2, 8] -->
+    <!-- MÓDULO: TRÁILER -->
     <section id="modulo-trailer">
-        <div id="video-container">
-            <!-- El JS inyectará el thumbnail aquí para evitar Error 153 -->
-        </div>
+        <div id="video-container"></div>
     </section>
 
     <!-- MÓDULO: SINOPSIS -->
-    <section id="modulo-sinopsis">
-        <h2>Sinopsis</h2>
+    <section id="modulo-sinopsis" style="display: block;">
+        <h2>Sobre el encuentro</h2>
         <div id="event-description">--</div>
     </section>
 
-    <!-- MÓDULO: DJ LINEUP [9, 10] -->
+    <!-- MÓDULO: DJ LINEUP -->
     <section id="modulo-lineup">
-        <h2>Lineup</h2>
-        <ul id="lineup-list"></ul>
+        <h2>LINEUP / ARTISTAS</h2>
+        <div id="lineup-list">
+            <!-- Ejemplo de estructura para lineup -->
+            <div class="lineup-item"><span>RASTRO MC</span> <small>08:00 PM</small></div>
+            <div class="lineup-item"><span>OSHUN 412</span> <small>09:30 PM</small></div>
+            <div class="lineup-item"><span>CHOKOFLOW</span> <small>11:00 PM</small></div>
+        </div>
     </section>
 
-    <!-- FORMULARIO DE REGISTRO DINÁMICO [2, 11] -->
+    <!-- MÓDULO: REGISTRO -->
     <section id="modulo-registro" style="display: block !important;">
-        <h2>Reserva tu entrada</h2>
-        <form id="form-registro">
-            <input type="text" id="reg-nombre" placeholder="Nombre completo" required>
-            <input type="text" id="reg-cedula" placeholder="Cédula / Documento" required>
-            <input type="tel" id="reg-tel" placeholder="Teléfono" required>
-            <div id="campos-custom"></div> <!-- Aquí se cargan preguntas del admin [12] -->
-            <button type="submit" id="btn-submit">Confirmar Asistencia</button>
-        </form>
+        <div style="max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.03); padding: 3rem; border: 1px solid rgba(255,255,255,0.05);">
+            <h2 style="text-align: center; margin-bottom: 2rem;">RESERVAR LUGAR</h2>
+            <form id="form-registro">
+                <input type="text" id="reg-nombre" placeholder="NOMBRE COMPLETO" required style="width:100%; padding: 1rem; margin-bottom: 1rem; background: transparent; border: 1px solid #333; color: white;">
+                <input type="text" id="reg-cedula" placeholder="DOCUMENTO / CÉDULA" required style="width:100%; padding: 1rem; margin-bottom: 1rem; background: transparent; border: 1px solid #333; color: white;">
+                <button type="submit" id="btn-submit">OBTENER TICKET QR</button>
+            </form>
+        </div>
     </section>
 
-    <!-- ÁREA DEL TICKET QR (Canvas API) [2, 13] -->
-    <div id="ticket-result" style="display: none;">
-        <canvas id="qr-canvas"></canvas>
+    <!-- ÁREA DE TICKET (OCULTA HASTA REGISTRO) -->
+    <div id="ticket-result" style="display: none; text-align: center; padding: 4rem;">
+        <canvas id="qr-canvas" style="max-width: 300px; border: 10px solid white;"></canvas>
+        <p>Tu entrada ha sido generada.</p>
     </div>
 
     <script>
         /* ================================================================
-           2. MANUAL MODULE CONTROLLER (EDITA AQUÍ PARA ACTIVAR MÓDULOS)
+           MANUAL MODULE CONTROLLER
+           Cambia estos valores a true/false para activar secciones.
            ================================================================ */
         const SANDBOX_CONFIG = {
-            trailer: false,
-            sinopsis: true,
-            lineup: true,
-            faq: false,
-            force_gold: '#c8a96e' // Cambia el color base aquí manualmente
+            trailer: true,      // Muestra/oculta el video
+            sinopsis: true,     // Muestra/oculta la descripción
+            lineup: true,       // Muestra/oculta la lista de DJs
+            faq: false,         // Preguntas frecuentes
+            force_gold: '#ff007f' // Color neón predominante (Rosa #ff007f o Cyan #00f2ff)
         };
 
-        /* CREDENCIALES DEL SISTEMA [1] */
+        /* CREDENCIALES DEL SISTEMA QR [2] */
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const supabase = exports.supabase.createClient(SB_URL, SB_KEY);
 
-        async function initSandbox() {
+        async function initEvento() {
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
 
             if (!slug) {
-                alert("Necesitas un ?slug= en la URL para cargar datos reales.");
+                document.body.innerHTML = "<h1 style='color:white; padding: 20%;'>Error: Falta ?slug= en la URL.</h1>";
                 return;
             }
 
             try {
-                // Obtener datos reales del evento [2]
+                // Descarga de datos reales desde Supabase [4]
                 const { data: evento, error } = await supabase
                     .from('eventos')
                     .select('*, organizaciones(color_primario, nombre_app)')
@@ -143,25 +210,25 @@
 
                 if (error) throw error;
 
-                // Inyectar Datos Reales
-                document.getElementById('event-title').innerText = evento.nombre;
+                // Inyección de contenido dinámico
+                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-description').innerHTML = evento.descripcion;
+                document.getElementById('event-date').innerText = new Date(evento.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
                 
-                // Aplicar variable de color (Prioridad Manual > Org)
-                document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold || evento.organizaciones.color_primario);
+                // Aplicación de color neón (Sandbox manda sobre DB)
+                document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
 
-                // CONTROLADOR MANUAL DE MÓDULOS [instrucciones]
+                // Aplicar filtros de visibilidad manuales
                 applyManualFilters();
 
             } catch (err) {
-                console.error("Error cargando evento:", err);
+                console.error("Fallo al cargar evento:", err);
             } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
 
         function applyManualFilters() {
-            // Recorre el objeto SANDBOX_CONFIG y aplica display block/none
             Object.keys(SANDBOX_CONFIG).forEach(key => {
                 const el = document.getElementById(`modulo-${key}`);
                 if (el) {
@@ -170,8 +237,7 @@
             });
         }
 
-        // Ejecutar al cargar
-        window.onload = initSandbox;
+        window.onload = initEvento;
     </script>
 </body>
 </html>
