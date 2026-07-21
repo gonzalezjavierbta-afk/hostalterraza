@@ -1,4 +1,4 @@
-<!-- EVENTO_VERSION:v32a7b49e -->
+<!-- EVENTO_VERSION:v76528b2c -->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -3751,7 +3751,7 @@ let refCodigo  = '';
 let refNombre  = '';
 
 async function init() {
-  console.log('[evento.html] VERSION=v32a7b49e | P6:style.display | fiesta:complete');
+  console.log('[evento.html] VERSION=v76528b2c | P6:gallery+faq+mapa+sponsors | fiesta:complete');
   const params = new URLSearchParams(window.location.search);
   let evId = params.get('id');
   let slug = params.get('slug') || location.pathname.split('/e/')[1];
@@ -5136,6 +5136,95 @@ function _ldRenderFiesta(content, cfg) {
     console.log('[fiesta] mod-ubicacion rendered ✅');
   }
 
+  // Gallery — 3/4 aspect cards for fiesta
+  if (mods.gallery && co.gallery?.length) {
+    const modG = document.getElementById('mod-gallery');
+    if (modG) { modG.style.display='block'; }
+    const grid = document.getElementById('at-gallery-grid');
+    if (grid) {
+      document.getElementById('at-gallery-hero')?.setAttribute('style','display:none');
+      document.getElementById('at-gallery-dots')?.setAttribute('style','display:none');
+      grid.innerHTML = co.gallery.map((url,i) =>
+        `<div class="rs-gallery-card"><img src="${url}" loading="lazy" alt="Foto ${i+1}"></div>`
+      ).join('');
+    }
+    console.log('[fiesta] mod-gallery rendered ✅');
+  }
+
+  // Countdown
+  if (mods.countdown) {
+    const target = co.countdown_date ||
+      (eventoActual?.fecha && eventoActual?.fecha !== '2099-12-31' && eventoActual?.hora
+        ? eventoActual.fecha + 'T' + eventoActual.hora : null);
+    if (target) _ldStartCountdown(target);
+    else { const el=document.getElementById('mod-countdown'); if(el) el.style.display='none'; }
+    console.log('[fiesta] mod-countdown rendered ✅ target:', target);
+  }
+
+  // FAQ — premium acordeón
+  if (mods.faq && co.faq?.length) {
+    const modF = document.getElementById('mod-faq');
+    if (modF) modF.style.display = 'block';
+    let list = document.getElementById('ld-faq-list');
+    if (!list) { list=document.createElement('div'); list.id='ld-faq-list'; modF?.appendChild(list); }
+    if (list) list.innerHTML = co.faq.map((f,i) => `
+      <div class="rs-faq-item" id="rs-faq-${i}">
+        <button class="rs-faq-q" onclick="(function(btn){
+          const a=btn.nextElementSibling;
+          const open=a.style.maxHeight&&a.style.maxHeight!=='0px';
+          document.querySelectorAll('.rs-faq-a').forEach(x=>{x.style.maxHeight='0px';x.style.opacity='0'});
+          document.querySelectorAll('.rs-faq-icon').forEach(x=>{x.textContent='+'});
+          if(!open){a.style.maxHeight=a.scrollHeight+'px';a.style.opacity='1';btn.querySelector('.rs-faq-icon').textContent='−';}
+        })(this)" aria-expanded="false">
+          <span class="rs-faq-q-text">${f.q}</span>
+          <span class="rs-faq-icon">+</span>
+        </button>
+        <div class="rs-faq-a" style="max-height:0px;opacity:0">
+          <div class="rs-faq-a-inner">${f.a}</div>
+        </div>
+      </div>`).join('');
+    console.log('[fiesta] mod-faq rendered ✅');
+  }
+
+  // Ubicacion — card premium con mapa
+  if (mods.ubicacion && co.ubicacion) {
+    const modU = document.getElementById('mod-ubicacion');
+    if (modU) modU.style.display = 'block';
+    const el = document.getElementById('ld-ubicacion-text');
+    if (el) el.textContent = co.ubicacion;
+    // Inject premium ubicacion card
+    const ubCard = document.getElementById('rs-ubicacion-card');
+    if (!ubCard && modU) {
+      const card = document.createElement('div');
+      card.id = 'rs-ubicacion-card';
+      card.className = 'rs-ubicacion-card';
+      const mapsQuery = encodeURIComponent(co.ubicacion);
+      card.innerHTML = `
+        <div class="rs-ubicacion-info">
+          <div class="rs-ubicacion-icon">📍</div>
+          <div>
+            <div class="rs-ubicacion-nombre">${eventoActual?.nombre || 'Venue'}</div>
+            <div class="rs-ubicacion-dir">${co.ubicacion}</div>
+          </div>
+        </div>
+        <div class="rs-ubicacion-map">
+          <iframe
+            src="https://maps.google.com/maps?q=${mapsQuery}&output=embed&z=15"
+            width="100%" height="220" style="border:none;border-radius:12px;display:block"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+        <a href="https://maps.google.com/?q=${mapsQuery}" target="_blank" rel="noopener" class="rs-ubicacion-btn">
+          Ver en Google Maps →
+        </a>`;
+      // Replace the simple text with the card
+      const txtEl = document.getElementById('ld-ubicacion-text');
+      if (txtEl) txtEl.style.display = 'none';
+      modU.appendChild(card);
+    }
+    console.log('[fiesta] mod-ubicacion rendered ✅');
+  }
+
   // Sponsors
   if (mods.sponsors && co.sponsors?.length) {
     const modS = document.getElementById('mod-sponsors');
@@ -5253,10 +5342,55 @@ function _ldInitRooftopSunset(cfg) {
     body[data-theme="rooftop-sunset"] .ld-desc-module{background:#14100a!important;padding:5rem 2.5rem;border-top:1px solid rgba(${ar},${ag},${ab},.18)}
     body[data-theme="rooftop-sunset"] .ld-desc-text{font-family:'Playfair Display',Georgia,serif;color:rgba(240,234,216,.85);font-style:italic;font-size:clamp(17px,2vw,22px);line-height:1.8}
     body[data-theme="rooftop-sunset"] .ld-desc-eyebrow{font-family:'Cinzel',Georgia,serif;color:${accent};letter-spacing:.25em}
+    /* Gallery */
+    body[data-theme="rooftop-sunset"] #mod-gallery{background:#0d0a04!important;padding:5rem 2.5rem}
+    body[data-theme="rooftop-sunset"] #at-gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:1.5rem}
+    body[data-theme="rooftop-sunset"] #at-gallery-hero{display:none!important}
+    body[data-theme="rooftop-sunset"] #at-gallery-dots{display:none!important}
+    body[data-theme="rooftop-sunset"] .rs-gallery-card{overflow:hidden;border-radius:8px;background:#111}
+    body[data-theme="rooftop-sunset"] .rs-gallery-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform .4s ease,filter .4s;filter:brightness(.8)}
+    body[data-theme="rooftop-sunset"] .rs-gallery-card:hover img{transform:scale(1.06);filter:brightness(1)}
+
+    /* FAQ premium */
+    body[data-theme="rooftop-sunset"] #mod-faq{background:#0d0a04!important;padding:5rem 2.5rem}
+    body[data-theme="rooftop-sunset"] #ld-faq-list{max-width:none;margin:2rem 0 0}
+    body[data-theme="rooftop-sunset"] .rs-faq-item{border:1px solid rgba(${ar},${ag},${ab},.15);border-radius:14px;margin-bottom:.75rem;overflow:hidden;background:#14100a;transition:border-color .2s}
+    body[data-theme="rooftop-sunset"] .rs-faq-item:hover{border-color:rgba(${ar},${ag},${ab},.35)}
+    body[data-theme="rooftop-sunset"] .rs-faq-q{width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;text-align:left;gap:1rem}
+    body[data-theme="rooftop-sunset"] .rs-faq-q-text{font-family:'Cinzel',Georgia,serif;font-size:13px;font-weight:400;color:#f0ead8;letter-spacing:.06em;line-height:1.5}
+    body[data-theme="rooftop-sunset"] .rs-faq-icon{font-size:20px;color:${accent};flex-shrink:0;font-weight:300;transition:transform .2s;font-family:sans-serif}
+    body[data-theme="rooftop-sunset"] .rs-faq-a{overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0}
+    body[data-theme="rooftop-sunset"] .rs-faq-a-inner{padding:.25rem 1.5rem 1.25rem;font-family:'Playfair Display',Georgia,serif;font-size:14px;font-style:italic;color:rgba(240,234,216,.6);line-height:1.7}
+
+    /* Ubicacion premium card */
+    body[data-theme="rooftop-sunset"] #mod-ubicacion{background:#0d0a04!important;padding:5rem 2.5rem}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-card{background:#14100a;border:1px solid rgba(${ar},${ag},${ab},.18);border-radius:18px;overflow:hidden;max-width:560px}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-info{display:flex;align-items:flex-start;gap:1rem;padding:1.5rem 1.5rem 1rem}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-nombre{font-family:'Cinzel',Georgia,serif;font-size:15px;font-weight:600;color:#f0ead8;letter-spacing:.06em;margin-bottom:.25rem}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-dir{font-family:'Playfair Display',Georgia,serif;font-size:13px;font-style:italic;color:rgba(240,234,216,.55)}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-map{padding:0 1rem}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-btn{display:block;text-align:center;padding:1rem 1.5rem;font-family:'Cinzel',Georgia,serif;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:${accent};text-decoration:none;border-top:1px solid rgba(${ar},${ag},${ab},.15);transition:background .2s;margin-top:.75rem}
+    body[data-theme="rooftop-sunset"] .rs-ubicacion-btn:hover{background:rgba(${ar},${ag},${ab},.08)}
+
+    /* Sponsors premium */
+    body[data-theme="rooftop-sunset"] #mod-sponsors{background:#14100a!important;padding:4rem 2.5rem}
+    body[data-theme="rooftop-sunset"] .ld-sponsors-grid{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2rem 3rem;margin-top:2rem;padding:1.5rem;border:1px solid rgba(${ar},${ag},${ab},.1);border-radius:16px}
+    body[data-theme="rooftop-sunset"] .ld-sponsor-item{background:transparent;border:none;border-radius:0;font-family:'Cinzel',Georgia,serif;font-size:14px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,234,216,.3);transition:color .2s,opacity .2s;cursor:default;padding:0}
+    body[data-theme="rooftop-sunset"] .ld-sponsor-item:hover{color:rgba(240,234,216,.9)}
+
+    /* FAQ + Ubicacion 2-col layout */
+    body[data-theme="rooftop-sunset"] .rs-faq-ubicacion-grid{display:grid;grid-template-columns:1fr 560px;gap:3rem;max-width:1100px;align-items:start}
+
+    @media(max-width:900px){
+      body[data-theme="rooftop-sunset"] .rs-faq-ubicacion-grid{grid-template-columns:1fr}
+      body[data-theme="rooftop-sunset"] .rs-ubicacion-card{max-width:100%}
+    }
     @media(max-width:768px){
       body[data-theme="rooftop-sunset"] .ld-module{padding:3.5rem 1.5rem}
       body[data-theme="rooftop-sunset"] #mod-countdown .ld-cd-grid{grid-template-columns:repeat(2,1fr)}
       body[data-theme="rooftop-sunset"] #at-gallery-grid{grid-template-columns:repeat(2,1fr)}
+      body[data-theme="rooftop-sunset"] .ld-sponsors-grid{gap:1.5rem 2rem}
     }
   `;
   console.log('[T6] CSS injected via JS ✅ accent:', accent);
