@@ -3,89 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v4: Vinculador de Datos · Sistema QR</title>
+    <title>Sandbox v5: Deep Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
-        :root {
-            --main-bg: #050505;
-            --gold: #ff007f; 
-            --text-color: #ffffff;
-        }
-        body {
-            margin: 0; background-color: var(--main-bg); color: var(--text-color);
-            font-family: 'Geist', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased;
-        }
+        :root { --main-bg: #050505; --gold: #ff007f; --text-color: #ffffff; }
+        body { margin: 0; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; }
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
-        
-        /* Estilo de la Plantilla Sandbox */
         body.tpl-sandbox { background: radial-gradient(circle at top right, #1a001a 0%, #050505 100%); }
-        .hero-title {
-            font-weight: 900; font-size: clamp(3rem, 10vw, 7rem); line-height: 0.85;
-            text-transform: uppercase; background: linear-gradient(to bottom, var(--gold), #ffffff);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.4));
-        }
-        .data-item { margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-left: 3px solid var(--gold); }
+        .hero-title { font-weight: 900; font-size: clamp(3rem, 10vw, 7rem); line-height: 0.85; text-transform: uppercase; background: linear-gradient(to bottom, var(--gold), #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.4)); }
+        .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.2rem; }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Conectando módulos a DB...</div>
+    <div id="loader" class="loading-overlay">Forzando sincronización profunda...</div>
 
     <header class="hero" style="padding: 10% 10% 2% 10%;">
         <h1 id="event-title" class="hero-title">--</h1>
-        <p id="event-date" style="letter-spacing: 3px; opacity: 0.5;">--</p>
+        <p id="event-date" style="letter-spacing: 3px; opacity: 0.5; font-weight: bold;">--</p>
     </header>
 
-    <!-- MÓDULOS CON CONTENEDORES DE DATOS INTERNOS -->
     <section id="modulo-sinopsis">
-        <h2 style="color: var(--gold);">SINOPSIS</h2>
-        <div id="db-descripcion" class="content">--</div>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">SINOPSIS</h2>
+        <div id="db-descripcion" style="line-height: 1.6; opacity: 0.8; font-size: 1.1rem;">--</div>
     </section>
 
     <section id="modulo-lineup">
-        <h2 style="color: var(--gold);">LINEUP</h2>
-        <div id="db-lineup" class="lineup-container">
-            <!-- Los items se inyectarán aquí -->
-        </div>
-    </section>
-
-    <section id="modulo-ubicacion">
-        <h2 style="color: var(--gold);">UBICACIÓN</h2>
-        <div id="db-ubicacion" class="data-item">--</div>
-    </section>
-
-    <section id="modulo-aforo_max">
-        <h2 style="color: var(--gold);">CAPACIDAD</h2>
-        <div id="db-aforo" class="data-item">--</div>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
+        <div id="db-lineup"></div>
     </section>
 
     <section id="modulo-playlist">
-        <h2 style="color: var(--gold);">SPOTIFY PLAYLIST</h2>
-        <div id="db-playlist-container"></div>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">PLAYLIST OFICIAL</h2>
+        <div id="db-spotify-area"></div>
     </section>
 
-    <section id="modulo-faq">
-        <h2 style="color: var(--gold);">PREGUNTAS FRECUENTES</h2>
-        <div id="db-faq-container"></div>
+    <section id="modulo-ubicacion">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">UBICACIÓN</h2>
+        <div id="db-ubicacion" class="data-item">--</div>
     </section>
 
     <script>
         /**
-         * 1. CONFIGURACIÓN DE MÓDULOS
+         * CONFIGURACIÓN SANDBOX
          */
         const SANDBOX_CONFIG = {
             sinopsis: true,
             lineup: true,
-            ubicacion: true,
-            aforo_max: true,
             playlist: true,
+            ubicacion: true,
             faq: true,
             force_gold: '#ff007f'
         };
@@ -93,99 +65,64 @@
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
 
-        let sbClient;
-        try {
-            sbClient = window.supabase.createClient(SB_URL, SB_KEY);
-        } catch (e) { console.error("Error inicializando cliente:", e); }
+        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
             const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
-            console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace;`);
+            console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo]}; font-family: monospace; font-weight: bold;`);
         }
 
         async function initEvento() {
-            logStatus("Iniciando auditoría de datos...");
+            logStatus("Iniciando Deep Sync con columnas explícitas...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
-            if (!slug) {
-                logStatus("Error: Falta slug en la URL", "ERROR");
-                return;
-            }
-
             try {
+                // CONSULTA EXPLÍCITA: Pedimos las columnas exactas para evitar fallos de RLS o Cache [6]
                 const { data: evento, error } = await sbClient
                     .from('eventos')
-                    .select('*')
+                    .select('id, nombre, fecha, hora, descripcion, lineup, video_url, ubicacion, faq, aforo_max')
                     .eq('slug', slug)
                     .single();
 
                 if (error) throw error;
 
-                // LOG 1: Campos con información
-                const camposLlenos = Object.keys(evento).filter(k => evento[k] !== null && evento[k] !== "");
-                logStatus(`Campos detectados en DB: ${camposLlenos.join(', ')}`, "DB");
+                // LOG DE VERIFICACIÓN DE CRUDO
+                logStatus(`Estructura recibida de ${evento.nombre}: ${Object.keys(evento).join(', ')}`, "DB");
 
-                // INYECCIÓN DE DATOS Y LOG DE CONFIRMACIÓN
-                
-                // 1. Título y Fecha
+                // VINCULACIÓN DE DATOS
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                document.getElementById('event-date').innerText = `${evento.fecha} · ${evento.hora} HRS`;
-                logStatus("Vinculado: Nombre y Fecha del evento.", "LINK");
+                document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
 
-                // 2. Sinopsis
-                if (evento.descripcion) {
-                    document.getElementById('db-descripcion').innerHTML = evento.descripcion;
-                    logStatus("Vinculado: Descripción inyectada en modulo-sinopsis.", "LINK");
-                }
-
-                // 3. Lineup (Procesamiento de texto multilínea similar a evento.html)
+                // 1. Lineup: Procesar saltos de línea [5]
                 if (evento.lineup) {
-                    const items = evento.lineup.split('\n');
-                    const container = document.getElementById('db-lineup');
-                    container.innerHTML = items.map(i => `<div class="data-item">${i}</div>`).join('');
-                    logStatus(`Vinculado: ${items.length} artistas en modulo-lineup.`, "LINK");
+                    const artistas = evento.lineup.split('\n').filter(a => a.trim() !== "");
+                    document.getElementById('db-lineup').innerHTML = artistas.map(a => `<div class="data-item">${a}</div>`).join('');
+                    logStatus(`VINCULADO: ${artistas.length} artistas en Lineup.`, "LINK");
                 }
 
-                // 4. Ubicación
-                if (evento.ubicacion) {
-                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
-                    logStatus("Vinculado: Dirección física en modulo-ubicacion.", "LINK");
-                }
-
-                // 5. Aforo
-                if (evento.aforo_max) {
-                    document.getElementById('db-aforo').innerText = `${evento.aforo_max} personas máximo.`;
-                    logStatus("Vinculado: Capacidad máxima en modulo-aforo_max.", "LINK");
-                }
-
-                // 6. Playlist
+                // 2. Playlist/Spotify: Detectar si es link de Spotify en el campo video_url [6]
                 if (evento.video_url && evento.video_url.includes('spotify')) {
-                    document.getElementById('db-playlist-container').innerHTML = `<iframe src="${evento.video_url.replace('open.spotify.com', 'open.spotify.com/embed')}" width="100%" height="380" frameBorder="0" allow="encrypted-media"></iframe>`;
-                    logStatus("Vinculado: Reproductor Spotify en modulo-playlist.", "LINK");
+                    const embedUrl = evento.video_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify-area').innerHTML = `<iframe src="${embedUrl}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
+                    logStatus("VINCULADO: Reproductor de Spotify detectado en video_url.", "LINK");
                 }
 
-                // 7. FAQ (Formato Pregunta|Respuesta)
-                if (evento.faq) {
-                    const faqs = evento.faq.split('\n');
-                    document.getElementById('db-faq-container').innerHTML = faqs.map(f => {
-                        const [q, a] = f.split('|');
-                        return `<div class="data-item"><strong>${q || ''}</strong><br>${a || ''}</div>`;
-                    }).join('');
-                    logStatus("Vinculado: Preguntas frecuentes en modulo-faq.", "LINK");
-                }
+                // 3. Otros campos
+                document.getElementById('db-descripcion').innerHTML = evento.descripcion || 'Sin descripción.';
+                document.getElementById('db-ubicacion').innerText = evento.ubicacion || 'Por definir.';
 
-                // Aplicar visibilidad final
+                // Aplicar visibilidad y colores
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("PROCESO DE VINCULACIÓN COMPLETADO.", "INFO");
+                logStatus("SINCRONIZACIÓN COMPLETADA EXITOSAMENTE.", "INFO");
 
             } catch (err) {
-                logStatus(`Fallo crítico: ${err.message}`, "ERROR");
+                logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
             } finally {
                 document.getElementById('loader').style.display = 'none';
             }
