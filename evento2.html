@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v6: JSON Deep Seek · Sistema QR</title>
+    <title>Sandbox v7: Auditor Total · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,16 +22,16 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Extrayendo datos de JSON...</div>
+    <div id="loader" class="loading-overlay">Recuperando auditoría completa...</div>
 
     <header class="hero" style="padding: 10% 10% 2% 10%;">
         <h1 id="event-title" class="hero-title">--</h1>
-        <p id="event-date" style="letter-spacing: 3px; opacity: 0.5;">--</p>
+        <p id="event-date" style="letter-spacing: 3px; opacity: 0.5; font-weight: bold;">--</p>
     </header>
 
     <section id="modulo-sinopsis">
         <h2 style="color: var(--gold);">SINOPSIS</h2>
-        <div id="db-descripcion">--</div>
+        <div id="db-descripcion" style="line-height: 1.6; opacity: 0.8;">--</div>
     </section>
 
     <section id="modulo-lineup">
@@ -40,15 +40,25 @@
     </section>
 
     <section id="modulo-playlist">
-        <h2 style="color: var(--gold);">SPOTIFY</h2>
+        <h2 style="color: var(--gold);">PLAYLIST SPOTIFY</h2>
         <div id="db-spotify"></div>
     </section>
 
+    <section id="modulo-ubicacion">
+        <h2 style="color: var(--gold);">UBICACIÓN</h2>
+        <div id="db-ubicacion" class="data-item">--</div>
+    </section>
+
     <script>
+        /**
+         * 1. CONFIGURACIÓN MANUAL (SANDBOX)
+         * Lista de módulos: sinopsis, lineup, playlist, ubicacion, faq
+         */
         const SANDBOX_CONFIG = {
             sinopsis: true,
             lineup: true,
             playlist: true,
+            ubicacion: true,
             force_gold: '#ff007f'
         };
 
@@ -56,18 +66,21 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        /** 
+         * 2. SISTEMA DE LOGGING RECUPERADO 
+         */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const colors = { 'INFO': '#00ff88', 'JSON': '#f39c12', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
+            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#f39c12', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo]}; font-family: monospace; font-weight: bold;`);
         }
 
         async function initEvento() {
-            logStatus("Iniciando búsqueda profunda en config_landing...");
+            logStatus("Iniciando auditoría profunda de datos...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
-                // CONSULTA SEGURA: Solo pedimos columnas que el log anterior confirmó
+                // Consulta base segura
                 const { data: evento, error } = await sbClient
                     .from('eventos')
                     .select('id, nombre, fecha, hora, descripcion, ubicacion, config_landing')
@@ -76,40 +89,54 @@
 
                 if (error) throw error;
 
-                // 1. Datos de primer nivel
+                // LOG 1: Auditoría de campos de primer nivel
+                const camposLlenos = Object.keys(evento).filter(k => evento[k] !== null && evento[k] !== "");
+                logStatus(`Campos detectados en raíz DB: ${camposLlenos.join(', ')}`, "DB");
+
+                // Vinculación básica
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora}`;
-                document.getElementById('db-descripcion').innerHTML = evento.descripcion || '';
+                document.getElementById('db-descripcion').innerHTML = evento.descripcion || 'Sin descripción.';
+                document.getElementById('db-ubicacion').innerText = evento.ubicacion || 'Ubicación no disponible.';
+                logStatus("VINCULADO: Hero, Sinopsis y Ubicación.", "LINK");
 
-                // 2. EXTRACCIÓN DEL JSON (config_landing)
+                // 3. PROCESAMIENTO PROFUNDO DE config_landing (JSON)
                 const config = evento.config_landing || {};
-                
-                // Procesar Lineup desde JSON
+                logStatus(`Llaves encontradas en JSON config_landing: ${Object.keys(config).join(', ') || 'VACÍO'}`, "JSON");
+
+                // Vinculación de Lineup desde JSON
                 const lineupRaw = config.lineup || "";
                 if (lineupRaw) {
-                    logStatus("Detectado 'lineup' dentro de config_landing.", "JSON");
                     const artistas = lineupRaw.split('\n').filter(a => a.trim() !== "");
                     document.getElementById('db-lineup').innerHTML = artistas.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus(`VINCULADO: ${artistas.length} artistas desde JSON.`, "LINK");
+                    logStatus(`VINCULADO: ${artistas.length} artistas desde config_landing.`, "LINK");
+                } else {
+                    logStatus("Módulo Lineup no tiene datos en config_landing.", "JSON");
                 }
 
-                // Procesar Spotify (video_url) desde JSON
+                // Vinculación de Spotify (video_url) desde JSON
                 const spotifyUrl = config.video_url || "";
                 if (spotifyUrl && spotifyUrl.includes('spotify')) {
-                    logStatus("Detectado 'video_url' (Spotify) dentro de config_landing.", "JSON");
                     const embed = spotifyUrl.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("VINCULADO: Playlist Spotify desde JSON.", "LINK");
+                    logStatus("VINCULADO: Playlist Spotify detectada en config_landing.", "LINK");
+                } else {
+                    logStatus("Módulo Spotify no tiene URL válida en config_landing.", "JSON");
                 }
 
-                // Aplicar estilos y visibilidad
+                // Aplicar visibilidad final
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN JSON COMPLETADA.", "INFO");
+                // LOG FINAL de Módulos Activos
+                const activos = Object.entries(SANDBOX_CONFIG)
+                    .filter(([k, v]) => v === true && k !== 'force_gold')
+                    .map(([k]) => k.toUpperCase());
+                logStatus(`Módulos ACTIVOS en Interfaz: ${activos.join(' | ')}`);
+                logStatus("AUDITORÍA Y SINCRONIZACIÓN COMPLETADA.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO: ${err.message}`, "ERROR");
