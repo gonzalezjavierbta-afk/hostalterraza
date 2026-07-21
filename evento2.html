@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v8: Visual Sync · Sistema QR</title>
+    <title>Sandbox v9: Auditoría y Visual Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,10 +13,10 @@
         :root { --main-bg: #050505; --gold: #ff007f; --text-color: #ffffff; }
         body { margin: 0; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; }
         
-        /* HERO CON IMAGEN DE FONDO (Novedad) */
+        /* HERO CON IMAGEN DE FONDO (Mejora visual) */
         .hero {
             position: relative;
-            min-height: 80vh;
+            min-height: 85vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -24,11 +24,12 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            transition: background-image 0.5s ease-in-out;
         }
-        /* Capa de oscurecimiento para legibilidad */
+        /* Capa de oscurecimiento dinámica para legibilidad */
         .hero::before {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, #050505 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, #050505 100%);
             z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; }
@@ -49,87 +50,118 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Sincronizando imagen y datos...</div>
+    <div id="loader" class="loading-overlay">Recuperando auditoría y visuales...</div>
 
+    <!-- HEADER / HERO -->
     <header id="hero-bg" class="hero">
         <div class="hero-content">
             <h1 id="event-title" class="hero-title">--</h1>
-            <p id="event-date" style="letter-spacing: 4px; margin-top: 2rem; font-weight: bold; opacity: 0.8;">--</p>
+            <p id="event-date" style="letter-spacing: 4px; margin-top: 2rem; font-weight: bold; opacity: 0.8;">--/--/--</p>
         </div>
     </header>
 
+    <!-- MÓDULOS ACTIVABLES -->
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
     </section>
 
     <section id="modulo-playlist">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">SPOTIFY</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">SPOTIFY PLAYLIST</h2>
         <div id="db-spotify"></div>
     </section>
 
+    <section id="modulo-ubicacion">
+        <h2 style="color: var(--gold);">UBICACIÓN</h2>
+        <div id="db-ubicacion" class="data-item">--</div>
+    </section>
+
     <script>
+        /**
+         * 1. CONFIGURACIÓN MANUAL (SANDBOX)
+         */
         const SANDBOX_CONFIG = {
             lineup: true,
             playlist: true,
-            force_gold: '#ff007f'
+            ubicacion: true,
+            force_gold: '#df20b6' // Magenta/Púrpura detectado en el log de evento.html
         };
 
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        /**
+         * 2. SISTEMA DE LOGGING AVANZADO (RESTAURADO)
+         */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const colors = { 'INFO': '#00ff88', 'JSON': '#f39c12', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
+            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#f39c12', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo]}; font-family: monospace; font-weight: bold;`);
         }
 
         async function initEvento() {
-            logStatus("Iniciando carga visual profunda...");
+            logStatus("Iniciando auditoría visual y de datos profunda...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
+                // Consulta total para auditar
                 const { data: evento, error } = await sbClient
                     .from('eventos')
-                    .select('nombre, fecha, hora, imagen_url, config_landing')
+                    .select('*')
                     .eq('slug', slug)
                     .single();
 
                 if (error) throw error;
 
-                // 1. APLICAR IMAGEN DE FONDO (Hero)
+                // LOG 1: Campos en raíz
+                const camposRaiz = Object.keys(evento).filter(k => evento[k] !== null && evento[k] !== "");
+                logStatus(`Campos en raíz DB: ${camposRaiz.join(', ')}`, "DB");
+
+                // 1. VINCULACIÓN HERO (Imagen y Texto)
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("VINCULADO: Imagen de fondo (Hero) aplicada.", "LINK");
+                    logStatus("LINK: Imagen de fondo aplicada al Hero.", "LINK");
                 }
-
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora}`;
 
-                // 2. PROCESAR JSON PARA LINEUP Y SPOTIFY
+                // 2. VINCULACIÓN UBICACIÓN
+                document.getElementById('db-ubicacion').innerText = evento.ubicacion || 'Ubicación por confirmar.';
+
+                // 3. AUDITORÍA Y VINCULACIÓN JSON (config_landing)
                 const config = evento.config_landing || {};
-                
-                if (config.lineup) {
-                    const artistas = config.lineup.split('\n').filter(a => a.trim() !== "");
+                const llavesJSON = Object.keys(config);
+                logStatus(`Llaves encontradas en JSON config_landing: ${llavesJSON.join(', ') || 'VACÍO'}`, "JSON");
+
+                // --- PROCESADOR DE LINEUP (Busca llaves 'lineup' o 'dj_lineup') ---
+                const lineupData = config.lineup || config.dj_lineup || "";
+                if (lineupData) {
+                    const artistas = lineupData.split('\n').filter(a => a.trim() !== "");
                     document.getElementById('db-lineup').innerHTML = artistas.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus(`VINCULADO: ${artistas.length} artistas desde config_landing.`, "LINK");
+                    logStatus(`LINK: ${artistas.length} artistas vinculados desde JSON.`, "LINK");
+                } else {
+                    logStatus("Módulo Lineup sin datos detectados en JSON.", "JSON");
                 }
 
-                if (config.video_url && config.video_url.includes('spotify')) {
-                    const embed = config.video_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                // --- PROCESADOR DE PLAYLIST (Busca llaves 'video_url' o 'playlist') ---
+                const playlistData = config.video_url || config.playlist || "";
+                if (playlistData && playlistData.includes('spotify')) {
+                    const embed = playlistData.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("VINCULADO: Playlist Spotify desde config_landing.", "LINK");
+                    logStatus("LINK: Playlist Spotify vinculada desde JSON.", "LINK");
+                } else {
+                    logStatus("Módulo Playlist sin URL de Spotify válida en JSON.", "JSON");
                 }
 
-                // Visibilidad
+                // APLICAR VISIBILIDAD Y COLOR
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN VISUAL COMPLETADA.", "INFO");
+                logStatus("PROCESO DE AUDITORÍA Y SINCRONIZACIÓN FINALIZADO.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO: ${err.message}`, "ERROR");
@@ -137,6 +169,7 @@
                 document.getElementById('loader').style.display = 'none';
             }
         }
+
         window.onload = initEvento;
     </script>
 </body>
