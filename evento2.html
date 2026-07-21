@@ -3,22 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox: Fiesta Sofisticada · Sistema QR</title>
+    <title>Sandbox Corregido · Sistema QR</title>
     
-    <!-- Tipografía premium Geist sugerida para 2026 [1] -->
+    <!-- Fuentes y Librerías Core -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
-    
-    <!-- Librerías de backend y seguridad [2, 3] -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
-        /* ================================================================
-           ESTILOS BASE (No tocar para mantener compatibilidad)
-           ================================================================ */
         :root {
             --main-bg: #050505;
-            --gold: #ff007f; /* Color por defecto del sandbox */
+            --gold: #ff007f; /* Color neón por defecto */
             --text-color: #ffffff;
         }
         body {
@@ -32,209 +27,134 @@
         section { display: none; padding: 5rem 10%; position: relative; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
         
-        /* Contenedor universal para videos */
-        #video-container iframe, #video-container img { width: 100%; border-radius: 15px; aspect-ratio: 16/9; }
-    </style>
-
-    <!-- ================================================================
-         SANDBOX STYLES: PLANTILLA FIESTA SOFISTICADA VIBRANTE
-         Edita este bloque para cambiar la apariencia visual de la plantilla.
-         ================================================================ -->
-    <style id="sandbox-styles">
-        /* 1. Fondo con degradado radial para profundidad */
-        body.tpl-sandbox {
-            background: radial-gradient(circle at top right, #1a001a 0%, #050505 100%);
-        }
-
-        /* 2. Título Hero: Estilo editorial asimétrico con efecto Glow */
-        .tpl-sandbox .hero {
-            min-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 10%;
-        }
-
+        /* Estilos de la Plantilla Sandbox */
+        body.tpl-sandbox { background: radial-gradient(circle at top right, #1a001a 0%, #050505 100%); }
         .tpl-sandbox .hero-title {
             font-weight: 900;
             font-size: clamp(3.5rem, 12vw, 8rem);
             line-height: 0.85;
             letter-spacing: -5px;
             text-transform: uppercase;
-            margin: 0;
             background: linear-gradient(to bottom, var(--gold), #ffffff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5)); /* Efecto neón */
+            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5));
         }
-
-        /* 3. Módulo DJ Lineup: Lista minimalista con micro-interacciones */
-        .tpl-sandbox #modulo-lineup h2 { 
-            color: var(--gold); 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        .tpl-sandbox .lineup-item {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            cursor: pointer;
-        }
-
-        .tpl-sandbox .lineup-item:hover {
-            color: var(--gold);
-            padding-left: 2rem;
-            background: rgba(255, 0, 127, 0.05);
-        }
-
-        /* 4. Botón de Registro Sofisticado */
         .tpl-sandbox #btn-submit {
-            width: 100%;
-            background-color: var(--gold);
-            color: #000;
-            border: none;
-            padding: 1.5rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            border-radius: 4px; /* Estilo más cuadrado/brutalista */
-            cursor: pointer;
-            box-shadow: 0 10px 40px rgba(255, 0, 127, 0.3);
-            transition: transform 0.2s ease;
-        }
-
-        .tpl-sandbox #btn-submit:hover {
-            transform: scale(1.02);
-        }
-
-        /* 5. Estilo para la Sinopsis (Storytelling) */
-        .tpl-sandbox #event-description {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            max-width: 600px;
-            opacity: 0.8;
+            width: 100%; background-color: var(--gold); color: #000; padding: 1.5rem;
+            font-weight: 800; border: none; border-radius: 4px; cursor: pointer;
         }
     </style>
 </head>
 
-<body class="tpl-sandbox"> <!-- Clase forzada para priorizar el CSS del sandbox [instrucciones] -->
+<body class="tpl-sandbox">
 
     <div id="loader" class="loading-overlay">Sincronizando vibras...</div>
 
-    <!-- HEADER / HERO -->
-    <header class="hero">
+    <header class="hero" style="padding: 10% 10% 5% 10%;">
         <h1 id="event-title" class="hero-title">CARGANDO...</h1>
-        <p id="event-date" style="font-weight: 500; letter-spacing: 4px; margin-top: 2rem; opacity: 0.6;">--/--/--</p>
+        <p id="event-date" style="letter-spacing: 4px; opacity: 0.6;">--/--/--</p>
     </header>
 
-    <!-- MÓDULO: TRÁILER -->
-    <section id="modulo-trailer">
-        <div id="video-container"></div>
-    </section>
-
-    <!-- MÓDULO: SINOPSIS -->
-    <section id="modulo-sinopsis" style="display: block;">
-        <h2>Sobre el encuentro</h2>
+    <section id="modulo-sinopsis">
+        <h2>SINOPSIS</h2>
         <div id="event-description">--</div>
     </section>
 
-    <!-- MÓDULO: DJ LINEUP -->
     <section id="modulo-lineup">
-        <h2>LINEUP / ARTISTAS</h2>
+        <h2>LINEUP</h2>
         <div id="lineup-list">
-            <!-- Ejemplo de estructura para lineup -->
-            <div class="lineup-item"><span>RASTRO MC</span> <small>08:00 PM</small></div>
-            <div class="lineup-item"><span>OSHUN 412</span> <small>09:30 PM</small></div>
-            <div class="lineup-item"><span>CHOKOFLOW</span> <small>11:00 PM</small></div>
+            <!-- Datos inyectados por JS -->
         </div>
     </section>
 
-    <!-- MÓDULO: REGISTRO -->
     <section id="modulo-registro" style="display: block !important;">
-        <div style="max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.03); padding: 3rem; border: 1px solid rgba(255,255,255,0.05);">
-            <h2 style="text-align: center; margin-bottom: 2rem;">RESERVAR LUGAR</h2>
+        <div style="max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.03); padding: 2rem; border: 1px solid rgba(255,255,255,0.05);">
             <form id="form-registro">
-                <input type="text" id="reg-nombre" placeholder="NOMBRE COMPLETO" required style="width:100%; padding: 1rem; margin-bottom: 1rem; background: transparent; border: 1px solid #333; color: white;">
-                <input type="text" id="reg-cedula" placeholder="DOCUMENTO / CÉDULA" required style="width:100%; padding: 1rem; margin-bottom: 1rem; background: transparent; border: 1px solid #333; color: white;">
-                <button type="submit" id="btn-submit">OBTENER TICKET QR</button>
+                <input type="text" id="reg-cedula" placeholder="CÉDULA / DOCUMENTO" required style="width:100%; padding: 1rem; margin-bottom: 1rem; background: transparent; border: 1px solid #333; color: white;">
+                <button type="submit" id="btn-submit">GENERAR TICKET</button>
             </form>
         </div>
     </section>
 
-    <!-- ÁREA DE TICKET (OCULTA HASTA REGISTRO) -->
-    <div id="ticket-result" style="display: none; text-align: center; padding: 4rem;">
-        <canvas id="qr-canvas" style="max-width: 300px; border: 10px solid white;"></canvas>
-        <p>Tu entrada ha sido generada.</p>
-    </div>
-
     <script>
-        /* ================================================================
-           MANUAL MODULE CONTROLLER
-           Cambia estos valores a true/false para activar secciones.
-           ================================================================ */
+        /**
+         * 1. CONFIGURACIÓN MANUAL DE MÓDULOS
+         */
         const SANDBOX_CONFIG = {
-            trailer: true,      // Muestra/oculta el video
-            sinopsis: true,     // Muestra/oculta la descripción
-            lineup: true,       // Muestra/oculta la lista de DJs
-            faq: false,         // Preguntas frecuentes
-            force_gold: '#ff007f' // Color neón predominante (Rosa #ff007f o Cyan #00f2ff)
+            sinopsis: true,
+            lineup: true,
+            trailer: false,
+            force_gold: '#ff007f'
         };
 
-        /* CREDENCIALES DEL SISTEMA QR [2] */
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
-        const supabase = exports.supabase.createClient(SB_URL, SB_KEY);
+
+        /**
+         * 2. SOLUCIÓN AL ERROR DE DECLARACIÓN (Ref: Console Error)
+         * Usamos un patrón que verifica si la variable ya existe antes de declararla.
+         */
+        let sbClient;
+        try {
+            sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+        } catch (e) {
+            console.error("Error al inicializar Supabase:", e);
+        }
+
+        /**
+         * 3. FUNCIÓN DE LOGGING (Igual a evento.html)
+         */
+        function logStatus(mensaje, tipo = 'INFO') {
+            const t = new Date().toLocaleTimeString();
+            const color = tipo === 'ERROR' ? 'color: #ff4d4d; font-weight: bold;' : 'color: #00ff88;';
+            console.log(`%c[${t}] [${tipo}] ${mensaje}`, color);
+        }
 
         async function initEvento() {
+            logStatus("Iniciando proceso de carga...");
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
 
             if (!slug) {
-                document.body.innerHTML = "<h1 style='color:white; padding: 20%;'>Error: Falta ?slug= en la URL.</h1>";
+                logStatus("Error: Falta el slug en la URL", "ERROR");
+                document.getElementById('event-title').innerText = "FALTA ?SLUG= EN URL";
+                document.getElementById('loader').style.display = 'none';
                 return;
             }
 
             try {
-                // Descarga de datos reales desde Supabase [4]
-                const { data: evento, error } = await supabase
+                // Descarga de datos
+                const { data: evento, error } = await sbClient
                     .from('eventos')
-                    .select('*, organizaciones(color_primario, nombre_app)')
+                    .select('*, organizaciones(color_primario)')
                     .eq('slug', slug)
                     .single();
 
                 if (error) throw error;
 
-                // Inyección de contenido dinámico
+                logStatus(`Datos del evento '${evento.nombre}' obtenidos correctamente.`);
+
+                // Inyección
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-description').innerHTML = evento.descripcion;
-                document.getElementById('event-date').innerText = new Date(evento.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
                 
-                // Aplicación de color neón (Sandbox manda sobre DB)
+                // Color Sandbox
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
 
-                // Aplicar filtros de visibilidad manuales
-                applyManualFilters();
+                // Aplicar filtros visuales
+                Object.keys(SANDBOX_CONFIG).forEach(key => {
+                    const el = document.getElementById(`modulo-${key}`);
+                    if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
+                });
+
+                logStatus("Interfaz renderizada con éxito.");
 
             } catch (err) {
-                console.error("Fallo al cargar evento:", err);
+                logStatus(`Fallo en la carga: ${err.message}`, "ERROR");
             } finally {
                 document.getElementById('loader').style.display = 'none';
             }
-        }
-
-        function applyManualFilters() {
-            Object.keys(SANDBOX_CONFIG).forEach(key => {
-                const el = document.getElementById(`modulo-${key}`);
-                if (el) {
-                    el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
-                }
-            });
         }
 
         window.onload = initEvento;
