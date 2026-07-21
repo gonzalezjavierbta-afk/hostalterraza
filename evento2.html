@@ -3,105 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v3: Auditor de Datos · Sistema QR</title>
+    <title>Sandbox v4: Vinculador de Datos · Sistema QR</title>
     
-    <!-- Librerías y Tipografía -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
-        /* Estilos Base y Sandbox */
         :root {
             --main-bg: #050505;
             --gold: #ff007f; 
             --text-color: #ffffff;
         }
         body {
-            margin: 0;
-            background-color: var(--main-bg);
-            color: var(--text-color);
-            font-family: 'Geist', sans-serif;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            margin: 0; background-color: var(--main-bg); color: var(--text-color);
+            font-family: 'Geist', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased;
         }
-        section { display: none; padding: 5rem 10%; position: relative; }
+        section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
         
+        /* Estilo de la Plantilla Sandbox */
         body.tpl-sandbox { background: radial-gradient(circle at top right, #1a001a 0%, #050505 100%); }
         .hero-title {
-            font-weight: 900;
-            font-size: clamp(3rem, 10vw, 7rem);
-            line-height: 0.85;
-            text-transform: uppercase;
-            background: linear-gradient(to bottom, var(--gold), #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 900; font-size: clamp(3rem, 10vw, 7rem); line-height: 0.85;
+            text-transform: uppercase; background: linear-gradient(to bottom, var(--gold), #ffffff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.4));
         }
+        .data-item { margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-left: 3px solid var(--gold); }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Auditando base de datos...</div>
+    <div id="loader" class="loading-overlay">Conectando módulos a DB...</div>
 
-    <!-- Interface Estándar -->
     <header class="hero" style="padding: 10% 10% 2% 10%;">
         <h1 id="event-title" class="hero-title">--</h1>
-        <p id="event-date" style="letter-spacing: 3px; opacity: 0.5;">--/--/--</p>
+        <p id="event-date" style="letter-spacing: 3px; opacity: 0.5;">--</p>
     </header>
 
-    <section id="modulo-trailer"><div id="video-container"></div></section>
-    <section id="modulo-sinopsis"><h2>SINOPSIS</h2><div id="event-description">--</div></section>
-    <section id="modulo-lineup"><h2>LINEUP</h2><div id="lineup-list"></div></section>
-    <section id="modulo-playlist"><h2>PLAYLIST</h2><div id="spotify-area"></div></section>
-    <section id="modulo-faq"><h2>FAQ</h2><div id="faq-list"></div></section>
-    
-    <!-- Registro (Siempre visible en Sandbox para pruebas) -->
-    <section id="modulo-registro" style="display: block !important; border-top: 1px solid #222;">
-        <div style="max-width: 450px; margin: 0 auto; background: rgba(255,255,255,0.02); padding: 2rem;">
-            <input type="text" id="reg-cedula" placeholder="DOCUMENTO" style="width:100%; padding: 1rem; background: transparent; border: 1px solid #333; color: white;">
-            <button id="btn-submit" style="width: 100%; background: var(--gold); color: black; border: none; padding: 1rem; margin-top: 1rem; font-weight: bold; cursor: pointer;">PROBAR REGISTRO</button>
+    <!-- MÓDULOS CON CONTENEDORES DE DATOS INTERNOS -->
+    <section id="modulo-sinopsis">
+        <h2 style="color: var(--gold);">SINOPSIS</h2>
+        <div id="db-descripcion" class="content">--</div>
+    </section>
+
+    <section id="modulo-lineup">
+        <h2 style="color: var(--gold);">LINEUP</h2>
+        <div id="db-lineup" class="lineup-container">
+            <!-- Los items se inyectarán aquí -->
         </div>
+    </section>
+
+    <section id="modulo-ubicacion">
+        <h2 style="color: var(--gold);">UBICACIÓN</h2>
+        <div id="db-ubicacion" class="data-item">--</div>
+    </section>
+
+    <section id="modulo-aforo_max">
+        <h2 style="color: var(--gold);">CAPACIDAD</h2>
+        <div id="db-aforo" class="data-item">--</div>
+    </section>
+
+    <section id="modulo-playlist">
+        <h2 style="color: var(--gold);">SPOTIFY PLAYLIST</h2>
+        <div id="db-playlist-container"></div>
+    </section>
+
+    <section id="modulo-faq">
+        <h2 style="color: var(--gold);">PREGUNTAS FRECUENTES</h2>
+        <div id="db-faq-container"></div>
     </section>
 
     <script>
         /**
-         * 1. CONFIGURACIÓN DE MÓDULOS (SANDBOX)
-         * 
-         * LISTA DE MÓDULOS EXISTENTES:
-         * - trailer: Muestra video de YouTube/Vimeo [3].
-         * - sinopsis: Muestra la descripción larga del evento [2].
-         * - lineup: Muestra lista de DJs/Artistas [4].
-         * - playlist: Muestra el reproductor de Spotify [4].
-         * - faq: Muestra preguntas frecuentes [2].
-         * - registro: Formulario de entrada (activado abajo) [5].
+         * 1. CONFIGURACIÓN DE MÓDULOS
          */
         const SANDBOX_CONFIG = {
-            trailer: false,
             sinopsis: true,
             lineup: true,
-            playlist: true,
-            faq: true,
             ubicacion: true,
             aforo_max: true,
-            force_gold: '#ff007f' // Color Neón
+            playlist: true,
+            faq: true,
+            force_gold: '#ff007f'
         };
 
-        /* Credenciales */
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
 
         let sbClient;
         try {
             sbClient = window.supabase.createClient(SB_URL, SB_KEY);
-        } catch (e) { console.error("Error Supabase:", e); }
+        } catch (e) { console.error("Error inicializando cliente:", e); }
 
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const color = tipo === 'ERROR' ? 'color: #ff4d4d;' : tipo === 'DB' ? 'color: #33ccff;' : 'color: #00ff88;';
-            console.log(`%c[${t}] [${tipo}] ${mensaje}`, color);
+            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
+            console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace;`);
         }
 
         async function initEvento() {
@@ -109,8 +109,7 @@
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             if (!slug) {
-                logStatus("Error: Falta slug en URL", "ERROR");
-                document.getElementById('loader').innerText = "FALTA ?SLUG=";
+                logStatus("Error: Falta slug en la URL", "ERROR");
                 return;
             }
 
@@ -123,33 +122,70 @@
 
                 if (error) throw error;
 
-                /**
-                 * REQUERIMIENTO 1: LOG DE INFORMACIÓN LLENA EN DB
-                 */
-                const camposLlenos = Object.keys(evento).filter(key => 
-                    evento[key] !== null && evento[key] !== "" && evento[key] !== undefined
-                );
-                logStatus(`Campos detectados con información en DB: ${camposLlenos.join(', ')}`, "DB");
+                // LOG 1: Campos con información
+                const camposLlenos = Object.keys(evento).filter(k => evento[k] !== null && evento[k] !== "");
+                logStatus(`Campos detectados en DB: ${camposLlenos.join(', ')}`, "DB");
 
-                // Inyección visual
+                // INYECCIÓN DE DATOS Y LOG DE CONFIRMACIÓN
+                
+                // 1. Título y Fecha
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                document.getElementById('event-description').innerHTML = evento.descripcion;
-                document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
+                document.getElementById('event-date').innerText = `${evento.fecha} · ${evento.hora} HRS`;
+                logStatus("Vinculado: Nombre y Fecha del evento.", "LINK");
 
-                // Aplicar visibilidad
+                // 2. Sinopsis
+                if (evento.descripcion) {
+                    document.getElementById('db-descripcion').innerHTML = evento.descripcion;
+                    logStatus("Vinculado: Descripción inyectada en modulo-sinopsis.", "LINK");
+                }
+
+                // 3. Lineup (Procesamiento de texto multilínea similar a evento.html)
+                if (evento.lineup) {
+                    const items = evento.lineup.split('\n');
+                    const container = document.getElementById('db-lineup');
+                    container.innerHTML = items.map(i => `<div class="data-item">${i}</div>`).join('');
+                    logStatus(`Vinculado: ${items.length} artistas en modulo-lineup.`, "LINK");
+                }
+
+                // 4. Ubicación
+                if (evento.ubicacion) {
+                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
+                    logStatus("Vinculado: Dirección física en modulo-ubicacion.", "LINK");
+                }
+
+                // 5. Aforo
+                if (evento.aforo_max) {
+                    document.getElementById('db-aforo').innerText = `${evento.aforo_max} personas máximo.`;
+                    logStatus("Vinculado: Capacidad máxima en modulo-aforo_max.", "LINK");
+                }
+
+                // 6. Playlist
+                if (evento.video_url && evento.video_url.includes('spotify')) {
+                    document.getElementById('db-playlist-container').innerHTML = `<iframe src="${evento.video_url.replace('open.spotify.com', 'open.spotify.com/embed')}" width="100%" height="380" frameBorder="0" allow="encrypted-media"></iframe>`;
+                    logStatus("Vinculado: Reproductor Spotify en modulo-playlist.", "LINK");
+                }
+
+                // 7. FAQ (Formato Pregunta|Respuesta)
+                if (evento.faq) {
+                    const faqs = evento.faq.split('\n');
+                    document.getElementById('db-faq-container').innerHTML = faqs.map(f => {
+                        const [q, a] = f.split('|');
+                        return `<div class="data-item"><strong>${q || ''}</strong><br>${a || ''}</div>`;
+                    }).join('');
+                    logStatus("Vinculado: Preguntas frecuentes en modulo-faq.", "LINK");
+                }
+
+                // Aplicar visibilidad final
+                document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                // Reporte final de activos
-                const activos = Object.entries(SANDBOX_CONFIG)
-                    .filter(([k, v]) => v === true && k !== 'force_gold')
-                    .map(([k]) => k.toUpperCase());
-                logStatus(`Módulos ACTIVOS en Sandbox: ${activos.join(' | ') || 'NINGUNO'}`);
+                logStatus("PROCESO DE VINCULACIÓN COMPLETADO.", "INFO");
 
             } catch (err) {
-                logStatus(`Error: ${err.message}`, "ERROR");
+                logStatus(`Fallo crítico: ${err.message}`, "ERROR");
             } finally {
                 document.getElementById('loader').style.display = 'none';
             }
