@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v80: Media & Asset Final Reconciliation · Sistema QR</title>
+    <title>Editor v81: Production Hardening · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,7 +32,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO & RESTORED COUNTDOWN (3.2rem) */
+        /* 1. HERO & COUNTDOWN (3.2rem) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
@@ -47,56 +47,55 @@
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
 
-        /* 2. MEDIA & GALLERY (Restored Visibility) */
-        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; }
+        /* 2. MEDIA (Recovery Fix) */
+        .gallery-media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: start; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
-        .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 420px; }
-        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
+        .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 600px; } /* Altura inmersiva */
 
-        /* 3. DATA CARDS (XL Icons 68px) */
+        /* 3. LINEUP & DATA CARDS */
+        .lineup-poster { width: 320px !important; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
+        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
+        
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1100px; margin: 0 auto; }
         .data-card { 
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: 15px; padding: 2.5rem 1rem; text-align: center; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px;
         }
-        .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.8rem; }
-        .card-val { font-size: 1.15rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
-        /* 4. FAQ & UBICACIÓN */
-        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
-        .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); }
-
-        /* 5. SPONSORS v80 (Alpha Shield + Screen Mixing) */
-        .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 5.5rem 0; border-top: 1px solid rgba(255,255,255,0.05); background: #000; }
-        .sponsors-strip { display: flex; justify-content: center; align-items: center; gap: clamp(2rem, 8vw, 8rem); flex-wrap: wrap; padding: 0 10%; }
+        /* 4. SPONSORS v81 (Zero Filters - Native Alpha) */
+        .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 5.5rem 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        .sponsors-strip { display: flex; justify-content: center; align-items: center; gap: clamp(2.5rem, 8vw, 8rem); flex-wrap: wrap; padding: 0 10%; }
         .sponsor-logo { 
-            height: 42px !important; width: auto !important; max-width: 200px;
+            height: 44px !important; width: auto !important; max-width: 210px;
             object-fit: contain; 
-            filter: invert(1) contrast(1.5); /* Convierte logo oscuro en blanco y el fondo blanco en negro */
-            mix-blend-mode: screen; /* Hace que el fondo negro (antes blanco) sea transparente sobre el negro de la web */
+            /* Filtros eliminados para respetar logos blancos con transparencia original */
+            background: transparent !important;
             opacity: 1;
-            transition: 0.4s;
+            transition: transform 0.4s;
         }
 
-        /* 6. FORM */
-        .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+        /* 5. FORM & FAQ */
+        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         
         @media (max-width: 850px) {
+            .gallery-media-grid { grid-template-columns: 1fr; }
             .data-cards-container { grid-template-columns: repeat(2, 1fr); }
             .cd-v { font-size: 2.2rem; }
+            .spotify-container { height: 450px; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">MEDIA RECONCILIATION v80...</div>
+    <div id="loader" class="loading-overlay">PRODUCTION HARDENING v81...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -104,7 +103,7 @@
             <h1 id="event-title" class="hero-title">--</h1>
             <div class="hero-meta">
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
-                <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
+                <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
             </div>
             <div id="unified-frame" class="unified-countdown-frame">
@@ -126,11 +125,11 @@
             </div>
         </section>
 
-        <!-- GALLERY & MEDIA (v80 Recovery) -->
+        <!-- GALLERY & MEDIA (v81 Stabilized) -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
-            <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:2.5rem; max-width:1100px; margin:4rem auto 0;">
+            <div class="gallery-media-grid">
                 <div id="modulo-trailer" class="video-wrapper"><iframe id="db-trailer-iframe" class="video-iframe" src="" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
                 <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed" style="height:100%;"></div></div>
             </div>
@@ -165,7 +164,7 @@
             </div>
         </section>
 
-        <!-- SPONSORS -->
+        <!-- SPONSORS (True Alpha Release) -->
         <section id="modulo-patrocinadores">
             <div class="sponsors-full-frame">
                 <span style="color:var(--gold); font-size:0.65rem; font-weight:900; letter-spacing:4px; text-transform:uppercase; margin-bottom:4rem; text-align:center; display:block;">PATROCINADORES</span>
@@ -197,13 +196,13 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V80: Ejecutando reconciliación multimedia y blindaje de sponsors.");
+            logStatus("AUDITORÍA V81: Ejecutando blindaje de Media y lógica True Alpha para Sponsors.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                // 1. Heartbeat immediate (3.2rem)
+                // 1. Heartbeat immediate (v75 restore)
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -224,35 +223,35 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 3. Media Reconciliation (v80 Fix)
+                // 3. Media Hardening (v81 Fix)
                 if (content.trailer_url) {
                     document.getElementById('db-trailer-iframe').src = content.trailer_url;
-                    logStatus("LINK: Video oficial inyectado con éxito.", "LINK");
+                    logStatus("LINK: Video oficial (TRAILER) inyectado con éxito.", "LINK");
                 }
                 if (content.playlist_url) {
                     const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border:none;"></iframe>`;
-                    logStatus("LINK: Playlist de Spotify inyectada con ruta embed.", "LINK");
+                    logStatus("LINK: Playlist de Spotify inyectada en formato inmersivo.", "LINK");
                 }
 
-                // 4. Lineup & Gallery
+                // 4. Lineup & Gallery (Circle Restoration)
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
                     <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                 if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
 
-                // 5. Sponsors Alpha Shield v80
+                // 5. Sponsors (v81 True Alpha Logic - NO FILTERS)
                 try {
                     const forcedAsset = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe_O0ax-NJaL7VRZjRusflR1T92YebpyBO4CrO_8T_Lw&s=10";
-                    const marks = ["Brand 1", "Brand 2", "Brand 3", "Brand 4"];
+                    const marks = ["Logo 1", "Logo 2", "Logo 3", "Logo 4"];
                     document.getElementById('db-sponsors-strip').innerHTML = marks.map(m => {
-                        return `<img src="${forcedAsset}" class="sponsor-logo" alt="${m}" onload="console.log('%c[TRACE] Sponsor ${m} verificado con Alpha Shield.', 'color: #e67e22;')">`;
+                        return `<img src="${forcedAsset}" class="sponsor-logo" alt="${m}" onload="console.log('%c[TRACE] Sponsor ${m} cargado con Alpha Nativo.', 'color: #e67e22;')">`;
                     }).join('');
-                    logStatus("LINK: Sponsors blindados (Fondo blanco removido vía Invert-Screen).", "LINK");
+                    logStatus("LINK: Sponsors desplegados en modo 'Clean Alpha' (Filtros desactivados).", "LINK");
                 } catch (e) { logStatus(`ERR-SPONSORS: ${e.message}`, "ERROR"); }
 
-                // 6. Data Cards & rest
+                // 6. Technical Data & rest
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
@@ -268,7 +267,7 @@
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
 
-                // Audit Shield Final v80
+                // Audit Final v81
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : (key==='patrocinadores') ? 'modulo-patrocinadores' : `modulo-${key}`;
                     const el = document.getElementById(elId);
