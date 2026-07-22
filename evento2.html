@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v13: Final Truth Sync · Sistema QR</title>
+    <title>Sandbox v14: Master Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,6 +19,7 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
+        /* HERO VISUAL */
         .hero {
             position: relative; min-height: 80vh; display: flex; flex-direction: column;
             justify-content: center; padding: 0 10%; background-size: cover; background-position: center;
@@ -44,7 +45,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Restaurando logs y datos...</div>
+    <div id="loader" class="loading-overlay">Sincronizando Playlist y Datos...</div>
 
     <header id="hero-bg" class="hero">
         <div class="hero-content">
@@ -53,6 +54,7 @@
         </div>
     </header>
 
+    <!-- MÓDULOS ACTIVOS -->
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
@@ -87,7 +89,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando auditoría completa v13...");
+            logStatus("Iniciando auditoría v14 (Master Sync)...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
@@ -99,31 +101,36 @@
 
                 if (error) throw error;
 
-                // RECUPERACIÓN DE LOGS DE RAÍZ
+                // 1. AUDITORÍA RAÍZ
                 logStatus(`Campos en raíz DB: ${Object.keys(evento).join(', ')}`, "DB");
 
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen Hero aplicada.", "LINK");
+                    logStatus("LINK: Imagen Hero vinculada.", "LINK");
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora}`;
                 if (evento.ubicacion) document.getElementById('db-ubicacion').innerText = evento.ubicacion;
 
-                // RECUPERACIÓN DE LOGS DE JSON
                 const config = evento.config_landing || {};
                 logStatus(`Estructura JSON detectada: ${Object.keys(config).join(', ')}`, "TRACE");
 
                 /**
-                 * FUNCIÓN DE BÚSQUEDA EXCLUSIVA DE DATOS
-                 * Ignora valores booleanos (flags de admin.html) y busca strings/arrays.
+                 * FUNCIÓN DE BÚSQUEDA EXCLUSIVA DE CONTENIDO
+                 * Busca en raíz de evento, config, modules y content, ignorando booleanos.
                  */
-                const deepDataSeek = (llavesPosibles) => {
-                    for (let key of llavesPosibles) {
+                const findContent = (llaves) => {
+                    for (let key of llaves) {
+                        // Primero probar raíz de la tabla (ej: video_url)
+                        if (evento[key] && typeof evento[key] === 'string' && evento[key].length > 5) {
+                            logStatus(`TRACE: Usando '${key}' desde RAÍZ de la tabla.`, "TRACE");
+                            return evento[key];
+                        }
+                        // Luego probar en el JSON (raíz, modules, content)
                         let locations = [config, config.modules, config.content];
                         for (let loc of locations) {
-                            if (loc && loc[key] !== undefined && typeof loc[key] !== 'boolean') {
-                                logStatus(`TRACE: Encontrado contenido en '${key}' (Tipo: ${typeof loc[key]})`, "TRACE");
+                            if (loc && loc[key] !== undefined && typeof loc[key] === 'string' && loc[key].length > 2) {
+                                logStatus(`TRACE: Usando '${key}' desde JSON (config_landing).`, "TRACE");
                                 return loc[key];
                             }
                         }
@@ -131,32 +138,34 @@
                     return null;
                 };
 
-                // 1. Vincular Lineup
-                const lineupData = deepDataSeek(['lineup', 'dj_lineup', 'artistas']);
+                // 2. VINCULAR LINEUP (Ya funcional)
+                const lineupData = findContent(['lineup', 'dj_lineup', 'artistas']);
                 if (lineupData) {
-                    let artistas = typeof lineupData === 'string' ? lineupData.split('\n') : lineupData;
-                    document.getElementById('db-lineup').innerHTML = artistas.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus(`LINK: ${artistas.length} artistas vinculados con éxito.`, "LINK");
+                    const artistas = lineupData.split('\n').filter(a => a.trim() !== "");
+                    document.getElementById('db-lineup').innerHTML = artistas.map(a => `<div class="data-item">${a}</div>`).join('');
+                    logStatus(`LINK: ${artistas.length} artistas vinculados.`, "LINK");
+                }
+
+                // 3. VINCULAR PLAYLIST (Mejorado)
+                // Se buscan específicamente las llaves donde admin.html guarda la URL
+                const spotifyUrl = findContent(['video_url', 'spotify_url', 'playlist_url', 'playlist']);
+                
+                if (spotifyUrl && spotifyUrl.toLowerCase().includes('spotify')) {
+                    const embed = spotifyUrl.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
+                    logStatus("LINK: Playlist Spotify inyectada correctamente.", "LINK");
                 } else {
-                    logStatus("TRACE: No se encontró texto para Lineup (solo flags booleanas).", "ERROR");
+                    logStatus("TRACE: No se encontró una URL de Spotify válida. Se omitirá el módulo.", "ERROR");
                 }
 
-                // 2. Vincular Spotify
-                const spotifyData = deepDataSeek(['video_url', 'playlist', 'spotify']);
-                if (spotifyData && typeof spotifyData === 'string' && spotifyData.includes('spotify')) {
-                    const embed = spotifyData.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("LINK: Spotify vinculado con éxito.", "LINK");
-                }
-
-                // Estilos finales
+                // Aplicar visibilidad final
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN Y AUDITORÍA FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN FINALIZADA.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO: ${err.message}`, "ERROR");
