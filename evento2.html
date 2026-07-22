@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v17: Cumulative Audit · Sistema QR</title>
+    <title>Sandbox v18: Comprehensive Module Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,9 +19,8 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
-        /* HERO VISUAL */
         .hero {
-            position: relative; min-height: 75vh; display: flex; flex-direction: column;
+            position: relative; min-height: 70vh; display: flex; flex-direction: column;
             justify-content: center; padding: 0 10%; background-size: cover; background-position: center;
         }
         .hero::before {
@@ -38,9 +37,16 @@
         }
 
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.2rem; }
+        .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
         
-        /* COUNTDOWN GRID */
+        /* ESTILOS ESPECÍFICOS MÓDULOS */
+        .faq-item { margin-bottom: 1.5rem; }
+        .faq-q { font-weight: bold; color: var(--gold); display: block; margin-bottom: 0.5rem; }
+        .faq-a { opacity: 0.8; line-height: 1.5; }
+        
+        .aforo-bar-container { background: rgba(255,255,255,0.1); height: 8px; border-radius: 10px; margin-top: 1rem; overflow: hidden; }
+        .aforo-fill { background: var(--gold); height: 100%; width: 0%; transition: width 1s ease; }
+
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
@@ -52,7 +58,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Ejecutando Auditoría Acumulativa...</div>
+    <div id="loader" class="loading-overlay">Sincronización avanzada de módulos...</div>
 
     <header id="hero-bg" class="hero">
         <div class="hero-content">
@@ -71,9 +77,25 @@
         </div>
     </section>
 
+    <section id="modulo-aforo">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">DISPONIBILIDAD</h2>
+        <div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">Calculando cupos...</div>
+        <div class="aforo-bar-container"><div id="aforo-fill" class="aforo-fill"></div></div>
+    </section>
+
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
+    </section>
+
+    <section id="modulo-guest_list">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">GUEST LIST</h2>
+        <div id="db-guest-txt" class="data-item">--</div>
+    </section>
+
+    <section id="modulo-faq">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">PREGUNTAS FRECUENTES</h2>
+        <div id="db-faq-list"></div>
     </section>
 
     <section id="modulo-playlist">
@@ -106,35 +128,21 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         /**
-         * 2. MOTOR DE LOGGING ACUMULATIVO (Mejorado)
+         * 2. MOTOR DE LOGGING ACUMULATIVO (Reglas de Oro)
          */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const colors = { 
-                'INFO': '#00ff88',  // Verde: Estado general
-                'DB': '#33ccff',    // Azul: Campos de tabla
-                'JSON': '#e67e22',  // Naranja: Estructura interna
-                'LINK': '#f1c40f',  // Amarillo: Vinculación exitosa
-                'TIME': '#9b59b6',  // Púrpura: Countdown
-                'ERROR': '#ff4d4d'   // Rojo: Fallos
-            };
+            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#e67e22', 'TRACE': '#f39c12', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d' };
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // Motor Countdown
         function startCountdown(date, time) {
             const target = new Date(`${date}T${time}`).getTime();
-            if (isNaN(target)) {
-                logStatus("TIME: Error en formato de fecha/hora para countdown.", "ERROR");
-                return;
-            }
-            logStatus(`TIME: Motor iniciado para ${date} a las ${time}.`, "TIME");
-            
+            if (isNaN(target)) return;
+            logStatus(`TIME: Motor iniciado para el ${date}.`, "TIME");
             setInterval(() => {
-                const now = new Date().getTime();
-                const diff = target - now;
+                const diff = target - new Date().getTime();
                 if (diff <= 0) return;
-                
                 document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
                 document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
                 document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
@@ -143,50 +151,35 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V17: Iniciando secuencia acumulativa...");
+            logStatus("Iniciando secuencia acumulativa v18...");
             
-            // LOG: Reporte de módulos activos en Config
-            const activos = Object.entries(SANDBOX_CONFIG)
-                .filter(([k, v]) => v === true && k !== 'force_gold')
-                .map(([k]) => k.toUpperCase());
-            logStatus(`MÓDULOS ACTIVOS EN CONFIG: ${activos.join(' | ')}`, "INFO");
+            const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
+            logStatus(`MÓDULOS ACTIVOS: ${activos.join(' | ')}`, "INFO");
 
             const slug = new URLSearchParams(window.location.search).get('slug');
-            if (!slug) { logStatus("Falta parámetro ?slug= en URL.", "ERROR"); return; }
+            if (!slug) { logStatus("Error: No hay slug en la URL.", "ERROR"); return; }
 
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // LOG: Auditoría de Campos Raíz (v7)
-                logStatus(`Campos detectados en RAÍZ DB: ${Object.keys(evento).join(', ')}`, "DB");
+                logStatus(`DB: Campos detectados -> ${Object.keys(evento).join(', ')}`, "DB");
 
-                // Vinculación Hero e Imagen (v8)
+                // --- VINCULACIÓN RAÍZ ---
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen de fondo aplicada al Hero.", "LINK");
+                    logStatus("LINK: Imagen Hero vinculada.", "LINK");
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
+                if (evento.ubicacion) document.getElementById('db-ubicacion').innerText = evento.ubicacion;
 
-                // Vinculación Ubicación desde Raíz (v11)
-                if (evento.ubicacion) {
-                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
-                    logStatus(`LINK: Ubicación '${evento.ubicacion}' vinculada desde raíz.`, "LINK");
-                }
+                if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
-                // Iniciar Countdown (v16)
-                if (SANDBOX_CONFIG.countdown) {
-                    startCountdown(evento.fecha, evento.hora);
-                }
-
-                // Auditoría JSON config_landing (v11/v15)
+                // --- PROCESAMIENTO JSON ---
                 const config = evento.config_landing || {};
-                logStatus(`Estructura JSON: Módulos internos detectados -> ${Object.keys(config.modules || {}).join(', ')}`, "JSON");
+                logStatus(`JSON: Módulos internos -> ${Object.keys(config.modules || {}).join(', ')}`, "JSON");
 
-                /**
-                 * FUNCIÓN DE EXTRACCIÓN CON TRAZABILIDAD (v15)
-                 */
                 const getModuleData = (llaves, term = null) => {
                     let levels = [evento, config, config.modules, config.content];
                     for (let loc of levels) {
@@ -194,11 +187,11 @@
                         for (let k of llaves) {
                             let val = loc[k];
                             if (val && typeof val !== 'boolean') {
-                                if (typeof val === 'string' && val.length > 5 && (!term || val.toLowerCase().includes(term))) {
-                                    logStatus(`JSON-CALL: Extrayendo '${k}' desde ${loc === evento ? 'Raíz' : 'Config'}.`, "JSON");
+                                if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) {
+                                    logStatus(`TRACE: Obteniendo '${k}' desde JSON/Raíz.`, "TRACE");
                                     return val;
                                 } else if (Array.isArray(val) && val.length > 0) {
-                                    logStatus(`JSON-CALL: Extrayendo '${k}' (Array) desde Config.`, "JSON");
+                                    logStatus(`TRACE: Obteniendo '${k}' (Array) desde JSON.`, "TRACE");
                                     return val;
                                 }
                             }
@@ -207,30 +200,57 @@
                     return null;
                 };
 
-                // Vincular Lineup
+                // 1. MÓDULO AFORO (Raíz + Lógica) [2]
+                if (SANDBOX_CONFIG.aforo && evento.aforo_max) {
+                    const max = evento.aforo_max;
+                    // En un sistema real haríamos un count de inscritos. Aquí simulamos el cálculo visual.
+                    document.getElementById('db-aforo-txt').innerText = `0 de ${max} cupos ocupados · ${max} disponibles`;
+                    document.getElementById('aforo-fill').style.width = `5%`; // Simulación inicial
+                    logStatus("LINK: Módulo Aforo vinculado.", "LINK");
+                }
+
+                // 2. MÓDULO LINEUP (Existente) [3]
                 const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const lista = typeof lineup === 'string' ? lineup.split('\n') : lineup;
                     document.getElementById('db-lineup').innerHTML = lista.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus(`LINK: Lineup inyectado (${lista.length} artistas).`, "LINK");
+                    logStatus("LINK: Lineup inyectado.", "LINK");
                 }
 
-                // Vincular Playlist
+                // 3. MÓDULO GUEST LIST [3]
+                const guestData = getModuleData(['guest_list', 'instrucciones_guest']);
+                if (guestData) {
+                    document.getElementById('db-guest-txt').innerText = guestData;
+                    logStatus("LINK: Instrucciones Guest List vinculadas.", "LINK");
+                }
+
+                // 4. MÓDULO FAQ (Nuevo Render) [3, 4]
+                const faqRaw = getModuleData(['faq', 'preguntas_frecuentes']);
+                if (faqRaw && typeof faqRaw === 'string') {
+                    const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
+                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item"><span class="faq-q">${q.trim()}</span><span class="faq-a">${a.trim()}</span></div>`;
+                    }).join('');
+                    logStatus(`LINK: ${lineas.length} preguntas FAQ inyectadas.`, "LINK");
+                }
+
+                // 5. MÓDULO PLAYLIST [5]
                 const playlist = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
                 if (playlist) {
                     const embed = playlist.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify vinculada correctamente.", "LINK");
+                    logStatus("LINK: Playlist Spotify vinculada.", "LINK");
                 }
 
-                // Aplicar Visibilidad Final
+                // APLICAR VISIBILIDAD FINAL
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SECUENCIA DE AUDITORÍA Y SINCRONIZACIÓN FINALIZADA CON ÉXITO.", "INFO");
+                logStatus("SINCRONIZACIÓN COMPLETA FINALIZADA CON ÉXITO.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
