@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v84: Restoration Baseline · Sistema QR</title>
+    <title>Editor v85: Deep Media Diagnostic · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,21 +32,21 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO & COUNTDOWN (3.2rem) */
+        /* 1. HERO & COUNTDOWN (3.2rem Restored) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
         
         .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 2.5rem; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; z-index: 2; position: relative; opacity: 0.9; }
         .meta-item { display: flex; align-items: center; gap: 0.7rem; }
-        .meta-svg { width: 18px; height: 18px; fill: var(--gold); }
+        .meta-svg { width: 18px !important; height: 18px !important; fill: var(--gold); }
 
         .unified-countdown-frame { position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.5rem 2.5rem; background: var(--glass-lite); border-radius: 12px; border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; width: fit-content; }
         .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .cd-block:last-child { border-right: none; }
-        .cd-v { display: block; font-size: 3.2rem; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
+        .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
 
-        /* 2. MEDIA GRID (v84 Recovery) */
+        /* 2. MEDIA GRID RECOVERY (v85 Stability) */
         .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: start; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
@@ -87,7 +87,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">RESTORING STABLE BASELINE v84...</div>
+    <div id="loader" class="loading-overlay">MEDIA DIAGNOSTIC v85...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px;">--</div>
@@ -108,6 +108,7 @@
     </header>
 
     <main id="main-content-flow">
+        <!-- LINEUP -->
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0; max-width:950px; margin:0 auto; align-items:start;">
@@ -116,15 +117,17 @@
             </div>
         </section>
 
+        <!-- GALLERY & MEDIA (Diagnostic Ready) -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
             <div class="media-grid">
-                <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content" style="height:100%;"></div></div>
-                <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed" style="height:100%;"></div></div>
+                <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content" style="height:100%; width:100%;"></div></div>
+                <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed" style="height:100%; width:100%;"></div></div>
             </div>
         </section>
 
+        <!-- DATA CARDS -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
                 <div class="data-card">
@@ -145,6 +148,7 @@
             </div>
         </section>
 
+        <!-- FAQ & UBICACIÓN -->
         <section id="modulo-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
                 <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
@@ -152,6 +156,7 @@
             </div>
         </section>
 
+        <!-- FORMULARIO -->
         <section id="modulo-formulario">
             <h2 style="text-align:center;">REGISTRO DE ASISTENCIA</h2>
             <form id="master-reg-form" style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem;">
@@ -175,7 +180,7 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V84: Restaurando estabilidad 11 módulos (Sin Patrocinadores).");
+            logStatus("AUDITORÍA V85: Ejecutando diagnóstico profundo de Media y restaurando estabilidad 11 módulos.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
@@ -191,8 +196,9 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
+                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
 
-                // 2. Hero
+                // 2. Hero Data
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
@@ -201,25 +207,28 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 3. Media Stabilization (v84 Fix)
+                // 3. Media Diagnostic & Stabilization (v85 Fix)
                 if (content.trailer_url) {
+                    logStatus(`TRACE: Detectada URL de tráiler: ${content.trailer_url}`, "TRACE");
                     const isYT = content.trailer_url.includes('youtube.com') || content.trailer_url.includes('youtu.be');
                     if (isYT) {
-                        const poster = evento.imagen_url;
                         document.getElementById('db-video-content').innerHTML = `
-                            <div class="yt-cover" style="background-image: url('${poster}')" onclick="window.open('${content.trailer_url}', '_blank')">
+                            <div class="yt-cover" style="background-image: url('${evento.imagen_url}')" onclick="window.open('${content.trailer_url}', '_blank')">
                                 <div class="play-btn"><svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>`;
-                        logStatus("LINK: Video YouTube inyectado como Play-Overlay (Anti-Error 153).", "LINK");
+                        logStatus("LINK: Módulo TRAILER inyectado como Play-Overlay (YouTube detectado).", "LINK");
                     } else {
                         document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${content.trailer_url}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                        logStatus("LINK: Video Vimeo inyectado como iFrame nativo.", "LINK");
+                        logStatus("LINK: Módulo TRAILER inyectado como iFrame nativo (Vimeo detectado).", "LINK");
                     }
+                } else {
+                    logStatus("TRACE: No se detectó trailer_url en config_landing.content.", "TRACE");
                 }
+
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" width="100%" height="600" frameBorder="0" allow="encrypted-media" style="border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify recuperada a 600px de altura.", "LINK");
+                    logStatus("LINK: Playlist Spotify recuperada con altura inmersiva (600px).", "LINK");
                 }
 
                 // 4. Lineup & Gallery
@@ -229,7 +238,7 @@
                     <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                 if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
 
-                // 5. Data & rest
+                // 5. Data Cards & rest
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
@@ -245,7 +254,7 @@
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
 
-                // Audit Shield Final v84
+                // Audit Final v85 (11 módulos)
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : `modulo-${key}`;
                     const el = document.getElementById(elId);
