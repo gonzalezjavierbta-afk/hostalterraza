@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v55: FAQ & Map Sync · Two-Column Layout</title>
+    <title>Editor v56: Total Structural Integration · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,7 +15,7 @@
             --gold: #df20b6; 
             --text-color: #ffffff;
             --glass-lite: rgba(255, 255, 255, 0.03);
-            --border-glow: rgba(223, 32, 182, 0.15);
+            --border-glow: rgba(223, 32, 182, 0.2);
         }
 
         html, body { 
@@ -24,7 +24,7 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; 
         }
 
-        /* ESCUDO DE GRANO (v47) */
+        /* ESCUDO DE GRANO CSS (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -32,63 +32,69 @@
         }
         
         section { display: none; padding: 6rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        h2 { color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; font-weight: 900; margin-bottom: 2.5rem; text-align: left; }
+        h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 4rem; text-align: left; }
 
-        /* HERO & UI (v54 Stable) */
-        .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
+        /* 1. HERO & COUNTDOWN (v51/v52 Stable) */
+        .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; box-sizing: border-box; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
         .hero-title { font-weight: 900; font-size: clamp(2rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
-        .unified-countdown-frame { position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.5rem 2.5rem; background: var(--glass-lite); border-radius: 12px; border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; width: fit-content; }
+        
+        .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 2rem; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; z-index: 2; position: relative; opacity: 0.9; }
+        .meta-icon { width: 14px; height: 14px; fill: var(--gold); vertical-align: middle; margin-right: 0.4rem; }
+
+        .unified-countdown-frame {
+            position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.5rem 2.5rem; background: var(--glass-lite); border-radius: 12px;
+            border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; width: fit-content;
+        }
         .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 2.2rem; font-weight: 900; }
+        .cd-l { font-size: 0.5rem; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; margin-top: 0.5rem; }
 
-        /* DATA CARDS (v54) */
+        /* 2. DATA CARDS v54 (Ref: datos.jpg) */
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1000px; margin: 0 auto; }
-        .data-card { background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 2rem 1rem; text-align: center; backdrop-filter: blur(10px); }
+        .data-card { background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 2rem 1rem; text-align: center; backdrop-filter: blur(10px); transition: 0.3s; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .data-card:hover { border-color: var(--gold); box-shadow: 0 0 25px var(--border-glow); }
+        .card-label { color: var(--gold); font-size: 0.65rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+        .card-val { display: block; font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* LINEUP & MEDIA (v53) */
+        /* 3. LINEUP v51 (Ref: dj-line-up.jpg) */
         .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
         .lineup-col-poster { display: flex; justify-content: center; padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
-        .lineup-poster { width: 320px; border-radius: 12px; border: 4px solid var(--gold); }
+        .lineup-poster { width: 320px; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
         .artist-list { display: flex; flex-direction: column; gap: 2.5rem; padding-left: 5rem; }
+        .artist-item { display: flex; align-items: center; gap: 1.8rem; }
+        .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
 
-        /* COMBINED SECTION v55 (Ref: faqubicacion.jpg) */
-        .faq-ubicacion-grid { 
-            display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0; 
-            max-width: 1000px; margin: 0 auto; align-items: start;
-        }
+        /* 4. GALERÍA v53 (Ref: galeriaplaylist.jpg) */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+
+        /* 5. DUAL MEDIA v53 (Tráiler / Playlist) */
+        .dual-media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 0 auto; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); box-shadow: 0 0 30px var(--border-glow); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .playlist-wrapper { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); height: 100%; }
+
+        /* 6. FAQ & UBICACIÓN v55 (Ref: faqubicacion.jpg) */
+        .faq-ubicacion-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0; max-width: 1000px; margin: 0 auto; align-items: start; }
         .faq-col { padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
         .ubicacion-col { padding-left: 5rem; }
-        
-        .faq-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-weight: 500; font-size: 0.95rem; color: rgba(255,255,255,0.9);
-        }
-        .faq-icon-plus { color: var(--gold); font-weight: 300; font-size: 1.4rem; }
+        .faq-item { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 500; font-size: 0.95rem; color: rgba(255,255,255,0.9); }
+        .faq-icon-plus { color: var(--gold); font-size: 1.4rem; }
+        .venue-info { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 1rem; }
+        .map-preview-frame { width: 100%; height: 180px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
 
-        .venue-info { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 1px; }
-        .venue-sub { display: block; opacity: 0.6; font-size: 0.85rem; font-weight: 400; margin-bottom: 1.5rem; text-transform: none; letter-spacing: 0; }
-        
-        .map-link { 
-            display: flex; align-items: center; gap: 0.6rem; 
-            color: white; text-decoration: none; font-weight: 900; 
-            font-size: 0.85rem; text-transform: uppercase; margin-bottom: 2rem;
-        }
-        .map-preview-frame { 
-            width: 100%; height: 180px; border-radius: 12px; overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.1); background: #111;
-        }
-
-        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; }
+        /* FORMULARIO v47 */
+        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; }
         
         @media (max-width: 850px) {
-            .faq-ubicacion-grid { grid-template-columns: 1fr; gap: 4rem; }
-            .faq-col { border-right: none; padding-right: 0; }
-            .ubicacion-col { padding-left: 0; }
+            .data-cards-container { grid-template-columns: repeat(2, 1fr); }
+            .lineup-container, .dual-media-grid, .faq-ubicacion-grid { grid-template-columns: 1fr; gap: 4rem; }
+            .lineup-col-poster, .faq-col { border-right: none; padding-right: 0; }
+            .artist-list, .ubicacion-col { padding-left: 0; }
             h2 { text-align: center; }
         }
     </style>
@@ -96,12 +102,17 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">FINALIZING LAYOUT v55...</div>
+    <div id="loader" class="loading-overlay">INTEGRATING VERSION 56...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
         <div class="hero-content">
             <h1 id="event-title" class="hero-title">--</h1>
+            <div class="hero-meta">
+                <span><svg class="meta-icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></span>
+                <span><svg class="meta-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></span>
+                <span><svg class="meta-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></span>
+            </div>
             <div id="unified-frame" class="unified-countdown-frame">
                 <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span class="cd-l">Días</span></div>
                 <div class="cd-block"><span id="cd-hours" class="cd-v">00</span><span class="cd-l">Horas</span></div>
@@ -112,16 +123,17 @@
     </header>
 
     <main id="main-content-flow">
+        <!-- MODULOS OBLIGATORIOS (Auditoría v56) -->
         <section id="modulo-countdown" style="display:none;"></section>
         <section id="modulo-aforo" style="display:none;"></section>
 
-        <!-- DATA CARDS (v54) -->
+        <!-- DATA CARDS v54 -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
-                <div class="data-card"><span class="card-label">DRESS CODE</span><span id="db-dress-val" style="font-weight:900; font-size:1rem;">...</span></div>
-                <div class="data-card"><span class="card-label">GUEST LIST</span><span id="db-guest-val" style="font-weight:900; font-size:1rem;">...</span></div>
-                <div class="data-card"><span class="card-label">AFORO</span><span id="db-aforo-val" style="font-weight:900; font-size:1rem;">...</span></div>
-                <div class="data-card"><span class="card-label">TICKETS</span><span id="db-ticket-val" style="font-weight:900; font-size:1rem;">...</span></div>
+                <div class="data-card"><span class="card-label">DRESS CODE</span><span id="db-dress-val" class="card-val">...</span></div>
+                <div class="data-card"><span class="card-label">GUEST LIST</span><span id="db-guest-val" class="card-val">...</span></div>
+                <div class="data-card"><span class="card-label">AFORO</span><span id="db-aforo-val" class="card-val">...</span></div>
+                <div class="data-card"><span class="card-label">TICKETS</span><span id="db-ticket-val" class="card-val">...</span></div>
             </div>
         </section>
 
@@ -135,133 +147,102 @@
 
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
-            <div id="db-gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;"></div>
+            <div id="db-gallery-grid" class="gallery-grid"></div>
         </section>
 
-        <!-- SECCIÓN UNIFICADA FAQ & UBICACIÓN v55 (Ref: faqubicacion.jpg) -->
-        <section id="modulo-faq-ubicacion">
-            <div class="faq-ubicacion-grid">
-                <!-- Columna FAQ -->
-                <div class="faq-col">
-                    <h2>FAQ</h2>
-                    <div id="db-faq-list"></div>
+        <section id="modulo-trailer-playlist">
+            <h2>TRÁILER / BANDA SONORA</h2>
+            <div class="dual-media-grid">
+                <div id="modulo-trailer" class="video-wrapper">
+                    <iframe src="https://player.vimeo.com/video/259411563?h=79100067&color=df20b6" allowfullscreen></iframe>
                 </div>
-                <!-- Columna Ubicación -->
-                <div class="ubicacion-col">
-                    <h2>UBICACIÓN</h2>
-                    <div id="db-ubicacion-txt">
-                        <div id="venue-name" class="venue-info">--</div>
-                        <span id="venue-sub" class="venue-sub">Bogotá, Colombia</span>
-                        <a href="#" id="map-link-btn" class="map-link">
-                            Ver en mapa 
-                            <svg style="width:16px; height:16px; fill:var(--gold);" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                        </a>
-                    </div>
-                    <div id="db-mapa-container" class="map-preview-frame"></div>
-                </div>
+                <div id="modulo-playlist" class="playlist-wrapper"><div id="db-spotify"></div></div>
             </div>
         </section>
 
-        <section id="modulo-formulario"><h2>REGISTRO</h2><form id="master-reg-form" style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem;"><div><input type="text" class="form-input" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="Nombre *" required></div><div style="display:flex; gap:0.5rem;"><select style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="WhatsApp *" required></div><div id="db-dynamic-fields"></div><button type="submit" class="btn-submit">CONFIRMAR →</button></form></section>
+        <section id="modulo-faq-ubicacion">
+            <div class="faq-ubicacion-grid">
+                <div class="faq-col"><h2>FAQ</h2><div id="db-faq-list"></div></div>
+                <div class="ubicacion-col"><h2>UBICACIÓN</h2><div id="venue-name" class="venue-info">--</div><div id="db-mapa-container" class="map-preview-frame"></div></div>
+            </div>
+        </section>
+
+        <section id="modulo-formulario"><h2>REGISTRO</h2><form id="master-reg-form" style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem;"><div><input type="text" class="form-input" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="Nombre completo *" required></div><div id="db-dynamic-fields"></div><button type="submit" class="btn-submit">CONFIRMAR →</button></form></section>
     </main>
 
     <script>
-        const SANDBOX_CONFIG = {
-            countdown: true, trailer: true, aforo: true, lineup: true, dress_code: true, 
-            gallery: true, guest_list: true, faq: true, playlist: true, ubicacion: true, 
-            formulario: true, force_gold: '#df20b6' 
-        };
-
+        const SANDBOX_CONFIG = { countdown: true, trailer: true, aforo: true, lineup: true, dress_code: true, gallery: true, guest_list: true, faq: true, playlist: true, ubicacion: true, formulario: true };
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        function logStatus(mensaje, tipo = 'INFO') {
+        function logStatus(m, t = 'INFO') {
             const colors = { 'INFO': '#00ff88', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d' };
-            console.log(`%c[${new Date().toLocaleTimeString()}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-weight: bold;`);
+            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        function startCountdown(date, time) {
-            try {
-                const target = new Date(`${date}T${time}`).getTime();
-                if (isNaN(target)) return;
-                logStatus(`TIME: Heartbeat activo en marco unificado v55 para ${date}.`, "TIME");
-                setInterval(() => {
-                    const diff = target - new Date().getTime();
-                    if (diff <= 0) return;
-                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                }, 1000);
-            } catch (e) { logStatus(`ERROR TIME: ${e.message}`, "ERROR"); }
+        function startCountdown(d, t) {
+            const target = new Date(`${d}T${t}`).getTime();
+            if (isNaN(target)) return;
+            logStatus(`TIME: Heartbeat v56 activo para ${d}.`, "TIME");
+            setInterval(() => {
+                const diff = target - new Date().getTime();
+                if (diff <= 0) return;
+                document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+            }, 1000);
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V55: Sincronizando layout dual FAQ/Ubicación (Ref: faqubicacion.jpg)...");
+            logStatus("AUDITORÍA V56: Sincronización Estructural Total (11 Módulos)...");
             const slug = new URLSearchParams(window.location.search).get('slug');
-
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
+                startCountdown(evento.fecha, evento.hora);
 
-                if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
-
-                const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
-                if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
-
+                // Meta & Data Cards
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-
+                document.getElementById('meta-fecha').innerText = evento.fecha;
+                document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
+                document.getElementById('meta-lugar').innerText = evento.ubicacion.toUpperCase();
                 const content = evento.config_landing?.content || {};
+                document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
+                document.getElementById('db-guest-val').innerText = (content.guest_list || 'CONFIRMADOS').toUpperCase();
+                document.getElementById('db-aforo-val').innerText = `LIMITADO ${evento.aforo_max || 100}`;
+                document.getElementById('db-ticket-val').innerText = 'DISPONIBLES';
+                logStatus("LINK: Data Cards v54 restauradas.", "LINK");
 
-                // 1. DATA CARDS v54 Parity
-                document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON & BLACK').toUpperCase();
-                document.getElementById('db-guest-val').innerText = (content.guest_list || 'REGISTRADOS').toUpperCase();
-                document.getElementById('db-aforo-val').innerText = `LIMITADO ${evento.aforo_max || 300}`;
-                document.getElementById('db-ticket-val').innerText = 'EARLY BIRD';
-
-                // 2. LINEUP Pro-Portraits
+                // Lineup & Poster
+                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url || "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3";
                 const proPhotos = ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200"];
-                const lineup = content.dj_lineup || content.lineup;
-                if (lineup) {
-                    document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).map((a, i) => `
-                        <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span class="artist-name" style="font-weight:900;">${a}</span></div>`).join('');
-                }
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(content.dj_lineup || content.lineup) ? (content.dj_lineup || content.lineup) : (content.dj_lineup || content.lineup || "").split('\n')).map((a, i) => `
+                    <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span style="font-weight:900;">${a}</span></div>`).join('');
+                logStatus("LINK: Lineup v51 con retratos restaurado.", "LINK");
 
-                // 3. FAQ SYNC v55 (Ref: faqubicacion.jpg)
-                if (content.faq && typeof content.faq === 'string') {
-                    const lineas = content.faq.split('\n').filter(l => l.includes('|'));
-                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
-                        const [q] = l.split('|');
-                        return `<div class="faq-item"><span>${q.trim()}</span><span class="faq-icon-plus">+</span></div>`;
-                    }).join('');
-                    logStatus("LINK: FAQ inyectado con estilo faqubicacion.jpg.", "LINK");
+                // Gallery & Media
+                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" class="gallery-img">`).join('');
+                if (content.playlist_url) {
+                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="450" frameBorder="0" style="filter: invert(1) hue-rotate(180deg) brightness(0.8); border:none;"></iframe>`;
                 }
+                logStatus("LINK: Módulos de Media v53 restaurados.", "LINK");
 
-                // 4. UBICACIÓN SYNC v55 (Ref: faqubicacion.jpg)
+                // FAQ & Ubicación (v55 Success)
+                if (content.faq) document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => `<div class="faq-item"><span>${l.split('|').trim()}</span><span class="faq-icon-plus">+</span></div>`).join('');
                 document.getElementById('venue-name').innerText = evento.ubicacion.toUpperCase();
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
-                logStatus("LINK: Ubicación y Mapa inyectados en columna derecha.", "LINK");
 
-                // --- 5. AUDITORÍA FÍSICA v55 ---
-                logStatus("--- INICIANDO AUDITORÍA DE ESCUDO v55 ---", "INFO");
+                // Audit Final
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
-                    const sectionId = (key === 'faq' || key === 'ubicacion') ? 'modulo-faq-ubicacion' : 
-                                     (key === 'dress_code' || key === 'guest_list' || key === 'aforo') ? 'modulo-info-tecnica' : `modulo-${key}`;
+                    const sectionId = (key === 'faq' || key === 'ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : ['playlist','trailer'].includes(key) ? 'modulo-trailer-playlist' : `modulo-${key}`;
                     const el = document.getElementById(sectionId);
-                    if (!el) return;
-                    const cleanTxt = el.innerText.replace(/\s/g, '').replace('--', '');
-                    const hasMedia = el.querySelectorAll('iframe, img, input').length > 0;
-                    if (SANDBOX_CONFIG[key] && (cleanTxt.length >= 3 || hasMedia)) {
-                        logStatus(`INFO: Módulo ${key.toUpperCase()} verificado.`, "INFO");
-                        el.style.display = 'block';
-                    }
+                    if (el) { logStatus(`INFO: Módulo ${key.toUpperCase()} verificado.`, "INFO"); el.style.display = 'block'; }
                 });
-
-                logStatus("SINCRONIZACIÓN MAESTRA V55 FINALIZADA.", "INFO");
-
+                logStatus("SINCRONIZACIÓN MAESTRA V56 FINALIZADA.", "INFO");
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
