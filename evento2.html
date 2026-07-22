@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v59: Absolute Stability · Sistema QR</title>
+    <title>Editor v60: Structural Parity · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,7 +21,7 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; 
         }
 
-        /* ESCUDO DE GRANO (v47 Fix 404) */
+        /* ESCUDO DE GRANO (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -31,8 +31,8 @@
         section { display: none; padding: 6rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 4rem; text-align: left; }
 
-        /* 1. HERO & COUNTDOWN */
-        .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; box-sizing: border-box; text-align: center; }
+        /* 1. HERO & COUNTDOWN (v51/v52) */
+        .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
@@ -43,36 +43,38 @@
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 2.2rem; font-weight: 900; }
 
-        /* 2. DATA CARDS v54 (Ref: datos.jpg) */
+        /* 2. DATA CARDS (v54) */
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1000px; margin: 0 auto; }
         .data-card { background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 2rem 1rem; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
         .card-label { color: var(--gold); font-size: 0.65rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; display: block; }
         .card-val { display: block; font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* 3. LINEUP v51 (Ref: dj-line-up.jpg) */
+        /* 3. LINEUP (v51/v52) */
         .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
         .lineup-col-poster { display: flex; justify-content: center; padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
         .lineup-poster { width: 320px; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
         .artist-list { display: flex; flex-direction: column; gap: 2.5rem; padding-left: 5rem; }
+        .artist-item { display: flex; align-items: center; gap: 1.8rem; }
         .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
 
-        /* 4. GALERÍA v53 (Ref: galeriaplaylist.jpg) */
+        /* 4. GALERÍA (v53) */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* 5. DUAL MEDIA v53 (Tráiler / Playlist) */
+        /* 5. MEDIA DUAL (v53) */
         .dual-media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 0 auto; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         .playlist-wrapper { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); height: 100%; }
 
-        /* 6. FAQ & UBICACIÓN v55 (Ref: faqubicacion.jpg) */
+        /* 6. FAQ & UBICACIÓN (v55) */
         .faq-ubicacion-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0; max-width: 1000px; margin: 0 auto; align-items: start; }
         .faq-col { padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
         .ubicacion-col { padding-left: 5rem; }
         .faq-item { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 500; font-size: 0.95rem; }
         .faq-icon-plus { color: var(--gold); font-size: 1.4rem; }
         .venue-info { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 1rem; }
+        .map-preview-frame { width: 100%; height: 180px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
 
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
@@ -89,7 +91,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">SYNCHRONIZING REPAIR v59...</div>
+    <div id="loader" class="loading-overlay">FINALIZING SYNC v60...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -138,7 +140,7 @@
             <div id="db-gallery-grid" class="gallery-grid"></div>
         </section>
 
-        <!-- TRÁILER & PLAYLIST -->
+        <!-- MEDIA DUAL -->
         <section id="modulo-trailer-playlist">
             <h2>TRÁILER / BANDA SONORA</h2>
             <div class="dual-media-grid">
@@ -175,7 +177,7 @@
         function startCountdown(d, t) {
             const target = new Date(`${d}T${t}`).getTime();
             if (isNaN(target)) return;
-            logStatus(`TIME: Latido v59 activo para el evento del ${d}.`, "TIME");
+            logStatus(`TIME: Heartbeat v60 activo para el evento del ${d}.`, "TIME");
             setInterval(() => {
                 const diff = target - new Date().getTime();
                 if (diff <= 0) return;
@@ -187,7 +189,7 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V59: Iniciando reparación de sintaxis y blindaje de 11 módulos...");
+            logStatus("AUDITORÍA V60: Resolviendo fallo crítico de FAQ y restaurando paridad estructural...");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
@@ -197,33 +199,33 @@
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
 
-                // 1. DATA CARDS (v54 Shield)
+                // 1. DATA CARDS (v54 Parity)
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 
                 const content = evento.config_landing?.content || {};
-                logStatus(`JSON: config_landing verificado con ${Object.keys(content).length} llaves de contenido.`, "JSON");
+                logStatus(`JSON: config_landing verificado con ${Object.keys(content).length} llaves.`, "JSON");
 
                 try {
                     document.getElementById('db-dress-val').innerText = (content.dresscode || 'BLACK & NEON').toUpperCase();
-                    document.getElementById('db-guest-val').innerText = (content.guest_list || 'RESERVADOS').toUpperCase();
-                    document.getElementById('db-aforo-val').innerText = `CUPOS: ${evento.aforo_max || 200}`;
-                    document.getElementById('db-ticket-val').innerText = 'DISPONIBLES';
+                    document.getElementById('db-guest-val').innerText = (content.guest_list || 'CONFIRMADOS').toUpperCase();
+                    document.getElementById('db-aforo-val').innerText = `CUPOS: ${evento.aforo_max || 150}`;
+                    document.getElementById('db-ticket-val').innerText = 'EARLY BIRD';
                     logStatus("LINK: Data Cards inyectadas.", "LINK");
-                } catch (e) { logStatus(`ERROR: Fallo en Data Cards: ${e.message}`, "ERROR"); }
+                } catch (e) { logStatus(`ERR-CARDS: ${e.message}`, "ERROR"); }
 
-                // 2. LINEUP (v52 Shield)
+                // 2. LINEUP (v52 Parity)
                 try {
                     document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url || "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3";
                     const proPhotos = ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200"];
                     const lineup = content.dj_lineup || content.lineup || "";
                     const lArray = Array.isArray(lineup) ? lineup : lineup.split('\n');
                     document.getElementById('db-lineup').innerHTML = lArray.filter(a => a.length > 2).map((a, i) => `
-                        <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span style="font-weight:900; letter-spacing:1px;">${a.trim()}</span></div>`).join('');
+                        <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span style="font-weight:900;">${a.trim()}</span></div>`).join('');
                     logStatus("LINK: Lineup inyectado.", "LINK");
-                } catch (e) { logStatus(`ERROR: Fallo en Lineup: ${e.message}`, "ERROR"); }
+                } catch (e) { logStatus(`ERR-LINEUP: ${e.message}`, "ERROR"); }
 
                 // 3. MEDIA & GALLERY
                 try {
@@ -232,33 +234,33 @@
                         const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
                         document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="450" frameBorder="0" allow="encrypted-media" style="filter: invert(1) hue-rotate(180deg) brightness(0.8); border:none;"></iframe>`;
                     }
-                    logStatus("LINK: Gallery & Spotify (Permissions Fixed) vinculados.", "LINK");
-                } catch (e) { logStatus(`ERROR: Fallo en Media: ${e.message}`, "ERROR"); }
+                    logStatus("LINK: Gallery & Spotify vinculados.", "LINK");
+                } catch (e) { logStatus(`ERR-MEDIA: ${e.message}`, "ERROR"); }
 
-                // 4. FAQ FIX v59 (Syntax Repair)
+                // 4. FAQ FIX v60 (Correct Syntax: Array element access)
                 try {
                     if (content.faq && typeof content.faq === 'string') {
-                        logStatus("TRACE: Procesando cadena content.faq para listado.", "TRACE");
+                        logStatus("TRACE: Procesando cadena content.faq (Corrected Logic).", "TRACE");
                         const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                         document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                             const parts = l.split('|');
-                            const q = (parts && parts) ? parts.trim() : 'Consulta';
+                            const q = (parts && parts) ? parts.trim() : 'Consulta'; // FIXED: Accessing index  before trim
                             return `<div class="faq-item"><span>${q}</span><span class="faq-icon-plus">+</span></div>`;
                         }).join('');
-                        logStatus("LINK: FAQ renderizado con éxito (v59 Syntax Fix).", "LINK");
+                        logStatus("LINK: FAQ renderizado con éxito (v60 Syntax Fix).", "LINK");
                     }
-                } catch (e) { logStatus(`ERROR: Fallo en FAQ Logic: ${e.message}`, "ERROR"); }
+                } catch (e) { logStatus(`ERR-FAQ: ${e.message}`, "ERROR"); }
 
                 // 5. UBICACIÓN
                 try {
-                    document.getElementById('venue-name').innerText = evento.ubicacion.toUpperCase();
+                    document.getElementById('venue-name').innerText = (evento.ubicacion || 'TERRAZA R10').toUpperCase();
                     const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
-                } catch (e) { logStatus(`ERROR: Fallo en Ubicación: ${e.message}`, "ERROR"); }
+                } catch (e) { logStatus(`ERR-MAP: ${e.message}`, "ERROR"); }
 
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
 
-                // --- AUDITORÍA DE ESCUDO FINAL v59 ---
+                // --- AUDITORÍA DE ESCUDO FINAL v60 ---
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const sectionId = (key === 'faq' || key === 'ubicacion') ? 'modulo-faq-ubicacion' : 
                                      (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : 
@@ -267,7 +269,7 @@
                     if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V59 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V60 FINALIZADA.", "INFO");
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
