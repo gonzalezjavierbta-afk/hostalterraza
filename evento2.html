@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v49: Precision Lineup · Sistema QR</title>
+    <title>Editor v50: Poster Fallback & Audit Shield · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,17 +23,17 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; 
         }
 
-        /* Efecto Grano Inline (Fix 404) */
+        /* ESCUDO DE GRANO (Fix 404): Ruido generado por CSS/SVG Inline */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03; contrast: 120%;
+            opacity: 0.04; contrast: 130%;
         }
         
         section { display: none; padding: 6rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.7rem; font-weight: 900; margin-bottom: 4rem; text-align: center; }
 
-        /* HERO STABLE PARITY */
+        /* HERO STABLE */
         .hero { 
             position: relative; height: 100vh; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; 
@@ -54,28 +54,27 @@
         .cd-v { display: block; font-size: 2rem; font-weight: 900; }
         .cd-l { font-size: 0.5rem; letter-spacing: 2px; opacity: 0.4; text-transform: uppercase; margin-top: 0.4rem; font-weight: 900; }
 
-        /* LINEUP REFINADO (Ref: dj-line-up.jpg) */
+        /* LINEUP DUAL COLUMN (v50 Fix) */
         .lineup-container { 
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start; 
             max-width: 1000px; margin: 0 auto;
         }
-        .lineup-poster { width: 100%; border-radius: 12px; border: 1px solid rgba(223, 32, 182, 0.3); box-shadow: 0 0 40px rgba(223, 32, 182, 0.1); }
-        .artist-list { display: flex; flex-direction: column; gap: 2rem; }
-        .artist-item { display: flex; align-items: center; gap: 1.5rem; padding: 1rem; background: var(--glass-lite); border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); transition: 0.3s; }
-        .artist-item:hover { border-color: var(--gold); transform: translateX(10px); }
-        .artist-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+        .lineup-poster { width: 100%; border-radius: 12px; border: 1px solid rgba(223, 32, 182, 0.3); box-shadow: 0 0 40px rgba(223, 32, 182, 0.15); }
+        .artist-list { display: flex; flex-direction: column; gap: 1.8rem; }
+        .artist-item { display: flex; align-items: center; gap: 1.5rem; padding: 1rem; background: var(--glass-lite); border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); }
+        .artist-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
         .artist-name { font-weight: 900; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
 
         .data-item { margin-bottom: 1.5rem; padding: 2rem; background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; backdrop-filter: blur(5px); }
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 10px; color: white; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 2px; }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">CALIBRATING AUDIT v49...</div>
+    <div id="loader" class="loading-overlay">SYNCHRONIZING VERSION 50...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -96,12 +95,12 @@
         <section id="modulo-aforo" style="display:none;"></section>
         <section id="modulo-trailer"><h2>EXPERIENCIA VISUAL</h2><div id="db-trailer-container"></div></section>
 
-        <!-- LINEUP DUAL COLUMN -->
+        <!-- MÓDULO LINEUP (v50: DUAL COLUMN & POSTER FALLBACK) -->
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div class="lineup-container">
                 <div class="lineup-col">
-                    <img id="db-poster-img" src="" class="lineup-poster" alt="Afiche" onerror="this.style.display='none'">
+                    <img id="db-poster-img" src="" class="lineup-poster" alt="Evento Afiche">
                 </div>
                 <div id="db-lineup" class="artist-list"></div>
             </div>
@@ -146,7 +145,7 @@
             try {
                 const target = new Date(`${date}T${time}`).getTime();
                 if (isNaN(target)) return;
-                logStatus(`TIME: Latido activo v49 para ${date}.`, "TIME");
+                logStatus(`TIME: Latido v50 sincronizado para el ocaso del ${date}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -159,13 +158,14 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V49: Corrigiendo validación física de Lineup y Formulario...");
+            logStatus("AUDITORÍA V50: Iniciando Blindaje de Auditoría y Fallback de Poster...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
+                // 1. PROTOCOLO LATIDO (Heartbeat)
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
@@ -177,11 +177,12 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 1. INYECCIÓN LINEUP (Ref: dj-line-up.jpg)
-                if (evento.poster_url || evento.imagen_url) {
-                    document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
-                    logStatus("LINK: Poster inyectado.", "LINK");
-                }
+                // 2. INYECCIÓN LINEUP & POSTER FALLBACK (v50 Ref)
+                const posterImg = document.getElementById('db-poster-img');
+                const defaultPoster = "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1000&auto=format&fit=crop"; // Estética P6 Sunset
+                posterImg.src = evento.poster_url || evento.imagen_url || defaultPoster;
+                logStatus("LINK: Poster inyectado (con fallback P6).", "LINK");
+
                 const lineup = content.dj_lineup || content.lineup;
                 if (lineup) {
                     const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
@@ -190,15 +191,14 @@
                             <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(a)}&background=df20b6&color=fff&bold=true" class="artist-avatar">
                             <span class="artist-name">${a}</span>
                         </div>`).join('');
-                    logStatus("LINK: Artistas inyectados.", "LINK");
+                    logStatus("LINK: Lista de artistas inyectada.", "LINK");
                 }
 
-                // 2. DRESS CODE & GUEST LIST
+                // 3. RESTO DE MÓDULOS (Blindaje v50)
                 if (content.dresscode) document.getElementById('db-dress-txt').innerText = content.dresscode.toUpperCase();
                 if (content.guest_list) document.getElementById('db-guest-txt').innerText = content.guest_list;
-
-                // 3. GALERÍA & FAQ
                 if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:300px; object-fit:cover; border-radius:12px;">`).join('');
+
                 if (content.faq && typeof content.faq === 'string') {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
@@ -207,45 +207,51 @@
                     }).join('');
                 }
 
-                // 4. MAPA & FORM DINÁMICO
+                if (content.playlist_url) {
+                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:15px; border:none; filter: invert(1) hue-rotate(180deg) brightness(0.8);"></iframe>`;
+                    logStatus("LINK: Playlist inyectada.", "LINK");
+                }
+
                 if (evento.ubicacion) {
                     const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
                 }
+
                 if (evento.form_campos) {
                     const fields = evento.form_campos || {};
                     let html = '';
-                    if (fields.email) html += `<div><input type="email" class="form-input" placeholder="Email *"></div>`;
+                    if (fields.email) html += `<div><input type="email" class="form-input" placeholder="Email de contacto"></div>`;
                     if (fields.edad) html += `<div><input type="number" class="form-input" placeholder="Edad"></div>`;
                     document.getElementById('db-dynamic-fields').innerHTML = html;
+                    logStatus("LINK: Formulario dinámico inyectado.", "LINK");
                 }
 
-                // --- AUDITORÍA DE INTEGRIDAD ROBUSTA v49 ---
-                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD REFORZADA ---", "INFO");
+                // --- 4. AUDITORÍA DE ESCUDO (v50 Shield) ---
+                logStatus("--- INICIANDO AUDITORÍA DE ESCUDO v50 ---", "INFO");
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     if (key === 'force_gold' || key === 'trailer') return;
                     const el = document.getElementById(`modulo-${key}`);
                     if (!el) return;
 
-                    // FIX v49: El auditor ahora busca el primer contenedor 'db-' O la imagen del poster para Lineup
-                    const dataCont = el.querySelector('[id*="db-"]') || el.querySelector('form') || document.getElementById('unified-frame');
+                    const container = el.querySelector('[id*="db-"]') || el.querySelector('form') || document.getElementById('unified-frame');
+                    const hasInput = el.querySelectorAll('input').length > 0;
+                    const hasIframe = el.querySelectorAll('iframe').length > 0;
+                    const hasImg = el.querySelectorAll('img').length > 0;
+                    const contentTxt = container ? container.innerText.replace(/\s/g, '').replace('--', '') : '';
                     
-                    const hasInput = (dataCont || el).querySelector('input');
-                    const hasIframe = (dataCont || el).tagName === 'IFRAME' || (dataCont || el).querySelector('iframe');
-                    const hasImg = (dataCont || el).tagName === 'IMG' || (dataCont || el).querySelector('img');
-                    const cleanTxt = (dataCont && dataCont.innerText) ? dataCont.innerText.replace(/\s/g, '').replace('--', '') : '';
-                    
-                    let isValid = (key === 'formulario') ? (hasInput !== null) : (cleanTxt.length >= 3 || hasIframe || hasImg);
+                    // SHIELD FIX: Playlist ahora es válido si tiene iframe. Formulario es válido si tiene inputs físicos.
+                    let isValid = (key === 'formulario') ? hasInput : (contentTxt.length >= 3 || hasIframe || hasImg);
 
                     if (SANDBOX_CONFIG[key] && isValid) {
                         logStatus(`INFO: Módulo ${key.toUpperCase()} verificado.`, "INFO");
                         el.style.display = 'block';
                     } else if (SANDBOX_CONFIG[key]) {
-                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló validación física.`, "ERROR");
+                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló validación de contenido.`, "ERROR");
                     }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V49 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V50 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
