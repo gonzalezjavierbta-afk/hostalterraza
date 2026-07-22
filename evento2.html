@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v37: Dynamic Layout Engine · Sistema QR</title>
+    <title>Editor v38: HTML-First Layout · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,9 +15,6 @@
         
         .editor-tools { position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(20,20,20,0.9); border: 1px solid var(--gold); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 10px; }
         .btn-export { background: var(--gold); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
-        
-        /* CONTENEDOR MAESTRO PARA REORDENAMIENTO */
-        #render-container { display: flex; flex-direction: column; }
         
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .hero { position: relative; min-height: 70vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10%; background-size: cover; background-position: center; }
@@ -45,10 +42,10 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Iniciando Motor Dinámico v37...</div>
+    <div id="loader" class="loading-overlay">Sincronización HTML-First v38...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">DYNAMIC LAYOUT ACTIVE</span>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">HTML ORDER MODE</span>
         <button class="btn-export" onclick="exportTemplate()">COPIAR JSON CONFIG</button>
     </div>
 
@@ -59,19 +56,45 @@
         </div>
     </header>
 
-    <!-- CONTENEDOR MAESTRO DONDE EL MOTOR ORGANIZARÁ LAS SECCIONES -->
-    <main id="render-container">
-        <!-- 11 MÓDULOS OBLIGATORIOS (Inmutabilidad) -->
+    <!-- 
+      ANNOTATION / GUÍA DE EDICIÓN:
+      Para cambiar el orden de presentación, simplemente mueve los bloques <section> 
+      de arriba hacia abajo. El navegador respetará el orden físico que definas aquí.
+      No es necesario modificar la base de datos para reordenar.
+    -->
+    <main id="main-content-flow">
+        
+        <!-- MÓDULO 1: COUNTDOWN -->
         <section id="modulo-countdown"><h2 style="color:var(--gold); letter-spacing:2px; font-size:0.8rem;">COMIENZA EN</h2><div class="countdown-grid"><div class="cd-box"><span id="cd-days" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">DÍAS</span></div><div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">HORAS</span></div><div class="cd-box"><span id="cd-mins" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">MIN</span></div><div class="cd-box"><span id="cd-secs" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">SEG</span></div></div></section>
+
+        <!-- MÓDULO 2: TRAILER -->
         <section id="modulo-trailer"><h2 style="color:var(--gold); letter-spacing:2px;">TRÁILER OFICIAL</h2><div id="db-trailer-container"></div></section>
+
+        <!-- MÓDULO 3: AFORO -->
         <section id="modulo-aforo"><h2 style="color:var(--gold); letter-spacing:2px;">DISPONIBILIDAD</h2><div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div></section>
+
+        <!-- MÓDULO 4: LINEUP -->
         <section id="modulo-lineup"><h2 style="color:var(--gold); letter-spacing:2px;">DJ LINEUP</h2><div id="db-lineup"></div></section>
+
+        <!-- MÓDULO 5: DRESS CODE -->
         <section id="modulo-dress_code"><h2 style="color:var(--gold); letter-spacing:2px;">DRESS CODE</h2><div id="db-dress-txt" class="data-item">--</div></section>
+
+        <!-- MÓDULO 6: GALERÍA -->
         <section id="modulo-gallery"><h2 style="color:var(--gold); letter-spacing:2px;">GALERÍA</h2><div id="db-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;"></div></section>
+
+        <!-- MÓDULO 7: GUEST LIST -->
         <section id="modulo-guest_list"><h2 style="color:var(--gold); letter-spacing:2px;">GUEST LIST</h2><div id="db-guest-txt" class="data-item">--</div></section>
+
+        <!-- MÓDULO 8: FAQ -->
         <section id="modulo-faq"><h2 style="color:var(--gold); letter-spacing:2px;">PREGUNTAS FRECUENTES</h2><div id="db-faq-list"></div></section>
+
+        <!-- MÓDULO 9: PLAYLIST -->
         <section id="modulo-playlist"><h2 style="color:var(--gold); letter-spacing:2px;">PLAYLIST OFICIAL</h2><div id="db-spotify"></div></section>
+
+        <!-- MÓDULO 10: UBICACIÓN -->
         <section id="modulo-ubicacion"><h2 style="color:var(--gold);">UBICACIÓN</h2><div id="db-ubicacion" class="data-item">--</div><div id="db-mapa-container" style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(223, 32, 182, 0.2);"></div></section>
+
+        <!-- MÓDULO 11: FORMULARIO -->
         <section id="modulo-formulario">
             <h2 style="color: var(--gold); letter-spacing: 4px; text-align: center; margin-bottom: 3rem; font-weight: 900;">REGISTRO DE ASISTENCIA</h2>
             <form id="master-reg-form" class="form-container" onsubmit="alert('Registro enviado'); return false;">
@@ -118,45 +141,48 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V37: Iniciando orquestación de Layout Dinámico...");
+            logStatus("AUDITORÍA V38: Sincronización de Orden basada en HTML...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 2. PROTOCOLO LATIDO (Principio Obligatorio)
+                // 2. PROTOCOLO LATIDO (Inmediato tras carga de DB)
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const config = evento.config_landing || {};
                 const content = config.content || {};
 
-                // --- 3. MOTOR DE LAYOUT DINÁMICO (Nuevo en v37) ---
-                // Si existe config.order = ['lineup', 'faq', ...], reordena los nodos en el DOM.
-                if (config.order && Array.isArray(config.order)) {
-                    logStatus(`TRACE: Aplicando orden personalizado: ${config.order.join(' > ')}`, "TRACE");
-                    const container = document.getElementById('render-container');
-                    config.order.forEach(modId => {
-                        const section = document.getElementById(`modulo-${modId}`);
-                        if (section) container.appendChild(section); // appendChild mueve el nodo existente al final
-                    });
-                    logStatus("LINK: Estructura de módulos reordenada según base de datos.", "LINK");
-                } else {
-                    logStatus("INFO: Usando orden secuencial por defecto (sin llave 'order' en DB).", "INFO");
+                // 3. VINCULACIÓN DE DATOS POR ID (Independiente del orden HTML)
+                if (evento.aforo_max) {
+                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos configurados.`;
+                    logStatus("LINK: Aforo inyectado.", "LINK");
                 }
 
-                // 4. VINCULACIÓN DE DATOS (Mantenida v36)
-                if (evento.aforo_max) document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos configurados.`;
-                
                 const lineup = content.dj_lineup || content.lineup;
-                if (lineup) document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).map(a => `<div class="data-item">${a}</div>`).join('');
-                
-                if (content.dresscode) document.getElementById('db-dress-txt').innerText = content.dresscode;
-                
+                if (lineup) {
+                    const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
+                    document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item">${a}</div>`).join('');
+                    logStatus("LINK: DJ Lineup inyectado.", "LINK");
+                }
+
+                if (content.dresscode) {
+                    document.getElementById('db-dress-txt').innerText = content.dresscode;
+                    logStatus("LINK: Dress Code inyectado.", "LINK");
+                }
+
                 const gallery = content.gallery || content.galeria;
-                if (gallery) document.getElementById('db-gallery-grid').innerHTML = (Array.isArray(gallery) ? gallery : gallery.split('\n')).filter(u => u.length > 5).map(u => `<img src="${u.trim()}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`).join('');
-                
-                if (content.guest_list) document.getElementById('db-guest-txt').innerText = content.guest_list;
+                if (gallery) {
+                    const urls = Array.isArray(gallery) ? gallery : gallery.split('\n');
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`).join('');
+                    logStatus(`LINK: Galería (${urls.length} imágenes) inyectada.`, "LINK");
+                }
+
+                if (content.guest_list) {
+                    document.getElementById('db-guest-txt').innerText = content.guest_list;
+                    logStatus("LINK: Guest List inyectada.", "LINK");
+                }
 
                 if (content.faq && typeof content.faq === 'string') {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
@@ -164,17 +190,20 @@
                         const [q, a] = l.split('|');
                         return `<div style="margin-bottom:1.5rem;"><b style="color:var(--gold); display:block;">${q.trim()}</b><p style="opacity:0.7; margin:0.5rem 0 0 0;">${a.trim()}</p></div>`;
                     }).join('');
+                    logStatus("LINK: FAQ inyectada.", "LINK");
                 }
 
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
+                    logStatus("LINK: Playlist vinculada.", "LINK");
                 }
 
                 if (evento.ubicacion) {
                     document.getElementById('db-ubicacion').innerText = evento.ubicacion;
                     const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+                    logStatus("LINK: Mapa inyectado.", "LINK");
                 }
 
                 if (SANDBOX_CONFIG.formulario) {
@@ -183,6 +212,7 @@
                     if (fields.email) html += `<div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" required></div>`;
                     if (fields.edad) html += `<div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input"></div>`;
                     document.getElementById('db-dynamic-fields').innerHTML = html;
+                    logStatus("LINK: Formulario dinámico inyectado.", "LINK");
                 }
 
                 // HERO DATA
@@ -190,7 +220,7 @@
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
 
-                // --- 5. AUDITORÍA DE INTEGRIDAD FINAL v37 ---
+                // --- 4. AUDITORÍA DE INTEGRIDAD FINAL v38 ---
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD ---", "INFO");
                 
@@ -209,20 +239,20 @@
                     let isValid = (key === 'formulario') ? (hasInput !== null) : (cleanContent.length >= 3 || hasIframe || hasImg);
 
                     if (SANDBOX_CONFIG[key] && !isValid) {
-                        logStatus(`ERROR: Módulo ${key.toUpperCase()} vacío.`, "ERROR");
+                        logStatus(`ERROR: Módulo ${key.toUpperCase()} activo pero sin datos físicos.`, "ERROR");
                     } else if (SANDBOX_CONFIG[key]) {
-                        logStatus(`INFO: Módulo ${key.toUpperCase()} verificado.`, "INFO");
+                        logStatus(`INFO: Módulo ${key.toUpperCase()} verificado en el orden HTML actual.`, "INFO");
                     }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V37 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V38 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
         window.onload = initEvento;
-        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "dynamic-v37", modules: SANDBOX_CONFIG, order: [] }, null, 2)); alert("JSON Copiado"); }
+        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "html-first-v38", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
     </script>
 </body>
 </html>
