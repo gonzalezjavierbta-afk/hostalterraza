@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v24: Full Fiesta & Form Sync · Sistema QR</title>
+    <title>Editor v25: Master Fiesta & Registry Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,7 +19,7 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
-        /* UI DEL EDITOR */
+        /* UI EDITOR */
         .editor-tools {
             position: fixed; bottom: 20px; right: 20px; z-index: 1000;
             background: rgba(20,20,20,0.9); border: 1px solid var(--gold);
@@ -29,10 +29,9 @@
         .btn-export {
             background: var(--gold); color: white; border: none; padding: 10px 20px;
             border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;
-            transition: all 0.3s ease;
         }
 
-        /* SECCIONES */
+        /* LAYOUT */
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .hero {
             position: relative; min-height: 70vh; display: flex; flex-direction: column;
@@ -53,22 +52,7 @@
 
         .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
         
-        /* FORMULARIO (NUEVO) */
-        .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .form-label { font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; }
-        .form-input {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem; border-radius: 8px; color: white; font-family: inherit; font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-        .form-input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,0.08); }
-        .btn-submit {
-            background: var(--gold); color: white; border: none; padding: 1.2rem;
-            border-radius: 8px; font-weight: 900; font-size: 1rem; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 2px; margin-top: 1rem;
-        }
-
+        /* ESPECÍFICOS */
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
@@ -77,16 +61,23 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
         .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 
+        .trailer-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(223, 32, 182, 0.2); }
+        
+        .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; color: white; font-family: inherit; }
+        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Ensamblando Registro de Fiesta v24...</div>
+    <div id="loader" class="loading-overlay">Sincronización Maestra v25...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">EDITOR MAESTRO</span>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODO EDITOR v25</span>
         <button class="btn-export" onclick="exportFiestaTemplate()">COPIAR JSON CONFIG</button>
     </div>
 
@@ -97,8 +88,9 @@
         </div>
     </header>
 
+    <!-- MÓDULOS DE CATEGORÍA FIESTA -->
     <section id="modulo-countdown">
-        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">COMIENZA EN</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">EL EVENTO COMIENZA EN</h2>
         <div class="countdown-grid">
             <div class="cd-box"><span id="cd-days" class="cd-number">00</span><span class="cd-label">DÍAS</span></div>
             <div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span class="cd-label">HORAS</span></div>
@@ -107,18 +99,46 @@
         </div>
     </section>
 
+    <section id="modulo-trailer">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">TRÁILER OFICIAL</h2>
+        <div id="db-trailer-container"></div>
+    </section>
+
+    <section id="modulo-aforo">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">AFORO DISPONIBLE</h2>
+        <div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div>
+        <div style="background: rgba(255,255,255,0.1); height: 10px; border-radius: 10px; margin-top: 1rem; overflow: hidden;">
+            <div id="aforo-fill" style="background: var(--gold); height: 100%; width: 0%; transition: width 1.5s ease;"></div>
+        </div>
+    </section>
+
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
     </section>
 
+    <section id="modulo-dress_code">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">DRESS CODE</h2>
+        <div id="db-dress-txt" class="data-item">--</div>
+    </section>
+
     <section id="modulo-gallery">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA DEL EVENTO</h2>
         <div id="db-gallery-grid" class="gallery-grid"></div>
     </section>
 
+    <section id="modulo-guest_list">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">GUEST LIST</h2>
+        <div id="db-guest-txt" class="data-item">--</div>
+    </section>
+
+    <section id="modulo-faq">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">PREGUNTAS FRECUENTES</h2>
+        <div id="db-faq-list"></div>
+    </section>
+
     <section id="modulo-playlist">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">PLAYLIST</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">PLAYLIST OFICIAL</h2>
         <div id="db-spotify"></div>
     </section>
 
@@ -128,41 +148,24 @@
         <div id="db-mapa-container" style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; margin-top: 1.5rem; border: 1px solid rgba(223, 32, 182, 0.2);"></div>
     </section>
 
-    <!-- MÓDULO FINAL: FORMULARIO (REQUERIMIENTO V24) -->
     <section id="modulo-formulario">
-        <h2 style="color: var(--gold); letter-spacing: 2px; text-align: center;">REGISTRO AL EVENTO</h2>
-        <form id="event-reg-form" class="form-container" onsubmit="handleRegistration(event)">
-            <div class="form-group">
-                <label class="form-label">Nombre Completo *</label>
-                <input type="text" class="form-input" placeholder="Tu nombre..." required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Cédula / Documento *</label>
-                <input type="text" class="form-input" placeholder="Número de ID..." required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Teléfono *</label>
-                <input type="tel" class="form-input" placeholder="+57 ..." required>
-            </div>
-            <!-- Contenedor para campos dinámicos del JSON -->
+        <h2 style="color: var(--gold); letter-spacing: 2px; text-align: center;">REGISTRO</h2>
+        <form id="event-reg-form" class="form-container" onsubmit="alert('Inscrito con éxito')">
+            <div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">NOMBRE *</label><input type="text" class="form-input" required></div>
+            <div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">ID / CÉDULA *</label><input type="text" class="form-input" required></div>
             <div id="db-custom-fields" class="form-container" style="padding:0; margin:0;"></div>
-            
             <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
         </form>
     </section>
 
     <script>
         /**
-         * 1. CONFIGURACIÓN DEL EDITOR (REQUERIMIENTO FIESTA + FORM)
+         * 1. CONFIGURACIÓN COMPLETA (v25)
          */
         const SANDBOX_CONFIG = {
-            countdown: true,
-            lineup: true,
-            playlist: true,
-            ubicacion: true,
-            gallery: true,
-            formulario: true, // ¡NUEVO!
-            force_gold: '#df20b6' 
+            countdown: true, trailer: true, aforo: true, lineup: true, 
+            dress_code: true, gallery: true, guest_list: true, faq: true, 
+            playlist: true, ubicacion: true, formulario: true, force_gold: '#df20b6' 
         };
 
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
@@ -170,32 +173,39 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         /**
-         * 2. MOTOR DE LOGGING ACUMULATIVO (REGLAS DE ORO)
+         * 2. MOTOR DE LOGGING (REGLAS DE ORO) [1]
          */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const colors = { 
-                'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#e67e22', 
-                'TRACE': '#f39c12', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d' 
-            };
+            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#e67e22', 'TRACE': '#f39c12', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d' };
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
         function exportFiestaTemplate() {
-            const template = { theme: "fiesta-sync-v24", colors: { primary: SANDBOX_CONFIG.force_gold, bg: "#050505" }, modules: SANDBOX_CONFIG };
+            const template = { theme: "master-fiesta-v25", modules: SANDBOX_CONFIG };
             navigator.clipboard.writeText(JSON.stringify(template, null, 2));
-            logStatus("TRACE: config_landing exportado con módulo Formulario incluido.", "TRACE");
-            alert("JSON copiado con éxito.");
+            logStatus("TRACE: Exportación de JSON realizada.", "TRACE");
+            alert("Configuración copiada.");
         }
 
-        function handleRegistration(e) {
-            e.preventDefault();
-            alert("¡Registro simulado con éxito! (Integración de base de datos activa)");
+        function startCountdown(date, time) {
+            try {
+                const target = new Date(`${date}T${time}`).getTime();
+                if (isNaN(target)) throw new Error("Fecha inválida");
+                logStatus(`TIME: Motor iniciado para ${date}.`, "TIME");
+                setInterval(() => {
+                    const diff = target - new Date().getTime();
+                    if (diff <= 0) return;
+                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+            } catch (e) { logStatus(`TIME ERROR: ${e.message}`, "ERROR"); }
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V24: Iniciando sincronización de Fiesta con Formulario...");
-            
+            logStatus("AUDITORÍA Maestra v25: Iniciando secuencia acumulativa...");
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
             logStatus(`MÓDULOS ACTIVOS: ${activos.join(' | ')}`, "INFO");
 
@@ -205,31 +215,20 @@
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                logStatus(`DB: Campos en RAÍZ -> ${Object.keys(evento).join(', ')}`, "DB");
+                logStatus(`DB: Campos raíz -> ${Object.keys(evento).join(', ')}`, "DB");
 
                 // VINCULACIÓN BÁSICA
-                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                if (evento.imagen_url) {
+                    document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                    logStatus("LINK: Imagen Hero vinculada.", "LINK");
+                }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
 
-                // --- VINCULACIÓN DE FORMULARIO (REQUERIMIENTO V24) ---
-                if (SANDBOX_CONFIG.formulario) {
-                    const customFields = evento.form_campos || {};
-                    const container = document.getElementById('db-custom-fields');
-                    
-                    // Auditoría de campos personalizados
-                    logStatus(`TRACE: Analizando campos personalizados: ${Object.keys(customFields).join(', ')}`, "TRACE");
-                    
-                    let html = '';
-                    // Si el evento requiere email, edad, etc. (vía flags en DB) [12, Source 1]
-                    if (customFields.email) html += `<div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="ejemplo@mail.com"></div>`;
-                    if (customFields.edad) html += `<div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input" placeholder="Años"></div>`;
-                    
-                    container.innerHTML = html;
-                    logStatus("LINK: Módulo Formulario inyectado con campos base y dinámicos.", "LINK");
-                }
+                // --- COUNTDOWN (RESTAURADO) ---
+                if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
-                // --- PROCESAMIENTO JSON ---
+                // --- PROCESAMIENTO DINÁMICO ---
                 const config = evento.config_landing || {};
                 const getModuleData = (llaves, term = null) => {
                     let levels = [evento, config, config.modules, config.content];
@@ -238,44 +237,84 @@
                         for (let k of llaves) {
                             let val = loc[k];
                             if (val && typeof val !== 'boolean') {
-                                if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) return val;
-                                else if (Array.isArray(val) && val.length > 0) return val;
+                                if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) {
+                                    logStatus(`TRACE: Obteniendo '${k}' para renderizado.`, "TRACE");
+                                    return val;
+                                } else if (Array.isArray(val) && val.length > 0) {
+                                    logStatus(`TRACE: Obteniendo '${k}' (Array) para renderizado.`, "TRACE");
+                                    return val;
+                                }
                             }
                         }
                     }
                     return null;
                 };
 
-                // VINCULAR RESTO DE MÓDULOS FIESTA
-                const lineup = getModuleData(['lineup', 'dj_lineup']);
+                // 1. AFORO
+                if (evento.aforo_max) {
+                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos disponibles.`;
+                    document.getElementById('aforo-fill').style.width = '15%';
+                    logStatus("LINK: Módulo Aforo vinculado.", "LINK");
+                }
+
+                // 2. LINEUP
+                const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const lista = typeof lineup === 'string' ? lineup.split('\n') : lineup;
                     document.getElementById('db-lineup').innerHTML = lista.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus("LINK: DJ Lineup vinculado.", "LINK");
+                    logStatus("LINK: Lineup inyectado.", "LINK");
                 }
 
-                const gallery = getModuleData(['gallery', 'galeria']);
+                // 3. TRÁILER
+                const trailerUrl = getModuleData(['video_url', 'trailer_url', 'trailer']);
+                if (trailerUrl) {
+                    document.getElementById('db-trailer-container').innerHTML = `<div class="trailer-box" onclick="window.open('${trailerUrl}', '_blank')"><span style="font-size:3rem; color:var(--gold);">▶</span></div>`;
+                    logStatus("LINK: Tráiler vinculado.", "LINK");
+                }
+
+                // 4. GALERÍA
+                const gallery = getModuleData(['gallery', 'galeria', 'imagenes']);
                 if (gallery) {
                     const urls = typeof gallery === 'string' ? gallery.split('\n') : gallery;
-                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 10).map(u => `
-                        <img src="${u.trim()}" class="gallery-img" alt="Fiesta" onerror="this.style.display='none'">
-                    `).join('');
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" class="gallery-img">`).join('');
                     logStatus(`LINK: Galería (${urls.length} imágenes) vinculada.`, "LINK");
                 }
 
-                const playlist = getModuleData(['video_url', 'playlist'], 'spotify');
-                if (playlist) {
-                    const embed = playlist.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
-                    logStatus("LINK: Spotify vinculado.", "LINK");
+                // 5. FAQ
+                const faqRaw = getModuleData(['faq', 'preguntas_frecuentes']);
+                if (faqRaw && typeof faqRaw === 'string') {
+                    const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
+                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div style="margin-bottom:1rem;"><b style="color:var(--gold);">${q}</b><p style="opacity:0.7; margin:0;">${a}</p></div>`;
+                    }).join('');
+                    logStatus("LINK: FAQ inyectado.", "LINK");
                 }
 
-                // MAPA
+                // 6. PLAYLIST (RESTAURADO)
+                const playlistUrl = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
+                if (playlistUrl) {
+                    const embed = playlistUrl.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
+                    logStatus("LINK: Playlist Spotify vinculada.", "LINK");
+                }
+
+                // 7. UBICACIÓN Y MAPA
                 if (evento.ubicacion) {
                     document.getElementById('db-ubicacion').innerText = evento.ubicacion;
                     const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen loading="lazy" style="filter: grayscale(1) invert(1) contrast(1.2);"></iframe>`;
-                    logStatus("LINK: Mapa de ubicación inyectado.", "LINK");
+                    logStatus("LINK: Mapa vinculado.", "LINK");
+                }
+
+                // 8. FORMULARIO DINÁMICO
+                if (SANDBOX_CONFIG.formulario) {
+                    const fields = evento.form_campos || {};
+                    let html = '';
+                    if (fields.email) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">EMAIL</label><input type="email" class="form-input"></div>`;
+                    if (fields.ciudad) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">CIUDAD</label><input type="text" class="form-input"></div>`;
+                    document.getElementById('db-custom-fields').innerHTML = html;
+                    logStatus("LINK: Formulario inyectado.", "LINK");
                 }
 
                 // VISIBILIDAD FINAL
@@ -285,7 +324,7 @@
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN Y AUDITORÍA V24 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN Y AUDITORÍA V25 FINALIZADA CON ÉXITO.", "INFO");
 
             } catch (err) { logStatus(`FALLO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
