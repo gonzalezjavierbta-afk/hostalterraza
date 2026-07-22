@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v20: Full Feature & Auditoría · Sistema QR</title>
+    <title>Sandbox v21: Final Fiesta Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -40,24 +40,19 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
         
-        /* COUNTDOWN */
+        /* GRID DE GALERÍA (NUEVO) */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s ease; }
+        .gallery-img:hover { transform: scale(1.02); border-color: var(--gold); }
+
+        /* TRAILER (NUEVO - Evita Error 153) */
+        .trailer-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .trailer-play-btn { font-size: 4rem; color: var(--gold); filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
         .cd-label { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.5; }
-
-        /* AFORO */
-        .aforo-bar { background: rgba(255,255,255,0.1); height: 10px; border-radius: 10px; margin-top: 1rem; overflow: hidden; }
-        .aforo-fill { background: var(--gold); height: 100%; width: 0%; transition: width 1.5s ease; }
-
-        /* FAQ */
-        .faq-item { margin-bottom: 2rem; }
-        .faq-q { font-weight: bold; color: var(--gold); display: block; margin-bottom: 0.5rem; font-size: 1.2rem; }
-        .faq-a { opacity: 0.7; line-height: 1.6; display: block; }
-
-        /* MAPA */
-        .map-wrapper { width: 100%; height: 300px; border-radius: 12px; overflow: hidden; margin-top: 1.5rem; border: 1px solid rgba(223, 32, 182, 0.2); }
-        iframe { border: 0; filter: grayscale(1) invert(1) contrast(1.2); }
 
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -65,7 +60,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Sincronización v20 en curso...</div>
+    <div id="loader" class="loading-overlay">Sincronizando Módulos Fiesta v21...</div>
 
     <header id="hero-bg" class="hero">
         <div class="hero-content">
@@ -75,7 +70,7 @@
     </header>
 
     <section id="modulo-countdown">
-        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">TIEMPO RESTANTE</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">EL EVENTO COMIENZA EN</h2>
         <div class="countdown-grid">
             <div class="cd-box"><span id="cd-days" class="cd-number">00</span><span class="cd-label">DÍAS</span></div>
             <div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span class="cd-label">HORAS</span></div>
@@ -84,15 +79,32 @@
         </div>
     </section>
 
+    <section id="modulo-trailer">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">TRÁILER OFICIAL</h2>
+        <div id="db-trailer-container"></div>
+    </section>
+
     <section id="modulo-aforo">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">DISPONIBILIDAD</h2>
-        <div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">Calculando cupos...</div>
-        <div class="aforo-bar"><div id="aforo-fill" class="aforo-fill"></div></div>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">AFORO DISPONIBLE</h2>
+        <div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div>
+        <div style="background: rgba(255,255,255,0.1); height: 10px; border-radius: 10px; margin-top: 1rem; overflow: hidden;">
+            <div id="aforo-fill" style="background: var(--gold); height: 100%; width: 0%; transition: width 1.5s ease;"></div>
+        </div>
     </section>
 
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
+    </section>
+
+    <section id="modulo-dress_code">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">DRESS CODE</h2>
+        <div id="db-dress-txt" class="data-item">--</div>
+    </section>
+
+    <section id="modulo-gallery">
+        <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA DEL EVENTO</h2>
+        <div id="db-gallery-grid" class="gallery-grid"></div>
     </section>
 
     <section id="modulo-guest_list">
@@ -113,22 +125,24 @@
     <section id="modulo-ubicacion">
         <h2 style="color: var(--gold);">UBICACIÓN</h2>
         <div id="db-ubicacion" class="data-item">--</div>
-        <div id="db-mapa-container" class="map-wrapper"></div>
+        <div id="db-mapa-container" style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; margin-top: 1.5rem; border: 1px solid rgba(223, 32, 182, 0.2);"></div>
     </section>
 
     <script>
         /**
-         * 1. CONFIGURACIÓN MANUAL (SANDBOX)
-         * Se activan todos los módulos solicitados.
+         * 1. CONFIGURACIÓN SANDBOX (Módulos Categoría Fiesta)
          */
         const SANDBOX_CONFIG = {
             countdown: true,
+            trailer: true,
+            aforo: true,
             lineup: true,
+            dress_code: true,
+            gallery: true,
+            guest_list: true,
+            faq: true,
             playlist: true,
             ubicacion: true,
-            guest_list: true, // ¡ACTIVADO!
-            faq: true,        // ¡ACTIVADO!
-            aforo: true,      // ¡ACTIVADO!
             force_gold: '#df20b6' 
         };
 
@@ -137,7 +151,7 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         /**
-         * 2. MOTOR DE LOGGING ACUMULATIVO (Reglas de Oro)
+         * 2. MOTOR DE LOGGING (Reglas de Oro)
          */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
@@ -145,30 +159,8 @@
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // MOTOR COUNTDOWN CON LOG DE SEGURIDAD
-        function startCountdown(date, time) {
-            try {
-                const target = new Date(`${date}T${time}`).getTime();
-                if (isNaN(target)) throw new Error("Formato de fecha inválido");
-                
-                logStatus(`TIME: Motor iniciado para ${date} ${time}.`, "TIME");
-                
-                setInterval(() => {
-                    const diff = target - new Date().getTime();
-                    if (diff <= 0) return;
-                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                }, 1000);
-            } catch (e) {
-                logStatus(`TIME: Error al iniciar countdown: ${e.message}`, "ERROR");
-            }
-        }
-
         async function initEvento() {
-            logStatus("AUDITORÍA V20: Iniciando secuencia acumulativa completa...");
-            
+            logStatus("AUDITORÍA V21: Iniciando sincronización de categoría Fiesta...");
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
             logStatus(`MÓDULOS ACTIVOS: ${activos.join(' | ')}`, "INFO");
 
@@ -180,27 +172,14 @@
 
                 logStatus(`DB: Campos raíz detectados -> ${Object.keys(evento).join(', ')}`, "DB");
 
-                // --- VINCULACIÓN BÁSICA ---
+                // --- VINCULACIÓN RAÍZ ---
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen Hero vinculada con éxito.", "LINK");
+                    logStatus("LINK: Imagen Hero vinculada.", "LINK");
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
-
-                // --- COUNTDOWN (RESTAURADO) ---
-                if (SANDBOX_CONFIG.countdown) {
-                    startCountdown(evento.fecha, evento.hora);
-                }
-
-                // --- UBICACIÓN Y MAPA ---
-                if (evento.ubicacion) {
-                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
-                    logStatus(`TRACE: Usando ubicación '${evento.ubicacion}' para el mapa.`, "TRACE");
-                    const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen loading="lazy"></iframe>`;
-                    logStatus("LINK: Mapa inyectado con éxito.", "LINK");
-                }
+                if (evento.ubicacion) document.getElementById('db-ubicacion').innerText = evento.ubicacion;
 
                 // --- PROCESAMIENTO JSON ---
                 const config = evento.config_landing || {};
@@ -211,42 +190,64 @@
                         for (let k of llaves) {
                             let val = loc[k];
                             if (val && typeof val !== 'boolean') {
-                                if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) {
-                                    logStatus(`TRACE: Obteniendo '${k}' desde JSON.`, "TRACE");
-                                    return val;
-                                } else if (Array.isArray(val) && val.length > 0) {
-                                    logStatus(`TRACE: Obteniendo '${k}' (Array) desde JSON.`, "TRACE");
-                                    return val;
-                                }
+                                if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) return val;
+                                else if (Array.isArray(val) && val.length > 0) return val;
                             }
                         }
                     }
                     return null;
                 };
 
-                // 1. AFORO
-                if (SANDBOX_CONFIG.aforo && evento.aforo_max) {
-                    document.getElementById('db-aforo-txt').innerText = `0 de ${evento.aforo_max} cupos ocupados · ${evento.aforo_max} disponibles`;
-                    document.getElementById('aforo-fill').style.width = `5%`;
-                    logStatus("LINK: Módulo Aforo vinculado con éxito.", "LINK");
+                // 1. TRÁILER (YouTube Link para evitar Error 153)
+                const trailerUrl = getModuleData(['video_url', 'trailer_url', 'trailer']);
+                if (trailerUrl) {
+                    const isYT = trailerUrl.includes('youtube') || trailerUrl.includes('youtu.be');
+                    document.getElementById('db-trailer-container').innerHTML = `
+                        <div class="trailer-box" onclick="window.open('${trailerUrl}', '_blank')">
+                            <span class="trailer-play-btn">▶</span>
+                            <p style="position:absolute; bottom:1rem;">VER EN ${isYT ? 'YOUTUBE' : 'VIDEO'}</p>
+                        </div>`;
+                    logStatus("LINK: Módulo Tráiler vinculado (Acción: New Tab).", "LINK");
                 }
 
-                // 2. LINEUP
+                // 2. AFORO
+                if (evento.aforo_max) {
+                    document.getElementById('db-aforo-txt').innerText = `Cupos Totales: ${evento.aforo_max}`;
+                    document.getElementById('aforo-fill').style.width = '10%'; // Simulación
+                    logStatus("LINK: Módulo Aforo vinculado.", "LINK");
+                }
+
+                // 3. DRESS CODE
+                const dress = getModuleData(['dress_code', 'vestimenta']);
+                if (dress) {
+                    document.getElementById('db-dress-txt').innerText = dress;
+                    logStatus("LINK: Módulo Dress Code vinculado.", "LINK");
+                }
+
+                // 4. GALERÍA (Array o Texto multilínea)
+                const galleryData = getModuleData(['gallery', 'galeria', 'imagenes']);
+                if (galleryData) {
+                    const urls = typeof galleryData === 'string' ? galleryData.split('\n') : galleryData;
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 10).map(u => `
+                        <img src="${u.trim()}" class="gallery-img" alt="Evento" onerror="this.style.display='none'">
+                    `).join('');
+                    logStatus(`LINK: Galería vinculada (${urls.length} imágenes detectadas).`, "LINK");
+                }
+
+                // 5. LINEUP, GUEST LIST, FAQ, PLAYLIST (Mantenidos de v20)
                 const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const lista = typeof lineup === 'string' ? lineup.split('\n') : lineup;
                     document.getElementById('db-lineup').innerHTML = lista.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus("LINK: Lineup vinculado con éxito.", "LINK");
+                    logStatus("LINK: Lineup inyectado.", "LINK");
                 }
 
-                // 3. GUEST LIST
                 const guest = getModuleData(['guest_list', 'instrucciones_guest']);
                 if (guest) {
                     document.getElementById('db-guest-txt').innerText = guest;
-                    logStatus("LINK: Módulo Guest List vinculado con éxito.", "LINK");
+                    logStatus("LINK: Guest List vinculada.", "LINK");
                 }
 
-                // 4. FAQ (Renderizado de admin.html)
                 const faqRaw = getModuleData(['faq', 'preguntas_frecuentes']);
                 if (faqRaw && typeof faqRaw === 'string') {
                     const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
@@ -254,25 +255,31 @@
                         const [q, a] = l.split('|');
                         return `<div class="faq-item"><span class="faq-q">${q.trim()}</span><span class="faq-a">${a.trim()}</span></div>`;
                     }).join('');
-                    logStatus("LINK: Módulo FAQ vinculado con éxito.", "LINK");
+                    logStatus("LINK: Módulo FAQ inyectado.", "LINK");
                 }
 
-                // 5. PLAYLIST
                 const playlist = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
                 if (playlist) {
                     const embed = playlist.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify vinculada con éxito.", "LINK");
+                    logStatus("LINK: Playlist Spotify vinculada.", "LINK");
                 }
 
-                // APLICAR VISIBILIDAD
+                // 6. MAPA
+                if (evento.ubicacion) {
+                    const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen loading="lazy" style="filter: grayscale(1) invert(1) contrast(1.2);"></iframe>`;
+                    logStatus("LINK: Mapa inyectado con éxito.", "LINK");
+                }
+
+                // Aplicar visibilidad
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN V20 FINALIZADA CON ÉXITO.", "INFO");
+                logStatus("SINCRONIZACIÓN V21 FINALIZADA CON ÉXITO.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
