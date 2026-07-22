@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v45: Precise Frame · Sistema QR</title>
+    <title>Editor v46: Recovery & Precision · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,7 +32,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.7rem; font-weight: 900; margin-bottom: 3rem; text-align: center; }
 
-        /* HERO AJUSTADO v45 */
+        /* HERO P6 (v45 Parity) */
         .hero { 
             position: relative; height: 100vh; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; 
@@ -48,12 +48,10 @@
         .hero-content { position: relative; z-index: 2; width: 100%; max-width: 850px; }
         .hero-title { font-weight: 900; font-size: clamp(2rem, 8vw, 4.5rem); line-height: 1; text-transform: uppercase; margin: 0; letter-spacing: -3px; color: #fff; }
 
-        /* Metadata Premium */
         .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 2rem; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
         .meta-item { display: flex; align-items: center; gap: 0.5rem; }
         .meta-icon { width: 16px; height: 18px; fill: var(--gold); }
 
-        /* CAJA DE AFORO (Ref: evento.html original) */
         .aforo-box {
             display: inline-block; margin-top: 1.5rem; padding: 0.8rem 1.5rem;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
@@ -61,31 +59,32 @@
             letter-spacing: 1px; text-transform: uppercase;
         }
 
-        /* MARCO UNIFICADO COMPACTO CON SEPARADORES (v45) */
         .unified-countdown-frame {
             position: relative; z-index: 2; margin-top: 2.5rem; padding: 1.5rem 2rem;
             background: var(--glass-lite); border-radius: 12px;
-            border: 1px solid var(--gold); backdrop-filter: blur(6px); /* Desenfoque menor solicitado */
+            border: 1px solid var(--gold); backdrop-filter: blur(6px);
             display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 20px rgba(223, 32, 182, 0.15);
             width: fit-content; margin-left: auto; margin-right: auto;
         }
         .cd-block { padding: 0 1.2rem; display: flex; flex-direction: column; align-items: center; }
-        /* Separador vertical */
         .cd-block:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.1); }
-        
         .cd-v { display: block; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900; line-height: 1; color: #fff; }
         .cd-l { font-size: 0.55rem; letter-spacing: 2px; opacity: 0.4; text-transform: uppercase; margin-top: 0.4rem; font-weight: 900; }
 
-        .data-item { margin-bottom: 1.5rem; padding: 2rem; background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
-        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; }
+        .data-item { margin-bottom: 1.5rem; padding: 1.5rem; background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; backdrop-filter: blur(5px); }
+        
+        /* FORMULARIO ESTILOS */
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 10px; color: white; font-family: inherit; width: 100%; box-sizing: border-box; font-size: 1rem; }
+        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 10px 25px rgba(223, 32, 182, 0.4); margin-top: 2rem; }
+        
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">FINALIZING PARITY v45...</div>
+    <div id="loader" class="loading-overlay">RESTORING LOGIC v46...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -99,10 +98,8 @@
                 <div class="meta-item"><svg class="meta-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
             </div>
 
-            <!-- CAJA DE AFORO ESTILO ORIGINAL -->
-            <div id="hero-aforo-txt" class="aforo-box">CARGANDO CUPOS...</div>
+            <div id="hero-aforo-txt" class="aforo-box">CARGANDO...</div>
 
-            <!-- MARCO UNIFICADO COMPACTO -->
             <div id="unified-frame" class="unified-countdown-frame">
                 <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span class="cd-l">Días</span></div>
                 <div class="cd-block"><span id="cd-hours" class="cd-v">00</span><span class="cd-l">Horas</span></div>
@@ -113,19 +110,19 @@
     </header>
 
     <main id="main-content-flow">
-        <!-- MODULOS ACUMULATIVOS OBLIGATORIOS (662) -->
+        <!-- MODULOS OBLIGATORIOS (Resguardados para auditoría) -->
         <section id="modulo-countdown" style="display:none;"></section>
         <section id="modulo-aforo" style="display:none;"></section>
 
         <section id="modulo-trailer"><h2>EXPERIENCIA VISUAL</h2><div id="db-trailer-container"></div></section>
         <section id="modulo-lineup"><h2>DJ LINEUP</h2><div id="db-lineup"></div></section>
         <section id="modulo-dress_code"><h2>VESTIMENTA</h2><div id="db-dress-txt" class="data-item" style="text-align:center;">--</div></section>
-        <section id="modulo-gallery"><h2>ATMÓSFERA</h2><div id="db-gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem;"></div></section>
-        <section id="modulo-guest_list"><h2>REGLAS DE INVITACIÓN</h2><div id="db-guest-txt" class="data-item">--</div></section>
+        <section id="modulo-gallery"><h2>GALERÍA</h2><div id="db-gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem;"></div></section>
+        <section id="modulo-guest_list"><h2>GUEST LIST</h2><div id="db-guest-txt" class="data-item">--</div></section>
         <section id="modulo-faq"><h2>DUDAS FRECUENTES</h2><div id="db-faq-list"></div></section>
         <section id="modulo-playlist"><h2>BANDA SONORA</h2><div id="db-spotify"></div></section>
         <section id="modulo-ubicacion"><h2>LOCALIZACIÓN</h2><div id="db-mapa-container" style="width:100%; height:450px; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"></div></section>
-        <section id="modulo-formulario"><h2>RESERVA TU LUGAR</h2><form id="master-reg-form" style="max-width:600px; margin:0 auto;"><div id="db-dynamic-fields" style="display:flex; flex-direction:column; gap:1.5rem;"></div><button type="submit" class="btn-submit" style="margin-top:2rem;">CONFIRMAR ASISTENCIA →</button></form></section>
+        <section id="modulo-formulario"><h2>RESERVA TU LUGAR</h2><form id="master-reg-form" style="max-width:600px; margin:0 auto;"><div id="db-dynamic-fields" style="display:flex; flex-direction:column; gap:1.2rem;"></div><button type="submit" class="btn-submit">CONFIRMAR ASISTENCIA →</button></form></section>
     </main>
 
     <script>
@@ -148,7 +145,7 @@
             try {
                 const target = new Date(`${date}T${time}`).getTime();
                 if (isNaN(target)) return;
-                logStatus(`TIME: Heartbeat vinculado al Marco Compacto v45 para ${date}.`, "TIME");
+                logStatus(`TIME: Latido de tiempo activo para ${date}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -161,7 +158,7 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V45: Sincronizando Refinamiento de Marco y Caja de Aforo...");
+            logStatus("AUDITORÍA V46: Ejecutando restauración de bloques y precisión de auditoría...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
@@ -177,47 +174,99 @@
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = evento.ubicacion.toUpperCase();
-                
-                if (evento.aforo_max) {
-                    document.getElementById('hero-aforo-txt').innerText = `${evento.aforo_max} CUPOS DISPONIBLES · 100% REGISTRADOS`;
-                    logStatus("LINK: Caja de Aforo integrada en Hero.", "LINK");
-                }
-
+                if (evento.aforo_max) document.getElementById('hero-aforo-txt').innerText = `${evento.aforo_max} CUPOS DISPONIBLES`;
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
 
-                // Renderizado de Módulos (Paridad v44)
                 const content = evento.config_landing?.content || {};
-                if (content.dj_lineup || content.lineup) {
-                    const l = Array.isArray(content.dj_lineup || content.lineup) ? (content.dj_lineup || content.lineup) : (content.dj_lineup || content.lineup).split('\n');
-                    document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item" style="text-align:center; font-weight:900;">${a}</div>`).join('');
-                }
-                
-                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:300px; object-fit:cover; border-radius:12px;">`).join('');
 
+                // 1. LINEUP
+                const lineup = content.dj_lineup || content.lineup;
+                if (lineup) {
+                    const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
+                    document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item" style="text-align:center; font-weight:900;">${a}</div>`).join('');
+                    logStatus("LINK: Lineup inyectado.", "LINK");
+                }
+
+                // 2. DRESS CODE (RESTAURADO)
+                const dress = content.dresscode || content.vestimenta;
+                if (dress) {
+                    document.getElementById('db-dress-txt').innerText = dress.toUpperCase();
+                    logStatus("LINK: Dress Code inyectado.", "LINK");
+                }
+
+                // 3. GALERÍA
+                const gallery = content.gallery || content.galeria;
+                if (gallery) {
+                    const urls = Array.isArray(gallery) ? gallery : gallery.split('\n');
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" style="width:100%; height:300px; object-fit:cover; border-radius:12px;">`).join('');
+                    logStatus("LINK: Galería inyectada.", "LINK");
+                }
+
+                // 4. GUEST LIST (RESTAURADO)
+                if (content.guest_list) {
+                    document.getElementById('db-guest-txt').innerText = content.guest_list;
+                    logStatus("LINK: Guest List inyectada.", "LINK");
+                }
+
+                // 5. FAQ
                 if (content.faq && typeof content.faq === 'string') {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                         const [q, a] = l.split('|');
                         return `<div class="data-item"><b style="color:var(--gold); display:block; margin-bottom:1rem; font-size:0.8rem;">${q.trim()}</b><p style="opacity:0.7; margin:0;">${a.trim()}</p></div>`;
                     }).join('');
+                    logStatus("LINK: FAQ inyectada.", "LINK");
                 }
 
+                // 6. PLAYLIST
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:15px; border:none; filter: invert(1) hue-rotate(180deg) brightness(0.8);"></iframe>`;
+                    logStatus("LINK: Playlist inyectada.", "LINK");
                 }
 
-                // Auditoría de Integridad v45
-                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD UNIFICADA v45 ---", "INFO");
+                // 7. UBICACIÓN (MAPA)
+                if (evento.ubicacion) {
+                    const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+                    logStatus("LINK: Mapa inyectado.", "LINK");
+                }
+
+                // 8. FORMULARIO (RESTAURADO)
+                if (SANDBOX_CONFIG.formulario) {
+                    const fields = evento.form_campos || {};
+                    let html = '';
+                    if (fields.email) html += `<div style="margin-bottom:1rem;"><input type="email" class="form-input" placeholder="Email del asistente" required></div>`;
+                    if (fields.edad) html += `<div style="margin-bottom:1rem;"><input type="number" class="form-input" placeholder="Edad"></div>`;
+                    document.getElementById('db-dynamic-fields').innerHTML = html;
+                    logStatus("LINK: Formulario dinámico inyectado.", "LINK");
+                }
+
+                // --- AUDITORÍA DE INTEGRIDAD PRECISA v46 ---
+                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD PRECISA ---", "INFO");
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     if (key === 'force_gold' || key === 'trailer') return;
-                    const el = document.getElementById(`modulo-${key}`) || document.getElementById('unified-frame');
-                    const isValid = (el.innerText.replace(/\s/g, '').length > 5 || el.querySelector('input') || el.querySelector('iframe') || el.querySelector('img'));
-                    if (SANDBOX_CONFIG[key] && isValid) logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con éxito.`, "INFO");
-                    if (el.tagName === 'SECTION') el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
+                    const el = document.getElementById(`modulo-${key}`);
+                    if (!el) return;
+
+                    // PRECISIÓN: Validamos el contenedor de datos (db-), no el section completo con h2
+                    const dataCont = el.querySelector('[id*="db-"]') || el.querySelector('form') || document.getElementById('unified-frame');
+                    const hasInput = (dataCont || el).querySelector('input');
+                    const hasIframe = (dataCont || el).querySelector('iframe');
+                    const hasImg = (dataCont || el).querySelector('img');
+                    const cleanTxt = dataCont ? dataCont.innerText.replace(/\s/g, '').replace('--', '') : '';
+                    
+                    let isValid = (key === 'formulario') ? (hasInput !== null) : (cleanTxt.length >= 3 || hasIframe || hasImg);
+
+                    if (SANDBOX_CONFIG[key] && !isValid && key !== 'countdown' && key !== 'aforo') {
+                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló validación física.`, "ERROR");
+                    } else if (SANDBOX_CONFIG[key]) {
+                        logStatus(`INFO: Módulo ${key.toUpperCase()} verificado.`, "INFO");
+                        el.style.display = 'block';
+                    }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V45 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V46 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
