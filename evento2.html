@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v11: Trace Sync · Sistema QR</title>
+    <title>Sandbox v12: Robust Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,8 +11,20 @@
 
     <style>
         :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; }
-        body { margin: 0; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; }
         
+        /* FIX: Asegurar scroll vertical */
+        html, body { 
+            margin: 0; 
+            padding: 0;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto !important; /* Fuerza el scroll */
+            background-color: var(--main-bg);
+            color: var(--text-color);
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
         /* HERO VISUAL */
         .hero {
             position: relative; min-height: 80vh; display: flex; flex-direction: column;
@@ -40,7 +52,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Rastreando rutas de datos...</div>
+    <div id="loader" class="loading-overlay">Estabilizando interfaz...</div>
 
     <header id="hero-bg" class="hero">
         <div class="hero-content">
@@ -49,7 +61,6 @@
         </div>
     </header>
 
-    <!-- MÓDULOS DE DATOS -->
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
@@ -66,10 +77,6 @@
     </section>
 
     <script>
-        /**
-         * 1. CONFIGURACIÓN MANUAL (SANDBOX)
-         * Módulos disponibles: lineup, playlist, ubicacion, sinopsis, trailer, faq
-         */
         const SANDBOX_CONFIG = {
             lineup: true,
             playlist: true,
@@ -81,9 +88,6 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        /**
-         * 2. SISTEMA DE LOGGING DE TRAZABILIDAD (Novedad)
-         */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
             const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'TRACE': '#e67e22', 'LINK': '#f1c40f', 'ERROR': '#ff4d4d' };
@@ -91,7 +95,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Trace Sync (Rastreo profundo)...");
+            logStatus("Iniciando Trace Sync v12 (Robust)...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
@@ -103,80 +107,59 @@
 
                 if (error) throw error;
 
-                // LOG 1: Auditoría Raíz
-                logStatus(`Campos en raíz DB: ${Object.keys(evento).join(', ')}`, "DB");
-
-                // --- VINCULACIÓN BÁSICA (Raíz) ---
-                if (evento.imagen_url) {
-                    document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen Hero vinculada desde raíz.", "LINK");
-                }
+                // Raíz
+                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora}`;
-                
-                // Forzar ubicación (si existe en raíz)
-                if (evento.ubicacion) {
-                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
-                    logStatus("LINK: Ubicación vinculada desde raíz.", "LINK");
-                }
+                if (evento.ubicacion) document.getElementById('db-ubicacion').innerText = evento.ubicacion;
 
-                // --- VINCULACIÓN COMPLEJA (JSON Trace) ---
                 const config = evento.config_landing || {};
-                logStatus(`Estructura JSON detectada: ${Object.keys(config).join(', ')}`, "TRACE");
 
                 /**
-                 * FUNCIÓN DE BÚSQUEDA AGRESIVA
-                 * Intenta encontrar una llave en el objeto JSON buscando en múltiples niveles.
+                 * FUNCIÓN DE BÚSQUEDA ROBUSTA (Soluciona .split error)
                  */
                 const deepSeek = (llavesPosibles) => {
                     for (let key of llavesPosibles) {
-                        // 1. Probar en la raíz del JSON
-                        if (config[key]) {
-                            logStatus(`TRACE: Encontrado '${key}' en config_landing.${key}`, "TRACE");
-                            return config[key];
-                        }
-                        // 2. Probar dentro de 'modules' (Estructura Admin)
-                        if (config.modules && config.modules[key]) {
-                            logStatus(`TRACE: Encontrado '${key}' en config_landing.modules.${key}`, "TRACE");
-                            return config.modules[key];
-                        }
-                        // 3. Probar dentro de 'content' (Estructura Alternativa)
-                        if (config.content && config.content[key]) {
-                            logStatus(`TRACE: Encontrado '${key}' en config_landing.content.${key}`, "TRACE");
-                            return config.content[key];
+                        let val = config[key] || (config.modules && config.modules[key]) || (config.content && config.content[key]);
+                        if (val) {
+                            logStatus(`TRACE: Encontrado '${key}' (Tipo: ${typeof val})`, "TRACE");
+                            return val;
                         }
                     }
                     return null;
                 };
 
-                // 1. Rastrear Lineup
-                const lineupRaw = deepSeek(['lineup', 'dj_lineup', 'artistas', 'dj']);
+                // 1. Lineup
+                const lineupRaw = deepSeek(['lineup', 'dj_lineup', 'artistas']);
                 if (lineupRaw) {
-                    const artistas = lineupRaw.split('\n').filter(a => a.trim() !== "");
+                    let artistas = [];
+                    // Si es String, split; si es Array, usar directo [Requerimiento]
+                    if (typeof lineupRaw === 'string') {
+                        artistas = lineupRaw.split('\n').filter(a => a.trim() !== "");
+                    } else if (Array.isArray(lineupRaw)) {
+                        artistas = lineupRaw;
+                    }
+                    
                     document.getElementById('db-lineup').innerHTML = artistas.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus(`LINK: ${artistas.length} artistas vinculados con éxito.`, "LINK");
-                } else {
-                    logStatus("TRACE: No se encontró 'lineup' en ninguna ruta conocida.", "ERROR");
+                    logStatus(`LINK: ${artistas.length} artistas vinculados.`, "LINK");
                 }
 
-                // 2. Rastrear Playlist (Spotify)
-                const playlistRaw = deepSeek(['video_url', 'playlist', 'spotify_url', 'spotify']);
-                if (playlistRaw && playlistRaw.includes('spotify')) {
+                // 2. Playlist
+                const playlistRaw = deepSeek(['video_url', 'playlist', 'spotify']);
+                if (playlistRaw && typeof playlistRaw === 'string' && playlistRaw.includes('spotify')) {
                     const embed = playlistRaw.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify vinculada con éxito.", "LINK");
-                } else {
-                    logStatus("TRACE: No se encontró URL de Spotify en ninguna ruta conocida.", "ERROR");
+                    logStatus("LINK: Spotify vinculado.", "LINK");
                 }
 
-                // Aplicar visibilidad final
+                // Visibilidad
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN Y TRAZABILIDAD COMPLETADA.", "INFO");
+                logStatus("SINCRONIZACIÓN EXITOSA.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO: ${err.message}`, "ERROR");
