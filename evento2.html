@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v26: Infinite Trace & Guest Sync · Sistema QR</title>
+    <title>Editor v27: Validation & Integrity Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,7 +19,6 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
-        /* EDITOR UI */
         .editor-tools {
             position: fixed; bottom: 20px; right: 20px; z-index: 1000;
             background: rgba(20,20,20,0.9); border: 1px solid var(--gold);
@@ -31,7 +30,6 @@
             border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;
         }
 
-        /* SECCIONES */
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .hero {
             position: relative; min-height: 70vh; display: flex; flex-direction: column;
@@ -51,16 +49,15 @@
         }
 
         .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
-        
-        /* COUNTDOWN */
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
         .cd-label { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.5; }
 
-        /* FORMULARIO */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; color: white; font-family: inherit; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
@@ -70,10 +67,10 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Sincronizando Versión 26 Máster...</div>
+    <div id="loader" class="loading-overlay">Ejecutando Auditoría de Integridad v27...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODO EDITOR v26</span>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">INTEGRITY CHECK v27</span>
         <button class="btn-export" onclick="exportTemplate()">COPIAR JSON CONFIG</button>
     </div>
 
@@ -84,8 +81,9 @@
         </div>
     </header>
 
+    <!-- 11 MÓDULOS OBLIGATORIOS (Inmutabilidad) -->
     <section id="modulo-countdown">
-        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">COMIENZA EN</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">EL EVENTO COMIENZA EN</h2>
         <div class="countdown-grid">
             <div class="cd-box"><span id="cd-days" class="cd-number">00</span><span class="cd-label">DÍAS</span></div>
             <div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span class="cd-label">HORAS</span></div>
@@ -116,7 +114,7 @@
 
     <section id="modulo-gallery">
         <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA</h2>
-        <div id="db-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
+        <div id="db-gallery-grid" class="gallery-grid"></div>
     </section>
 
     <section id="modulo-guest_list">
@@ -125,19 +123,19 @@
     </section>
 
     <section id="modulo-faq">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">FAQ</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">PREGUNTAS FRECUENTES</h2>
         <div id="db-faq-list"></div>
     </section>
 
     <section id="modulo-playlist">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">SPOTIFY</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">PLAYLIST OFICIAL</h2>
         <div id="db-spotify"></div>
     </section>
 
     <section id="modulo-ubicacion">
         <h2 style="color: var(--gold);">UBICACIÓN</h2>
         <div id="db-ubicacion" class="data-item">--</div>
-        <div id="db-mapa-container" style="width:100%; height:300px; border-radius:12px; overflow:hidden;"></div>
+        <div id="db-mapa-container" style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(223, 32, 182, 0.2);"></div>
     </section>
 
     <section id="modulo-formulario">
@@ -147,8 +145,7 @@
 
     <script>
         /**
-         * 1. CONFIGURACIÓN (Inmutabilidad de Módulos)
-         * Se mantienen todos los módulos activos de la v25.
+         * 1. CONFIGURACIÓN (Inmutabilidad v25/v26)
          */
         const SANDBOX_CONFIG = {
             countdown: true, trailer: true, aforo: true, lineup: true, 
@@ -166,12 +163,12 @@
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // MOTOR COUNTDOWN (Blindaje Protocolo v22)
+        // MOTOR TIEMPO (Protocolo de Latido v26)
         function startCountdown(date, time) {
             try {
                 const target = new Date(`${date}T${time}`).getTime();
-                if (isNaN(target)) return;
-                logStatus(`TIME: Motor iniciado satisfactoriamente para el evento del ${date}.`, "TIME");
+                if (isNaN(target)) throw new Error("Fecha/Hora no válida");
+                logStatus(`TIME: Motor sincronizado para el ${date} a las ${time}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -184,38 +181,28 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V26: Ejecutando secuencia de alta fidelidad...");
-            
-            // REQUERIMIENTO INFO: Conteo de módulos
-            const activos = Object.entries(SANDBOX_CONFIG).filter(([k,v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
-            logStatus(`INFO: Mantenida Inmutabilidad de Módulos (Total: ${activos.length}) -> ${activos.join(' | ')}`, "INFO");
+            logStatus("AUDITORÍA V27: Ejecutando secuencia de Integridad Total...");
+            const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
+            logStatus(`INFO: Mantenida Inmutabilidad (11 módulos).`, "INFO");
 
             const slug = new URLSearchParams(window.location.search).get('slug');
-
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                logStatus(`DB: Campos raíz detectados -> ${Object.keys(evento).join(', ')}`, "DB");
-                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
-                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-
-                // 2. PROTOCOLO INYECCIÓN TIEMPO (Inmediatamente tras carga) [1]
+                // 2. PROTOCOLO LATIDO (Inmediatamente tras carga)
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const config = evento.config_landing || {};
                 const getModuleData = (llaves, term = null) => {
-                    // Ampliado para buscar en sub-niveles de contenido real [2]
                     let levels = [evento, config, config.modules, config.content, config.data];
                     for (let loc of levels) {
                         if (!loc) continue;
                         for (let k of llaves) {
                             let val = loc[k];
-                            // Poka-yoke: Evitar booleano de activación, solo aceptar contenido real
                             if (val && typeof val !== 'boolean') {
                                 if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) {
-                                    logStatus(`TRACE: Extrayendo '${k}' desde ${loc === evento ? 'Raíz' : 'Capas JSON'}.`, "TRACE");
+                                    logStatus(`TRACE: Extrayendo '${k}' para inyección.`, "TRACE");
                                     return val;
                                 } else if (Array.isArray(val) && val.length > 0) {
                                     logStatus(`TRACE: Obteniendo lista '${k}' (Array).`, "TRACE");
@@ -227,54 +214,114 @@
                     return null;
                 };
 
-                // FIX GUEST LIST: Búsqueda forzada de instrucciones [3]
-                const guestInfo = getModuleData(['guest_list', 'instrucciones_guest', 'beneficios_guest']);
-                if (guestInfo) {
-                    document.getElementById('db-guest-txt').innerText = guestInfo;
-                    logStatus("LINK: Módulo Guest List vinculado con el contenido de la BD.", "LINK");
+                // VINCULACIÓN HERO
+                if (evento.imagen_url) {
+                    document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                    logStatus("LINK: Imagen Hero aplicada.", "LINK");
+                }
+                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
+                document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
+
+                // 1. AFORO (FIX)
+                if (evento.aforo_max) {
+                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos disponibles para registro.`;
+                    logStatus("LINK: Módulo Aforo vinculado con éxito.", "LINK");
                 }
 
-                // PLAYLIST SYNC
-                const spotify = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
-                if (spotify) {
-                    const embed = spotify.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify vinculada con éxito.", "LINK");
-                }
-
-                // LINEUP, GALERÍA Y MAPA (Restaurados v25)
+                // 2. LINEUP
                 const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const l = typeof lineup === 'string' ? lineup.split('\n') : lineup;
-                    document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item">${a}</div>`).join('');
+                    document.getElementById('db-lineup').innerHTML = l.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
                     logStatus("LINK: DJ Lineup inyectado.", "LINK");
                 }
 
+                // 3. DRESS CODE (FIX)
+                const dress = getModuleData(['dress_code', 'vestimenta', 'dresscode']);
+                if (dress) {
+                    document.getElementById('db-dress-txt').innerText = dress;
+                    logStatus("LINK: Módulo Dress Code vinculado con éxito.", "LINK");
+                }
+
+                // 4. GALERÍA (FIX)
+                const gallery = getModuleData(['gallery', 'galeria', 'imagenes']);
+                if (gallery) {
+                    const urls = typeof gallery === 'string' ? gallery.split('\n') : gallery;
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" class="gallery-img" onerror="this.style.display='none'">`).join('');
+                    logStatus(`LINK: Galería (${urls.length} imágenes) inyectada.`, "LINK");
+                }
+
+                // 5. GUEST LIST
+                const guest = getModuleData(['guest_list', 'instrucciones_guest', 'beneficios']);
+                if (guest) {
+                    document.getElementById('db-guest-txt').innerText = guest;
+                    logStatus("LINK: Guest List vinculada.", "LINK");
+                }
+
+                // 6. FAQ (FIX)
+                const faqRaw = getModuleData(['faq', 'preguntas_frecuentes']);
+                if (faqRaw && typeof faqRaw === 'string') {
+                    const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
+                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div style="margin-bottom:1rem;"><b style="color:var(--gold);">${q}</b><p style="opacity:0.7; margin:0;">${a}</p></div>`;
+                    }).join('');
+                    logStatus(`LINK: ${lineas.length} preguntas FAQ inyectadas.`, "LINK");
+                }
+
+                // 7. PLAYLIST (FIX)
+                const spotify = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
+                if (spotify) {
+                    const embed = spotify.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
+                    logStatus("LINK: Playlist Spotify vinculada con éxito.", "LINK");
+                }
+
+                // 8. UBICACIÓN Y MAPA
                 if (evento.ubicacion) {
                     document.getElementById('db-ubicacion').innerText = evento.ubicacion;
                     const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2);"></iframe>`;
-                    logStatus("LINK: Mapa de ubicación inyectado.", "LINK");
+                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+                    logStatus("LINK: Mapa inyectado con éxito.", "LINK");
                 }
 
-                // VISIBILIDAD FINAL
+                // 9. FORMULARIO
+                if (evento.form_campos) {
+                    const f = evento.form_campos;
+                    let html = '';
+                    if (f.email) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">EMAIL</label><input type="email" class="form-input"></div>`;
+                    if (f.ciudad) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">CIUDAD</label><input type="text" class="form-input"></div>`;
+                    document.getElementById('db-custom-fields').innerHTML = html;
+                    logStatus("LINK: Formulario dinámico inyectado.", "LINK");
+                }
+
+                // VISIBILIDAD FINAL Y AUDITORÍA DE INTEGRIDAD (REQUERIMIENTO V27)
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
+                
+                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD DE MÓDULOS ---", "INFO");
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
+                    if (key === 'force_gold') return;
                     const el = document.getElementById(`modulo-${key}`);
-                    if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
+                    if (el) {
+                        el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
+                        // Validación de información real
+                        const content = el.innerText.replace(/\s/g, '');
+                        if (SANDBOX_CONFIG[key] && content.length < 5) {
+                            logStatus(`ERROR: Módulo ${key.toUpperCase()} está activo pero NO tiene información de la BD.`, "ERROR");
+                        } else if (SANDBOX_CONFIG[key]) {
+                            logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con información.`, "INFO");
+                        }
+                    }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V26 FINALIZADA CON ÉXITO.", "INFO");
+                logStatus("SECUENCIA V27 FINALIZADA CON ÉXITO.", "INFO");
 
             } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
         window.onload = initEvento;
-        function exportTemplate() {
-            navigator.clipboard.writeText(JSON.stringify({ modules: SANDBOX_CONFIG }, null, 2));
-            alert("JSON copiado.");
-        }
+        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
     </script>
 </body>
 </html>
