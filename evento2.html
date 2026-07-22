@@ -1,9 +1,9 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v70: Fidelity Reconciliation · Sistema QR</title>
+    <title>Editor v71: Assets Stability & Form Completion · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,7 +32,7 @@
         section { display: none; padding: 4rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3rem; text-align: left; }
 
-        /* HERO RECOVERY */
+        /* HERO & METADATA (v70 Recovery) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
@@ -45,19 +45,18 @@
         .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
         .lineup-poster { width: 320px !important; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
         .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* DATA CARDS (Ref: referencia-datos.jpg) */
+        /* DATA CARDS (Fidelity per referencia-datos.jpg) */
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 1000px; margin: 0 auto; }
         .data-card { 
             background: var(--glass-lite); border: 1px solid rgba(255, 255, 255, 0.05); 
             border-radius: 10px; padding: 2.5rem 1.2rem; text-align: center; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center; min-height: 180px;
         }
-        .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
         .card-val { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        .card-subval { font-size: 0.55rem; font-weight: 800; color: rgba(255,255,255,0.4); margin-top: 0.3rem; }
         .card-icon { width: 32px; height: 32px; fill: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); opacity: 0.8; margin-top: auto; }
 
         /* FAQ & UBICACIÓN */
@@ -68,14 +67,15 @@
         .faq-item.active .faq-answer { max-height: 250px; opacity: 1; padding-bottom: 1.5rem; }
         .faq-item.active .faq-icon-plus { transform: rotate(45deg); color: #fff; }
 
-        /* SPONSORS FULL FRAME */
+        /* SPONSORS FULL FRAME (v71 Asset Fix) */
         .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 4rem 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        .sponsors-strip { display: flex; justify-content: center; align-items: center; gap: clamp(2rem, 5vw, 5rem); flex-wrap: wrap; padding: 0 10%; }
-        .sponsor-logo { height: 35px; filter: brightness(0) invert(1); opacity: 0.9; }
+        .sponsors-strip { display: flex; justify-content: center; align-items: center; gap: 4.5rem; flex-wrap: wrap; padding: 0 10%; }
+        .sponsor-logo { height: 32px; width: auto; filter: brightness(0) invert(1); opacity: 0.85; transition: 0.3s; }
+        .sponsor-logo:hover { opacity: 1; transform: scale(1.05); }
 
-        /* FORM */
+        /* FORM (Full Completion Ref: evento.html) */
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
-        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 10px; color: white; width: 100%; box-sizing: border-box; }
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 10px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
@@ -83,14 +83,15 @@
         @media (max-width: 850px) {
             .data-cards-container { grid-template-columns: repeat(2, 1fr); }
             .lineup-container { grid-template-columns: 1fr; gap: 4rem; }
-            .sponsor-logo { height: 25px; }
+            .sponsors-strip { gap: 2.5rem; }
+            .sponsor-logo { height: 24px; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">STRUCTURAL RECONCILIATION v70...</div>
+    <div id="loader" class="loading-overlay">ASSETS RECONCILIATION v71...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -118,7 +119,7 @@
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div class="lineup-container">
-                <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" class="lineup-poster" alt="Poster"></div>
+                <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" class="lineup-poster" alt="Cartel"></div>
                 <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem; padding-left:5rem;"></div>
             </div>
         </section>
@@ -133,7 +134,7 @@
             </div>
         </section>
 
-        <!-- DATA CARDS (v70 Fidelity per referencia-datos.jpg) -->
+        <!-- DATA CARDS (v71 Fidelity) -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
                 <div class="data-card">
@@ -141,14 +142,14 @@
                     <svg class="card-icon" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zM12 11c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">GUEST LIST</span><br><span id="db-guest-val" class="card-val">--</span><br><span class="card-subval">CONFIRMADOS</span></div>
+                    <div><span class="card-label">GUEST LIST</span><br><span id="db-guest-val" class="card-val">--</span><br><span style="font-size:0.55rem; opacity:0.4; font-weight:800; margin-top:0.3rem;">CONFIRMADOS</span></div>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">AFORO</span><br><span id="db-aforo-val" class="card-val">--</span><br><span class="card-subval">PERSONAS</span></div>
+                    <div><span class="card-label">AFORO</span><br><span id="db-aforo-val" class="card-val">--</span><br><span style="font-size:0.55rem; opacity:0.4; font-weight:800; margin-top:0.3rem;">PERSONAS</span></div>
                     <svg class="card-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">TICKETS</span><br><span id="db-ticket-val" class="card-val">--</span><br><span class="card-subval">DISPONIBLES</span></div>
+                    <div><span class="card-label">TICKETS</span><br><span id="db-ticket-val" class="card-val">--</span><br><span style="font-size:0.55rem; opacity:0.4; font-weight:800; margin-top:0.3rem;">DISPONIBLES</span></div>
                     <svg class="card-icon" viewBox="0 0 24 24"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
                 </div>
             </div>
@@ -162,24 +163,26 @@
             </div>
         </section>
 
-        <!-- SPONSORS -->
+        <!-- SPONSORS (v71 Verified Assets) -->
         <section id="modulo-patrocinadores">
             <div class="sponsors-full-frame">
-                <span style="color:var(--gold); font-size:0.65rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; margin-bottom:3rem; text-align:center; display:block;">SPONSORS</span>
+                <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; margin-bottom:3rem; text-align:center; display:block;">PATROCINADORES</span>
                 <div id="db-sponsors-strip" class="sponsors-strip"></div>
             </div>
         </section>
 
-        <!-- FORMULARIO -->
+        <!-- FORM (Full Recovery v71) -->
         <section id="modulo-formulario">
             <h2 style="text-align:center;">REGISTRO DE ASISTENCIA</h2>
             <form id="master-reg-form" class="form-container">
                 <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
                 <input type="text" class="form-input" id="reg-cedula" placeholder="Cédula / Documento *" required>
-                <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-pais" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+1">🇺🇸 +1</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
-                <input type="email" class="form-input" id="reg-email" placeholder="Correo electrónico *">
+                <div style="display:flex; gap:0.5rem;">
+                    <select class="form-input" id="reg-pais" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+1">🇺🇸 +1</option></select>
+                    <input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required>
+                </div>
                 <div id="db-dynamic-fields" style="display:flex; flex-direction:column; gap:1.5rem;"></div>
-                <button type="submit" class="btn-submit">CONFIRMAR →</button>
+                <button type="submit" class="btn-submit">CONFIRMAR ASISTENCIA →</button>
             </form>
         </section>
     </main>
@@ -195,93 +198,98 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        function startCountdown(d, t) {
-            const target = new Date(`${d}T${t}`).getTime();
-            if (isNaN(target)) return;
-            logStatus("TIME: Heartbeat Heartbeat v70 activo.", "TIME");
-            setInterval(() => {
-                const diff = target - new Date().getTime();
-                if (diff <= 0) return;
-                document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-            }, 1000);
-        }
+        function toggleFaq(el) { el.classList.toggle('active'); }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V70: Restaurando integridad de metadatos, contador y galería.");
+            logStatus("AUDITORÍA V71: Verificando estabilidad de activos y completitud de formulario...");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                startCountdown(evento.fecha, evento.hora);
+                // 1. Heartbeat v71
+                const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
+                setInterval(() => {
+                    const diff = target - new Date().getTime();
+                    if (diff <= 0) return;
+                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+                logStatus("TIME: Contador reinicializado con Heartbeat v71.", "TIME");
 
-                // HERO DATA RECOVERY
+                // 2. Hero Restoration (ID Unification)
+                const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
+                if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                logStatus("LINK: Hero Metadata inyectado correctamente.", "LINK");
+                logStatus("LINK: Hero metadata vinculado con IDs unificados.", "LINK");
 
                 const content = evento.config_landing?.content || {};
 
-                // LINEUP & GALLERY
+                // 3. Lineup & Gallery
                 try {
                     document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
-                    const proPhotos = ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200"];
                     const lineup = content.dj_lineup || content.lineup || "";
                     document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map((a, i) => `
-                        <div style="display:flex; align-items:center; gap:1.8rem;"><img src="${proPhotos[i % 2]}" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
+                        <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                     if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" class="gallery-img">`).join('');
-                    logStatus("LINK: Lineup y Galería renderizados.", "LINK");
-                } catch (e) { logStatus(`ERR-LINEUP/GAL: ${e.message}`, "ERROR"); }
+                    logStatus("LINK: Lineup y Galería inyectados satisfactoriamente.", "LINK");
+                } catch (e) { logStatus(`ERR-MEDIA: ${e.message}`, "ERROR"); }
 
-                // DATA CARDS (v70 Fidelity)
+                // 4. Data Cards (Fidelity Sync)
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
-                document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'EARLY BIRD').toUpperCase();
+                document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
 
-                // FAQ & UBICACIÓN
+                // 5. Sponsors (v71 Verified Asset Stability)
+                try {
+                    const verifiedLogos = [
+                        { n: 'Absolut', u: 'https://cdn.worldvectorlogo.com/logos/absolut.svg' },
+                        { n: 'RedBull', u: 'https://cdn.worldvectorlogo.com/logos/red-bull-2.svg' },
+                        { n: 'Corona', u: 'https://cdn.worldvectorlogo.com/logos/corona-6.svg' },
+                        { n: 'Pioneer', u: 'https://cdn.worldvectorlogo.com/logos/pioneer-dj.svg' }
+                    ];
+                    document.getElementById('db-sponsors-strip').innerHTML = verifiedLogos.map(l => `<img src="${l.u}" class="sponsor-logo" alt="${l.n}" onerror="this.src='https://via.placeholder.com/150x50/FFFFFF/000000?text=${l.n}'">`).join('');
+                    logStatus("LINK: Sponsors vinculados con enlaces de alta disponibilidad (Pioneer fix).", "LINK");
+                } catch (e) { logStatus(`ERR-SPONSORS: ${e.message}`, "ERROR"); }
+
+                // 6. Form (Full 7 Fields Integration)
+                try {
+                    let htmlForm = '';
+                    if (evento.form_campos?.email) htmlForm += `<input type="email" class="form-input" placeholder="Correo electrónico *">`;
+                    if (evento.form_campos?.edad) htmlForm += `<input type="number" class="form-input" placeholder="Edad *">`;
+                    if (evento.form_campos?.ciudad) htmlForm += `<input type="text" class="form-input" placeholder="Ciudad *">`;
+                    htmlForm += `<textarea class="form-input" placeholder="Nota adicional" style="height:80px;"></textarea>`;
+                    document.getElementById('db-dynamic-fields').innerHTML = htmlForm;
+                    logStatus("LINK: Formulario completado con campos base y dinámicos.", "LINK");
+                } catch (e) { logStatus(`ERR-FORM: ${e.message}`, "ERROR"); }
+
+                // FAQ & rest
                 if (content.faq) {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                         const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${(q||'Consulta').trim()}</span><span class="faq-icon-plus">+</span></div><div class="faq-answer">${(a||'Contacta al organizador.').trim()}</div></div>`;
+                        return `<div class="faq-item" onclick="toggleFaq(this)"><div class="faq-header"><span>${(q||'Consulta').trim()}</span><span class="faq-icon-plus">+</span></div><div class="faq-answer">${(a||'Contacta al hostal.').trim()}</div></div>`;
                     }).join('');
                 }
-                document.getElementById('venue-name').innerText = (evento.ubicacion || 'TERRAZA R10').toUpperCase();
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+                document.getElementById('venue-name').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
 
-                // SPONSORS (v70 High-Availability Logos)
-                const refLogos = [
-                    { n: 'Absolut', u: 'https://www.vectorlogo.zone/logos/absolut/absolut-official.svg' },
-                    { n: 'RedBull', u: 'https://www.vectorlogo.zone/logos/redbull/redbull-ar21.svg' },
-                    { n: 'Corona', u: 'https://www.vectorlogo.zone/logos/corona/corona-ar21.svg' },
-                    { n: 'Pioneer', u: 'https://www.vectorlogo.zone/logos/pioneer/pioneer-ar21.svg' }
-                ];
-                document.getElementById('db-sponsors-strip').innerHTML = refLogos.map(l => `<img src="${l.u}" class="sponsor-logo" alt="${l.n}">`).join('');
-
-                // FORM RECOVERY (7 Fields)
-                let htmlForm = '';
-                if (evento.form_campos?.email) htmlForm += `<input type="email" class="form-input" id="reg-email" placeholder="Correo electrónico *">`;
-                if (evento.form_campos?.edad) htmlForm += `<input type="number" class="form-input" placeholder="Edad *">`;
-                if (evento.form_campos?.ciudad) htmlForm += `<input type="text" class="form-input" placeholder="Ciudad de origen *">`;
-                htmlForm += `<textarea class="form-input" placeholder="Nota adicional" style="height:80px;"></textarea>`;
-                document.getElementById('db-dynamic-fields').innerHTML = htmlForm;
-
-                // Media Frame
+                // Multi-media
                 document.getElementById('db-trailer-iframe').src = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6";
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="400" frameBorder="0" allow="encrypted-media" style="border:none; border-radius:12px;"></iframe>`;
                 }
 
-                // Audit Shield Final v70
+                // Audit Shield Final v71
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : (key==='patrocinadores') ? 'modulo-patrocinadores' : `modulo-${key}`;
                     const el = document.getElementById(elId);
