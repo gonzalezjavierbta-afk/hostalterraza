@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v31: Ground Truth Sync · Sistema QR</title>
+    <title>Editor v32: Precision Mapping · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,7 +11,7 @@
 
     <style>
         :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; }
-        html, body { margin: 0; padding: 0; min-height: 100%; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; }
+        html, body { margin: 0; padding: 0; min-height: 100%; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; }
         .editor-tools { position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(20,20,20,0.9); border: 1px solid var(--gold); padding: 15px; border-radius: 12px; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 10px; }
         .btn-export { background: var(--gold); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -34,11 +34,11 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Sincronizando con Ground Truth v31...</div>
+    <div id="loader" class="loading-overlay">Sincronización de Precisión v32...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">SYNC: salsa-and-flow-final</span>
-        <button class="btn-export" onclick="exportTemplate()">COPIAR JSON AJUSTADO</button>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">PRECISION MODE v32</span>
+        <button class="btn-export" onclick="exportTemplate()">COPIAR JSON CONFIG</button>
     </div>
 
     <header id="hero-bg" class="hero">
@@ -48,7 +48,7 @@
         </div>
     </header>
 
-    <!-- LOS 11 MÓDULOS OBLIGATORIOS (Inmutabilidad de Módulos) -->
+    <!-- MÓDULOS OBLIGATORIOS (INMUTABILIDAD) -->
     <section id="modulo-countdown"><h2 style="color:var(--gold); letter-spacing:2px; font-size:0.8rem;">COMIENZA EN</h2><div class="countdown-grid"><div class="cd-box"><span id="cd-days" class="cd-number">00</span><span class="cd-label">DÍAS</span></div><div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span class="cd-label">HORAS</span></div><div class="cd-box"><span id="cd-mins" class="cd-number">00</span><span class="cd-label">MIN</span></div><div class="cd-box"><span id="cd-secs" class="cd-number">00</span><span class="cd-label">SEG</span></div></div></section>
     <section id="modulo-trailer"><h2 style="color:var(--gold); letter-spacing:2px;">TRÁILER</h2><div id="db-trailer-container"></div></section>
     <section id="modulo-aforo"><h2 style="color:var(--gold); letter-spacing:2px;">DISPONIBILIDAD</h2><div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div></section>
@@ -78,7 +78,6 @@
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // MOTOR TIEMPO (Principio Poka-yoke v22)
         function startCountdown(date, time) {
             try {
                 const target = new Date(`${date}T${time}`).getTime();
@@ -96,31 +95,32 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V31: Sincronizando datos finales detectados...");
-            const activos = Object.entries(SANDBOX_CONFIG).filter(([k,v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
-            logStatus(`INFO: Módulos Activos en el Editor: ${activos.join(' | ')}`, "INFO");
-
+            logStatus("AUDITORÍA V32: Iniciando mapeo de precisión...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 2. PROTOCOLO INYECCIÓN TIEMPO (Heartbeat)
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const config = evento.config_landing || {};
-                const getModuleData = (llaves) => {
-                    let levels = [evento, config, config.content, config.data];
-                    for (let loc of levels) {
-                        if (!loc) continue;
-                        for (let k of llaves) {
-                            let val = loc[k];
-                            if (val && typeof val !== 'boolean') return val;
-                        }
-                    }
-                    return null;
-                };
+                const contentObj = config.content || {};
+
+                logStatus(`JSON: Llaves detectadas en content -> ${Object.keys(contentObj).join(', ')}`, "JSON");
+
+                // --- PROCESAMIENTO FAQ (Mapeo Hard-Fix) ---
+                const faqRaw = contentObj.faq || contentObj.preguntas_frecuentes || evento.faq;
+                if (faqRaw && typeof faqRaw === 'string' && faqRaw.includes('|')) {
+                    const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
+                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div style="margin-bottom:1.5rem;"><b style="color:var(--gold); display:block;">${q.trim()}</b><p style="opacity:0.7; margin:0.5rem 0 0 0;">${a.trim()}</p></div>`;
+                    }).join('');
+                    logStatus(`LINK: FAQ inyectada (${lineas.length} preguntas).`, "LINK");
+                } else if (faqRaw) {
+                    logStatus("TRACE: Info FAQ encontrada pero NO cumple el formato 'pregunta|respuesta'.", "ERROR");
+                }
 
                 // HERO
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
@@ -133,23 +133,23 @@
                     logStatus("LINK: Módulo Aforo vinculado.", "LINK");
                 }
 
-                // 2. LINEUP (Ajustado para Array de tu JSON)
-                const lineup = getModuleData(['dj_lineup', 'lineup']);
+                // 2. LINEUP
+                const lineup = contentObj.dj_lineup || contentObj.lineup;
                 if (lineup) {
                     const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
                     document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus("LINK: Lineup inyectado (desde Array JSON).", "LINK");
+                    logStatus("LINK: Lineup inyectado.", "LINK");
                 }
 
                 // 3. DRESS CODE
-                const dress = getModuleData(['dresscode', 'vestimenta']);
+                const dress = contentObj.dresscode || contentObj.vestimenta;
                 if (dress) {
                     document.getElementById('db-dress-txt').innerText = dress;
                     logStatus("LINK: Dress Code vinculado.", "LINK");
                 }
 
-                // 4. GALERÍA (Ajustado para Array de tu JSON)
-                const gallery = getModuleData(['gallery', 'galeria']);
+                // 4. GALERÍA
+                const gallery = contentObj.gallery || contentObj.galeria;
                 if (gallery) {
                     const urls = Array.isArray(gallery) ? gallery : gallery.split('\n');
                     document.getElementById('db-gallery-grid').innerHTML = urls.map(u => `<img src="${u.trim()}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`).join('');
@@ -157,18 +157,17 @@
                 }
 
                 // 5. GUEST LIST
-                const guest = getModuleData(['guest_list']);
-                if (guest) {
-                    document.getElementById('db-guest-txt').innerText = guest;
+                if (contentObj.guest_list) {
+                    document.getElementById('db-guest-txt').innerText = contentObj.guest_list;
                     logStatus("LINK: Guest List vinculada.", "LINK");
                 }
 
-                // 6. PLAYLIST (Ajustado a llave 'playlist_url')
-                const playlist = getModuleData(['playlist_url', 'spotify']);
-                if (playlist) {
+                // 6. PLAYLIST
+                const playlist = contentObj.playlist_url || contentObj.spotify;
+                if (playlist && typeof playlist === 'string' && playlist.includes('spotify')) {
                     const embed = playlist.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("LINK: Playlist vinculada (llave: playlist_url).", "LINK");
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
+                    logStatus("LINK: Playlist vinculada.", "LINK");
                 }
 
                 // 7. UBICACIÓN
@@ -183,9 +182,9 @@
                 document.getElementById('db-custom-fields').innerHTML = '<div class="form-group"><label style="color:var(--gold); font-size:0.7rem; font-weight:bold;">NOMBRE COMPLETO *</label><input type="text" class="form-input" placeholder="Tu nombre..." required></div>';
                 logStatus("LINK: Formulario inyectado.", "LINK");
 
-                // --- AUDITORÍA DE INTEGRIDAD FINAL v31 ---
+                // --- AUDITORÍA DE INTEGRIDAD FINAL v32 ---
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
-                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD DE DATOS ---", "INFO");
+                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD ---", "INFO");
                 
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     if (key === 'force_gold' || key === 'trailer') return;
@@ -198,20 +197,20 @@
                     const cleanContent = container ? container.innerText.replace(/\s/g, '').replace('--', '') : '';
 
                     if (SANDBOX_CONFIG[key] && cleanContent.length < 3 && !hasIframe && !hasImg) {
-                        logStatus(`ERROR: Módulo ${key.toUpperCase()} vacío. No hay datos en la DB para este evento.`, "ERROR");
+                        logStatus(`ERROR: Módulo ${key.toUpperCase()} activo pero VACÍO en el DOM.`, "ERROR");
                     } else if (SANDBOX_CONFIG[key]) {
                         logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con datos reales.`, "INFO");
                     }
                 });
 
-                logStatus("SINCRONIZACIÓN GROUND TRUTH FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN V32 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
         window.onload = initEvento;
-        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "ground-truth-v31", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
+        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "precision-v32", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
     </script>
 </body>
 </html>
