@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v33: Full Registry Sync · Sistema QR</title>
+    <title>Editor v34: Ultimate Restoration · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,8 +32,8 @@
         .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
         .form-label { color: var(--gold); font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; color: white; font-family: inherit; width: 100%; box-sizing: border-box; font-size: 1rem; transition: border 0.3s; }
-        .form-input:focus { border-color: var(--gold); outline: none; outline: none; }
-        .phone-input-group { display: flex; gap: 0.5rem; }
+        .form-input:focus { border-color: var(--gold); outline: none; }
+        .phone-group { display: flex; gap: 0.5rem; }
         .country-select { width: 100px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 1rem; font-size: 1rem; letter-spacing: 1px; }
 
@@ -43,10 +43,10 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Sincronización Maestra de Registro v33...</div>
+    <div id="loader" class="loading-overlay">Restauración Maestra v34...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">REGISTRY SYNC ACTIVE</span>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">ULTIMATE STABILITY v34</span>
         <button class="btn-export" onclick="exportTemplate()">COPIAR JSON CONFIG</button>
     </div>
 
@@ -57,50 +57,34 @@
         </div>
     </header>
 
-    <!-- 11 MÓDULOS OBLIGATORIOS -->
+    <!-- 11 MÓDULOS OBLIGATORIOS (INMUTABILIDAD) -->
     <section id="modulo-countdown"><h2 style="color:var(--gold); letter-spacing:2px; font-size:0.8rem;">COMIENZA EN</h2><div class="countdown-grid"><div class="cd-box"><span id="cd-days" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">DÍAS</span></div><div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">HORAS</span></div><div class="cd-box"><span id="cd-mins" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">MIN</span></div><div class="cd-box"><span id="cd-secs" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">SEG</span></div></div></section>
+    
     <section id="modulo-trailer"><h2 style="color:var(--gold); letter-spacing:2px;">TRÁILER</h2><div id="db-trailer-container"></div></section>
+    
     <section id="modulo-aforo"><h2 style="color:var(--gold); letter-spacing:2px;">DISPONIBILIDAD</h2><div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div></section>
+    
     <section id="modulo-lineup"><h2 style="color:var(--gold); letter-spacing:2px;">DJ LINEUP</h2><div id="db-lineup"></div></section>
+    
     <section id="modulo-dress_code"><h2 style="color:var(--gold); letter-spacing:2px;">DRESS CODE</h2><div id="db-dress-txt" class="data-item">--</div></section>
-    <section id="modulo-gallery"><h2 style="color:var(--gold); letter-spacing:2px;">GALERÍA</h2><div id="db-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div></section>
+    
+    <section id="modulo-gallery"><h2 style="color:var(--gold); letter-spacing:2px;">GALERÍA</h2><div id="db-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;"></div></section>
+    
     <section id="modulo-guest_list"><h2 style="color:var(--gold); letter-spacing:2px;">GUEST LIST</h2><div id="db-guest-txt" class="data-item">--</div></section>
+    
     <section id="modulo-faq"><h2 style="color:var(--gold); letter-spacing:2px;">PREGUNTAS FRECUENTES</h2><div id="db-faq-list"></div></section>
+    
     <section id="modulo-playlist"><h2 style="color:var(--gold); letter-spacing:2px;">PLAYLIST OFICIAL</h2><div id="db-spotify"></div></section>
+    
     <section id="modulo-ubicacion"><h2 style="color:var(--gold);">UBICACIÓN</h2><div id="db-ubicacion" class="data-item">--</div><div id="db-mapa-container" style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(223, 32, 182, 0.2);"></div></section>
 
-    <!-- FORMULARIO RECONSTRUIDO SEGÚN EVENTO.HTML -->
     <section id="modulo-formulario">
         <h2 style="color: var(--gold); letter-spacing: 4px; text-align: center; margin-bottom: 3rem; font-weight: 900;">REGISTRO DE ASISTENCIA</h2>
-        <form id="master-reg-form" class="form-container" onsubmit="alert('Simulación: Registro exitoso'); return false;">
-            
-            <!-- CAMPOS BASE OBLIGATORIOS [2] -->
-            <div class="form-group">
-                <label class="form-label">Nombre completo *</label>
-                <input type="text" class="form-input" placeholder="Ej: Juan Pérez" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Cédula / Documento *</label>
-                <input type="text" class="form-input" placeholder="ID único" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Teléfono *</label>
-                <div class="phone-input-group">
-                    <select class="country-select">
-                        <option value="+57">🇨🇴 +57</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+34">🇪🇸 +34</option>
-                        <option value="+52">🇲🇽 +52</option>
-                    </select>
-                    <input type="tel" class="form-input" placeholder="Número de celular" required>
-                </div>
-            </div>
-
-            <!-- CONTENEDOR DE CAMPOS DINÁMICOS [3, 4] -->
+        <form id="master-reg-form" class="form-container" onsubmit="alert('Registro exitoso'); return false;">
+            <div class="form-group"><label class="form-label">Nombre completo *</label><input type="text" class="form-input" placeholder="Nombre y Apellido" required></div>
+            <div class="form-group"><label class="form-label">Cédula / Documento *</label><input type="text" class="form-input" placeholder="ID único" required></div>
+            <div class="form-group"><label class="form-label">Teléfono *</label><div class="phone-group"><select class="country-select"><option value="+57">🇨🇴 +57</option><option value="+1">🇺🇸 +1</option><option value="+34">🇪🇸 +34</option></select><input type="tel" class="form-input" placeholder="Celular" required></div></div>
             <div id="db-dynamic-fields" style="display: flex; flex-direction: column; gap: 1.2rem;"></div>
-
             <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
         </form>
     </section>
@@ -122,12 +106,11 @@
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // MOTOR TIEMPO (Protocolo de Latido v22)
         function startCountdown(date, time) {
             try {
                 const target = new Date(`${date}T${time}`).getTime();
                 if (isNaN(target)) return;
-                logStatus(`TIME: Latido de tiempo activo para el evento del ${date}.`, "TIME");
+                logStatus(`TIME: Latido de tiempo sincronizado para ${date}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -140,9 +123,9 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V33: Sincronización completa de Formulario...");
+            logStatus("AUDITORÍA V34: Restauración de integridad y paridad de registro...");
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k,v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
-            logStatus(`INFO: Módulos Activos (Inmutabilidad: 11) -> ${activos.join(' | ')}`, "INFO");
+            logStatus(`INFO: Módulos Activos (11): ${activos.join(' | ')}`, "INFO");
 
             const slug = new URLSearchParams(window.location.search).get('slug');
 
@@ -150,98 +133,117 @@
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 2. PROTOCOLO INYECCIÓN TIEMPO (Inmediato)
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const config = evento.config_landing || {};
-                const contentObj = config.content || {};
-
-                // --- VINCULACIÓN FÍSICA DE DATOS ---
-                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
+                const content = config.content || {};
 
                 // 1. AFORO
                 if (evento.aforo_max) {
-                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos disponibles para este evento.`;
-                    logStatus("LINK: Módulo Aforo vinculado.", "LINK");
+                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos disponibles para registro.`;
+                    logStatus("LINK: Módulo Aforo inyectado.", "LINK");
                 }
 
-                // 2. LINEUP (Array Support)
-                if (contentObj.dj_lineup) {
-                    const l = Array.isArray(contentObj.dj_lineup) ? contentObj.dj_lineup : contentObj.dj_lineup.split('\n');
+                // 2. LINEUP (Restaurado)
+                const lineup = content.dj_lineup || content.lineup;
+                if (lineup) {
+                    const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
                     document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus("LINK: DJ Lineup inyectado.", "LINK");
+                    logStatus("LINK: Lineup inyectado.", "LINK");
                 }
 
-                // 3. FAQ (Hard-Fix v32)
-                if (contentObj.faq && typeof contentObj.faq === 'string') {
-                    const lineas = contentObj.faq.split('\n').filter(l => l.includes('|'));
+                // 3. DRESS CODE (Restaurado)
+                const dress = content.dresscode || content.vestimenta;
+                if (dress) {
+                    document.getElementById('db-dress-txt').innerText = dress;
+                    logStatus("LINK: Dress Code inyectado.", "LINK");
+                }
+
+                // 4. GALERÍA (Restaurado)
+                const gallery = content.gallery || content.galeria;
+                if (gallery) {
+                    const urls = Array.isArray(gallery) ? gallery : gallery.split('\n');
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`).join('');
+                    logStatus(`LINK: Galería (${urls.length} imágenes) inyectada.`, "LINK");
+                }
+
+                // 5. GUEST LIST (Restaurado)
+                if (content.guest_list) {
+                    document.getElementById('db-guest-txt').innerText = content.guest_list;
+                    logStatus("LINK: Guest List inyectada.", "LINK");
+                }
+
+                // 6. FAQ
+                if (content.faq && typeof content.faq === 'string') {
+                    const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                         const [q, a] = l.split('|');
                         return `<div style="margin-bottom:1.5rem;"><b style="color:var(--gold); display:block;">${q.trim()}</b><p style="opacity:0.7; margin:0.5rem 0 0 0;">${a.trim()}</p></div>`;
                     }).join('');
-                    logStatus("LINK: FAQ inyectado con éxito.", "LINK");
+                    logStatus("LINK: FAQ inyectada.", "LINK");
                 }
 
-                // 4. PLAYLIST (Key: playlist_url)
-                if (contentObj.playlist_url) {
-                    const embed = contentObj.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                // 7. PLAYLIST (Embed Fix)
+                if (content.playlist_url) {
+                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
                     logStatus("LINK: Playlist vinculada.", "LINK");
                 }
 
-                // 5. UBICACIÓN Y MAPA
+                // 8. UBICACIÓN
                 if (evento.ubicacion) {
                     document.getElementById('db-ubicacion').innerText = evento.ubicacion;
                     const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
-                    logStatus("LINK: Mapa de ubicación inyectado.", "LINK");
+                    logStatus("LINK: Mapa inyectado.", "LINK");
                 }
 
-                // --- 6. RECONSTRUCCIÓN DEL FORMULARIO DINÁMICO [1, 3] ---
+                // 9. FORMULARIO DINÁMICO (Paridad evento.html)
                 if (SANDBOX_CONFIG.formulario) {
                     const fields = evento.form_campos || {};
-                    let dynamicHtml = '';
-                    
-                    if (fields.email) dynamicHtml += `<div class="form-group"><label class="form-label">Correo electrónico *</label><input type="email" class="form-input" placeholder="ejemplo@mail.com" required></div>`;
-                    if (fields.edad) dynamicHtml += `<div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input" placeholder="Tu edad"></div>`;
-                    if (fields.ciudad) dynamicHtml += `<div class="form-group"><label class="form-label">Ciudad de origen</label><input type="text" class="form-input" placeholder="Ciudad"></div>`;
-                    if (fields.nota) dynamicHtml += `<div class="form-group"><label class="form-label">Nota (opcional)</label><textarea class="form-input" placeholder="Información adicional..." style="min-height:80px;"></textarea></div>`;
-
-                    document.getElementById('db-dynamic-fields').innerHTML = dynamicHtml;
-                    logStatus("LINK: Campos de formulario base y dinámicos inyectados.", "LINK");
+                    let html = '';
+                    if (fields.email) html += `<div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" placeholder="ejemplo@mail.com" required></div>`;
+                    if (fields.edad) html += `<div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input" placeholder="Tu edad"></div>`;
+                    if (fields.ciudad) html += `<div class="form-group"><label class="form-label">Ciudad origen</label><input type="text" class="form-input" placeholder="Ciudad"></div>`;
+                    document.getElementById('db-dynamic-fields').innerHTML = html;
+                    logStatus("LINK: Formulario reconstruido con éxito.", "LINK");
                 }
 
-                // --- PROTOCOLO DE INTEGRIDAD FINAL v33 ---
+                // HERO DATA
+                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
+                document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
+
+                // --- AUDITORÍA DE INTEGRIDAD FINAL v34 ---
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD ---", "INFO");
                 
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
-                    if (key === 'force_gold' || key === 'trailer' || key === 'dress_code') return;
+                    if (key === 'force_gold' || key === 'trailer') return;
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                     
                     const container = el.querySelector('[id*="db-"]') || el.querySelector('.countdown-grid') || el.querySelector('form');
                     const hasIframe = container ? container.querySelector('iframe') : null;
                     const hasInput = container ? container.querySelector('input') : null;
+                    const hasImg = container ? container.querySelector('img') : null;
                     const cleanContent = container ? container.innerText.replace(/\s/g, '').replace('--', '') : '';
 
-                    if (SANDBOX_CONFIG[key] && cleanContent.length < 3 && !hasIframe && !hasInput) {
-                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló al cargar información.`, "ERROR");
+                    if (SANDBOX_CONFIG[key] && cleanContent.length < 3 && !hasIframe && !hasInput && !hasImg) {
+                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló al cargar información real.`, "ERROR");
                     } else if (SANDBOX_CONFIG[key]) {
                         logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con éxito.`, "INFO");
                     }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V33 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V34 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
         window.onload = initEvento;
-        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "full-registry-v33", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
+        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "ultimate-v34", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
     </script>
 </body>
 </html>
