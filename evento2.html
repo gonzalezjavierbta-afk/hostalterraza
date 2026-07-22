@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v27: Validation & Integrity Sync · Sistema QR</title>
+    <title>Editor v28: Integrity Shield · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,6 +19,7 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
+        /* UI EDITOR */
         .editor-tools {
             position: fixed; bottom: 20px; right: 20px; z-index: 1000;
             background: rgba(20,20,20,0.9); border: 1px solid var(--gold);
@@ -30,7 +31,9 @@
             border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;
         }
 
+        /* SECCIONES VISIBLES POR DEFECTO PARA DEBUG */
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
         .hero {
             position: relative; min-height: 70vh; display: flex; flex-direction: column;
             justify-content: center; padding: 0 10%; background-size: cover; background-position: center;
@@ -49,17 +52,17 @@
         }
 
         .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
+        
+        /* GRID DE TIEMPO */
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
         .cd-label { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.5; }
 
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
-        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-
+        /* FORMULARIO CSS */
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem; }
-        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; color: white; font-family: inherit; }
-        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; color: white; font-family: inherit; width: 100%; box-sizing: border-box; }
+        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; width: 100%; }
 
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -67,11 +70,11 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Ejecutando Auditoría de Integridad v27...</div>
+    <div id="loader" class="loading-overlay">Sincronización de Integridad v28...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">INTEGRITY CHECK v27</span>
-        <button class="btn-export" onclick="exportTemplate()">COPIAR JSON CONFIG</button>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">integrity Check ACTIVE</span>
+        <button class="btn-export" onclick="exportTemplate()">COPIAR JSON MAESTRO</button>
     </div>
 
     <header id="hero-bg" class="hero">
@@ -81,7 +84,7 @@
         </div>
     </header>
 
-    <!-- 11 MÓDULOS OBLIGATORIOS (Inmutabilidad) -->
+    <!-- LOS 11 MÓDULOS DE CATEGORÍA FIESTA -->
     <section id="modulo-countdown">
         <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">EL EVENTO COMIENZA EN</h2>
         <div class="countdown-grid">
@@ -114,7 +117,7 @@
 
     <section id="modulo-gallery">
         <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA</h2>
-        <div id="db-gallery-grid" class="gallery-grid"></div>
+        <div id="db-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
     </section>
 
     <section id="modulo-guest_list">
@@ -139,13 +142,18 @@
     </section>
 
     <section id="modulo-formulario">
-        <h2 style="color: var(--gold); letter-spacing: 2px; text-align: center;">REGISTRO</h2>
-        <div id="db-custom-fields" class="form-container"></div>
+        <h2 style="color: var(--gold); letter-spacing: 2px; text-align: center; margin-bottom: 2rem;">REGISTRO</h2>
+        <form id="event-reg-form" class="form-container" onsubmit="alert('Registro enviado'); return false;">
+            <div class="form-group"><label style="color:var(--gold); font-size:0.7rem; font-weight: bold;">NOMBRE COMPLETO *</label><input type="text" class="form-input" required></div>
+            <div class="form-group"><label style="color:var(--gold); font-size:0.7rem; font-weight: bold; margin-top:1rem; display:block;">ID / DOCUMENTO *</label><input type="text" class="form-input" required></div>
+            <div id="db-custom-fields" class="form-container" style="padding:0; margin:0; gap: 1.2rem;"></div>
+            <button type="submit" class="btn-submit" style="margin-top: 2rem;">Confirmar Asistencia →</button>
+        </form>
     </section>
 
     <script>
         /**
-         * 1. CONFIGURACIÓN (Inmutabilidad v25/v26)
+         * 1. CONFIGURACIÓN (Inmutabilidad v28)
          */
         const SANDBOX_CONFIG = {
             countdown: true, trailer: true, aforo: true, lineup: true, 
@@ -163,12 +171,12 @@
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // MOTOR TIEMPO (Protocolo de Latido v26)
+        // MOTOR TIEMPO (Blindaje v26)
         function startCountdown(date, time) {
             try {
                 const target = new Date(`${date}T${time}`).getTime();
-                if (isNaN(target)) throw new Error("Fecha/Hora no válida");
-                logStatus(`TIME: Motor sincronizado para el ${date} a las ${time}.`, "TIME");
+                if (isNaN(target)) throw new Error("Datos de tiempo inválidos");
+                logStatus(`TIME: Motor sincronizado para el evento del ${date}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -177,20 +185,24 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-            } catch (e) { logStatus(`TIME ERROR: ${e.message}`, "ERROR"); }
+            } catch (e) { logStatus(`ERROR TIME: ${e.message}`, "ERROR"); }
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V27: Ejecutando secuencia de Integridad Total...");
+            // REQUERIMIENTO: Restaurar log de confirmación de módulos activos al inicio
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
-            logStatus(`INFO: Mantenida Inmutabilidad (11 módulos).`, "INFO");
+            logStatus(`INFO: MÓDULOS ACTIVOS EN SANDBOX_CONFIG: ${activos.join(' | ')}`, "INFO");
+            logStatus(`INFO: Verificando Inmutabilidad (Total: ${activos.length} módulos activos).`, "INFO");
 
             const slug = new URLSearchParams(window.location.search).get('slug');
+
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 2. PROTOCOLO LATIDO (Inmediatamente tras carga)
+                logStatus(`DB: Campos raíz detectados -> ${Object.keys(evento).join(', ')}`, "DB");
+
+                // --- PROTOCOLO LATIDO ---
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const config = evento.config_landing || {};
@@ -202,7 +214,7 @@
                             let val = loc[k];
                             if (val && typeof val !== 'boolean') {
                                 if (typeof val === 'string' && val.length > 2 && (!term || val.toLowerCase().includes(term))) {
-                                    logStatus(`TRACE: Extrayendo '${k}' para inyección.`, "TRACE");
+                                    logStatus(`TRACE: Extrayendo '${k}' para renderizado visual.`, "TRACE");
                                     return val;
                                 } else if (Array.isArray(val) && val.length > 0) {
                                     logStatus(`TRACE: Obteniendo lista '${k}' (Array).`, "TRACE");
@@ -214,62 +226,62 @@
                     return null;
                 };
 
-                // VINCULACIÓN HERO
+                // HERO E IMAGEN
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen Hero aplicada.", "LINK");
+                    logStatus("LINK: Imagen Hero inyectada.", "LINK");
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
 
-                // 1. AFORO (FIX)
+                // 1. AFORO
                 if (evento.aforo_max) {
-                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos disponibles para registro.`;
-                    logStatus("LINK: Módulo Aforo vinculado con éxito.", "LINK");
+                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos totales para inscripción.`;
+                    logStatus("LINK: Módulo Aforo vinculado.", "LINK");
                 }
 
                 // 2. LINEUP
                 const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const l = typeof lineup === 'string' ? lineup.split('\n') : lineup;
-                    document.getElementById('db-lineup').innerHTML = l.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
+                    document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item">${a}</div>`).join('');
                     logStatus("LINK: DJ Lineup inyectado.", "LINK");
                 }
 
-                // 3. DRESS CODE (FIX)
+                // 3. DRESS CODE
                 const dress = getModuleData(['dress_code', 'vestimenta', 'dresscode']);
                 if (dress) {
                     document.getElementById('db-dress-txt').innerText = dress;
-                    logStatus("LINK: Módulo Dress Code vinculado con éxito.", "LINK");
+                    logStatus("LINK: Módulo Dress Code vinculado.", "LINK");
                 }
 
-                // 4. GALERÍA (FIX)
+                // 4. GALERÍA
                 const gallery = getModuleData(['gallery', 'galeria', 'imagenes']);
                 if (gallery) {
                     const urls = typeof gallery === 'string' ? gallery.split('\n') : gallery;
-                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" class="gallery-img" onerror="this.style.display='none'">`).join('');
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 10).map(u => `<img src="${u.trim()}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`).join('');
                     logStatus(`LINK: Galería (${urls.length} imágenes) inyectada.`, "LINK");
                 }
 
-                // 5. GUEST LIST
+                // 5. GUEST LIST (FIX v26)
                 const guest = getModuleData(['guest_list', 'instrucciones_guest', 'beneficios']);
                 if (guest) {
                     document.getElementById('db-guest-txt').innerText = guest;
                     logStatus("LINK: Guest List vinculada.", "LINK");
                 }
 
-                // 6. FAQ (FIX)
-                const faqRaw = getModuleData(['faq', 'preguntas_frecuentes']);
+                // 6. FAQ (FIX REQUERIMIENTO V28)
+                const faqRaw = getModuleData(['faq', 'preguntas_frecuentes', 'faq_list']);
                 if (faqRaw && typeof faqRaw === 'string') {
                     const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                         const [q, a] = l.split('|');
-                        return `<div style="margin-bottom:1rem;"><b style="color:var(--gold);">${q}</b><p style="opacity:0.7; margin:0;">${a}</p></div>`;
+                        return `<div style="margin-bottom:1.5rem;"><b style="color:var(--gold); display:block; font-size:1rem;">${q.trim()}</b><p style="opacity:0.7; margin:0.5rem 0 0 0;">${a.trim()}</p></div>`;
                     }).join('');
-                    logStatus(`LINK: ${lineas.length} preguntas FAQ inyectadas.`, "LINK");
+                    logStatus("LINK: Módulo FAQ inyectado satisfactoriamente.", "LINK");
                 }
 
-                // 7. PLAYLIST (FIX)
+                // 7. PLAYLIST (FIX REQUERIMIENTO V28)
                 const spotify = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
                 if (spotify) {
                     const embed = spotify.replace('open.spotify.com', 'open.spotify.com/embed');
@@ -282,46 +294,48 @@
                     document.getElementById('db-ubicacion').innerText = evento.ubicacion;
                     const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
-                    logStatus("LINK: Mapa inyectado con éxito.", "LINK");
+                    logStatus("LINK: Mapa de ubicación inyectado.", "LINK");
                 }
 
-                // 9. FORMULARIO
+                // 9. FORMULARIO (FIX REQUERIMIENTO V28)
                 if (evento.form_campos) {
                     const f = evento.form_campos;
                     let html = '';
-                    if (f.email) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">EMAIL</label><input type="email" class="form-input"></div>`;
-                    if (f.ciudad) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem;">CIUDAD</label><input type="text" class="form-input"></div>`;
+                    if (f.email) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem; font-weight:bold; margin-top:1rem; display:block;">EMAIL *</label><input type="email" class="form-input" required></div>`;
+                    if (f.ciudad) html += `<div class="form-group"><label style="color:var(--gold); font-size:0.7rem; font-weight:bold; margin-top:1rem; display:block;">CIUDAD</label><input type="text" class="form-input"></div>`;
                     document.getElementById('db-custom-fields').innerHTML = html;
-                    logStatus("LINK: Formulario dinámico inyectado.", "LINK");
+                    logStatus("LINK: Campos de formulario dinámicos inyectados.", "LINK");
                 }
 
-                // VISIBILIDAD FINAL Y AUDITORÍA DE INTEGRIDAD (REQUERIMIENTO V27)
+                // --- PROTOCOLO DE VISIBILIDAD E INTEGRIDAD FINAL ---
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 
-                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD DE MÓDULOS ---", "INFO");
+                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD DE MÓDULOS v28 ---", "INFO");
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     if (key === 'force_gold') return;
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) {
+                        // FORZAR VISIBILIDAD si está en true
                         el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
-                        // Validación de información real
-                        const content = el.innerText.replace(/\s/g, '');
-                        if (SANDBOX_CONFIG[key] && content.length < 5) {
-                            logStatus(`ERROR: Módulo ${key.toUpperCase()} está activo pero NO tiene información de la BD.`, "ERROR");
+                        
+                        // VALIDACIÓN DE CONTENIDO REAL
+                        const cleanContent = el.innerText.replace(/\s/g, '').replace('--', '');
+                        if (SANDBOX_CONFIG[key] && cleanContent.length < 5) {
+                            logStatus(`ERROR: Módulo ${key.toUpperCase()} está activo pero QUEDÓ VACÍO (Data Fail).`, "ERROR");
                         } else if (SANDBOX_CONFIG[key]) {
-                            logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con información.`, "INFO");
+                            logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con contenido visible.`, "INFO");
                         }
                     }
                 });
 
-                logStatus("SECUENCIA V27 FINALIZADA CON ÉXITO.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V28 FINALIZADA CON ÉXITO.", "INFO");
 
-            } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally {
+            } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
         window.onload = initEvento;
-        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
+        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "integrity-v28", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
     </script>
 </body>
 </html>
