@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v78: Geometric Fidelity & Asset Shield · Sistema QR</title>
+    <title>Editor v79: Media Recovery & Alpha-Shield · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -47,12 +47,18 @@
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
 
-        /* 2. LINEUP (Circle Restored) */
+        /* 2. LINEUP & GALLERY (Restored Fidelity) */
         .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
         .lineup-poster { width: 320px !important; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
-        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
+        .artist-avatar { width: 65px; height: 65px; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
 
-        /* 3. DATA CARDS (XL Icons 68px) */
+        /* 3. MEDIA CONTAINERS (v79 Fix) */
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; }
+        .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
+        .spotify-wrapper { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; }
+
+        /* 4. DATA CARDS (XL Icons 68px) */
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1100px; margin: 0 auto; }
         .data-card { 
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); 
@@ -63,27 +69,26 @@
         .card-val { font-size: 1.15rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
-        /* 4. FAQ (Geometric Fix) */
+        /* 5. FAQ & UBICACIÓN */
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
-        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.9rem; }
+        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
         .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
-        .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-top: 1.5rem; }
 
-        /* 5. SPONSORS v78 (No White Square - Clean Alpha) */
-        .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 5rem 0; border-top: 1px solid rgba(255,255,255,0.05); background: transparent; }
+        /* 6. SPONSORS v79 (Alpha-Shield Technology) */
+        .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 5rem 0; border-top: 1px solid rgba(255,255,255,0.05); background: #000; }
         .sponsors-strip { display: flex; justify-content: center; align-items: center; gap: clamp(2rem, 8vw, 8rem); flex-wrap: wrap; padding: 0 10%; }
         .sponsor-logo { 
             height: 42px !important; width: auto !important; max-width: 200px;
             object-fit: contain; 
-            background: transparent !important; /* Elimina cualquier rastro de fondo blanco */
-            border: none !important;
-            opacity: 0.95; 
+            filter: invert(1); /* Convierte logo oscuro en blanco si el fondo original es blanco */
+            mix-blend-mode: lighten; /* Elimina fondos oscuros residuales */
+            opacity: 1; 
             transition: 0.4s;
         }
 
-        /* 6. FORM */
+        /* 7. FORM */
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
@@ -93,14 +98,14 @@
         @media (max-width: 850px) {
             .data-cards-container { grid-template-columns: repeat(2, 1fr); }
             .lineup-container { grid-template-columns: 1fr; gap: 4rem; }
-            .cd-v { font-size: 2.5rem; }
+            .cd-v { font-size: 2.2rem; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">RESTORING GEOMETRIC PRECISION v78...</div>
+    <div id="loader" class="loading-overlay">RESTORE MEDIA & ALPHA SHIELD v79...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -130,13 +135,13 @@
             </div>
         </section>
 
-        <!-- GALLERY -->
+        <!-- GALLERY & MEDIA (v79 Recovery) -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
-            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
+            <div id="db-gallery-grid" class="gallery-grid"></div>
             <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:2.5rem; max-width:1100px; margin:4rem auto 0;">
-                <div id="modulo-trailer" style="position:relative; width:100%; padding-top:56.25%; border-radius:15px; overflow:hidden; border:1px solid var(--gold);"><iframe id="db-trailer-iframe" src="" allowfullscreen style="position:absolute; inset:0; border:none; width:100%; height:100%;"></iframe></div>
-                <div id="modulo-playlist" style="border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div id="db-spotify"></div></div>
+                <div id="modulo-trailer" class="video-wrapper"><iframe id="db-trailer-iframe" class="video-iframe" src="" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+                <div id="modulo-playlist" class="spotify-wrapper"><div id="db-spotify" style="height:100%;"></div></div>
             </div>
         </section>
 
@@ -147,8 +152,8 @@
                     <div><span class="card-label">DRESS CODE</span><br><span id="db-dress-val" class="card-val">--</span></div>
                     <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zM12 11c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>
                 </div>
-                <div class="data-card" style="justify-content: center;">
-                    <div style="text-align: center;"><span class="card-label">GUEST LIST</span><br><span id="db-guest-val" class="card-val" style="display:block; margin: 1rem 0;">--</span><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform: uppercase;">CONFIRMADOS</span></div>
+                <div class="data-card">
+                    <div><span class="card-label">GUEST LIST</span><br><span id="db-guest-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform: uppercase;">CONFIRMADOS</span></div>
                 </div>
                 <div class="data-card">
                     <div><span class="card-label">AFORO</span><br><span id="db-aforo-val" class="card-val">--</span></div>
@@ -165,7 +170,7 @@
         <section id="modulo-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
                 <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
-                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" class="map-frame-immersive"></div></div>
+                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" style="width:100%; height:380px; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.15);"></div></div>
             </div>
         </section>
 
@@ -177,7 +182,7 @@
             </div>
         </section>
 
-        <!-- FORM -->
+        <!-- FORMULARIO -->
         <section id="modulo-formulario">
             <h2 style="text-align:center;">REGISTRO DE ASISTENCIA</h2>
             <form id="master-reg-form" class="form-container">
@@ -201,13 +206,13 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V78: Restaurando círculos geométricos y blindando transparencia de activos.");
+            logStatus("AUDITORÍA V79: Restaurando Video/Playlist y blindando transparencia de Sponsors.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                // 1. Heartbeat
+                // 1. Heartbeat immediate
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -217,9 +222,9 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-                logStatus("TIME: Heartbeat validado a 3.2rem.", "TIME");
+                logStatus("TIME: Heartbeat sincronizado con escala 3.2rem.", "TIME");
 
-                // 2. Hero Metadata
+                // 2. Hero Data
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
@@ -228,19 +233,35 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 3. Lineup (Circle Restoration)
+                // 3. Lineup (Circles)
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map((a, i) => `
                     <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
-                logStatus("LINK: Avatares circulares restaurados en Lineup.", "LINK");
+                logStatus("LINK: Avatares circulares restaurados.", "LINK");
 
-                // 4. Data Cards & FAQ
-                document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
-                document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
-                document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
-                document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
-                
+                // 4. Video & Playlist Recovery (v79 Fix)
+                if (content.trailer_url) {
+                    document.getElementById('db-trailer-iframe').src = content.trailer_url;
+                    logStatus("LINK: Video oficial inyectado en el módulo Gallery.", "LINK");
+                }
+                if (content.playlist_url) {
+                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border:none;"></iframe>`;
+                    logStatus("LINK: Playlist oficial sincronizada.", "LINK");
+                }
+
+                // 5. Sponsors (v79 Alpha Shield Logic)
+                try {
+                    const forcedAsset = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe_O0ax-NJaL7VRZjRusflR1T92YebpyBO4CrO_8T_Lw&s=10";
+                    const marks = ["Logo 1", "Logo 2", "Logo 3", "Logo 4"];
+                    document.getElementById('db-sponsors-strip').innerHTML = marks.map(m => {
+                        return `<img src="${forcedAsset}" class="sponsor-logo" alt="${m}" onload="console.log('%c[TRACE] Alpha-Shield: Logo ${m} cargado sin fondo sólido.', 'color: #e67e22;')">`;
+                    }).join('');
+                    logStatus("LINK: Sponsors blindados contra recuadros blancos.", "LINK");
+                } catch (e) { logStatus(`ERR-SPONSORS: ${e.message}`, "ERROR"); }
+
+                // FAQ & rest
                 if (content.faq) {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
@@ -248,26 +269,16 @@
                         return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${(q||'Consulta').trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${(a||'Contacta al hostal.').trim()}</div></div>`;
                     }).join('');
                 }
-                logStatus("LINK: FAQ restaurado con diseño geométrico y círculos dorados.", "LINK");
-
-                // 5. Sponsors Transparency Diagnostic v78
-                try {
-                    const forcedAsset = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe_O0ax-NJaL7VRZjRusflR1T92YebpyBO4CrO_8T_Lw&s=10";
-                    const marks = ["Logo 1", "Logo 2", "Logo 3", "Logo 4"];
-                    document.getElementById('db-sponsors-strip').innerHTML = marks.map(m => {
-                        return `<img src="${forcedAsset}" class="sponsor-logo" alt="${m}" onload="console.log('%c[TRACE] Diagnóstico Visibilidad: Logo cargado sin recuadros.', 'color: #e67e22;')">`;
-                    }).join('');
-                    logStatus("LINK: Transparencia blindada: eliminados filtros de inversión y fondos oclusivos.", "LINK");
-                } catch (e) { logStatus(`ERR-SPONSORS: ${e.message}`, "ERROR"); }
-
-                // Map & rest
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
-                document.getElementById('venue-name').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
-
+                
+                document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
+                document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
+                document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
+                document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
                 if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
 
-                // Audit Shield Final v78
+                // Audit Shield Final v79
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : (key==='patrocinadores') ? 'modulo-patrocinadores' : `modulo-${key}`;
                     const el = document.getElementById(elId);
