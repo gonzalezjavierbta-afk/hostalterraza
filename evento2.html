@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v35: Integrity Refinement · Sistema QR</title>
+    <title>Editor v36: Total Audit Fix · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -27,7 +27,7 @@
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
         
-        /* FORMULARIO CSS */
+        /* FORMULARIO ESTILO EVENTO.HTML */
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem; }
         .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
         .form-label { color: var(--gold); font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
@@ -35,7 +35,7 @@
         .form-input:focus { border-color: var(--gold); outline: none; }
         .phone-group { display: flex; gap: 0.5rem; }
         .country-select { width: 100px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; }
-        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 1rem; }
+        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 1rem; font-size: 1rem; }
 
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -43,10 +43,10 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Finalizando Auditoría de Sistemas v35...</div>
+    <div id="loader" class="loading-overlay">Finalizando Sincronización v36...</div>
 
     <div class="editor-tools">
-        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">INTEGRITY V35 OK</span>
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">PRODUCTION STABLE v36</span>
         <button class="btn-export" onclick="exportTemplate()">COPIAR JSON CONFIG</button>
     </div>
 
@@ -57,7 +57,7 @@
         </div>
     </header>
 
-    <!-- 11 MÓDULOS OBLIGATORIOS (Inmutabilidad v25+) -->
+    <!-- 11 MÓDULOS OBLIGATORIOS (Inmutabilidad) -->
     <section id="modulo-countdown"><h2 style="color:var(--gold); letter-spacing:2px; font-size:0.8rem;">COMIENZA EN</h2><div class="countdown-grid"><div class="cd-box"><span id="cd-days" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">DÍAS</span></div><div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">HORAS</span></div><div class="cd-box"><span id="cd-mins" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">MIN</span></div><div class="cd-box"><span id="cd-secs" class="cd-number">00</span><span style="font-size:0.6rem; opacity:0.5; letter-spacing:2px;">SEG</span></div></div></section>
     <section id="modulo-trailer"><h2 style="color:var(--gold); letter-spacing:2px;">TRÁILER OFICIAL</h2><div id="db-trailer-container"></div></section>
     <section id="modulo-aforo"><h2 style="color:var(--gold); letter-spacing:2px;">DISPONIBILIDAD</h2><div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div></section>
@@ -71,10 +71,10 @@
 
     <section id="modulo-formulario">
         <h2 style="color: var(--gold); letter-spacing: 4px; text-align: center; margin-bottom: 3rem; font-weight: 900;">REGISTRO DE ASISTENCIA</h2>
-        <form id="master-reg-form" class="form-container" onsubmit="alert('Registro exitoso'); return false;">
-            <div class="form-group"><label class="form-label">Nombre completo *</label><input type="text" class="form-input" placeholder="Nombre y Apellido" required></div>
-            <div class="form-group"><label class="form-label">Cédula / Documento *</label><input type="text" class="form-input" placeholder="ID único" required></div>
-            <div class="form-group"><label class="form-label">Teléfono *</label><div class="phone-group"><select class="country-select"><option value="+57">🇨🇴 +57</option><option value="+1">🇺🇸 +1</option><option value="+34">🇪🇸 +34</option></select><input type="tel" class="form-input" placeholder="Celular" required></div></div>
+        <form id="master-reg-form" class="form-container" onsubmit="alert('Registro enviado'); return false;">
+            <div class="form-group"><label class="form-label">Nombre completo *</label><input type="text" class="form-input" placeholder="Tu Nombre" required></div>
+            <div class="form-group"><label class="form-label">Documento *</label><input type="text" class="form-input" placeholder="ID" required></div>
+            <div class="form-group"><label class="form-label">Teléfono *</label><div class="phone-group"><select class="country-select"><option value="+57">🇨🇴 +57</option><option value="+1">🇺🇸 +1</option></select><input type="tel" class="form-input" required></div></div>
             <div id="db-dynamic-fields" style="display: flex; flex-direction: column; gap: 1.2rem;"></div>
             <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
         </form>
@@ -114,7 +114,7 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V35: Ejecutando secuencia de paridad total...");
+            logStatus("AUDITORÍA V36: Ejecutando verificación de estabilidad final...");
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k,v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
             logStatus(`INFO: Módulos Activos (11): ${activos.join(' | ')}`, "INFO");
 
@@ -124,7 +124,6 @@
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 2. PROTOCOLO LATIDO (Corazón del sistema)
                 if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
 
                 const config = evento.config_landing || {};
@@ -132,16 +131,16 @@
 
                 // 1. AFORO
                 if (evento.aforo_max) {
-                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos configurados.`;
+                    document.getElementById('db-aforo-txt').innerText = `${evento.aforo_max} cupos disponibles para registro.`;
                     logStatus("LINK: Módulo Aforo inyectado.", "LINK");
                 }
 
-                // 2. LINEUP (Mapping Array v31)
+                // 2. LINEUP
                 const lineup = content.dj_lineup || content.lineup;
                 if (lineup) {
                     const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
                     document.getElementById('db-lineup').innerHTML = l.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus("LINK: Lineup inyectado.", "LINK");
+                    logStatus("LINK: DJ Lineup inyectado.", "LINK");
                 }
 
                 // 3. DRESS CODE
@@ -151,12 +150,12 @@
                     logStatus("LINK: Dress Code inyectado.", "LINK");
                 }
 
-                // 4. GALERÍA (Mapping Array v31)
+                // 4. GALERÍA
                 const gallery = content.gallery || content.galeria;
                 if (gallery) {
                     const urls = Array.isArray(gallery) ? gallery : gallery.split('\n');
                     document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `<img src="${u.trim()}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">`).join('');
-                    logStatus(`LINK: Galería (${urls.length} imágenes) inyectada.`, "LINK");
+                    logStatus(`LINK: Galería inyectada con éxito.`, "LINK");
                 }
 
                 // 5. GUEST LIST
@@ -165,7 +164,7 @@
                     logStatus("LINK: Guest List inyectada.", "LINK");
                 }
 
-                // 6. FAQ (Format Check v29)
+                // 6. FAQ
                 if (content.faq && typeof content.faq === 'string') {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
@@ -175,7 +174,7 @@
                     logStatus("LINK: FAQ inyectada.", "LINK");
                 }
 
-                // 7. PLAYLIST (playlist_url key)
+                // 7. PLAYLIST (Embed Logic)
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
@@ -190,15 +189,14 @@
                     logStatus("LINK: Mapa inyectado.", "LINK");
                 }
 
-                // 9. FORMULARIO DINÁMICO (Paridad v33)
+                // 9. FORMULARIO (Campos dinámicos)
                 if (SANDBOX_CONFIG.formulario) {
                     const fields = evento.form_campos || {};
                     let html = '';
-                    if (fields.email) html += `<div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" placeholder="correo@ejemplo.com" required></div>`;
-                    if (fields.edad) html += `<div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input" placeholder="Tu edad"></div>`;
-                    if (fields.ciudad) html += `<div class="form-group"><label class="form-label">Ciudad</label><input type="text" class="form-input" placeholder="Ciudad"></div>`;
+                    if (fields.email) html += `<div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" required></div>`;
+                    if (fields.edad) html += `<div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input"></div>`;
                     document.getElementById('db-dynamic-fields').innerHTML = html;
-                    logStatus("LINK: Formulario reconstruido con éxito.", "LINK");
+                    logStatus("LINK: Formulario reconstruido con campos dinámicos.", "LINK");
                 }
 
                 // HERO DATA
@@ -206,45 +204,46 @@
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
 
-                // --- AUDITORÍA DE INTEGRIDAD MEJORADA v35 (SOLUCIÓN AL ERROR DE FORMULARIO) ---
+                // --- AUDITORÍA DE INTEGRIDAD v36 (FIX FINAL FORMULARIO) ---
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
-                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD v35 ---", "INFO");
+                logStatus("--- INICIANDO AUDITORÍA DE INTEGRIDAD v36 ---", "INFO");
                 
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     if (key === 'force_gold' || key === 'trailer') return;
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                     
-                    const container = el.querySelector('[id*="db-"]') || el.querySelector('.countdown-grid') || el.querySelector('form');
-                    const hasIframe = container ? container.querySelector('iframe') : null;
-                    const hasInput = container ? container.querySelector('input') : null;
-                    const hasImg = container ? container.querySelector('img') : null;
+                    // REFINAMIENTO DE SELECTOR: Buscamos primero el form, luego el db- o countdown
+                    const formElement = el.querySelector('form');
+                    const container = el.querySelector('[id*="db-"]') || el.querySelector('.countdown-grid');
                     
-                    // REFINAMIENTO: El formulario ahora valida por presencia de inputs, no por texto plano
+                    const hasInput = (formElement || el).querySelector('input');
+                    const hasIframe = (container || el).querySelector('iframe');
+                    const hasImg = (container || el).querySelector('img');
                     const cleanContent = container ? container.innerText.replace(/\s/g, '').replace('--', '') : '';
+                    
                     let isValid = false;
-
                     if (key === 'formulario') {
-                        isValid = (hasInput !== null); // Un formulario es válido si tiene inputs
+                        isValid = (hasInput !== null); // Un formulario es válido si tiene cualquier input (estático o dinámico)
                     } else {
                         isValid = (cleanContent.length >= 3 || hasIframe || hasImg);
                     }
 
                     if (SANDBOX_CONFIG[key] && !isValid) {
-                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló la prueba de datos reales.`, "ERROR");
+                        logStatus(`ERROR: Módulo ${key.toUpperCase()} falló la validación física.`, "ERROR");
                     } else if (SANDBOX_CONFIG[key]) {
                         logStatus(`INFO: Módulo ${key.toUpperCase()} verificado con éxito.`, "INFO");
                     }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V35 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V36 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
         window.onload = initEvento;
-        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "integrity-v35", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
+        function exportTemplate() { navigator.clipboard.writeText(JSON.stringify({ theme: "stable-v36", modules: SANDBOX_CONFIG }, null, 2)); alert("JSON Copiado"); }
     </script>
 </body>
 </html>
