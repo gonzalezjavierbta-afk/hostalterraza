@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v21: Final Fiesta Sync · Sistema QR</title>
+    <title>Sandbox v22: Time Restoration · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,7 +19,6 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
-        /* HERO */
         .hero {
             position: relative; min-height: 70vh; display: flex; flex-direction: column;
             justify-content: center; padding: 0 10%; background-size: cover; background-position: center;
@@ -40,19 +39,17 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
         
-        /* GRID DE GALERÍA (NUEVO) */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
-        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s ease; }
-        .gallery-img:hover { transform: scale(1.02); border-color: var(--gold); }
-
-        /* TRAILER (NUEVO - Evita Error 153) */
-        .trailer-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .trailer-play-btn { font-size: 4rem; color: var(--gold); filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
-
+        /* COUNTDOWN GRID */
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
         .cd-label { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.5; }
+
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+
+        .trailer-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .trailer-play-btn { font-size: 4rem; color: var(--gold); }
 
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -60,7 +57,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Sincronizando Módulos Fiesta v21...</div>
+    <div id="loader" class="loading-overlay">Restaurando Motor de Tiempo v22...</div>
 
     <header id="hero-bg" class="hero">
         <div class="hero-content">
@@ -69,6 +66,7 @@
         </div>
     </header>
 
+    <!-- MÓDULOS -->
     <section id="modulo-countdown">
         <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">EL EVENTO COMIENZA EN</h2>
         <div class="countdown-grid">
@@ -85,7 +83,7 @@
     </section>
 
     <section id="modulo-aforo">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">AFORO DISPONIBLE</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">DISPONIBILIDAD</h2>
         <div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div>
         <div style="background: rgba(255,255,255,0.1); height: 10px; border-radius: 10px; margin-top: 1rem; overflow: hidden;">
             <div id="aforo-fill" style="background: var(--gold); height: 100%; width: 0%; transition: width 1.5s ease;"></div>
@@ -103,7 +101,7 @@
     </section>
 
     <section id="modulo-gallery">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA DEL EVENTO</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA</h2>
         <div id="db-gallery-grid" class="gallery-grid"></div>
     </section>
 
@@ -159,8 +157,29 @@
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
+        // MOTOR COUNTDOWN CON VERIFICACIÓN (Poka-yoke)
+        function startCountdown(date, time) {
+            try {
+                const target = new Date(`${date}T${time}`).getTime();
+                if (isNaN(target)) throw new Error(`Formato de fecha '${date}T${time}' no válido.`);
+                
+                logStatus(`TIME: Motor de tiempo iniciado para el ${date} a las ${time}.`, "TIME");
+                
+                setInterval(() => {
+                    const diff = target - new Date().getTime();
+                    if (diff <= 0) return;
+                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+            } catch (e) {
+                logStatus(`TIME ERROR: ${e.message}`, "ERROR");
+            }
+        }
+
         async function initEvento() {
-            logStatus("AUDITORÍA V21: Iniciando sincronización de categoría Fiesta...");
+            logStatus("AUDITORÍA V22: Iniciando restauración de motor de tiempo...");
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
             logStatus(`MÓDULOS ACTIVOS: ${activos.join(' | ')}`, "INFO");
 
@@ -179,6 +198,12 @@
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
+                
+                // RESTAURADO: Llamada al Countdown
+                if (SANDBOX_CONFIG.countdown) {
+                    startCountdown(evento.fecha, evento.hora);
+                }
+
                 if (evento.ubicacion) document.getElementById('db-ubicacion').innerText = evento.ubicacion;
 
                 // --- PROCESAMIENTO JSON ---
@@ -201,40 +226,39 @@
                 // 1. TRÁILER (YouTube Link para evitar Error 153)
                 const trailerUrl = getModuleData(['video_url', 'trailer_url', 'trailer']);
                 if (trailerUrl) {
-                    const isYT = trailerUrl.includes('youtube') || trailerUrl.includes('youtu.be');
                     document.getElementById('db-trailer-container').innerHTML = `
                         <div class="trailer-box" onclick="window.open('${trailerUrl}', '_blank')">
                             <span class="trailer-play-btn">▶</span>
-                            <p style="position:absolute; bottom:1rem;">VER EN ${isYT ? 'YOUTUBE' : 'VIDEO'}</p>
+                            <p style="position:absolute; bottom:1rem; letter-spacing:2px; font-size:0.8rem;">VER TRÁILER OFICIAL</p>
                         </div>`;
-                    logStatus("LINK: Módulo Tráiler vinculado (Acción: New Tab).", "LINK");
+                    logStatus("LINK: Módulo Tráiler vinculado (Target: New Tab).", "LINK");
                 }
 
                 // 2. AFORO
                 if (evento.aforo_max) {
-                    document.getElementById('db-aforo-txt').innerText = `Cupos Totales: ${evento.aforo_max}`;
-                    document.getElementById('aforo-fill').style.width = '10%'; // Simulación
+                    document.getElementById('db-aforo-txt').innerText = `Cupos Totales: ${evento.aforo_max} disponibles.`;
+                    document.getElementById('aforo-fill').style.width = '10%';
                     logStatus("LINK: Módulo Aforo vinculado.", "LINK");
                 }
 
                 // 3. DRESS CODE
-                const dress = getModuleData(['dress_code', 'vestimenta']);
+                const dress = getModuleData(['dress_code', 'vestimenta', 'dresscode']);
                 if (dress) {
                     document.getElementById('db-dress-txt').innerText = dress;
                     logStatus("LINK: Módulo Dress Code vinculado.", "LINK");
                 }
 
-                // 4. GALERÍA (Array o Texto multilínea)
+                // 4. GALERÍA
                 const galleryData = getModuleData(['gallery', 'galeria', 'imagenes']);
                 if (galleryData) {
                     const urls = typeof galleryData === 'string' ? galleryData.split('\n') : galleryData;
                     document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 10).map(u => `
-                        <img src="${u.trim()}" class="gallery-img" alt="Evento" onerror="this.style.display='none'">
+                        <img src="${u.trim()}" class="gallery-img" alt="Foto Evento" onerror="this.style.display='none'">
                     `).join('');
-                    logStatus(`LINK: Galería vinculada (${urls.length} imágenes detectadas).`, "LINK");
+                    logStatus(`LINK: Galería vinculada (${urls.length} imágenes).`, "LINK");
                 }
 
-                // 5. LINEUP, GUEST LIST, FAQ, PLAYLIST (Mantenidos de v20)
+                // 5. LINEUP, GUEST LIST, FAQ, PLAYLIST
                 const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const lista = typeof lineup === 'string' ? lineup.split('\n') : lineup;
@@ -253,7 +277,7 @@
                     const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                         const [q, a] = l.split('|');
-                        return `<div class="faq-item"><span class="faq-q">${q.trim()}</span><span class="faq-a">${a.trim()}</span></div>`;
+                        return `<div class="faq-item"><span style="color:var(--gold); font-weight:bold; display:block;">${q.trim()}</span><span style="opacity:0.7;">${a.trim()}</span></div>`;
                     }).join('');
                     logStatus("LINK: Módulo FAQ inyectado.", "LINK");
                 }
@@ -269,17 +293,18 @@
                 if (evento.ubicacion) {
                     const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen loading="lazy" style="filter: grayscale(1) invert(1) contrast(1.2);"></iframe>`;
+                    logStatus(`TRACE: Usando ubicación '${evento.ubicacion}' para el mapa interactivo.`, "TRACE");
                     logStatus("LINK: Mapa inyectado con éxito.", "LINK");
                 }
 
-                // Aplicar visibilidad
+                // Aplicar visibilidad final
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN V21 FINALIZADA CON ÉXITO.", "INFO");
+                logStatus("SINCRONIZACIÓN V22 FINALIZADA CON ÉXITO.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
