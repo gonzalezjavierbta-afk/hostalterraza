@@ -3,43 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v9: Auditoría y Visual Sync · Sistema QR</title>
+    <title>Sandbox v11: Trace Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
-        :root { --main-bg: #050505; --gold: #ff007f; --text-color: #ffffff; }
+        :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; }
         body { margin: 0; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; }
         
-        /* HERO CON IMAGEN DE FONDO (Mejora visual) */
+        /* HERO VISUAL */
         .hero {
-            position: relative;
-            min-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 10%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: background-image 0.5s ease-in-out;
+            position: relative; min-height: 80vh; display: flex; flex-direction: column;
+            justify-content: center; padding: 0 10%; background-size: cover;
+            background-position: center; background-repeat: no-repeat;
         }
-        /* Capa de oscurecimiento dinámica para legibilidad */
         .hero::before {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, #050505 100%);
-            z-index: 1;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, #050505 100%); z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; }
-
         .hero-title {
             font-weight: 900; font-size: clamp(3.5rem, 12vw, 8rem); line-height: 0.85;
             text-transform: uppercase; margin: 0; letter-spacing: -5px;
             background: linear-gradient(to bottom, var(--gold), #ffffff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5));
+            filter: drop-shadow(0 0 20px rgba(223, 32, 182, 0.5));
         }
 
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -50,17 +40,16 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Recuperando auditoría y visuales...</div>
+    <div id="loader" class="loading-overlay">Rastreando rutas de datos...</div>
 
-    <!-- HEADER / HERO -->
     <header id="hero-bg" class="hero">
         <div class="hero-content">
             <h1 id="event-title" class="hero-title">--</h1>
-            <p id="event-date" style="letter-spacing: 4px; margin-top: 2rem; font-weight: bold; opacity: 0.8;">--/--/--</p>
+            <p id="event-date" style="letter-spacing: 4px; margin-top: 2rem; font-weight: bold; opacity: 0.8;">--</p>
         </div>
     </header>
 
-    <!-- MÓDULOS ACTIVABLES -->
+    <!-- MÓDULOS DE DATOS -->
     <section id="modulo-lineup">
         <h2 style="color: var(--gold); letter-spacing: 2px;">DJ LINEUP</h2>
         <div id="db-lineup"></div>
@@ -79,12 +68,13 @@
     <script>
         /**
          * 1. CONFIGURACIÓN MANUAL (SANDBOX)
+         * Módulos disponibles: lineup, playlist, ubicacion, sinopsis, trailer, faq
          */
         const SANDBOX_CONFIG = {
             lineup: true,
             playlist: true,
             ubicacion: true,
-            force_gold: '#df20b6' // Magenta/Púrpura detectado en el log de evento.html
+            force_gold: '#df20b6' 
         };
 
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
@@ -92,20 +82,19 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         /**
-         * 2. SISTEMA DE LOGGING AVANZADO (RESTAURADO)
+         * 2. SISTEMA DE LOGGING DE TRAZABILIDAD (Novedad)
          */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#f39c12', 'LINK': '#f7b731', 'ERROR': '#ff4d4d' };
+            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'TRACE': '#e67e22', 'LINK': '#f1c40f', 'ERROR': '#ff4d4d' };
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo]}; font-family: monospace; font-weight: bold;`);
         }
 
         async function initEvento() {
-            logStatus("Iniciando auditoría visual y de datos profunda...");
+            logStatus("Iniciando Trace Sync (Rastreo profundo)...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
-                // Consulta total para auditar
                 const { data: evento, error } = await sbClient
                     .from('eventos')
                     .select('*')
@@ -114,54 +103,80 @@
 
                 if (error) throw error;
 
-                // LOG 1: Campos en raíz
-                const camposRaiz = Object.keys(evento).filter(k => evento[k] !== null && evento[k] !== "");
-                logStatus(`Campos en raíz DB: ${camposRaiz.join(', ')}`, "DB");
+                // LOG 1: Auditoría Raíz
+                logStatus(`Campos en raíz DB: ${Object.keys(evento).join(', ')}`, "DB");
 
-                // 1. VINCULACIÓN HERO (Imagen y Texto)
+                // --- VINCULACIÓN BÁSICA (Raíz) ---
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen de fondo aplicada al Hero.", "LINK");
+                    logStatus("LINK: Imagen Hero vinculada desde raíz.", "LINK");
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora}`;
+                
+                // Forzar ubicación (si existe en raíz)
+                if (evento.ubicacion) {
+                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
+                    logStatus("LINK: Ubicación vinculada desde raíz.", "LINK");
+                }
 
-                // 2. VINCULACIÓN UBICACIÓN
-                document.getElementById('db-ubicacion').innerText = evento.ubicacion || 'Ubicación por confirmar.';
-
-                // 3. AUDITORÍA Y VINCULACIÓN JSON (config_landing)
+                // --- VINCULACIÓN COMPLEJA (JSON Trace) ---
                 const config = evento.config_landing || {};
-                const llavesJSON = Object.keys(config);
-                logStatus(`Llaves encontradas en JSON config_landing: ${llavesJSON.join(', ') || 'VACÍO'}`, "JSON");
+                logStatus(`Estructura JSON detectada: ${Object.keys(config).join(', ')}`, "TRACE");
 
-                // --- PROCESADOR DE LINEUP (Busca llaves 'lineup' o 'dj_lineup') ---
-                const lineupData = config.lineup || config.dj_lineup || "";
-                if (lineupData) {
-                    const artistas = lineupData.split('\n').filter(a => a.trim() !== "");
+                /**
+                 * FUNCIÓN DE BÚSQUEDA AGRESIVA
+                 * Intenta encontrar una llave en el objeto JSON buscando en múltiples niveles.
+                 */
+                const deepSeek = (llavesPosibles) => {
+                    for (let key of llavesPosibles) {
+                        // 1. Probar en la raíz del JSON
+                        if (config[key]) {
+                            logStatus(`TRACE: Encontrado '${key}' en config_landing.${key}`, "TRACE");
+                            return config[key];
+                        }
+                        // 2. Probar dentro de 'modules' (Estructura Admin)
+                        if (config.modules && config.modules[key]) {
+                            logStatus(`TRACE: Encontrado '${key}' en config_landing.modules.${key}`, "TRACE");
+                            return config.modules[key];
+                        }
+                        // 3. Probar dentro de 'content' (Estructura Alternativa)
+                        if (config.content && config.content[key]) {
+                            logStatus(`TRACE: Encontrado '${key}' en config_landing.content.${key}`, "TRACE");
+                            return config.content[key];
+                        }
+                    }
+                    return null;
+                };
+
+                // 1. Rastrear Lineup
+                const lineupRaw = deepSeek(['lineup', 'dj_lineup', 'artistas', 'dj']);
+                if (lineupRaw) {
+                    const artistas = lineupRaw.split('\n').filter(a => a.trim() !== "");
                     document.getElementById('db-lineup').innerHTML = artistas.map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus(`LINK: ${artistas.length} artistas vinculados desde JSON.`, "LINK");
+                    logStatus(`LINK: ${artistas.length} artistas vinculados con éxito.`, "LINK");
                 } else {
-                    logStatus("Módulo Lineup sin datos detectados en JSON.", "JSON");
+                    logStatus("TRACE: No se encontró 'lineup' en ninguna ruta conocida.", "ERROR");
                 }
 
-                // --- PROCESADOR DE PLAYLIST (Busca llaves 'video_url' o 'playlist') ---
-                const playlistData = config.video_url || config.playlist || "";
-                if (playlistData && playlistData.includes('spotify')) {
-                    const embed = playlistData.replace('open.spotify.com', 'open.spotify.com/embed');
+                // 2. Rastrear Playlist (Spotify)
+                const playlistRaw = deepSeek(['video_url', 'playlist', 'spotify_url', 'spotify']);
+                if (playlistRaw && playlistRaw.includes('spotify')) {
+                    const embed = playlistRaw.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify vinculada desde JSON.", "LINK");
+                    logStatus("LINK: Playlist Spotify vinculada con éxito.", "LINK");
                 } else {
-                    logStatus("Módulo Playlist sin URL de Spotify válida en JSON.", "JSON");
+                    logStatus("TRACE: No se encontró URL de Spotify en ninguna ruta conocida.", "ERROR");
                 }
 
-                // APLICAR VISIBILIDAD Y COLOR
+                // Aplicar visibilidad final
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("PROCESO DE AUDITORÍA Y SINCRONIZACIÓN FINALIZADO.", "INFO");
+                logStatus("SINCRONIZACIÓN Y TRAZABILIDAD COMPLETADA.", "INFO");
 
             } catch (err) {
                 logStatus(`FALLO: ${err.message}`, "ERROR");
@@ -169,7 +184,6 @@
                 document.getElementById('loader').style.display = 'none';
             }
         }
-
         window.onload = initEvento;
     </script>
 </body>
