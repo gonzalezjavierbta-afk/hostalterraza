@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sandbox v22: Time Restoration · Sistema QR</title>
+    <title>Editor v23: Fiesta Template Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,6 +19,21 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
         }
 
+        /* UI DEL EDITOR (NUEVO) */
+        .editor-tools {
+            position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+            background: rgba(20,20,20,0.9); border: 1px solid var(--gold);
+            padding: 15px; border-radius: 12px; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px;
+        }
+        .btn-export {
+            background: var(--gold); color: white; border: none; padding: 10px 20px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        .btn-export:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+        /* SECCIONES VISUALES */
         .hero {
             position: relative; min-height: 70vh; display: flex; flex-direction: column;
             justify-content: center; padding: 0 10%; background-size: cover; background-position: center;
@@ -39,7 +54,6 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .data-item { margin-bottom: 1rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-left: 4px solid var(--gold); border-radius: 4px; font-size: 1.1rem; }
         
-        /* COUNTDOWN GRID */
         .countdown-grid { display: flex; gap: 1rem; text-align: center; margin-top: 2rem; flex-wrap: wrap; }
         .cd-box { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; min-width: 70px; border: 1px solid rgba(223, 32, 182, 0.15); flex: 1; }
         .cd-number { display: block; font-size: 2rem; font-weight: 900; color: var(--gold); }
@@ -48,16 +62,19 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
         .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 
-        .trailer-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .trailer-play-btn { font-size: 4rem; color: var(--gold); }
-
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">Restaurando Motor de Tiempo v22...</div>
+    <div id="loader" class="loading-overlay">Cargando Editor de Plantillas v23...</div>
+
+    <!-- PANEL DE CONTROL DEL EDITOR -->
+    <div class="editor-tools">
+        <span style="font-size: 0.7rem; color: var(--gold); font-weight: bold; letter-spacing: 1px;">EDITOR DE FIESTA</span>
+        <button class="btn-export" onclick="exportFiestaTemplate()">COPIAR JSON DE PLANTILLA</button>
+    </div>
 
     <header id="hero-bg" class="hero">
         <div class="hero-content">
@@ -66,9 +83,9 @@
         </div>
     </header>
 
-    <!-- MÓDULOS -->
+    <!-- MÓDULOS DE CATEGORÍA FIESTA -->
     <section id="modulo-countdown">
-        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">EL EVENTO COMIENZA EN</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px; font-size: 0.8rem;">COMIENZA EN</h2>
         <div class="countdown-grid">
             <div class="cd-box"><span id="cd-days" class="cd-number">00</span><span class="cd-label">DÍAS</span></div>
             <div class="cd-box"><span id="cd-hours" class="cd-number">00</span><span class="cd-label">HORAS</span></div>
@@ -78,16 +95,8 @@
     </section>
 
     <section id="modulo-trailer">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">TRÁILER OFICIAL</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">TRÁILER</h2>
         <div id="db-trailer-container"></div>
-    </section>
-
-    <section id="modulo-aforo">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">DISPONIBILIDAD</h2>
-        <div id="db-aforo-txt" class="data-item" style="border:none; padding:0;">--</div>
-        <div style="background: rgba(255,255,255,0.1); height: 10px; border-radius: 10px; margin-top: 1rem; overflow: hidden;">
-            <div id="aforo-fill" style="background: var(--gold); height: 100%; width: 0%; transition: width 1.5s ease;"></div>
-        </div>
     </section>
 
     <section id="modulo-lineup">
@@ -95,28 +104,18 @@
         <div id="db-lineup"></div>
     </section>
 
-    <section id="modulo-dress_code">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">DRESS CODE</h2>
-        <div id="db-dress-txt" class="data-item">--</div>
-    </section>
-
     <section id="modulo-gallery">
         <h2 style="color: var(--gold); letter-spacing: 2px;">GALERÍA</h2>
         <div id="db-gallery-grid" class="gallery-grid"></div>
     </section>
 
-    <section id="modulo-guest_list">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">GUEST LIST</h2>
-        <div id="db-guest-txt" class="data-item">--</div>
-    </section>
-
     <section id="modulo-faq">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">PREGUNTAS FRECUENTES</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">FAQ</h2>
         <div id="db-faq-list"></div>
     </section>
 
     <section id="modulo-playlist">
-        <h2 style="color: var(--gold); letter-spacing: 2px;">PLAYLIST OFICIAL</h2>
+        <h2 style="color: var(--gold); letter-spacing: 2px;">SPOTIFY</h2>
         <div id="db-spotify"></div>
     </section>
 
@@ -128,19 +127,16 @@
 
     <script>
         /**
-         * 1. CONFIGURACIÓN SANDBOX (Módulos Categoría Fiesta)
+         * 1. CONFIGURACIÓN DEL EDITOR (CATEGORÍA FIESTA)
          */
         const SANDBOX_CONFIG = {
             countdown: true,
-            trailer: true,
-            aforo: true,
             lineup: true,
-            dress_code: true,
-            gallery: true,
-            guest_list: true,
-            faq: true,
             playlist: true,
             ubicacion: true,
+            gallery: true,
+            trailer: true,
+            faq: true,
             force_gold: '#df20b6' 
         };
 
@@ -149,22 +145,35 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         /**
-         * 2. MOTOR DE LOGGING (Reglas de Oro)
+         * 2. MOTOR DE LOGGING ACUMULATIVO (REGLAS DE ORO)
          */
         function logStatus(mensaje, tipo = 'INFO') {
             const t = new Date().toLocaleTimeString();
-            const colors = { 'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#e67e22', 'TRACE': '#f39c12', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d' };
+            const colors = { 
+                'INFO': '#00ff88', 'DB': '#33ccff', 'JSON': '#e67e22', 
+                'TRACE': '#f39c12', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d' 
+            };
             console.log(`%c[${t}] [${tipo}] ${mensaje}`, `color: ${colors[tipo] || '#fff'}; font-family: monospace; font-weight: bold;`);
         }
 
-        // MOTOR COUNTDOWN CON VERIFICACIÓN (Poka-yoke)
+        // FUNCIÓN DE EXPORTACIÓN (Para anexar al código principal)
+        function exportFiestaTemplate() {
+            const template = {
+                theme: "fiesta-sync-v23",
+                colors: { primary: SANDBOX_CONFIG.force_gold, bg: "#050505" },
+                modules: SANDBOX_CONFIG
+            };
+            navigator.clipboard.writeText(JSON.stringify(template, null, 2));
+            logStatus("TRACE: Objeto 'config_landing' exportado al portapapeles para anexo principal.", "TRACE");
+            alert("¡JSON de Plantilla Fiesta copiado! Puedes pegarlo en la columna config_landing de tu evento.");
+        }
+
+        // MOTOR TIEMPO (REGLAS DE ORO)
         function startCountdown(date, time) {
             try {
                 const target = new Date(`${date}T${time}`).getTime();
-                if (isNaN(target)) throw new Error(`Formato de fecha '${date}T${time}' no válido.`);
-                
-                logStatus(`TIME: Motor de tiempo iniciado para el ${date} a las ${time}.`, "TIME");
-                
+                if (isNaN(target)) throw new Error("Fecha inválida");
+                logStatus(`TIME: Sincronizando reloj para Fiesta en ${date}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -173,13 +182,12 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-            } catch (e) {
-                logStatus(`TIME ERROR: ${e.message}`, "ERROR");
-            }
+            } catch (e) { logStatus(`ERROR TIEMPO: ${e.message}`, "ERROR"); }
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V22: Iniciando restauración de motor de tiempo...");
+            logStatus("EDITOR V23: Iniciando auditoría de plantilla de Fiesta...");
+            
             const activos = Object.entries(SANDBOX_CONFIG).filter(([k, v]) => v === true && k !== 'force_gold').map(([k]) => k.toUpperCase());
             logStatus(`MÓDULOS ACTIVOS: ${activos.join(' | ')}`, "INFO");
 
@@ -189,24 +197,28 @@
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                logStatus(`DB: Campos raíz detectados -> ${Object.keys(evento).join(', ')}`, "DB");
+                logStatus(`DB: Campos en RAÍZ -> ${Object.keys(evento).join(', ')}`, "DB");
 
-                // --- VINCULACIÓN RAÍZ ---
+                // VINCULACIÓN BÁSICA
                 if (evento.imagen_url) {
                     document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                    logStatus("LINK: Imagen Hero vinculada.", "LINK");
+                    logStatus("LINK: Hero visual vinculado.", "LINK");
                 }
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('event-date').innerText = `${evento.fecha} | ${evento.hora} HRS`;
                 
-                // RESTAURADO: Llamada al Countdown
-                if (SANDBOX_CONFIG.countdown) {
-                    startCountdown(evento.fecha, evento.hora);
+                if (SANDBOX_CONFIG.countdown) startCountdown(evento.fecha, evento.hora);
+
+                // UBICACIÓN Y MAPA
+                if (evento.ubicacion) {
+                    document.getElementById('db-ubicacion').innerText = evento.ubicacion;
+                    const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen loading="lazy" style="filter: grayscale(1) invert(1) contrast(1.2);"></iframe>`;
+                    logStatus(`TRACE: Mapa generado desde dirección '${evento.ubicacion}'.`, "TRACE");
+                    logStatus("LINK: Módulo Mapa inyectado.", "LINK");
                 }
 
-                if (evento.ubicacion) document.getElementById('db-ubicacion').innerText = evento.ubicacion;
-
-                // --- PROCESAMIENTO JSON ---
+                // PROCESAMIENTO JSON DINÁMICO
                 const config = evento.config_landing || {};
                 const getModuleData = (llaves, term = null) => {
                     let levels = [evento, config, config.modules, config.content];
@@ -223,92 +235,40 @@
                     return null;
                 };
 
-                // 1. TRÁILER (YouTube Link para evitar Error 153)
-                const trailerUrl = getModuleData(['video_url', 'trailer_url', 'trailer']);
-                if (trailerUrl) {
-                    document.getElementById('db-trailer-container').innerHTML = `
-                        <div class="trailer-box" onclick="window.open('${trailerUrl}', '_blank')">
-                            <span class="trailer-play-btn">▶</span>
-                            <p style="position:absolute; bottom:1rem; letter-spacing:2px; font-size:0.8rem;">VER TRÁILER OFICIAL</p>
-                        </div>`;
-                    logStatus("LINK: Módulo Tráiler vinculado (Target: New Tab).", "LINK");
-                }
-
-                // 2. AFORO
-                if (evento.aforo_max) {
-                    document.getElementById('db-aforo-txt').innerText = `Cupos Totales: ${evento.aforo_max} disponibles.`;
-                    document.getElementById('aforo-fill').style.width = '10%';
-                    logStatus("LINK: Módulo Aforo vinculado.", "LINK");
-                }
-
-                // 3. DRESS CODE
-                const dress = getModuleData(['dress_code', 'vestimenta', 'dresscode']);
-                if (dress) {
-                    document.getElementById('db-dress-txt').innerText = dress;
-                    logStatus("LINK: Módulo Dress Code vinculado.", "LINK");
-                }
-
-                // 4. GALERÍA
-                const galleryData = getModuleData(['gallery', 'galeria', 'imagenes']);
-                if (galleryData) {
-                    const urls = typeof galleryData === 'string' ? galleryData.split('\n') : galleryData;
-                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 10).map(u => `
-                        <img src="${u.trim()}" class="gallery-img" alt="Foto Evento" onerror="this.style.display='none'">
-                    `).join('');
-                    logStatus(`LINK: Galería vinculada (${urls.length} imágenes).`, "LINK");
-                }
-
-                // 5. LINEUP, GUEST LIST, FAQ, PLAYLIST
+                // VINCULAR MÓDULOS FIESTA
                 const lineup = getModuleData(['lineup', 'dj_lineup', 'artistas']);
                 if (lineup) {
                     const lista = typeof lineup === 'string' ? lineup.split('\n') : lineup;
                     document.getElementById('db-lineup').innerHTML = lista.filter(a => a).map(a => `<div class="data-item">${a}</div>`).join('');
-                    logStatus("LINK: Lineup inyectado.", "LINK");
+                    logStatus("LINK: DJ Lineup vinculado.", "LINK");
                 }
 
-                const guest = getModuleData(['guest_list', 'instrucciones_guest']);
-                if (guest) {
-                    document.getElementById('db-guest-txt').innerText = guest;
-                    logStatus("LINK: Guest List vinculada.", "LINK");
-                }
-
-                const faqRaw = getModuleData(['faq', 'preguntas_frecuentes']);
-                if (faqRaw && typeof faqRaw === 'string') {
-                    const lineas = faqRaw.split('\n').filter(l => l.includes('|'));
-                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
-                        const [q, a] = l.split('|');
-                        return `<div class="faq-item"><span style="color:var(--gold); font-weight:bold; display:block;">${q.trim()}</span><span style="opacity:0.7;">${a.trim()}</span></div>`;
-                    }).join('');
-                    logStatus("LINK: Módulo FAQ inyectado.", "LINK");
+                const gallery = getModuleData(['gallery', 'galeria', 'imagenes']);
+                if (gallery) {
+                    const urls = typeof gallery === 'string' ? gallery.split('\n') : gallery;
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 10).map(u => `
+                        <img src="${u.trim()}" class="gallery-img" alt="Fiesta" onerror="this.style.display='none'">
+                    `).join('');
+                    logStatus(`LINK: Galería con ${urls.length} activos vinculada.`, "LINK");
                 }
 
                 const playlist = getModuleData(['video_url', 'playlist_url', 'spotify'], 'spotify');
                 if (playlist) {
                     const embed = playlist.replace('open.spotify.com', 'open.spotify.com/embed');
                     document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:12px; border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify vinculada.", "LINK");
+                    logStatus("LINK: Spotify Playlist vinculada.", "LINK");
                 }
 
-                // 6. MAPA
-                if (evento.ubicacion) {
-                    const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen loading="lazy" style="filter: grayscale(1) invert(1) contrast(1.2);"></iframe>`;
-                    logStatus(`TRACE: Usando ubicación '${evento.ubicacion}' para el mapa interactivo.`, "TRACE");
-                    logStatus("LINK: Mapa inyectado con éxito.", "LINK");
-                }
-
-                // Aplicar visibilidad final
+                // APLICAR VISIBILIDAD FINAL
                 document.documentElement.style.setProperty('--gold', SANDBOX_CONFIG.force_gold);
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const el = document.getElementById(`modulo-${key}`);
                     if (el) el.style.display = SANDBOX_CONFIG[key] ? 'block' : 'none';
                 });
 
-                logStatus("SINCRONIZACIÓN V22 FINALIZADA CON ÉXITO.", "INFO");
+                logStatus("SINCRONIZACIÓN Y AUDITORÍA DE PLANTILLA FINALIZADA.", "INFO");
 
-            } catch (err) {
-                logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
-            } finally {
+            } catch (err) { logStatus(`FALLO: ${err.message}`, "ERROR"); } finally {
                 document.getElementById('loader').style.display = 'none';
             }
         }
