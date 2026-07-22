@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v63: Style Recovery & FAQ Fix · Sistema QR</title>
+    <title>Editor v64: Style Recovery & Interactive Shield · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,7 +12,7 @@
     <style>
         :root { 
             --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff;
-            --glass-lite: rgba(255, 255, 255, 0.03); --border-glow: rgba(223, 32, 182, 0.2);
+            --glass-lite: rgba(255, 255, 255, 0.03); --border-glow: rgba(223, 32, 182, 0.25);
         }
 
         html, body { 
@@ -31,7 +31,7 @@
         section { display: none; padding: 6rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 4rem; text-align: left; }
 
-        /* 1. HERO & DATA CARDS */
+        /* HERO & DATA CARDS (v54 + Icons Recovery) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
@@ -44,33 +44,35 @@
         .card-val { display: block; font-size: 1rem; font-weight: 900; text-transform: uppercase; }
         .card-icon { width: 32px; height: 32px; fill: var(--gold); margin-top: 1.5rem; filter: drop-shadow(0 0 8px var(--gold)); opacity: 0.8; }
 
-        /* 2. LINEUP RESTORED v63 (Ref: dj-line-up.jpg) */
+        /* LINEUP STYLE RECOVERY v64 (Ref: dj-line-up.jpg / v51 Approved) */
         .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
         .lineup-col-poster { display: flex; justify-content: center; padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
-        .lineup-poster { width: 320px; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
+        .lineup-poster { width: 320px !important; height: auto; border-radius: 12px; border: 4px solid var(--gold) !important; box-shadow: 0 0 40px var(--border-glow) !important; }
         .artist-list { display: flex; flex-direction: column; gap: 2.5rem; padding-left: 5rem; }
         .artist-item { display: flex; align-items: center; gap: 1.8rem; }
-        .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
-        
+        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+        .artist-name { font-weight: 900; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 4rem; }
         .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* 3. FAQ & UBICACION INTERACTIVE v63 (Ref: faqubicacion.jpg) */
+        /* FAQ INTERACTIVE RECOVERY v64 (Ref: faqubicacion.jpg) */
         .faq-ubicacion-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0; max-width: 1000px; margin: 0 auto; align-items: start; }
         .faq-col { padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
         .ubicacion-col { padding-left: 5rem; }
         
-        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); overflow: hidden; cursor: pointer; }
-        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-weight: 500; font-size: 0.95rem; }
-        .faq-icon-plus { color: var(--gold); font-size: 1.4rem; transition: transform 0.3s ease; }
-        .faq-answer { max-height: 0; opacity: 0; transition: all 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
-        .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
-        .faq-item.active .faq-icon-plus { transform: rotate(45deg); }
+        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; }
+        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-weight: 500; font-size: 0.95rem; pointer-events: none; }
+        .faq-icon-plus { color: var(--gold); font-size: 1.4rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+        .faq-item.active .faq-answer { max-height: 250px; opacity: 1; padding-bottom: 1.5rem; }
+        .faq-item.active .faq-icon-plus { transform: rotate(45deg); color: #fff; }
 
-        /* 4. FORM & UI */
+        /* FORM RECOVERY (Selector Países) */
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 10px; color: white; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
+        
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         
         @media (max-width: 850px) {
@@ -83,7 +85,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">STYLE RECOVERY v63...</div>
+    <div id="loader" class="loading-overlay">RECONSTRUCTING FIDELITY v64...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -102,17 +104,17 @@
         <section id="modulo-countdown" style="display:none;"></section>
         <section id="modulo-aforo" style="display:none;"></section>
 
-        <!-- DATA CARDS (Icons Restored) -->
+        <!-- DATA CARDS (Icons Recovery) -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
                 <div class="data-card"><span class="card-label">DRESS CODE</span><span id="db-dress-val" class="card-val">...</span><svg class="card-icon" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zM12 11c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg></div>
                 <div class="data-card"><span class="card-label">GUEST LIST</span><span id="db-guest-val" class="card-val">...</span><svg class="card-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
                 <div class="data-card"><span class="card-label">AFORO</span><span id="db-aforo-val" class="card-val">...</span><svg class="card-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
-                <div class="data-card"><span class="card-label">TICKETS</span><span id="db-ticket-val" class="card-val">DISPONIBLES</span><svg class="card-icon" viewBox="0 0 24 24"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg></div>
+                <div class="data-card"><span class="card-label">TICKETS</span><span id="db-ticket-val" class="card-val">...</span><svg class="card-icon" viewBox="0 0 24 24"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg></div>
             </div>
         </section>
 
-        <!-- LINEUP RESTORED -->
+        <!-- LINEUP RECOVERY (v64 High Fidelity) -->
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div class="lineup-container">
@@ -121,17 +123,17 @@
             </div>
         </section>
 
-        <!-- MEDIA GRID -->
+        <!-- MEDIA GRID (v53 Parity) -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" class="gallery-grid"></div>
             <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:2.5rem; max-width:1100px; margin:0 auto;">
-                <div id="modulo-trailer" style="position:relative; width:100%; padding-top:56.25%; border-radius:15px; overflow:hidden; border:1px solid var(--gold);"><iframe id="db-trailer-iframe" src="" allow="autoplay; encrypted-media" style="position:absolute; inset:0; border:none; width:100%; height:100%;"></iframe></div>
+                <div id="modulo-trailer" style="position:relative; width:100%; padding-top:56.25%; border-radius:15px; overflow:hidden; border:1px solid var(--gold);"><iframe id="db-trailer-iframe" src="" allow="autoplay; fullscreen" style="position:absolute; inset:0; border:none; width:100%; height:100%;"></iframe></div>
                 <div id="modulo-playlist" style="border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div id="db-spotify"></div></div>
             </div>
         </section>
 
-        <!-- FAQ INTERACTIVE -->
+        <!-- FAQ INTERACTIVE (v64 Structural Fix) -->
         <section id="modulo-faq-ubicacion">
             <div class="faq-ubicacion-grid">
                 <div class="faq-col"><h2>FAQ</h2><div id="db-faq-list"></div></div>
@@ -139,14 +141,14 @@
             </div>
         </section>
 
-        <!-- FORM RECOVERY -->
+        <!-- FORM RECOVERY (Selector Países) -->
         <section id="modulo-formulario">
             <h2>REGISTRO DE ASISTENCIA</h2>
             <form id="master-reg-form" class="form-container">
                 <input type="text" class="form-input" placeholder="Nombre completo *" required>
                 <input type="text" class="form-input" placeholder="Cédula *" required>
                 <div style="display:flex; gap:0.5rem;">
-                    <select class="form-input" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+1">🇺🇸 +1</option></select>
+                    <select class="form-input" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+52">🇲🇽 +52</option></select>
                     <input type="tel" class="form-input" placeholder="WhatsApp *" required>
                 </div>
                 <div id="db-dynamic-fields" style="display:flex; flex-direction:column; gap:1.5rem;"></div>
@@ -162,12 +164,18 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         function logStatus(m, t = 'INFO') {
-            const colors = { 'INFO': '#00ff88', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d', 'TRACE': '#e67e22' };
+            const colors = { 'INFO': '#00ff88', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'ERROR': '#ff4d4d', 'TRACE': '#e67e22', 'JSON': '#f39c12' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
+        // Motor de Acción FAQ (v64 Debugger)
+        function toggleFaq(el) {
+            logStatus("TRACE: Clic detectado en FAQ. Aplicando estado .active.", "TRACE");
+            el.classList.toggle('active');
+        }
+
         async function initEvento() {
-            logStatus("AUDITORÍA V63: Recuperando estilos de Lineup y activando FAQ interactivo...");
+            logStatus("AUDITORÍA V64: Recuperando estilos High-Fidelity y blindando lógica FAQ...");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
@@ -186,54 +194,67 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 1. DATA CARDS
-                document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
-                document.getElementById('db-guest-val').innerText = (content.guest_list || 'RESERVADOS').toUpperCase();
-                document.getElementById('db-aforo-val').innerText = `LÍMITE ${evento.aforo_max || 100}`;
-                logStatus("LINK: Data Cards e iconos vinculados.", "LINK");
+                // 1. DATA CARDS (v54 + Icons)
+                try {
+                    document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
+                    document.getElementById('db-guest-val').innerText = (content.guest_list || 'REGISTRADOS').toUpperCase();
+                    document.getElementById('db-aforo-val').innerText = `LÍMITE ${evento.aforo_max || 100}`;
+                    document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
+                    logStatus("LINK: Data Cards e iconos restaurados.", "LINK");
+                } catch (e) { logStatus(`ERR-CARDS: ${e.message}`, "ERROR"); }
 
-                // 2. LINEUP RESTORED (v63 Style Parity)
-                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
-                const proPhotos = ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200"];
-                const lineup = content.dj_lineup || content.lineup || "";
-                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map((a, i) => `
-                    <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span style="font-weight:900;">${a.trim()}</span></div>`).join('');
-                logStatus("LINK: Estilos de Lineup (Póster 320px + Avatares) restaurados.", "LINK");
+                // 2. LINEUP (v51 Recovery)
+                try {
+                    document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url || "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3";
+                    const proPhotos = ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200"];
+                    const lineup = content.dj_lineup || content.lineup || "";
+                    const list = Array.isArray(lineup) ? lineup : lineup.split('\n');
+                    document.getElementById('db-lineup').innerHTML = list.filter(a => a.length > 2).map((a, i) => `
+                        <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span class="artist-name">${a.trim()}</span></div>`).join('');
+                    logStatus("LINK: Estilos de Lineup (v51 High Fidelity) restaurados.", "LINK");
+                } catch (e) { logStatus(`ERR-LINEUP: ${e.message}`, "ERROR"); }
 
-                // 3. MEDIA
-                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" class="gallery-img">`).join('');
-                document.getElementById('db-trailer-iframe').src = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6";
-                if (content.playlist_url) {
-                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="400" frameBorder="0" allow="encrypted-media" style="filter: invert(1) hue-rotate(180deg) brightness(0.8); border:none;"></iframe>`;
-                }
+                // 3. MEDIA & GALLERY (v53)
+                try {
+                    if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" class="gallery-img">`).join('');
+                    document.getElementById('db-trailer-iframe').src = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6";
+                    if (content.playlist_url) {
+                        const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                        document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="400" frameBorder="0" allow="encrypted-media" style="filter: invert(1) hue-rotate(180deg) brightness(0.8); border:none;"></iframe>`;
+                    }
+                    logStatus("LINK: Módulos de Media (Galería/Spotify) activos.", "LINK");
+                } catch (e) { logStatus(`ERR-MEDIA: ${e.message}`, "ERROR"); }
 
-                // 4. FAQ INTERACTIVE (v63 Logic)
-                if (content.faq) {
-                    const lineas = content.faq.split('\n').filter(l => l.includes('|'));
-                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
-                        const [q, a] = l.split('|');
-                        return `
-                        <div class="faq-item" onclick="this.classList.toggle('active')">
-                            <div class="faq-header"><span>${(q || 'Consulta').trim()}</span><span class="faq-icon-plus">+</span></div>
-                            <div class="faq-answer">${(a || 'Ponte en contacto con el organizador.').trim()}</div>
-                        </div>`;
-                    }).join('');
-                    logStatus("LINK: FAQ interactivo con despliegue (+) activado.", "LINK");
-                }
+                // 4. FAQ INTERACTIVE (v64 Functional Shield)
+                try {
+                    if (content.faq && typeof content.faq === 'string') {
+                        const lineas = content.faq.split('\n').filter(l => l.includes('|'));
+                        document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
+                            const [q, a] = l.split('|'); // Desestructuración segura
+                            const qClean = q ? q.trim() : 'Consulta';
+                            const aClean = a ? a.trim() : 'Ponte en contacto con el organizador.';
+                            return `
+                            <div class="faq-item" onclick="toggleFaq(this)">
+                                <div class="faq-header"><span>${qClean}</span><span class="faq-icon-plus">+</span></div>
+                                <div class="faq-answer">${aClean}</div>
+                            </div>`;
+                        }).join('');
+                        logStatus("LINK: FAQ interactivo re-inyectado con motor de expansión.", "LINK");
+                    }
+                } catch (e) { logStatus(`ERR-FAQ: ${e.message}`, "ERROR"); }
 
                 // 5. UBICACION & FORM
-                document.getElementById('venue-name').innerText = (evento.ubicacion || 'TERRAZA R10').toUpperCase();
-                const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-                document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
-                
-                if (evento.form_campos?.email) document.getElementById('db-dynamic-fields').innerHTML = `<input type="email" class="form-input" placeholder="Correo electrónico *">`;
+                try {
+                    document.getElementById('venue-name').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
+                    const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                    document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+                } catch (e) { logStatus(`ERR-MAP: ${e.message}`, "ERROR"); }
 
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
 
-                // Audit Shield
+                // Audit Final v64
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
-                    const el = document.getElementById((key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : `modulo-${key}`);
+                    const el = document.getElementById((key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : key==='playlist'||key==='trailer' ? 'modulo-gallery' : `modulo-${key}`);
                     if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
                 });
 
