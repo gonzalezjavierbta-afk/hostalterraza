@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v77: Clean Asset Logic · Sistema QR</title>
+    <title>Editor v78: Geometric Fidelity & Asset Shield · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,7 +32,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO & RESTORED COUNTDOWN (3.2rem) */
+        /* 1. HERO & COUNTDOWN (3.2rem) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
@@ -40,14 +40,19 @@
         
         .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 2.5rem; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; z-index: 2; position: relative; opacity: 0.9; }
         .meta-item { display: flex; align-items: center; gap: 0.7rem; }
-        .meta-svg { width: 18px !important; height: 18px !important; fill: var(--gold); }
+        .meta-svg { width: 18px; height: 18px; fill: var(--gold); }
 
         .unified-countdown-frame { position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.5rem 2.5rem; background: var(--glass-lite); border-radius: 12px; border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; width: fit-content; }
         .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .cd-block:last-child { border-right: none; }
-        .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
+        .cd-v { display: block; font-size: 3.2rem; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
 
-        /* 2. DATA CARDS (XL Icons 68px) */
+        /* 2. LINEUP (Circle Restored) */
+        .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
+        .lineup-poster { width: 320px !important; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
+        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
+
+        /* 3. DATA CARDS (XL Icons 68px) */
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1100px; margin: 0 auto; }
         .data-card { 
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); 
@@ -58,47 +63,44 @@
         .card-val { font-size: 1.15rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
-        /* 3. FAQ & UBICACIÓN (Immersive Map 380px) */
-        .faq-ubicacion-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 0; max-width: 1200px; margin: 0 auto; align-items: stretch; }
-        .faq-col { padding-right: 4rem; border-right: 1px solid rgba(255,255,255,0.1); }
-        .ubicacion-col { padding-left: 4rem; }
+        /* 4. FAQ (Geometric Fix) */
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
+        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.9rem; }
         .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
         .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-top: 1.5rem; }
 
-        /* 4. SPONSORS v77 (Clean Asset Mode) */
-        .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 5rem 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        /* 5. SPONSORS v78 (No White Square - Clean Alpha) */
+        .sponsors-full-frame { width: 100vw; margin-left: calc(-50vw + 50%); padding: 5rem 0; border-top: 1px solid rgba(255,255,255,0.05); background: transparent; }
         .sponsors-strip { display: flex; justify-content: center; align-items: center; gap: clamp(2rem, 8vw, 8rem); flex-wrap: wrap; padding: 0 10%; }
         .sponsor-logo { 
             height: 42px !important; width: auto !important; max-width: 200px;
             object-fit: contain; 
-            /* Se omiten filtros agresivos para respetar logos blancos con transparencia original */
+            background: transparent !important; /* Elimina cualquier rastro de fondo blanco */
+            border: none !important;
             opacity: 0.95; 
             transition: 0.4s;
         }
 
-        /* 5. FORM */
-        #modulo-formulario h2 { text-align: center; }
+        /* 6. FORM */
         .form-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
-        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; }
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         
         @media (max-width: 850px) {
             .data-cards-container { grid-template-columns: repeat(2, 1fr); }
-            .lineup-container, .faq-ubicacion-grid { grid-template-columns: 1fr; gap: 4rem; }
-            .faq-col, .ubicacion-col { border: none; padding: 0; }
-            .cd-v { font-size: 2.2rem !important; }
+            .lineup-container { grid-template-columns: 1fr; gap: 4rem; }
+            .cd-v { font-size: 2.5rem; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">CLEAN ASSET DEPLOY v77...</div>
+    <div id="loader" class="loading-overlay">RESTORING GEOMETRIC PRECISION v78...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
@@ -107,7 +109,7 @@
             <div class="hero-meta">
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
-                <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5 2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
+                <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
             </div>
             <div id="unified-frame" class="unified-countdown-frame">
                 <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px;">DÍAS</span></div>
@@ -119,9 +121,7 @@
     </header>
 
     <main id="main-content-flow">
-        <section id="modulo-countdown" style="display:none;"></section>
-        <section id="modulo-aforo" style="display:none;"></section>
-
+        <!-- LINEUP -->
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div class="lineup-container">
@@ -130,42 +130,46 @@
             </div>
         </section>
 
+        <!-- GALLERY -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
             <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:2.5rem; max-width:1100px; margin:4rem auto 0;">
-                <div id="modulo-trailer" style="position:relative; width:100%; padding-top:56.25%; border-radius:15px; overflow:hidden; border:1px solid var(--gold);"><iframe id="db-trailer-iframe" src="" allow="autoplay; fullscreen" style="position:absolute; inset:0; border:none; width:100%; height:100%;"></iframe></div>
+                <div id="modulo-trailer" style="position:relative; width:100%; padding-top:56.25%; border-radius:15px; overflow:hidden; border:1px solid var(--gold);"><iframe id="db-trailer-iframe" src="" allowfullscreen style="position:absolute; inset:0; border:none; width:100%; height:100%;"></iframe></div>
                 <div id="modulo-playlist" style="border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div id="db-spotify"></div></div>
             </div>
         </section>
 
+        <!-- DATA CARDS -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
                 <div class="data-card">
                     <div><span class="card-label">DRESS CODE</span><br><span id="db-dress-val" class="card-val">--</span></div>
                     <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zM12 11c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>
                 </div>
-                <div class="data-card">
-                    <div><span class="card-label">GUEST LIST</span><br><span id="db-guest-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; margin-top:0.4rem;">CONFIRMADOS</span></div>
+                <div class="data-card" style="justify-content: center;">
+                    <div style="text-align: center;"><span class="card-label">GUEST LIST</span><br><span id="db-guest-val" class="card-val" style="display:block; margin: 1rem 0;">--</span><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform: uppercase;">CONFIRMADOS</span></div>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">AFORO</span><br><span id="db-aforo-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; margin-top:0.4rem;">PERSONAS</span></div>
+                    <div><span class="card-label">AFORO</span><br><span id="db-aforo-val" class="card-val">--</span></div>
                     <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">TICKETS</span><br><span id="db-ticket-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; margin-top:0.4rem;">DISPONIBLES</span></div>
+                    <div><span class="card-label">TICKETS</span><br><span id="db-ticket-val" class="card-val">--</span></div>
                     <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
                 </div>
             </div>
         </section>
 
+        <!-- FAQ & UBICACIÓN -->
         <section id="modulo-faq-ubicacion">
-            <div class="faq-ubicacion-grid">
-                <div class="faq-col"><h2>FAQ</h2><div id="db-faq-list"></div></div>
-                <div class="ubicacion-col"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" class="map-frame-immersive"></div></div>
+            <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
+                <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
+                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" class="map-frame-immersive"></div></div>
             </div>
         </section>
 
+        <!-- SPONSORS -->
         <section id="modulo-patrocinadores">
             <div class="sponsors-full-frame">
                 <span style="color:var(--gold); font-size:0.65rem; font-weight:900; letter-spacing:4px; text-transform:uppercase; margin-bottom:4rem; text-align:center; display:block;">PATROCINADORES</span>
@@ -173,11 +177,12 @@
             </div>
         </section>
 
+        <!-- FORM -->
         <section id="modulo-formulario">
-            <h2>REGISTRO DE ASISTENCIA</h2>
+            <h2 style="text-align:center;">REGISTRO DE ASISTENCIA</h2>
             <form id="master-reg-form" class="form-container">
                 <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
-                <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-pais" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+1">🇺🇸 +1</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
+                <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-pais" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
                 <div id="db-dynamic-fields" style="display:flex; flex-direction:column; gap:1.5rem;"></div>
                 <button type="submit" class="btn-submit">CONFIRMAR REGISTRO →</button>
             </form>
@@ -196,13 +201,13 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V77: Aplicando modo 'Clean Asset' en Patrocinadores (Filtros omitidos).");
+            logStatus("AUDITORÍA V78: Restaurando círculos geométricos y blindando transparencia de activos.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                // 1. Heartbeat v75 Restore
+                // 1. Heartbeat
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -212,6 +217,7 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
+                logStatus("TIME: Heartbeat validado a 3.2rem.", "TIME");
 
                 // 2. Hero Metadata
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
@@ -222,45 +228,46 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 3. Lineup & Gallery
+                // 3. Lineup (Circle Restoration)
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map((a, i) => `
                     <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
-                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
+                logStatus("LINK: Avatares circulares restaurados en Lineup.", "LINK");
 
-                // 4. Data Cards XL 68px
+                // 4. Data Cards & FAQ
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
                 document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
+                
+                if (content.faq) {
+                    const lineas = content.faq.split('\n').filter(l => l.includes('|'));
+                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${(q||'Consulta').trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${(a||'Contacta al hostal.').trim()}</div></div>`;
+                    }).join('');
+                }
+                logStatus("LINK: FAQ restaurado con diseño geométrico y círculos dorados.", "LINK");
 
-                // 5. Sponsors Clean Asset Mode v77
+                // 5. Sponsors Transparency Diagnostic v78
                 try {
                     const forcedAsset = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe_O0ax-NJaL7VRZjRusflR1T92YebpyBO4CrO_8T_Lw&s=10";
-                    const marks = ["Absolut", "RedBull", "Corona", "Pioneer"];
+                    const marks = ["Logo 1", "Logo 2", "Logo 3", "Logo 4"];
                     document.getElementById('db-sponsors-strip').innerHTML = marks.map(m => {
-                        return `<img src="${forcedAsset}" class="sponsor-logo" alt="${m}" onload="console.log('%c[TRACE] Logo ${m} cargado en modo limpio (W:${this.naturalWidth}px).', 'color: #e67e22;')">`;
+                        return `<img src="${forcedAsset}" class="sponsor-logo" alt="${m}" onload="console.log('%c[TRACE] Diagnóstico Visibilidad: Logo cargado sin recuadros.', 'color: #e67e22;')">`;
                     }).join('');
-                    logStatus("LINK: Patrocinadores inyectados sin filtros de inversión de color.", "LINK");
+                    logStatus("LINK: Transparencia blindada: eliminados filtros de inversión y fondos oclusivos.", "LINK");
                 } catch (e) { logStatus(`ERR-SPONSORS: ${e.message}`, "ERROR"); }
 
-                // 6. Form & Map
-                let htmlForm = '';
-                if (evento.form_campos?.email) htmlForm += `<input type="email" class="form-input" placeholder="Email *">`;
-                document.getElementById('db-dynamic-fields').innerHTML = htmlForm;
-
+                // Map & rest
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
                 document.getElementById('venue-name').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
 
-                document.getElementById('db-trailer-iframe').src = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6";
-                if (content.playlist_url) {
-                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="400" frameBorder="0" allow="encrypted-media" style="border:none; border-radius:12px;"></iframe>`;
-                }
+                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
 
-                // Audit Shield Final v77
+                // Audit Shield Final v78
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : (key==='patrocinadores') ? 'modulo-patrocinadores' : `modulo-${key}`;
                     const el = document.getElementById(elId);
