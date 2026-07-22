@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v52: Metadata Recovery & Professional Portraits · Sistema QR</title>
+    <title>Editor v53: Gallery & Dual Media Sync · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,6 +15,7 @@
             --gold: #df20b6; 
             --text-color: #ffffff;
             --glass-lite: rgba(255, 255, 255, 0.03);
+            --border-glow: rgba(223, 32, 182, 0.15);
         }
 
         html, body { 
@@ -23,7 +24,7 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; 
         }
 
-        /* ESCUDO DE GRANO (v47 Fix): Ruido Inline Inmune a errores 404 */
+        /* ESCUDO DE GRANO CSS (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -31,59 +32,47 @@
         }
         
         section { display: none; padding: 6rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.7rem; font-weight: 900; margin-bottom: 5rem; text-align: center; }
+        h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* HERO RECOVERY v52 */
-        .hero { 
-            position: relative; height: 100vh; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; 
-            box-sizing: border-box; text-align: center;
-        }
+        /* HERO & COUNTDOWN (v52 Stable) */
+        .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; box-sizing: border-box; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
-        
-        .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; color: white; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .hero-content { position: relative; z-index: 2; width: 100%; max-width: 900px; }
-        .hero-title { font-weight: 900; font-size: clamp(2rem, 8vw, 4.5rem); line-height: 1; text-transform: uppercase; margin: 0; letter-spacing: -3px; color: #fff; }
-
-        /* Metadata Premium Recuperada */
-        .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 2rem; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; }
-        .meta-item { display: flex; align-items: center; gap: 0.6rem; color: rgba(255,255,255,0.9); }
-        .meta-icon { width: 16px; height: 16px; fill: var(--gold); }
-
+        .org-badge { position: absolute; top: 2rem; left: 2rem; z-index: 10; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
+        .hero-title { font-weight: 900; font-size: clamp(2rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
+        .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 2rem; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; z-index: 2; position: relative; }
+        .meta-icon { width: 16px; height: 16px; fill: var(--gold); vertical-align: middle; margin-right: 0.5rem; }
         .aforo-box { display: inline-block; margin-top: 1.5rem; padding: 0.8rem 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; z-index: 2; position: relative; }
 
         .unified-countdown-frame {
             position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.5rem 2.5rem; background: var(--glass-lite); border-radius: 12px;
-            border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 20px rgba(223, 32, 182, 0.15); width: fit-content;
+            border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; width: fit-content;
         }
         .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 2.2rem; font-weight: 900; }
-        .cd-l { font-size: 0.5rem; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; margin-top: 0.5rem; font-weight: 900; }
+        .cd-l { font-size: 0.5rem; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; margin-top: 0.5rem; }
 
-        /* LINEUP REFINED v52: DIVISOR & PRO PORTRAITS */
-        .lineup-container { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; 
-            max-width: 950px; margin: 0 auto;
-        }
-        .lineup-col-poster { 
-            display: flex; justify-content: center; padding-right: 5rem; 
-            border-right: 1px solid rgba(255,255,255,0.1); /* Línea divisora */
-        }
-        .lineup-poster { 
-            width: 320px; border-radius: 12px; 
-            border: 4px solid var(--gold); /* Borde grueso solicitado */
-            box-shadow: 0 0 40px rgba(223, 32, 182, 0.2); 
-        }
-        
+        /* LINEUP (v52) */
+        .lineup-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; max-width: 950px; margin: 0 auto; }
+        .lineup-col-poster { display: flex; justify-content: center; padding-right: 5rem; border-right: 1px solid rgba(255,255,255,0.1); }
+        .lineup-poster { width: 320px; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 40px var(--border-glow); }
         .artist-list { display: flex; flex-direction: column; gap: 2.5rem; padding-left: 5rem; }
-        .artist-item { display: flex; align-items: center; gap: 1.8rem; background: transparent; padding: 0; }
-        .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(223, 32, 182, 0.3); }
-        .artist-name { font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+        .artist-item { display: flex; align-items: center; gap: 1.8rem; }
+        .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
 
-        .data-item { margin-bottom: 1.5rem; padding: 2rem; background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
+        /* GALERÍA v53 (Ref: galeriaplaylist.jpg) */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+
+        /* DUAL MEDIA COLUMN v53 (Tráiler / Playlist) */
+        .dual-media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; max-width: 1100px; margin: 0 auto; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); box-shadow: 0 0 30px var(--border-glow); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .playlist-wrapper { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); height: 100%; }
+
+        .data-item { padding: 2rem; background: var(--glass-lite); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 10px; color: white; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.4rem; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; }
     </style>
@@ -91,32 +80,18 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">RECOVERING EXPERIENCE v52...</div>
+    <div id="loader" class="loading-overlay">CALIBRATING MEDIA v53...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" class="org-badge">--</div>
-        
         <div class="hero-content">
             <h1 id="event-title" class="hero-title">--</h1>
-            
-            <!-- METADATOS RECUPERADOS (v52 Recovery) -->
             <div class="hero-meta">
-                <div class="meta-item">
-                    <svg class="meta-icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                    <span id="meta-fecha">--/--/--</span>
-                </div>
-                <div class="meta-item">
-                    <svg class="meta-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                    <span id="meta-hora">--:--</span>
-                </div>
-                <div class="meta-item">
-                    <svg class="meta-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    <span id="meta-lugar">--</span>
-                </div>
+                <span><svg class="meta-icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></span>
+                <span><svg class="meta-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></span>
+                <span><svg class="meta-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></span>
             </div>
-
             <div id="hero-aforo-txt" class="aforo-box">...</div>
-
             <div id="unified-frame" class="unified-countdown-frame">
                 <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span class="cd-l">Días</span></div>
                 <div class="cd-block"><span id="cd-hours" class="cd-v">00</span><span class="cd-l">Horas</span></div>
@@ -127,39 +102,42 @@
     </header>
 
     <main id="main-content-flow">
-        <!-- MODULOS OBLIGATORIOS (Auditoría v52) -->
         <section id="modulo-countdown" style="display:none;"></section>
         <section id="modulo-aforo" style="display:none;"></section>
-        <section id="modulo-trailer"><h2>EXPERIENCIA VISUAL</h2><div id="db-trailer-container"></div></section>
-
-        <!-- LINEUP v52: DIVISOR VERTICAL Y FOTOS DE REFERENCIA -->
+        
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div class="lineup-container">
-                <div class="lineup-col-poster">
-                    <img id="db-poster-img" src="" class="lineup-poster" alt="Evento Afiche">
-                </div>
+                <div class="lineup-col-poster"><img id="db-poster-img" src="" class="lineup-poster" alt="Afiche"></div>
                 <div id="db-lineup" class="artist-list"></div>
             </div>
         </section>
 
+        <!-- MÓDULO GALERÍA v53 -->
+        <section id="modulo-gallery">
+            <h2>GALERÍA</h2>
+            <div id="db-gallery-grid" class="gallery-grid"></div>
+        </section>
+
+        <!-- COLUMNAS DUAL MEDIA (Tráiler / Playlist) -->
+        <section id="modulo-trailer-playlist">
+            <h2>TRÁILER OFICIAL / PLAYLIST</h2>
+            <div class="dual-media-grid">
+                <div id="modulo-trailer" class="video-wrapper">
+                    <!-- Video Genérico de Referencia (Vimeo para evitar Error 153 de YouTube) -->
+                    <iframe src="https://player.vimeo.com/video/259411563?h=79100067&color=df20b6&title=0&byline=0&portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div id="modulo-playlist" class="playlist-wrapper">
+                    <div id="db-spotify"></div>
+                </div>
+            </div>
+        </section>
+
         <section id="modulo-dress_code"><h2>VESTIMENTA</h2><div id="db-dress-txt" class="data-item" style="text-align:center;">--</div></section>
-        <section id="modulo-gallery"><h2>GALERÍA</h2><div id="db-gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem;"></div></section>
         <section id="modulo-guest_list"><h2>GUEST LIST</h2><div id="db-guest-txt" class="data-item">--</div></section>
         <section id="modulo-faq"><h2>DUDAS FRECUENTES</h2><div id="db-faq-list"></div></section>
-        <section id="modulo-playlist"><h2>BANDA SONORA</h2><div id="db-spotify"></div></section>
         <section id="modulo-ubicacion"><h2>LOCALIZACIÓN</h2><div id="db-mapa-container" style="width:100%; height:450px; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"></div></section>
-
-        <section id="modulo-formulario">
-            <h2>RESERVA TU LUGAR</h2>
-            <form id="master-reg-form" style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem;">
-                <div><input type="text" class="form-input" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="Nombre completo *" required></div>
-                <div><input type="text" class="form-input" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="Cédula *" required></div>
-                <div style="display:flex; gap:0.5rem;"><select style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="WhatsApp *" required></div>
-                <div id="db-dynamic-fields"></div>
-                <button type="submit" class="btn-submit">CONFIRMAR ASISTENCIA →</button>
-            </form>
-        </section>
+        <section id="modulo-formulario"><h2>RESERVA TU LUGAR</h2><form id="master-reg-form" style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem;"><div><input type="text" class="form-input" placeholder="Nombre completo *" required></div><div><input type="text" class="form-input" placeholder="Cédula *" required></div><div style="display:flex; gap:0.5rem;"><select class="form-input" style="width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" class="form-input" placeholder="WhatsApp *" required></div><div id="db-dynamic-fields"></div><button type="submit" class="btn-submit">CONFIRMAR ASISTENCIA →</button></form></section>
     </main>
 
     <script>
@@ -182,7 +160,7 @@
             try {
                 const target = new Date(`${date}T${time}`).getTime();
                 if (isNaN(target)) return;
-                logStatus(`TIME: Heartbeat activo en marco unificado v52 para ${date}.`, "TIME");
+                logStatus(`TIME: Heartbeat activo en marco unificado v53 para ${date}.`, "TIME");
                 setInterval(() => {
                     const diff = target - new Date().getTime();
                     if (diff <= 0) return;
@@ -195,7 +173,7 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V52: Restaurando Metadata de Hero y Pro-Portraits en Lineup...");
+            logStatus("AUDITORÍA V53: Ejecutando maquetación dual Tráiler/Playlist (Ref: P6)...");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             try {
@@ -207,46 +185,46 @@
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
 
-                // 1. RECOVERY: Metadata Injection
+                // Hero Metadata Recovery
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                document.getElementById('meta-fecha').innerText = evento.fecha || '--/--/--';
-                document.getElementById('meta-hora').innerText = `${evento.hora || '--:--'} HRS`;
-                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
-                logStatus("LINK: Metadatos de Hero recuperados y vinculados.", "LINK");
-
+                document.getElementById('meta-fecha').innerText = evento.fecha;
+                document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
+                document.getElementById('meta-lugar').innerText = evento.ubicacion.toUpperCase();
                 if (evento.aforo_max) document.getElementById('hero-aforo-txt').innerText = `${evento.aforo_max} CUPOS DISPONIBLES`;
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
 
                 const content = evento.config_landing?.content || {};
 
-                // 2. LINEUP v52: Pro-Portraits Support
+                // 1. LINEUP & POSTER
                 const posterImg = document.getElementById('db-poster-img');
-                const defaultPoster = "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1000&auto=format&fit=crop";
-                posterImg.src = evento.poster_url || evento.imagen_url || defaultPoster;
-
+                posterImg.src = evento.poster_url || evento.imagen_url || "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1000&auto=format&fit=crop";
+                
                 const lineup = content.dj_lineup || content.lineup;
                 if (lineup) {
-                    const l = Array.isArray(lineup) ? lineup : lineup.split('\n');
-                    // Fotos de referencia profesionales (Unsplash) para DJs
-                    const proPhotos = [
-                        "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
-                    ];
-                    document.getElementById('db-lineup').innerHTML = l.map((a, i) => `
-                        <div class="artist-item">
-                            <img src="${proPhotos[i % 4]}" class="artist-avatar">
-                            <span class="artist-name">${a}</span>
-                        </div>`).join('');
-                    logStatus("LINK: Lineup con fotos de referencia profesionales inyectado.", "LINK");
+                    const proPhotos = ["https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=200", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200"];
+                    document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).map((a, i) => `
+                        <div class="artist-item"><img src="${proPhotos[i % 4]}" class="artist-avatar"><span class="artist-name">${a}</span></div>`).join('');
                 }
 
-                // 3. LOGIC BLOCKS (v51 Shield)
+                // 2. GALERÍA REFINED (v53 Grid)
+                const gallery = content.gallery || content.galeria;
+                if (gallery) {
+                    const urls = Array.isArray(gallery) ? gallery : gallery.split('\n');
+                    document.getElementById('db-gallery-grid').innerHTML = urls.filter(u => u.length > 5).map(u => `
+                        <img src="${u.trim()}" class="gallery-img">`).join('');
+                    logStatus("LINK: Galería de 4 columnas inyectada.", "LINK");
+                }
+
+                // 3. PLAYLIST REFINED (v53 Column)
+                if (content.playlist_url) {
+                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
+                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="450" frameBorder="0" allow="encrypted-media" style="filter: invert(1) hue-rotate(180deg) brightness(0.8); border:none;"></iframe>`;
+                    logStatus("LINK: Playlist vinculada en columna derecha.", "LINK");
+                }
+
+                // Otros bloques lógicos
                 if (content.dresscode) document.getElementById('db-dress-txt').innerText = content.dresscode.toUpperCase();
                 if (content.guest_list) document.getElementById('db-guest-txt').innerText = content.guest_list;
-                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:300px; object-fit:cover; border-radius:12px;">`).join('');
-
                 if (content.faq && typeof content.faq === 'string') {
                     const lineas = content.faq.split('\n').filter(l => l.includes('|'));
                     document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
@@ -254,46 +232,29 @@
                         return `<div class="data-item"><b style="color:var(--gold); display:block; margin-bottom:1rem;">${q.trim()}</b><p style="opacity:0.7; margin:0;">${a.trim()}</p></div>`;
                     }).join('');
                 }
-
-                if (content.playlist_url) {
-                    const embed = content.playlist_url.replace('open.spotify.com', 'open.spotify.com/embed');
-                    document.getElementById('db-spotify').innerHTML = `<iframe src="${embed}" width="100%" height="380" frameBorder="0" allow="encrypted-media" style="border-radius:15px; border:none; filter: invert(1) hue-rotate(180deg) brightness(0.8);"></iframe>`;
-                }
-
                 if (evento.ubicacion) {
                     const url = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                     document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${url}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
                 }
 
-                if (evento.form_campos) {
-                    const fields = evento.form_campos || {};
-                    let html = '';
-                    if (fields.email) html += `<div><input type="email" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="Email de contacto"></div>`;
-                    if (fields.edad) html += `<div><input type="number" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:1.2rem; border-radius:10px; color:white; width:100%;" placeholder="Edad"></div>`;
-                    document.getElementById('db-dynamic-fields').innerHTML = html;
-                }
-
-                // --- 4. AUDITORÍA FÍSICA v52 (Shield Active) ---
-                logStatus("--- INICIANDO AUDITORÍA DE ESCUDO v52 ---", "INFO");
+                // --- 4. AUDITORÍA FÍSICA v53 ---
+                logStatus("--- INICIANDO AUDITORÍA DE ESCUDO v53 ---", "INFO");
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
-                    if (key === 'force_gold' || key === 'trailer') return;
-                    const el = document.getElementById(`modulo-${key}`);
+                    const el = document.getElementById(`modulo-${key}`) || document.getElementById(`modulo-trailer-playlist`);
                     if (!el) return;
-
                     const hasInput = el.querySelectorAll('input').length > 0;
                     const hasIframe = el.querySelectorAll('iframe').length > 0;
                     const hasImg = el.querySelectorAll('img').length > 0;
                     const contentTxt = el.innerText.replace(/\s/g, '').replace('--', '');
-                    
                     let isValid = (key === 'formulario') ? hasInput : (contentTxt.length >= 3 || hasIframe || hasImg);
-
                     if (SANDBOX_CONFIG[key] && isValid) {
                         logStatus(`INFO: Módulo ${key.toUpperCase()} verificado.`, "INFO");
-                        el.style.display = 'block';
+                        if (el.tagName === 'SECTION') el.style.display = 'block';
+                        document.getElementById('modulo-trailer-playlist').style.display = 'block';
                     }
                 });
 
-                logStatus("SINCRONIZACIÓN MAESTRA V52 FINALIZADA.", "INFO");
+                logStatus("SINCRONIZACIÓN MAESTRA V53 FINALIZADA.", "INFO");
 
             } catch (err) { logStatus(`CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
