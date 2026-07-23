@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v90: Data Card Symmetry & Glow · Sistema QR</title>
+    <title>Editor v91: Media Alignment & Gallery · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,7 +41,6 @@
         .meta-item { display: flex; align-items: center; gap: 0.7rem; }
         .meta-svg { width: 18px !important; height: 18px !important; fill: var(--gold); }
 
-        /* Unified frame from v89 (Compact + Glow) */
         .unified-countdown-frame { 
             position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.2rem 1.5rem; 
             background: rgba(255, 255, 255, 0.02); border-radius: 12px; border: 1px solid var(--gold); 
@@ -51,42 +50,41 @@
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
 
-        /* 2. MEDIA GRID */
-        .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: start; }
+        /* 2. MEDIA GRID v91 (Stretch Sync Height) */
+        .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
         .yt-cover { position: absolute; inset: 0; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .play-btn { width: 70px; height: 70px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--gold); }
-        .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 600px; }
+        
+        .spotify-container { 
+            border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); 
+            background: #121212; height: 100%; display: flex; flex-direction: column; 
+        }
+        #db-spotify-embed { flex: 1; min-height: 0; }
 
-        /* 3. DATA CARDS v90 (Symmetry Restoration) */
+        /* 3. DATA CARDS v90 (Symmetry Protection) */
         .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1100px; margin: 0 auto; }
         .data-card { 
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: 15px; padding: 2.5rem 1rem; text-align: center; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; 
-            transition: 0.3s ease;
         }
-        .data-card:hover { background: rgba(255, 255, 255, 0.04); border-color: var(--gold); }
         .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
-        .card-val { font-size: 1.15rem; font-weight: 900; text-transform: uppercase; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
         /* 4. FAQ & MAP */
-        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
+        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; }
         .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
-        .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-        .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
         .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-top: 1.5rem; }
 
-        /* 5. FORM MASTER BOX */
+        /* 5. FORM MASTER BOX (Dual-Path) */
         .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
+        .form-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
@@ -101,7 +99,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">DATA CARD SYMMETRY v90...</div>
+    <div id="loader" class="loading-overlay">MEDIA SYNC v91...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -126,12 +124,12 @@
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0; max-width:950px; margin:0 auto; align-items:start;">
-                <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold); box-shadow: 0 0 30px var(--gold);" alt="Poster"></div>
+                <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold); shadow: 0 0 30px var(--gold);" alt="Poster"></div>
                 <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem; padding-left:5rem;"></div>
             </div>
         </section>
 
-        <!-- 2. GALLERY & MEDIA -->
+        <!-- 2. GALLERY v91 (Restored) -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
@@ -141,22 +139,22 @@
             </div>
         </section>
 
-        <!-- 3. DATA CARDS v90 restored -->
+        <!-- 3. DATA CARDS -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
                 <div class="data-card">
-                    <div><span class="card-label">DRESS CODE</span><span id="db-dress-val" class="card-val">--</span></div>
+                    <div><span class="card-label">DRESS CODE</span><span id="db-dress-val" style="font-size:1.15rem; font-weight:900; text-transform:uppercase;">--</span></div>
                     <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">GUEST LIST</span><span id="db-guest-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">CONFIRMADOS</span></div>
+                    <div><span class="card-label">GUEST LIST</span><span id="db-guest-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">CONFIRMADOS</span></div>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">AFORO</span><span id="db-aforo-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">PERSONAS</span></div>
-                    <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3z"/></svg>
+                    <div><span class="card-label">AFORO</span><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">PERSONAS</span></div>
+                    <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg>
                 </div>
                 <div class="data-card">
-                    <div><span class="card-label">TICKETS</span><span id="db-ticket-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">DISPONIBLES</span></div>
+                    <div><span class="card-label">TICKETS</span><span id="db-ticket-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">DISPONIBLES</span></div>
                     <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg>
                 </div>
             </div>
@@ -170,7 +168,7 @@
             </div>
         </section>
 
-        <!-- 5. FORMULARIO (Dual-Path) -->
+        <!-- 5. FORMULARIO -->
         <section id="modulo-formulario">
             <div class="form-master-box">
                 <div class="form-tabs">
@@ -194,7 +192,7 @@
                     <p style="font-size:0.8rem; opacity:0.6; margin-bottom:2rem;">Ingresa tus datos para obtener tu entrada QR generada previamente.</p>
                     <input type="text" class="form-input" id="rec-cedula" placeholder="Cédula / Documento *">
                     <input type="tel" class="form-input" id="rec-tel" placeholder="WhatsApp registrado *">
-                    <button class="btn-submit" onclick="alert('Funcionalidad de recuperación activa.')">Verificar mis datos →</button>
+                    <button class="btn-submit" onclick="alert('Recuperación activa.')">Verificar mis datos →</button>
                 </div>
             </div>
         </section>
@@ -219,13 +217,13 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V90: Restaurando simetría de Data Cards y verificando integridad de módulos.");
+            logStatus("AUDITORÍA V91: Recuperando Galería y sincronizando alturas multimedia (Video/Spotify).");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                // 1. Heartbeat immediate (3.2rem)
+                // 1. Heartbeat
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -235,32 +233,35 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-                logStatus("TIME: Heartbeat sincronizado a 3.2rem satisfactoriamente.", "TIME");
+                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
 
                 // 2. Org & Hero
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
-                document.getElementById('meta-fecha').innerText = evento.fecha;
-                document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
-                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
 
                 const content = evento.config_landing?.content || {};
-                
-                // 3. Media Logic
+
+                // 3. Gallery & Media Sync (v91 Fix)
+                if (content.gallery) {
+                    document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:12px;">`).join('');
+                    logStatus("LINK: Módulo GALERÍA inyectado con éxito.", "LINK");
+                }
+
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6&title=0&byline=0&portrait=0";
                 if (trailerUrl.includes('youtube.com') || trailerUrl.includes('youtu.be')) {
                     document.getElementById('db-video-content').innerHTML = `<div class="yt-cover" style="background-image: url('${evento.imagen_url}')" onclick="window.open('${trailerUrl}', '_blank')"><div class="play-btn"><svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div></div>`;
                     logStatus("LINK: Tráiler YouTube inyectado como Play-Overlay.", "LINK");
                 } else {
                     document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                    logStatus("LINK: Tráiler Vimeo/Fallback inyectado con éxito.", "LINK");
+                    logStatus("LINK: Tráiler Vimeo inyectado satisfactoriamente.", "LINK");
                 }
+
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
-                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" width="100%" height="600" frameBorder="0" allow="encrypted-media" style="border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify recuperada a 600px de altura.", "LINK");
+                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border:none; border-radius:15px;"></iframe>`;
+                    logStatus("LINK: Playlist Spotify sincronizada a la altura del video.", "LINK");
                 }
 
                 // 4. Form Integrity Check (Reglas de Oro v89+)
@@ -268,10 +269,11 @@
                     logStatus("LINK: Motor de registro (Dual-Path) verificado y persistente.", "LINK");
                 }
 
-                // 5. Lineup, FAQ & टेक्निकल RESTORATION
+                // 5. Lineup, Technical Data & rest
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
-                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `<div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
+                    <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                 
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
@@ -281,7 +283,7 @@
                 if (content.faq) {
                     document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
                         const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${a.trim()}</div></div>`;
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer" style="max-height:0; opacity:0; overflow:hidden; transition:0.4s ease; font-size:0.85rem; color:rgba(255,255,255,0.6);">${a.trim()}</div></div>`;
                     }).join('');
                 }
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
@@ -295,7 +297,7 @@
                     if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
                 });
 
-            } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (err) { logStatus(`ERROR: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
     </script>
