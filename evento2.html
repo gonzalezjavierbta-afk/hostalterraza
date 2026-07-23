@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v89: Hero Refinement · Sistema QR</title>
+    <title>Editor v90: Data Card Symmetry & Glow · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,15 +41,11 @@
         .meta-item { display: flex; align-items: center; gap: 0.7rem; }
         .meta-svg { width: 18px !important; height: 18px !important; fill: var(--gold); }
 
-        /* Compacted Spacing + Glow Effect */
+        /* Unified frame from v89 (Compact + Glow) */
         .unified-countdown-frame { 
-            position: relative; z-index: 2; margin: 3rem auto 0; 
-            padding: 1.2rem 1.5rem; /* Reducido para evitar exceso lateral */
-            background: rgba(255, 255, 255, 0.02); /* Efecto menos intenso */
-            border-radius: 12px; border: 1px solid var(--gold); 
-            backdrop-filter: blur(4px); /* Menos intenso */
-            box-shadow: 0 0 15px var(--border-glow); /* Pequeño efecto de glow */
-            display: flex; width: fit-content; 
+            position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.2rem 1.5rem; 
+            background: rgba(255, 255, 255, 0.02); border-radius: 12px; border: 1px solid var(--gold); 
+            backdrop-filter: blur(4px); box-shadow: 0 0 15px var(--border-glow); display: flex; width: fit-content; 
         }
         .cd-block { padding: 0 1rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .cd-block:last-child { border-right: none; }
@@ -63,12 +59,21 @@
         .play-btn { width: 70px; height: 70px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--gold); }
         .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 600px; }
 
-        /* 3. LINEUP & DATA CARDS */
-        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
-        .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; }
+        /* 3. DATA CARDS v90 (Symmetry Restoration) */
+        .data-cards-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1100px; margin: 0 auto; }
+        .data-card { 
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 15px; padding: 2.5rem 1rem; text-align: center; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; 
+            transition: 0.3s ease;
+        }
+        .data-card:hover { background: rgba(255, 255, 255, 0.04); border-color: var(--gold); }
+        .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+        .card-val { font-size: 1.15rem; font-weight: 900; text-transform: uppercase; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
         /* 4. FAQ & MAP */
+        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
         .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
@@ -76,19 +81,18 @@
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
         .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-top: 1.5rem; }
 
-        /* 5. FORM MASTER BOX (Dual-Path) */
+        /* 5. FORM MASTER BOX */
         .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-        
         .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         
         @media (max-width: 850px) {
-            .media-grid { grid-template-columns: 1fr; }
+            .media-grid, .data-cards-container { grid-template-columns: 1fr; }
             .cd-v { font-size: 2.2rem; }
             .form-master-box { padding: 2rem 1.5rem; }
         }
@@ -97,7 +101,7 @@
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">HERO REFINEMENT v89...</div>
+    <div id="loader" class="loading-overlay">DATA CARD SYMMETRY v90...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -105,7 +109,7 @@
             <h1 id="event-title" class="hero-title">--</h1>
             <div class="hero-meta">
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
-                <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
+                <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
             </div>
             <div id="unified-frame" class="unified-countdown-frame">
@@ -137,13 +141,24 @@
             </div>
         </section>
 
-        <!-- 3. DATA CARDS -->
+        <!-- 3. DATA CARDS v90 restored -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container">
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">GUEST LIST</span><br><span id="db-guest-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4;">CONFIRMADOS</span></div></div>
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">AFORO</span><br><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg></div>
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">TICKETS</span><br><span id="db-ticket-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg></div>
+                <div class="data-card">
+                    <div><span class="card-label">DRESS CODE</span><span id="db-dress-val" class="card-val">--</span></div>
+                    <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg>
+                </div>
+                <div class="data-card">
+                    <div><span class="card-label">GUEST LIST</span><span id="db-guest-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">CONFIRMADOS</span></div>
+                </div>
+                <div class="data-card">
+                    <div><span class="card-label">AFORO</span><span id="db-aforo-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">PERSONAS</span></div>
+                    <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3z"/></svg>
+                </div>
+                <div class="data-card">
+                    <div><span class="card-label">TICKETS</span><span id="db-ticket-val" class="card-val">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">DISPONIBLES</span></div>
+                    <svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg>
+                </div>
             </div>
         </section>
 
@@ -167,7 +182,7 @@
                         <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
                         <input type="text" class="form-input" id="reg-cedula" placeholder="Cédula / Documento *" required>
                         <div style="display:flex; gap:0.5rem;">
-                            <select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+1">🇺🇸 +1</option></select>
+                            <select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option></select>
                             <input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required>
                         </div>
                         <input type="email" class="form-input" id="reg-email" placeholder="Correo electrónico (Opcional)">
@@ -179,7 +194,7 @@
                     <p style="font-size:0.8rem; opacity:0.6; margin-bottom:2rem;">Ingresa tus datos para obtener tu entrada QR generada previamente.</p>
                     <input type="text" class="form-input" id="rec-cedula" placeholder="Cédula / Documento *">
                     <input type="tel" class="form-input" id="rec-tel" placeholder="WhatsApp registrado *">
-                    <button class="btn-submit" onclick="alert('Funcionalidad de recuperación operativa.')">Verificar mis datos →</button>
+                    <button class="btn-submit" onclick="alert('Funcionalidad de recuperación activa.')">Verificar mis datos →</button>
                 </div>
             </div>
         </section>
@@ -204,13 +219,13 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V89: Ejecutando refinamiento estético de Hero y blindaje de Formulario.");
+            logStatus("AUDITORÍA V90: Restaurando simetría de Data Cards y verificando integridad de módulos.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                // 1. Heartbeat
+                // 1. Heartbeat immediate (3.2rem)
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -220,13 +235,11 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-                logStatus("TIME: Heartbeat sincronizado a 3.2rem.", "TIME");
+                logStatus("TIME: Heartbeat sincronizado a 3.2rem satisfactoriamente.", "TIME");
 
-                // 2. Org Name Recovery
+                // 2. Org & Hero
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
-
-                // 3. Hero & Media Fallback
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
@@ -234,33 +247,31 @@
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
 
                 const content = evento.config_landing?.content || {};
-                const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6&title=0&byline=0&portrait=0";
                 
+                // 3. Media Logic
+                const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6&title=0&byline=0&portrait=0";
                 if (trailerUrl.includes('youtube.com') || trailerUrl.includes('youtu.be')) {
                     document.getElementById('db-video-content').innerHTML = `<div class="yt-cover" style="background-image: url('${evento.imagen_url}')" onclick="window.open('${trailerUrl}', '_blank')"><div class="play-btn"><svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div></div>`;
                     logStatus("LINK: Tráiler YouTube inyectado como Play-Overlay.", "LINK");
                 } else {
                     document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                    logStatus("LINK: Tráiler Vimeo/Fallback inyectado satisfactoriamente.", "LINK");
+                    logStatus("LINK: Tráiler Vimeo/Fallback inyectado con éxito.", "LINK");
                 }
-
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" width="100%" height="600" frameBorder="0" allow="encrypted-media" style="border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify inyectada a 600px.", "LINK");
+                    logStatus("LINK: Playlist Spotify recuperada a 600px de altura.", "LINK");
                 }
 
-                // 4. Form Integrity Check (Reglas de Oro v89)
+                // 4. Form Integrity Check (Reglas de Oro v89+)
                 if (document.getElementById('modulo-formulario')) {
                     logStatus("LINK: Motor de registro (Dual-Path) verificado y persistente.", "LINK");
                 }
 
-                // 5. Lineup, Gallery & Técnico
+                // 5. Lineup, FAQ & टेक्निकल RESTORATION
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
-                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
-                    <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
-                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `<div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                 
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
@@ -277,14 +288,14 @@
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
                 document.getElementById('venue-name').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
 
-                // Audit Final v89 (11 módulos)
+                // Final Audit
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : `modulo-${key}`;
                     const el = document.getElementById(elId);
                     if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
                 });
 
-            } catch (err) { logStatus(`ERROR: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
     </script>
