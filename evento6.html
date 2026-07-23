@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiet Luxury v126 · Private Member Club</title>
+    <title>Quiet Luxury v127 · Strict Single Viewport</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,81 +11,81 @@
 
     <style>
         :root { --main-bg: #050505; --gold: #c8a96e; --text-color: #ffffff; }
-        html, body { margin: 0; padding: 0; background: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; overflow: hidden; }
+        html, body { margin: 0; padding: 0; background: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; height: 100vh; overflow: hidden; }
 
         /* ESCUDO DE GRANO (v47) */
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
 
-        /* ESTRUCTURA SINGLE VIEWPORT (P9) */
+        /* ESTRUCTURA SINGLE VIEWPORT (P9) - REESTRUCTURADA */
         #template-container { 
             display: none; height: 100vh; width: 100vw; 
             background-size: cover; background-position: center;
             position: relative; align-items: center; justify-content: center;
         }
-        #template-container::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.95) 100%); z-index: 1; }
+        #template-container::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.9) 100%); z-index: 1; }
 
-        /* PANEL CENTRAL REFINADO */
+        /* PANEL CENTRAL - AJUSTE DE ALTURA */
         .luxury-panel { 
-            position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 0.8fr; 
-            gap: 6rem; max-width: 1200px; width: 85%; align-items: center;
+            position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 0.7fr; 
+            gap: 3rem; max-width: 1200px; width: 90%; align-items: center; max-height: 90vh;
         }
 
-        /* METADATOS ORGÁNICOS */
-        .info-side { border-left: 1px solid rgba(200, 169, 110, 0.3); padding-left: 4rem; }
-        .org-badge { font-size: 0.55rem; letter-spacing: 7px; opacity: 0.5; text-transform: uppercase; margin-bottom: 1.5rem; }
-        .hero-title { font-size: clamp(3.5rem, 9vw, 6.5rem); font-weight: 900; letter-spacing: -6px; line-height: 0.8; margin: 0; text-transform: uppercase; }
+        /* METADATOS ORGÁNICOS COMPACTOS */
+        .info-side { border-left: 1px solid rgba(200, 169, 110, 0.3); padding: 1rem 0 1rem 3rem; }
+        .org-badge { font-size: 0.5rem; letter-spacing: 5px; opacity: 0.5; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .hero-title { font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 900; letter-spacing: -5px; line-height: 0.85; margin: 0; text-transform: uppercase; }
         
-        .metadata-organic { margin-top: 3rem; list-style: none; padding: 0; }
-        .metadata-organic li { font-size: 0.8rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 1rem; }
-        .metadata-organic li::before { content: ''; width: 30px; height: 1px; background: rgba(200, 169, 110, 0.4); }
+        .metadata-organic { margin-top: 1.5rem; list-style: none; padding: 0; }
+        .metadata-organic li { font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.8rem; }
+        .metadata-organic li::before { content: ''; width: 20px; height: 1px; background: rgba(200, 169, 110, 0.4); }
 
-        /* DATA CARDS SOFISTICADOS (v126) */
-        .tech-specs-organic { margin-top: 4rem; display: flex; gap: 3rem; }
-        .data-item { position: relative; }
-        .data-item .label { font-size: 0.5rem; letter-spacing: 4px; opacity: 0.4; text-transform: uppercase; display: block; margin-bottom: 0.3rem; }
-        .data-item .value { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; border-bottom: 2px solid var(--gold); padding-bottom: 0.2rem; }
+        .tech-specs-organic { margin-top: 2rem; display: flex; gap: 2rem; }
+        .data-item .label { font-size: 0.45rem; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; display: block; }
+        .data-item .value { font-size: 1.1rem; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; border-bottom: 1px solid var(--gold); }
 
-        /* FORMULARIO GLASS (Single Viewport Focus) */
+        /* FORMULARIO GLASS COMPACTO - REESTRUCTURADO */
         .form-master-box { 
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); 
-            padding: 4rem; border: 1px solid rgba(255, 255, 255, 0.05); 
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(40px); 
+            padding: 2.5rem; border: 1px solid rgba(255, 255, 255, 0.05); 
             box-shadow: 0 40px 100px rgba(0,0,0,0.8); border-radius: 4px;
         }
         .form-input { 
             background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.1); 
-            padding: 1.5rem 0; color: white; width: 100%; font-size: 1.1rem; margin-bottom: 2rem; 
-            font-family: inherit; transition: 0.4s;
+            padding: 1rem 0; color: white; width: 100%; font-size: 0.95rem; margin-bottom: 1.2rem; 
+            font-family: inherit;
         }
-        .form-input:focus { border-color: var(--gold); outline: none; padding-left: 1rem; }
         .btn-submit { 
-            background: var(--gold); color: black; font-weight: 900; padding: 1.8rem; 
+            background: var(--gold); color: black; font-weight: 900; padding: 1.2rem; 
             border: none; cursor: pointer; text-transform: uppercase; width: 100%; 
-            letter-spacing: 5px; margin-top: 1rem; transition: 0.5s ease;
+            letter-spacing: 3px; transition: 0.4s ease;
         }
-        .btn-submit:hover { letter-spacing: 8px; filter: brightness(1.3); transform: translateY(-2px); }
 
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 12px; color: var(--gold); text-transform: uppercase; }
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; color: var(--gold); }
 
-        /* IDs DE DATOS PROTEGIDOS (Cero Borrado) */
+        /* CERO BORRADO */
         #db-poster-img, #modulo-countdown, #modulo-gallery, #modulo-lineup, #db-faq-list, #db-mapa-container, #db-sponsors-list { display: none; }
 
-        @media (max-width: 1100px) {
-            .luxury-panel { grid-template-columns: 1fr; gap: 4rem; width: 90%; }
+        @media (max-width: 1000px) {
+            .luxury-panel { grid-template-columns: 1fr; gap: 2rem; }
             .info-side { padding-left: 0; border-left: none; text-align: center; }
             .metadata-organic li { justify-content: center; }
             .tech-specs-organic { justify-content: center; }
-            #template-container { overflow-y: auto; height: auto; min-height: 100vh; padding: 6rem 0; }
+            .form-master-box { padding: 2rem; }
+            #template-container { overflow-y: auto; height: auto; padding: 2rem 0; }
+            body { overflow-y: auto; }
         }
     </style>
 </head>
 
 <body class="tpl-p9">
 
-    <div id="loader" class="loading-overlay">SOPHISTICATION v126...</div>
+    <div id="loader" class="loading-overlay">ADMISSION v127...</div>
 
     <div id="template-container">
+        <!-- id="hero-bg" para inyección de imagen corregida en v122 -->
+        <div id="hero-bg" style="position:absolute; inset:0; background-size:cover; background-position:center; z-index:0;"></div>
+        
         <div class="luxury-panel">
-            <!-- SECCIÓN A: IDENTIDAD TIPOGRÁFICA Y METADATOS -->
             <div class="info-side">
                 <div id="org-name-badge" class="org-badge">--</div>
                 <h1 id="event-title" class="hero-title">--</h1>
@@ -102,15 +102,14 @@
                         <span id="db-dress-val" class="value">--</span>
                     </div>
                     <div class="data-item">
-                        <span class="label">PRIVATE CAPACITY</span>
+                        <span class="label">CAPACITY</span>
                         <span id="db-aforo-val" class="value">--</span>
                     </div>
                 </div>
             </div>
 
-            <!-- SECCIÓN B: FORMULARIO DE ACCESO -->
             <div class="form-master-box">
-                <div style="font-size:0.5rem; letter-spacing:6px; opacity:0.4; margin-bottom:3rem; text-transform:uppercase; text-align:center;">Request Admission Invitation</div>
+                <div style="font-size:0.45rem; letter-spacing:5px; opacity:0.4; margin-bottom:2rem; text-transform:uppercase; text-align:center;">Request Admission</div>
                 <form id="master-reg-form">
                     <input type="text" id="reg-nombre" placeholder="TU NOMBRE *" required class="form-input">
                     <input type="text" id="reg-cedula" placeholder="DOCUMENTO ID *" required class="form-input">
@@ -119,14 +118,12 @@
             </div>
         </div>
 
-        <!-- CONTRATO DE DATOS PROTEGIDOS (Cerebro de Datos v121) -->
+        <!-- CONTRATO DE INTEGRIDAD (IDs Ocultos v121) -->
         <main style="display:none;">
             <div id="modulo-countdown"></div>
             <div id="modulo-gallery"><div id="db-gallery-grid"></div><div id="db-video-content"></div><div id="db-spotify-embed"></div></div>
             <div id="modulo-lineup"><div id="db-lineup"></div><img id="db-poster-img"></div>
-            <div id="db-faq-list"></div>
-            <div id="db-mapa-container"></div>
-            <div id="db-sponsors-list"></div>
+            <div id="db-faq-list"></div><div id="db-mapa-container"></div><div id="db-sponsors-list"></div>
         </main>
     </div>
 
@@ -140,47 +137,36 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
         }
 
-        async function initQuietLuxury() {
-            logStatus("AUDITORÍA V126: Iniciando Silo T9 con Metadatos Orgánicos.", "INFO");
+        async function initStrictZen() {
+            logStatus("AUDITORÍA V127: Validando Pantalla Única Estricta.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
-            
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 1. Mapeo Metadatos (Diseño Orgánico)
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
-                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'HIDDEN VENUE').toUpperCase();
-                if (evento.imagen_url) document.getElementById('template-container').style.backgroundImage = `url('${evento.imagen_url}')`;
+                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'MEMBERS ONLY').toUpperCase();
+                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
                 
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
-                logStatus("INFO: Metadatos del Hero inyectados orgánicamente.", "INFO");
 
-                // 2. Mapeo Datos Técnicos (Refined Style)
                 const content = evento.config_landing?.content || {};
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'FORMAL').toUpperCase();
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 'LIMITED'}`;
-                logStatus("INFO: Datos técnicos refinados con Jerarquía Boutique.", "INFO");
 
-                // 3. Auditoría de Módulos (v124 High-Density)
-                console.group("%c[AUDITORÍA DE INTEGRIDAD V126]", "color:#e67e22; font-weight:bold;");
-                console.log("%cACTIVOS ✅: Hero (Identidad), Metadata List, Tech Specs Organic, Form Glassmorphism.", "color:#00ff88;");
-                console.log("%cPROTEGIDOS 👁️: Countdown, Media Stack, Lineup, FAQ, Mapa, Sponsors (Invisibles para asegurar integridad).", "color:#f1c40f;");
+                console.group("%c[AUDITORÍA DE INTEGRIDAD V127]", "color:#e67e22; font-weight:bold;");
+                console.log("%cACTIVOS ✅: Hero Identity, Metadata List, Compact Tech Specs, Glass Form.", "color:#00ff88;");
+                console.log("%cPROTEGIDOS 👁️: 9 Módulos invisibles (Cero Borrado Protocol).", "color:#f1c40f;");
                 console.groupEnd();
 
-                logStatus("TRACE: 12 Módulos sincronizados | Organic Metadata Ready | Single Viewport Fix.", "TRACE");
-
-                if (document.getElementById('master-reg-form')) logStatus("LINK: Motor de registro directo verificado y persistente.", "LINK");
-
+                logStatus("TRACE: 12 Módulos sincronizados | Single Viewport Strictly Validated.", "TRACE");
                 document.getElementById('template-container').style.display = 'flex';
-
-            } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (err) { logStatus(`ERROR: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
-        window.onload = initQuietLuxury;
+        window.onload = initStrictZen;
     </script>
 </body>
-</html>
 </html>
