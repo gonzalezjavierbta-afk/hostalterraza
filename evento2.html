@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v103: Full-Integrity Sponsors · Baseline v97</title>
+    <title>Editor v104: Unified Baseline · 12 Modules</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
 
-        /* ESCUDO DE GRANO (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -32,7 +31,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO (v95 Master Style) */
+        /* 1. HERO (v95 Master) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
@@ -50,29 +49,32 @@
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.2rem; }
 
-        /* 2. MEDIA GRID (v97 Sincronización) */
+        /* 2. MEDIA GRID (v97 Sync) */
         .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
+        
         .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; display: flex; flex-direction: column; }
         #db-spotify-embed { flex: 1; display: flex; }
         #db-spotify-embed iframe { width: 100%; height: 100% !important; min-height: 450px; border: none; }
 
-        /* 3. SPONSORS ATÓMICO (Sin Filtros) */
-        .sponsors-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2rem; display: block; }
-        .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3.5rem; }
-        .sponsor-img { height: 45px; width: auto; opacity: 1; transition: 0.3s ease; border-radius: 8px; }
-
-        /* 4. LINEUP & DATA CARDS */
+        /* 3. DATA CARDS & FAQ (v97 Styles) */
         .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
         .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; }
+        .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
+
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
+        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
         .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
-        .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-top: 1.5rem; }
 
-        /* 5. FORM MASTER BOX */
+        /* 4. SPONSORS (v104 Balanced) */
+        .sponsors-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2rem; display: block; }
+        .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3.5rem; }
+        .sponsor-img { height: 40px; width: auto; opacity: 0.8; }
+
+        /* 5. FORM MASTER */
         .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
@@ -84,13 +86,14 @@
         @media (max-width: 850px) {
             .media-grid { grid-template-columns: 1fr; }
             .cd-v { font-size: 2.2rem; }
+            .form-master-box { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">FULL INTEGRITY SYNC v103...</div>
+    <div id="loader" class="loading-overlay">RESTORING INTEGRITY v104...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -130,23 +133,22 @@
 
         <section id="modulo-info-tecnica">
             <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; max-width:1100px; margin:0 auto;">
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900; text-transform:uppercase;">--</span></div></div>
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">GUEST LIST</span><br><span id="db-guest-val" style="font-size:1.15rem; font-weight:900;">--</span></div></div>
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">AFORO</span><br><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span></div></div>
-                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">TICKETS</span><br><span id="db-ticket-val" style="font-size:1.15rem; font-weight:900;">--</span></div></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900; text-transform:uppercase;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">GUEST LIST</span><br><span id="db-guest-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4; font-weight:800; text-transform:uppercase;">CONFIRMADOS</span></div></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">AFORO</span><br><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">TICKETS</span><br><span id="db-ticket-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg></div>
             </div>
         </section>
 
         <section id="modulo-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
                 <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
-                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" class="map-frame-immersive"></div></div>
+                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" style="width:100%; height:380px; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.15);"></div></div>
             </div>
         </section>
 
-        <!-- 5. SPONSORS v103 (Clean Integrity) -->
         <section id="modulo-sponsors" style="text-align:center;">
-            <span class="sponsors-label">ALIADOS ESTRATÉGICOS</span>
+            <span class="sponsors-label">PATROCINADO POR</span>
             <div id="db-sponsors-list" class="sponsors-grid"></div>
         </section>
 
@@ -189,13 +191,12 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V103: Restauración completa de lógica y depuración de Sponsors.");
+            logStatus("AUDITORÍA V104: Restauración de Integridad Total y Módulo Sponsors.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
-                // 1. Heartbeat
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -207,7 +208,6 @@
                 }, 1000);
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
 
-                // 2. Metadatos (Restaurado)
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
@@ -218,30 +218,23 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // 3. Media Sync (Spotify Fixed Baseline v97)
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
                 document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" frameBorder="0" allow="encrypted-media"></iframe>`;
+                    logStatus("LINK: Playlist Spotify sincronizada a altura dinámica.", "LINK");
                 }
 
-                // 4. Sponsors (Debug Mode Assets)
-                const debugLogos = [
-                    "https://assets.vercel.com/image/upload/front/favicon/vercel/180x180.png",
-                    "https://supabase.com/favicon/favicon-196x196.png",
-                    "https://www.scdn.co/mirror/static/icons/apple-touch-icon-152x152.png",
-                    "https://github.com/apple-touch-icon.png"
-                ];
-                document.getElementById('db-sponsors-list').innerHTML = debugLogos.map(url => `<img src="${url}" class="sponsor-img">`).join('');
-                logStatus("LINK: Módulo PATROCINADORES inyectado con activos restaurados.", "LINK");
+                // Sponsors (Safe Links)
+                const logos = ["https://supabase.com/favicon/favicon-196x196.png", "https://www.scdn.co/mirror/static/icons/apple-touch-icon-152x152.png", "https://github.com/apple-touch-icon.png"];
+                document.getElementById('db-sponsors-list').innerHTML = logos.map(url => `<img src="${url}" class="sponsor-img">`).join('');
 
-                // 5. Technical Data (Restaurado)
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
                     <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
-                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:12px;">`).join('');
+                
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
@@ -250,7 +243,7 @@
                 if (content.faq) {
                     document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
                         const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${(q||'').trim()}</span></div><div class="faq-answer">${(a||'').trim()}</div></div>`;
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${a.trim()}</div></div>`;
                     }).join('');
                 }
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
