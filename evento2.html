@@ -22,6 +22,7 @@
             overflow-x: hidden;
         }
 
+        /* ESCUDO DE GRANO (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -31,7 +32,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO (v95 Master) */
+        /* 1. HERO (v95 Reference) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
@@ -49,7 +50,7 @@
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.2rem; }
 
-        /* 2. MEDIA GRID (v97 Sync) */
+        /* 2. MEDIA GRID (v97 Sync Integrity) */
         .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
@@ -58,8 +59,7 @@
         #db-spotify-embed { flex: 1; display: flex; }
         #db-spotify-embed iframe { width: 100%; height: 100% !important; min-height: 450px; border: none; }
 
-        /* 3. DATA CARDS & FAQ (v97 Styles) */
-        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
+        /* 3. DATA CARDS & FAQ (v97 Restoration) */
         .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
@@ -69,12 +69,12 @@
         .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
 
-        /* 4. SPONSORS (v104 Balanced) */
-        .sponsors-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2rem; display: block; }
-        .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3.5rem; }
+        /* 4. SPONSORS v104 (Safe Assets) */
+        .sponsors-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2.5rem; display: block; }
+        .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4rem; }
         .sponsor-img { height: 40px; width: auto; opacity: 0.8; }
 
-        /* 5. FORM MASTER */
+        /* 5. FORM MASTER BOX (v88 Core) */
         .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
@@ -114,6 +114,7 @@
     </header>
 
     <main id="main-content-flow">
+        <!-- 1. LINEUP -->
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0; max-width:950px; margin:0 auto; align-items:start;">
@@ -122,6 +123,7 @@
             </div>
         </section>
 
+        <!-- 2. GALLERY & MEDIA -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
@@ -131,6 +133,7 @@
             </div>
         </section>
 
+        <!-- 3. DATA CARDS (SVG RESTORED) -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; max-width:1100px; margin:0 auto;">
                 <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900; text-transform:uppercase;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
@@ -140,6 +143,7 @@
             </div>
         </section>
 
+        <!-- 4. FAQ (INDICATOR RESTORED) & UBICACIÓN -->
         <section id="modulo-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
                 <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
@@ -147,11 +151,13 @@
             </div>
         </section>
 
+        <!-- 5. SPONSORS v104 (Verified Assets) -->
         <section id="modulo-sponsors" style="text-align:center;">
             <span class="sponsors-label">PATROCINADO POR</span>
             <div id="db-sponsors-list" class="sponsors-grid"></div>
         </section>
 
+        <!-- 6. FORMULARIO -->
         <section id="modulo-formulario">
             <div class="form-master-box">
                 <div class="form-tabs">
@@ -163,7 +169,6 @@
                         <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
                         <input type="text" class="form-input" id="reg-cedula" placeholder="Cédula / Documento *" required>
                         <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
-                        <input type="email" class="form-input" id="reg-email" placeholder="Correo (Opcional)">
                         <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
                     </form>
                 </div>
@@ -218,18 +223,23 @@
 
                 const content = evento.config_landing?.content || {};
 
+                // Media Sync v97 Base
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
                 document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" frameBorder="0" allow="encrypted-media"></iframe>`;
-                    logStatus("LINK: Playlist Spotify sincronizada a altura dinámica.", "LINK");
                 }
 
-                // Sponsors (Safe Links)
-                const logos = ["https://supabase.com/favicon/favicon-196x196.png", "https://www.scdn.co/mirror/static/icons/apple-touch-icon-152x152.png", "https://github.com/apple-touch-icon.png"];
+                // Sponsors Fixed v104 (Safe Links)
+                const logos = [
+                    "https://supabase.com/favicon/favicon-196x196.png",
+                    "https://github.com/apple-touch-icon.png",
+                    "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
+                ];
                 document.getElementById('db-sponsors-list').innerHTML = logos.map(url => `<img src="${url}" class="sponsor-img">`).join('');
 
+                // technical data restored
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
