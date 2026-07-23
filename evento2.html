@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v93: Style Integrity & Media Alignment · Sistema QR</title>
+    <title>Editor v88: Full Module Integrity · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,7 +22,7 @@
             overflow-x: hidden;
         }
 
-        /* ESCUDO DE GRANO */
+        /* ESCUDO DE GRANO (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -32,7 +32,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO & METADATA */
+        /* 1. HERO & COUNTDOWN (3.2rem) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
@@ -41,61 +41,54 @@
         .meta-item { display: flex; align-items: center; gap: 0.7rem; }
         .meta-svg { width: 18px !important; height: 18px !important; fill: var(--gold); }
 
-        .unified-countdown-frame { 
-            position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.2rem 1.5rem; 
-            background: rgba(255, 255, 255, 0.02); border-radius: 12px; border: 1px solid var(--gold); 
-            backdrop-filter: blur(4px); box-shadow: 0 0 15px var(--border-glow); display: flex; width: fit-content; 
-        }
-        .cd-block { padding: 0 1rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .unified-countdown-frame { position: relative; z-index: 2; margin: 3rem auto 0; padding: 1.5rem 2.5rem; background: var(--glass-lite); border-radius: 12px; border: 1px solid var(--gold); backdrop-filter: blur(8px); display: flex; width: fit-content; }
+        .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
 
-        /* 2. MEDIA GRID v93 (Total Sync) */
-        .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
+        /* 2. MEDIA GRID (Diagnostic Stability) */
+        .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: start; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
         .yt-cover { position: absolute; inset: 0; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .play-btn { width: 70px; height: 70px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--gold); }
-        
-        .spotify-container { 
-            border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); 
-            background: #121212; height: 100%; /* Sincroniza con la altura de la celda estirada */
-            display: flex; flex-direction: column; 
-        }
-        #db-spotify-embed { flex: 1; min-height: 0; }
+        .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 600px; }
 
         /* 3. LINEUP & DATA CARDS */
-        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); aspect-ratio: 1/1; }
+        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
         .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; }
-        .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+        .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
-        /* 4. FAQ v93 (Style Restoration) */
+        /* 4. FAQ & Ubicación (Restored Integrity) */
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; font-weight: 700; }
-        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1rem; }
-        .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
+        .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
+        .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
         .map-frame-immersive { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-top: 1.5rem; }
 
-        /* 5. FORM MASTER BOX */
+        /* 5. FORM MASTER BOX v88 (Exact UI/UX Fidelity) */
         .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-        .form-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; margin-bottom: 1.5rem; }
+        
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
         .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         
         @media (max-width: 850px) {
-            .media-grid, .data-cards-container { grid-template-columns: 1fr; }
+            .media-grid { grid-template-columns: 1fr; }
             .cd-v { font-size: 2.2rem; }
+            .form-master-box { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">RESTORING STYLE INTEGRITY v93...</div>
+    <div id="loader" class="loading-overlay">DATA & MODULE RECOVERY v88...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -116,14 +109,16 @@
     </header>
 
     <main id="main-content-flow">
+        <!-- 1. LINEUP -->
         <section id="modulo-lineup">
             <h2>ARTISTAS INVITADOS</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0; max-width:950px; margin:0 auto; align-items:start;">
-                <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold); box-shadow: 0 0 30px var(--gold);" alt="Poster"></div>
+                <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold); shadow: 0 0 30px var(--gold);" alt="Poster"></div>
                 <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem; padding-left:5rem;"></div>
             </div>
         </section>
 
+        <!-- 2. GALLERY & MEDIA -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
@@ -133,22 +128,25 @@
             </div>
         </section>
 
+        <!-- 3. DATA CARDS -->
         <section id="modulo-info-tecnica">
-            <div class="data-cards-container">
-                <div class="data-card"><div><span class="card-label">DRESS CODE</span><span id="db-dress-val" style="font-size:1.15rem; font-weight:900; text-transform:uppercase;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
-                <div class="data-card"><div><span class="card-label">GUEST LIST</span><span id="db-guest-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4;">CONFIRMADOS</span></div></div>
-                <div class="data-card"><div><span class="card-label">AFORO</span><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4;">PERSONAS</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg></div>
-                <div class="data-card"><div><span class="card-label">TICKETS</span><span id="db-ticket-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4;">DISPONIBLES</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg></div>
+            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; max-width:1100px; margin:0 auto;">
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">GUEST LIST</span><br><span id="db-guest-val" style="font-size:1.15rem; font-weight:900;">--</span><br><span style="font-size:0.6rem; opacity:0.4;">CONFIRMADOS</span></div></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">AFORO</span><br><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg></div>
+                <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px;">TICKETS</span><br><span id="db-ticket-val" style="font-size:1.15rem; font-weight:900;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg></div>
             </div>
         </section>
 
+        <!-- 4. FAQ & UBICACIÓN (Restored in v88) -->
         <section id="modulo-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
                 <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
-                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" style="width:100%; height:380px; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.15);"></div></div>
+                <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" class="map-frame-immersive"></div></div>
             </div>
         </section>
 
+        <!-- 5. FORMULARIO v88 -->
         <section id="modulo-formulario">
             <div class="form-master-box">
                 <div class="form-tabs">
@@ -159,13 +157,21 @@
                     <form id="master-reg-form">
                         <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
                         <input type="text" class="form-input" id="reg-cedula" placeholder="Cédula / Documento *" required>
-                        <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
-                        <input type="email" class="form-input" id="reg-email" placeholder="Correo electrónico">
+                        <div style="display:flex; gap:0.5rem;">
+                            <select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option><option value="+34">🇪🇸 +34</option><option value="+1">🇺🇸 +1</option></select>
+                            <input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required>
+                        </div>
+                        <input type="email" class="form-input" id="reg-email" placeholder="Correo electrónico (Opcional)">
                         <div id="db-dynamic-fields"></div>
                         <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
                     </form>
                 </div>
-                <div id="form-ya" style="display:none;"><p style="font-size:0.8rem; opacity:0.6; margin-bottom:2rem;">Ingresa tus datos para recuperar tu QR.</p><input type="text" class="form-input" id="rec-cedula" placeholder="Cédula / Documento *"><input type="tel" class="form-input" id="rec-tel" placeholder="WhatsApp registrado *"><button class="btn-submit" onclick="alert('Sistema de recuperación operativo.')">Verificar mis datos →</button></div>
+                <div id="form-ya" style="display:none;">
+                    <p style="font-size:0.8rem; opacity:0.6; margin-bottom:2rem;">Ingresa tus datos para obtener tu entrada QR generada previamente.</p>
+                    <input type="text" class="form-input" id="rec-cedula" placeholder="Cédula / Documento *">
+                    <input type="tel" class="form-input" id="rec-tel" placeholder="WhatsApp registrado *">
+                    <button class="btn-submit" onclick="alert('Funcionalidad de recuperación en desarrollo')">Verificar mis datos →</button>
+                </div>
             </div>
         </section>
     </main>
@@ -189,12 +195,13 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V93: Restaurando estilos de FAQ y sincronizando alturas multimedia.");
+            logStatus("AUDITORÍA V88: Recuperando integridad total de 11 módulos y datos de organización.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
                 
+                // 1. Heartbeat immediate (3.2rem)
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -204,64 +211,75 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-                logStatus("TIME: Heartbeat sincronizado a 3.2rem.", "TIME");
+                logStatus("TIME: Heartbeat activado satisfactoriamente.", "TIME");
 
+                // 2. Org Name Recovery
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
-                if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
+                if (org) {
+                    document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
+                    logStatus(`LINK: Información de la organización (${org.nombre}) recuperada.`, "LINK");
+                }
+
+                // 3. Hero & Media Fallback v88
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                logStatus("LINK: Metadatos del Hero vinculados satisfactoriamente.", "LINK");
 
                 const content = evento.config_landing?.content || {};
-
-                if (content.gallery) {
-                    document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:12px;">`).join('');
-                }
-
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563?h=79100067&color=df20b6&title=0&byline=0&portrait=0";
+                
+                logStatus(`TRACE: trailer_url detectada: ${content.trailer_url || "NONE (Using Fallback)"}`, "TRACE");
+                
                 if (trailerUrl.includes('youtube.com') || trailerUrl.includes('youtu.be')) {
                     document.getElementById('db-video-content').innerHTML = `<div class="yt-cover" style="background-image: url('${evento.imagen_url}')" onclick="window.open('${trailerUrl}', '_blank')"><div class="play-btn"><svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div></div>`;
+                    logStatus("LINK: Módulo TRAILER (YouTube) inyectado como Play-Overlay.", "LINK");
                 } else {
                     document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+                    logStatus("LINK: Módulo TRAILER (Vimeo/Fallback) inyectado satisfactoriamente.", "LINK");
                 }
 
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
-                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px; border:none;"></iframe>`;
-                    logStatus("LINK: Playlist Spotify sincronizada a altura completa (Sync Height).", "LINK");
+                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" width="100%" height="600" frameBorder="0" allow="encrypted-media" style="border:none;"></iframe>`;
+                    logStatus("LINK: Playlist Spotify recuperada a 600px.", "LINK");
                 }
 
-                if (document.getElementById('modulo-formulario')) logStatus("LINK: Motor de registro (Dual-Path) verificado y persistente.", "LINK");
-
+                // 4. Lineup, Gallery & Technical Cards
+                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 const lineup = content.dj_lineup || content.lineup || "";
-                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `<div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
+                    <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
+                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">`).join('');
                 
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
                 document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
 
+                // 5. FAQ & UBICACIÓN RECOVERY
                 if (content.faq) {
-                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
+                    const lineas = content.faq.split('\n').filter(l => l.includes('|'));
+                    document.getElementById('db-faq-list').innerHTML = lineas.map(l => {
                         const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${a.trim()}</div></div>`;
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${(q||'Consulta').trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${(a||'Contacta al hostal.').trim()}</div></div>`;
                     }).join('');
-                    logStatus("LINK: Estilos y contenido de FAQ restaurados.", "LINK");
+                    logStatus("LINK: Módulo FAQ recuperado e inyectado.", "LINK");
                 }
                 const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
                 document.getElementById('venue-name').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
+                logStatus("LINK: Módulo UBICACIÓN (Mapa) recuperado e inyectado.", "LINK");
 
+                // Audit Shield Final v88
                 Object.keys(SANDBOX_CONFIG).forEach(key => {
                     const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : `modulo-${key}`;
                     const el = document.getElementById(elId);
                     if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
                 });
 
-            } catch (err) { logStatus(`ERROR: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
     </script>
