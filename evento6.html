@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiet Luxury v127 · Strict Single Viewport</title>
+    <title>Quiet Luxury v128 · Single Viewport Inline</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,62 +16,67 @@
         /* ESCUDO DE GRANO (v47) */
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
 
-        /* ESTRUCTURA SINGLE VIEWPORT (P9) - REESTRUCTURADA */
+        /* ESTRUCTURA SINGLE VIEWPORT */
         #template-container { 
             display: none; height: 100vh; width: 100vw; 
             background-size: cover; background-position: center;
             position: relative; align-items: center; justify-content: center;
         }
-        #template-container::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.9) 100%); z-index: 1; }
+        #template-container::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.95) 100%); z-index: 1; }
 
-        /* PANEL CENTRAL - AJUSTE DE ALTURA */
+        /* PANEL CENTRAL COMPACTO */
         .luxury-panel { 
-            position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 0.7fr; 
-            gap: 3rem; max-width: 1200px; width: 90%; align-items: center; max-height: 90vh;
+            position: relative; z-index: 10; display: flex; flex-direction: column; 
+            gap: 2.5rem; max-width: 900px; width: 90%; text-align: center;
         }
 
-        /* METADATOS ORGÁNICOS COMPACTOS */
-        .info-side { border-left: 1px solid rgba(200, 169, 110, 0.3); padding: 1rem 0 1rem 3rem; }
-        .org-badge { font-size: 0.5rem; letter-spacing: 5px; opacity: 0.5; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .hero-title { font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 900; letter-spacing: -5px; line-height: 0.85; margin: 0; text-transform: uppercase; }
+        /* IDENTIDAD TIPOGRÁFICA */
+        .org-badge { font-size: 0.5rem; letter-spacing: 8px; opacity: 0.5; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .hero-title { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; letter-spacing: -5px; line-height: 0.85; margin: 0; text-transform: uppercase; }
         
-        .metadata-organic { margin-top: 1.5rem; list-style: none; padding: 0; }
-        .metadata-organic li { font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.8rem; }
-        .metadata-organic li::before { content: ''; width: 20px; height: 1px; background: rgba(200, 169, 110, 0.4); }
+        /* METADATOS EN UNA SOLA LÍNEA (v128) */
+        .metadata-inline { 
+            margin-top: 1rem; display: flex; justify-content: center; align-items: center; 
+            gap: 1.5rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; 
+            text-transform: uppercase; color: var(--gold);
+        }
+        .metadata-inline span::after { content: '•'; margin-left: 1.5rem; opacity: 0.3; }
+        .metadata-inline span:last-child::after { content: ''; }
 
-        .tech-specs-organic { margin-top: 2rem; display: flex; gap: 2rem; }
-        .data-item .label { font-size: 0.45rem; letter-spacing: 3px; opacity: 0.4; text-transform: uppercase; display: block; }
-        .data-item .value { font-size: 1.1rem; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; border-bottom: 1px solid var(--gold); }
+        /* ESPECIFICACIONES COMPACTAS */
+        .tech-specs-row { display: flex; justify-content: center; gap: 3rem; margin-top: 1rem; opacity: 0.6; }
+        .spec-item { display: flex; align-items: baseline; gap: 0.5rem; }
+        .spec-label { font-size: 0.45rem; letter-spacing: 3px; font-weight: 900; }
+        .spec-value { font-size: 0.9rem; font-weight: 900; border-bottom: 1px solid var(--gold); }
 
-        /* FORMULARIO GLASS COMPACTO - REESTRUCTURADO */
+        /* FORMULARIO GLASS REFINADO */
         .form-master-box { 
             background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(40px); 
-            padding: 2.5rem; border: 1px solid rgba(255, 255, 255, 0.05); 
+            padding: 2.5rem 4rem; border: 1px solid rgba(255, 255, 255, 0.05); 
             box-shadow: 0 40px 100px rgba(0,0,0,0.8); border-radius: 4px;
+            max-width: 500px; margin: 0 auto;
         }
         .form-input { 
             background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.1); 
-            padding: 1rem 0; color: white; width: 100%; font-size: 0.95rem; margin-bottom: 1.2rem; 
-            font-family: inherit;
+            padding: 1rem 0; color: white; width: 100%; font-size: 0.95rem; margin-bottom: 1rem; 
+            font-family: inherit; text-align: center;
         }
         .btn-submit { 
             background: var(--gold); color: black; font-weight: 900; padding: 1.2rem; 
             border: none; cursor: pointer; text-transform: uppercase; width: 100%; 
-            letter-spacing: 3px; transition: 0.4s ease;
+            letter-spacing: 4px; margin-top: 1rem;
         }
 
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; color: var(--gold); }
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 12px; color: var(--gold); }
 
         /* CERO BORRADO */
         #db-poster-img, #modulo-countdown, #modulo-gallery, #modulo-lineup, #db-faq-list, #db-mapa-container, #db-sponsors-list { display: none; }
 
-        @media (max-width: 1000px) {
-            .luxury-panel { grid-template-columns: 1fr; gap: 2rem; }
-            .info-side { padding-left: 0; border-left: none; text-align: center; }
-            .metadata-organic li { justify-content: center; }
-            .tech-specs-organic { justify-content: center; }
+        @media (max-width: 600px) {
+            .metadata-inline { flex-direction: column; gap: 0.5rem; }
+            .metadata-inline span::after { display: none; }
             .form-master-box { padding: 2rem; }
-            #template-container { overflow-y: auto; height: auto; padding: 2rem 0; }
+            #template-container { overflow-y: auto; align-items: flex-start; padding: 4rem 0; }
             body { overflow-y: auto; }
         }
     </style>
@@ -79,46 +84,49 @@
 
 <body class="tpl-p9">
 
-    <div id="loader" class="loading-overlay">ADMISSION v127...</div>
+    <div id="loader" class="loading-overlay">AUTHENTICATION v128...</div>
 
     <div id="template-container">
-        <!-- id="hero-bg" para inyección de imagen corregida en v122 -->
+        <!-- id="hero-bg" para inyección de imagen corregida -->
         <div id="hero-bg" style="position:absolute; inset:0; background-size:cover; background-position:center; z-index:0;"></div>
         
         <div class="luxury-panel">
-            <div class="info-side">
+            <!-- IDENTIDAD COMPACTA -->
+            <div>
                 <div id="org-name-badge" class="org-badge">--</div>
                 <h1 id="event-title" class="hero-title">--</h1>
                 
-                <ul class="metadata-organic">
-                    <li id="meta-fecha">--</li>
-                    <li id="meta-hora">--</li>
-                    <li id="meta-lugar">--</li>
-                </ul>
+                <!-- METADATOS EN UNA SOLA LÍNEA -->
+                <div class="metadata-inline">
+                    <span id="meta-fecha">--</span>
+                    <span id="meta-hora">--</span>
+                    <span id="meta-lugar">--</span>
+                </div>
 
-                <div class="tech-specs-organic">
-                    <div class="data-item">
-                        <span class="label">DRESS CODE</span>
-                        <span id="db-dress-val" class="value">--</span>
+                <div class="tech-specs-row">
+                    <div class="spec-item">
+                        <span class="spec-label">DRESS:</span>
+                        <span id="db-dress-val" class="spec-value">--</span>
                     </div>
-                    <div class="data-item">
-                        <span class="label">CAPACITY</span>
-                        <span id="db-aforo-val" class="value">--</span>
+                    <div class="spec-item">
+                        <span class="spec-label">AFORO:</span>
+                        <span id="db-aforo-val" class="spec-value">--</span>
                     </div>
                 </div>
             </div>
 
+            <!-- FORMULARIO DE ACCESO -->
             <div class="form-master-box">
-                <div style="font-size:0.45rem; letter-spacing:5px; opacity:0.4; margin-bottom:2rem; text-transform:uppercase; text-align:center;">Request Admission</div>
+                <div style="font-size:0.4rem; letter-spacing:6px; opacity:0.4; margin-bottom:2rem; text-transform:uppercase;">Registration Portal</div>
                 <form id="master-reg-form">
-                    <input type="text" id="reg-nombre" placeholder="TU NOMBRE *" required class="form-input">
-                    <input type="text" id="reg-cedula" placeholder="DOCUMENTO ID *" required class="form-input">
-                    <button type="submit" class="btn-submit">Somet Admission →</button>
+                    <input type="text" id="reg-nombre" placeholder="Nombre completo *" required class="form-input">
+                    <input type="text" id="reg-cedula" placeholder="ID / Cédula *" required class="form-input">
+                    <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
                 </form>
             </div>
         </div>
 
-        <!-- CONTRATO DE INTEGRIDAD (IDs Ocultos v121) -->
+        <!-- CONTRATO DE INTEGRIDAD (9 Módulos Protegidos) -->
         <main style="display:none;">
             <div id="modulo-countdown"></div>
             <div id="modulo-gallery"><div id="db-gallery-grid"></div><div id="db-video-content"></div><div id="db-spotify-embed"></div></div>
@@ -137,36 +145,37 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
         }
 
-        async function initStrictZen() {
-            logStatus("AUDITORÍA V127: Validando Pantalla Única Estricta.", "INFO");
+        async function initInlineZen() {
+            logStatus("AUDITORÍA V128: Validando Metadatos Inline y Viewport Estricto.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
+                // Mapeo Maestro
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
-                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'MEMBERS ONLY').toUpperCase();
+                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'HIDDEN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
                 
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
 
                 const content = evento.config_landing?.content || {};
-                document.getElementById('db-dress-val').innerText = (content.dresscode || 'FORMAL').toUpperCase();
-                document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 'LIMITED'}`;
+                document.getElementById('db-dress-val').innerText = (content.dresscode || 'BLACK').toUpperCase();
+                document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 'LTD'}`;
 
-                console.group("%c[AUDITORÍA DE INTEGRIDAD V127]", "color:#e67e22; font-weight:bold;");
-                console.log("%cACTIVOS ✅: Hero Identity, Metadata List, Compact Tech Specs, Glass Form.", "color:#00ff88;");
+                console.group("%c[AUDITORÍA DE INTEGRIDAD V128]", "color:#e67e22; font-weight:bold;");
+                console.log("%cACTIVOS ✅: Hero Compact, Inline Metadata, Spec Row, Glass Form.", "color:#00ff88;");
                 console.log("%cPROTEGIDOS 👁️: 9 Módulos invisibles (Cero Borrado Protocol).", "color:#f1c40f;");
                 console.groupEnd();
 
-                logStatus("TRACE: 12 Módulos sincronizados | Single Viewport Strictly Validated.", "TRACE");
+                logStatus("TRACE: 12 Módulos sincronizados | Inline Metadata Validated | Strict Viewport Ready.", "TRACE");
                 document.getElementById('template-container').style.display = 'flex';
             } catch (err) { logStatus(`ERROR: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
-        window.onload = initStrictZen;
+        window.onload = initInlineZen;
     </script>
 </body>
 </html>
