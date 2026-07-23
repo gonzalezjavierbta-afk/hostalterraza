@@ -3,144 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Template 7: Underground · Sistema QR</title>
+    <title>Master Orchestrator v117 · Sistema QR</title>
     
+    <!-- LIBRERÍAS MAESTRAS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
-    <style>
-        :root { 
-            --acid: #bcff00; --main-bg: #000000; --text-color: #ffffff;
-            --border-glow: rgba(188, 255, 0, 0.3);
-        }
-
+    <style id="master-core-styles">
+        :root { --main-bg: #050505; --text-color: #ffffff; }
         html, body { margin: 0; padding: 0; background: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; overflow-x: hidden; }
-
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
+        #template-container { display: none; }
+        
         /* ESCUDO DE GRANO (v47) */
-        body::before {
-            content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
+        body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+    </style>
 
-        /* ESTRUCTURA DISRUPTIVA P7 (Split-Screen) */
-        #template-container { display: none; flex-direction: row; min-height: 100vh; }
+    <!-- SILO VISUAL: TEMPLATE 6 (Edition Hotels · Golden Hour) -->
+    <style id="style-p6">
+        .tpl-p6 { --gold: #df20b6; --border-glow: rgba(223, 32, 182, 0.4); --glass-lite: rgba(255, 255, 255, 0.03); }
+        .tpl-p6 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tpl-p6 h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
         
-        /* LADO IZQUIERDO: Estático */
-        .hero { 
-            width: 40%; height: 100vh; position: fixed; left: 0; top: 0;
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 4rem; border-right: 1px solid rgba(188, 255, 0, 0.2); z-index: 10;
-            background-size: cover; background-position: center; box-sizing: border-box;
-        }
-        .hero::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
-        .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; letter-spacing: -2px; margin: 0; color: var(--acid); text-transform: uppercase; font-weight: 900; }
-        
-        /* LADO DERECHO: Scroll */
-        #main-content-flow { width: 60%; margin-left: 40%; padding: 0; box-sizing: border-box; }
-        
-        section { padding: 6rem 12%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        h2 { color: var(--acid); font-size: 0.7rem; letter-spacing: 5px; font-weight: 900; margin-bottom: 3rem; text-transform: uppercase; }
+        /* HERO */
+        .tpl-p6 .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; padding: 2rem; }
+        .tpl-p6 .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
+        .tpl-p6 .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
+        .tpl-p6 .unified-countdown-frame { position: relative; z-index: 2; margin: 3.5rem auto 0; padding: 0.7rem 1.2rem; background: rgba(255, 255, 255, 0.01); border-radius: 10px; border: 2px solid var(--gold); box-shadow: 0 0 25px var(--border-glow); display: flex; width: fit-content; }
+        .tpl-p6 .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; }
 
-        /* MÓDULOS ACTIVOS (6/12) */
-        .unified-countdown-frame { background: none; border: 1px solid var(--acid); padding: 2rem; box-shadow: 10px 10px 0px var(--border-glow); display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
-        .cd-v { font-size: 2.8rem !important; font-weight: 900; color: var(--acid); }
-        
-        .media-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        .video-wrapper { border: 1px solid rgba(255,255,255,0.1); position: relative; padding-top: 56.25%; filter: grayscale(1); transition: 0.4s; }
-        .video-wrapper:hover { filter: grayscale(0); border-color: var(--acid); }
-        .video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-        .spotify-container { min-height: 450px; height: 100%; border: 1px solid rgba(255,255,255,0.1); }
+        /* MULTIMEDIA SYNC 1:1 */
+        .tpl-p6 .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
+        .tpl-p6 .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
+        .tpl-p6 .video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+        .tpl-p6 .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; display: flex; flex-direction: column; }
+        .tpl-p6 #db-spotify-embed { flex: 1; display: flex; }
+        .tpl-p6 #db-spotify-embed iframe { width: 100%; height: 100% !important; min-height: 450px; border: none; }
 
-        .artist-row { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid rgba(188,255,0,0.1); padding: 1.5rem 0; transition: 0.3s; cursor: crosshair; display: flex; align-items: center; gap: 2rem; }
-        .artist-row:hover { color: var(--acid); padding-left: 2rem; background: rgba(188,255,0,0.05); }
-        .artist-avatar { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--acid); filter: grayscale(1); }
+        /* DATA CARDS PREMIUM */
+        .tpl-p6 .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; min-height: 240px; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s ease; }
+        .tpl-p6 .data-card:hover { border-color: var(--gold); box-shadow: inset 0 0 20px var(--border-glow); }
+        .tpl-p6 .card-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+        .tpl-p6 .card-value { color: #ffffff; font-size: 1.15rem; font-weight: 900; text-transform: uppercase; display: block; margin-top: 0.5rem; }
+        .tpl-p6 .card-icon-xl { width: 68px; height: 68px; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
-        .form-master-box { background: none; border: 1px solid var(--acid); padding: 2.5rem; margin-top: 2rem; box-shadow: 8px 8px 0px var(--border-glow); }
-        .form-input { border-radius: 0; background: #111; border: 1px solid #333; color: white; padding: 1.2rem; margin-bottom: 1rem; width: 100%; box-sizing: border-box; font-family: inherit; }
-        .btn-submit { background: var(--acid); color: black; border-radius: 0; font-weight: 900; padding: 1.5rem; border: none; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; }
+        /* LINEUP, FAQ & FORM */
+        .tpl-p6 .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+        .tpl-p6 .poster-main-img { width: 320px; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 30px var(--border-glow); }
+        .tpl-p6 .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .tpl-p6 .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
+        .tpl-p6 .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
+        .tpl-p6 .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .tpl-p6 .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
+        .tpl-p6 .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4rem; margin-top: 2.5rem; }
+        .tpl-p6 .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .tpl-p6 .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
+        .tpl-p6 .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .tpl-p6 .form-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
+        .tpl-p6 .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
 
-        /* OCULTAR MÓDULOS (PROTOCOLO CERO BORRADO) */
-        #db-poster-img, #modulo-faq-ubicacion, #modulo-sponsors, #modulo-gallery { display: none; }
-
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; color: var(--acid); }
-
-        @media (max-width: 1024px) {
-            #template-container { flex-direction: column; }
-            .hero { width: 100%; height: auto; position: relative; padding: 2rem; }
-            #main-content-flow { width: 100%; margin-left: 0; }
-        }
+        @media (max-width: 850px) { .tpl-p6 .media-grid { grid-template-columns: 1fr; } .tpl-p6 .form-master-box { padding: 2rem 1.5rem; } .tpl-p6 .sponsors-grid { gap: 2rem; } }
     </style>
 </head>
 
-<body class="tpl-p7">
+<body class="tpl-p6">
 
-    <div id="loader" class="loading-overlay">UNDERGROUND ENGINE v116...</div>
+    <div id="loader" class="loading-overlay">ORCHESTRATOR v117 · BASELINE MASTER...</div>
 
     <div id="template-container">
-        <!-- LADO IZQUIERDO: MASTER DATA & FORM -->
+        <!-- CONTRATO DE DATOS (IDs Universales v107) -->
         <header id="hero-bg" class="hero">
-            <div id="org-name-badge" style="font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--acid);">--</div>
-            <div>
+            <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:2;">--</div>
+            <div class="hero-content">
                 <h1 id="event-title" class="hero-title">--</h1>
-                <div id="hero-meta" style="margin-top:2rem; opacity:0.6; font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:2px;">
-                    <span id="meta-fecha">--</span> | <span id="meta-hora">--</span> | <span id="meta-lugar">--</span>
+                <div id="hero-meta" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2.5rem; margin-top:2.5rem; font-weight:800; text-transform:uppercase; font-size:0.85rem; letter-spacing:2px; z-index:2; position:relative; opacity:0.9;">
+                    <div style="display:flex; align-items:center; gap:0.7rem;"><svg style="width:18px; fill:#df20b6;" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--</span></div>
+                    <div style="display:flex; align-items:center; gap:0.7rem;"><svg style="width:18px; fill:#df20b6;" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--</span></div>
+                    <div style="display:flex; align-items:center; gap:0.7rem;"><svg style="width:18px; fill:#df20b6;" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
                 </div>
-                
-                <div class="form-master-box">
-                    <form id="master-reg-form">
-                        <input type="text" class="form-input" id="reg-nombre" placeholder="TU NOMBRE *" required>
-                        <input type="text" class="form-input" id="reg-cedula" placeholder="DOCUMENTO ID *" required>
-                        <button type="submit" class="btn-submit">REGISTRARME EN EL PIT →</button>
-                    </form>
+                <div id="unified-frame" class="unified-countdown-frame">
+                    <div style="padding:0 0.8rem;"><span id="cd-days" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px; display:block;">DÍAS</span></div>
+                    <div style="padding:0 0.8rem;"><span id="cd-hours" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px; display:block;">HORAS</span></div>
+                    <div style="padding:0 0.8rem;"><span id="cd-mins" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px; display:block;">MIN</span></div>
+                    <div style="padding:0 0.8rem;"><span id="cd-secs" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px; display:block;">SEG</span></div>
                 </div>
             </div>
-            <div style="font-size:0.6rem; opacity:0.4; letter-spacing:3px;">BOILER ROOM STYLE · V116</div>
         </header>
 
-        <!-- LADO DERECHO: MEDIA & CONTENT -->
         <main id="main-content-flow">
-            <!-- Módulo 2: Countdown -->
-            <section id="modulo-countdown">
-                <h2>RESTANTE</h2>
-                <div id="unified-frame" class="unified-countdown-frame">
-                    <div><span id="cd-days" class="cd-v">00</span><br><small>DÍAS</small></div>
-                    <div><span id="cd-hours" class="cd-v">00</span><br><small>HRS</small></div>
-                    <div><span id="cd-mins" class="cd-v">00</span><br><small>MIN</small></div>
-                    <div><span id="cd-secs" class="cd-v">00</span><br><small>SEG</small></div>
+            <section id="modulo-lineup">
+                <h2>ARTISTAS INVITADOS</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0; max-width:950px; margin:0 auto; align-items:start;">
+                    <div style="display:flex; justify-content:center; padding-right:5rem; border-right:1px solid rgba(255,255,255,0.1);"><img id="db-poster-img" src="" class="poster-main-img" alt="Poster"></div>
+                    <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem; padding-left:5rem;"></div>
                 </div>
             </section>
 
-            <!-- Módulo 3: Multimedia Sync -->
             <section id="modulo-gallery">
-                <h2>VISUALS & AUDIO</h2>
+                <h2>GALERÍA</h2>
+                <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem; margin-bottom:4rem;"></div>
                 <div class="media-grid">
-                    <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content"></div></div>
+                    <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content" style="height:100%; width:100%;"></div></div>
                     <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed"></div></div>
                 </div>
             </section>
 
-            <!-- Módulo 4: Lineup -->
-            <section id="modulo-lineup">
-                <h2>LINEUP</h2>
-                <div id="db-lineup"></div>
-            </section>
-
-            <!-- Módulo 5: Data -->
             <section id="modulo-info-tecnica">
-                <h2>ESPECIFICACIONES</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
-                    <div class="data-card">DRESS: <span id="db-dress-val">--</span></div>
-                    <div class="data-card">AFORO: <span id="db-aforo-val">--</span></div>
+                <div id="tech-data-container" class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; max-width:1100px; margin:0 auto;">
+                    <!-- Se puebla dinámicamente para evitar texto plano -->
                 </div>
             </section>
 
-            <!-- Módulos Invisibles (Contrato de Datos) -->
-            <img id="db-poster-img" src="" style="display:none;">
-            <div id="db-faq-list" style="display:none;"></div>
-            <div id="db-mapa-container" style="display:none;"></div>
-            <div id="db-sponsors-list" style="display:none;"></div>
-            <div id="db-gallery-grid" style="display:none;"></div>
+            <section id="modulo-faq-ubicacion">
+                <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
+                    <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
+                    <div style="padding-left:4rem;"><h2>UBICACIÓN</h2><div id="venue-name" style="font-weight:800; text-transform:uppercase; margin-bottom:1rem;">--</div><div id="db-mapa-container" style="width:100%; height:380px; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.15);"></div></div>
+                </div>
+            </section>
+
+            <section id="modulo-sponsors" style="text-align:center;">
+                <span class="card-label">PATROCINADO POR</span>
+                <div id="db-sponsors-list" class="sponsors-grid"></div>
+            </section>
+
+            <section id="modulo-formulario">
+                <div class="form-master-box">
+                    <div class="form-tabs" style="display:flex; gap:2rem; margin-bottom:2.5rem; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <button class="tab-btn active" id="tab-new" onclick="switchForm('nuevo')">Registro Nuevo</button>
+                        <button class="tab-btn" id="tab-old" onclick="switchForm('ya')">Ya estoy registrado</button>
+                    </div>
+                    <div id="form-nuevo">
+                        <form id="master-reg-form">
+                            <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
+                            <input type="text" class="form-input" id="reg-cedula" placeholder="Cédula / Documento *" required>
+                            <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
+                            <input type="email" class="form-input" id="reg-email" placeholder="Correo (Opcional)">
+                            <div id="db-dynamic-fields"></div>
+                            <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
+                        </form>
+                    </div>
+                    <div id="form-ya" style="display:none;">
+                        <input type="text" class="form-input" id="rec-cedula" placeholder="Cédula / Documento *">
+                        <input type="tel" class="form-input" id="rec-tel" placeholder="WhatsApp registrado *">
+                        <button class="btn-submit">Verificar mis datos →</button>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -154,30 +163,43 @@
             console.log(`%c[${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
         }
 
-        async function initUnderground() {
-            logStatus("AUDITORÍA V116: Iniciando Silo P7 Underground.");
+        function switchForm(type) {
+            document.getElementById('tab-new').classList.toggle('active', type === 'nuevo');
+            document.getElementById('tab-old').classList.toggle('active', type === 'ya');
+            document.getElementById('form-nuevo').style.display = type === 'nuevo' ? 'block' : 'none';
+            document.getElementById('form-ya').style.display = type === 'ya' ? 'block' : 'none';
+        }
+
+        async function initOrchestrator() {
+            logStatus("AUDITORÍA V117: Master Orchestrator · Estabilización Total.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                // 1. Datos Maestros
+                const tid = evento.config_landing?.template_id || "P6";
+                document.body.className = `tpl-${tid.toLowerCase()}`;
+                logStatus(`INFO: Template ${tid} activado sobre el nucleo master.`, "INFO");
+
+                // 1. Datos Hero (Fidelidad v115)
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
-                document.getElementById('meta-hora').innerText = evento.hora;
-                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'PIT').toUpperCase();
+                document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
+                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-                
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
 
-                // 2. Mapeo de Contenido (v115 Engine)
+                // 2. Mapeo de Contenido (v107 Integrity)
                 const content = evento.config_landing?.content || {};
+                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
-                    <div class="artist-row"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span>${a.trim()}</span></div>`).join('');
+                    <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                 
+                if (content.gallery) document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:12px;">`).join('');
+
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
                 document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
                 if (content.playlist_url) {
@@ -185,12 +207,32 @@
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" style="width:100%; height:100% !important; min-height:450px; border:none;" allow="encrypted-media"></iframe>`;
                 }
 
-                document.getElementById('db-dress-val').innerText = (content.dresscode || 'ALL BLACK').toUpperCase();
-                document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 'FULL'}`;
+                // 3. Tech Data (Tratamiento No-Plano)
+                const dressCode = (content.dresscode || 'NEON').toUpperCase();
+                const aforoMax = evento.aforo_max || 100;
+                document.getElementById('tech-data-container').innerHTML = `
+                    <div class="data-card"><span class="card-label">DRESS CODE</span><span class="card-value">${dressCode}</span><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
+                    <div class="data-card"><span class="card-label">GUEST LIST</span><span class="card-value">${content.guest_list || '+200'}</span></div>
+                    <div class="data-card"><span class="card-label">AFORO</span><span class="card-value">${aforoMax} PERS.</span><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/></svg></div>
+                    <div class="data-card"><span class="card-label">TICKETS</span><span class="card-value">${(content.tickets_info || 'OPEN').toUpperCase()}</span><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M22 10V6H4v4c1.1 0 2 .9 2 2s-.9 2-2 2v4h18v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg></div>
+                `;
 
-                logStatus("TRACE: 6 Módulos Underground mapeados con fidelidad.", "TRACE");
+                if (content.faq) {
+                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer">${a.trim()}</div></div>`;
+                    }).join('');
+                }
 
-                // 3. Heartbeat
+                const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(evento.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                document.getElementById('db-mapa-container').innerHTML = `<iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen style="filter: grayscale(1) invert(1) contrast(1.2); border:none; border-radius:15px;"></iframe>`;
+
+                const logos = ["https://supabase.com/favicon/favicon-196x196.png", "https://github.com/apple-touch-icon.png", "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"];
+                document.getElementById('db-sponsors-list').innerHTML = logos.map(url => `<img src="${url}" style="height:40px; opacity:0.8;">`).join('');
+
+                logStatus("TRACE: 12 Módulos sincronizados con éxito (Restored Baseline v115).", "TRACE");
+
+                // 4. Heartbeat
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -200,15 +242,15 @@
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
-                logStatus("TIME: Heartbeat industrial sincronizado.", "TIME");
+                logStatus("TIME: Heartbeat maestro sincronizado a 3.2rem.", "TIME");
 
-                if (document.getElementById('master-reg-form')) logStatus("LINK: Motor de registro directo verificado.", "LINK");
+                if (document.getElementById('master-reg-form')) logStatus("LINK: Motor de registro (Dual-Path) verificado y persistente.", "LINK");
 
-                document.getElementById('template-container').style.display = 'flex';
+                document.getElementById('template-container').style.display = 'block';
 
             } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
-        window.onload = initUnderground;
+        window.onload = initOrchestrator;
     </script>
 </body>
 </html>
