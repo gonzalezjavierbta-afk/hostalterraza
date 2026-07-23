@@ -733,6 +733,7 @@ tr:hover td{background:var(--surface)}
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-aforo" checked style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Aforo</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-faq" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-ubicacion" style="width:13px;height:13px;accent-color:var(--gold)"> 📍 Ubicación</label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sponsors" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Patrocinadores</label>
               </div>
             </div>
 
@@ -797,6 +798,9 @@ tr:hover td{background:var(--surface)}
             <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
             <div id="ld-campo-guest-list" style="display:none" class="fg"><label style="font-size:12px">Instrucciones Guest List</label><input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario"></div>
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
+            <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 8)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg"><label style="font-size:12px">Patrocinadores (separados por coma)</label><input id="ld-sponsors-fiesta-val" placeholder="Ej. Aguila, Spotify, Davivienda" style="font-size:12px"></div>
 
             <!-- CAMPOS CAMPAÑA -->
             <div id="ld-campo-historia" style="display:none">
@@ -2284,6 +2288,9 @@ function seleccionarTheme(theme) {
     'ld-mod-playlist':   'ld-campo-playlist',
     'ld-mod-guest-list': 'ld-campo-guest-list',
     'ld-mod-ubicacion':  'ld-campo-ubicacion',
+    'ld-mod-gallery':    'ld-campo-gallery-fiesta',
+    'ld-mod-faq':        'ld-campo-faq-fiesta',
+    'ld-mod-sponsors':   'ld-campo-sponsors-fiesta',
     // Campaña
     'ld-mod-historia':        'ld-campo-historia',
     'ld-mod-objetivo':        'ld-campo-objetivo',
@@ -2373,6 +2380,10 @@ function _buildConfigLanding() {
       playlist_url:val('ld-playlist-url')   || null,
       guest_list:  val('ld-guest-list-val') || null,
       ubicacion:   val('ld-ubicacion-val')  || null,
+      // Fiesta extra fields
+      gallery:     (()=>{ const v=val('ld-gallery-fiesta-urls')||val('ld-gallery-urls'); return v ? v.split('\n').filter(Boolean) : undefined; })(),
+      faq:         (()=>{ const v=val('ld-faq-fiesta-val')||val('ld-faq-val'); return v ? v.split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{q:p[0]?.trim(),a:p[1]?.trim()};}) : undefined; })(),
+      sponsors:    (()=>{ const v=val('ld-sponsors-fiesta-val')||val('ld-sponsors-val'); return v ? v.split(',').map(s=>s.trim()).filter(Boolean) : undefined; })(),
       // Campaña
       historia:    val('ld-historia-val')   || null,
       historia_titulo: val('ld-historia-titulo') || null,
