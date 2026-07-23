@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editor v104: Unified Baseline · 12 Modules</title>
+    <title>Editor v105: Full-Integrity Baseline · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,7 +32,7 @@
         section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
 
-        /* 1. HERO (v95 Reference) */
+        /* 1. HERO (v95/97 Master) */
         .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background-size: cover; background-position: center; text-align: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
@@ -47,53 +47,45 @@
             backdrop-filter: blur(2px); box-shadow: 0 0 25px var(--border-glow); display: flex; width: fit-content; 
         }
         .cd-block { padding: 0 0.8rem; border-right: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .cd-block:last-child { border-right: none; }
         .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; margin-bottom: 0.2rem; }
 
-        /* 2. MEDIA GRID (v97 Sync Integrity) */
+        /* 2. MEDIA GRID v97 SYNC */
         .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
         .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
         .video-iframe { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
-        
         .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; display: flex; flex-direction: column; }
         #db-spotify-embed { flex: 1; display: flex; }
         #db-spotify-embed iframe { width: 100%; height: 100% !important; min-height: 450px; border: none; }
 
-        /* 3. DATA CARDS & FAQ (v97 Restoration) */
+        /* 3. LINEUP & DATA CARDS (Restored) */
+        .artist-avatar { width: 65px !important; height: 65px !important; border-radius: 50% !important; object-fit: cover; border: 2px solid var(--gold); }
         .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 240px; }
         .card-icon-xl { width: 68px !important; height: 68px !important; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
 
+        /* 4. FAQ & UBICACIÓN */
         .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; font-size: 0.9rem; }
         .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
         .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
         .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
 
-        /* 4. SPONSORS v104 (Safe Assets) */
+        /* 5. SPONSORS v105 */
         .sponsors-label { color: var(--gold); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2.5rem; display: block; }
         .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4rem; }
         .sponsor-img { height: 40px; width: auto; opacity: 0.8; }
-
-        /* 5. FORM MASTER BOX (v88 Core) */
-        .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
-        .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-        .form-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
-        .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
         
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         
         @media (max-width: 850px) {
             .media-grid { grid-template-columns: 1fr; }
             .cd-v { font-size: 2.2rem; }
-            .form-master-box { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 
 <body class="tpl-sandbox">
 
-    <div id="loader" class="loading-overlay">RESTORING INTEGRITY v104...</div>
+    <div id="loader" class="loading-overlay">CORE RESTORATION v105...</div>
 
     <header id="hero-bg" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -123,17 +115,17 @@
             </div>
         </section>
 
-        <!-- 2. GALLERY & MEDIA -->
+        <!-- 2. GALLERY & MEDIA (Restored structure) -->
         <section id="modulo-gallery">
             <h2>GALERÍA</h2>
-            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;"></div>
+            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem; margin-bottom:4rem;"></div>
             <div class="media-grid">
                 <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content" style="height:100%; width:100%;"></div></div>
                 <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed"></div></div>
             </div>
         </section>
 
-        <!-- 3. DATA CARDS (SVG RESTORED) -->
+        <!-- 3. DATA CARDS (Restored SVGs) -->
         <section id="modulo-info-tecnica">
             <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; max-width:1100px; margin:0 auto;">
                 <div class="data-card"><div><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900; text-transform:uppercase;">--</span></div><svg class="card-icon-xl" viewBox="0 0 24 24"><path d="M17 10h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2z"/></svg></div>
@@ -143,7 +135,7 @@
             </div>
         </section>
 
-        <!-- 4. FAQ (INDICATOR RESTORED) & UBICACIÓN -->
+        <!-- 4. FAQ (Restored "+" icon) & UBICACIÓN -->
         <section id="modulo-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:0; max-width:1200px; margin:0 auto; align-items:stretch;">
                 <div style="padding-right:4rem; border-right:1px solid rgba(255,255,255,0.1);"><h2>FAQ</h2><div id="db-faq-list"></div></div>
@@ -151,7 +143,7 @@
             </div>
         </section>
 
-        <!-- 5. SPONSORS v104 (Verified Assets) -->
+        <!-- 5. SPONSORS v105 (Restored assets) -->
         <section id="modulo-sponsors" style="text-align:center;">
             <span class="sponsors-label">PATROCINADO POR</span>
             <div id="db-sponsors-list" class="sponsors-grid"></div>
@@ -196,7 +188,7 @@
         }
 
         async function initEvento() {
-            logStatus("AUDITORÍA V104: Restauración de Integridad Total y Módulo Sponsors.");
+            logStatus("AUDITORÍA V105: Restauración de Galería, Círculos de Lineup y Sponsors.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
@@ -223,7 +215,7 @@
 
                 const content = evento.config_landing?.content || {};
 
-                // Media Sync v97 Base
+                // Media & Gallery Sync
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
                 document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
                 if (content.playlist_url) {
@@ -231,20 +223,23 @@
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" frameBorder="0" allow="encrypted-media"></iframe>`;
                 }
 
-                // Sponsors Fixed v104 (Safe Links)
-                const logos = [
-                    "https://supabase.com/favicon/favicon-196x196.png",
-                    "https://github.com/apple-touch-icon.png",
-                    "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
-                ];
-                document.getElementById('db-sponsors-list').innerHTML = logos.map(url => `<img src="${url}" class="sponsor-img">`).join('');
-
-                // technical data restored
-                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
+                // LINEUP circular restored
                 const lineup = content.dj_lineup || content.lineup || "";
                 document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
                     <div style="display:flex; align-items:center; gap:1.8rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span style="font-weight:900; text-transform:uppercase;">${a.trim()}</span></div>`).join('');
                 
+                // GALLERY restored
+                if (content.gallery) {
+                    document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(u => `<img src="${u}" style="width:100%; height:250px; object-fit:cover; border-radius:12px;">`).join('');
+                    logStatus("LINK: Galería de imágenes cargada.", "LINK");
+                }
+
+                // Sponsors Verified v105
+                const logos = ["https://supabase.com/favicon/favicon-196x196.png", "https://github.com/apple-touch-icon.png", "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"];
+                document.getElementById('db-sponsors-list').innerHTML = logos.map(url => `<img src="${url}" class="sponsor-img">`).join('');
+
+                // rest technical
+                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
