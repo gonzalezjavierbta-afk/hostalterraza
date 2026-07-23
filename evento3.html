@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v111 · Sistema QR</title>
+    <title>Master Orchestrator v112 · Sistema QR</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,44 +16,49 @@
         #template-container { display: none; }
     </style>
 
-    <!-- SILO VISUAL: TEMPLATE 6 (Baseline v107 Protegido) -->
+    <!-- SILO VISUAL: TEMPLATE 6 (Baseline v107 Full Integrity) -->
     <style id="style-p6">
         .tpl-p6 { --gold: #df20b6; --border-glow: rgba(223, 32, 182, 0.4); --glass-lite: rgba(255, 255, 255, 0.03); }
         .tpl-p6 body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
         .tpl-p6 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .tpl-p6 h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
         
+        /* HERO & MULTIMEDIA SYNC v107 */
         .tpl-p6 .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; }
         .tpl-p6 .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
         .tpl-p6 .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; z-index: 2; letter-spacing: -3px; }
-        .tpl-p6 .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 2.5rem; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; z-index: 2; position: relative; opacity: 0.9; }
         .tpl-p6 .meta-svg { width: 18px; height: 18px; fill: var(--gold); vertical-align: middle; margin-right: 0.7rem; }
-
         .tpl-p6 .unified-countdown-frame { position: relative; z-index: 2; margin: 3.5rem auto 0; padding: 0.7rem 1.2rem; background: rgba(255, 255, 255, 0.01); border-radius: 10px; border: 2px solid var(--gold); box-shadow: 0 0 25px var(--border-glow); display: flex; width: fit-content; }
         .tpl-p6 .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; line-height: 1; }
 
+        /* MULTIMEDIA HEIGHT SYNC (REFIX) */
         .tpl-p6 .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
         .tpl-p6 .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); box-shadow: 0 0 30px var(--border-glow); }
         .tpl-p6 .video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-        .tpl-p6 .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; }
+        .tpl-p6 .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; display: flex; flex-direction: column; }
+        .tpl-p6 #db-spotify-embed { flex: 1; display: flex; }
+        .tpl-p6 #db-spotify-embed iframe { width: 100%; height: 100% !important; min-height: 450px; border: none; }
 
+        /* ASSETS & FORM v107 */
         .tpl-p6 .artist-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
         .tpl-p6 .poster-main-img { width: 320px; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 30px var(--border-glow); }
-        .tpl-p6 .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; min-height: 240px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .tpl-p6 .card-icon-xl { width: 68px; height: 68px; fill: var(--gold); filter: drop-shadow(0 0 15px var(--gold)); opacity: 0.9; margin-top: 2rem; }
-
         .tpl-p6 .faq-icon-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); }
-        .tpl-p6 .sponsor-img { height: 40px; width: auto; opacity: 0.8; }
         .tpl-p6 .form-master-box { max-width: 600px; margin: 0 auto; background: var(--glass-lite); padding: 3rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .tpl-p6 .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 1rem; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; border-bottom: 2px solid transparent; }
+        .tpl-p6 .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .tpl-p6 .form-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.2rem; border-radius: 12px; color: white; width: 100%; box-sizing: border-box; font-family: inherit; margin-bottom: 1.5rem; }
+        .tpl-p6 .btn-submit { background: var(--gold); color: white; border: none; padding: 1.5rem; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
+
+        @media (max-width: 850px) { .tpl-p6 .media-grid { grid-template-columns: 1fr; } .tpl-p6 .form-master-box { padding: 2rem 1.5rem; } }
     </style>
 </head>
 
 <body class="tpl-p6">
 
-    <div id="loader" class="loading-overlay">ORCHESTRATOR v111 · SYNCING P6...</div>
+    <div id="loader" class="loading-overlay">RESTORE CORE INTEGRITY v112...</div>
 
     <div id="template-container">
-        <!-- CONTRATO DE DATOS (IDs v107 Obligatorios) -->
         <header id="hero-bg" class="hero">
             <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:2;">--</div>
             <div class="hero-content">
@@ -86,7 +91,7 @@
                 <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem; margin-bottom:4rem;"></div>
                 <div class="media-grid">
                     <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content" style="height:100%; width:100%;"></div></div>
-                    <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed" style="height:100%;"></div></div>
+                    <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed"></div></div>
                 </div>
             </section>
 
@@ -113,10 +118,25 @@
 
             <section id="modulo-formulario">
                 <div class="form-master-box">
-                    <form id="master-reg-form">
-                        <input type="text" id="reg-nombre" class="form-input" style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:12px;" placeholder="Nombre completo *" required>
-                        <button type="submit" style="background:var(--gold); color:white; border:none; padding:1.5rem; border-radius:15px; font-weight:900; width:100%; cursor:pointer;">Confirmar Asistencia →</button>
-                    </form>
+                    <div class="form-tabs" style="display:flex; gap:2rem; margin-bottom:2rem; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <button class="tab-btn active" id="tab-new" onclick="switchForm('nuevo')">Registro Nuevo</button>
+                        <button class="tab-btn" id="tab-old" onclick="switchForm('ya')">Ya estoy registrado</button>
+                    </div>
+                    <div id="form-nuevo">
+                        <form id="master-reg-form">
+                            <input type="text" class="form-input" id="reg-nombre" placeholder="Nombre completo *" required>
+                            <input type="text" class="form-input" id="reg-cedula" placeholder="Cédula / Documento *" required>
+                            <div style="display:flex; gap:0.5rem;"><select class="form-input" id="reg-prefijo" style="width:110px;"><option value="+57">🇨🇴 +57</option></select><input type="tel" class="form-input" id="reg-tel" placeholder="WhatsApp *" required></div>
+                            <input type="email" class="form-input" id="reg-email" placeholder="Correo (Opcional)">
+                            <div id="db-dynamic-fields"></div>
+                            <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
+                        </form>
+                    </div>
+                    <div id="form-ya" style="display:none;">
+                        <input type="text" class="form-input" id="rec-cedula" placeholder="Cédula / Documento *">
+                        <input type="tel" class="form-input" id="rec-tel" placeholder="WhatsApp registrado *">
+                        <button class="btn-submit">Verificar mis datos →</button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -132,8 +152,15 @@
             console.log(`%c[${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
         }
 
+        function switchForm(type) {
+            document.getElementById('tab-new').classList.toggle('active', type === 'nuevo');
+            document.getElementById('tab-old').classList.toggle('active', type === 'ya');
+            document.getElementById('form-nuevo').style.display = type === 'nuevo' ? 'block' : 'none';
+            document.getElementById('form-ya').style.display = type === 'ya' ? 'block' : 'none';
+        }
+
         async function initOrchestrator() {
-            logStatus("AUDITORÍA V111: Ejecutando Master Orchestrator Integrado.");
+            logStatus("AUDITORÍA V112: Ejecutando Master · Full Multimedia & Form Restoration.");
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
@@ -143,7 +170,7 @@
                 document.body.className = `tpl-${tid.toLowerCase()}`;
                 logStatus(`INFO: Template ${tid} activado sobre el nucleo master.`, "INFO");
 
-                // 1. Datos Maestros
+                // 1. Datos Maestros Hero
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
@@ -152,7 +179,7 @@
                 const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
                 if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
 
-                // 2. Mapeo de Contenido (v107 Full)
+                // 2. Mapeo de Contenido (v107 Integrity)
                 const content = evento.config_landing?.content || {};
                 document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
                 
@@ -166,10 +193,10 @@
                 document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
-                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" style="width:100%; height:100%; border:none;" allow="encrypted-media"></iframe>`;
+                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" frameBorder="0" allow="encrypted-media"></iframe>`;
                 }
 
-                // 3. Tech Data
+                // 3. Tech Data & FAQ
                 document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
                 document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
                 document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 100}`;
@@ -190,7 +217,7 @@
 
                 logStatus("TRACE: 12 Módulos mapeados y persistentes.", "TRACE");
 
-                // 4. Heartbeat
+                // 4. Heartbeat & Logic Check
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -201,7 +228,7 @@
                 }, 1000);
                 logStatus("TIME: Heartbeat maestro sincronizado.", "TIME");
 
-                if (document.getElementById('master-reg-form')) logStatus("LINK: Motor de registro verificado.", "LINK");
+                if (document.getElementById('master-reg-form')) logStatus("LINK: Motor de registro (Dual-Path) verificado y persistente.", "LINK");
 
                 document.getElementById('template-container').style.display = 'block';
 
