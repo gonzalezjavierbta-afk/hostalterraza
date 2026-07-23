@@ -1,67 +1,214 @@
-<!-- SILO VISUAL: TEMPLATE 7 (Underground / Split-Screen) -->
-<style id="style-p7">
-    /* 1. RESETO Y VARIABLES ATÓMICAS */
-    .tpl-p7 { 
-        --acid: #bcff00; --main-bg: #000000; --text-color: #ffffff;
-        --border-glow: rgba(188, 255, 0, 0.3);
-    }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Template 7: Underground · Sistema QR</title>
     
-    /* 2. ESTRUCTURA DISRUPTIVA (Lateral Split) */
-    .tpl-p7 #template-container { display: flex; flex-direction: row; min-height: 100vh; background: var(--main-bg); }
-    
-    /* LADO IZQUIERDO: Información Fija */
-    .tpl-p7 #hero-bg { 
-        width: 40%; height: 100vh; position: fixed; left: 0; top: 0;
-        display: flex; flex-direction: column; justify-content: space-between;
-        padding: 4rem; border-right: 1px solid rgba(188, 255, 0, 0.2); z-index: 10;
-        background-size: cover; background-position: center;
-    }
-    .tpl-p7 #hero-bg::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
-    
-    /* LADO DERECHO: Contenido en Scroll */
-    .tpl-p7 #main-content-flow { width: 60%; margin-left: 40%; padding: 0; }
-    
-    /* 3. ESTILO DE LOS 6 MÓDULOS ACTIVOS */
-    .tpl-p7 section { padding: 6rem 12%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .tpl-p7 h2 { color: var(--acid); font-size: 0.7rem; letter-spacing: 5px; font-weight: 900; margin-bottom: 3rem; }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
-    /* Módulo 1: Hero (Título y Metas) */
-    .tpl-p7 .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; letter-spacing: -2px; margin: 0; color: var(--acid); }
-    .tpl-p7 .hero-meta { font-size: 0.7rem; font-weight: 900; letter-spacing: 2px; opacity: 0.6; display: flex; flex-direction: column; gap: 0.5rem; }
+    <style>
+        :root { 
+            --acid: #bcff00; --main-bg: #000000; --text-color: #ffffff;
+            --border-glow: rgba(188, 255, 0, 0.3);
+        }
 
-    /* Módulo 2: Countdown (Industrial) */
-    .tpl-p7 .unified-countdown-frame { 
-        background: none; border: 1px solid var(--acid); padding: 2rem; border-radius: 0; 
-        box-shadow: 10px 10px 0px var(--border-glow); display: grid; grid-template-columns: repeat(4, 1fr); text-align: center;
-    }
-    .tpl-p7 .cd-v { font-size: 2.8rem !important; font-weight: 900; color: var(--acid); }
+        html, body { margin: 0; padding: 0; background: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; overflow-x: hidden; }
 
-    /* Módulo 3: Multimedia Sync 1:1 [v107] */
-    .tpl-p7 .media-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: stretch; }
-    .tpl-p7 .video-wrapper { border: 1px solid rgba(255,255,255,0.1); border-radius: 0; position: relative; padding-top: 56.25%; filter: grayscale(1); transition: 0.4s; }
-    .tpl-p7 .video-wrapper:hover { filter: grayscale(0); border-color: var(--acid); }
-    .tpl-p7 .spotify-container { min-height: 400px; height: 100%; border: 1px solid rgba(255,255,255,0.1); }
+        /* ESCUDO DE GRANO (v47) */
+        body::before {
+            content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
 
-    /* Módulo 4: Lineup (Tipográfico) */
-    .tpl-p7 #db-lineup { display: flex; flex-direction: column; gap: 1rem; }
-    .tpl-p7 .artist-row { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid rgba(188,255,0,0.1); padding: 1rem 0; transition: 0.3s; cursor: crosshair; }
-    .tpl-p7 .artist-row:hover { color: var(--acid); padding-left: 2rem; }
+        /* ESTRUCTURA DISRUPTIVA P7 (Split-Screen) */
+        #template-container { display: none; flex-direction: row; min-height: 100vh; }
+        
+        /* LADO IZQUIERDO: Estático */
+        .hero { 
+            width: 40%; height: 100vh; position: fixed; left: 0; top: 0;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 4rem; border-right: 1px solid rgba(188, 255, 0, 0.2); z-index: 10;
+            background-size: cover; background-position: center; box-sizing: border-box;
+        }
+        .hero::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
+        .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; letter-spacing: -2px; margin: 0; color: var(--acid); text-transform: uppercase; font-weight: 900; }
+        
+        /* LADO DERECHO: Scroll */
+        #main-content-flow { width: 60%; margin-left: 40%; padding: 0; box-sizing: border-box; }
+        
+        section { padding: 6rem 12%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        h2 { color: var(--acid); font-size: 0.7rem; letter-spacing: 5px; font-weight: 900; margin-bottom: 3rem; text-transform: uppercase; }
 
-    /* Módulo 5: Data Cards (Grid técnica) */
-    .tpl-p7 .data-card { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 0; min-height: 120px; display: flex; align-items: center; justify-content: center; font-weight: 900; }
-    .tpl-p7 .card-icon-xl { display: none; } /* Diseño minimalista sin iconos pesados */
+        /* MÓDULOS ACTIVOS (6/12) */
+        .unified-countdown-frame { background: none; border: 1px solid var(--acid); padding: 2rem; box-shadow: 10px 10px 0px var(--border-glow); display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
+        .cd-v { font-size: 2.8rem !important; font-weight: 900; color: var(--acid); }
+        
+        .media-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .video-wrapper { border: 1px solid rgba(255,255,255,0.1); position: relative; padding-top: 56.25%; filter: grayscale(1); transition: 0.4s; }
+        .video-wrapper:hover { filter: grayscale(0); border-color: var(--acid); }
+        .video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+        .spotify-container { min-height: 450px; height: 100%; border: 1px solid rgba(255,255,255,0.1); }
 
-    /* Módulo 6: Formulario (Lado Izquierdo Fijo) */
-    .tpl-p7 .form-master-box { background: none; border: 1px solid var(--acid); border-radius: 0; padding: 2rem; margin-top: 2rem; }
-    .tpl-p7 .form-input { border-radius: 0; background: #111; border: 1px solid #333; color: white; padding: 1rem; margin-bottom: 1rem; width: 100%; box-sizing: border-box; }
-    .tpl-p7 .btn-submit { background: var(--acid); color: black; border-radius: 0; font-weight: 900; padding: 1.2rem; cursor: pointer; text-transform: uppercase; width: 100%; }
+        .artist-row { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid rgba(188,255,0,0.1); padding: 1.5rem 0; transition: 0.3s; cursor: crosshair; display: flex; align-items: center; gap: 2rem; }
+        .artist-row:hover { color: var(--acid); padding-left: 2rem; background: rgba(188,255,0,0.05); }
+        .artist-avatar { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--acid); filter: grayscale(1); }
 
-    /* OCULTAR MÓDULOS NO DESEADOS (Protocolo Cero Borrado) */
-    .tpl-p7 #db-poster-img, .tpl-p7 #modulo-faq-ubicacion, .tpl-p7 #modulo-sponsors, .tpl-p7 #modulo-gallery { display: none; }
+        .form-master-box { background: none; border: 1px solid var(--acid); padding: 2.5rem; margin-top: 2rem; box-shadow: 8px 8px 0px var(--border-glow); }
+        .form-input { border-radius: 0; background: #111; border: 1px solid #333; color: white; padding: 1.2rem; margin-bottom: 1rem; width: 100%; box-sizing: border-box; font-family: inherit; }
+        .btn-submit { background: var(--acid); color: black; border-radius: 0; font-weight: 900; padding: 1.5rem; border: none; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; }
 
-    @media (max-width: 1024px) {
-        .tpl-p7 #template-container { flex-direction: column; }
-        .tpl-p7 #hero-bg { width: 100%; height: auto; position: relative; padding: 2rem; }
-        .tpl-p7 #main-content-flow { width: 100%; margin-left: 0; }
-    }
-</style>
+        /* OCULTAR MÓDULOS (PROTOCOLO CERO BORRADO) */
+        #db-poster-img, #modulo-faq-ubicacion, #modulo-sponsors, #modulo-gallery { display: none; }
+
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; color: var(--acid); }
+
+        @media (max-width: 1024px) {
+            #template-container { flex-direction: column; }
+            .hero { width: 100%; height: auto; position: relative; padding: 2rem; }
+            #main-content-flow { width: 100%; margin-left: 0; }
+        }
+    </style>
+</head>
+
+<body class="tpl-p7">
+
+    <div id="loader" class="loading-overlay">UNDERGROUND ENGINE v116...</div>
+
+    <div id="template-container">
+        <!-- LADO IZQUIERDO: MASTER DATA & FORM -->
+        <header id="hero-bg" class="hero">
+            <div id="org-name-badge" style="font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--acid);">--</div>
+            <div>
+                <h1 id="event-title" class="hero-title">--</h1>
+                <div id="hero-meta" style="margin-top:2rem; opacity:0.6; font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:2px;">
+                    <span id="meta-fecha">--</span> | <span id="meta-hora">--</span> | <span id="meta-lugar">--</span>
+                </div>
+                
+                <div class="form-master-box">
+                    <form id="master-reg-form">
+                        <input type="text" class="form-input" id="reg-nombre" placeholder="TU NOMBRE *" required>
+                        <input type="text" class="form-input" id="reg-cedula" placeholder="DOCUMENTO ID *" required>
+                        <button type="submit" class="btn-submit">REGISTRARME EN EL PIT →</button>
+                    </form>
+                </div>
+            </div>
+            <div style="font-size:0.6rem; opacity:0.4; letter-spacing:3px;">BOILER ROOM STYLE · V116</div>
+        </header>
+
+        <!-- LADO DERECHO: MEDIA & CONTENT -->
+        <main id="main-content-flow">
+            <!-- Módulo 2: Countdown -->
+            <section id="modulo-countdown">
+                <h2>RESTANTE</h2>
+                <div id="unified-frame" class="unified-countdown-frame">
+                    <div><span id="cd-days" class="cd-v">00</span><br><small>DÍAS</small></div>
+                    <div><span id="cd-hours" class="cd-v">00</span><br><small>HRS</small></div>
+                    <div><span id="cd-mins" class="cd-v">00</span><br><small>MIN</small></div>
+                    <div><span id="cd-secs" class="cd-v">00</span><br><small>SEG</small></div>
+                </div>
+            </section>
+
+            <!-- Módulo 3: Multimedia Sync -->
+            <section id="modulo-gallery">
+                <h2>VISUALS & AUDIO</h2>
+                <div class="media-grid">
+                    <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content"></div></div>
+                    <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed"></div></div>
+                </div>
+            </section>
+
+            <!-- Módulo 4: Lineup -->
+            <section id="modulo-lineup">
+                <h2>LINEUP</h2>
+                <div id="db-lineup"></div>
+            </section>
+
+            <!-- Módulo 5: Data -->
+            <section id="modulo-info-tecnica">
+                <h2>ESPECIFICACIONES</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div class="data-card">DRESS: <span id="db-dress-val">--</span></div>
+                    <div class="data-card">AFORO: <span id="db-aforo-val">--</span></div>
+                </div>
+            </section>
+
+            <!-- Módulos Invisibles (Contrato de Datos) -->
+            <img id="db-poster-img" src="" style="display:none;">
+            <div id="db-faq-list" style="display:none;"></div>
+            <div id="db-mapa-container" style="display:none;"></div>
+            <div id="db-sponsors-list" style="display:none;"></div>
+            <div id="db-gallery-grid" style="display:none;"></div>
+        </main>
+    </div>
+
+    <script>
+        const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
+        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+
+        function logStatus(m, t = 'INFO') {
+            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'ERROR':'#ff4d4d' };
+            console.log(`%c[${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
+        }
+
+        async function initUnderground() {
+            logStatus("AUDITORÍA V116: Iniciando Silo P7 Underground.");
+            const slug = new URLSearchParams(window.location.search).get('slug');
+            try {
+                const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
+                if (error) throw error;
+
+                // 1. Datos Maestros
+                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
+                document.getElementById('meta-fecha').innerText = evento.fecha;
+                document.getElementById('meta-hora').innerText = evento.hora;
+                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'PIT').toUpperCase();
+                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                
+                const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
+                if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
+
+                // 2. Mapeo de Contenido (v115 Engine)
+                const content = evento.config_landing?.content || {};
+                
+                const lineup = content.dj_lineup || content.lineup || "";
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `
+                    <div class="artist-row"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" class="artist-avatar"><span>${a.trim()}</span></div>`).join('');
+                
+                const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
+                document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
+                if (content.playlist_url) {
+                    const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
+                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" style="width:100%; height:100% !important; min-height:450px; border:none;" allow="encrypted-media"></iframe>`;
+                }
+
+                document.getElementById('db-dress-val').innerText = (content.dresscode || 'ALL BLACK').toUpperCase();
+                document.getElementById('db-aforo-val').innerText = `${evento.aforo_max || 'FULL'}`;
+
+                logStatus("TRACE: 6 Módulos Underground mapeados con fidelidad.", "TRACE");
+
+                // 3. Heartbeat
+                const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
+                setInterval(() => {
+                    const diff = target - new Date().getTime();
+                    if (diff <= 0) return;
+                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+                logStatus("TIME: Heartbeat industrial sincronizado.", "TIME");
+
+                if (document.getElementById('master-reg-form')) logStatus("LINK: Motor de registro directo verificado.", "LINK");
+
+                document.getElementById('template-container').style.display = 'flex';
+
+            } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+        }
+        window.onload = initUnderground;
+    </script>
+</body>
+</html>
