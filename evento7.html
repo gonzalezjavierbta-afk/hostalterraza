@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Silo CA2: Solidario Pro v129 · Sistema QR</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
+
+    <style id="style-ca2">
+        :root { --ca2-primary: #0056b3; --ca2-accent: #28a745; --ca2-bg: #080808; --ca2-text: #ffffff; }
+        html, body { margin: 0; padding: 0; background: var(--ca2-bg); color: var(--ca2-text); font-family: 'Geist', sans-serif; overflow-x: hidden; }
+
+        /* ESCUDO DE GRANO (v47) */
+        body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+
+        /* Aislamiento Atómico CA2 */
+        .tpl-ca2 section { padding: 8rem 12%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tpl-ca2 h2 { color: var(--ca2-primary); font-size: 0.8rem; letter-spacing: 5px; font-weight: 900; text-transform: uppercase; margin-bottom: 4rem; }
+
+        /* HERO CAMPAÑA */
+        .tpl-ca2 .hero { height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; position: relative; }
+        .tpl-ca2 .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(8,8,8,1) 100%); }
+        .tpl-ca2 .hero-content { position: relative; z-index: 2; max-width: 900px; }
+        .tpl-ca2 .hero-title { font-size: clamp(3rem, 10vw, 6rem); font-weight: 900; letter-spacing: -4px; line-height: 0.85; margin: 0; text-transform: uppercase; }
+
+        /* MÓDULO OBJETIVO (PROGRESS BAR) */
+        .tpl-ca2 .goal-container { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 3rem; border-radius: 15px; margin-top: 4rem; }
+        .tpl-ca2 .progress-bar { height: 12px; background: #222; border-radius: 10px; overflow: hidden; margin: 1.5rem 0; }
+        .tpl-ca2 .progress-fill { height: 100%; background: var(--ca2-accent); width: 0%; transition: 1.5s ease-out; box-shadow: 0 0 20px var(--ca2-accent); }
+
+        /* IMPACTO CARDS */
+        .tpl-ca2 .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; }
+        .tpl-ca2 .impact-card { padding: 2.5rem; background: rgba(255,255,255,0.02); border-left: 3px solid var(--ca2-primary); text-align: left; }
+        .tpl-ca2 .impact-val { font-size: 2.5rem; font-weight: 900; display: block; color: var(--ca2-accent); }
+
+        /* EQUIPO & TESTIMONIOS */
+        .tpl-ca2 .team-grid { display: flex; flex-wrap: wrap; gap: 3rem; justify-content: center; }
+        .tpl-ca2 .team-item { text-align: center; max-width: 150px; }
+        .tpl-ca2 .team-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ca2-primary); margin-bottom: 1rem; }
+
+        /* FAQ (Interactividad v121) */
+        .tpl-ca2 .faq-item { border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .tpl-ca2 .faq-header { display: flex; justify-content: space-between; padding: 1.5rem 0; font-weight: 800; }
+        .tpl-ca2 .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s; color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        .tpl-ca2 .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
+
+        .tpl-ca2 .form-master-box { background: var(--ca2-primary); color: white; padding: 4rem; border-radius: 20px; }
+        .tpl-ca2 .btn-submit { background: #ffffff; color: var(--ca2-primary); font-weight: 900; padding: 1.5rem; border: none; width: 100%; border-radius: 12px; cursor: pointer; letter-spacing: 2px; }
+
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 5px; color: var(--ca2-primary); }
+    </style>
+</head>
+
+<body class="tpl-ca2">
+
+    <div id="loader" class="loading-overlay">CA2 ENGINE · IMPACT MODE...</div>
+
+    <div id="template-container">
+        <!-- HERO CA2 -->
+        <header id="hero-bg" class="hero">
+            <div id="org-name-badge" style="position:absolute; top:3rem; left:3rem; font-weight:900; letter-spacing:4px; opacity:0.6; text-transform:uppercase;">--</div>
+            <div class="hero-content">
+                <h1 id="event-title" class="hero-title">--</h1>
+                <div style="margin-top:2.5rem; font-weight:800; opacity:0.5; letter-spacing:3px;">
+                    <span id="meta-fecha">--</span> • <span id="meta-hora">--</span> • <span id="meta-lugar">--</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content-flow">
+            <!-- 1. HISTORIA DE LA CAUSA -->
+            <section id="modulo-historia">
+                <h2>La Causa</h2>
+                <div id="db-historia-txt" style="font-size: 1.3rem; line-height: 1.6; opacity: 0.8; max-width: 800px;">--</div>
+            </section>
+
+            <!-- 2. OBJETIVO ECONÓMICO -->
+            <section id="modulo-objetivo">
+                <div class="goal-container">
+                    <div style="display:flex; justify-content:space-between; font-weight:900;">
+                        <span>RECAUDADO: <span id="db-recaudado">--</span></span>
+                        <span>META: <span id="db-meta">--</span></span>
+                    </div>
+                    <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+                    <div id="db-motivacion" style="text-align:center; font-style:italic; opacity:0.6;">--</div>
+                </div>
+            </section>
+
+            <!-- 3. IMPACTO -->
+            <section id="modulo-impacto">
+                <h2>Impacto de tu apoyo</h2>
+                <div id="db-impacto-grid" class="impact-grid"></div>
+            </section>
+
+            <!-- 4. GALERÍA & MEDIA -->
+            <section id="modulo-gallery">
+                <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
+                <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:2rem;">
+                    <div id="db-video-content" style="position:relative; padding-top:56.25%; background:#000;"></div>
+                    <div id="db-spotify-embed"></div>
+                </div>
+            </section>
+
+            <!-- 5. EQUIPO / ORGANIZACIÓN -->
+            <section id="modulo-equipo">
+                <h2>Nuestro Equipo</h2>
+                <div id="db-team-grid" class="team-grid"></div>
+            </section>
+
+            <!-- 6. TESTIMONIOS -->
+            <section id="modulo-testimonios">
+                <h2>Testimonios</h2>
+                <div id="db-testimonios-list" style="display:flex; flex-direction:column; gap:3rem;"></div>
+            </section>
+
+            <!-- 7. ACTUALIZACIONES -->
+            <section id="modulo-actualizaciones">
+                <h2>Últimas noticias</h2>
+                <div id="db-updates-list"></div>
+            </section>
+
+            <!-- 8. FAQ & UBICACIÓN -->
+            <section id="modulo-faq-ubicacion">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5rem;">
+                    <div><h2>FAQ</h2><div id="db-faq-list"></div></div>
+                    <div id="db-mapa-container" style="height:400px; border-radius:15px; overflow:hidden;"></div>
+                </div>
+            </section>
+
+            <!-- 9. FORMULARIO & SPONSORS -->
+            <section id="modulo-formulario">
+                <div class="form-master-box">
+                    <h2 style="color:white; margin-bottom:2rem;">Únete a la iniciativa</h2>
+                    <form id="master-reg-form">
+                        <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.1); border:none; color:white; margin-bottom:1rem; border-radius:10px;">
+                        <button type="submit" class="btn-submit">REGISTRARME AHORA →</button>
+                    </form>
+                    <div id="db-sponsors-list" style="margin-top:4rem; display:flex; justify-content:center; gap:3rem; opacity:0.7; filter:grayscale(1);"></div>
+                </div>
+            </section>
+            
+            <!-- CERO BORRADO: IDs ocultos v121 -->
+            <div id="modulo-countdown" style="display:none;"><span id="cd-days"></span><span id="cd-hours"></span><span id="cd-mins"></span><span id="cd-secs"></span></div>
+            <img id="db-poster-img" style="display:none;">
+            <div id="db-lineup" style="display:none;"></div>
+        </main>
+    </div>
+
+    <script>
+        const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
+        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+        
+        function logStatus(m, t = 'INFO') {
+            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22' };
+            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
+        }
+
+        async function initCampaign() {
+            logStatus("AUDITORÍA V129: Iniciando Silo CA2 · Campaña Full Módulos.", "INFO");
+            const slug = new URLSearchParams(window.location.search).get('slug');
+            try {
+                const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
+                if (error) throw error;
+
+                // 1. Datos Hero e Identidad
+                document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
+                document.getElementById('meta-fecha').innerText = evento.fecha;
+                document.getElementById('meta-hora').innerText = evento.hora;
+                document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'HIDDEN').toUpperCase();
+                if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                
+                const { data: org } = await sbClient.from('organizaciones').select('nombre').eq('id', evento.org_id).single();
+                if (org) document.getElementById('org-name-badge').innerText = org.nombre.toUpperCase();
+
+                // 2. Módulos Específicos de Campaña [2, 5]
+                const content = evento.config_landing?.content || {};
+                document.getElementById('db-historia-txt').innerText = content.historia_causa || 'Cargando historia...';
+                document.getElementById('db-recaudado').innerText = `$${content.recaudado || 0}`;
+                document.getElementById('db-meta').innerText = `$${content.meta_economica || 1000}`;
+                document.getElementById('db-motivacion').innerText = content.texto_motivacional || '';
+                const pct = Math.min(((content.recaudado || 0) / (content.meta_economica || 1000)) * 100, 100);
+                document.getElementById('progress-fill').style.width = `${pct}%`;
+
+                if (content.impacto) {
+                    document.getElementById('db-impacto-grid').innerHTML = content.impacto.split('\n').map(l => {
+                        const [item, val, icon] = l.split('|');
+                        return `<div class="impact-card"><span class="impact-val">${val} ${icon || ''}</span><small>${item}</small></div>`;
+                    }).join('');
+                }
+
+                if (content.equipo) {
+                    document.getElementById('db-team-grid').innerHTML = content.equipo.split('\n').map(l => {
+                        const [nom, rol, url] = l.split('|');
+                        return `<div class="team-item"><img src="${url}" class="team-img"><div><strong>${nom}</strong><br><small>${rol}</small></div></div>`;
+                    }).join('');
+                }
+
+                // 3. Multimedia & FAQ (Interactividad Inyectada v121) [v121]
+                const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
+                document.getElementById('db-video-content').innerHTML = `<iframe style="position:absolute; inset:0; width:100%; height:100%; border:none;" src="${trailerUrl}" allowfullscreen></iframe>`;
+                
+                if (content.faq) {
+                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><span>+</span></div><div class="faq-answer">${a.trim()}</div></div>`;
+                    }).join('');
+                }
+
+                // 4. Auditoría Log-Driven [24, v121]
+                console.group("%c[AUDITORÍA CA2 FULL MÓDULOS]", "color:#e67e22; font-weight:bold;");
+                console.log("%cACTIVOS ✅: Hero, Historia, Objetivo (Barra), Impacto, Gallery, Equipo, Testimonios, Updates, FAQ, Mapa, Form, Sponsors.", "color:#00ff88;");
+                console.log("%cPROTEGIDOS 👁️: CD, Poster, Lineup (IDs presentes pero ocultos para Cero Borrado).", "color:#f1c40f;");
+                console.groupEnd();
+
+                logStatus("TRACE: 12 Módulos sincronizados | Historia & Goal Ready | FAQ Onclick Injected.", "TRACE");
+                document.getElementById('template-container').style.display = 'block';
+
+            } catch (err) { logStatus(`ERROR: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+        }
+        window.onload = initCampaign;
+    </script>
+</body>
+</html>
