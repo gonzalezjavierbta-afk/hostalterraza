@@ -13,7 +13,7 @@
     <style>
         :root {
             --main-bg: #050505;
-            --gold: #df20b6; /* Color fallback hasta inyección de template */
+            --gold: #df20b6; 
             --text-color: #ffffff;
         }
 
@@ -32,7 +32,7 @@
         }
 
         /* Blindaje de Seguridad: Secciones ocultas hasta validación PM */
-        section { display: none; }
+        section, header { display: none; }
 
         .loading-overlay { 
             position: fixed; inset: 0; background: #000; z-index: 999; 
@@ -81,7 +81,7 @@
             </div>
         </section>
 
-        <!-- 3. DATA CARDS (PREMIUM) -->
+        <!-- 3. DATA CARDS -->
         <section id="mod-info-tecnica">
             <div id="db-dress-val">--</div>
             <div id="db-guest-val">--</div>
@@ -121,13 +121,13 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        /** ESCUDO DE VERIFICACIÓN GOLD: LOGS DE SALUD */
+        /** ESCUDO DE VERIFICACIÓN GOLD */
         function logStatus(m, t = 'INFO') {
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        /** INYECCIÓN ATÓMICA DE CSS (AISLAMIENTO SCOPED) */
+        /** INYECCIÓN ATÓMICA DE CSS */
         function injectAtomicCSS(templateId) {
             return new Promise((resolve) => {
                 const cssPath = `templates/${templateId}.css`;
@@ -143,14 +143,14 @@
                     resolve(true);
                 };
                 link.onerror = () => {
-                    logStatus(`ERROR 404: No se encontró ${cssPath}. Verifica la carpeta /templates/ en Vercel.`, "ERROR");
+                    logStatus(`ERROR 404: No se halló ${cssPath}. Revisa carpetas en Drive/Vercel.`, "ERROR");
                     resolve(false);
                 };
                 link.href = cssPath;
             });
         }
 
-        /** MANEJADOR FAQ FISICO (CONTRATO INTERACTIVIDAD v121) */
+        /** MANEJADOR FAQ FISICO */
         function toggleFAQ(element) {
             const answer = element.querySelector('.faq-answer');
             if (answer) {
@@ -160,59 +160,60 @@
             }
         }
 
-        /** ORQUESTADOR PRINCIPAL v1.2 (LOG-DRIVEN) */
+        /** ORQUESTADOR PRINCIPAL v1.2 */
         async function initEvento() {
             logStatus("Iniciando Orquestador Atómico Master.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
             if (!slug) {
-                logStatus("Falta SLUG en URL. Ejemplo: ?slug=nombre-evento", "ERROR");
+                logStatus("Falta SLUG en URL.", "ERROR");
                 return;
             }
 
             try {
                 // 1. Fetch Data
                 const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
-                if (error || !ev) throw new Error("Evento no hallado en la base de datos.");
+                if (error || !ev) throw new Error("Evento no hallado.");
 
-                // 2. LOG DE CONFIRMACIÓN (REQUERIMIENTO DEL DIRECTOR)
-                const templateId = ev.template_id || 'P1';
+                // 2. Identificación del Template (LOG REQUERIDO)
+                const templateId = ev.template_id || 'F3';
                 logStatus(`TEMPLATE ID DETECTADO: [${templateId}] para el slug: [${slug}]`, "INFO");
 
                 // 3. Inyección Atómica
                 await injectAtomicCSS(templateId);
 
-                // 4. Mapeo Metadata (Contrato Cero Borrado)
+                // 4. Mapeo Metadata
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
+                document.getElementById('meta-lugar').innerText = (ev.content?.ubicacion || ev.ubicacion || "--").toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
+                
+                // 5. Visibilidad dinámica según JSON 'modules'
+                const flags = ev.modules || {};
+                const moduleMap = {
+                    'mod-hero': true, // Siempre visible
+                    'mod-lineup': flags.dj_lineup,
+                    'mod-gallery': flags.gallery,
+                    'mod-info-tecnica': flags.aforo || flags.dresscode,
+                    'mod-faq-ubicacion': flags.faq || flags.ubicacion,
+                    'mod-sponsors': flags.sponsors,
+                    'mod-form': true // Siempre visible (Motor Dual-Path)
+                };
 
-                // 5. Inyección de FAQ con interactividad física (onclick)
-                const content = ev.config_landing?.content || {};
-                if (content.faq) {
-                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n')
-                        .filter(l => l.includes('|'))
-                        .map(l => {
-                            const [q, a] = l.split('|');
-                            return `<div class="faq-item" onclick="toggleFAQ(this)">
-                                <div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div>
-                                <div class="faq-answer" style="display:none;">${a.trim()}</div>
-                            </div>`;
-                        }).join('');
-                }
-
-                // 6. Visibilidad Blindada de Módulos (v121)
-                const modulos = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
-                modulos.forEach(id => {
+                Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) el.style.setProperty('display', 'block', 'important');
+                    if (el) {
+                        el.style.display = moduleMap[id] ? 'block' : 'none';
+                        if (moduleMap[id] && id !== 'mod-hero' && id !== 'mod-form') {
+                            logStatus(`Módulo ${id.toUpperCase()} activado por contrato JSON.`, "INFO");
+                        }
+                    }
                 });
 
-                // 7. Cierre de Auditoría GOLD
+                // 6. Cierre de Auditoría GOLD
                 logStatus("Heartbeat del contador sincronizado a 3.2rem", "TIME");
-                logStatus("12 Módulos sincronizados | FAQ Onclick Presente", "TRACE");
+                logStatus("TRACE: 12 Módulos sincronizados | FAQ Onclick Presente | Template F3 Vinculado", "TRACE");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
