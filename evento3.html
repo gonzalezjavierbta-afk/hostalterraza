@@ -55,7 +55,6 @@
                 <div class="meta-item"><span id="meta-hora">--:--</span></div>
                 <div class="meta-item"><span id="meta-lugar">--</span></div>
             </div>
-            <!-- Heartbeat del Contador 3.2rem -->
             <div id="unified-frame" class="unified-countdown-frame">
                 <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span>DÍAS</span></div>
                 <div class="cd-block"><span id="cd-hours" class="cd-v">00</span><span>HORAS</span></div>
@@ -66,13 +65,10 @@
     </header>
 
     <main id="main-content-flow">
-        <!-- 1. POSTER & LINEUP -->
         <section id="mod-lineup">
             <div id="db-poster-container"><img id="db-poster-img" src="" alt="Poster"></div>
             <div id="db-lineup"></div>
         </section>
-
-        <!-- 2. GALLERY & MEDIA -->
         <section id="mod-gallery">
             <div id="db-gallery-grid"></div>
             <div class="media-sync">
@@ -80,28 +76,20 @@
                 <div id="mod-playlist"><div id="db-spotify-embed"></div></div>
             </div>
         </section>
-
-        <!-- 3. DATA CARDS -->
         <section id="mod-info-tecnica">
             <div id="db-dress-val">--</div>
             <div id="db-guest-val">--</div>
             <div id="db-aforo-val">--</div>
             <div id="db-ticket-val">--</div>
         </section>
-
-        <!-- 4. FAQ & UBICACIÓN -->
         <section id="mod-faq-ubicacion">
             <div id="db-faq-list"></div>
             <div id="venue-name">--</div>
             <div id="db-mapa-container"></div>
         </section>
-
-        <!-- 5. SPONSORS -->
         <section id="mod-sponsors">
             <div id="db-sponsors-list"></div>
         </section>
-
-        <!-- 6. MOTOR DE REGISTRO DUAL-PATH -->
         <section id="mod-form">
             <div class="form-master-box">
                 <form id="master-reg-form">
@@ -121,16 +109,16 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        /** ESCUDO DE VERIFICACIÓN GOLD */
         function logStatus(m, t = 'INFO') {
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        /** INYECCIÓN ATÓMICA DE CSS */
+        /** INYECCIÓN ATÓMICA DE CSS (RUTA CORREGIDA) */
         function injectAtomicCSS(templateId) {
             return new Promise((resolve) => {
-                const cssPath = `templates/${templateId}.css`;
+                // Ajustado según requerimiento del Director: css/templates/
+                const cssPath = `css/templates/${templateId}.css`;
                 let link = document.querySelector('link[data-template-css]');
                 if (!link) {
                     link = document.createElement('link');
@@ -143,14 +131,13 @@
                     resolve(true);
                 };
                 link.onerror = () => {
-                    logStatus(`ERROR 404: No se halló ${cssPath}. Revisa carpetas en Drive/Vercel.`, "ERROR");
+                    logStatus(`FALLO 404: No se halló ${cssPath} en Vercel.`, "ERROR");
                     resolve(false);
                 };
                 link.href = cssPath;
             });
         }
 
-        /** MANEJADOR FAQ FISICO */
         function toggleFAQ(element) {
             const answer = element.querySelector('.faq-answer');
             if (answer) {
@@ -175,7 +162,7 @@
                 const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
                 if (error || !ev) throw new Error("Evento no hallado.");
 
-                // 2. Identificación del Template (LOG REQUERIDO)
+                // 2. Identificación del Template
                 const templateId = ev.template_id || 'F3';
                 logStatus(`TEMPLATE ID DETECTADO: [${templateId}] para el slug: [${slug}]`, "INFO");
 
@@ -192,22 +179,19 @@
                 // 5. Visibilidad dinámica según JSON 'modules'
                 const flags = ev.modules || {};
                 const moduleMap = {
-                    'mod-hero': true, // Siempre visible
+                    'mod-hero': true,
                     'mod-lineup': flags.dj_lineup,
                     'mod-gallery': flags.gallery,
                     'mod-info-tecnica': flags.aforo || flags.dresscode,
                     'mod-faq-ubicacion': flags.faq || flags.ubicacion,
                     'mod-sponsors': flags.sponsors,
-                    'mod-form': true // Siempre visible (Motor Dual-Path)
+                    'mod-form': true
                 };
 
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
                         el.style.display = moduleMap[id] ? 'block' : 'none';
-                        if (moduleMap[id] && id !== 'mod-hero' && id !== 'mod-form') {
-                            logStatus(`Módulo ${id.toUpperCase()} activado por contrato JSON.`, "INFO");
-                        }
                     }
                 });
 
