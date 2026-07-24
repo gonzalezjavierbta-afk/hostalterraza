@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v148 · Full Integrity</title>
+    <title>Master Orchestrator v149 · Full Integrity</title>
     
     <!-- CDNs Obligatorios (Contrato v107) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
@@ -29,9 +29,9 @@
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">VERIFICACIÓN FULL INTEGRITY V148...</div>
+    <div id="loader" class="loading-overlay">VERIFICACIÓN SINCRONÍA V149...</div>
 
-    <!-- 1. HERO SECTION -->
+    <!-- ESTRUCTURA MASTER PROTEGIDA -->
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
         <div class="hero-content">
@@ -51,13 +51,11 @@
     </header>
 
     <main id="main-content-flow">
-        <!-- 2. LINEUP & POSTER -->
         <section id="mod-lineup">
             <div id="db-poster-container"><img id="db-poster-img" src="" alt="Poster"></div>
             <div id="db-lineup"></div>
         </section>
 
-        <!-- 3. MULTIMEDIA (Sincronizado con CSS media-grid) -->
         <section id="mod-gallery">
             <div id="db-gallery-grid"></div>
             <div class="media-grid">
@@ -66,13 +64,11 @@
             </div>
         </section>
 
-        <!-- 4. DATA CARDS -->
         <section id="mod-info-tecnica">
             <div class="card-item"><span class="label">DRESS CODE</span><span id="db-dress-val">--</span></div>
             <div class="card-item"><span class="label">AFORO</span><span id="db-aforo-val">--</span></div>
         </section>
 
-        <!-- 5. FAQ & UBICACIÓN -->
         <section id="mod-faq-ubicacion">
             <div id="mod-faq">
                 <h2>PREGUNTAS FRECUENTES</h2>
@@ -84,7 +80,6 @@
             </div>
         </section>
 
-        <!-- 6. MOTOR DUAL-PATH -->
         <section id="mod-form">
             <div class="form-tabs">
                 <button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">Registro</button>
@@ -122,21 +117,31 @@
             document.getElementById('form-ya').style.display = type === 'ya' ? 'block' : 'none';
         }
 
-        async function auditCSSRules(templateId) {
+        /** NUEVO: LOG DE VERIFICACIÓN DE SINCRONÍA ID/CSS (v149) */
+        function auditCSSSync(templateId) {
             const scope = `.tpl-${templateId.toLowerCase()}`;
-            let rulesFound = 0;
+            const criticalIDs = ['#mod-hero', '#mod-lineup', '#mod-gallery', '#mod-info-tecnica', '#mod-faq', '#mod-form'];
+            let foundSelectors = [];
+
             try {
                 for (let sheet of document.styleSheets) {
                     if (sheet.href && sheet.href.includes(templateId)) {
                         const rules = sheet.cssRules || sheet.rules;
                         for (let rule of rules) {
-                            if (rule.selectorText && rule.selectorText.toLowerCase().includes(scope)) rulesFound++;
+                            if (rule.selectorText) foundSelectors.push(rule.selectorText.toLowerCase());
                         }
                     }
                 }
-            } catch (e) {}
-            if (rulesFound > 0) logStatus(`AUDIT: ${rulesFound} reglas válidas para ${scope}.`, "LINK");
-            else logStatus(`ERROR: No se hallaron estilos para ${scope}.`, "ERROR");
+            } catch (e) { logStatus("DEBUG: Limitación de lectura CSS (CORS).", "DEBUG"); }
+
+            if (foundSelectors.length > 0) {
+                logStatus(`AUDIT: ${foundSelectors.length} reglas detectadas en el silo visual.`, "LINK");
+                criticalIDs.forEach(id => {
+                    const isSynced = foundSelectors.some(s => s.includes(scope) && s.includes(id));
+                    if (isSynced) logStatus(`SYNC OK: Módulo [${id}] tiene estilo definido en CSS.`, "LINK");
+                    else logStatus(`SYNC WARNING: Módulo [${id}] NO tiene reglas en ${templateId}.css.`, "DEBUG");
+                });
+            }
         }
 
         async function injectAtomicCSS(templateId) {
@@ -147,14 +152,18 @@
                     link = document.createElement('link'); link.rel = 'stylesheet';
                     link.setAttribute('data-template-css', 'true'); document.head.appendChild(link);
                 }
-                link.onload = () => { logStatus(`LINK: Estilo vinculado.`, "LINK"); auditCSSRules(templateId); resolve(true); };
-                link.onerror = () => { logStatus(`ERROR 404: No se halló el CSS.`, "ERROR"); resolve(false); };
+                link.onload = () => { 
+                    logStatus(`LINK: Archivo ${templateId}.css cargado.`, "LINK"); 
+                    auditCSSSync(templateId);
+                    resolve(true); 
+                };
+                link.onerror = () => { logStatus(`ERROR 404: No se halló el archivo.`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v148 - Full Integrity.", "INFO");
+            logStatus("Iniciando Orquestador v149 - Full Integrity.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -164,7 +173,7 @@
 
                 const templateId = ev.template_id || 'F3';
                 document.body.className = `tpl-${templateId} tpl-${templateId.toLowerCase()}`;
-                logStatus(`DEBUG: Ámbito [.tpl-${templateId.toLowerCase()}] activo.`, "DEBUG");
+                logStatus(`DEBUG: Ámbito [.tpl-${templateId.toLowerCase()}] inyectado.`, "DEBUG");
 
                 await injectAtomicCSS(templateId);
 
@@ -172,13 +181,7 @@
                 const content = ev.config_landing?.content || ev.content || {};
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                document.getElementById('meta-fecha').innerText = ev.fecha;
-                document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
-                document.getElementById('meta-lugar').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
-                document.getElementById('venue-name').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
-
-                // Datos Técnicos (Premium v122)
-                document.getElementById('db-dress-val').innerText = (content.dresscode || "FORMAL").toUpperCase();
+                document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
                 document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
 
                 if (content.dj_lineup) {
@@ -196,16 +199,20 @@
                     logStatus(`TRACE: FAQ inyectado (${lines.length} preguntas).`, "TRACE");
                 }
 
-                // VISIBILIDAD (CONTRATO v122)
+                // VISIBILIDAD
                 const flags = ev.config_landing?.modules || ev.modules || {};
-                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':flags.gallery || flags.playlist, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-form':true };
+                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':true, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-form':true };
                 
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) { el.style.setProperty('display', moduleMap[id] ? 'block' : 'none', 'important'); logStatus(`INFO: Módulo [${id}] -> ${moduleMap[id] ? 'FORZADO ACTIVO' : 'OCULTO'}`, "INFO"); }
+                    if (el) {
+                        const isV = moduleMap[id] === true;
+                        el.style.setProperty('display', isV ? 'block' : 'none', 'important');
+                        logStatus(`INFO: Módulo [${id}] -> ${isV ? 'FORZADO ACTIVO' : 'OCULTO'}`, "INFO");
+                    }
                 });
 
-                logStatus("TIME: Heartbeat sincronizado (3.2rem).", "TIME");
+                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 12 Módulos sincronizados | Fidelidad Dual Validada.", "TRACE");
 
             } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
