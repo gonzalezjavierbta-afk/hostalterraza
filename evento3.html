@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v143 · Sistema QR</title>
+    <title>Master Orchestrator v144 · Sistema QR</title>
     
     <!-- CDNs Obligatorios (Contrato v107) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
@@ -24,7 +24,7 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.04; contrast: 130%;
         }
-        /* Blindaje de Seguridad Master */
+        /* Blindaje de Seguridad Master: Secciones ocultas hasta validación de datos */
         section, header { display: none; }
         .loading-overlay { 
             position: fixed; inset: 0; background: #000; z-index: 999; 
@@ -35,7 +35,7 @@
 </head>
 
 <body>
-    <div id="loader" class="loading-overlay">VERIFICACIÓN FÍSICA V143...</div>
+    <div id="loader" class="loading-overlay">RESETEANDO SILO V144...</div>
 
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -56,12 +56,8 @@
     </header>
 
     <main id="main-content-flow">
-        <section id="mod-lineup">
-            <div id="db-lineup"></div>
-        </section>
-        <section id="mod-gallery">
-            <div id="db-gallery-grid"></div>
-        </section>
+        <section id="mod-lineup"><div id="db-lineup"></div></section>
+        <section id="mod-gallery"><div id="db-gallery-grid"></div></section>
         <section id="mod-info-tecnica">
             <div id="db-dress-val">--</div>
             <div id="db-aforo-val">--</div>
@@ -100,8 +96,8 @@
                     link = document.createElement('link'); link.rel = 'stylesheet';
                     link.setAttribute('data-template-css', 'true'); document.head.appendChild(link);
                 }
-                link.onload = () => { logStatus(`LINK: Estilo ${cssPath} cargado.`, "LINK"); resolve(true); };
-                link.onerror = () => { logStatus(`ERROR: No se halló el archivo CSS.`, "ERROR"); resolve(false); };
+                link.onload = () => { logStatus(`LINK: Estilo ${cssPath} cargado exitosamente.`, "LINK"); resolve(true); };
+                link.onerror = () => { logStatus(`ERROR: Archivo ${cssPath} no hallado.`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
         }
@@ -116,7 +112,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v143 - Fidelidad de Mapeo.", "INFO");
+            logStatus("Iniciando Orquestador v144 - Reseteo de Silo.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -124,44 +120,32 @@
                 const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
                 if (error || !ev) throw new Error("Evento no hallado.");
 
+                // --- MEJORA: DUAL-SCOPE ACTIVATION ---
                 const templateId = ev.template_id || 'F3';
-                document.body.className = `tpl-${templateId.toLowerCase()}`;
+                document.body.className = `tpl-${templateId} tpl-${templateId.toLowerCase()}`;
+                logStatus(`DEBUG: Ámbitos [.tpl-${templateId}] y [.tpl-${templateId.toLowerCase()}] activos.`, "DEBUG");
 
                 await injectAtomicCSS(templateId);
 
-                // --- MAPEO DE DATOS (CONTRATO v143-STRICT) ---
+                // Mapeo de Datos (Integridad Confirmada v143)
                 const content = ev.config_landing?.content || ev.content || {};
-                
-                // 1. Identidad
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                logStatus(`DEBUG: Título [${ev.nombre}] inyectado.`, "DEBUG");
 
-                // 2. Lineup (Soporte Array/String)
-                const lineupContainer = document.getElementById('db-lineup');
-                if (lineupContainer && content.dj_lineup) {
+                if (content.dj_lineup) {
                     const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
-                    lineupContainer.innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
-                    logStatus(`TRACE: Inyectados ${lineup.length} artistas en Lineup.`, "TRACE");
+                    document.getElementById('db-lineup').innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
                 }
 
-                // 3. FAQ (Soporte Pipe Delimiter)
-                const faqContainer = document.getElementById('db-faq-list');
-                if (faqContainer && content.faq) {
+                if (content.faq) {
                     const faqItems = content.faq.split('\n').filter(l => l.includes('|'));
-                    faqContainer.innerHTML = faqItems.map(l => {
+                    document.getElementById('db-faq-list').innerHTML = faqItems.map(l => {
                         const [q, a] = l.split('|');
                         return `<div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer" style="display:none;">${a.trim()}</div></div>`;
                     }).join('');
-                    logStatus(`TRACE: Inyectadas ${faqItems.length} preguntas en FAQ.`, "TRACE");
                 }
 
-                // 4. Ubicación
-                const ubi = content.ubicacion || ev.ubicacion || "--";
-                document.getElementById('meta-lugar').innerText = ubi.toUpperCase();
-                document.getElementById('venue-name').innerText = ubi.toUpperCase();
-
-                // --- VISIBILIDAD (CONTRATO DE BANDERAS) ---
+                // --- VISIBILIDAD BLINDADA (v121) ---
                 const flags = ev.config_landing?.modules || ev.modules || {};
                 const moduleMap = {
                     'mod-hero': true,
@@ -177,11 +161,10 @@
                     if (el) {
                         const isVisible = moduleMap[id] === true;
                         el.style.setProperty('display', isVisible ? 'block' : 'none', 'important');
-                        logStatus(`INFO: Módulo [${id}] -> ${isVisible ? 'MOSTRADO' : 'OCULTO'}`, "INFO");
                     }
                 });
 
-                logStatus("TIME: Heartbeat sincronizado.", "TIME");
+                logStatus("TRACE: Mapeo completo | Escudo GOLD activo", "TRACE");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
