@@ -3,41 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de Evento — Hostal Terraza</title>
+  <title>Sandbox CSS Templates — Hostal Terraza</title>
 
-  <!-- Inyección Dinámica de CSS por Template (Fallback a default.css) -->
-  <link id="dynamic-template-css" rel="stylesheet" href="/css/templates/default.css">
+  <!-- Inyección Dinámica de CSS Externo (Fallback directo a f3.css) -->
+  <link id="dynamic-template-css" rel="stylesheet" href="/css/templates/f3.css">
 
-  <!-- Supabase Client & QR Generator -->
+  <!-- CDN de Supabase Client & QR Generator -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
   <main class="event-container" id="event-app">
-    <!-- Header del Evento -->
     <header class="event-header">
       <img id="event-image" src="" alt="Portada del Evento" style="display:none;">
     </header>
 
-    <!-- Cuerpo del Evento -->
     <section class="event-body">
-      <h1 class="event-title" id="event-title">Cargando evento...</h1>
+      <h1 class="event-title" id="event-title">Cargando sandbox...</h1>
       <div class="event-meta">
         <span id="event-date">--/--/----</span>
         <span id="event-capacity">Aforo: --</span>
       </div>
 
-      <!-- Formulario Dinámico -->
       <form id="register-form">
-        <div id="dynamic-fields">
-          <!-- Se renderizan los inputs desde Supabase (custom_fields) -->
-        </div>
+        <div id="dynamic-fields"></div>
         <button type="submit" class="btn-submit" id="btn-submit">Obtener Entrada</button>
       </form>
     </section>
 
-    <!-- Render de Ticket / Canvas -->
     <section class="ticket-container" id="ticket-section">
       <h3>¡Tu entrada está lista!</h3>
       <div id="qrcode"></div>
@@ -46,38 +40,41 @@
   </main>
 
   <script>
-    // Inicialización del Motor de Eventos (Lead Developer)
+    // Inicialización Limpia (evita sintaxis redeclarada de 'supabase')
     const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
     const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // Uso de ámbito seguro window.supabaseClient para evitar SyntaxError
+    if (typeof window.supabaseClient === 'undefined') {
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
 
-    async function initEventEngine() {
+    async function initSandboxEngine() {
       const urlParams = new URLSearchParams(window.location.search);
-      const eventId = urlParams.get('id');
+      const eventSlug = urlParams.get('slug') || urlParams.get('id');
 
-      if (!eventId) {
-        document.getElementById('event-title').innerText = 'Evento no encontrado';
+      if (!eventSlug) {
+        document.getElementById('event-title').innerText = 'Modo Sandbox: Añade ?slug=... a la URL';
         return;
       }
 
-      // 1. Consulta a la tabla de eventos
-      const { data: event, error } = await supabase
+      // 1. Consulta en Supabase usando el cliente inicializado
+      const { data: event, error } = await window.supabaseClient
         .from('eventos')
         .select('*')
-        .eq('id', eventId)
+        .or(`id.eq.${eventSlug},slug.eq.${eventSlug}`)
         .single();
 
       if (error || !event) {
-        document.getElementById('event-title').innerText = 'Error al cargar el evento';
+        document.getElementById('event-title').innerText = 'Error al cargar evento en sandbox';
         return;
       }
 
-      // 2. INYECCIÓN DINÁMICA DE CSS (Regla TSK-2026-004)
-      const templateSlug = event.template_slug || 'template-4';
-      const templatePath = `/css/templates/${templateSlug}.css`;
-      document.getElementById('dynamic-template-css').href = templatePath;
+      // 2. Inyección dinámica del CSS (Apunta a /css/templates/f3.css si no hay slug)
+      const templateSlug = event.template_slug || 'f3';
+      document.getElementById('dynamic-template-css').href = `/css/templates/${templateSlug}.css`;
 
-      // 3. Renderizado de Datos Básicos
+      // 3. Renderizado de Datos
       document.getElementById('event-title').innerText = event.titulo;
       document.getElementById('event-date').innerText = new Date(event.fecha).toLocaleDateString();
       if (event.imagen_url) {
@@ -86,7 +83,7 @@
         img.style.display = 'block';
       }
 
-      // 4. Renderizado Dinámico de Formulario (custom_fields)
+      // 4. Formulario Dinámico
       const fieldsContainer = document.getElementById('dynamic-fields');
       const customFields = event.custom_fields || [
         { name: 'nombre', label: 'Nombre Completo', type: 'text', required: true },
@@ -101,7 +98,7 @@
       `).join('');
     }
 
-    document.addEventListener('DOMContentLoaded', initEventEngine);
+    document.addEventListener('DOMContentLoaded', initSandboxEngine);
   </script>
 </body>
 </html>
