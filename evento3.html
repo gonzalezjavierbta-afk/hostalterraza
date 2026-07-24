@@ -116,18 +116,18 @@
     </main>
 
     <script>
-        // CREDENCIALES CORE v107 [5, 6]
+        // 1. CREDENCIALES CORE (CONTRATO v107)
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        /** ESCUDO DE VERIFICACIÓN GOLD [3, 7] */
+        /** ESCUDO DE VERIFICACIÓN GOLD: LOGS DE SALUD */
         function logStatus(m, t = 'INFO') {
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        /** INYECCIÓN ATÓMICA DE CSS [2, 8] */
+        /** INYECCIÓN ATÓMICA DE CSS (AISLAMIENTO SCOPED) */
         function injectAtomicCSS(templateId) {
             return new Promise((resolve) => {
                 const cssPath = `templates/${templateId}.css`;
@@ -139,18 +139,18 @@
                     document.head.appendChild(link);
                 }
                 link.onload = () => {
-                    logStatus("Inyección de CSS Atómico exitosa.", "LINK");
+                    logStatus(`Inyección exitosa: ${cssPath}`, "LINK");
                     resolve(true);
                 };
                 link.onerror = () => {
-                    logStatus(`Fallo al cargar ${cssPath}. Aplicando estilos base.`, "ERROR");
+                    logStatus(`ERROR 404: No se encontró ${cssPath}. Verifica la carpeta /templates/ en Vercel.`, "ERROR");
                     resolve(false);
                 };
                 link.href = cssPath;
             });
         }
 
-        /** MANEJADOR FAQ FISICO (CONTRATO INTERACTIVIDAD) [2, 9] */
+        /** MANEJADOR FAQ FISICO (CONTRATO INTERACTIVIDAD v121) */
         function toggleFAQ(element) {
             const answer = element.querySelector('.faq-answer');
             if (answer) {
@@ -160,56 +160,62 @@
             }
         }
 
-        /** ORQUESTADOR PRINCIPAL v1.2 [2, 10] */
+        /** ORQUESTADOR PRINCIPAL v1.2 (LOG-DRIVEN) */
         async function initEvento() {
             logStatus("Iniciando Orquestador Atómico Master.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
 
+            if (!slug) {
+                logStatus("Falta SLUG en URL. Ejemplo: ?slug=nombre-evento", "ERROR");
+                return;
+            }
+
             try {
                 // 1. Fetch Data
                 const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
-                if (error) throw error;
+                if (error || !ev) throw new Error("Evento no hallado en la base de datos.");
 
-                // 2. Inyección de Estilo según template_id
+                // 2. LOG DE CONFIRMACIÓN (REQUERIMIENTO DEL DIRECTOR)
                 const templateId = ev.template_id || 'P1';
+                logStatus(`TEMPLATE ID DETECTADO: [${templateId}] para el slug: [${slug}]`, "INFO");
+
+                // 3. Inyección Atómica
                 await injectAtomicCSS(templateId);
 
-                // 3. Mapeo de Datos (Cero Borrado)
+                // 4. Mapeo Metadata (Contrato Cero Borrado)
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
-                // 4. Inyección de FAQ con onclick físico [3, 11]
+                // 5. Inyección de FAQ con interactividad física (onclick)
                 const content = ev.config_landing?.content || {};
                 if (content.faq) {
-                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
-                        const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="toggleFAQ(this)">
-                            <div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div>
-                            <div class="faq-answer" style="display:none;">${a.trim()}</div>
-                        </div>`;
-                    }).join('');
+                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n')
+                        .filter(l => l.includes('|'))
+                        .map(l => {
+                            const [q, a] = l.split('|');
+                            return `<div class="faq-item" onclick="toggleFAQ(this)">
+                                <div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div>
+                                <div class="faq-answer" style="display:none;">${a.trim()}</div>
+                            </div>`;
+                        }).join('');
                 }
 
-                // 5. Visibilidad Blindada de Módulos
+                // 6. Visibilidad Blindada de Módulos (v121)
                 const modulos = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
                 modulos.forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) {
-                        el.style.setProperty('display', 'block', 'important');
-                        logStatus(`Módulo ${id.replace('mod-', '').toUpperCase()} validado.`, "INFO");
-                    }
+                    if (el) el.style.setProperty('display', 'block', 'important');
                 });
 
-                // 6. Cierre de Auditoría GOLD [3, 7]
+                // 7. Cierre de Auditoría GOLD
                 logStatus("Heartbeat del contador sincronizado a 3.2rem", "TIME");
-                logStatus("12 Módulos sincronizados | FAQ Onclick Presente | Spotify Sync 1:1", "TRACE");
+                logStatus("12 Módulos sincronizados | FAQ Onclick Presente", "TRACE");
 
             } catch (err) {
-                logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR");
+                logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
             } finally {
                 document.getElementById('loader').style.display = 'none';
             }
