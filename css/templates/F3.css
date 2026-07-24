@@ -1,86 +1,36 @@
-/* ==========================================================================
-   TEMPLATE F3: ATOMIC STYLESHEET (Campaña / Fiesta Hostal Terraza)
-   Encapsulado estricto bajo .tpl-f3 - AI-DOS v1.2
-   ========================================================================== */
-
-/* 
-   TEMPLATE F3 - VERIFIED v1.2 
-   Atomic Scoped CSS for Master Orchestrator
-*/
-
-/* Bloque de Reseteo de Silo */
+/* TEMPLATE F3 - FULL INTEGRITY v1.2.1 */
 .tpl-f3 {
     --f3-bg-primary: #050505;
-    --f3-bg-card: #141419;
-    --f3-accent: #df20b6; /* Sincronizado con JSON */
+    --f3-accent: #df20b6;
     --f3-text-main: #ffffff;
-    --f3-text-muted: #a0a0ab;
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
-    color: var(--f3-text-main);
-    font-family: 'Geist', sans-serif; /* Fuente Premium v122 */
-    margin: 0; padding: 0;
+    font-family: 'Geist', sans-serif;
 }
 
-/* 1. Hero Section */
+/* 1. Hero con Imagen de Fondo (CORREGIDO) */
 .tpl-f3 #mod-hero {
-    position: relative; min-height: 80vh;
+    position: relative; min-height: 85vh;
     display: flex; align-items: center; justify-content: center;
-    padding: 4rem 1.5rem;
-    background: radial-gradient(circle at center, rgba(223, 32, 182, 0.15) 0%, rgba(5, 5, 5, 0.95) 100%);
-    border-bottom: 1px solid var(--f3-border);
+    background-size: cover; background-position: center;
+}
+.tpl-f3 #mod-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(5,5,5,1) 100%);
+    z-index: 1;
+}
+.tpl-f3 .hero-content { z-index: 2; position: relative; text-align: center; }
+
+/* 2. Sincronización de Módulos Críticos (Elimina Warnings) */
+.tpl-f3 #mod-lineup { padding: 4rem 10%; border-bottom: 1px solid var(--f3-border); }
+.tpl-f3 #mod-gallery { padding: 4rem 10%; background: #0a0a0c; }
+.tpl-f3 .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; margin-top: 3rem; }
+
+/* 3. FAQ con Estilo de Tarjeta */
+.tpl-f3 #mod-faq {
+    background: #141419; padding: 3rem; border-radius: 20px;
+    border: 1px solid var(--f3-border); max-width: 900px; margin: 0 auto;
 }
 
-.tpl-f3 #event-title {
-    font-size: clamp(2.5rem, 8vw, 4.5rem);
-    font-weight: 900; text-transform: uppercase;
-    letter-spacing: -3px; color: var(--f3-text-main);
-    text-shadow: 0 0 30px rgba(223, 32, 182, 0.4);
-}
-
-/* 2. Disposición Multimedia Sync 1:1 */
-.tpl-f3 .media-sync {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 1.5rem; margin: 3rem auto; max-width: 1100px;
-}
-
-.tpl-f3 #db-spotify-embed iframe {
-    height: 100% !important; min-height: 450px;
-    border-radius: 12px; border: 1px solid var(--f3-border);
-}
-
-/* 3. Data Cards Premium (v122) */
-.tpl-f3 #mod-info-tecnica {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem; padding: 4rem 10%;
-}
-
-.tpl-f3 .card-item {
-    background: var(--f3-bg-card); padding: 2.5rem;
-    border-radius: 12px; border: 1px solid var(--f3-border);
-    text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.tpl-f3 .card-item span {
-    display: block; font-weight: 900; font-size: 1.5rem;
-    color: var(--f3-accent); text-shadow: 0 0 10px var(--f3-accent);
-}
-
-/* 4. FAQ Interactividad */
-.tpl-f3 .faq-item {
-    border-bottom: 1px solid var(--f3-border);
-    padding: 1.5rem; cursor: pointer; transition: 0.3s;
-}
-
-.tpl-f3 .faq-item.active { background: rgba(223, 32, 182, 0.05); }
-
-.tpl-f3 .faq-answer { 
-    color: var(--f3-text-muted); padding-top: 1rem; line-height: 1.6;
-}
-
-/* 5. Formulario Master Box */
-.tpl-f3 #mod-form {
-    max-width: 600px; margin: 4rem auto; padding: 3rem;
-    background: var(--f3-bg-card); border-radius: 20px;
-    border: 1px solid var(--f3-accent);
-}
+/* 4. Formulario Premium */
+.tpl-f3 #mod-form { max-width: 600px; margin: 4rem auto; padding: 3rem; border: 1px solid var(--f3-accent); }
