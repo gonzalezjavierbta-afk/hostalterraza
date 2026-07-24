@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sandbox CSS Templates — Hostal Terraza</title>
 
-  <!-- Inyección Dinámica de CSS Externo (Fallback directo a f3.css) -->
+  <!-- Inyección Dinámica de CSS Externo (Fallback a f3.css) -->
   <link id="dynamic-template-css" rel="stylesheet" href="/css/templates/f3.css">
 
-  <!-- CDN de Supabase Client & QR Generator -->
+  <!-- CDN Supabase & QR Generator -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -40,25 +40,32 @@
   </main>
 
   <script>
-    // Inicialización Limpia (evita sintaxis redeclarada de 'supabase')
-    const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    
-    // Uso de ámbito seguro window.supabaseClient para evitar SyntaxError
+    console.log("🚀 [AI-DOS Sandbox] Inicializando motor de eventos...");
+
+    // CONFIGURACIÓN: Reemplazar con tus credenciales reales de Supabase
+    const SUPABASE_URL = 'https://TU_PROYECTO_REAL.supabase.co'; 
+    const SUPABASE_KEY = 'TU_ANON_KEY_REAL';
+
+    // Ámbito seguro para evitar errores de duplicidad (Uncaught SyntaxError)
     if (typeof window.supabaseClient === 'undefined') {
       window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log("✅ [AI-DOS Supabase] Cliente inicializado correctamente.");
     }
 
     async function initSandboxEngine() {
       const urlParams = new URLSearchParams(window.location.search);
       const eventSlug = urlParams.get('slug') || urlParams.get('id');
 
+      console.log("🔍 [AI-DOS Params] Buscando evento con ID/Slug:", eventSlug);
+
       if (!eventSlug) {
+        console.warn("⚠️ [AI-DOS Params] No se proporcionó parámetro ?slug= o ?id= en la URL.");
         document.getElementById('event-title').innerText = 'Modo Sandbox: Añade ?slug=... a la URL';
         return;
       }
 
-      // 1. Consulta en Supabase usando el cliente inicializado
+      // 1. Consulta a Supabase
+      console.log("📡 [AI-DOS DB] Consultando tabla 'eventos'...");
       const { data: event, error } = await window.supabaseClient
         .from('eventos')
         .select('*')
@@ -66,24 +73,36 @@
         .single();
 
       if (error || !event) {
+        console.error("❌ [AI-DOS DB Error] Error al obtener el evento desde Supabase:", error);
         document.getElementById('event-title').innerText = 'Error al cargar evento en sandbox';
         return;
       }
 
-      // 2. Inyección dinámica del CSS (Apunta a /css/templates/f3.css si no hay slug)
-      const templateSlug = event.template_slug || 'f3';
-      document.getElementById('dynamic-template-css').href = `/css/templates/${templateSlug}.css`;
+      console.log("🎉 [AI-DOS DB] Datos del evento cargados con éxito:", event);
 
-      // 3. Renderizado de Datos
+      // 2. Inyección Dinámica de CSS Externo con Logs
+      const templateSlug = event.template_slug || 'f3';
+      const templatePath = `/css/templates/${templateSlug}.css`;
+      
+      console.log(`🎨 [AI-DOS Template] Inyectando hoja de estilos: ${templatePath}`);
+      const cssLink = document.getElementById('dynamic-template-css');
+      cssLink.href = templatePath;
+
+      cssLink.onload = () => console.log(`✅ [AI-DOS CSS] Hoja de estilo '${templatePath}' cargada y aplicada.`);
+      cssLink.onerror = () => console.error(`❌ [AI-DOS CSS Error] No se pudo cargar '${templatePath}'. Verifica que el archivo exista en el servidor.`);
+
+      // 3. Renderizado en DOM
       document.getElementById('event-title').innerText = event.titulo;
       document.getElementById('event-date').innerText = new Date(event.fecha).toLocaleDateString();
+      
       if (event.imagen_url) {
         const img = document.getElementById('event-image');
         img.src = event.imagen_url;
         img.style.display = 'block';
+        console.log("🖼️ [AI-DOS UI] Imagen de portada cargada.");
       }
 
-      // 4. Formulario Dinámico
+      // 4. Renderizado Dinámico de Formulario
       const fieldsContainer = document.getElementById('dynamic-fields');
       const customFields = event.custom_fields || [
         { name: 'nombre', label: 'Nombre Completo', type: 'text', required: true },
@@ -96,6 +115,8 @@
           <input type="${field.type}" id="${field.name}" name="${field.name}" class="form-control" ${field.required ? 'required' : ''}>
         </div>
       `).join('');
+
+      console.log("📝 [AI-DOS UI] Campos de formulario renderizados correctamente.");
     }
 
     document.addEventListener('DOMContentLoaded', initSandboxEngine);
