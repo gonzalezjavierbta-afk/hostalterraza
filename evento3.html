@@ -1,9 +1,10 @@
+Versión 1.2.1 (v141) — Orquestador Maestro Completo
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v1.2 · Sistema QR</title>
+    <title>Master Orchestrator v141 · Sistema QR</title>
     
     <!-- CDNs Obligatorios (Contrato v107) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
@@ -24,7 +25,7 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.04; contrast: 130%;
         }
-        /* Blindaje de Seguridad Master: Oculto hasta inyección exitosa */
+        /* Blindaje de Seguridad Master */
         section, header { display: none; }
         .loading-overlay { 
             position: fixed; inset: 0; background: #000; z-index: 999; 
@@ -35,7 +36,7 @@
 </head>
 
 <body>
-    <div id="loader" class="loading-overlay">VERIFICANDO INTEGRIDAD DE DATOS...</div>
+    <div id="loader" class="loading-overlay">AUDITORÍA V141 EN CURSO...</div>
 
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -94,7 +95,7 @@
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         function logStatus(m, t = 'INFO') {
-            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'ERROR':'#ff4d4d' };
+            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
@@ -108,7 +109,7 @@
                     document.head.appendChild(link);
                 }
                 link.onload = () => { logStatus(`LINK: Estilo ${cssPath} cargado.`, "LINK"); resolve(true); };
-                link.onerror = () => { logStatus(`ERROR 404: ${cssPath} no encontrado.`, "ERROR"); resolve(false); };
+                link.onerror = () => { logStatus(`ERROR 404: ${cssPath} no hallado.`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
         }
@@ -123,7 +124,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador Atómico Master.", "INFO");
+            logStatus("Iniciando Orquestador v141.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -133,15 +134,13 @@
 
                 const templateId = ev.template_id || 'F3';
                 document.body.className = `tpl-${templateId.toLowerCase()}`;
-                logStatus(`INFO: Ámbito .tpl-${templateId.toLowerCase()} activado.`, "INFO");
+                logStatus(`DEBUG: Template ID [${templateId}] - Ámbito Atómico [.tpl-${templateId.toLowerCase()}]`, "DEBUG");
 
                 await injectAtomicCSS(templateId);
 
-                // --- MAPEO DE DATOS ROBUSTO ---
+                // --- MAPEO DE DATOS ---
                 const content = ev.config_landing?.content || ev.content || {};
-                let lineageCount = 0;
-                let faqItemCount = 0;
-
+                
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
@@ -149,31 +148,20 @@
                 document.getElementById('venue-name').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
 
-                // Inyección Lineup
                 if (content.dj_lineup) {
                     const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
-                    lineageCount = lineup.length;
                     document.getElementById('db-lineup').innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
                 }
 
-                // Inyección FAQ (Interactividad Física)
                 if (content.faq) {
                     const lines = content.faq.split('\n').filter(l => l.includes('|'));
-                    faqItemCount = lines.length;
                     document.getElementById('db-faq-list').innerHTML = lines.map(l => {
                         const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="toggleFAQ(this)">
-                            <div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div>
-                            <div class="faq-answer" style="display:none;">${a.trim()}</div>
-                        </div>`;
+                        return `<div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer" style="display:none;">${a.trim()}</div></div>`;
                     }).join('');
                 }
 
-                // Datos Técnicos
-                document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
-                document.getElementById('db-aforo-val').innerText = ev.aforo_max || "100";
-
-                // --- VISIBILIDAD BASADA EN CONTRATO JSON ---
+                // --- VISIBILIDAD BLINDADA (v121) ---
                 const flags = ev.modules || {};
                 const moduleMap = {
                     'mod-hero': true,
@@ -186,12 +174,14 @@
 
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) el.style.setProperty('display', moduleMap[id] ? 'block' : 'none', 'important');
+                    if (el) {
+                        const isVisible = moduleMap[id];
+                        el.style.setProperty('display', isVisible ? 'block' : 'none', 'important');
+                        logStatus(`TRACE: Módulo [${id}] - Estado: ${isVisible ? 'ACTIVO' : 'OCULTO'}`, "TRACE");
+                    }
                 });
 
-                // --- NUEVO LOG DE VERIFICACIÓN DE DATOS (REQUERIMIENTO) ---
                 logStatus("TIME: Heartbeat sincronizado a 3.2rem", "TIME");
-                logStatus(`TRACE: 12 Módulos procesados | Datos: Lineup(${lineageCount}), FAQ(${faqItemCount}) | Escudo GOLD activo`, "TRACE");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
