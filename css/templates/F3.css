@@ -1,8 +1,7 @@
-/* TEMPLATE F3 - FULL INTEGRITY v1.2.1 */
+/* TEMPLATE F3 - FULL INTEGRITY v1.2.2 */
 .tpl-f3 {
     --f3-bg-primary: #050505;
     --f3-accent: #df20b6;
-    --f3-text-main: #ffffff;
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
     font-family: 'Geist', sans-serif;
@@ -10,27 +9,29 @@
 
 /* 1. Hero con Imagen de Fondo (CORREGIDO) */
 .tpl-f3 #mod-hero {
-    position: relative; min-height: 85vh;
+    position: relative; min-height: 80vh;
     display: flex; align-items: center; justify-content: center;
     background-size: cover; background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
 }
+
+/* Capa de Gradiente (No bloquea el background-image) */
 .tpl-f3 #mod-hero::before {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(5,5,5,1) 100%);
+    background: radial-gradient(circle at center, rgba(223, 32, 182, 0.15) 0%, rgba(5, 5, 5, 0.90) 100%);
     z-index: 1;
 }
+
 .tpl-f3 .hero-content { z-index: 2; position: relative; text-align: center; }
 
-/* 2. Sincronización de Módulos Críticos (Elimina Warnings) */
-.tpl-f3 #mod-lineup { padding: 4rem 10%; border-bottom: 1px solid var(--f3-border); }
-.tpl-f3 #mod-gallery { padding: 4rem 10%; background: #0a0a0c; }
-.tpl-f3 .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; margin-top: 3rem; }
-
-/* 3. FAQ con Estilo de Tarjeta */
-.tpl-f3 #mod-faq {
-    background: #141419; padding: 3rem; border-radius: 20px;
-    border: 1px solid var(--f3-border); max-width: 900px; margin: 0 auto;
+.tpl-f3 #event-title {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900; text-transform: uppercase;
+    letter-spacing: -3px; color: #fff;
+    text-shadow: 0 0 30px rgba(223, 32, 182, 0.4);
 }
 
-/* 4. Formulario Premium */
-.tpl-f3 #mod-form { max-width: 600px; margin: 4rem auto; padding: 3rem; border: 1px solid var(--f3-accent); }
+/* 2. Selectores de Sincronía (Elimina Warnings) */
+.tpl-f3 #mod-lineup, .tpl-f3 #mod-gallery { padding: 5rem 10%; border-bottom: 1px solid var(--f3-border); }
+.tpl-f3 #mod-faq { background: #141419; padding: 2rem; border-radius: 15px; border: 1px solid var(--f3-border); }
