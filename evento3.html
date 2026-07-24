@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v147 · Full Integrity</title>
+    <title>Master Orchestrator v148 · Full Integrity</title>
     
     <!-- CDNs Obligatorios (Contrato v107) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
@@ -28,14 +28,15 @@
     </style>
 </head>
 
-<body>
-    <div id="loader" class="loading-overlay">VERIFICACIÓN MAESTRA V147...</div>
+<body class="tpl-init">
+    <div id="loader" class="loading-overlay">VERIFICACIÓN FULL INTEGRITY V148...</div>
 
+    <!-- 1. HERO SECTION -->
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
         <div class="hero-content">
             <h1 id="event-title" class="hero-title">--</h1>
-            <div class="hero-meta" style="display:flex; gap:2rem; justify-content:center; margin: 1rem 0;">
+            <div class="hero-meta">
                 <span id="meta-fecha">--/--/--</span>
                 <span id="meta-hora">--:--</span>
                 <span id="meta-lugar">--</span>
@@ -50,60 +51,56 @@
     </header>
 
     <main id="main-content-flow">
-        <!-- 1. LINEUP & POSTER -->
+        <!-- 2. LINEUP & POSTER -->
         <section id="mod-lineup">
-            <div id="db-poster-container"><img id="db-poster-img" src="" alt="Poster" style="max-width:300px;"></div>
+            <div id="db-poster-container"><img id="db-poster-img" src="" alt="Poster"></div>
             <div id="db-lineup"></div>
         </section>
 
-        <!-- 2. GALLERY & MEDIA -->
+        <!-- 3. MULTIMEDIA (Sincronizado con CSS media-grid) -->
         <section id="mod-gallery">
             <div id="db-gallery-grid"></div>
-            <div class="media-sync">
-                <div id="mod-trailer"><div id="db-video-content"></div></div>
-                <div id="mod-playlist"><div id="db-spotify-embed"></div></div>
+            <div class="media-grid">
+                <div id="db-video-content"></div>
+                <div id="db-spotify-embed"></div>
             </div>
         </section>
 
-        <!-- 3. DATA CARDS -->
+        <!-- 4. DATA CARDS -->
         <section id="mod-info-tecnica">
-            <div class="card-item"><span id="db-dress-val">--</span></div>
-            <div class="card-item"><span id="db-guest-val">--</span></div>
-            <div class="card-item"><span id="db-aforo-val">--</span></div>
-            <div class="card-item"><span id="db-ticket-val">--</span></div>
+            <div class="card-item"><span class="label">DRESS CODE</span><span id="db-dress-val">--</span></div>
+            <div class="card-item"><span class="label">AFORO</span><span id="db-aforo-val">--</span></div>
         </section>
 
-        <!-- 4. FAQ & UBICACIÓN -->
+        <!-- 5. FAQ & UBICACIÓN -->
         <section id="mod-faq-ubicacion">
-            <div id="db-faq-list"></div>
-            <div id="venue-name">--</div>
-            <div id="db-mapa-container"></div>
+            <div id="mod-faq">
+                <h2>PREGUNTAS FRECUENTES</h2>
+                <div id="db-faq-list"></div>
+            </div>
+            <div id="mod-ubicacion">
+                <div id="venue-name">--</div>
+                <div id="db-mapa-container"></div>
+            </div>
         </section>
 
-        <!-- 5. SPONSORS -->
-        <section id="mod-sponsors">
-            <div id="db-sponsors-list"></div>
-        </section>
-
-        <!-- 6. MOTOR DUAL-PATH (RESTORED) -->
+        <!-- 6. MOTOR DUAL-PATH -->
         <section id="mod-form">
-            <div class="form-master-box">
-                <div class="form-tabs">
-                    <button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">Registro</button>
-                    <button id="tab-old" class="tab-btn" onclick="switchForm('ya')">Recuperar QR</button>
-                </div>
-                <div id="form-nuevo">
-                    <form id="master-reg-form">
-                        <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
-                        <input type="text" id="reg-cedula" placeholder="Cédula *" required>
-                        <input type="tel" id="reg-tel" placeholder="WhatsApp *" required>
-                        <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
-                    </form>
-                </div>
-                <div id="form-ya" style="display:none;">
-                    <input type="text" id="rec-cedula" placeholder="Ingresa tu cédula *">
-                    <button class="btn-submit" onclick="alert('Buscando...')">Verificar Datos →</button>
-                </div>
+            <div class="form-tabs">
+                <button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">Registro</button>
+                <button id="tab-old" class="tab-btn" onclick="switchForm('ya')">Recuperar QR</button>
+            </div>
+            <div id="form-nuevo">
+                <form id="master-reg-form">
+                    <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
+                    <input type="text" id="reg-cedula" placeholder="Cédula *" required>
+                    <input type="tel" id="reg-tel" placeholder="WhatsApp *" required>
+                    <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
+                </form>
+            </div>
+            <div id="form-ya" style="display:none;">
+                <input type="text" id="rec-cedula" placeholder="Cédula para recuperar *">
+                <button class="btn-submit" onclick="alert('Buscando...')">Verificar Datos →</button>
             </div>
         </section>
     </main>
@@ -139,7 +136,7 @@
                 }
             } catch (e) {}
             if (rulesFound > 0) logStatus(`AUDIT: ${rulesFound} reglas válidas para ${scope}.`, "LINK");
-            else logStatus(`ERROR: No se hallaron estilos para el ámbito ${scope}.`, "ERROR");
+            else logStatus(`ERROR: No se hallaron estilos para ${scope}.`, "ERROR");
         }
 
         async function injectAtomicCSS(templateId) {
@@ -157,7 +154,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v147 - Full Integrity.", "INFO");
+            logStatus("Iniciando Orquestador v148 - Full Integrity.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -180,6 +177,10 @@
                 document.getElementById('meta-lugar').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
                 document.getElementById('venue-name').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
 
+                // Datos Técnicos (Premium v122)
+                document.getElementById('db-dress-val').innerText = (content.dresscode || "FORMAL").toUpperCase();
+                document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
+
                 if (content.dj_lineup) {
                     const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
                     document.getElementById('db-lineup').innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
@@ -195,9 +196,9 @@
                     logStatus(`TRACE: FAQ inyectado (${lines.length} preguntas).`, "TRACE");
                 }
 
-                // VISIBILIDAD (CONTRATO v121)
+                // VISIBILIDAD (CONTRATO v122)
                 const flags = ev.config_landing?.modules || ev.modules || {};
-                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':flags.gallery, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-sponsors':flags.sponsors, 'mod-form':true };
+                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':flags.gallery || flags.playlist, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-form':true };
                 
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
