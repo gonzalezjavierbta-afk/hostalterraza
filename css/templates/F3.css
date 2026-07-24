@@ -1,75 +1,39 @@
-/* TEMPLATE F3 - FULL INTEGRITY v1.2.3 (Premium Neon) */
+/* TEMPLATE F3 - FULL INTEGRITY v1.2.5 */
 .tpl-f3 {
     --f3-bg-primary: #050505;
-    --f3-bg-card: #141419;
     --f3-accent: #df20b6;
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
-    font-family: 'Geist', sans-serif; /* Tipografía Estándar v122 */
+    font-family: 'Geist', sans-serif;
 }
 
-/* 1. Countdown Frame Premium (SOLUCIÓN AL "PLANO") */
-.tpl-f3 .unified-countdown-frame {
-    margin: 3rem auto 0;
-    padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 12px;
-    border: 2px solid var(--f3-accent); /* Borde de Identidad */
-    box-shadow: 0 0 25px rgba(223, 32, 182, 0.3); /* Resplandor GOLD */
-    display: flex;
-    width: fit-content;
-    backdrop-filter: blur(4px);
+/* 1. Hero Base & Image Container (CORREGIDO) */
+.tpl-f3 #mod-hero {
+    position: relative; min-height: 80vh;
+    display: flex; align-items: center; justify-content: center;
+    background-size: cover; background-position: center;
 }
 
-.tpl-f3 .cd-block {
-    padding: 0 1.2rem;
-    border-right: 1px solid var(--f3-border);
-    text-align: center;
+.tpl-f3 #mod-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(5,5,5,1) 100%);
+    z-index: 1;
 }
 
-.tpl-f3 .cd-block:last-child { border-right: none; }
-
-.tpl-f3 .cd-v {
-    display: block;
-    font-size: 3.2rem !important; /* Heartbeat Standard */
-    font-weight: 900;
-    line-height: 1;
-    color: #fff;
-    text-shadow: 0 0 15px var(--f3-accent);
-}
-
-.tpl-f3 .cd-l {
-    font-size: 0.6rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    opacity: 0.7;
-    text-transform: uppercase;
-}
+.tpl-f3 .hero-content { z-index: 2; position: relative; text-align: center; width: 100%; }
 
 /* 2. Sincronización de Módulos (Elimina Warnings) */
-.tpl-f3 #mod-info-tecnica {
-    padding: 4rem 10%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
+.tpl-f3 #mod-lineup { padding: 4rem 10%; border-bottom: 1px solid var(--f3-border); }
+.tpl-f3 #mod-gallery { padding: 4rem 10%; }
+.tpl-f3 #mod-faq { background: #141419; padding: 2.5rem; border-radius: 16px; border: 1px solid var(--f3-border); max-width: 900px; margin: 0 auto; }
 
-.tpl-f3 .card-item {
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-border);
-    border-radius: 15px;
-    padding: 2rem;
-    text-align: center;
-    transition: 0.3s ease;
+/* 3. Countdown Premium (Non-Flat) */
+.tpl-f3 .unified-countdown-frame {
+    margin: 3rem auto 0; padding: 0.8rem 1.5rem;
+    background: rgba(255, 255, 255, 0.01); border-radius: 12px;
+    border: 2px solid var(--f3-accent);
+    box-shadow: 0 0 25px rgba(223, 32, 182, 0.35);
+    display: flex; width: fit-content; backdrop-filter: blur(5px);
 }
-
-.tpl-f3 .card-item:hover { border-color: var(--f3-accent); transform: translateY(-5px); }
-
-.tpl-f3 #mod-form {
-    max-width: 600px;
-    margin: 4rem auto;
-    padding: 3rem;
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-accent);
-    border-radius: 20px;
-}
+.tpl-f3 .cd-v { display: block; font-size: 3.2rem !important; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--f3-accent); }
+.tpl-f3 .cd-l { font-size: 0.6rem; letter-spacing: 3px; font-weight: 900; opacity: 0.8; text-transform: uppercase; }

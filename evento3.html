@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v154 · Full Integrity Milestone</title>
-    
-    <!-- CDNs Obligatorios (Contrato v107) -->
+    <title>Master Orchestrator v155 · Full Integrity Milestone</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
-
     <style>
         :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; }
         html, body { margin: 0; padding: 0; min-height: 100%; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; overflow-x: hidden; }
@@ -23,7 +20,7 @@
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">SINCRO TOTAL V154...</div>
+    <div id="loader" class="loading-overlay">SINCRO TOTAL V155...</div>
 
     <!-- 1. HERO SECTION -->
     <header id="mod-hero" class="hero">
@@ -31,9 +28,7 @@
         <div class="hero-content">
             <h1 id="event-title" class="hero-title">--</h1>
             <div class="hero-meta" style="display:flex; gap:2.5rem; justify-content:center; margin: 1.5rem 0; font-weight:800; text-transform:uppercase; font-size:0.75rem;">
-                <div class="meta-item"><span id="meta-fecha">--/--/--</span></div>
-                <div class="meta-item"><span id="meta-hora">--:--</span></div>
-                <div class="meta-item"><span id="meta-lugar">--</span></div>
+                <span id="meta-fecha">--/--/--</span> <span id="meta-hora">--:--</span> <span id="meta-lugar">--</span>
             </div>
             <div id="unified-frame" class="unified-countdown-frame">
                 <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span class="cd-l">DÍAS</span></div>
@@ -45,7 +40,6 @@
     </header>
 
     <main id="main-content-flow">
-        <!-- 2. LINEUP & POSTER -->
         <section id="mod-lineup">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:3rem; max-width:1100px; margin:0 auto;">
                 <div id="db-poster-container"><img id="db-poster-img" src="" alt="Poster" style="max-width:100%; border-radius:15px; border: 4px solid var(--gold);"></div>
@@ -53,7 +47,6 @@
             </div>
         </section>
 
-        <!-- 3. MULTIMEDIA -->
         <section id="mod-gallery">
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
             <div class="media-grid" style="display:grid; grid-template-columns: 1.6fr 1fr; gap:2rem;">
@@ -62,7 +55,6 @@
             </div>
         </section>
 
-        <!-- 4. DATA CARDS -->
         <section id="mod-info-tecnica">
             <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; max-width:1200px; margin:0 auto;">
                 <div class="card-item"><span style="font-size:0.6rem; letter-spacing:2px; font-weight:900; opacity:0.6; display:block; margin-bottom:0.5rem;">DRESS CODE</span><span id="db-dress-val" style="font-weight:900; font-size:1.4rem;">--</span></div>
@@ -70,32 +62,17 @@
             </div>
         </section>
 
-        <!-- 5. FAQ & UBICACIÓN -->
         <section id="mod-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:4rem; max-width:1200px; margin:0 auto;">
-                <div id="mod-faq"><h2>PREGUNTAS FRECUENTES</h2><div id="db-faq-list"></div></div>
+                <div id="mod-faq"><h2>FAQ</h2><div id="db-faq-list"></div></div>
                 <div id="mod-ubicacion"><h2>UBICACIÓN</h2><div id="venue-name">--</div><div id="db-mapa-container" style="height:400px; border-radius:20px; overflow:hidden;"></div></div>
             </div>
         </section>
 
-        <!-- 6. SPONSORS -->
-        <section id="mod-sponsors" style="text-align:center; padding: 4rem 0;">
-            <span style="font-size:0.6rem; letter-spacing:4px; opacity:0.5; font-weight:900;">POWERED BY</span>
-            <div id="db-sponsors-list" style="display:flex; justify-content:center; gap:3rem; margin-top:2rem;"></div>
-        </section>
-
-        <!-- 7. FORMULARIO DUAL-PATH -->
         <section id="mod-form">
             <div class="form-master-box" style="max-width:550px; margin:0 auto;">
                 <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
-                <div id="form-nuevo">
-                    <form id="master-reg-form">
-                        <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;">
-                        <input type="text" id="reg-cedula" placeholder="Cédula *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;">
-                        <button type="submit" class="btn-submit" style="width:100%; padding:1.4rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:12px; cursor:pointer;">CONFIRMAR →</button>
-                    </form>
-                </div>
-                <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula registrada *" style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;"><button class="btn-submit" style="width:100%; padding:1.4rem; background:transparent; border:1px solid var(--gold); color:white; font-weight:900; border-radius:12px; cursor:pointer; margin-top:1rem;">VERIFICAR →</button></div>
+                <div id="form-nuevo"><form id="master-reg-form"><input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;"><input type="text" id="reg-cedula" placeholder="Cédula *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;"><button type="submit" class="btn-submit" style="width:100%; padding:1.4rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:12px; cursor:pointer;">CONFIRMAR →</button></form></div>
             </div>
         </section>
     </main>
@@ -110,16 +87,9 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        function switchForm(type) {
-            document.getElementById('tab-new').classList.toggle('active', type === 'nuevo');
-            document.getElementById('tab-old').classList.toggle('active', type === 'ya');
-            document.getElementById('form-nuevo').style.display = type === 'nuevo' ? 'block' : 'none';
-            document.getElementById('form-ya').style.display = type === 'ya' ? 'block' : 'none';
-        }
-
         async function auditStructuralSync(templateId) {
             const scope = `.tpl-${templateId.toLowerCase()}`;
-            const criticalIDs = ['#mod-hero', '#mod-lineup', '#mod-gallery', '#mod-info-tecnica', '#mod-faq', '#mod-form', '.unified-countdown-frame'];
+            const criticalIDs = ['#mod-hero', '#mod-lineup', '#mod-gallery', '#mod-info-tecnica', '#mod-faq', '#mod-form'];
             let selectors = [];
             try {
                 for (let sheet of document.styleSheets) {
@@ -129,7 +99,7 @@
                 }
             } catch (e) {}
             criticalIDs.forEach(id => {
-                const isSynced = selectors.some(s => s.includes(scope) && s.includes(id.toLowerCase()));
+                const isSynced = selectors.some(s => s.includes(scope) && s.includes(id));
                 if (isSynced) logStatus(`SYNC OK: Módulo [${id}] vinculado en CSS.`, "LINK");
                 else logStatus(`SYNC WARNING: Módulo [${id}] sin reglas en ${templateId}.css.`, "DEBUG");
             });
@@ -147,7 +117,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v154 - Full Integrity.", "INFO");
+            logStatus("Iniciando Orquestador v155 - Full Integrity.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -161,11 +131,20 @@
 
                 await injectAtomicCSS(templateId);
 
+                // CORRECCIÓN COUNTDOWN (v155)
+                const target = new Date(`${ev.fecha}T${ev.hora}`).getTime();
+                setInterval(() => {
+                    const diff = target - Date.now();
+                    if (diff <= 0) return;
+                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+
                 if (ev.imagen_url) {
                     document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
-                    document.getElementById('mod-hero').style.backgroundSize = 'cover';
-                    document.getElementById('mod-hero').style.backgroundPosition = 'center';
-                    logStatus(`LINK: Fondo Hero inyectado.`, "LINK");
+                    logStatus(`LINK: Fondo Hero inyectado satisfactoriamente.`, "LINK");
                 }
 
                 const content = ev.config_landing?.content || ev.content || {};
@@ -177,17 +156,15 @@
                 document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
                 document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
 
-                if (content.dj_lineup) {
-                    const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
-                    document.getElementById('db-lineup').innerHTML = lineup.map(dj => `<div style="display:flex; align-items:center; gap:1rem; padding:0.8rem; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid rgba(255,255,255,0.05);"><div style="width:40px; height:40px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900;">${dj.charAt(0)}</div><span style="font-weight:900; text-transform:uppercase;">${dj.trim()}</span></div>`).join('');
-                    logStatus(`TRACE: Lineup inyectado (${lineup.length} artistas).`, "TRACE");
-                }
+                const lineup = content.dj_lineup || [];
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).map(dj => `<div style="display:flex; align-items:center; gap:1rem; padding:0.8rem; background:rgba(255,255,255,0.02); border-radius:10px;"><div style="width:40px; height:40px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900;">${dj.charAt(0)}</div><span style="font-weight:900; text-transform:uppercase;">${dj.trim()}</span></div>`).join('');
+                logStatus(`TRACE: Lineup inyectado (${lineup.length} artistas).`, "TRACE");
 
                 const flags = ev.config_landing?.modules || ev.modules || {};
-                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':true, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-sponsors':flags.sponsors, 'mod-form':true };
+                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':true, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-form':true };
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) { el.style.setProperty('display', moduleMap[id] === true ? 'block' : 'none', 'important'); logStatus(`INFO: Módulo [${id}] -> ${moduleMap[id] ? 'FORZADO ACTIVO' : 'OCULTO'}`, "INFO"); }
+                    if (el) { el.style.setProperty('display', moduleMap[id] ? 'block' : 'none', 'important'); logStatus(`INFO: Módulo [${id}] -> FORZADO ACTIVO`, "INFO"); }
                 });
 
                 logStatus("TIME: Heartbeat sincronizado a 3.2rem.", "TIME");
