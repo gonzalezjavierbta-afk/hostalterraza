@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v158 · Full Integrity Milestone</title>
+    <title>Master Orchestrator v159 · Full Integrity Milestone</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
@@ -13,14 +13,11 @@
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
         section, header { display: none; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
-        .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 0.8rem; cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; }
-        .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
     </style>
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">CORE POSTER RECOVERY V158...</div>
+    <div id="loader" class="loading-overlay">SINCRO ALTA FIDELIDAD V159...</div>
 
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
@@ -58,7 +55,7 @@
         </section>
 
         <section id="mod-info-tecnica">
-            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1.2rem; max-width:1100px; margin:0 auto;">
+            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:1.5rem; max-width:1100px; margin:0 auto;">
                 <div class="card-item"><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">DRESS CODE</span><br><span id="db-dress-val" style="font-size:1.15rem; font-weight:900;">--</span></div>
                 <div class="card-item"><span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase;">AFORO</span><br><span id="db-aforo-val" style="font-size:1.15rem; font-weight:900;">--</span></div>
             </div>
@@ -73,14 +70,11 @@
 
         <section id="mod-form">
             <div class="form-master-box" style="max-width:600px; margin:0 auto; background:rgba(255,255,255,0.02); padding:3rem; border-radius:20px; border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px);">
-                <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
-                <div id="form-nuevo">
-                    <form id="master-reg-form">
-                        <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
-                        <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR ASISTENCIA →</button>
-                    </form>
-                </div>
-                <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *" style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;"><button class="btn-submit" style="width:100%; padding:1.5rem; margin-top:1.5rem; background:transparent; border:1px solid var(--gold); color:white; font-weight:900; border-radius:15px; cursor:pointer;">VERIFICAR DATOS →</button></div>
+                <div class="form-tabs"><button id="tab-new" class="tab-btn active">REGISTRO</button></div>
+                <form id="master-reg-form">
+                    <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
+                    <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR ASISTENCIA →</button>
+                </form>
             </div>
         </section>
     </main>
@@ -100,8 +94,8 @@
             const parts = dateStr.toLowerCase().split(' de ');
             if (parts.length === 3) {
                 const day = parts.padStart(2, '0');
-                const month = months[parts[8]];
-                const year = parts[9];
+                const month = months[parts[9]];
+                const year = parts[10];
                 return new Date(`${year}-${month}-${day}T${timeStr}`);
             }
             return new Date(`${dateStr}T${timeStr}`);
@@ -136,7 +130,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v158 - Full Integrity.", "INFO");
+            logStatus("Iniciando Orquestador v159 - Full Integrity.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -148,7 +142,6 @@
                 document.body.className = `tpl-${templateId} tpl-${templateId.toLowerCase()}`;
                 await injectAtomicCSS(templateId);
 
-                // --- COUNTDOWN (v158) ---
                 const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
                 setInterval(() => {
                     const diff = target - Date.now();
