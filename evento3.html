@@ -1,10 +1,9 @@
-Versión 1.2.1 (v141) — Orquestador Maestro Completo
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v141 · Sistema QR</title>
+    <title>Master Orchestrator v142 · Sistema QR</title>
     
     <!-- CDNs Obligatorios (Contrato v107) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
@@ -36,7 +35,7 @@ Versión 1.2.1 (v141) — Orquestador Maestro Completo
 </head>
 
 <body>
-    <div id="loader" class="loading-overlay">AUDITORÍA V141 EN CURSO...</div>
+    <div id="loader" class="loading-overlay">SINCRONIZANDO V142...</div>
 
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -104,27 +103,17 @@ Versión 1.2.1 (v141) — Orquestador Maestro Completo
                 const cssPath = `css/templates/${templateId}.css`;
                 let link = document.querySelector('link[data-template-css]');
                 if (!link) {
-                    link = document.createElement('link');
-                    link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true');
-                    document.head.appendChild(link);
+                    link = document.createElement('link'); link.rel = 'stylesheet';
+                    link.setAttribute('data-template-css', 'true'); document.head.appendChild(link);
                 }
-                link.onload = () => { logStatus(`LINK: Estilo ${cssPath} cargado.`, "LINK"); resolve(true); };
-                link.onerror = () => { logStatus(`ERROR 404: ${cssPath} no hallado.`, "ERROR"); resolve(false); };
+                link.onload = () => { logStatus(`LINK: Estilo cargado.`, "LINK"); resolve(true); };
+                link.onerror = () => { logStatus(`ERROR: ${cssPath} no hallado.`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
         }
 
-        function toggleFAQ(element) {
-            const answer = element.querySelector('.faq-answer');
-            if (answer) {
-                const isOpen = answer.style.display === 'block';
-                answer.style.display = isOpen ? 'none' : 'block';
-                element.classList.toggle('active', !isOpen);
-            }
-        }
-
         async function initEvento() {
-            logStatus("Iniciando Orquestador v141.", "INFO");
+            logStatus("Iniciando Orquestador v142.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -134,35 +123,19 @@ Versión 1.2.1 (v141) — Orquestador Maestro Completo
 
                 const templateId = ev.template_id || 'F3';
                 document.body.className = `tpl-${templateId.toLowerCase()}`;
-                logStatus(`DEBUG: Template ID [${templateId}] - Ámbito Atómico [.tpl-${templateId.toLowerCase()}]`, "DEBUG");
+                
+                // --- CORRECCIÓN DE RUTA DE BANDERAS (v142) ---
+                const flags = ev.config_landing?.modules || ev.modules || {};
+                logStatus(`DEBUG: Origen de módulos detectado. FAQ: ${flags.faq}, Lineup: ${flags.dj_lineup}`, "DEBUG");
 
                 await injectAtomicCSS(templateId);
 
-                // --- MAPEO DE DATOS ---
+                // Mapeo Metadata
                 const content = ev.config_landing?.content || ev.content || {};
-                
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
-                document.getElementById('meta-fecha').innerText = ev.fecha;
-                document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
-                document.getElementById('venue-name').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
-                document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
 
-                if (content.dj_lineup) {
-                    const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
-                    document.getElementById('db-lineup').innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
-                }
-
-                if (content.faq) {
-                    const lines = content.faq.split('\n').filter(l => l.includes('|'));
-                    document.getElementById('db-faq-list').innerHTML = lines.map(l => {
-                        const [q, a] = l.split('|');
-                        return `<div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer" style="display:none;">${a.trim()}</div></div>`;
-                    }).join('');
-                }
-
-                // --- VISIBILIDAD BLINDADA (v121) ---
-                const flags = ev.modules || {};
+                // Mapeo Módulos Dinámicos
                 const moduleMap = {
                     'mod-hero': true,
                     'mod-lineup': flags.dj_lineup,
@@ -175,13 +148,13 @@ Versión 1.2.1 (v141) — Orquestador Maestro Completo
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
-                        const isVisible = moduleMap[id];
+                        const isVisible = moduleMap[id] === true;
                         el.style.setProperty('display', isVisible ? 'block' : 'none', 'important');
-                        logStatus(`TRACE: Módulo [${id}] - Estado: ${isVisible ? 'ACTIVO' : 'OCULTO'}`, "TRACE");
+                        logStatus(`TRACE: Módulo [${id}] -> ${isVisible ? 'ACTIVO' : 'OCULTO'}`, "TRACE");
                     }
                 });
 
-                logStatus("TIME: Heartbeat sincronizado a 3.2rem", "TIME");
+                logStatus("TIME: Heartbeat sincronizado.", "TIME");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
