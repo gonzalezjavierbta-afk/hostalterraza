@@ -1,43 +1,61 @@
-/* TEMPLATE F3 - FULL INTEGRITY v1.3.8 (Sync P6 Afterglow) */
+/* TEMPLATE F3 - FULL INTEGRITY v1.3.6 (Hero Layout & Brightness Fixed) */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
     --f3-bg-card: #141419;
     --f3-accent: #d72dc0; /* Afterglow Magenta */
-    --f3-text-main: #ffffff;
-    --f3-text-muted: #c0c0cb;
+    --f3-text-main: #ffffff; /* Brillo Máximo */
+    --f3-text-muted: #c0c0cb; /* Mayor legibilidad */
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
     color: var(--f3-text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* 1. Hero Diagramming (v165 Brightness Fix) */
+/* 1. Hero Section (Jerarquía v108) */
 .tpl-f3 #mod-hero {
     position: relative; min-height: 85vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background-size: cover !important; background-position: center !important;
+    padding: 2rem; background-size: cover !important;
+    background-position: center !important; text-align: center; overflow: hidden;
 }
+
+/* Overlay de Difuminado (Corregido para no oscurecer texto) */
 .tpl-f3 #mod-hero::before {
     content: ''; position: absolute; inset: 0;
     background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,0.8) 70%, rgba(10,10,12,1) 100%);
     z-index: 1;
 }
-.tpl-f3 .hero-content { position: relative; z-index: 5; text-align: center; width: 100%; }
-.tpl-f3 #event-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: -4px; text-shadow: 0 0 40px rgba(215, 45, 192, 0.6); margin-bottom: 2rem; }
 
-/* 2. Sincronía de Módulos (Escudo GOLD) */
-.tpl-f3 #mod-lineup { padding: 5rem 10%; border-bottom: 1px solid var(--f3-border); }
-.tpl-f3 #mod-gallery { padding: 5rem 10%; }
-.tpl-f3 .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; margin: 4rem auto; align-items: stretch; }
-.tpl-f3 #db-video-content { aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--f3-accent); }
-.tpl-f3 #db-spotify-embed { border-radius: 15px; border: 1px solid var(--f3-border); }
-.tpl-f3 #mod-info-tecnica { padding: 4rem 10%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-.tpl-f3 .card-item { background: var(--f3-bg-card); border: 1px solid var(--f3-border); border-radius: 15px; padding: 2rem; text-align: center; }
-.tpl-f3 #mod-faq { background: var(--f3-bg-card); padding: 3rem; border-radius: 20px; border: 1px solid var(--f3-border); margin: 2rem auto; }
-.tpl-f3 #mod-form { max-width: 550px; margin: 4rem auto; padding: 3rem; background: var(--f3-bg-card); border: 1px solid var(--f3-accent); border-radius: 20px; }
+.tpl-f3 .hero-content {
+    position: relative; z-index: 5; /* Por encima de la sombra */
+    width: 100%; max-width: 1200px;
+}
 
-/* 3. Countdown Premium con Separadores */
-.tpl-f3 .unified-countdown-frame { margin: 4rem auto 0; display: flex; border: 2px solid var(--f3-accent); border-radius: 15px; box-shadow: 0 0 35px rgba(215, 45, 192, 0.5); backdrop-filter: blur(10px); width: fit-content; padding: 1rem; }
+/* Título Impactante (v108 Style) */
+.tpl-f3 #event-title {
+    font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900;
+    text-transform: uppercase; letter-spacing: -4px;
+    color: var(--f3-text-main); line-height: 0.9;
+    text-shadow: 0 0 40px rgba(215, 45, 192, 0.6); /* Resplandor v121 */
+    margin-bottom: 2rem;
+}
+
+/* Diagramación de Metadatos */
+.tpl-f3 .hero-meta {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem;
+    font-size: 0.9rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--f3-text-muted);
+}
+.tpl-f3 .meta-item { display: flex; align-items: center; gap: 0.8rem; }
+.tpl-f3 .meta-svg { width: 20px; height: 20px; fill: var(--f3-accent); filter: drop-shadow(0 0 5px var(--f3-accent)); }
+
+/* 2. Countdown con Sombra Proyectada */
+.tpl-f3 .unified-countdown-frame {
+    margin: 4rem auto 0; padding: 1.2rem 2rem;
+    background: rgba(255, 255, 255, 0.02); border-radius: 15px;
+    border: 2px solid var(--f3-accent); box-shadow: 0 0 35px rgba(215, 45, 192, 0.5); 
+    display: flex; width: fit-content; backdrop-filter: blur(10px);
+}
 .tpl-f3 .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.15); text-align: center; }
 .tpl-f3 .cd-block:last-child { border-right: none; }
 .tpl-f3 .cd-v { display: block; font-size: 3.5rem !important; font-weight: 900; line-height: 1; }
