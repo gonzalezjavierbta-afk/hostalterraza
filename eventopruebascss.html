@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Evento — Hostal Terraza</title>
+
+  <!-- Inyección Dinámica de CSS por Template (Fallback a default.css) -->
+  <link id="dynamic-template-css" rel="stylesheet" href="/css/templates/default.css">
+
+  <!-- Supabase Client & QR Generator -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+  <main class="event-container" id="event-app">
+    <!-- Header del Evento -->
+    <header class="event-header">
+      <img id="event-image" src="" alt="Portada del Evento" style="display:none;">
+    </header>
+
+    <!-- Cuerpo del Evento -->
+    <section class="event-body">
+      <h1 class="event-title" id="event-title">Cargando evento...</h1>
+      <div class="event-meta">
+        <span id="event-date">--/--/----</span>
+        <span id="event-capacity">Aforo: --</span>
+      </div>
+
+      <!-- Formulario Dinámico -->
+      <form id="register-form">
+        <div id="dynamic-fields">
+          <!-- Se renderizan los inputs desde Supabase (custom_fields) -->
+        </div>
+        <button type="submit" class="btn-submit" id="btn-submit">Obtener Entrada</button>
+      </form>
+    </section>
+
+    <!-- Render de Ticket / Canvas -->
+    <section class="ticket-container" id="ticket-section">
+      <h3>¡Tu entrada está lista!</h3>
+      <div id="qrcode"></div>
+      <canvas id="ticket-canvas" class="ticket-canvas"></canvas>
+    </section>
+  </main>
+
+  <script>
+    // Inicialización del Motor de Eventos (Lead Developer)
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function initEventEngine() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventId = urlParams.get('id');
+
+      if (!eventId) {
+        document.getElementById('event-title').innerText = 'Evento no encontrado';
+        return;
+      }
+
+      // 1. Consulta a la tabla de eventos
+      const { data: event, error } = await supabase
+        .from('eventos')
+        .select('*')
+        .eq('id', eventId)
+        .single();
+
+      if (error || !event) {
+        document.getElementById('event-title').innerText = 'Error al cargar el evento';
+        return;
+      }
+
+      // 2. INYECCIÓN DINÁMICA DE CSS (Regla TSK-2026-004)
+      const templateSlug = event.template_slug || 'template-4';
+      const templatePath = `/css/templates/${templateSlug}.css`;
+      document.getElementById('dynamic-template-css').href = templatePath;
+
+      // 3. Renderizado de Datos Básicos
+      document.getElementById('event-title').innerText = event.titulo;
+      document.getElementById('event-date').innerText = new Date(event.fecha).toLocaleDateString();
+      if (event.imagen_url) {
+        const img = document.getElementById('event-image');
+        img.src = event.imagen_url;
+        img.style.display = 'block';
+      }
+
+      // 4. Renderizado Dinámico de Formulario (custom_fields)
+      const fieldsContainer = document.getElementById('dynamic-fields');
+      const customFields = event.custom_fields || [
+        { name: 'nombre', label: 'Nombre Completo', type: 'text', required: true },
+        { name: 'documento', label: 'Cédula / Pasaporte', type: 'text', required: true }
+      ];
+
+      fieldsContainer.innerHTML = customFields.map(field => `
+        <div class="form-group">
+          <label for="${field.name}">${field.label}</label>
+          <input type="${field.type}" id="${field.name}" name="${field.name}" class="form-control" ${field.required ? 'required' : ''}>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', initEventEngine);
+  </script>
+</body>
+</html>
