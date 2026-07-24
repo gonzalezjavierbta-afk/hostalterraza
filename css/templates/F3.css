@@ -1,127 +1,100 @@
-/* ==========================================================================
-   AI-DOS Framework — Hostal Terraza QR
-   Template 4: Layout Moderno & VIP Event
-   Ruta: /css/templates/template-4.css
-   ========================================================================== */
+/* 
+   ESTILO ATÓMICO F3: UNDERGROUND (Split-Screen)
+   Versión Corregida v1.1 · Blindaje v121 
+*/
 
-:root {
-  --primary-color: #ff5722;
-  --primary-hover: #e64a19;
-  --bg-dark: #121212;
-  --card-bg: #1e1e1e;
-  --text-main: #ffffff;
-  --text-muted: #b0bec5;
-  --border-color: #333333;
-  --accent-color: #00e676;
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+.tpl-f3 {
+    --acid: #bcff00;
+    --industrial-bg: #050505;
+    --border-acid: rgba(188, 255, 0, 0.2);
 }
 
-body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: var(--font-family);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+/* 1. ACTIVACIÓN DE VISIBILIDAD (CRÍTICO) */
+/* Rompe el display:none del Master Orchestrator para este template */
+.tpl-f3 section { 
+    display: block !important; 
+    opacity: 1 !important;
+    visibility: visible !important;
+    padding: 8rem 10%; 
+    border-bottom: 1px solid var(--border-acid); 
+    text-align: left;
 }
 
-.event-container {
-  width: 100%;
-  max-width: 480px;
-  background: var(--card-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  margin: 20px auto;
+/* 2. ESTRUCTURA SPLIT-SCREEN REFORZADA */
+.tpl-f3 #template-container {
+    display: flex !important;
+    flex-direction: row;
+    min-height: 100vh;
 }
 
-.event-header img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
+/* CARA IZQUIERDA: HERO FIJO */
+.tpl-f3 .hero { 
+    width: 40%; 
+    height: 100vh; 
+    position: fixed; 
+    left: 0; 
+    top: 0; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    padding: 4rem; 
+    background-size: cover; 
+    background-position: center; 
+    border-right: 1px solid var(--border-acid);
+    z-index: 10;
 }
 
-.event-body {
-  padding: 24px;
+.tpl-f3 .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%);
 }
 
-.event-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text-main);
+.tpl-f3 .hero-title { 
+    font-weight: 900; 
+    font-size: clamp(2rem, 5vw, 3.5rem); 
+    color: var(--acid); 
+    text-transform: uppercase; 
+    line-height: 0.9;
+    z-index: 2;
+    position: relative;
 }
 
-.event-meta {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-  display: flex;
-  gap: 12px;
+/* CARA DERECHA: FLUJO DE CONTENIDO */
+.tpl-f3 #main-content-flow { 
+    width: 60%; 
+    margin-left: 40%; 
+    background: var(--industrial-bg);
 }
 
-/* Formulario */
-.form-group {
-  margin-bottom: 16px;
+/* 3. TRATAMIENTO NO-PLANO DE DATOS (REGLA DE ORO) */
+.tpl-f3 .data-card { 
+    background: rgba(188, 255, 0, 0.03); 
+    border: 1px solid var(--acid); 
+    padding: 2.5rem; 
+    box-shadow: 10px 10px 0px rgba(188, 255, 0, 0.1); /* Sombra industrial dura */
+    margin-bottom: 1.5rem;
 }
 
-.form-group label {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+.tpl-f3 .data-card span {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: #fff;
 }
 
-.form-control {
-  width: 100%;
-  padding: 12px 14px;
-  background: #2a2a2a;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-main);
-  font-size: 1rem;
-  box-sizing: border-box;
-}
+/* 4. MULTIMEDIA SYNC 1:1 */
+.tpl-f3 .media-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; }
+.tpl-f3 .video-wrapper { border: 1px solid var(--acid); }
+.tpl-f3 .spotify-container { border: 1px solid rgba(255,255,255,0.1); height: 450px !important; }
 
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
+/* 5. INTERACTIVIDAD FAQ */
+.tpl-f3 .faq-item { border-bottom: 1px solid var(--border-acid); cursor: pointer; padding: 1.5rem 0; }
+.tpl-f3 .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.3s; color: var(--acid); }
+.tpl-f3 .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-top: 1rem; }
 
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background: var(--primary-color);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  margin-top: 10px;
-}
-
-.btn-submit:hover {
-  background: var(--primary-hover);
-}
-
-/* Ticket & Canvas API Area */
-.ticket-container {
-  display: none;
-  text-align: center;
-  padding: 20px;
-  background: #181818;
-  border-top: 1px dashed var(--border-color);
-}
-
-.ticket-canvas {
-  max-width: 100%;
-  border-radius: 8px;
-  margin-top: 12px;
+/* RESPONSIVE: COLAPSO DE SPLIT-SCREEN */
+@media (max-width: 1024px) {
+    .tpl-f3 #template-container { flex-direction: column; }
+    .tpl-f3 .hero { width: 100%; height: 60vh; position: relative; }
+    .tpl-f3 #main-content-flow { width: 100%; margin-left: 0; }
 }
