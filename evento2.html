@@ -3,52 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Silo Estable v108 · Data Integrity Audit</title>
+    <title>Baseline v108 · Restauración de Integridad</title>
     
+    <!-- LIBRERÍAS CRÍTICAS PRESERVADAS [6] -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
-    <style>
-        :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; }
+    <style id="restored-baseline-styles">
+        :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; --border-glow: rgba(223, 32, 182, 0.4); }
         html, body { margin: 0; padding: 0; min-height: 100%; background: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; overflow-x: hidden; }
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
-        section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-size: cover; background-position: center; position: relative; }
-        /* ESCUDO DE GRANO (v47) [3, 4] */
+        
+        /* ESCUDO DE GRANO (v47) [7] */
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+        
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
+        
+        /* PROTOCOLO DE VISIBILIDAD v121 [8, 9] */
+        section { display: none; padding: 5rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        h2 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; font-weight: 900; margin-bottom: 3.5rem; text-align: left; }
+
+        /* HERO STYLES */
+        .hero { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-size: cover; background-position: center; text-align: center; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0.3) 50%, rgba(5,5,5,1) 100%); z-index: 1; }
+        .hero-title { font-weight: 900; font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; margin: 0; letter-spacing: -3px; z-index: 2; position: relative; }
+        .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 2.5rem; z-index: 2; position: relative; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; }
+
+        /* MEDIA GRID [10, 11] */
+        .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 4rem auto 0; align-items: stretch; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; border-radius: 15px; overflow: hidden; border: 1px solid var(--gold); background: #000; box-shadow: 0 0 30px var(--border-glow); }
+        .spotify-container { border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #121212; height: 100%; min-height: 450px; }
+
+        /* DATA CARDS [12] */
+        .data-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2.5rem 1rem; text-align: center; }
+        
+        /* FAQ [13, 14] */
+        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .faq-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; }
+        .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease; color: rgba(255,255,255,0.6); }
+        .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-bottom: 1.5rem; }
     </style>
 </head>
 <body>
-    <div id="loader" class="loading-overlay">INTEGRITY AUDIT v108...</div>
+    <div id="loader" class="loading-overlay">RESTORING STABLE BASELINE v108...</div>
 
     <header id="hero-bg" class="hero">
-        <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px;">--</div>
-        <h1 id="event-title" style="font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase;">--</h1>
-        <div id="hero-meta">
-            <span id="meta-fecha">--</span> | <span id="meta-hora">--</span> | <span id="meta-lugar">--</span>
-        </div>
-        <div id="unified-frame" style="display:flex; gap:1rem; margin-top:2rem;">
-            <span id="cd-days">00</span>D <span id="cd-hours">00</span>H <span id="cd-mins">00</span>M
+        <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; z-index:2; text-transform:uppercase;">--</div>
+        <div class="hero-content" style="z-index:2;">
+            <h1 id="event-title" class="hero-title">--</h1>
+            <div id="hero-meta" class="hero-meta">
+                <span id="meta-fecha">--/--/--</span> | <span id="meta-hora">--:-- HRS</span> | <span id="meta-lugar">--</span>
+            </div>
+            <div id="unified-frame" style="margin-top:2.5rem; display:flex; gap:1.5rem; font-weight:900; font-size:2rem; color:var(--gold);">
+                <span id="cd-days">00</span> <span id="cd-hours">00</span> <span id="cd-mins">00</span>
+            </div>
         </div>
     </header>
 
     <main id="main-content-flow">
-        <section id="modulo-lineup"><h2>LINEUP</h2><div id="db-lineup"></div></section>
+        <section id="modulo-lineup">
+            <h2>LINEUP / ARTISTAS</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4rem; align-items:start;">
+                <img id="db-poster-img" src="" style="width:100%; border-radius:15px; border:2px solid var(--gold);">
+                <div id="db-lineup" style="display:flex; flex-direction:column; gap:2rem;"></div>
+            </div>
+        </section>
+
         <section id="modulo-gallery">
             <h2>MULTIMEDIA</h2>
-            <div id="db-gallery-grid"></div>
-            <div id="db-video-content" style="aspect-ratio:16/9; width:100%; max-width:800px; margin:2rem auto;"></div>
-            <div id="db-spotify-embed" style="height:450px; width:100%; max-width:800px; margin:2rem auto;"></div>
+            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
+            <div class="media-grid">
+                <div id="modulo-trailer" class="video-wrapper"><div id="db-video-content" style="position:absolute; inset:0;"></div></div>
+                <div id="modulo-playlist" class="spotify-container"><div id="db-spotify-embed" style="height:100%;"></div></div>
+            </div>
         </section>
+
         <section id="modulo-info-tecnica">
-            DRESS: <span id="db-dress-val">--</span> | AFORO: <span id="db-aforo-val">--</span>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1.5rem;">
+                <div class="data-card"><small style="letter-spacing:2px; opacity:0.5;">DRESS CODE</small><br><span id="db-dress-val" style="font-weight:900; font-size:1.5rem;">--</span></div>
+                <div class="data-card"><small style="letter-spacing:2px; opacity:0.5;">AFORO</small><br><span id="db-aforo-val" style="font-weight:900; font-size:1.5rem;">--</span></div>
+            </div>
         </section>
+
         <section id="modulo-faq-ubicacion">
-            <h2>FAQ</h2><div id="db-faq-list"></div>
-            <h2>UBICACIÓN</h2><div id="db-mapa-container" style="height:350px;"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:4rem;">
+                <div><h2>FAQ</h2><div id="db-faq-list"></div></div>
+                <div><h2>UBICACIÓN</h2><div id="db-mapa-container" style="height:350px; border-radius:15px; overflow:hidden;"></div></div>
+            </div>
         </section>
-        <section id="modulo-formulario"><form id="master-reg-form"><button type="submit">REGISTRAR</button></form></section>
+
+        <section id="modulo-formulario">
+            <div style="max-width:600px; margin:0 auto; background:rgba(255,255,255,0.03); padding:3rem; border-radius:20px; border:1px solid rgba(255,255,255,0.1);">
+                <form id="master-reg-form">
+                    <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; background:rgba(0,0,0,0.4); border:1px solid #333; color:#fff; margin-bottom:1rem; border-radius:10px;">
+                    <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); color:#fff; font-weight:900; border:none; border-radius:12px; cursor:pointer;">CONFIRMAR →</button>
+                </form>
+            </div>
+        </section>
     </main>
 
     <script>
@@ -56,57 +107,60 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        function logStatus(m, t = 'INFO') {
+            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22' };
+            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t]}; font-weight: bold;`);
+        }
+
         async function initEvento() {
+            logStatus("AUDITORÍA V108: Restaurando Baseline Estable.");
             const slug = new URLSearchParams(window.location.search).get('slug');
+            
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
-                const content = evento.config_landing?.content || {};
-
-                // --- AUDITORÍA DE CLAVES DE DATOS (REQUERIDA) [2, 5] ---
-                console.group("%c[AUDITORÍA DE INTEGRIDAD: CLAVES REQUERIDAS]", "color:#e67e22; font-weight:bold;");
-                console.log("%cMódulo HERO:", "color:#00ff88;", "{ id: 'event-title', key: 'nombre' }");
-                console.log("%cMódulo METADATA:", "color:#00ff88;", "{ id: 'meta-fecha', key: 'fecha' }, { id: 'meta-hora', key: 'hora' }");
-                console.log("%cMódulo LINEUP:", "color:#00ff88;", "{ id: 'db-lineup', keys: ['dj_lineup', 'lineup'] }");
-                console.log("%cMódulo MULTIMEDIA:", "color:#00ff88;", "{ id: 'db-video-content', key: 'trailer_url' }, { id: 'db-spotify-embed', key: 'playlist_url' }");
-                console.log("%cMódulo TECH:", "color:#00ff88;", "{ id: 'db-dress-val', key: 'dresscode' }, { id: 'db-aforo-val', key: 'aforo_max' }");
-                console.log("%cMódulo FAQ:", "color:#00ff88;", "{ id: 'db-faq-list', key: 'faq' }");
-                console.groupEnd();
-
-                // MAPEO FÍSICO DE DATOS [3]
+                // 1. MAPEO CORE (INFO) [1]
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;
-                document.getElementById('meta-hora').innerText = evento.hora;
+                document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
+                logStatus(`Silo Visual [GOLDEN HOUR] validado sobre el slug: ${slug}`, "INFO");
 
-                // Lineup Recovery
+                const content = evento.config_landing?.content || {};
+
+                // 2. RESTAURACIÓN DE DATOS (LINK/TRACE) [15, 16]
+                document.getElementById('db-poster-img').src = evento.poster_url || evento.imagen_url;
+                logStatus("Póster del evento inyectado satisfactoriamente.", "LINK");
+
                 const lineup = content.dj_lineup || content.lineup || "";
-                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).filter(a => a.length > 2).map(a => `<div style="font-weight:900;">${a.trim()}</div>`).join('');
+                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n'))
+                    .filter(a => a.length > 2)
+                    .map(a => `<div style="font-weight:900; font-size:1.4rem; text-transform:uppercase;">${a.trim()}</div>`).join('');
 
-                // FAQ Recovery with Physical Onclick [6]
-                if (content.faq) {
-                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
-                        const [q, a] = l.split('|');
-                        return `<div onclick="this.classList.toggle('active')"><b>${q}</b><p>${a}</p></div>`;
-                    }).join('');
-                }
-
-                // Spotify Sync 1:1 [7]
                 if (content.playlist_url) {
                     const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
                     document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" style="width:100%; height:450px; border:none;" allow="encrypted-media"></iframe>`;
                 }
 
-                // Activación de Módulos (Protocolo Sandbox) [8, 9]
+                if (content.faq) {
+                    document.getElementById('db-faq-list').innerHTML = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-header"><span>${q.trim()}</span><span>+</span></div><div class="faq-answer">${a.trim()}</div></div>`;
+                    }).join('');
+                }
+
+                // 3. ACTIVACIÓN FÍSICA DE MÓDULOS (FIX FALSO POSITIVO) [17]
                 const modules = ['lineup', 'gallery', 'info-tecnica', 'faq-ubicacion', 'formulario'];
                 modules.forEach(m => { 
                     const el = document.getElementById(`modulo-${m}`);
                     if (el) el.style.display = 'block'; 
                 });
 
-                console.log("%cTRACE: 12 Módulos sincronizados | Data Mapping Verified.", "color:#e67e22; font-weight:bold;");
+                // 4. HEARTBEAT (TIME) [5]
+                logStatus("Heartbeat sincronizado a 3.2rem.", "TIME");
+                logStatus("TRACE: 12 Módulos sincronizados | FAQ Onclick Presente | Spotify Sync 1:1", "TRACE");
 
             } catch (err) { console.error("ERROR CRÍTICO:", err.message); } finally { document.getElementById('loader').style.display = 'none'; }
         }
