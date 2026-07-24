@@ -3,131 +3,84 @@
    Encapsulado estricto bajo .tpl-f3 - AI-DOS v1.2
    ========================================================================== */
 
-/* Variables locales aisladas */
-.tpl-f3 {
-  --f3-bg-primary: #0a0a0c;
-  --f3-bg-card: #141419;
-  --f3-accent: #d72dc0;
-  --f3-text-main: #f8f9fa;
-  --f3-text-muted: #a0a0ab;
-  --f3-border: rgba(255, 255, 255, 0.08);
+/* 
+   TEMPLATE F3 - VERIFIED v1.2 
+   Atomic Scoped CSS for Master Orchestrator
+*/
 
-  background-color: var(--f3-bg-primary);
-  color: var(--f3-text-main);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  margin: 0;
-  padding: 0;
+/* Bloque de Reseteo de Silo */
+.tpl-f3 {
+    --f3-bg-primary: #050505;
+    --f3-bg-card: #141419;
+    --f3-accent: #df20b6; /* Sincronizado con JSON */
+    --f3-text-main: #ffffff;
+    --f3-text-muted: #a0a0ab;
+    --f3-border: rgba(255, 255, 255, 0.08);
+    background-color: var(--f3-bg-primary);
+    color: var(--f3-text-main);
+    font-family: 'Geist', sans-serif; /* Fuente Premium v122 */
+    margin: 0; padding: 0;
 }
 
 /* 1. Hero Section */
 .tpl-f3 #mod-hero {
-  position: relative;
-  min-height: 75vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 1.5rem;
-  background: radial-gradient(circle at center, rgba(215, 45, 192, 0.15) 0%, rgba(10, 10, 12, 0.95) 100%);
-  border-bottom: 1px solid var(--f3-border);
+    position: relative; min-height: 80vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4rem 1.5rem;
+    background: radial-gradient(circle at center, rgba(223, 32, 182, 0.15) 0%, rgba(5, 5, 5, 0.95) 100%);
+    border-bottom: 1px solid var(--f3-border);
 }
 
 .tpl-f3 #event-title {
-  font-size: clamp(2.2rem, 5vw, 4.2rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  color: var(--f3-text-main);
-  margin-bottom: 1rem;
-  text-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
-}
-
-.tpl-f3 .hero-meta {
-  display: flex;
-  gap: 1.5rem;
-  font-size: 1.1rem;
-  color: var(--f3-text-muted);
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900; text-transform: uppercase;
+    letter-spacing: -3px; color: var(--f3-text-main);
+    text-shadow: 0 0 30px rgba(223, 32, 182, 0.4);
 }
 
 /* 2. Disposición Multimedia Sync 1:1 */
-.tpl-f3 .media-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin: 2rem 0;
-  align-items: stretch;
-}
-
-.tpl-f3 #db-video-content iframe,
-.tpl-f3 #db-spotify-embed iframe {
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid var(--f3-border);
+.tpl-f3 .media-sync {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5rem; margin: 3rem auto; max-width: 1100px;
 }
 
 .tpl-f3 #db-spotify-embed iframe {
-  height: 100% !important;
-  min-height: 380px;
+    height: 100% !important; min-height: 450px;
+    border-radius: 12px; border: 1px solid var(--f3-border);
 }
 
-/* 3. Interactividad FAQ Inline */
-.tpl-f3 #mod-faq {
-  background-color: var(--f3-bg-card);
-  padding: 2.5rem;
-  border-radius: 16px;
-  margin: 2rem auto;
-  max-width: 900px;
-  border: 1px solid var(--f3-border);
+/* 3. Data Cards Premium (v122) */
+.tpl-f3 #mod-info-tecnica {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem; padding: 4rem 10%;
 }
 
+.tpl-f3 .card-item {
+    background: var(--f3-bg-card); padding: 2.5rem;
+    border-radius: 12px; border: 1px solid var(--f3-border);
+    text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.tpl-f3 .card-item span {
+    display: block; font-weight: 900; font-size: 1.5rem;
+    color: var(--f3-accent); text-shadow: 0 0 10px var(--f3-accent);
+}
+
+/* 4. FAQ Interactividad */
 .tpl-f3 .faq-item {
-  border-bottom: 1px solid var(--f3-border);
-  padding: 1.2rem 0;
-  cursor: pointer;
-  transition: background 0.2s ease;
+    border-bottom: 1px solid var(--f3-border);
+    padding: 1.5rem; cursor: pointer; transition: 0.3s;
 }
 
-.tpl-f3 .faq-item:last-child {
-  border-bottom: none;
+.tpl-f3 .faq-item.active { background: rgba(223, 32, 182, 0.05); }
+
+.tpl-f3 .faq-answer { 
+    color: var(--f3-text-muted); padding-top: 1rem; line-height: 1.6;
 }
 
-.tpl-f3 .faq-question {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.tpl-f3 .faq-question h4 {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--f3-text-main);
-}
-
-.tpl-f3 .faq-question span {
-  font-size: 1.5rem;
-  color: var(--f3-accent);
-  font-weight: bold;
-}
-
-.tpl-f3 .faq-answer {
-  margin-top: 0.8rem;
-  color: var(--f3-text-muted);
-  line-height: 1.6;
-}
-
-/* 4. Motor de Registro Dual-Path (Formulario) */
+/* 5. Formulario Master Box */
 .tpl-f3 #mod-form {
-  max-width: 600px;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: var(--f3-bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--f3-accent);
-}
-
-/* Adaptación Mobile */
-@media (max-width: 768px) {
-  .tpl-f3 .media-grid {
-    grid-template-columns: 1fr;
-  }
+    max-width: 600px; margin: 4rem auto; padding: 3rem;
+    background: var(--f3-bg-card); border-radius: 20px;
+    border: 1px solid var(--f3-accent);
 }
