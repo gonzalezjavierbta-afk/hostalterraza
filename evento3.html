@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v142 · Sistema QR</title>
+    <title>Master Orchestrator v143 · Sistema QR</title>
     
     <!-- CDNs Obligatorios (Contrato v107) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
@@ -35,7 +35,7 @@
 </head>
 
 <body>
-    <div id="loader" class="loading-overlay">SINCRONIZANDO V142...</div>
+    <div id="loader" class="loading-overlay">VERIFICACIÓN FÍSICA V143...</div>
 
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
@@ -57,15 +57,10 @@
 
     <main id="main-content-flow">
         <section id="mod-lineup">
-            <div id="db-poster-container"><img id="db-poster-img" src="" alt="Poster"></div>
             <div id="db-lineup"></div>
         </section>
         <section id="mod-gallery">
             <div id="db-gallery-grid"></div>
-            <div class="media-sync">
-                <div id="mod-trailer"><div id="db-video-content"></div></div>
-                <div id="mod-playlist"><div id="db-spotify-embed"></div></div>
-            </div>
         </section>
         <section id="mod-info-tecnica">
             <div id="db-dress-val">--</div>
@@ -81,7 +76,6 @@
                 <form id="master-reg-form">
                     <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
                     <input type="text" id="reg-cedula" placeholder="Cédula *" required>
-                    <input type="tel" id="reg-tel" placeholder="WhatsApp *" required>
                     <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
                 </form>
             </div>
@@ -106,14 +100,23 @@
                     link = document.createElement('link'); link.rel = 'stylesheet';
                     link.setAttribute('data-template-css', 'true'); document.head.appendChild(link);
                 }
-                link.onload = () => { logStatus(`LINK: Estilo cargado.`, "LINK"); resolve(true); };
-                link.onerror = () => { logStatus(`ERROR: ${cssPath} no hallado.`, "ERROR"); resolve(false); };
+                link.onload = () => { logStatus(`LINK: Estilo ${cssPath} cargado.`, "LINK"); resolve(true); };
+                link.onerror = () => { logStatus(`ERROR: No se halló el archivo CSS.`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
         }
 
+        function toggleFAQ(element) {
+            const answer = element.querySelector('.faq-answer');
+            if (answer) {
+                const isOpen = answer.style.display === 'block';
+                answer.style.display = isOpen ? 'none' : 'block';
+                element.classList.toggle('active', !isOpen);
+            }
+        }
+
         async function initEvento() {
-            logStatus("Iniciando Orquestador v142.", "INFO");
+            logStatus("Iniciando Orquestador v143 - Fidelidad de Mapeo.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -123,19 +126,43 @@
 
                 const templateId = ev.template_id || 'F3';
                 document.body.className = `tpl-${templateId.toLowerCase()}`;
-                
-                // --- CORRECCIÓN DE RUTA DE BANDERAS (v142) ---
-                const flags = ev.config_landing?.modules || ev.modules || {};
-                logStatus(`DEBUG: Origen de módulos detectado. FAQ: ${flags.faq}, Lineup: ${flags.dj_lineup}`, "DEBUG");
 
                 await injectAtomicCSS(templateId);
 
-                // Mapeo Metadata
+                // --- MAPEO DE DATOS (CONTRATO v143-STRICT) ---
                 const content = ev.config_landing?.content || ev.content || {};
+                
+                // 1. Identidad
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
-                document.getElementById('meta-lugar').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
+                document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
+                logStatus(`DEBUG: Título [${ev.nombre}] inyectado.`, "DEBUG");
 
-                // Mapeo Módulos Dinámicos
+                // 2. Lineup (Soporte Array/String)
+                const lineupContainer = document.getElementById('db-lineup');
+                if (lineupContainer && content.dj_lineup) {
+                    const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
+                    lineupContainer.innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
+                    logStatus(`TRACE: Inyectados ${lineup.length} artistas en Lineup.`, "TRACE");
+                }
+
+                // 3. FAQ (Soporte Pipe Delimiter)
+                const faqContainer = document.getElementById('db-faq-list');
+                if (faqContainer && content.faq) {
+                    const faqItems = content.faq.split('\n').filter(l => l.includes('|'));
+                    faqContainer.innerHTML = faqItems.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div><div class="faq-answer" style="display:none;">${a.trim()}</div></div>`;
+                    }).join('');
+                    logStatus(`TRACE: Inyectadas ${faqItems.length} preguntas en FAQ.`, "TRACE");
+                }
+
+                // 4. Ubicación
+                const ubi = content.ubicacion || ev.ubicacion || "--";
+                document.getElementById('meta-lugar').innerText = ubi.toUpperCase();
+                document.getElementById('venue-name').innerText = ubi.toUpperCase();
+
+                // --- VISIBILIDAD (CONTRATO DE BANDERAS) ---
+                const flags = ev.config_landing?.modules || ev.modules || {};
                 const moduleMap = {
                     'mod-hero': true,
                     'mod-lineup': flags.dj_lineup,
@@ -150,7 +177,7 @@
                     if (el) {
                         const isVisible = moduleMap[id] === true;
                         el.style.setProperty('display', isVisible ? 'block' : 'none', 'important');
-                        logStatus(`TRACE: Módulo [${id}] -> ${isVisible ? 'ACTIVO' : 'OCULTO'}`, "TRACE");
+                        logStatus(`INFO: Módulo [${id}] -> ${isVisible ? 'MOSTRADO' : 'OCULTO'}`, "INFO");
                     }
                 });
 
