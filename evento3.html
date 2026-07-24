@@ -11,29 +11,21 @@
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
-        :root {
-            --main-bg: #050505;
-            --gold: #df20b6; 
-            --text-color: #ffffff;
-        }
-
-        html, body {
+        :root { --main-bg: #050505; --gold: #df20b6; --text-color: #ffffff; }
+        html, body { 
             margin: 0; padding: 0; min-height: 100%;
             background-color: var(--main-bg); color: var(--text-color);
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
-
         /* ESCUDO DE GRANO v47 */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.04; contrast: 130%;
         }
-
-        /* Blindaje de Seguridad: Secciones ocultas hasta validación PM */
+        /* Blindaje de Seguridad Master */
         section, header { display: none; }
-
         .loading-overlay { 
             position: fixed; inset: 0; background: #000; z-index: 999; 
             display: flex; align-items: center; justify-content: center; 
@@ -43,9 +35,9 @@
 </head>
 
 <body>
-    <div id="loader" class="loading-overlay">ORQUESTADOR ATÓMICO v1.2...</div>
+    <div id="loader" class="loading-overlay">ACTIVANDO ÁMBITO ATÓMICO...</div>
 
-    <!-- ESTRUCTURA MASTER (CERO BORRADO v121) -->
+    <!-- ESTRUCTURA MASTER PROTEGIDA -->
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
         <div class="hero-content">
@@ -104,7 +96,6 @@
     </main>
 
     <script>
-        // 1. CREDENCIALES CORE (CONTRATO v107)
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
@@ -114,10 +105,8 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        /** INYECCIÓN ATÓMICA DE CSS (RUTA CORREGIDA) */
-        function injectAtomicCSS(templateId) {
+        async function injectAtomicCSS(templateId) {
             return new Promise((resolve) => {
-                // Ajustado según requerimiento del Director: css/templates/
                 const cssPath = `css/templates/${templateId}.css`;
                 let link = document.querySelector('link[data-template-css]');
                 if (!link) {
@@ -126,57 +115,38 @@
                     link.setAttribute('data-template-css', 'true');
                     document.head.appendChild(link);
                 }
-                link.onload = () => {
-                    logStatus(`Inyección exitosa: ${cssPath}`, "LINK");
-                    resolve(true);
-                };
-                link.onerror = () => {
-                    logStatus(`FALLO 404: No se halló ${cssPath} en Vercel.`, "ERROR");
-                    resolve(false);
-                };
+                link.onload = () => { logStatus(`Inyección exitosa: ${cssPath}`, "LINK"); resolve(true); };
+                link.onerror = () => { logStatus(`FALLO 404: ${cssPath}`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
         }
 
-        function toggleFAQ(element) {
-            const answer = element.querySelector('.faq-answer');
-            if (answer) {
-                const isOpen = answer.style.display === 'block';
-                answer.style.display = isOpen ? 'none' : 'block';
-                element.classList.toggle('active', !isOpen);
-            }
-        }
-
-        /** ORQUESTADOR PRINCIPAL v1.2 */
         async function initEvento() {
             logStatus("Iniciando Orquestador Atómico Master.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
-
-            if (!slug) {
-                logStatus("Falta SLUG en URL.", "ERROR");
-                return;
-            }
+            if (!slug) return;
 
             try {
-                // 1. Fetch Data
                 const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
                 if (error || !ev) throw new Error("Evento no hallado.");
 
-                // 2. Identificación del Template
                 const templateId = ev.template_id || 'F3';
-                logStatus(`TEMPLATE ID DETECTADO: [${templateId}] para el slug: [${slug}]`, "INFO");
+                logStatus(`TEMPLATE ID DETECTADO: [${templateId}]`, "INFO");
 
-                // 3. Inyección Atómica
+                // --- MEJORA CRÍTICA: ACTIVACIÓN DE ÁMBITO ATÓMICO ---
+                document.body.className = `tpl-${templateId.toLowerCase()}`;
+                logStatus(`Ámbito activado: .tpl-${templateId.toLowerCase()}`, "INFO");
+
                 await injectAtomicCSS(templateId);
 
-                // 4. Mapeo Metadata
+                // Mapeo de Datos
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (ev.content?.ubicacion || ev.ubicacion || "--").toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
                 
-                // 5. Visibilidad dinámica según JSON 'modules'
+                // Control de Visibilidad
                 const flags = ev.modules || {};
                 const moduleMap = {
                     'mod-hero': true,
@@ -184,20 +154,16 @@
                     'mod-gallery': flags.gallery,
                     'mod-info-tecnica': flags.aforo || flags.dresscode,
                     'mod-faq-ubicacion': flags.faq || flags.ubicacion,
-                    'mod-sponsors': flags.sponsors,
                     'mod-form': true
                 };
 
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) {
-                        el.style.display = moduleMap[id] ? 'block' : 'none';
-                    }
+                    if (el) el.style.display = moduleMap[id] ? 'block' : 'none';
                 });
 
-                // 6. Cierre de Auditoría GOLD
                 logStatus("Heartbeat del contador sincronizado a 3.2rem", "TIME");
-                logStatus("TRACE: 12 Módulos sincronizados | FAQ Onclick Presente | Template F3 Vinculado", "TRACE");
+                logStatus("TRACE: 12 Módulos sincronizados | Ámbito Atómico Vinculado", "TRACE");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
