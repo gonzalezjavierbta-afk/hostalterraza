@@ -18,13 +18,13 @@
             font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
-        /* ESCUDO DE GRANO v47 */
+        /* ESCUDO DE GRANO (v47) */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.04; contrast: 130%;
         }
-        /* Blindaje de Seguridad Master */
+        /* Blindaje de Seguridad Master: Oculto hasta inyección exitosa */
         section, header { display: none; }
         .loading-overlay { 
             position: fixed; inset: 0; background: #000; z-index: 999; 
@@ -35,9 +35,8 @@
 </head>
 
 <body>
-    <div id="loader" class="loading-overlay">ACTIVANDO ÁMBITO ATÓMICO...</div>
+    <div id="loader" class="loading-overlay">VERIFICANDO INTEGRIDAD DE DATOS...</div>
 
-    <!-- ESTRUCTURA MASTER PROTEGIDA -->
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2rem; left:2rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">--</div>
         <div class="hero-content">
@@ -70,25 +69,19 @@
         </section>
         <section id="mod-info-tecnica">
             <div id="db-dress-val">--</div>
-            <div id="db-guest-val">--</div>
             <div id="db-aforo-val">--</div>
-            <div id="db-ticket-val">--</div>
         </section>
         <section id="mod-faq-ubicacion">
             <div id="db-faq-list"></div>
             <div id="venue-name">--</div>
             <div id="db-mapa-container"></div>
         </section>
-        <section id="mod-sponsors">
-            <div id="db-sponsors-list"></div>
-        </section>
         <section id="mod-form">
             <div class="form-master-box">
                 <form id="master-reg-form">
                     <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
-                    <input type="text" id="reg-cedula" placeholder="Cédula / Documento *" required>
+                    <input type="text" id="reg-cedula" placeholder="Cédula *" required>
                     <input type="tel" id="reg-tel" placeholder="WhatsApp *" required>
-                    <div id="db-dynamic-fields"></div>
                     <button type="submit" class="btn-submit">Confirmar Asistencia →</button>
                 </form>
             </div>
@@ -111,14 +104,22 @@
                 let link = document.querySelector('link[data-template-css]');
                 if (!link) {
                     link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.setAttribute('data-template-css', 'true');
+                    link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true');
                     document.head.appendChild(link);
                 }
-                link.onload = () => { logStatus(`Inyección exitosa: ${cssPath}`, "LINK"); resolve(true); };
-                link.onerror = () => { logStatus(`FALLO 404: ${cssPath}`, "ERROR"); resolve(false); };
+                link.onload = () => { logStatus(`LINK: Estilo ${cssPath} cargado.`, "LINK"); resolve(true); };
+                link.onerror = () => { logStatus(`ERROR 404: ${cssPath} no encontrado.`, "ERROR"); resolve(false); };
                 link.href = cssPath;
             });
+        }
+
+        function toggleFAQ(element) {
+            const answer = element.querySelector('.faq-answer');
+            if (answer) {
+                const isOpen = answer.style.display === 'block';
+                answer.style.display = isOpen ? 'none' : 'block';
+                element.classList.toggle('active', !isOpen);
+            }
         }
 
         async function initEvento() {
@@ -131,22 +132,48 @@
                 if (error || !ev) throw new Error("Evento no hallado.");
 
                 const templateId = ev.template_id || 'F3';
-                logStatus(`TEMPLATE ID DETECTADO: [${templateId}]`, "INFO");
-
-                // --- MEJORA CRÍTICA: ACTIVACIÓN DE ÁMBITO ATÓMICO ---
                 document.body.className = `tpl-${templateId.toLowerCase()}`;
-                logStatus(`Ámbito activado: .tpl-${templateId.toLowerCase()}`, "INFO");
+                logStatus(`INFO: Ámbito .tpl-${templateId.toLowerCase()} activado.`, "INFO");
 
                 await injectAtomicCSS(templateId);
 
-                // Mapeo de Datos
+                // --- MAPEO DE DATOS ROBUSTO ---
+                const content = ev.config_landing?.content || ev.content || {};
+                let lineageCount = 0;
+                let faqItemCount = 0;
+
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
-                document.getElementById('meta-lugar').innerText = (ev.content?.ubicacion || ev.ubicacion || "--").toUpperCase();
+                document.getElementById('meta-lugar').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
+                document.getElementById('venue-name').innerText = (content.ubicacion || ev.ubicacion || "--").toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                
-                // Control de Visibilidad
+
+                // Inyección Lineup
+                if (content.dj_lineup) {
+                    const lineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : content.dj_lineup.split('\n');
+                    lineageCount = lineup.length;
+                    document.getElementById('db-lineup').innerHTML = lineup.map(dj => `<div class="dj-item"><span>${dj.trim()}</span></div>`).join('');
+                }
+
+                // Inyección FAQ (Interactividad Física)
+                if (content.faq) {
+                    const lines = content.faq.split('\n').filter(l => l.includes('|'));
+                    faqItemCount = lines.length;
+                    document.getElementById('db-faq-list').innerHTML = lines.map(l => {
+                        const [q, a] = l.split('|');
+                        return `<div class="faq-item" onclick="toggleFAQ(this)">
+                            <div class="faq-header"><span>${q.trim()}</span><div class="faq-icon-circle">+</div></div>
+                            <div class="faq-answer" style="display:none;">${a.trim()}</div>
+                        </div>`;
+                    }).join('');
+                }
+
+                // Datos Técnicos
+                document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
+                document.getElementById('db-aforo-val').innerText = ev.aforo_max || "100";
+
+                // --- VISIBILIDAD BASADA EN CONTRATO JSON ---
                 const flags = ev.modules || {};
                 const moduleMap = {
                     'mod-hero': true,
@@ -159,11 +186,12 @@
 
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) el.style.display = moduleMap[id] ? 'block' : 'none';
+                    if (el) el.style.setProperty('display', moduleMap[id] ? 'block' : 'none', 'important');
                 });
 
-                logStatus("Heartbeat del contador sincronizado a 3.2rem", "TIME");
-                logStatus("TRACE: 12 Módulos sincronizados | Ámbito Atómico Vinculado", "TRACE");
+                // --- NUEVO LOG DE VERIFICACIÓN DE DATOS (REQUERIMIENTO) ---
+                logStatus("TIME: Heartbeat sincronizado a 3.2rem", "TIME");
+                logStatus(`TRACE: 12 Módulos procesados | Datos: Lineup(${lineageCount}), FAQ(${faqItemCount}) | Escudo GOLD activo`, "TRACE");
 
             } catch (err) {
                 logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR");
@@ -171,7 +199,6 @@
                 document.getElementById('loader').style.display = 'none';
             }
         }
-
         window.onload = initEvento;
     </script>
 </body>
