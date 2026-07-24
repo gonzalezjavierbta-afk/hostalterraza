@@ -1,100 +1,133 @@
-/* 
-   ESTILO ATÓMICO F3: UNDERGROUND (Split-Screen)
-   Versión Corregida v1.1 · Blindaje v121 
-*/
+/* ==========================================================================
+   TEMPLATE F3: ATOMIC STYLESHEET (Campaña / Fiesta Hostal Terraza)
+   Encapsulado estricto bajo .tpl-f3 - AI-DOS v1.2
+   ========================================================================== */
 
+/* Variables locales aisladas */
 .tpl-f3 {
-    --acid: #bcff00;
-    --industrial-bg: #050505;
-    --border-acid: rgba(188, 255, 0, 0.2);
+  --f3-bg-primary: #0a0a0c;
+  --f3-bg-card: #141419;
+  --f3-accent: #d72dc0;
+  --f3-text-main: #f8f9fa;
+  --f3-text-muted: #a0a0ab;
+  --f3-border: rgba(255, 255, 255, 0.08);
+
+  background-color: var(--f3-bg-primary);
+  color: var(--f3-text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-/* 1. ACTIVACIÓN DE VISIBILIDAD (CRÍTICO) */
-/* Rompe el display:none del Master Orchestrator para este template */
-.tpl-f3 section { 
-    display: block !important; 
-    opacity: 1 !important;
-    visibility: visible !important;
-    padding: 8rem 10%; 
-    border-bottom: 1px solid var(--border-acid); 
-    text-align: left;
+/* 1. Hero Section */
+.tpl-f3 #mod-hero {
+  position: relative;
+  min-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  background: radial-gradient(circle at center, rgba(215, 45, 192, 0.15) 0%, rgba(10, 10, 12, 0.95) 100%);
+  border-bottom: 1px solid var(--f3-border);
 }
 
-/* 2. ESTRUCTURA SPLIT-SCREEN REFORZADA */
-.tpl-f3 #template-container {
-    display: flex !important;
-    flex-direction: row;
-    min-height: 100vh;
+.tpl-f3 #event-title {
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--f3-text-main);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
 }
 
-/* CARA IZQUIERDA: HERO FIJO */
-.tpl-f3 .hero { 
-    width: 40%; 
-    height: 100vh; 
-    position: fixed; 
-    left: 0; 
-    top: 0; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    padding: 4rem; 
-    background-size: cover; 
-    background-position: center; 
-    border-right: 1px solid var(--border-acid);
-    z-index: 10;
+.tpl-f3 .hero-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--f3-text-muted);
 }
 
-.tpl-f3 .hero::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%);
+/* 2. Disposición Multimedia Sync 1:1 */
+.tpl-f3 .media-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  align-items: stretch;
 }
 
-.tpl-f3 .hero-title { 
-    font-weight: 900; 
-    font-size: clamp(2rem, 5vw, 3.5rem); 
-    color: var(--acid); 
-    text-transform: uppercase; 
-    line-height: 0.9;
-    z-index: 2;
-    position: relative;
+.tpl-f3 #db-video-content iframe,
+.tpl-f3 #db-spotify-embed iframe {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--f3-border);
 }
 
-/* CARA DERECHA: FLUJO DE CONTENIDO */
-.tpl-f3 #main-content-flow { 
-    width: 60%; 
-    margin-left: 40%; 
-    background: var(--industrial-bg);
+.tpl-f3 #db-spotify-embed iframe {
+  height: 100% !important;
+  min-height: 380px;
 }
 
-/* 3. TRATAMIENTO NO-PLANO DE DATOS (REGLA DE ORO) */
-.tpl-f3 .data-card { 
-    background: rgba(188, 255, 0, 0.03); 
-    border: 1px solid var(--acid); 
-    padding: 2.5rem; 
-    box-shadow: 10px 10px 0px rgba(188, 255, 0, 0.1); /* Sombra industrial dura */
-    margin-bottom: 1.5rem;
+/* 3. Interactividad FAQ Inline */
+.tpl-f3 #mod-faq {
+  background-color: var(--f3-bg-card);
+  padding: 2.5rem;
+  border-radius: 16px;
+  margin: 2rem auto;
+  max-width: 900px;
+  border: 1px solid var(--f3-border);
 }
 
-.tpl-f3 .data-card span {
-    font-family: 'Geist', sans-serif;
-    font-weight: 900;
-    font-size: 1.8rem;
-    color: #fff;
+.tpl-f3 .faq-item {
+  border-bottom: 1px solid var(--f3-border);
+  padding: 1.2rem 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-/* 4. MULTIMEDIA SYNC 1:1 */
-.tpl-f3 .media-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; }
-.tpl-f3 .video-wrapper { border: 1px solid var(--acid); }
-.tpl-f3 .spotify-container { border: 1px solid rgba(255,255,255,0.1); height: 450px !important; }
+.tpl-f3 .faq-item:last-child {
+  border-bottom: none;
+}
 
-/* 5. INTERACTIVIDAD FAQ */
-.tpl-f3 .faq-item { border-bottom: 1px solid var(--border-acid); cursor: pointer; padding: 1.5rem 0; }
-.tpl-f3 .faq-answer { max-height: 0; opacity: 0; overflow: hidden; transition: 0.3s; color: var(--acid); }
-.tpl-f3 .faq-item.active .faq-answer { max-height: 200px; opacity: 1; padding-top: 1rem; }
+.tpl-f3 .faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-/* RESPONSIVE: COLAPSO DE SPLIT-SCREEN */
-@media (max-width: 1024px) {
-    .tpl-f3 #template-container { flex-direction: column; }
-    .tpl-f3 .hero { width: 100%; height: 60vh; position: relative; }
-    .tpl-f3 #main-content-flow { width: 100%; margin-left: 0; }
+.tpl-f3 .faq-question h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--f3-text-main);
+}
+
+.tpl-f3 .faq-question span {
+  font-size: 1.5rem;
+  color: var(--f3-accent);
+  font-weight: bold;
+}
+
+.tpl-f3 .faq-answer {
+  margin-top: 0.8rem;
+  color: var(--f3-text-muted);
+  line-height: 1.6;
+}
+
+/* 4. Motor de Registro Dual-Path (Formulario) */
+.tpl-f3 #mod-form {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: var(--f3-bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--f3-accent);
+}
+
+/* Adaptación Mobile */
+@media (max-width: 768px) {
+  .tpl-f3 .media-grid {
+    grid-template-columns: 1fr;
+  }
 }
