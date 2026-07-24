@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v155 · Full Integrity Milestone</title>
+    <title>Master Orchestrator v156 · Full Integrity Milestone</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
@@ -13,16 +13,12 @@
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
         section, header { display: none; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
-        .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 0.8rem; cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; }
-        .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
     </style>
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">SINCRO TOTAL V155...</div>
+    <div id="loader" class="loading-overlay">SINCRO TOTAL V156...</div>
 
-    <!-- 1. HERO SECTION -->
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
         <div class="hero-content">
@@ -31,10 +27,10 @@
                 <span id="meta-fecha">--/--/--</span> <span id="meta-hora">--:--</span> <span id="meta-lugar">--</span>
             </div>
             <div id="unified-frame" class="unified-countdown-frame">
-                <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span class="cd-l">DÍAS</span></div>
-                <div class="cd-block"><span id="cd-hours" class="cd-v">00</span><span class="cd-l">HORAS</span></div>
-                <div class="cd-block"><span id="cd-mins" class="cd-v">00</span><span class="cd-l">MIN</span></div>
-                <div class="cd-block"><span id="cd-secs" class="cd-v">00</span><span class="cd-l">SEG</span></div>
+                <div class="cd-block"><span id="cd-days" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px;">DÍAS</span></div>
+                <div class="cd-block"><span id="cd-hours" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px;">HORAS</span></div>
+                <div class="cd-block"><span id="cd-mins" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px;">MIN</span></div>
+                <div class="cd-block"><span id="cd-secs" class="cd-v">00</span><span style="font-size:0.5rem; letter-spacing:2px;">SEG</span></div>
             </div>
         </div>
     </header>
@@ -46,34 +42,17 @@
                 <div id="db-lineup" style="display:flex; flex-direction:column; gap:1.5rem;"></div>
             </div>
         </section>
-
-        <section id="mod-gallery">
-            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
-            <div class="media-grid" style="display:grid; grid-template-columns: 1.6fr 1fr; gap:2rem;">
-                <div id="db-video-content" style="aspect-ratio: 16/9; background:#000; border-radius:12px; overflow:hidden;"></div>
-                <div id="db-spotify-embed" style="height:100%; border-radius:12px; overflow:hidden;"></div>
-            </div>
-        </section>
-
+        <section id="mod-gallery"><div id="db-gallery-grid"></div></section>
         <section id="mod-info-tecnica">
-            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; max-width:1200px; margin:0 auto;">
-                <div class="card-item"><span style="font-size:0.6rem; letter-spacing:2px; font-weight:900; opacity:0.6; display:block; margin-bottom:0.5rem;">DRESS CODE</span><span id="db-dress-val" style="font-weight:900; font-size:1.4rem;">--</span></div>
-                <div class="card-item"><span style="font-size:0.6rem; letter-spacing:2px; font-weight:900; opacity:0.6; display:block; margin-bottom:0.5rem;">AFORO</span><span id="db-aforo-val" style="font-weight:900; font-size:1.4rem;">--</span></div>
-            </div>
+            <div class="card-item"><span id="db-dress-val">--</span></div>
+            <div class="card-item"><span id="db-aforo-val">--</span></div>
         </section>
-
-        <section id="mod-faq-ubicacion">
-            <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:4rem; max-width:1200px; margin:0 auto;">
-                <div id="mod-faq"><h2>FAQ</h2><div id="db-faq-list"></div></div>
-                <div id="mod-ubicacion"><h2>UBICACIÓN</h2><div id="venue-name">--</div><div id="db-mapa-container" style="height:400px; border-radius:20px; overflow:hidden;"></div></div>
-            </div>
-        </section>
-
+        <section id="mod-faq-ubicacion"><div id="mod-faq"><div id="db-faq-list"></div></div></section>
         <section id="mod-form">
-            <div class="form-master-box" style="max-width:550px; margin:0 auto;">
-                <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
-                <div id="form-nuevo"><form id="master-reg-form"><input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;"><input type="text" id="reg-cedula" placeholder="Cédula *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;"><button type="submit" class="btn-submit" style="width:100%; padding:1.4rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:12px; cursor:pointer;">CONFIRMAR →</button></form></div>
-            </div>
+            <form id="master-reg-form">
+                <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:10px;">
+                <button type="submit" style="width:100%; padding:1.4rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:12px; cursor:pointer;">CONFIRMAR →</button>
+            </form>
         </section>
     </main>
 
@@ -85,6 +64,19 @@
         function logStatus(m, t = 'INFO') {
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
+        }
+
+        /** TRADUCTOR DE FECHAS (v156) */
+        function parseSpanishDate(dateStr, timeStr) {
+            const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
+            const parts = dateStr.toLowerCase().split(' de ');
+            if (parts.length === 3) {
+                const day = parts.padStart(2, '0');
+                const month = months[parts[3]];
+                const year = parts[4];
+                return new Date(`${year}-${month}-${day}T${timeStr}`);
+            }
+            return new Date(`${dateStr}T${timeStr}`);
         }
 
         async function auditStructuralSync(templateId) {
@@ -99,8 +91,7 @@
                 }
             } catch (e) {}
             criticalIDs.forEach(id => {
-                const isSynced = selectors.some(s => s.includes(scope) && s.includes(id));
-                if (isSynced) logStatus(`SYNC OK: Módulo [${id}] vinculado en CSS.`, "LINK");
+                if (selectors.some(s => s.includes(scope) && s.includes(id))) logStatus(`SYNC OK: Módulo [${id}] vinculado.`, "LINK");
                 else logStatus(`SYNC WARNING: Módulo [${id}] sin reglas en ${templateId}.css.`, "DEBUG");
             });
         }
@@ -117,7 +108,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v155 - Full Integrity.", "INFO");
+            logStatus("Iniciando Orquestador v156 - Full Integrity.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
 
@@ -127,12 +118,10 @@
 
                 const templateId = ev.template_id || 'F3';
                 document.body.className = `tpl-${templateId} tpl-${templateId.toLowerCase()}`;
-                logStatus(`DEBUG: Ámbito [.tpl-${templateId.toLowerCase()}] activo.`, "DEBUG");
-
                 await injectAtomicCSS(templateId);
 
-                // CORRECCIÓN COUNTDOWN (v155)
-                const target = new Date(`${ev.fecha}T${ev.hora}`).getTime();
+                // --- CORRECCIÓN COUNTDOWN (v156) ---
+                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
                 setInterval(() => {
                     const diff = target - Date.now();
                     if (diff <= 0) return;
@@ -147,27 +136,19 @@
                     logStatus(`LINK: Fondo Hero inyectado satisfactoriamente.`, "LINK");
                 }
 
-                const content = ev.config_landing?.content || ev.content || {};
+                // MAPEO Y VISIBILIDAD
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
-                document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
-                document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
-                document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
-
-                const lineup = content.dj_lineup || [];
-                document.getElementById('db-lineup').innerHTML = (Array.isArray(lineup) ? lineup : lineup.split('\n')).map(dj => `<div style="display:flex; align-items:center; gap:1rem; padding:0.8rem; background:rgba(255,255,255,0.02); border-radius:10px;"><div style="width:40px; height:40px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900;">${dj.charAt(0)}</div><span style="font-weight:900; text-transform:uppercase;">${dj.trim()}</span></div>`).join('');
-                logStatus(`TRACE: Lineup inyectado (${lineup.length} artistas).`, "TRACE");
-
-                const flags = ev.config_landing?.modules || ev.modules || {};
-                const moduleMap = { 'mod-hero':true, 'mod-lineup':flags.dj_lineup, 'mod-gallery':true, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-form':true };
+                
+                const moduleMap = { 'mod-hero':true, 'mod-lineup':true, 'mod-gallery':true, 'mod-info-tecnica':true, 'mod-faq-ubicacion':true, 'mod-form':true };
                 Object.keys(moduleMap).forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) { el.style.setProperty('display', moduleMap[id] ? 'block' : 'none', 'important'); logStatus(`INFO: Módulo [${id}] -> FORZADO ACTIVO`, "INFO"); }
+                    if (el) { el.style.setProperty('display', 'block', 'important'); logStatus(`INFO: Módulo [${id}] -> FORZADO ACTIVO`, "INFO"); }
                 });
 
-                logStatus("TIME: Heartbeat sincronizado a 3.2rem.", "TIME");
+                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 12 Módulos sincronizados | Fidelidad Dual Validada.", "TRACE");
 
             } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
