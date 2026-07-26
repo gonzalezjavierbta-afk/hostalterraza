@@ -1,21 +1,21 @@
-* === TEMPLATE F3 - BASELINE MAESTRO v1.3.20 (Restauración Afterglow) === */
-/* Masa Crítica Certificada: ~200 líneas [cite: 776] */
+/* === TEMPLATE F3 - BASELINE MAESTRO v1.3.21 (Fidelidad Afterglow) === */
+/* Protocolo: Aislamiento Atómico (ATOMIC) [cite: 447, 744] */
 
-/* 1. RESETEO DE SILO & VARIABLES AFTERGLOW [cite: 1, 12, 769] */
+/* 1. RESETEO DE SILO & VARIABLES PREMIUM [cite: 1, 10, 744] */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
     --f3-bg-card: #141419;
     --f3-accent: #d72dc0; /* Afterglow Magenta */
-    --f3-gold: #c8a96e;   /* Gold Accent */
     --f3-text-main: #ffffff;
     --f3-text-muted: #c0c0cb;
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
     color: var(--f3-text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
 }
 
-/* 2. HERO: JERARQUÍA Y TITULADO v108 [cite: 1, 13] */
+/* 2. HERO: JERARQUÍA Y TITULADO v108 [cite: 1, 11, 743] */
 .tpl-f3 #mod-hero {
     position: relative;
     min-height: 85vh;
@@ -38,21 +38,19 @@
     z-index: 1;
 }
 
+.tpl-f3 .hero-content { position: relative; z-index: 5; width: 100%; max-width: 1200px; }
+
 .tpl-f3 #event-title {
-    position: relative;
-    z-index: 5;
     font-size: clamp(2.8rem, 9vw, 5rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -4px;
+    letter-spacing: -4px; /* Sello Silo v108 [cite: 1] */
     text-shadow: 0 0 40px rgba(215, 45, 192, 0.6);
     line-height: 0.9;
     margin-bottom: 2rem;
 }
 
 .tpl-f3 .hero-meta {
-    position: relative;
-    z-index: 5;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -70,14 +68,64 @@
     filter: drop-shadow(0 0 5px var(--f3-accent));
 }
 
-/* 3. LINEUP & POSTER: BLINDAJE VISUAL [cite: 2, 327] */
-.tpl-f3 #mod-lineup {
-    padding: 6rem 10%;
-    border-bottom: 1px solid var(--f3-border);
+/* 3. MULTIMEDIA GRID: SINCRONÍA 1:1 [cite: 2, 747] */
+.tpl-f3 .media-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 2.5rem;
+    max-width: 1100px;
+    margin: 4rem auto;
+    align-items: stretch;
 }
 
+.tpl-f3 #db-video-content {
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 15px;
+    border: 1px solid var(--f3-accent);
+    overflow: hidden;
+}
+
+.tpl-f3 #db-spotify-embed {
+    border-radius: 15px;
+    border: 1px solid var(--f3-border);
+    overflow: hidden;
+    height: 100%;
+}
+
+/* 4. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 2, 743] */
+.tpl-f3 #mod-info-tecnica {
+    padding: 4rem 10%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.tpl-f3 .card-item {
+    background: var(--f3-bg-card);
+    border: 1px solid var(--f3-border);
+    border-radius: 15px;
+    padding: 2.5rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.tpl-f3 .card-item:hover { transform: translateY(-5px); border-color: var(--f3-accent); }
+
+.tpl-f3 .card-item span[id*="-val"] {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900; /* Estándar Geist 900 [cite: 743] */
+    font-size: 1.3rem;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(215, 45, 192, 0.3);
+}
+
+/* 5. LINEUP & PÓSTER [cite: 1, 316] */
+.tpl-f3 #mod-lineup { padding: 6rem 10%; border-bottom: 1px solid var(--f3-border); }
+
 .tpl-f3 #db-poster-img {
-    width: 340px;
+    width: 100%;
+    max-width: 340px;
     border-radius: 15px;
     border: 4px solid var(--f3-accent);
     box-shadow: 0 0 35px rgba(215, 45, 192, 0.4);
@@ -88,73 +136,21 @@
     height: 65px;
     border-radius: 50%;
     border: 2px solid var(--f3-accent);
-    box-shadow: 0 0 15px rgba(215, 45, 192, 0.5);
     object-fit: cover;
 }
 
-.tpl-f3 .artist-name {
-    font-weight: 900;
-    text-transform: uppercase;
-    font-size: 1.15rem;
-    letter-spacing: 1px;
-}
-
-/* 4. MULTIMEDIA GRID: SINCRONÍA 1:1 [cite: 3, 772] */
-.tpl-f3 .media-grid {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: 2.5rem;
-    max-width: 1100px;
-    margin: 4rem auto;
-}
-
-.tpl-f3 #db-video-content {
-    aspect-ratio: 16/9;
-    border-radius: 15px;
-    border: 1px solid var(--f3-accent);
-    overflow: hidden;
-    background: #000;
-}
-
-.tpl-f3 #db-spotify-embed {
-    border-radius: 15px;
-    border: 1px solid var(--f3-border);
-    overflow: hidden;
-    height: 100%;
-}
-
-/* 5. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 3, 768] */
-.tpl-f3 .card-item {
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-border);
-    border-radius: 15px;
-    padding: 2.5rem;
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.tpl-f3 .card-item:hover { transform: translateY(-5px); }
-
-.tpl-f3 span[id*="-val"] {
-    font-family: 'Geist', sans-serif;
-    font-weight: 900;
-    font-size: 1.3rem;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(215, 45, 192, 0.3);
-}
-
-/* 6. FAQ & UBICACIÓN: INTERACTIVIDAD FÍSICA [cite: 10, 319, 770] */
+/* 6. FAQ & UBICACIÓN: INTERACTIVIDAD FÍSICA [cite: 318, 745] */
 .tpl-f3 .faq-item {
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 1.5rem 0;
     cursor: pointer;
-    padding: 1.2rem 0;
 }
 
 .tpl-f3 .faq-answer {
     max-height: 0;
-    opacity: 0;
     overflow: hidden;
-    transition: 0.4s ease;
+    transition: all 0.4s ease;
+    opacity: 0;
     font-size: 0.85rem;
     color: var(--f3-text-muted);
 }
@@ -165,7 +161,7 @@
     padding-top: 1rem;
 }
 
-/* 7. FORMULARIO PREMIUM & TABS DUAL-PATH [cite: 3, 8, 10] */
+/* 7. FORMULARIO MAESTRO AFTERGLOW [cite: 2, 7, 743] */
 .tpl-f3 .form-master-box {
     max-width: 550px;
     margin: 4rem auto;
@@ -195,6 +191,7 @@
     border: 1px solid var(--f3-border);
     padding: 1.2rem; border-radius: 12px;
     color: white; width: 100%; margin-bottom: 1.5rem;
+    font-family: 'Geist', sans-serif;
 }
 
 .tpl-f3 .btn-submit {
@@ -212,7 +209,7 @@
     box-shadow: 0 0 35px rgba(215, 45, 192, 0.6);
 }
 
-/* 8. COUNTDOWN HEARTBEAT [cite: 4, 14, 771] */
+/* 8. COUNTDOWN & FOOTER [cite: 12, 746, 776] */
 .tpl-f3 .unified-countdown-frame {
     margin: 4rem auto 0;
     display: flex;
@@ -225,12 +222,11 @@
 
 .tpl-f3 .cd-v {
     display: block;
-    font-size: 3.5rem !important;
+    font-size: 3.5rem !important; /* Estándar Heartbeat [cite: 12] */
     font-weight: 900;
     line-height: 1;
 }
 
-/* 9. SPONSORS: TRANSPARENCIA REAL [cite: 10, 11, 772] */
 .tpl-f3 .sponsors-grid {
     display: flex; flex-wrap: wrap;
     justify-content: center; align-items: center;
@@ -241,9 +237,4 @@
     height: 40px; width: auto;
     opacity: 0.6; filter: grayscale(1) brightness(1.5);
     transition: all 0.4s ease;
-}
-
-.tpl-f3 .sponsor-img:hover {
-    opacity: 1; filter: grayscale(0) brightness(1);
-    transform: scale(1.1);
 }
