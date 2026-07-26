@@ -1,21 +1,35 @@
-/* TEMPLATE fiesta/f3 - BASELINE MODULAR v1.3.23 (Multimedia Support) */
+/* TEMPLATE fiesta/f3 - BASELINE MAESTRO v1.3.24 (Full Support) */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
-    --f3-accent: #d72dc0;
+    --f3-bg-card: #141419;
+    --f3-accent: #d72dc0; /* Afterglow Magenta */
     --f3-text-main: #ffffff;
+    --f3-text-muted: #c0c0cb;
+    --f3-border: rgba(255, 255, 255, 0.08);
+    background-color: var(--f3-bg-primary);
+    color: var(--f3-text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* 1. HERO PROTEGIDO [10] */
-.tpl-f3 #mod-hero { position: relative; min-height: 85vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; background-size: cover !important; background-position: center !important; text-align: center; }
-.tpl-f3 #mod-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,1) 100%); z-index: 1; }
+/* 1. HERO PROTEGIDO [cite: 1, 3] */
+.tpl-f3 #mod-hero { position: relative; min-height: 85vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; background-size: cover !important; background-position: center !important; text-align: center; overflow: hidden; }
+.tpl-f3 #mod-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,0.8) 70%, rgba(10,10,12,1) 100%); z-index: 1; }
+.tpl-f3 #event-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: -4px; text-shadow: 0 0 40px rgba(215, 45, 192, 0.6); margin-bottom: 2rem; line-height: 0.9; }
+.tpl-f3 .meta-svg { width: 20px !important; height: 20px !important; fill: var(--f3-accent); filter: drop-shadow(0 0 5px var(--f3-accent)); }
 
-/* 2. GALERÍA & SPONSORS - FIX VISIBILIDAD [8, 9] */
-.tpl-f3 #mod-gallery { padding: 4rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); display: block !important; }
+/* 2. LINEUP AFTERGLOW [cite: 854] */
+.tpl-f3 #mod-lineup { padding: 6rem 10%; border-bottom: 1px solid var(--f3-border); display: block !important; }
+.tpl-f3 #db-poster-img { width: 340px; border-radius: 15px; border: 4px solid var(--f3-accent); box-shadow: 0 0 35px rgba(215, 45, 192, 0.4); }
+
+/* 3. GALERÍA & MÓDULOS TÉCNICOS [cite: 4, 788] */
+.tpl-f3 #mod-gallery { padding: 4rem 10%; border-bottom: 1px solid var(--f3-border); display: block !important; }
 .tpl-f3 #db-gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 4rem; }
 .tpl-f3 .gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+.tpl-f3 #mod-info-tecnica, .tpl-f3 #mod-faq, .tpl-f3 #mod-form { padding: 4rem 10%; display: block !important; }
+.tpl-f3 .card-item { background: var(--f3-bg-card); border: 1px solid var(--f3-border); border-radius: 15px; padding: 2rem; text-align: center; }
 
-.tpl-f3 #mod-sponsors { padding: 6rem 10%; background: #000; text-align: center; display: block !important; }
-.tpl-f3 .sponsor-tag { font-weight: 900; letter-spacing: 2px; font-size: 1.1rem; opacity: 0.8; color: var(--f3-text-main); padding: 0 2rem; }
-
-/* 3. LINEUP AFTERGLOW  */
-.tpl-f3 #mod-lineup { padding: 6rem 10%; border-bottom: 1px solid rgba(255,255,255,0.05); display: block !important; }
+/* 4. SPONSORS & COUNTDOWN */
+.tpl-f3 #mod-sponsors { padding: 6rem 10%; text-align: center; display: block !important; }
+.tpl-f3 .sponsor-tag { font-weight: 900; letter-spacing: 2px; font-size: 1.1rem; opacity: 0.8; padding: 0 2rem; }
+.tpl-f3 .unified-countdown-frame { margin: 4rem auto 0; display: flex; border: 2px solid var(--f3-accent); border-radius: 15px; box-shadow: 0 0 35px rgba(215, 45, 192, 0.5); backdrop-filter: blur(10px); width: fit-content; padding: 1.2rem 2rem; }
+.tpl-f3 .cd-v { display: block; font-size: 3.5rem !important; font-weight: 900; line-height: 1; }
