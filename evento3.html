@@ -171,7 +171,7 @@
         }
     }
     // === FIN SEGMENTO VIDEO ===
-    
+
                 const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
                 setInterval(() => {
                     const diff = target - Date.now();
@@ -190,18 +190,42 @@
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
-                // MULTIMEDIA REAL (Blindaje Error 153) [cite: 11]
-                if (content.video_url) {
-                    const vCont = document.getElementById('db-video-content');
-                    const vId = content.video_url.includes('v=') ? content.video_url.split('v=')[1] : content.video_url.split('/').pop();
-                    vCont.innerHTML = `<div style="position:relative;width:100%;height:100%;cursor:pointer;background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" onclick="window.open('${content.video_url}', '_blank')"><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg></div></div>`;
-                }
 
-                if (content.playlist_url) {
-                    const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
-                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
-                    logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
-                }
+                  // === INICIO SEGMENTO: MULTIMEDIA MAESTRO (v204) ===
+    // 1. Lógica de Video (Silo v108 + Protocolo ADR-005) [cite: 329, 388]
+    const vUrl = content.video_url || content.trailer_url || "https://player.vimeo.com/video/259411563";
+    const vContainer = document.getElementById('db-video-content');
+    
+    if (vContainer) {
+        const isYT = vUrl.includes('youtube.com') || vUrl.includes('youtu.be');
+        if (isYT) {
+            // Extracción de ID para miniatura (Evita Error 153 en RRSS) [cite: 875]
+            const vId = vUrl.includes('v=') ? vUrl.split('v=')[1].split('&') : vUrl.split('/').pop();
+            vContainer.innerHTML = `
+                <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
+                     onclick="window.open('${vUrl}', '_blank')">
+                    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center;">
+                        <svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
+                    </div>
+                </div>`;
+        } else {
+            // Carga directa para Vimeo (Estándar Silo) [cite: 329]
+            vContainer.innerHTML = `<iframe src="${vUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
+        }
+        logStatus("TRACE: Video inyectado satisfactoriamente (Fase I OK).", "TRACE");
+    }
+
+    // 2. Sincronía Spotify 1:1 [cite: 448, 764]
+    if (content.playlist_url) {
+        const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
+        const sContainer = document.getElementById('db-spotify-embed');
+        if (sContainer) {
+            sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+            logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
+        }
+    }
+    // === FIN SEGMENTO MULTIMEDIA ===
+    
 
                 // GALERÍA & SPONSORS CUANTITATIVOS [cite: 12, 13]
                 if (content.gallery && Array.isArray(content.gallery)) {
