@@ -7,79 +7,24 @@
     
     <!-- LIBRERÍAS MAESTRAS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
+    <link rel="stylesheet" href="css/templates/fiesta/p5.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
 
     <style>
         :root { 
-            --acid: #bcff00; --main-bg: #000000; --text-color: #ffffff;
-            --border-glow: rgba(188, 255, 0, 0.3);
+            --acid: #a3e635; --main-bg: #0a1a0a; --text-color: #ffffff;
+            --border-glow: rgba(163, 230, 53, 0.25);
         }
 
         html, body { 
             margin: 0; padding: 0; background: var(--main-bg); color: var(--text-color); 
             font-family: 'Geist', sans-serif; overflow-x: hidden; 
         }
-
-        /* 0. ESCUDO DE GRANO (v47) */
-        body::before {
-            content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        /* 1. DIAGRAMACIÓN SPLIT-SCREEN (P7) */
-        #template-container { display: none; flex-direction: row; min-height: 100vh; }
-        
-        /* LADO IZQUIERDO: Estático (Hero + Form) */
-        .hero-sidebar { 
-            width: 40%; height: 100vh; position: fixed; left: 0; top: 0;
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 4rem; border-right: 1px solid rgba(188, 255, 0, 0.2); z-index: 10;
-            background-size: cover; background-position: center; box-sizing: border-box;
-        }
-        .hero-sidebar::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
-        
-        /* LADO DERECHO: Scroll (Contenido) */
-        .content-scroll { width: 60%; margin-left: 40%; padding: 0; box-sizing: border-box; }
-        
-        section { padding: 6rem 12%; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        h2 { color: var(--acid); font-size: 0.7rem; letter-spacing: 5px; font-weight: 900; margin-bottom: 3rem; text-transform: uppercase; }
-
-        /* 2. ESTILOS DE MÓDULOS ACTIVOS */
-        .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; letter-spacing: -2px; margin: 0; color: var(--acid); text-transform: uppercase; font-weight: 900; }
-        
-        .unified-countdown-frame { background: none; border: 1px solid var(--acid); padding: 2rem; box-shadow: 10px 10px 0px var(--border-glow); display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
-        .cd-v { font-size: 2.8rem !important; font-weight: 900; color: var(--acid); line-height: 1; }
-        
-        .media-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        .video-wrapper { border: 1px solid rgba(255,255,255,0.1); position: relative; padding-top: 56.25%; filter: grayscale(1); transition: 0.4s; }
-        .video-wrapper:hover { filter: grayscale(0); border-color: var(--acid); }
-        .video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-        .spotify-container { min-height: 450px; height: 100%; border: 1px solid rgba(255,255,255,0.1); }
-
-        .artist-row { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid rgba(188,255,0,0.1); padding: 1.5rem 0; transition: 0.3s; cursor: crosshair; display: flex; align-items: center; gap: 2rem; }
-        .artist-row:hover { color: var(--acid); padding-left: 2rem; background: rgba(188,255,0,0.05); }
-
-        /* DATA CARDS ACORDE AL ESTILO */
-        .data-card-underground { border: 1px solid var(--acid); padding: 2rem; text-align: left; box-shadow: 5px 5px 0px var(--border-glow); }
-        .data-label { color: var(--acid); font-size: 0.6rem; font-weight: 900; letter-spacing: 3px; display: block; margin-bottom: 0.5rem; }
-        .data-value { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; }
-
-        .form-master-box { background: none; border: 1px solid var(--acid); padding: 2.5rem; margin-top: 2rem; box-shadow: 8px 8px 0px var(--border-glow); }
-        .form-input { border-radius: 0; background: #111; border: 1px solid #333; color: white; padding: 1.2rem; margin-bottom: 1rem; width: 100%; box-sizing: border-box; font-family: inherit; }
-        .btn-submit { background: var(--acid); color: black; border-radius: 0; font-weight: 900; padding: 1.5rem; border: none; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; }
-
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; color: var(--acid); }
-
-        @media (max-width: 1024px) {
-            #template-container { flex-direction: column; }
-            .hero-sidebar { width: 100%; height: auto; position: relative; padding: 2rem; border-right: none; border-bottom: 1px solid var(--acid); }
-            .content-scroll { width: 100%; margin-left: 0; }
-        }
     </style>
 </head>
 
-<body class="tpl-p7">
+<body class="tpl-p5">
 
     <div id="loader" class="loading-overlay">UNDERGROUND SILO v119...</div>
 
