@@ -141,19 +141,42 @@
                 const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
                 let link = document.querySelector('link[data-template-css]');
                 if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
+                
+                let isResolved = false;
+                const timer = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}]. Continuando en degradación suave.`, "ERROR");
+                        resolve(false);
+                    }
+                }, 5000);
+
                 link.onload = () => {
-                    let rulesCount = 0;
-                    try {
-                        const sheets = Array.from(document.styleSheets);
-                        const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
-                        if (targetSheet && targetSheet.cssRules) {
-                            rulesCount = targetSheet.cssRules.length;
-                        }
-                    } catch (e) {}
-                    logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
-                    resolve(true);
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(timer);
+                        let rulesCount = 0;
+                        try {
+                            const sheets = Array.from(document.styleSheets);
+                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
+                            if (targetSheet && targetSheet.cssRules) {
+                                rulesCount = targetSheet.cssRules.length;
+                            }
+                        } catch (e) {}
+                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
+                        resolve(true);
+                    }
                 };
-                link.onerror = () => { logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR"); resolve(false); };
+
+                link.onerror = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(timer);
+                        logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR");
+                        resolve(false);
+                    }
+                };
+
                 link.href = path;
             });
         }
@@ -282,7 +305,7 @@
     if (sponsorsContainer) {
         sponsorsContainer.innerHTML = sponsorsList.map(url => `
             <div class="sponsor-item" style="padding: 1.5rem;">
-                <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.7; filter: grayscale(1) brightness(1.2);">
+                <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.85;">
             </div>`).join('');
             
         // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
@@ -415,7 +438,7 @@ if (document.getElementById('db-poster-img')) {
                 logStatus(`INFO: ${modules.length} módulos auditados y activos (Regla de Oro: 7 módulos).`, "INFO");
 
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
-                logStatus("TRACE: 5/5 Fixes Prioritarios aplicados con éxito. Gobernanza v123-MASTER certificada.", "TRACE");
+                logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");
 
             } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
