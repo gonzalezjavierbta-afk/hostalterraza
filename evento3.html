@@ -215,6 +215,25 @@ function switchForm(type) {
                 }
 
                 const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
+                // === PASO 6: INYECCIÓN CUANTITATIVA (Líneas 255-270 aprox) ===
+const content = ev.config_landing?.content || {};
+
+// 1. Renderizado de Galería
+if (content.gallery && Array.isArray(content.gallery)) {
+    document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(url => 
+        `<img src="${url}" class="gallery-img" style="width:100%; height:250px; object-fit:cover; border-radius:15px;">`
+    ).join('');
+    logStatus(`TRACE: Galería inyectada (${content.gallery.length} fotos).`, "TRACE");
+}
+
+// 2. Renderizado de Sponsors [cite: 708]
+const spList = Array.isArray(content.sponsors) ? content.sponsors : (content.sponsors || "").split(',').map(s => s.trim());
+if (spList.length > 0 && spList !== "") {
+    document.getElementById('db-sponsors-list').innerHTML = spList.map(name => 
+        `<span class="sponsor-tag" style="font-weight:900; color:var(--f3-accent); padding:0 2rem;">${name.toUpperCase()}</span>`
+    ).join('');
+    logStatus(`TRACE: Sponsors inyectados (${spList.length} marcas).`, "TRACE");
+}
                 modules.forEach(id => { 
                     const el = document.getElementById(id);
                     if (el) { 
