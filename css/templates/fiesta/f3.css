@@ -24,16 +24,16 @@
 
 .tpl-f3 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-/* === INICIO SEGMENTO: HERO BALANCE (v1.3.28) === */
+/* === INICIO SEGMENTO: HERO BALANCE FINAL (v1.3.29) === */
 .tpl-f3 #mod-hero {
     position: relative;
-    height: 100vh !important;
+    height: 100vh !important; /* Pantalla completa garantizada */
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Ajuste de balance: empuja el contenido ligeramente hacia abajo */
-    justify-content: center; 
-    padding-top: 8rem !important; 
+    /* justify-content: center se mantiene, pero aumentamos padding superior */
+    justify-content: center;
+    padding: 12rem 2rem 4rem !important; 
     background-size: cover !important;
     background-position: center !important;
     overflow: hidden;
@@ -43,8 +43,19 @@
     position: relative;
     z-index: 5;
     width: 100%;
-    max-width: 1200px;
-    padding: 0 2rem;
+    max-width: 1100px; /* Ancho contenido para evitar dispersión visual */
+}
+
+.tpl-f3 #org-name-badge {
+    position: absolute;
+    top: 4rem; /* Bajado 1rem más para despejar el borde superior */
+    left: 4rem;
+    z-index: 10;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--f3-accent);
 }
 /* === FIN SEGMENTO HERO BALANCE === */
 
@@ -124,34 +135,45 @@
 /* -------------------------------------------------------------------
    5. DATA CARDS & COUNTDOWN [cite: 7, 763]
    ------------------------------------------------------------------- */
-/* === INICIO SEGMENTO: COUNTDOWN CAPSULE (v1.3.28) === */
+
+
+/* === INICIO SEGMENTO: COUNTDOWN CAPSULE RESTORED (v1.3.29) === */
 .tpl-f3 .unified-countdown-frame {
     position: relative;
     z-index: 5;
-    /* Retorno al ancho contenido (No 100%) */
-    width: fit-content !important; 
-    margin: 4rem auto 0 !important; 
+    /* BLINDAJE DE ANCHO: fit-content es innegociable */
+    width: fit-content !important;
+    max-width: 90%; 
+    margin: 4.5rem auto 0 !important; /* Margen superior aumentado para separar del título */
     
-    /* Estilo Afterglow v108 */
-    padding: 1.5rem 3rem;
-    background: rgba(10, 10, 12, 0.5) !important;
+    /* Estética de Objeto Flotante v108 */
+    display: flex !important;
+    gap: 0.5rem;
+    padding: 1.2rem 2.5rem;
+    background: rgba(10, 10, 12, 0.6) !important;
     backdrop-filter: blur(15px);
     border: 2px solid var(--f3-accent) !important;
     border-radius: 20px;
-    box-shadow: 0 0 40px var(--f3-accent-soft);
-    
-    display: flex;
-    gap: 1rem;
+    box-shadow: 0 0 45px var(--f3-accent-soft);
 }
 
 .tpl-f3 [id^="cd-"] {
-    font-size: 3.5rem !important; /* Estándar GOLD 1.2 */
+    font-size: 3.5rem !important; /* Estándar Heartbeat de Oro */
     font-weight: 900;
     line-height: 1;
-    color: #ffffff;
     text-shadow: 0 0 20px var(--f3-accent);
 }
+
+.tpl-f3 .cd-block {
+    padding: 0 1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.tpl-f3 .cd-block:last-child { border-right: none; }
 /* === FIN SEGMENTO COUNTDOWN CAPSULE === */
+
+
 
 .tpl-f3 .card-item {
     background: var(--f3-bg-card);
