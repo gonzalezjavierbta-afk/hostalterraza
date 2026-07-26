@@ -24,41 +24,36 @@
 
 .tpl-f3 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-/* === INICIO SEGMENTO: HERO OPTICAL BALANCE (v1.3.31) === */
+/* === INICIO SEGMENTO: HERO OPTICAL BALANCE & IDENTITY (v1.3.32) === */
 .tpl-f3 #mod-hero {
     position: relative;
-    height: 100vh !important; /* Pantalla completa del Silo Maestro */
+    height: 100vh !important;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Bajamos el contenido: 10rem es el punto de equilibrio entre v1.3.29 y v1.3.30 */
-    padding: 10rem 2rem 4rem !important; 
+    /* Aumentamos el padding superior a 15rem para empujar el título al centro óptico */
+    padding: 15rem 2rem 5rem !important; 
     background-size: cover !important;
     background-position: center !important;
     overflow: hidden;
 }
 
-.tpl-f3 .hero-content {
-    position: relative;
-    z-index: 5;
-    width: 100%;
-    max-width: 1200px;
-    text-align: center; /* Refuerza el centrado horizontal */
-}
-
 .tpl-f3 #org-name-badge {
     position: absolute;
-    top: 3.5rem; /* Posición fija superior para que no baje con el título */
+    top: 3.5rem;
     left: 4rem;
     z-index: 10;
     font-weight: 900;
     letter-spacing: 4px;
     text-transform: uppercase;
     font-size: 0.7rem;
-    color: var(--f3-accent);
+    /* CORRECCIÓN: Blanco absoluto para legibilidad premium */
+    color: #ffffff !important; 
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    opacity: 0.9;
 }
-/* === FIN SEGMENTO HERO OPTICAL BALANCE === */
+/* === FIN SEGMENTO HERO BALANCE === */
 
 .tpl-f3 #mod-hero::before {
     content: '';
@@ -68,31 +63,49 @@
     z-index: 1;
 }
 
-/* === INICIO SEGMENTO: TÍTULO Y FLUJO INFERIOR (v1.3.31) === */
+/* === INICIO SEGMENTO: CENTRADO DE MASAS (v1.3.32) === */
+.tpl-f3 .hero-content {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 1200px;
+    /* Refuerzo de centrado flex */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
 .tpl-f3 #event-title {
     font-size: clamp(3rem, 10vw, 5.5rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -5px; /* Sello de exclusividad Silo v108 */
+    letter-spacing: -5px; /* Sello Silo v108 */
     line-height: 0.85;
-    margin: 0 auto 3rem !important; /* Centrado horizontal y aire inferior */
+    /* Margen auto para garantizar centrado horizontal físico */
+    margin: 0 auto 3.5rem !important; 
     text-shadow: 0 0 50px rgba(215, 45, 192, 0.7);
-    max-width: 900px;
+    color: #ffffff;
 }
 
 .tpl-f3 .unified-countdown-frame {
     position: relative;
     z-index: 5;
-    width: fit-content !important; /* Restaurar cápsula contenida */
-    margin: 1.5rem auto 0 !important; /* Separación controlada del título */
-    padding: 1.2rem 3rem;
-    background: rgba(10, 10, 12, 0.5) !important;
+    /* Mantenemos el estilo de cápsula flotante con ancho contenido */
+    width: fit-content !important;
+    margin: 0 auto !important; 
+    padding: 1.5rem 3.5rem;
+    background: rgba(10, 10, 12, 0.6) !important;
     backdrop-filter: blur(15px);
     border: 2px solid var(--f3-accent) !important;
     border-radius: 20px;
-    box-shadow: 0 0 35px var(--f3-accent-soft);
+    box-shadow: 0 0 45px var(--f3-accent-soft);
+    display: flex;
+    gap: 1.5rem;
 }
-/* === FIN SEGMENTO TÍTULO Y FLUJO === */
+/* === FIN SEGMENTO CENTRADO DE MASAS === */
+
+
 
 .tpl-f3 [id^="cd-"] {
     font-size: 3.5rem !important; /* Estándar Heartbeat de Oro */
