@@ -191,16 +191,17 @@
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
 
-                  // === INICIO SEGMENTO: MULTIMEDIA MAESTRO (v204) ===
-    // 1. Lógica de Video (Silo v108 + Protocolo ADR-005) [cite: 329, 388]
-    const vUrl = content.video_url || content.trailer_url || "https://player.vimeo.com/video/259411563";
+    // === INICIO SEGMENTO: MULTIMEDIA FINAL (v205) ===
+    // 1. Jerarquía de Video: Columna Directa > JSON content > Fallback Silo [cite: 287, 872]
+    const vUrl = ev.video_url || content.video_url || content.trailer_url || "https://player.vimeo.com/video/259411563";
     const vContainer = document.getElementById('db-video-content');
     
-    if (vContainer) {
+    if (vContainer && vUrl) {
         const isYT = vUrl.includes('youtube.com') || vUrl.includes('youtu.be');
         if (isYT) {
-            // Extracción de ID para miniatura (Evita Error 153 en RRSS) [cite: 875]
-            const vId = vUrl.includes('v=') ? vUrl.split('v=')[1].split('&') : vUrl.split('/').pop();
+            // Extracción robusta de ID para URLs tipo watch?v= [cite: 395, 874]
+            let vId = vUrl.includes('v=') ? vUrl.split('v=')[1].split('&') : vUrl.split('/').pop();
+            
             vContainer.innerHTML = `
                 <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
                      onclick="window.open('${vUrl}', '_blank')">
@@ -209,13 +210,13 @@
                     </div>
                 </div>`;
         } else {
-            // Carga directa para Vimeo (Estándar Silo) [cite: 329]
             vContainer.innerHTML = `<iframe src="${vUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
         }
-        logStatus("TRACE: Video inyectado satisfactoriamente (Fase I OK).", "TRACE");
+        // Log cuantitativo con verificación de URL [cite: 772]
+        logStatus(`TRACE: Video real inyectado -> ${vUrl.substring(0, 30)}...`, "TRACE");
     }
 
-    // 2. Sincronía Spotify 1:1 [cite: 448, 764]
+    // 2. Sincronía Spotify 1:1 [cite: 462, 767]
     if (content.playlist_url) {
         const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
         const sContainer = document.getElementById('db-spotify-embed');
@@ -225,7 +226,7 @@
         }
     }
     // === FIN SEGMENTO MULTIMEDIA ===
-    
+
 
                 // GALERÍA & SPONSORS CUANTITATIVOS [cite: 12, 13]
                 if (content.gallery && Array.isArray(content.gallery)) {
