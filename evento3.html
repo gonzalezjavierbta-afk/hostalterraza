@@ -90,17 +90,23 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        function parseSpanishDate(dateStr, timeStr) {
-            const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
-            const parts = dateStr.toLowerCase().split(' de ');
-            if (parts.length === 3) {
-                const d = parts.trim().padStart(2, '0');
-                const m = months[parts[1].trim()];
-                const a = parts[2].trim();
-                return new Date(`${a}-${m}-${d}T${timeStr}`);
-            }
-            return new Date(`${dateStr}T${timeStr}`);
-        }
+        // === INICIO DEL BLOQUE A PEGAR (PASO 2) ===
+function parseSpanishDate(dateStr, timeStr) {
+    const months = { 
+        "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", 
+        "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" 
+    };
+    const parts = dateStr.toLowerCase().split(' de ');
+    // Corrección de fidelidad: parts=día, parts[1]=mes, parts[2]=año [cite: 799]
+    if (parts.length === 3) {
+        const year = parts[2];
+        const month = months[parts[1]];
+        const day = parts.padStart(2, '0');
+        return new Date(`${year}-${month}-${day}T${timeStr}`);
+    }
+    return new Date(`${dateStr}T${timeStr}`);
+}
+// === FIN DEL BLOQUE A PEGAR ===
 
         async function auditStructuralSync(templateId) {
             const scope = `.tpl-${templateId.toLowerCase()}`;
