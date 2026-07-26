@@ -22,50 +22,58 @@
     -webkit-font-smoothing: antialiased;
 }
 
-
-// === INICIO SEGMENTO: HERO BASE Y RESETEO (v1.3.25) ===
+* === INICIO SEGMENTO: HERO FULL-SCREEN (v1.3.26) === */
 .tpl-f3 #mod-hero {
     position: relative;
-    min-height: 90vh; /* Aumentado para dar aire al diseño */
+    height: 100vh !important; /* Fuerza pantalla completa del Silo v108 */
+    min-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6rem 2rem 4rem; /* Padding top aumentado para evitar pisar el badge */
+    padding: 0 !important; /* Elimina márgenes restrictivos del Master */
+    margin: 0;
     background-size: cover !important;
     background-position: center !important;
-    text-align: center;
     overflow: hidden;
+    border-bottom: none;
 }
 
+.tpl-f3 .hero-content {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 2rem;
+    margin-top: 4rem; /* Aire de seguridad para no pisar el badge */
+}
+/* === FIN SEGMENTO HERO FULL-SCREEN === */
+
+/* === INICIO SEGMENTO: JERARQUÍA DE TÍTULO (v1.3.26) === */
 .tpl-f3 #org-name-badge {
     position: absolute;
     top: 3rem;
     left: 3rem;
     z-index: 10;
     font-weight: 900;
-    letter-spacing: 3px;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    opacity: 0.8;
+    font-size: 0.7rem;
     color: var(--f3-accent);
+    text-shadow: 0 0 15px var(--f3-accent-soft);
 }
-// === FIN SEGMENTO HERO BASE ===
 
-// === INICIO SEGMENTO: TÍTULO PREMIUM (v1.3.25) ===
 .tpl-f3 #event-title {
-    position: relative;
-    z-index: 5;
-    font-size: clamp(3rem, 10vw, 6rem); /* Escala Silo v108 */
+    font-size: clamp(3rem, 10vw, 5.5rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -5px; /* Sello de exclusividad Silo */
+    letter-spacing: -5px; /* Sello de fidelidad 1px del Silo */
     line-height: 0.85;
-    margin: 2rem 0 3rem; /* Espaciado equilibrado */
+    margin: 0 0 2.5rem 0;
     text-shadow: 0 0 50px rgba(215, 45, 192, 0.7);
-    color: #fff;
+    color: #ffffff;
 }
-// === FIN SEGMENTO TÍTULO ===
+/* === FIN SEGMENTO TÍTULO === */
 
 
 .tpl-f3 .meta-svg {
@@ -147,29 +155,27 @@
     box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
 }
 
-// === INICIO SEGMENTO: COUNTDOWN HEARTBEAT (v1.3.25) ===
+/* === INICIO SEGMENTO: ALINEACIÓN COUNTDOWN (v1.3.26) === */
 .tpl-f3 .unified-countdown-frame {
     position: relative;
     z-index: 5;
-    margin: 2rem auto 0;
-    padding: 1.5rem 3rem;
+    margin: 3.5rem auto 0 !important; /* Margen exacto del Silo v108 */
+    padding: 1.2rem 2.5rem;
     border: 2px solid var(--f3-accent) !important;
-    border-radius: 20px;
-    background: rgba(10, 10, 12, 0.6);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 0 40px var(--f3-accent-soft);
+    border-radius: 15px;
+    background: rgba(10, 10, 12, 0.4);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 35px var(--f3-accent-soft);
     display: flex;
     width: fit-content;
 }
 
 .tpl-f3 [id^="cd-"] {
-    font-size: 3.5rem !important; /* Estándar GOLD v1.2 */
+    font-size: 3.5rem !important; /* Estándar de Oro v1.2 */
     font-weight: 900;
-    color: #fff;
     text-shadow: 0 0 20px var(--f3-accent);
 }
-// === FIN SEGMENTO COUNTDOWN ===
-
+/* === FIN SEGMENTO COUNTDOWN === */
 
 
 @keyframes f3-heartbeat {
