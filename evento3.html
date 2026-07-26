@@ -228,22 +228,33 @@
     // === FIN SEGMENTO MULTIMEDIA ===
 
 
-  // === INICIO SEGMENTO: PATROCINADORES REALES (v206) ===
-    // 1. Inyección de Marcas desde Campo Separado por Comas [cite: 103]
+  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
+    // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
     const sponsorsRaw = content.sponsors || "";
-    const sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    
-    if (sponsorsList.length > 0) {
-        document.getElementById('db-sponsors-list').innerHTML = sponsorsList.map(url => `
-            <div class="sponsor-item" style="padding: 1rem;">
-                <img src="${url}" class="sponsor-img" style="height:45px; width:auto; opacity:0.8; filter: grayscale(1) brightness(1.5);">
+    let sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    let isFallback = false;
+
+    if (sponsorsList.length === 0) {
+        // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
+        sponsorsList = [
+            "https://supabase.com/favicon/favicon-196x196.png",
+            "https://github.com/apple-touch-icon.png",
+            "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
+        ];
+        isFallback = true;
+    }
+
+    // 2. Inyección Física en el Contrato de Datos [cite: 757]
+    const sponsorsContainer = document.getElementById('db-sponsors-list');
+    if (sponsorsContainer) {
+        sponsorsContainer.innerHTML = sponsorsList.map(url => `
+            <div class="sponsor-item" style="padding: 1.5rem;">
+                <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.7; filter: grayscale(1) brightness(1.2);">
             </div>`).join('');
             
-        // Certificación Cuantitativa (Regla de Oro v123) [cite: 774]
-        logStatus(`TRACE: Sponsors reales inyectados (${sponsorsList.length} marcas).`, "TRACE");
-    } else {
-        // Fallback: si no hay marcas, se oculta el módulo [cite: 765]
-        if (document.getElementById('modulo-sponsors')) document.getElementById('modulo-sponsors').style.display = 'none';
+        // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
+        const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
+        logStatus(`TRACE: ${statusMsg}.`, "TRACE");
     }
     // === FIN SEGMENTO PATROCINADORES ===
 
