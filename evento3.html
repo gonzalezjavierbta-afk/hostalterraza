@@ -303,7 +303,13 @@ if (document.getElementById('db-poster-img')) {
                 return `<div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${q.trim().toUpperCase()}</span><div style="width:22px; height:22px; border-radius:50%; border:1px solid var(--gold, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--gold, #d72dc0);">+</div></div><div class="faq-answer" style="max-height:0; overflow:hidden; transition:0.4s ease; font-size:0.85rem; opacity:0.6; padding-top:0;">${a.trim()}</div></div>`;
             }).join('');
         }
-        document.getElementById('db-faq-list').innerHTML = faqHtml;
+
+        document.getElementById('db-faq-list').innerHTML = content.faq.map(item => `
+    <div class="faq-item" onclick="this.classList.toggle('active')">
+        <div class="faq-question">...</div>
+        <div class="faq-answer">${item.respuesta}</div>
+    </div>`).join('');
+        
         
         // Log TRACE Requerido por Regla de Oro v123 [cite: 768]
         const count = document.querySelectorAll('#db-faq-list .faq-item').length;
