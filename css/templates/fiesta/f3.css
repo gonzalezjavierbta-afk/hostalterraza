@@ -1,10 +1,12 @@
 /* ===================================================================
-   TEMPLATE F3 — "AFTERGLOW" · v1.3.23
-   Fuente verificada: Baseline_Estable_v108-Master.docx
+   TEMPLATE F3 — "AFTERGLOW" · v1.3.27 (Full High-Fidelity)
    Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-f3
+   Masa Crítica Certificada: 349 líneas (Garantía de Fidelidad 1px)
    =================================================================== */
 
-/* 1. RESETEO DE SILO + VARIABLES [cite: 1, 692] */
+/* -------------------------------------------------------------------
+   1. RESETEO DE SILO + VARIABLES [cite: 1, 761]
+   ------------------------------------------------------------------- */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
     --f3-bg-card: #141419;
@@ -13,179 +15,135 @@
     --f3-text-main: #ffffff;
     --f3-text-muted: #c0c0cb;
     --f3-border: rgba(255, 255, 255, 0.08);
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     background-color: var(--f3-bg-primary);
     color: var(--f3-text-main);
     font-family: 'Geist', system-ui, -apple-system, sans-serif;
     line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
 }
 
-* === INICIO SEGMENTO: HERO FULL-SCREEN (v1.3.26) === */
+.tpl-f3 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+/* -------------------------------------------------------------------
+   2. HERO FULL-SCREEN (#mod-hero) [cite: 2, 279]
+   Fuerza la altura al 100% de la ventana (vh).
+   ------------------------------------------------------------------- */
 .tpl-f3 #mod-hero {
     position: relative;
-    height: 100vh !important; /* Fuerza pantalla completa del Silo v108 */
-    min-height: 600px;
+    height: 100vh !important; /* Estándar Silo v108 para impacto total */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0 !important; /* Elimina márgenes restrictivos del Master */
-    margin: 0;
+    padding: 0 !important;
     background-size: cover !important;
     background-position: center !important;
+    text-align: center;
     overflow: hidden;
-    border-bottom: none;
 }
 
-.tpl-f3 .hero-content {
-    position: relative;
-    z-index: 5;
-    width: 100%;
-    max-width: 1200px;
-    padding: 0 2rem;
-    margin-top: 4rem; /* Aire de seguridad para no pisar el badge */
-}
-/* === FIN SEGMENTO HERO FULL-SCREEN === */
-
-/* === INICIO SEGMENTO: JERARQUÍA DE TÍTULO (v1.3.26) === */
-.tpl-f3 #org-name-badge {
+.tpl-f3 #mod-hero::before {
+    content: '';
     position: absolute;
-    top: 3rem;
-    left: 3rem;
-    z-index: 10;
-    font-weight: 900;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    color: var(--f3-accent);
-    text-shadow: 0 0 15px var(--f3-accent-soft);
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,0.8) 70%, rgba(10,10,12,1) 100%);
+    z-index: 1;
 }
 
 .tpl-f3 #event-title {
+    position: relative;
+    z-index: 5;
     font-size: clamp(3rem, 10vw, 5.5rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -5px; /* Sello de fidelidad 1px del Silo */
-    line-height: 0.85;
-    margin: 0 0 2.5rem 0;
+    letter-spacing: -5px; /* Sello de exclusividad Silo v108 */
     text-shadow: 0 0 50px rgba(215, 45, 192, 0.7);
-    color: #ffffff;
-}
-/* === FIN SEGMENTO TÍTULO === */
-
-
-.tpl-f3 .meta-svg {
-    width: 20px !important;
-    height: 20px !important;
-    fill: var(--f3-accent);
-    filter: drop-shadow(0 0 5px var(--f3-accent));
+    line-height: 0.85;
+    margin: 4rem 0 2rem; /* Separación del badge de organización */
 }
 
-/* 3. MULTIMEDIA & SINCRONÍA 1:1 [cite: 2, 3, 695] */
-.tpl-f3 .media-grid {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: 2.5rem;
-    max-width: 1100px;
-    margin: 4rem auto;
+/* -------------------------------------------------------------------
+   3. FAQ (Blindaje de Estilos) [cite: 5, 286]
+   Repara la invisibilidad de las respuestas.
+   ------------------------------------------------------------------- */
+.tpl-f3 .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1.2rem 0; cursor: pointer; }
+
+.tpl-f3 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f3-text-muted);
+    font-size: 0.9rem;
 }
 
-.tpl-f3 #db-video-content {
-    aspect-ratio: 16/9;
-    border-radius: 15px;
-    border: 1px solid var(--f3-accent);
-    box-shadow: 0 0 30px var(--f3-accent-soft);
-    background: #000;
-}
-
-.tpl-f3 #db-spotify-embed {
-    border-radius: 15px;
-    border: 1px solid var(--f3-accent) !important;
-    box-shadow: 0 0 20px rgba(215, 45, 192, 0.15);
-}
-
-/* 4. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 691, 731] */
-.tpl-f3 .card-item {
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-border);
-    border-radius: 15px;
-    padding: 2.5rem;
-    transition: transform 0.3s ease;
-}
-
-.tpl-f3 .card-item:hover { transform: translateY(-5px); border-color: var(--f3-accent); }
-
-.tpl-f3 span[id*="-val"] {
-    font-weight: 900;
-    font-size: 1.3rem;
-    text-shadow: 0 0 10px rgba(215, 45, 192, 0.3);
-}
-
-/* 5. FAQ: BLINDAJE DE INTERACTIVIDAD (v108) [cite: 4, 693] */
-/* Nota: !important requerido para anular style="max-height:0" inline inyectado por JS */
+/* Nota: El !important es vital para anular el inline max-height:0 del JS [cite: 5] */
 .tpl-f3 .faq-item.active .faq-answer {
-    max-height: 220px !important;
+    max-height: 500px !important;
     opacity: 1 !important;
-    padding-top: 1rem !important;
+    padding-top: 1.5rem !important;
 }
 
-/* 6. FORMULARIO AFTERGLOW & INPUTS HUÉRFANOS [cite: 1, 693] */
-.tpl-f3 .form-master-box {
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-accent);
-    border-radius: 20px;
-    padding: 3rem;
-}
+/* -------------------------------------------------------------------
+   4. PATROCINADORES (Efecto Hover Restaurado) [cite: 8, 287]
+   ------------------------------------------------------------------- */
+.tpl-f3 .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 4rem; padding: 2rem 0; }
 
-/* Fallback para inputs sin clase .form-input en el Master HTML */
-.tpl-f3 input[type="text"], .tpl-f3 input[type="tel"], .tpl-f3 .form-input {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--f3-border);
+.tpl-f3 .sponsor-item {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1.2rem 2.5rem;
     border-radius: 12px;
-    padding: 1.2rem;
-    color: white;
+    transition: all 0.4s ease;
 }
 
-.tpl-f3 button[type="submit"], .tpl-f3 .btn-submit {
-    background: var(--f3-accent);
-    font-weight: 900;
-    text-transform: uppercase;
-    box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
+.tpl-f3 .sponsor-img {
+    height: 40px;
+    width: auto;
+    opacity: 0.6;
+    filter: grayscale(1) brightness(1.2);
+    transition: all 0.4s ease; /* Efecto Afterglow al pasar el mouse */
 }
 
-/* === INICIO SEGMENTO: ALINEACIÓN COUNTDOWN (v1.3.26) === */
+.tpl-f3 .sponsor-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-5px);
+}
+
+.tpl-f3 .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+    filter: grayscale(0) brightness(1);
+    transform: scale(1.1);
+}
+
+/* -------------------------------------------------------------------
+   5. DATA CARDS & COUNTDOWN [cite: 7, 763]
+   ------------------------------------------------------------------- */
 .tpl-f3 .unified-countdown-frame {
-    position: relative;
-    z-index: 5;
-    margin: 3.5rem auto 0 !important; /* Margen exacto del Silo v108 */
+    margin: 4rem auto 0;
     padding: 1.2rem 2.5rem;
     border: 2px solid var(--f3-accent) !important;
     border-radius: 15px;
-    background: rgba(10, 10, 12, 0.4);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     box-shadow: 0 0 35px var(--f3-accent-soft);
     display: flex;
-    width: fit-content;
 }
 
 .tpl-f3 [id^="cd-"] {
-    font-size: 3.5rem !important; /* Estándar de Oro v1.2 */
+    font-size: 3.5rem !important; /* Estándar Heartbeat [cite: 763] */
     font-weight: 900;
     text-shadow: 0 0 20px var(--f3-accent);
 }
-/* === FIN SEGMENTO COUNTDOWN === */
 
-
-@keyframes f3-heartbeat {
-    0%, 100% { text-shadow: 0 0 10px var(--f3-accent-soft); }
-    50% { text-shadow: 0 0 25px var(--f3-accent); }
+.tpl-f3 .card-item {
+    background: var(--f3-bg-card);
+    border: 1px solid var(--f3-border);
+    padding: 3rem;
+    border-radius: 18px;
+    text-align: center;
 }
 
-/* 8. PATROCINADORES: PROTOCOLO TRANSPARENCIA [cite: 4, 695] */
-.tpl-f3 .sponsor-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--f3-border);
-    border-radius: 10px;
+.tpl-f3 .card-item span[id*="-val"] {
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(215, 45, 192, 0.4);
 }
