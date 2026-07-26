@@ -190,14 +190,37 @@
                     logStatus(`TRACE: Sponsors inyectados (${spList.length} marcas).`, "TRACE");
                 }
 
-                // LINEUP [cite: 864]
-                if (content.dj_lineup) {
-                    document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => `<div style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold); object-fit:cover;"><span style="font-weight:900; text-transform:uppercase;">${dj.toUpperCase()}</span></div>`).join('');
-                }
 
                 document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
                 document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
                 document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
+
+// === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
+// 1. Verificación de Póster [cite: 343]
+if (document.getElementById('db-poster-img')) {
+    document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
+    logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
+}
+
+// === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198) ===
+    if (content.dj_lineup && Array.isArray(content.dj_lineup)) {
+        document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => {
+            // Soporte Dual: Detecta si 'dj' es un texto simple o un objeto {nombre, foto} [cite: 821]
+            const name = typeof dj === 'object' ? dj.nombre : dj;
+            const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
+            
+            return `
+                <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;">
+                    <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;">
+                    <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
+                </div>`;
+        }).join('');
+        
+        // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
+        logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
+    }
+    // === FIN SEGMENTO: LINEUP ===
+
 
                 // ACTIVACIÓN DE MÓDULOS [cite: 865]
                 const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
