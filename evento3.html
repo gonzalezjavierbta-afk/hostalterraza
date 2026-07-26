@@ -206,22 +206,43 @@ logStatus("TRACE: Multimedia (Video + Spotify) sincronizado con datos reales.", 
             logStatus("Iniciando Orquestador v185 - Full Integrity Baseline.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
-            try {
-                const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
-                if (error || !ev) throw new Error("Evento no hallado.");
-                
-                await injectAtomicCSS(ev.categoria_slug, ev.template_id);
-                document.body.className = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
 
-                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
-                setInterval(() => {
-                    const diff = target - Date.now();
-                    if (diff <= 0) return;
-                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                }, 1000);
+
+            // === INICIO SEGMENTO PROTEGIDO: DATOS & MULTIMEDIA (v195) ===
+try {
+    const { data: ev, error } = await sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
+    if (error || !ev) throw new Error("Evento no hallado.");
+
+    // DECLARACIÓN GLOBAL DEL CONTEXTO (Resuelve el ReferenceError)
+    const content = ev.config_landing?.content || {};
+
+    await injectAtomicCSS(ev.categoria_slug, ev.template_id);
+    document.body.className = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
+
+    // MOTOR DE FECHAS CORREGIDO (Integridad v123) [cite: 809, 873]
+    const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
+    setInterval(() => {
+        const diff = target - Date.now();
+        if (diff <= 0) return;
+        document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+        document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+        document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+        document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+    }, 1000);
+
+    // INYECCIÓN DE VIDEO Y SPOTIFY REAL [cite: 390, 432]
+    if (content.video_url) {
+        const vContainer = document.getElementById('db-video-content');
+        const vId = content.video_url.includes('v=') ? content.video_url.split('v=')[1].split('&') : content.video_url.split('/').pop();
+        vContainer.innerHTML = `<div style="position:relative;width:100%;height:100%;cursor:pointer;background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" onclick="window.open('${content.video_url}', '_blank')"><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg></div></div>`;
+    }
+
+    if (content.playlist_url) {
+        const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
+        document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+        logStatus("LINK: Spotify Sync 1:1 Validado.", "LINK");
+    }
+// === FIN SEGMENTO PROTEGIDO (v195) ===
 
                 if (ev.imagen_url) { document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`; logStatus(`LINK: Fondo Hero inyectado.`, "LINK"); }
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
