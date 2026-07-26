@@ -24,7 +24,8 @@
 
 .tpl-f3 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-/* === INICIO SEGMENTO: HERO OPTICAL BALANCE & IDENTITY (v1.3.32) === */
+
+/* === INICIO SEGMENTO: HERO PROPORTIONS & IDENTITY (v1.3.33) === */
 .tpl-f3 #mod-hero {
     position: relative;
     height: 100vh !important;
@@ -32,11 +33,23 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Aumentamos el padding superior a 15rem para empujar el título al centro óptico */
-    padding: 15rem 2rem 5rem !important; 
+    /* Rebalanceo vertical: 8rem de padding superior para centrar la masa visual */
+    padding: 8rem 2rem 2rem !important; 
     background-size: cover !important;
     background-position: center !important;
     overflow: hidden;
+}
+
+.tpl-f3 .hero-content {
+    position: relative;
+    z-index: 5;
+    /* BLINDAJE DE ANCHO: Evita la extensión excesiva reportada */
+    width: 100%;
+    max-width: 1000px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .tpl-f3 #org-name-badge {
@@ -48,12 +61,11 @@
     letter-spacing: 4px;
     text-transform: uppercase;
     font-size: 0.7rem;
-    /* CORRECCIÓN: Blanco absoluto para legibilidad premium */
-    color: #ffffff !important; 
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    color: #ffffff !important; /* Identidad CHOKOFLOW en blanco absoluto */
     opacity: 0.9;
 }
-/* === FIN SEGMENTO HERO BALANCE === */
+/* === FIN SEGMENTO HERO PROPORTIONS === */
+
 
 .tpl-f3 #mod-hero::before {
     content: '';
@@ -76,34 +88,44 @@
     text-align: center;
 }
 
+./* === INICIO SEGMENTO: METADATA & HEARTBEAT SYNC (v1.3.33) === */
 .tpl-f3 #event-title {
     font-size: clamp(3rem, 10vw, 5.5rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -5px; /* Sello Silo v108 */
+    letter-spacing: -5px;
     line-height: 0.85;
-    /* Margen auto para garantizar centrado horizontal físico */
-    margin: 0 auto 3.5rem !important; 
+    /* Margen inferior para dar espacio a la metadata */
+    margin: 0 auto 3rem !important; 
     text-shadow: 0 0 50px rgba(215, 45, 192, 0.7);
-    color: #ffffff;
+}
+
+.tpl-f3 .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3.5rem;
+    margin-bottom: 4rem !important; /* Separa metadata del countdown inferior */
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: var(--f3-text-muted);
 }
 
 .tpl-f3 .unified-countdown-frame {
     position: relative;
     z-index: 5;
-    /* Mantenemos el estilo de cápsula flotante con ancho contenido */
     width: fit-content !important;
     margin: 0 auto !important; 
-    padding: 1.5rem 3.5rem;
-    background: rgba(10, 10, 12, 0.6) !important;
+    padding: 1.2rem 3rem;
+    background: rgba(10, 10, 12, 0.5) !important;
     backdrop-filter: blur(15px);
     border: 2px solid var(--f3-accent) !important;
     border-radius: 20px;
     box-shadow: 0 0 45px var(--f3-accent-soft);
-    display: flex;
-    gap: 1.5rem;
 }
-/* === FIN SEGMENTO CENTRADO DE MASAS === */
+/* === FIN SEGMENTO METADATA & HEARTBEAT === */
 
 
 
