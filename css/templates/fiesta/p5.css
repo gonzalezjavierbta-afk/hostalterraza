@@ -1,26 +1,22 @@
 /* ===================================================================
-   TEMPLATE P5 — "SELINA STYLE" · v1.2.0 (High-Fidelity Silo)
+   TEMPLATE P5 — "SELINA STYLE" · v1.3.0 (Dynamic Color Bridge)
    Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
-   Contrato de Datos: v107 Compliance
-   Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f)
+   Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
+   Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
    =================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
 
 /* -------------------------------------------------------------------
-   1. RESETEO DE SILO + VARIABLES ATÓMICAS (.tpl-p5)
+   1. RESETEO DE SILO + PUENTE CROMÁTICO DINÁMICO (.tpl-p5)
    ------------------------------------------------------------------- */
 .tpl-p5, .tpl-P5 {
+    --tpl-accent: var(--master-accent, #a3e635);
     --p5-bg-deep: #0a1a0a;
     --p5-bg-wood: #3d2b1f;
-    --p5-accent-lime: #a3e635;
-    --p5-accent-lime-soft: rgba(163, 230, 53, 0.2);
-    --p5-accent-lime-glow: 0 0 20px rgba(163, 230, 53, 0.25);
-    --p5-accent-acid: #bcff00;
     --p5-text-main: #f3f6f0;
     --p5-text-muted: #a3b899;
     --p5-card-bg: rgba(15, 28, 15, 0.75);
-    --p5-card-border: rgba(163, 230, 53, 0.25);
     --p5-font-serif: 'Playfair Display', Georgia, serif;
     --p5-font-sans: 'Geist', system-ui, -apple-system, sans-serif;
     
@@ -41,11 +37,11 @@
 
 .tpl-p5 section, .tpl-P5 section {
     padding: 5rem 10%;
-    border-bottom: 1px solid rgba(163, 230, 53, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tpl-p5 h2, .tpl-P5 h2 {
-    color: var(--p5-accent-lime);
+    color: var(--tpl-accent);
     font-family: var(--p5-font-sans);
     font-size: 0.8rem;
     letter-spacing: 5px;
@@ -82,7 +78,7 @@
     font-weight: 900;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: var(--p5-accent-lime) !important;
+    color: var(--tpl-accent) !important;
     opacity: 0.95;
     margin-bottom: 1rem;
 }
@@ -95,7 +91,7 @@
     line-height: 1.05;
     letter-spacing: -1px !important;
     color: #ffffff;
-    text-shadow: 0 0 35px rgba(163, 230, 53, 0.35), 0 4px 20px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 0 35px var(--tpl-accent), 0 4px 20px rgba(0, 0, 0, 0.6);
     text-transform: uppercase;
     margin: 0.5rem 0 2rem;
 }
@@ -115,12 +111,12 @@
 }
 
 .tpl-p5 .meta-svg, .tpl-P5 .meta-svg {
-    fill: var(--p5-accent-lime) !important;
-    filter: drop-shadow(0 0 6px var(--p5-accent-lime));
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 6px var(--tpl-accent));
 }
 
 /* -------------------------------------------------------------------
-   3. COUNTDOWN FRAME (Heartbeat Orgánico)
+   3. COUNTDOWN FRAME (Heartbeat Orgánico Dinámico)
    ------------------------------------------------------------------- */
 .tpl-p5 .unified-countdown-frame, .tpl-P5 .unified-countdown-frame,
 .tpl-p5 #unified-frame, .tpl-P5 #unified-frame {
@@ -132,16 +128,16 @@
     background: rgba(10, 26, 10, 0.65) !important;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--p5-accent-lime) !important;
+    border: 2px solid var(--tpl-accent) !important;
     border-radius: 25px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), var(--p5-accent-lime-glow) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--tpl-accent) !important;
     margin: 2rem auto;
     width: fit-content;
 }
 
 .tpl-p5 .cd-block, .tpl-P5 .cd-block {
     padding: 0 1.2rem;
-    border-right: 1px solid rgba(163, 230, 53, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
     text-align: center;
 }
 
@@ -155,8 +151,8 @@
     font-size: 3rem !important;
     font-weight: 900 !important;
     line-height: 1;
-    color: var(--p5-accent-lime) !important;
-    text-shadow: 0 0 18px rgba(163, 230, 53, 0.4);
+    color: var(--tpl-accent) !important;
+    text-shadow: 0 0 18px var(--tpl-accent);
 }
 
 .tpl-p5 .unified-countdown-frame small, .tpl-P5 .unified-countdown-frame small {
@@ -168,26 +164,26 @@
 }
 
 /* -------------------------------------------------------------------
-   4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Lime Glow)
+   4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Dynamic Accent Glow)
    ------------------------------------------------------------------- */
 .tpl-p5 .card-item, .tpl-P5 .card-item,
 .tpl-p5 .data-card-underground, .tpl-P5 .data-card-underground {
     background: var(--p5-card-bg) !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--p5-card-border) !important;
+    border: 1px solid var(--tpl-accent) !important;
     border-radius: 25px !important;
     padding: 2.2rem 1.8rem;
     text-align: center;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), var(--p5-accent-lime-glow) !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px var(--tpl-accent) !important;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
 }
 
 .tpl-p5 .card-item:hover, .tpl-P5 .card-item:hover,
 .tpl-p5 .data-card-underground:hover, .tpl-P5 .data-card-underground:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(163, 230, 53, 0.4) !important;
-    border-color: var(--p5-accent-lime) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 35px var(--tpl-accent) !important;
+    border-color: var(--tpl-accent) !important;
 }
 
 .tpl-p5 .data-cards-container, .tpl-P5 .data-cards-container {
@@ -204,13 +200,13 @@
     font-weight: 900;
     font-size: 1.6rem;
     color: #ffffff;
-    text-shadow: 0 0 15px rgba(163, 230, 53, 0.3);
+    text-shadow: 0 0 15px var(--tpl-accent);
     display: block;
     margin-top: 0.4rem;
 }
 
 .tpl-p5 .data-label, .tpl-P5 .data-label {
-    color: var(--p5-accent-lime);
+    color: var(--tpl-accent);
     font-size: 0.65rem;
     font-weight: 900;
     letter-spacing: 3px;
@@ -236,7 +232,7 @@
     font-size: 2.2rem;
     font-weight: 900;
     text-transform: uppercase;
-    border-bottom: 1px solid rgba(163, 230, 53, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.4rem 0;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -247,18 +243,18 @@
 }
 
 .tpl-p5 .artist-row:hover, .tpl-P5 .artist-row:hover {
-    color: var(--p5-accent-lime);
+    color: var(--tpl-accent);
     padding-left: 1.5rem;
-    background: rgba(163, 230, 53, 0.05);
-    border-bottom-color: var(--p5-accent-lime);
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom-color: var(--tpl-accent);
 }
 
 .tpl-p5 .artist-avatar, .tpl-P5 .artist-avatar {
     width: 65px;
     height: 65px;
     border-radius: 50%;
-    border: 2px solid var(--p5-accent-lime);
-    box-shadow: var(--p5-accent-lime-glow);
+    border: 2px solid var(--tpl-accent);
+    box-shadow: 0 0 15px var(--tpl-accent);
     object-fit: cover;
 }
 
@@ -274,8 +270,8 @@
 .tpl-p5 #db-video-content, .tpl-P5 #db-video-content {
     background: #050c05;
     border-radius: 25px;
-    border: 1px solid var(--p5-card-border);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), var(--p5-accent-lime-glow);
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--tpl-accent);
     overflow: hidden;
     aspect-ratio: 16/9;
 }
@@ -283,7 +279,7 @@
 .tpl-p5 .spotify-container, .tpl-P5 .spotify-container,
 .tpl-p5 #db-spotify-embed, .tpl-P5 #db-spotify-embed {
     border-radius: 25px;
-    border: 1px solid var(--p5-card-border);
+    border: 1px solid var(--tpl-accent);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     min-height: 400px;
@@ -297,10 +293,10 @@
     background: var(--p5-card-bg);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid var(--p5-card-border);
+    border: 1px solid var(--tpl-accent);
     border-radius: 25px;
     padding: 3rem;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5), var(--p5-accent-lime-glow);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 25px var(--tpl-accent);
     max-width: 550px;
     margin: 2rem auto 0;
 }
@@ -313,7 +309,7 @@
     padding: 1.2rem 1.4rem;
     margin-bottom: 1.2rem;
     background: rgba(10, 20, 10, 0.8);
-    border: 1px solid rgba(163, 230, 53, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 15px;
     color: #ffffff;
     font-family: var(--p5-font-sans);
@@ -325,15 +321,15 @@
 .tpl-p5 #reg-nombre:focus, .tpl-P5 #reg-nombre:focus,
 .tpl-p5 #reg-cedula:focus, .tpl-P5 #reg-cedula:focus {
     outline: none;
-    border-color: var(--p5-accent-lime);
-    box-shadow: 0 0 15px rgba(163, 230, 53, 0.3);
+    border-color: var(--tpl-accent);
+    box-shadow: 0 0 15px var(--tpl-accent);
 }
 
 .tpl-p5 .btn-submit, .tpl-P5 .btn-submit,
 .tpl-p5 #master-reg-form button[type="submit"], .tpl-P5 #master-reg-form button[type="submit"] {
     width: 100%;
     padding: 1.4rem;
-    background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
+    background: var(--tpl-accent);
     color: #0a1a0a;
     font-family: var(--p5-font-sans);
     font-weight: 900;
@@ -343,22 +339,22 @@
     border: none;
     border-radius: 18px;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(163, 230, 53, 0.35);
+    box-shadow: 0 8px 25px var(--tpl-accent);
     transition: all 0.3s ease;
 }
 
 .tpl-p5 .btn-submit:hover, .tpl-P5 .btn-submit:hover,
 .tpl-p5 #master-reg-form button[type="submit"]:hover, .tpl-P5 #master-reg-form button[type="submit"]:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(163, 230, 53, 0.5);
-    background: linear-gradient(135deg, #b5f542 0%, #a3e635 100%);
+    box-shadow: 0 12px 30px var(--tpl-accent);
+    filter: brightness(1.15);
 }
 
 .tpl-p5 .form-tabs, .tpl-P5 .form-tabs {
     display: flex;
     gap: 1.5rem;
     margin-bottom: 2rem;
-    border-bottom: 1px solid rgba(163, 230, 53, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .tpl-p5 .tab-btn, .tpl-P5 .tab-btn {
@@ -375,15 +371,15 @@
 }
 
 .tpl-p5 .tab-btn.active, .tpl-P5 .tab-btn.active {
-    color: var(--p5-accent-lime);
-    border-bottom: 2px solid var(--p5-accent-lime);
+    color: var(--tpl-accent);
+    border-bottom: 2px solid var(--tpl-accent);
 }
 
 /* -------------------------------------------------------------------
    7. FAQ, MAPA & PATROCINADORES
    ------------------------------------------------------------------- */
 .tpl-p5 .faq-item, .tpl-P5 .faq-item {
-    border-bottom: 1px solid rgba(163, 230, 53, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.3rem 0;
     cursor: pointer;
 }
@@ -407,7 +403,7 @@
 .tpl-p5 #db-mapa-container, .tpl-P5 #db-mapa-container {
     border-radius: 25px;
     overflow: hidden;
-    border: 1px solid var(--p5-card-border);
+    border: 1px solid var(--tpl-accent);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
@@ -425,13 +421,13 @@
     background: rgba(255, 255, 255, 0.04);
     padding: 1.2rem 2.2rem;
     border-radius: 20px;
-    border: 1px solid rgba(163, 230, 53, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.4s ease;
 }
 
 .tpl-p5 .sponsor-item:hover, .tpl-P5 .sponsor-item:hover {
-    background: rgba(163, 230, 53, 0.08);
-    border-color: var(--p5-accent-lime);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--tpl-accent);
     transform: translateY(-4px);
 }
 
@@ -477,7 +473,7 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 3.5rem;
-    border-right: 1px solid rgba(163, 230, 53, 0.2);
+    border-right: 1px solid var(--tpl-accent);
     z-index: 10;
     box-sizing: border-box;
 }
@@ -502,7 +498,7 @@
         position: relative;
         padding: 3rem 2rem;
         border-right: none;
-        border-bottom: 1px solid var(--p5-accent-lime);
+        border-bottom: 1px solid var(--tpl-accent);
     }
     .tpl-p5 .content-scroll, .tpl-P5 .content-scroll {
         width: 100%;

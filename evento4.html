@@ -115,6 +115,13 @@
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
 
+                // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
+                const primaryColor = evento.color_primario || (evento.config_landing?.content?.color_primario);
+                if (primaryColor) {
+                    document.documentElement.style.setProperty('--master-accent', primaryColor);
+                }
+                logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
+
                 // 1. Datos Maestros Hero
                 document.getElementById('event-title').innerText = evento.nombre.toUpperCase();
                 document.getElementById('meta-fecha').innerText = evento.fecha;

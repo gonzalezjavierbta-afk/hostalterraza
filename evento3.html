@@ -195,6 +195,13 @@
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
                 const content = ev.config_landing?.content || {};
 
+                // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
+                const primaryColor = ev.color_primario || content.color_primario || content.accent_color;
+                if (primaryColor) {
+                    document.documentElement.style.setProperty('--master-accent', primaryColor);
+                }
+                logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
+
                 await injectAtomicCSS(ev.categoria_slug, ev.template_id);
 
                 // Activación de Ámbito Dual (P3)
