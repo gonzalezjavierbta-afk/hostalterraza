@@ -284,38 +284,35 @@ if (document.getElementById('db-poster-img')) {
     }
     // === FIN SEGMENTO: LINEUP ===
 
-  // === INICIO SEGMENTO: FAQ MULTI-FORMATO (v200) ===
+   // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
     if (content.faq) {
-        let faqHtml = '';
-        // Soporte para Array de objetos (v199) o String con tuberías (v107) [cite: 8, 338]
+        let faqItems = [];
+        // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
         if (Array.isArray(content.faq)) {
-            faqHtml = content.faq.map(item => `
+            faqItems = content.faq;
+        } else if (typeof content.faq === 'string') {
+            faqItems = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
+                const [q, a] = l.split('|');
+                return { pregunta: q.trim(), respuesta: a.trim() };
+            });
+        }
+
+        if (faqItems.length > 0) {
+            // Inyección con Contrato de Interactividad Física [cite: 706, 18]
+            document.getElementById('db-faq-list').innerHTML = faqItems.map(item => `
                 <div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${(item.pregunta || "").toUpperCase()}</span>
-                        <div style="width:22px; height:22px; border-radius:50%; border:1px solid var(--gold, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--gold, #d72dc0);">+</div>
+                        <div class="faq-icon-circle" style="width:22px; height:22px; border-radius:50%; border:1px solid var(--f3-accent); display:flex; align-items:center; justify-content:center; color:var(--f3-accent);">+</div>
                     </div>
-                    <div class="faq-answer" style="max-height:0; overflow:hidden; transition:0.4s ease; font-size:0.85rem; opacity:0.6; padding-top:0;">${item.respuesta}</div>
+                    <div class="faq-answer">${item.respuesta}</div>
                 </div>`).join('');
-        } else if (typeof content.faq === 'string') {
-            faqHtml = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
-                const [q, a] = l.split('|');
-                return `<div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${q.trim().toUpperCase()}</span><div style="width:22px; height:22px; border-radius:50%; border:1px solid var(--gold, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--gold, #d72dc0);">+</div></div><div class="faq-answer" style="max-height:0; overflow:hidden; transition:0.4s ease; font-size:0.85rem; opacity:0.6; padding-top:0;">${a.trim()}</div></div>`;
-            }).join('');
+            
+            // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
+            logStatus(`TRACE: FAQ inyectado satisfactoriamente (${faqItems.length} preguntas).`, "TRACE");
         }
-
-        document.getElementById('db-faq-list').innerHTML = content.faq.map(item => `
-    <div class="faq-item" onclick="this.classList.toggle('active')">
-        <div class="faq-question">...</div>
-        <div class="faq-answer">${item.respuesta}</div>
-    </div>`).join('');
-        
-        
-        // Log TRACE Requerido por Regla de Oro v123 [cite: 768]
-        const count = document.querySelectorAll('#db-faq-list .faq-item').length;
-        logStatus(`TRACE: FAQ inyectado (${count} preguntas detectadas).`, "TRACE");
     }
-    // === FIN SEGMENTO: FAQ ===
+    // === FIN SEGMENTO FAQ ===
 
     // === INICIO SEGMENTO: VINCULACIÓN DE UBICACIÓN (v201) ===
     if (ev.ubicacion) {
