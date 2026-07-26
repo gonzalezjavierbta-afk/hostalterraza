@@ -1,4 +1,6 @@
-/* TEMPLATE F3 - BASELINE MAESTRO v1.3.19 (Full Integrity Restored) */
+/* === INICIO SEGMENTO: ESTILIZACIÓN MAESTRA AFTERGLOW (v1.3.20) === */
+
+/* 1. RESETEO DE SILO & VARIABLES [cite: 668] */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
     --f3-bg-card: #141419;
@@ -8,202 +10,91 @@
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
     color: var(--f3-text-main);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Geist', 'Inter', sans-serif;
 }
 
-/* 1. HERO & METADATA - FIX ICONOS GIGANTES [cite: 3] */
-.tpl-f3 #mod-hero { position: relative; min-height: 85vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; background-size: cover !important; background-position: center !important; text-align: center; overflow: hidden; }
-.tpl-f3 #mod-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,0.8) 70%, rgba(10,10,12,1) 100%); z-index: 1; }
-.tpl-f3 .hero-content { position: relative; z-index: 5; width: 100%; max-width: 1200px; }
-.tpl-f3 #event-title { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 900; letter-spacing: -4px; text-shadow: 0 0 40px rgba(215, 45, 192, 0.6); margin-bottom: 2rem; line-height: 0.9; }
-.tpl-f3 .hero-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; font-size: 0.9rem; font-weight: 800; text-transform: uppercase; color: var(--f3-text-muted); }
-.tpl-f3 .meta-item { display: flex; align-items: center; gap: 0.8rem; }
-.tpl-f3 .meta-svg { width: 20px !important; height: 20px !important; fill: var(--f3-accent); filter: drop-shadow(0 0 5px var(--f3-accent)); }
-
-/* 2. LINEUP & POSTER [cite: 854] */
-.tpl-f3 #mod-lineup { padding: 6rem 10%; border-bottom: 1px solid var(--f3-border); }
-.tpl-f3 .lineup-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 5rem; max-width: 1100px; margin: 0 auto; align-items: start; }
-.tpl-f3 .poster-box { display: flex; justify-content: center; border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 5rem; }
-.tpl-f3 #db-poster-img { width: 340px; border-radius: 15px; border: 4px solid var(--f3-accent); box-shadow: 0 0 35px rgba(215, 45, 192, 0.4); }
-.tpl-f3 .artist-item { display: flex; align-items: center; gap: 1.8rem; margin-bottom: 2.5rem; }
-.tpl-f3 .artist-avatar { width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--f3-accent); box-shadow: 0 0 15px rgba(215, 45, 192, 0.5); object-fit: cover; }
-.tpl-f3 .artist-name { font-weight: 900; text-transform: uppercase; font-size: 1.15rem; letter-spacing: 1px; }
-
-/* 3. MULTIMEDIA, TECHNICAL & FORM (Full Restore) [cite: 4] */
-.tpl-f3 .media-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; margin: 4rem auto; max-width: 1100px; align-items: stretch; }
-.tpl-f3 #db-video-content { aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--f3-accent); overflow: hidden; }
-.tpl-f3 #db-spotify-embed { border-radius: 15px; border: 1px solid var(--f3-border); overflow: hidden; height: 100%; }
-.tpl-f3 #mod-info-tecnica { padding: 4rem 10%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-.tpl-f3 .card-item { background: var(--f3-bg-card); border: 1px solid var(--f3-border); border-radius: 15px; padding: 2rem; text-align: center; }
-.tpl-f3 #mod-faq { background: var(--f3-bg-card); padding: 3rem; border-radius: 20px; border: 1px solid var(--f3-border); margin: 2rem auto; max-width: 900px; }
-.tpl-f3 #mod-form { max-width: 550px; margin: 4rem auto; padding: 3rem; background: var(--f3-bg-card); border: 1px solid var(--f3-accent); border-radius: 20px; }
-
-/* 4. COUNTDOWN HEARTBEAT [cite: 3] */
-.tpl-f3 .unified-countdown-frame { margin: 4rem auto 0; display: flex; border: 2px solid var(--f3-accent); border-radius: 15px; box-shadow: 0 0 35px rgba(215, 45, 192, 0.5); backdrop-filter: blur(10px); width: fit-content; padding: 1.2rem 2rem; }
-.tpl-f3 .cd-block { padding: 0 1.5rem; border-right: 1px solid rgba(255,255,255,0.15); text-align: center; }
-.tpl-f3 .cd-block:last-child { border-right: none; }
-.tpl-f3 .cd-v { display: block; font-size: 3.5rem !important; font-weight: 900; line-height: 1; }
-
-/* === PASO 5: INTEGRIDAD VISUAL INTERNA === */
-
-/* 1. Definición de Galería para eliminar SYNC WARNING */
-.tpl-f3 #mod-gallery { padding: 4rem 10%; display: block !important; border-bottom: 1px solid var(--f3-border); }
-
-/* 2. Estilos del Formulario (Inputs y Botones) [cite: 283] */
-.tpl-f3 .form-input, .tpl-f3 input[type="text"], .tpl-f3 input[type="tel"], .tpl-f3 input[type="email"] {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1.2rem;
-    border-radius: 12px;
-    color: white;
-    width: 100%;
-    margin-bottom: 1.5rem;
-    font-family: inherit;
+/* 2. HERO: JERARQUÍA PREMIUM [cite: 1, 667] */
+.tpl-f3 #mod-hero {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover !important;
 }
 
-.tpl-f3 .btn-submit, .tpl-f3 button[type="submit"] {
-    background: var(--f3-accent);
-    color: white;
-    border: none;
-    padding: 1.5rem;
-    border-radius: 15px;
+.tpl-f3 #event-title {
+    font-size: clamp(2.8rem, 9vw, 5rem);
     font-weight: 900;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    width: 100%;
-    box-shadow: 0 0 20px rgba(215, 45, 192, 0.3);
+    letter-spacing: -4px;
+    text-shadow: 0 0 40px rgba(215, 45, 192, 0.6);
+    line-height: 0.9;
 }
 
-/* === FASE II: ESTILIZACIÓN PREMIUM (v1.3.20) === */
-
-/* 1. Tratamiento No-Plano de Inputs [cite: 749, 761] */
-.tpl-f3 .form-input, .tpl-f3 input[type="text"], .tpl-f3 input[type="tel"], .tpl-f3 input[type="email"] {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--f3-border);
-    padding: 1.2rem;
-    border-radius: 12px;
-    color: white;
-    width: 100%;
-    margin-bottom: 1.5rem;
-    font-family: 'Geist', sans-serif;
-    transition: border-color 0.3s ease;
+.tpl-f3 .meta-svg {
+    width: 20px !important;
+    height: 20px !important;
+    fill: var(--f3-accent);
+    filter: drop-shadow(0 0 5px var(--f3-accent));
 }
 
-.tpl-f3 .form-input:focus {
-    border-color: var(--f3-accent);
-    outline: none;
+/* 3. MULTIMEDIA: SINCRONÍA 1:1 [cite: 2, 670] */
+.tpl-f3 .media-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 4rem auto;
 }
 
-/* 2. Botón Maestro con Resplandor Afterglow [cite: 2, 749] */
-.tpl-f3 .btn-submit, .tpl-f3 button[type="submit"] {
-    background: var(--f3-accent);
-    color: white;
-    border: none;
-    padding: 1.5rem;
+.tpl-f3 #db-video-content, .tpl-f3 #db-spotify-embed {
     border-radius: 15px;
-    font-weight: 900; /* Estándar Premium v123 */
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    width: 100%;
-    cursor: pointer;
-    box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--f3-accent);
+    overflow: hidden;
+    background: #000;
 }
 
-.tpl-f3 .btn-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 35px rgba(215, 45, 192, 0.6);
-}
-
-/* 3. Refinamiento de Galería [cite: 3, 761] */
-.tpl-f3 .gallery-img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 15px;
+/* 4. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 667, 678] */
+.tpl-f3 .card-item {
+    background: var(--f3-bg-card);
     border: 1px solid var(--f3-border);
+    padding: 2rem;
+    border-radius: 15px;
     transition: transform 0.3s ease;
 }
 
-.tpl-f3 .gallery-img:hover {
-    transform: scale(1.03);
-    border-color: var(--f3-accent);
-}
-
-/* === FASE II: DISEÑO PREMIUM DE FORMULARIO (v1.3.20) === */
-
-/* 1. Inputs con Estética Afterglow [cite: 749, 761] */
-.tpl-f3 .form-input, 
-.tpl-f3 input[type="text"], 
-.tpl-f3 input[type="tel"], 
-.tpl-f3 input[type="email"] {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--f3-border);
-    padding: 1.2rem;
-    border-radius: 12px;
-    color: white;
-    width: 100%;
-    margin-bottom: 1.5rem;
+.tpl-f3 .card-item span[id*="-val"] {
     font-family: 'Geist', sans-serif;
-    transition: all 0.3s ease;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(215, 45, 192, 0.3);
 }
 
-.tpl-f3 .form-input:focus {
-    border-color: var(--f3-accent);
-    box-shadow: 0 0 15px rgba(215, 45, 192, 0.2);
-    outline: none;
+/* 5. FORMULARIO & TABS: ESTÁNDAR $10,000 [cite: 254, 761] */
+.tpl-f3 .form-master-box {
+    background: var(--f3-bg-card);
+    border: 1px solid var(--f3-accent);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-/* 2. Botón Maestro (Geist 900 + Drop-Shadow) [cite: 749, 761] */
-.tpl-f3 .btn-submit, 
-.tpl-f3 button[type="submit"] {
-    background: var(--f3-accent);
+.tpl-f3 .form-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--f3-border);
+    border-radius: 12px;
+    padding: 1.2rem;
     color: white;
-    border: none;
-    padding: 1.5rem;
-    border-radius: 15px;
-    font-weight: 900; /* Estándar Premium v123 */
+    margin-bottom: 1rem;
+}
+
+.tpl-f3 .btn-submit {
+    background: var(--f3-accent);
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;
-    width: 100%;
-    cursor: pointer;
+    border-radius: 15px;
     box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tpl-f3 .btn-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 35px rgba(215, 45, 192, 0.6);
-}
-
-/* 3. Refinamiento de Pestañas Dual-Path [cite: 751] */
-.tpl-f3 .tab-btn.active {
-    color: var(--f3-accent);
-    border-bottom: 2px solid var(--f3-accent);
-    text-shadow: 0 0 10px rgba(215, 45, 192, 0.5);
-}
-
-/* === FASE II: DISEÑO DE PATROCINADORES PREMIUM [cite: 3, 769] === */
-.tpl-f3 .sponsors-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4rem;
-    padding: 2rem 0;
-}
-
-.tpl-f3 .sponsor-img {
-    max-height: 40px;
-    width: auto;
-    opacity: 0.6;
-    transition: all 0.4s ease;
-    /* Evita el error visual de inversión en logos sin transparencia [cite: 769] */
-}
-
-.tpl-f3 .sponsor-img:hover {
-    opacity: 1;
-    filter: grayscale(0) brightness(1);
-    transform: scale(1.1);
-}
+/* === FIN SEGMENTO: ESTILIZACIÓN MAESTRA === */
