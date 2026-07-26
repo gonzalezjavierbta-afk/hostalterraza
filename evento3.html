@@ -125,18 +125,52 @@ function parseSpanishDate(dateStr, timeStr) {
             });
         }
 
-        async function injectAtomicCSS(categoriaSlug, templateId) {
-            return new Promise((resolve) => {
-                const cat = (categoriaSlug || 'fiesta').toLowerCase();
-                const tpl = (templateId || 'f3').toLowerCase();
-                const path = `css/templates/${cat}/${tpl}.css?v=${Date.now()}`;
-                let link = document.querySelector('link[data-template-css]');
-                if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
-                link.onload = () => { logStatus(`LINK: Estilo [${cat}/${tpl}] cargado.`, "LINK"); auditStructuralSync(tpl); resolve(true); };
-                link.onerror = () => { logStatus(`ERROR: No se halló el template en [${path}]`, "ERROR"); resolve(false); };
-                link.href = path;
-            });
+        // === INICIO DEL BLOQUE A PEGAR (PASO 3) ===
+async function injectAtomicCSS(categoriaSlug, templateId) {
+    return new Promise((resolve) => {
+        const cat = (categoriaSlug || 'fiesta').toLowerCase();
+        const tpl = (templateId || 'f3').toLowerCase();
+        const path = `css/templates/${cat}/${tpl}.css?v=${Date.now()}`;
+        let link = document.querySelector('link[data-template-css]');
+        
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.setAttribute('data-template-css', 'true');
+            document.head.appendChild(link);
         }
+
+        link.onload = () => { 
+            logStatus(`LINK: Estilo [${cat}/${tpl}] cargado con éxito.`, "LINK"); 
+            resolve(true); 
+        };
+
+        // RECTIFICACIÓN P0: Evita que el sistema se cuelgue si el CSS falla [cite: 958]
+        link.onerror = () => { 
+            logStatus(`ERROR: No se halló el archivo en [${path}]. Usando fallback.`, "ERROR"); 
+            resolve(false); 
+        };
+
+        link.href = path;
+    });
+}
+// === FIN DEL BLOQUE A PEGAR ===
+
+// === INICIO DEL BLOQUE A PEGAR (PASO 4) ===
+function switchForm(type) {
+    const isNew = type === 'nuevo';
+    // 1. Gestión de estados visuales en los botones
+    document.getElementById('tab-new').classList.toggle('active', isNew);
+    document.getElementById('tab-old').classList.toggle('active', !isNew);
+    
+    // 2. Conmutación física de contenedores [cite: 723]
+    document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
+    document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
+    
+    // 3. Log de auditoría según Escudo GOLD v1.2 [cite: 686]
+    logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
+}
+// === FIN DEL BLOQUE A PEGAR ===
 
         async function initEvento() {
             logStatus("Iniciando Orquestador v185 - Full Integrity Baseline.", "INFO");
