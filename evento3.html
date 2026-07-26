@@ -60,9 +60,23 @@
         </section>
 
         <section id="mod-info-tecnica">
-            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
-                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;"><span id="db-dress-val" style="font-size:1.4rem; font-weight:900;">--</span></div>
-                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;"><span id="db-aforo-val" style="font-size:1.4rem; font-weight:900;">--</span></div>
+            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">DRESS CODE</span>
+                    <span id="db-dress-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">GUEST LIST</span>
+                    <span id="db-guest-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">AFORO</span>
+                    <span id="db-aforo-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">TICKETS</span>
+                    <span id="db-ticket-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
             </div>
         </section>
 
@@ -335,6 +349,28 @@ if (document.getElementById('db-poster-img')) {
         logStatus("TRACE: Módulo de ubicación vinculado y mapa inyectado.", "TRACE");
     }
     // === FIN SEGMENTO UBICACIÓN ===
+
+    // === INICIO SEGMENTO: TECHNICAL DATA RESTORED (v209) ===
+    // technical data restored
+    let technicalCount = 0;
+    if (document.getElementById('db-dress-val')) {
+        document.getElementById('db-dress-val').innerText = (content.dresscode || 'NEON').toUpperCase();
+        technicalCount++;
+    }
+    if (document.getElementById('db-guest-val')) {
+        document.getElementById('db-guest-val').innerText = (content.guest_list || '+200');
+        technicalCount++;
+    }
+    if (document.getElementById('db-aforo-val')) {
+        document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100}`;
+        technicalCount++;
+    }
+    if (document.getElementById('db-ticket-val')) {
+        document.getElementById('db-ticket-val').innerText = (content.tickets_info || 'DISPONIBLES').toUpperCase();
+        technicalCount++;
+    }
+    logStatus(`TRACE: ${technicalCount} tarjetas técnicas mapeadas`, "TRACE");
+    // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
 
                 // ACTIVACIÓN DE MÓDULOS [cite: 865]
                 const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
