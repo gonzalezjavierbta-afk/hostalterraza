@@ -1,21 +1,54 @@
-/* === TEMPLATE F3 - BASELINE MAESTRO v1.3.21 (Fidelidad Afterglow) === */
-/* Protocolo: Aislamiento Atómico (ATOMIC) [cite: 447, 744] */
+/* ===================================================================
+   TEMPLATE F3 — "AFTERGLOW" · v1.3.23
+   Fuente verificada: Baseline_Estable_v108-Master.docx (Master
+   Orchestrator v196) + Reglas de Oro v123-MASTER.
+   Aislamiento Atómico: todo selector vive bajo .tpl-f3, tal como
+   inyecta el orquestador vía `document.body.className = tpl-${id}`.
+   =================================================================== */
 
-/* 1. RESETEO DE SILO & VARIABLES PREMIUM [cite: 1, 10, 744] */
+/* -------------------------------------------------------------------
+   1. RESETEO DE SILO + VARIABLES
+   El Maestro impone márgenes/paddings por defecto en html/body; este
+   bloque neutraliza cualquier desplazamiento antes de estilizar.
+   ------------------------------------------------------------------- */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
     --f3-bg-card: #141419;
-    --f3-accent: #d72dc0; /* Afterglow Magenta */
+    --f3-accent: #d72dc0;
+    --f3-accent-soft: rgba(215, 45, 192, 0.4);
     --f3-text-main: #ffffff;
     --f3-text-muted: #c0c0cb;
     --f3-border: rgba(255, 255, 255, 0.08);
+    margin: 0;
+    padding: 0;
     background-color: var(--f3-bg-primary);
     color: var(--f3-text-main);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* 2. HERO: JERARQUÍA Y TITULADO v108 [cite: 1, 11, 743] */
+.tpl-f3 section,
+.tpl-f3 header {
+    padding: 5rem 10%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-sizing: border-box;
+}
+
+.tpl-f3 h2 {
+    color: var(--f3-accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 900;
+    margin: 0 0 3.5rem;
+    text-align: left;
+}
+
+/* -------------------------------------------------------------------
+   2. HERO (#mod-hero) — El h1#event-title y el header no traen estilo
+   inline propio, así que se pueden definir libremente aquí.
+   ------------------------------------------------------------------- */
 .tpl-f3 #mod-hero {
     position: relative;
     min-height: 85vh;
@@ -24,10 +57,11 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background-size: cover !important;
-    background-position: center !important;
+    background-size: cover;
+    background-position: center;
     text-align: center;
     overflow: hidden;
+    border-bottom: none;
 }
 
 .tpl-f3 #mod-hero::before {
@@ -38,203 +72,278 @@
     z-index: 1;
 }
 
-.tpl-f3 .hero-content { position: relative; z-index: 5; width: 100%; max-width: 1200px; }
+.tpl-f3 #org-name-badge {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
 
 .tpl-f3 #event-title {
+    position: relative;
+    z-index: 5;
     font-size: clamp(2.8rem, 9vw, 5rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: -4px; /* Sello Silo v108 [cite: 1] */
+    letter-spacing: -4px;
     text-shadow: 0 0 40px rgba(215, 45, 192, 0.6);
     line-height: 0.9;
-    margin-bottom: 2rem;
+    margin: 0 0 2rem;
 }
 
 .tpl-f3 .hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 3rem;
-    font-size: 0.9rem;
-    font-weight: 800;
-    text-transform: uppercase;
     color: var(--f3-text-muted);
+    flex-wrap: wrap;
+    letter-spacing: 1px;
 }
 
+.tpl-f3 .meta-item { display: flex; align-items: center; gap: 0.7rem; }
+
 .tpl-f3 .meta-svg {
-    width: 20px !important;
-    height: 20px !important;
     fill: var(--f3-accent);
     filter: drop-shadow(0 0 5px var(--f3-accent));
 }
 
-/* 3. MULTIMEDIA GRID: SINCRONÍA 1:1 [cite: 2, 747] */
-.tpl-f3 .media-grid {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: 2.5rem;
-    max-width: 1100px;
-    margin: 4rem auto;
-    align-items: stretch;
+/* -------------------------------------------------------------------
+   3. COUNTDOWN — los spans #cd-days/hours/mins/secs NO traen clase
+   "cd-v" en este Baseline (solo estilo inline), por eso se targetea
+   por prefijo de ID. font-size necesita !important: el inline fija
+   3.2rem y el Estándar Heartbeat pide 3.5rem.
+   ------------------------------------------------------------------- */
+.tpl-f3 .unified-countdown-frame {
+    border: 2px solid var(--f3-accent) !important;
+    border-radius: 15px;
+    box-shadow: 0 0 35px var(--f3-accent-soft);
+    backdrop-filter: blur(10px);
+    width: fit-content;
 }
 
+.tpl-f3 .cd-block {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+.tpl-f3 .cd-block:last-child { border-right: none; }
+
+.tpl-f3 [id^="cd-"] {
+    font-size: 3.5rem !important;
+    animation: f3-heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes f3-heartbeat {
+    0%, 100% { text-shadow: 0 0 10px var(--f3-accent-soft); }
+    50% { text-shadow: 0 0 25px var(--f3-accent); }
+}
+
+/* -------------------------------------------------------------------
+   4. GALERÍA & SINCRONÍA MULTIMEDIA 1:1
+   #db-video-content ya trae aspect-ratio:16/9 inline (bien);
+   #db-spotify-embed se estira por align-items:stretch del .media-grid
+   padre, logrando la sincronía sin pelear con el inline.
+   ------------------------------------------------------------------- */
+.tpl-f3 #db-gallery-grid img {
+    border-radius: 12px;
+    border: 1px solid var(--f3-border);
+    transition: transform 0.3s ease;
+}
+.tpl-f3 #db-gallery-grid img:hover { transform: scale(1.02); }
+
 .tpl-f3 #db-video-content {
-    aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 15px;
-    border: 1px solid var(--f3-accent);
-    overflow: hidden;
+    box-shadow: 0 0 30px var(--f3-accent-soft);
 }
 
 .tpl-f3 #db-spotify-embed {
-    border-radius: 15px;
-    border: 1px solid var(--f3-border);
-    overflow: hidden;
-    height: 100%;
+    border-color: var(--f3-accent) !important;
+    box-shadow: 0 0 20px rgba(215, 45, 192, 0.15);
 }
 
-/* 4. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 2, 743] */
-.tpl-f3 #mod-info-tecnica {
-    padding: 4rem 10%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.tpl-f3 .card-item {
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-border);
-    border-radius: 15px;
-    padding: 2.5rem;
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.tpl-f3 .card-item:hover { transform: translateY(-5px); border-color: var(--f3-accent); }
-
-.tpl-f3 .card-item span[id*="-val"] {
-    font-family: 'Geist', sans-serif;
-    font-weight: 900; /* Estándar Geist 900 [cite: 743] */
-    font-size: 1.3rem;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(215, 45, 192, 0.3);
-}
-
-/* 5. LINEUP & PÓSTER [cite: 1, 316] */
-.tpl-f3 #mod-lineup { padding: 6rem 10%; border-bottom: 1px solid var(--f3-border); }
-
+/* -------------------------------------------------------------------
+   5. LINEUP & PÓSTER (#mod-lineup)
+   #db-poster-img trae width:320px inline (fijo, no responsivo);
+   se sobreescribe con !important para hacerlo fluido.
+   ------------------------------------------------------------------- */
 .tpl-f3 #db-poster-img {
-    width: 100%;
+    width: 100% !important;
     max-width: 340px;
-    border-radius: 15px;
-    border: 4px solid var(--f3-accent);
-    box-shadow: 0 0 35px rgba(215, 45, 192, 0.4);
+    box-shadow: 0 0 35px var(--f3-accent-soft);
 }
 
 .tpl-f3 .artist-avatar {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    border: 2px solid var(--f3-accent);
-    object-fit: cover;
+    box-shadow: 0 0 15px rgba(215, 45, 192, 0.25);
 }
 
-/* 6. FAQ & UBICACIÓN: INTERACTIVIDAD FÍSICA [cite: 318, 745] */
+.tpl-f3 .artist-name {
+    color: var(--f3-text-main);
+    letter-spacing: 1px;
+    font-size: 0.95rem;
+}
+
+/* -------------------------------------------------------------------
+   6. DATA CARDS (#mod-info-tecnica) — TRATAMIENTO NO-PLANO
+   El inline fija grid-template-columns: repeat(2, 1fr); se libera a
+   auto-fit para que 2, 3 o 4 tarjetas no rompan el layout.
+   ------------------------------------------------------------------- */
+.tpl-f3 .data-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+}
+
+.tpl-f3 .card-item {
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f3 .card-item:hover {
+    transform: translateY(-5px);
+    border-color: var(--f3-accent) !important;
+    box-shadow: 0 0 30px var(--f3-accent-soft);
+}
+
+.tpl-f3 .card-item span[id*="-val"] {
+    text-shadow: 0 0 10px rgba(215, 45, 192, 0.35);
+    letter-spacing: 0.5px;
+}
+
+/* -------------------------------------------------------------------
+   7. FAQ & UBICACIÓN (#mod-faq-ubicacion)
+   Los items de FAQ inyectados por JS NO usan clases para el header
+   ni para el círculo "+"; solo estilo inline. Se targetea por
+   estructura (> div:first-child). El max-height de .faq-answer
+   necesita !important: el JS solo alterna la clase .active y jamás
+   reescribe el inline max-height:0, así que sin !important el
+   acordeón no abriría nunca.
+   ------------------------------------------------------------------- */
 .tpl-f3 .faq-item {
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: 1.5rem 0;
-    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.tpl-f3 .faq-item:hover { background: rgba(255, 255, 255, 0.02); }
+
+.tpl-f3 .faq-item > div:first-child > span {
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.tpl-f3 .faq-item > div:first-child > div {
+    border-color: var(--f3-accent) !important;
+    color: var(--f3-accent) !important;
+    transition: transform 0.3s ease;
+}
+
+.tpl-f3 .faq-item.active > div:first-child > div {
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px var(--f3-accent-soft);
 }
 
 .tpl-f3 .faq-answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    opacity: 0;
-    font-size: 0.85rem;
     color: var(--f3-text-muted);
+    max-height: 0 !important;
+    opacity: 0 !important;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding-top 0.4s ease !important;
 }
 
 .tpl-f3 .faq-item.active .faq-answer {
-    max-height: 200px;
-    opacity: 1;
-    padding-top: 1rem;
+    max-height: 220px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
 }
 
-/* 7. FORMULARIO MAESTRO AFTERGLOW [cite: 2, 7, 743] */
+/* -------------------------------------------------------------------
+   8. PATROCINADORES (#mod-sponsors)
+   Regla de Oro #6: no forzar invert/brightness en logos sin canal
+   alfa confirmado (crea cajas blancas). En vez de pelear con el
+   filtro que ya trae .sponsor-img inline, se le da un "chip" al
+   contenedor .sponsor-item — así cualquier logo, opaco o no, luce
+   intencional.
+   ------------------------------------------------------------------- */
+.tpl-f3 .sponsor-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--f3-border);
+    border-radius: 10px;
+    transition: all 0.4s ease;
+}
+
+.tpl-f3 .sponsor-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--f3-accent);
+}
+
+.tpl-f3 .sponsor-item:hover .sponsor-img {
+    opacity: 1 !important;
+    filter: grayscale(0) !important;
+}
+
+/* -------------------------------------------------------------------
+   9. FORMULARIO MAESTRO AFTERGLOW (#mod-form)
+   #reg-nombre y el botón "CONFIRMAR" no traen clase .form-input/
+   .btn-submit en este Baseline (solo inline). Se cubren por
+   selector de atributo para que no queden sin skin del template.
+   El botón "VERIFICAR" (#form-ya) SÍ trae .btn-submit con
+   background:transparent inline — es el CTA secundario a propósito,
+   por eso no se le toca el fondo, solo el hover.
+   ------------------------------------------------------------------- */
 .tpl-f3 .form-master-box {
-    max-width: 550px;
-    margin: 4rem auto;
-    padding: 3rem;
-    background: var(--f3-bg-card);
-    border: 1px solid var(--f3-accent);
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.tpl-f3 .form-tabs {
+    border-bottom: 1px solid var(--f3-border);
 }
 
 .tpl-f3 .tab-btn {
-    background: none; border: none;
-    color: rgba(255,255,255,0.3);
-    font-weight: 900; text-transform: uppercase;
-    cursor: pointer; padding-bottom: 1rem;
-    border-bottom: 2px solid transparent;
-}
-
-.tpl-f3 .tab-btn.active {
-    color: var(--f3-accent);
-    border-bottom: 2px solid var(--f3-accent);
-    text-shadow: 0 0 10px rgba(215, 45, 192, 0.5);
-}
-
-.tpl-f3 .form-input {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--f3-border);
-    padding: 1.2rem; border-radius: 12px;
-    color: white; width: 100%; margin-bottom: 1.5rem;
-    font-family: 'Geist', sans-serif;
-}
-
-.tpl-f3 .btn-submit {
-    background: var(--f3-accent);
-    color: white; border: none; padding: 1.5rem;
-    border-radius: 15px; font-weight: 900;
-    text-transform: uppercase; letter-spacing: 2px;
-    width: 100%; cursor: pointer;
-    box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
     transition: all 0.3s ease;
 }
 
-.tpl-f3 .btn-submit:hover {
+.tpl-f3 .tab-btn.active {
+    text-shadow: 0 0 10px rgba(215, 45, 192, 0.5);
+}
+
+.tpl-f3 #mod-form input[type="text"],
+.tpl-f3 #mod-form input[type="tel"],
+.tpl-f3 #mod-form input[type="email"],
+.tpl-f3 #mod-form select {
+    transition: border-color 0.3s ease;
+}
+
+.tpl-f3 #mod-form input:focus,
+.tpl-f3 #mod-form select:focus {
+    outline: none;
+    border-color: var(--f3-accent) !important;
+}
+
+.tpl-f3 #mod-form button[type="submit"] {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
+}
+
+.tpl-f3 #mod-form button[type="submit"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 0 35px rgba(215, 45, 192, 0.6);
 }
 
-/* 8. COUNTDOWN & FOOTER [cite: 12, 746, 776] */
-.tpl-f3 .unified-countdown-frame {
-    margin: 4rem auto 0;
-    display: flex;
-    border: 2px solid var(--f3-accent);
-    border-radius: 15px;
-    box-shadow: 0 0 35px rgba(215, 45, 192, 0.5);
-    backdrop-filter: blur(10px);
-    width: fit-content; padding: 1.2rem 2rem;
+.tpl-f3 .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--f3-accent-soft);
 }
 
-.tpl-f3 .cd-v {
-    display: block;
-    font-size: 3.5rem !important; /* Estándar Heartbeat [cite: 12] */
-    font-weight: 900;
-    line-height: 1;
-}
+/* -------------------------------------------------------------------
+   10. RESPONSIVE
+   Varios grids (media-grid, lineup-grid, el wrapper de
+   #mod-faq-ubicacion) traen grid-template-columns inline; se
+   sobreescriben con !important solo dentro del breakpoint.
+   ------------------------------------------------------------------- */
+@media (max-width: 850px) {
+    .tpl-f3 .media-grid { grid-template-columns: 1fr !important; }
 
-.tpl-f3 .sponsors-grid {
-    display: flex; flex-wrap: wrap;
-    justify-content: center; align-items: center;
-    gap: 4rem; padding: 2rem 0;
-}
+    .tpl-f3 .lineup-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+    .tpl-f3 .lineup-grid > div:first-child {
+        padding-right: 0 !important;
+        border-right: none !important;
+    }
 
-.tpl-f3 .sponsor-img {
-    height: 40px; width: auto;
-    opacity: 0.6; filter: grayscale(1) brightness(1.5);
-    transition: all 0.4s ease;
+    .tpl-f3 #mod-faq-ubicacion > div {
+        grid-template-columns: 1fr !important;
+        gap: 2.5rem !important;
+    }
+
+    .tpl-f3 [id^="cd-"] { font-size: 2.2rem !important; }
+    .tpl-f3 #event-title { letter-spacing: -2px; }
+    .tpl-f3 #db-poster-img { max-width: 100%; }
 }
