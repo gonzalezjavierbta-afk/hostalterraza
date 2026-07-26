@@ -89,29 +89,47 @@
 }
 
 ./* === INICIO SEGMENTO: METADATA & HEARTBEAT SYNC (v1.3.33) === */
+/* === INICIO SEGMENTO: TITLE AFTERGLOW (v1.3.34) === */
 .tpl-f3 #event-title {
+    position: relative;
+    z-index: 5;
     font-size: clamp(3rem, 10vw, 5.5rem);
-    font-weight: 900;
+    /* EL ALMA DEL SILO v108 */
+    font-weight: 900 !important; 
     text-transform: uppercase;
-    letter-spacing: -5px;
+    letter-spacing: -5px !important; 
     line-height: 0.85;
-    /* Margen inferior para dar espacio a la metadata */
-    margin: 0 auto 3rem !important; 
-    text-shadow: 0 0 50px rgba(215, 45, 192, 0.7);
+    margin: 0 auto 3.5rem !important; 
+    /* EFECTO CINEMATOGRÁFICO v121 */
+    text-shadow: 0 0 50px rgba(215, 45, 192, 0.7), 0 0 20px rgba(215, 45, 192, 0.4);
+    color: #ffffff;
+    max-width: 1000px;
 }
+/* === FIN SEGMENTO TITLE AFTERGLOW === */
 
+/* === INICIO SEGMENTO: METADATA OXYGEN (v1.3.34) === */
 .tpl-f3 .hero-meta {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 3.5rem;
-    margin-bottom: 4rem !important; /* Separa metadata del countdown inferior */
+    gap: 4rem; /* Aumentado para evitar saturación horizontal */
+    margin-bottom: 5rem !important; /* Espacio sagrado ante el countdown */
     font-weight: 800;
     text-transform: uppercase;
     font-size: 0.85rem;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     color: var(--f3-text-muted);
 }
+
+.tpl-f3 .meta-svg {
+    width: 22px !important;
+    height: 22px !important;
+    fill: var(--f3-accent);
+    filter: drop-shadow(0 0 8px var(--f3-accent));
+}
+/* === FIN SEGMENTO METADATA OXYGEN === */
+
+
 
 .tpl-f3 .unified-countdown-frame {
     position: relative;
@@ -219,3 +237,23 @@
     font-size: 1.5rem;
     text-shadow: 0 0 15px rgba(215, 45, 192, 0.4);
 }
+
+/* === INICIO SEGMENTO: TYPOGRAPHY CORE (v1.3.34) === */
+@import url('https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css');
+
+.tpl-f3 {
+    --f3-bg-primary: #0a0a0c;
+    --f3-bg-card: #141419;
+    --f3-accent: #d72dc0;
+    --f3-accent-soft: rgba(215, 45, 192, 0.4);
+    --f3-text-main: #ffffff;
+    --f3-text-muted: #c0c0cb;
+    --f3-border: rgba(255, 255, 255, 0.08);
+    margin: 0; padding: 0;
+    background-color: var(--f3-bg-primary);
+    color: var(--f3-text-main);
+    /* FUERZA GEIST EN TODO EL TEMPLATE */
+    font-family: 'Geist', system-ui, -apple-system, sans-serif !important;
+    line-height: 1.5;
+}
+/* === FIN SEGMENTO TYPOGRAPHY CORE === */
