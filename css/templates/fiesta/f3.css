@@ -1,33 +1,66 @@
-/* === INICIO SEGMENTO: ESTILIZACIÓN MAESTRA AFTERGLOW (v1.3.20) === */
+* === TEMPLATE F3 - BASELINE MAESTRO v1.3.20 (Restauración Afterglow) === */
+/* Masa Crítica Certificada: ~200 líneas [cite: 776] */
 
-/* 1. RESETEO DE SILO & VARIABLES [cite: 668] */
+/* 1. RESETEO DE SILO & VARIABLES AFTERGLOW [cite: 1, 12, 769] */
 .tpl-f3 {
     --f3-bg-primary: #0a0a0c;
     --f3-bg-card: #141419;
     --f3-accent: #d72dc0; /* Afterglow Magenta */
+    --f3-gold: #c8a96e;   /* Gold Accent */
     --f3-text-main: #ffffff;
     --f3-text-muted: #c0c0cb;
     --f3-border: rgba(255, 255, 255, 0.08);
     background-color: var(--f3-bg-primary);
     color: var(--f3-text-main);
-    font-family: 'Geist', 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* 2. HERO: JERARQUÍA PREMIUM [cite: 1, 667] */
+/* 2. HERO: JERARQUÍA Y TITULADO v108 [cite: 1, 13] */
 .tpl-f3 #mod-hero {
+    position: relative;
     min-height: 85vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 2rem;
     background-size: cover !important;
+    background-position: center !important;
+    text-align: center;
+    overflow: hidden;
+}
+
+.tpl-f3 #mod-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,0.8) 70%, rgba(10,10,12,1) 100%);
+    z-index: 1;
 }
 
 .tpl-f3 #event-title {
+    position: relative;
+    z-index: 5;
     font-size: clamp(2.8rem, 9vw, 5rem);
     font-weight: 900;
+    text-transform: uppercase;
     letter-spacing: -4px;
     text-shadow: 0 0 40px rgba(215, 45, 192, 0.6);
     line-height: 0.9;
+    margin-bottom: 2rem;
+}
+
+.tpl-f3 .hero-meta {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--f3-text-muted);
 }
 
 .tpl-f3 .meta-svg {
@@ -37,64 +70,180 @@
     filter: drop-shadow(0 0 5px var(--f3-accent));
 }
 
-/* 3. MULTIMEDIA: SINCRONÍA 1:1 [cite: 2, 670] */
+/* 3. LINEUP & POSTER: BLINDAJE VISUAL [cite: 2, 327] */
+.tpl-f3 #mod-lineup {
+    padding: 6rem 10%;
+    border-bottom: 1px solid var(--f3-border);
+}
+
+.tpl-f3 #db-poster-img {
+    width: 340px;
+    border-radius: 15px;
+    border: 4px solid var(--f3-accent);
+    box-shadow: 0 0 35px rgba(215, 45, 192, 0.4);
+}
+
+.tpl-f3 .artist-avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid var(--f3-accent);
+    box-shadow: 0 0 15px rgba(215, 45, 192, 0.5);
+    object-fit: cover;
+}
+
+.tpl-f3 .artist-name {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+}
+
+/* 4. MULTIMEDIA GRID: SINCRONÍA 1:1 [cite: 3, 772] */
 .tpl-f3 .media-grid {
     display: grid;
     grid-template-columns: 1.6fr 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
     max-width: 1100px;
     margin: 4rem auto;
 }
 
-.tpl-f3 #db-video-content, .tpl-f3 #db-spotify-embed {
+.tpl-f3 #db-video-content {
+    aspect-ratio: 16/9;
     border-radius: 15px;
     border: 1px solid var(--f3-accent);
     overflow: hidden;
     background: #000;
 }
 
-/* 4. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 667, 678] */
+.tpl-f3 #db-spotify-embed {
+    border-radius: 15px;
+    border: 1px solid var(--f3-border);
+    overflow: hidden;
+    height: 100%;
+}
+
+/* 5. DATA CARDS: TRATAMIENTO NO-PLANO [cite: 3, 768] */
 .tpl-f3 .card-item {
     background: var(--f3-bg-card);
     border: 1px solid var(--f3-border);
-    padding: 2rem;
     border-radius: 15px;
+    padding: 2.5rem;
+    text-align: center;
     transition: transform 0.3s ease;
 }
 
-.tpl-f3 .card-item span[id*="-val"] {
+.tpl-f3 .card-item:hover { transform: translateY(-5px); }
+
+.tpl-f3 span[id*="-val"] {
     font-family: 'Geist', sans-serif;
     font-weight: 900;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: #fff;
     text-shadow: 0 0 10px rgba(215, 45, 192, 0.3);
 }
 
-/* 5. FORMULARIO & TABS: ESTÁNDAR $10,000 [cite: 254, 761] */
+/* 6. FAQ & UBICACIÓN: INTERACTIVIDAD FÍSICA [cite: 10, 319, 770] */
+.tpl-f3 .faq-item {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    padding: 1.2rem 0;
+}
+
+.tpl-f3 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: 0.4s ease;
+    font-size: 0.85rem;
+    color: var(--f3-text-muted);
+}
+
+.tpl-f3 .faq-item.active .faq-answer {
+    max-height: 200px;
+    opacity: 1;
+    padding-top: 1rem;
+}
+
+/* 7. FORMULARIO PREMIUM & TABS DUAL-PATH [cite: 3, 8, 10] */
 .tpl-f3 .form-master-box {
+    max-width: 550px;
+    margin: 4rem auto;
+    padding: 3rem;
     background: var(--f3-bg-card);
     border: 1px solid var(--f3-accent);
     border-radius: 20px;
-    padding: 3rem;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
+.tpl-f3 .tab-btn {
+    background: none; border: none;
+    color: rgba(255,255,255,0.3);
+    font-weight: 900; text-transform: uppercase;
+    cursor: pointer; padding-bottom: 1rem;
+    border-bottom: 2px solid transparent;
+}
+
+.tpl-f3 .tab-btn.active {
+    color: var(--f3-accent);
+    border-bottom: 2px solid var(--f3-accent);
+    text-shadow: 0 0 10px rgba(215, 45, 192, 0.5);
+}
+
 .tpl-f3 .form-input {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--f3-border);
-    border-radius: 12px;
-    padding: 1.2rem;
-    color: white;
-    margin-bottom: 1rem;
+    padding: 1.2rem; border-radius: 12px;
+    color: white; width: 100%; margin-bottom: 1.5rem;
 }
 
 .tpl-f3 .btn-submit {
     background: var(--f3-accent);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    border-radius: 15px;
+    color: white; border: none; padding: 1.5rem;
+    border-radius: 15px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 2px;
+    width: 100%; cursor: pointer;
     box-shadow: 0 0 25px rgba(215, 45, 192, 0.4);
+    transition: all 0.3s ease;
 }
 
-/* === FIN SEGMENTO: ESTILIZACIÓN MAESTRA === */
+.tpl-f3 .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(215, 45, 192, 0.6);
+}
+
+/* 8. COUNTDOWN HEARTBEAT [cite: 4, 14, 771] */
+.tpl-f3 .unified-countdown-frame {
+    margin: 4rem auto 0;
+    display: flex;
+    border: 2px solid var(--f3-accent);
+    border-radius: 15px;
+    box-shadow: 0 0 35px rgba(215, 45, 192, 0.5);
+    backdrop-filter: blur(10px);
+    width: fit-content; padding: 1.2rem 2rem;
+}
+
+.tpl-f3 .cd-v {
+    display: block;
+    font-size: 3.5rem !important;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* 9. SPONSORS: TRANSPARENCIA REAL [cite: 10, 11, 772] */
+.tpl-f3 .sponsors-grid {
+    display: flex; flex-wrap: wrap;
+    justify-content: center; align-items: center;
+    gap: 4rem; padding: 2rem 0;
+}
+
+.tpl-f3 .sponsor-img {
+    height: 40px; width: auto;
+    opacity: 0.6; filter: grayscale(1) brightness(1.5);
+    transition: all 0.4s ease;
+}
+
+.tpl-f3 .sponsor-img:hover {
+    opacity: 1; filter: grayscale(0) brightness(1);
+    transform: scale(1.1);
+}
