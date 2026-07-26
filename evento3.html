@@ -221,6 +221,24 @@ if (document.getElementById('db-poster-img')) {
     }
     // === FIN SEGMENTO: LINEUP ===
 
+     // === INICIO SEGMENTO: FAQ E INFO TÉCNICA (v199) ===
+    // 1. Renderizado de FAQ con Interactividad Física [cite: 653]
+    if (content.faq && Array.isArray(content.faq)) {
+        document.getElementById('db-faq-list').innerHTML = content.faq.map(item => `
+            <div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.5rem 0; border-bottom:1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:800; font-size:0.9rem; letter-spacing:1px;">${item.pregunta.toUpperCase()}</span>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="transition:transform 0.3s ease;"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div class="faq-answer" style="padding-top:1rem; font-size:0.85rem; opacity:0.7; line-height:1.6;">${item.respuesta}</div>
+            </div>`).join('');
+        logStatus(`TRACE: FAQ inyectado (${content.faq.length} preguntas con interactividad física).`, "TRACE");
+    }
+
+    // 2. Sincronización de Info Técnica [cite: 651]
+    document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
+    document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
+    // === FIN SEGMENTO: FAQ E INFO ===
 
                 // ACTIVACIÓN DE MÓDULOS [cite: 865]
                 const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
