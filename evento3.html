@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v191 · Full Integrity & Brightness</title>
+    <title>Master Orchestrator v192 · Multimedia & Sponsors Active</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
@@ -13,18 +13,16 @@
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
         section, header { display: none; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
-        .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); padding-bottom: 0.8rem; cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; }
+        .tab-btn { background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; }
     </style>
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">CALIBRANDO BRILLO v191...</div>
+    <div id="loader" class="loading-overlay">SINCRO MULTIMEDIA v192...</div>
 
-    <!-- MÓDULO 1: HERO CON Z-INDEX PROTEGIDO -->
     <header id="mod-hero" class="hero">
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
-        <div class="hero-content" style="position:relative; z-index:5;"> <!-- RECTIFICACIÓN: z-index 5 gana al difuminado -->
+        <div class="hero-content" style="position:relative; z-index:5;">
             <h1 id="event-title">--</h1>
             <div class="hero-meta">
                 <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="20" height="20"><path fill="#d72dc0" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
@@ -47,19 +45,36 @@
                 <div id="db-lineup" style="display:flex; flex-direction:column; padding-left:5rem;"></div>
             </div>
         </section>
+
+        <!-- MÓDULO 3: GALERÍA (v192) -->
         <section id="mod-gallery">
-            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem; margin-bottom:4rem;"></div>
-            <div class="media-grid" style="display:grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 0 auto;"><div id="db-video-content"></div><div id="db-spotify-embed"></div></div>
+            <div id="db-gallery-grid"></div>
+            <div class="media-grid" style="display:grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 0 auto;">
+                <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid #d72dc0; overflow: hidden;"></div>
+                <div id="db-spotify-embed" style="border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;"></div>
+            </div>
         </section>
+
         <section id="mod-info-tecnica">
             <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
                 <div class="card-item"><span id="db-dress-val" style="font-size:1.4rem; font-weight:900;">--</span></div>
                 <div class="card-item"><span id="db-aforo-val" style="font-size:1.4rem; font-weight:900;">--</span></div>
             </div>
         </section>
-        <section id="mod-faq-ubicacion"><div id="mod-faq"><h2>FAQ</h2><div id="db-faq-list"></div></div><div id="db-mapa-container"></div></section>
-        <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; margin-top:3rem; flex-wrap:wrap;"></div></section>
-        <section id="mod-form"><div class="form-master-box"><div id="form-nuevo"><form id="master-reg-form"><input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;"><button type="submit" style="width:100%; padding:1.5rem; background:#d72dc0; border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR →</button></form></div></div></section>
+
+        <section id="mod-faq-ubicacion">
+            <div id="mod-faq"><h2>FAQ</h2><div id="db-faq-list"></div></div>
+            <div id="db-mapa-container"></div>
+        </section>
+
+        <!-- MÓDULO 6: SPONSORS (v192) -->
+        <section id="mod-sponsors" style="text-align:center; padding:4rem 0;">
+            <div id="db-sponsors-list"></div>
+        </section>
+
+        <section id="mod-form">
+            <div class="form-master-box"><div id="form-nuevo"><form id="master-reg-form"><input type="text" id="reg-nombre" placeholder="Nombre completo *" required><button type="submit">CONFIRMAR →</button></form></div></div>
+        </section>
     </main>
 
     <script>
@@ -72,34 +87,11 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
-        // CORRECCIÓN P0: Mapeo de índices blindado (0=día, 1=mes, 2=año) [cite: 815, 825]
         function parseSpanishDate(dateStr, timeStr) {
             const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
             const parts = dateStr.toLowerCase().split(' de ');
-            if (parts.length === 3) {
-                const d = parts.trim().padStart(2, '0');
-                const m = months[parts[8].trim()];
-                const a = parts[3].trim();
-                return new Date(`${a}-${m}-${d}T${timeStr}`);
-            }
+            if (parts.length === 3) return new Date(`${parts[1].trim()}-${months[parts[2].trim()]}-${parts.trim().padStart(2, '0')}T${timeStr}`);
             return new Date(`${dateStr}T${timeStr}`);
-        }
-
-        async function auditStructuralSync(templateId) {
-            const scope = `.tpl-${templateId.toLowerCase()}`;
-            const IDs = ['#mod-hero', '#mod-lineup', '#mod-gallery', '#mod-info-tecnica', '#mod-faq', '#mod-form'];
-            let selectors = [];
-            try {
-                for (let sheet of document.styleSheets) {
-                    if (sheet.href && sheet.href.includes(templateId)) {
-                        for (let rule of (sheet.cssRules || sheet.rules)) { if (rule.selectorText) selectors.push(rule.selectorText.toLowerCase()); }
-                    }
-                }
-            } catch (e) {}
-            IDs.forEach(id => {
-                if (selectors.some(s => s.includes(scope) && s.includes(id))) logStatus(`SYNC OK: Módulo [${id}] vinculado en CSS.`, "LINK");
-                else logStatus(`SYNC WARNING: Módulo [${id}] sin reglas de diseño.`, "DEBUG");
-            });
         }
 
         async function injectAtomicCSS(catSlug, tplId) {
@@ -107,14 +99,14 @@
                 const path = `css/templates/${(catSlug || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
                 let link = document.querySelector('link[data-template-css]');
                 if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
-                link.onload = () => { logStatus(`LINK: Estilo [${tplId}] cargado satisfactoriamente.`, "LINK"); auditStructuralSync(tplId); resolve(true); };
+                link.onload = () => { logStatus(`LINK: Estilo [${tplId}] cargado.`, "LINK"); resolve(true); };
                 link.onerror = () => { logStatus(`ERROR: Fallo carga en [${path}]`, "ERROR"); resolve(false); };
                 link.href = path;
             });
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v191 - Brightness & Sync Baseline.", "INFO");
+            logStatus("Iniciando Orquestador v192 - Multimedia Sync.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
             try {
@@ -125,8 +117,6 @@
                 document.body.className = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
 
                 const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
-                if (isNaN(target)) logStatus("TIME ERROR: Fallo crítico en el motor de fechas.", "ERROR");
-                
                 setInterval(() => {
                     const diff = target - Date.now();
                     if (diff <= 0) return;
@@ -136,26 +126,42 @@
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
 
-                if (ev.imagen_url) { document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`; logStatus(`LINK: Fondo Hero inyectado.`, "LINK"); }
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
+                document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
+                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
                 const content = ev.config_landing?.content || {};
-                if (content.gallery) {
+                
+                // INYECCIÓN CUANTITATIVA GALERÍA [cite: 827]
+                if (content.gallery && Array.isArray(content.gallery)) {
                     document.getElementById('db-gallery-grid').innerHTML = content.gallery.map(url => `<img src="${url}" class="gallery-img">`).join('');
                     logStatus(`TRACE: Galería inyectada (${content.gallery.length} fotos).`, "TRACE");
                 }
+
+                // INYECCIÓN CUANTITATIVA SPONSORS [cite: 827]
+                const spList = Array.isArray(content.sponsors) ? content.sponsors : (content.sponsors || "").split(',').map(s => s.trim());
+                document.getElementById('db-sponsors-list').innerHTML = spList.map(name => `<span class="sponsor-tag">${name.toUpperCase()}</span>`).join('');
+                logStatus(`TRACE: Sponsors inyectados (${spList.length} marcas).`, "TRACE");
+
+                // INYECCIÓN LINEUP
                 if (content.dj_lineup) {
-                    document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => `<div style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;"><img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" style="width:65px; height:65px; border-radius:50%; border:2px solid #d72dc0; object-fit:cover;"><span style="font-weight:900; text-transform:uppercase;">${dj.toUpperCase()}</span></div>`).join('');
-                    logStatus(`TRACE: Lineup inyectado satisfactoriamente.`, "TRACE");
+                    document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => `
+                        <div style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2rem;">
+                            <img src="https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=200" style="width:65px; height:65px; border-radius:50%; border:2px solid #d72dc0; object-fit:cover;">
+                            <span style="font-weight:900; text-transform:uppercase;">${dj.toUpperCase()}</span>
+                        </div>`).join('');
                 }
 
-                const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
-                modules.forEach(id => { if (document.getElementById(id)) { document.getElementById(id).style.setProperty('display', 'block', 'important'); logStatus(`INFO: Módulo [${id}] -> VALIDADO Y ACTIVO`, "INFO"); } });
+                document.getElementById('db-dress-val').innerText = (content.dresscode || "Formal").toUpperCase();
+                document.getElementById('db-aforo-val').innerText = `${ev.aforo_max || 100} PERSONAS`;
+                document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
 
-                logStatus(`TRACE: 12 Módulos sincronizados | FAQ Onclick Presente | Heartbeat OK.`, "TRACE");
+                const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
+                modules.forEach(id => { if (document.getElementById(id)) document.getElementById(id).style.setProperty('display', 'block', 'important'); });
+
             } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
