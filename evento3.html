@@ -172,6 +172,36 @@ function switchForm(type) {
 }
 // === FIN DEL BLOQUE A PEGAR ===
 
+// === PASO 7: SINCRONÍA MULTIMEDIA REAL (Silo v119 Style) ===
+
+// 1. Inyección de Video (Blindaje contra Error 153) [cite: 372]
+if (content.video_url) {
+    const videoContainer = document.getElementById('db-video-content');
+    if (content.video_url.includes('youtube.com') || content.video_url.includes('youtu.be')) {
+        // Extraer ID y poner miniatura para evitar bloqueo en navegadores in-app [cite: 372]
+        const vId = content.video_url.split('v=')[1] || content.video_url.split('/').pop();
+        videoContainer.innerHTML = `
+            <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
+                 onclick="window.open('${content.video_url}', '_blank')">
+                <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;">
+                    <svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
+                </div>
+            </div>`;
+    } else {
+        // Vimeo u otros usan iframe estándar
+        videoContainer.innerHTML = `<iframe src="${content.video_url}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
+    }
+}
+
+// 2. Inyección de Spotify (Sincronía 1:1) [cite: 435]
+if (content.playlist_url) {
+    const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
+    document.getElementById('db-spotify-embed').innerHTML = `
+        <iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+}
+
+logStatus("TRACE: Multimedia (Video + Spotify) sincronizado con datos reales.", "TRACE");
+
         async function initEvento() {
             logStatus("Iniciando Orquestador v185 - Full Integrity Baseline.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
