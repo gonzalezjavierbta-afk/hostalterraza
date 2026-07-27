@@ -605,20 +605,25 @@
     }
 }
 
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.67) === */
+
+/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.68) === */
 @media (min-width: 1024px) {
-    /* PANEL IZQUIERDO: Blindaje de Posición */
-    .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; z-index: 10; }
-    .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; z-index: 100; background: transparent !important; }
-
-    /* PANEL DERECHO: Empuje Sagrado al 62% */
-    .tpl-p5 #main-content-flow {
-        display: block !important;
-        margin-left: 38vw !important; /* PUSH AL SECTOR DERECHO */
-        width: 62vw !important;
+    .tpl-p5 #mod-hero { position: fixed !important; left: 0; top: 0; width: 38vw !important; z-index: 10; }
+    
+    .tpl-p5 #mod-form { 
+        position: fixed !important; 
+        left: 0; top: 0; 
+        width: 38vw !important; 
+        height: 100vh !important;
+        z-index: 100; /* Siempre arriba del Hero */
+        background: transparent !important; /* Ver el Hero de fondo */
+        display: flex !important;
+        align-items: center;
+        overflow-y: auto;
     }
-}
 
+    .tpl-p5 #main-content-flow { margin-left: 38vw !important; width: 62vw !important; }
+}
 
 
 
