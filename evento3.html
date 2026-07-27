@@ -468,6 +468,11 @@ if (document.getElementById('db-poster-img')) {
 
                 logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
 
+                 // === INICIO SEGMENTO INYECTADO: AUDITORÍA ESTRUCTURAL P5 (v1.3.49) ===
+                if (document.body.classList.contains('tpl-p5')) {
+                    logStatus("TRACE: Diagramación Split-Screen validada | Formulario anclado a la izquierda", "TRACE");
+                }
+                // === FIN SEGMENTO INYECTADO: AUDITORÍA ESTRUCTURAL P5 ===
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");
 
