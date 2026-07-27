@@ -483,11 +483,16 @@ if (document.getElementById('db-poster-img')) {
 
                 logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
 
-                 // === INICIO SEGMENTO INYECTADO: AUDITORÍA ESTRUCTURAL P5 (v1.3.49) ===
-                if (document.body.classList.contains('tpl-p5')) {
-                    logStatus("TRACE: Diagramación Split-Screen validada | Formulario anclado a la izquierda", "TRACE");
-                }
-                // === FIN SEGMENTO INYECTADO: AUDITORÍA ESTRUCTURAL P5 ===
+                 // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL P5 con SENSOR (v1.3.55) ===
+    if (document.body.classList.contains('tpl-p5')) {
+        const heroEl = document.getElementById('mod-hero');
+        // Leemos la física real calculada por el motor de renderizado del navegador
+        const heroMargin = window.getComputedStyle(heroEl).marginLeft;
+        const heroDisplay = window.getComputedStyle(heroEl).display;
+        
+        logStatus(`TRACE: Split-Screen P5 Audit | Margen Hero: ${heroMargin} | Estado: ${heroDisplay}`, "TRACE");
+    }
+    // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL P5 con SENSOR ===
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");
 
