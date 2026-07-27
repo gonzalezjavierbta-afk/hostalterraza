@@ -619,39 +619,35 @@
 }
 
 
-
 /* === REEMPLAZO C: COUNTDOWN AL PANEL DERECHO v1.3.80 === */
 @media (min-width: 1024px) {
-    /* 1. ANCLAJE IZQUIERDO (Se mantiene estable) */
+    /* 1. ANCLAJE IZQUIERDO (Hero y Formulario permanecen estables) */
     .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; height: 100vh !important; z-index: 10; }
     .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; height: 100vh !important; z-index: 100; background: transparent !important; }
 
-    /* 2. REUBICACIÓN DEL COUNTDOWN (Primer elemento del flujo derecho) */
+    /* 2. REUBICACIÓN DEL COUNTDOWN (Salto al Panel Derecho) */
     .tpl-p5 #unified-frame {
-        position: absolute !important; /* Rompe el anclaje fixed del padre */
-        left: 38vw !important;         /* Inicia exactamente donde termina el Hero */
-        top: 0 !important;             /* Al tope del scroll derecho */
-        width: 62vw !important;        /* Ocupa todo el ancho del contenido */
-        height: auto !important;
+        position: absolute !important; /* Rompe el anclaje fixed del Hero padre */
+        left: 38vw !important;         /* Inicia exactamente donde termina el panel izquierdo */
+        top: 0 !important;             /* Se posiciona al tope del flujo derecho */
+        width: 62vw !important;        /* Ocupa el 100% del ancho del panel de contenido */
+        z-index: 200;                  /* Prioridad máxima sobre artistas y video */
         margin: 0 !important;
         padding: 2.5rem !important;
-        z-index: 200;                  /* Prioridad sobre el contenido del flujo */
-        border-radius: 0 !important;   /* Estética integrada al top */
         background: var(--p5-bg-deep, #0a1a0a) !important; /* Fondo sólido para legibilidad */
+        border-radius: 0 !important;
         border-bottom: 1px solid var(--tpl-accent);
         display: flex !important;
         justify-content: center;
-        gap: 3rem;
     }
 
-    /* 3. EMPUJE SAGRADO (Compensación de altura del Countdown) */
-    .tpl-p5 #main-content-flow {
+    /* 3. EMPUJE SAGRADO (Compensación para el flujo derecho) */
+    .tpl-p5 #main-content-flow { 
         margin-left: 38vw !important; 
-        width: 62vw !important;
-        padding-top: 120px !important; /* Espacio para que el Countdown no tape el Lineup */
+        width: 62vw !important; 
+        padding-top: 140px !important; /* Espacio para que el Countdown no tape el Lineup */
     }
 }
-
 
 
 
