@@ -50,26 +50,21 @@
     text-transform: uppercase;
 }
 
-/* -------------------------------------------------------------------
-   1.5 ACTIVACIÓN ATÓMICA — CONTRATO "ENCHUFE CIEGO"
-   El Master (evento3.html) declara TODO módulo oculto por defecto
-   (`section, header { display: none; }`). Es responsabilidad exclusiva
-   de este archivo "encender" los módulos que P5 quiere mostrar, con el
-   display que su propia diagramación requiera. Ningún módulo listado
-   aquí necesita — ni debe recibir — un toggle de visibilidad desde JS.
+/* ------------------------------------------------------------------- 
+   1.5 ACTIVACIÓN ATÓMICA — CONTRATO "ENCHUFE CIEGO" (v1.3.61)
+   El Master oculta todo; P5 "enciende" solo lo que necesita.
    ------------------------------------------------------------------- */
-.tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
-    display: flex; /* ya definido más abajo con las mismas reglas, declarado aquí por contrato */
+.tpl-p5 #mod-hero, 
+.tpl-p5 #mod-form, 
+.tpl-p5 #modulo-lineup, 
+.tpl-p5 #modulo-gallery, 
+.tpl-p5 #modulo-faq-ubicacion, 
+.tpl-p5 #modulo-sponsors { 
+    display: flex !important; 
 }
 
-.tpl-p5 #mod-lineup, .tpl-P5 #mod-lineup,
-.tpl-p5 #mod-gallery, .tpl-P5 #mod-gallery,
-.tpl-p5 #mod-info-tecnica, .tpl-P5 #mod-info-tecnica,
-.tpl-p5 #mod-faq-ubicacion, .tpl-P5 #mod-faq-ubicacion,
-.tpl-p5 #mod-sponsors, .tpl-P5 #mod-sponsors,
-.tpl-p5 #mod-form, .tpl-P5 #mod-form {
-    display: block;
-}
+/* Módulos que P5 decide ocultar para mantener limpieza */
+.tpl-p5 #modulo-info-tecnica { display: none !important; }
 
 /* -------------------------------------------------------------------
    2. HERO & IDENTITY (Selina Aesthetics + Playfair Display 900)
@@ -540,33 +535,7 @@
 
 
 
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.59) === */
-@media (min-width: 1024px) {
-    /* A. ACTIVACIÓN Y ANCLAJE DEL HERO (Fondo del panel izquierdo) */
-    .tpl-p5 #mod-hero {
-        display: flex !important; /* Reclamo de soberanía ante el Master */
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        z-index: 10; /* Debajo del formulario */
-        margin-left: 0 !important; /* El 0px del log ahora es intencional */
-        background-size: cover !important;
-        background-position: center !important;
-    }
-
-    /* B. FIJACIÓN DEL FORMULARIO (Encima del Hero en el panel izquierdo) */
-    .tpl-p5 #mod-form {
-        display: flex !important;
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        z-index: 100; /* Prioridad de interacción */
-        background: transparent !important; /* Permite ver el Hero detrás */
-        overflow-y: auto;
-    }
-
+  
     /* C. EMPUJE DE FLUJO (Todo lo que va a la derecha) */
     .tpl-p5 #main-content-flow {
         display: block !important;
@@ -574,12 +543,22 @@
         width: 62vw !important;
     }
     
-    /* Ajuste de transparencia del formulario para ver el Hero Selina */
-    .tpl-p5 .form-master-box {
-        background: rgba(10, 10, 12, 0.85) !important;
-        backdrop-filter: blur(10px);
-        margin: 2rem auto;
-    }
+  /* ALMA VISUAL: Glassmorphism Selina */
+.tpl-p5 .form-master-box {
+    background: rgba(15, 15, 20, 0.88) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--tpl-accent);
+    border-radius: 25px;
+    padding: 3.5rem;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+/* Recuperación de Inputs tras purga del Kernel */
+.tpl-p5 .form-input {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    font-family: 'Geist', sans-serif !important;
 }
 
 
@@ -597,51 +576,42 @@
     color: #ffffff;
 }
 
-.tpl-p5 .form-master-box {
-    background: rgba(15, 15, 20, 0.98) !important;
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--tpl-accent);
-    padding: 3rem; border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    margin: 2rem;
-}
 
-/* B. DIAGRAMACIÓN DESKTOP REAL (Fidelidad 1px) */
+
+/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.61) === */
 @media (min-width: 1024px) {
-    /* Formulario bloqueado a la izquierda */
-    .tpl-p5 #mod-form {
-        display: flex !important;
-        align-items: center; justify-content: center;
-        position: fixed; left: 0; top: 0;
-        width: 38vw; height: 100vh;
-        z-index: 100;
-        background: #050505;
-        border-right: 1px solid rgba(255,255,255,0.1);
-        overflow-y: auto;
-    }
-
-    /* CORRECCIÓN v1.3.58: El Hero ES el panel fijo de la izquierda
-       (igual que .hero-sidebar en evento4.html), NO se empuja a la derecha.
-       El formulario (z-index:100) queda por encima, pisándolo, tal como
-       está diagramado el silo de referencia. */
+    /* PANEL IZQUIERDO (38%): Hero de fondo + Formulario flotante */
     .tpl-p5 #mod-hero {
+        display: flex !important;
         position: fixed !important;
         left: 0; top: 0;
         width: 38vw !important;
-        height: 100vh;
-        margin-left: 0 !important;
+        height: 100vh !important;
         z-index: 10;
+        background-size: cover !important;
+        background-position: center !important;
     }
 
-    /* Solo el contenido restante (countdown, galería, lineup, etc.)
-       se empuja a la derecha. #mod-form es fixed, así que este margen
-       no lo afecta pese a ser su padre en el DOM. */
+    .tpl-p5 #mod-form {
+        display: flex !important;
+        position: fixed !important;
+        left: 0; top: 0;
+        width: 38vw !important;
+        height: 100vh !important;
+        z-index: 100;
+        background: transparent !important;
+        overflow-y: auto;
+    }
+
+    /* PANEL DERECHO (62%): Empuje de flujo de contenido */
     .tpl-p5 #main-content-flow {
+        display: block !important;
         margin-left: 38vw !important;
         width: 62vw !important;
-        display: block !important;
     }
 }
+
+
 
 /* C. ESTILO DE INPUTS TRAS PURGA DEL KERNEL */
 .tpl-p5 input[type="text"], .tpl-p5 input[type="tel"], .tpl-p5 select {
