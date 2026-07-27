@@ -11,6 +11,10 @@
         :root { --main-bg: #0a0a0c; --tpl-accent: #d72dc0; --gold: var(--tpl-accent, #d72dc0); --text-color: #ffffff; }
         html, body { margin: 0; padding: 0; min-height: 100%; background-color: var(--main-bg); color: var(--text-color); font-family: 'Geist', sans-serif; overflow-x: hidden; }
         body::before { content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+        /* PROTOCOLO DE VISIBILIDAD PASIVA (Inversión de Control v212):
+           Todo módulo nace oculto. Solo el CSS del template activo (.tpl-{id})
+           tiene mandato para encenderlo. El Master nunca vuelve a tocar `display`
+           de un módulo vía JS — ver injectAtomicCSS() y el Sensor de Salud Dinámico. */
         section, header { display: none; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; }
         .form-tabs { display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -260,7 +264,6 @@
     const vContainer = document.getElementById('db-video-content');
     
     if (vContainer && vUrl) {
-        vContainer.style.display = 'block';
         vContainer.style.borderColor = 'var(--tpl-accent)';
         const isYT = vUrl.includes('youtube.com') || vUrl.includes('youtu.be');
         if (isYT) {
@@ -286,7 +289,6 @@
         const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
         const sContainer = document.getElementById('db-spotify-embed');
         if (sContainer) {
-            sContainer.style.display = 'block';
             sContainer.style.borderColor = 'var(--tpl-accent)';
             sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
             logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
@@ -393,7 +395,6 @@ if (document.getElementById('db-poster-img')) {
         const mapContainer = document.getElementById('db-mapa-container');
         
         if (mapContainer) {
-            mapContainer.style.display = 'block';
             mapContainer.style.border = '1px solid var(--tpl-accent)';
             mapContainer.innerHTML = `
                 <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen 
@@ -442,31 +443,30 @@ if (document.getElementById('db-poster-img')) {
     logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
     // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
 
-                // === MAPEO Y ACTIVACIÓN EXTENDIDA 9 MÓDULOS POR CATEGORÍA (Kernel SaaS v210) ===
-                const categoryModuleMap = {
-                    'fiesta': ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form'],
-                    'default': ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form']
-                };
-                
-                const catSlug = (ev.categoria_slug || 'fiesta').toLowerCase();
-                const activeModules = categoryModuleMap[catSlug] || categoryModuleMap['default'];
+                // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
+                // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
+                // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
+                // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
+                // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
+                const MODULE_IDS = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
+                let activeModulesCount = 0;
 
-                activeModules.forEach(id => { 
-                    let el = document.getElementById(id);
+                MODULE_IDS.forEach(id => {
+                    const el = document.getElementById(id);
                     if (!el) {
-                        if (id === 'mod-playlist') el = document.getElementById('db-spotify-embed') || document.getElementById('modulo-playlist');
-                        else if (id === 'mod-ubicacion') el = document.getElementById('db-mapa-container');
+                        logStatus(`DEBUG: Módulo [${id}] no existe en el DOM del Master.`, "DEBUG");
+                        return;
                     }
-                    if (el) { 
-                        el.style.display = 'block'; 
-                        if (id === 'mod-faq' || id === 'mod-ubicacion') {
-                            const parentSec = document.getElementById('mod-faq-ubicacion');
-                            if (parentSec) parentSec.style.display = 'block';
-                        }
-                        logStatus(`INFO: Módulo [${id}] -> VALIDADO Y ACTIVO`, "INFO"); 
+                    const isVisible = window.getComputedStyle(el).display !== 'none';
+                    if (isVisible) {
+                        activeModulesCount++;
+                        logStatus(`INFO: Módulo [${id}] -> ACTIVADO POR CSS (template: ${ev.template_id || 'f3'})`, "INFO");
+                    } else {
+                        logStatus(`DEBUG: Módulo [${id}] -> INACTIVO (el template no lo enciende)`, "DEBUG");
                     }
                 });
-                logStatus(`INFO: ${activeModules.length} módulos auditados y activos para categoría ${catSlug.toUpperCase()}.`, "INFO");
+
+                logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
 
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");

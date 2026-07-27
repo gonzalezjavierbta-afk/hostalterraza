@@ -51,6 +51,27 @@
 }
 
 /* -------------------------------------------------------------------
+   1.5 ACTIVACIÓN ATÓMICA — CONTRATO "ENCHUFE CIEGO"
+   El Master (evento3.html) declara TODO módulo oculto por defecto
+   (`section, header { display: none; }`). Es responsabilidad exclusiva
+   de este archivo "encender" los módulos que P5 quiere mostrar, con el
+   display que su propia diagramación requiera. Ningún módulo listado
+   aquí necesita — ni debe recibir — un toggle de visibilidad desde JS.
+   ------------------------------------------------------------------- */
+.tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
+    display: flex; /* ya definido más abajo con las mismas reglas, declarado aquí por contrato */
+}
+
+.tpl-p5 #mod-lineup, .tpl-P5 #mod-lineup,
+.tpl-p5 #mod-gallery, .tpl-P5 #mod-gallery,
+.tpl-p5 #mod-info-tecnica, .tpl-P5 #mod-info-tecnica,
+.tpl-p5 #mod-faq-ubicacion, .tpl-P5 #mod-faq-ubicacion,
+.tpl-p5 #mod-sponsors, .tpl-P5 #mod-sponsors,
+.tpl-p5 #mod-form, .tpl-P5 #mod-form {
+    display: block;
+}
+
+/* -------------------------------------------------------------------
    2. HERO & IDENTITY (Selina Aesthetics + Playfair Display 900)
    ------------------------------------------------------------------- */
 .tpl-p5 #mod-hero, .tpl-P5 #mod-hero,
