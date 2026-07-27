@@ -618,49 +618,40 @@
     color: #ffffff;
 }
 
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.79 · Unificado) === */
+
+
+/* === REEMPLAZO C: COUNTDOWN AL PANEL DERECHO v1.3.80 === */
 @media (min-width: 1024px) {
-    /* PANEL IZQUIERDO (38%): Hero (Fondo) + Formulario (Capa superior) */
-    .tpl-p5 #mod-hero {
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        z-index: 10;
-        margin-left: 0 !important;
-    }
+    /* 1. ANCLAJE IZQUIERDO (Se mantiene estable) */
+    .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; height: 100vh !important; z-index: 10; }
+    .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; height: 100vh !important; z-index: 100; background: transparent !important; }
 
-    .tpl-p5 #mod-form {
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        z-index: 100; /* Encima del Hero, debajo del Countdown */
-        background: transparent !important; /* Permite ver el Hero detrás */
-        display: flex !important;
-        align-items: center; /* Centrado vertical del registro */
-        overflow-y: auto;
-    }
-
-    /* COUNTDOWN: primer impacto visual del panel izquierdo, por encima del Hero y del Form */
-    .tpl-p5 .unified-countdown-frame, .tpl-P5 .unified-countdown-frame,
-    .tpl-p5 #unified-frame, .tpl-P5 #unified-frame {
-        position: fixed !important;
-        top: 6rem !important;
-        left: 2rem !important;
+    /* 2. REUBICACIÓN DEL COUNTDOWN (Primer elemento del flujo derecho) */
+    .tpl-p5 #unified-frame {
+        position: absolute !important; /* Rompe el anclaje fixed del padre */
+        left: 38vw !important;         /* Inicia exactamente donde termina el Hero */
+        top: 0 !important;             /* Al tope del scroll derecho */
+        width: 62vw !important;        /* Ocupa todo el ancho del contenido */
+        height: auto !important;
         margin: 0 !important;
-        z-index: 200; /* Por encima del Form (100) y el Hero (10) */
+        padding: 2.5rem !important;
+        z-index: 200;                  /* Prioridad sobre el contenido del flujo */
+        border-radius: 0 !important;   /* Estética integrada al top */
+        background: var(--p5-bg-deep, #0a1a0a) !important; /* Fondo sólido para legibilidad */
+        border-bottom: 1px solid var(--tpl-accent);
+        display: flex !important;
+        justify-content: center;
+        gap: 3rem;
     }
 
-    /* PANEL DERECHO (62%): Artistas, Video y Playlist */
+    /* 3. EMPUJE SAGRADO (Compensación de altura del Countdown) */
     .tpl-p5 #main-content-flow {
-        display: block !important;
-        margin-left: 38vw !important; /* EMPUJE SAGRADO AL 62% */
+        margin-left: 38vw !important; 
         width: 62vw !important;
-        padding: 0;
-        background-color: #050505;
+        padding-top: 120px !important; /* Espacio para que el Countdown no tape el Lineup */
     }
 }
+
 
 
 
