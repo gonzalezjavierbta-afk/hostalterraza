@@ -49,22 +49,34 @@
     margin-bottom: 2.5rem;
     text-transform: uppercase;
 }
-/* === SEGMENTO: ACTIVACIÓN ATÓMICA v1.3.67 (Total Sovereignty) === */
-/* Mandato: P5 activa la visibilidad de TODOS los módulos funcionales */
 
-/* 1. ACTIVACIÓN DE PANELES (IDs v196 + Fallback v107) */
-.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
-.tpl-p5 #mod-lineup, .tpl-p5 #modulo-lineup { 
+
+/* === 1.5 ACTIVACIÓN ATÓMICA v1.3.70 (Ajuste de Visibilidad Selectiva) === */
+
+/* A. ACTIVACIÓN DE CONTENEDORES MAESTROS */
+/* Mantener mod-gallery activo para que el VIDEO siga funcionando */
+.tpl-p5 #mod-hero, 
+.tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
+.tpl-p5 #mod-lineup, .tpl-p5 #modulo-lineup,
+.tpl-p5 #mod-gallery, .tpl-p5 #modulo-gallery { 
     display: flex !important; 
 }
 
-/* 2. ACTIVACIÓN DEL CONTENEDOR DE FLUJO (Panel Derecho) */
-.tpl-p5 #main-content-flow { 
-    display: block !important; 
+/* B. OCULTACIÓN SELECTIVA (Lo que pediste quitar) */
+
+/* 1. Quitar el Póster del Lineup sin apagar a los artistas */
+.tpl-p5 #db-poster-img { 
+    display: none !important; 
 }
 
-/* 3. MÓDULOS OCULTOS POR DISEÑO (Afterglow Hygiene) */
-.tpl-p5 #mod-info-tecnica, .tpl-p5 #modulo-info-tecnica { 
+/* 2. Quitar la rejilla de fotos de la Galería pero DEJAR EL VIDEO */
+/* Esto oculta las 8 fotos pero mantiene el bloque del trailer/spotify */
+.tpl-p5 #db-gallery-grid { 
+    display: none !important; 
+}
+
+/* C. MÓDULOS TOTALMENTE INACTIVOS */
+.tpl-p5 #mod-info-tecnica, .tpl-p5 #mod-faq-ubicacion, .tpl-p5 #mod-sponsors { 
     display: none !important; 
 }
 
