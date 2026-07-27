@@ -538,26 +538,38 @@
     }
 }
 
-/* === INICIO SEGMENTO: REPARACIÓN DE PARIDAD v1.3.51 === */
+/* === INICIO SEGMENTO: RESTAURACIÓN DE SOBERANÍA v1.3.52 === */
+
+/* 1. RECUPERACIÓN ESTÉTICA DEL FORMULARIO (ADN Selina) */
+/* Devuelve el fondo, bordes y desenfoque que el Master ya no provee */
+.tpl-p5 .form-master-box {
+    background: rgba(20, 20, 25, 0.95) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--tpl-accent);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    margin: 2rem;
+}
+
+/* 2. FIJACIÓN SPLIT-SCREEN (Desktop >= 1024px) */
 @media (min-width: 1024px) {
-    /* 1. ANCLAJE IZQUIERDO: El formulario se bloquea al 38% del ancho */
+    /* ANCLA IZQUIERDA: El formulario se bloquea al 38% del ancho */
     .tpl-p5 #mod-form {
         display: block !important;
-        position: fixed; 
-        left: 0; top: 0;
-        width: 38vw; 
-        height: 100vh;
+        position: fixed; left: 0; top: 0;
+        width: 38vw; height: 100vh;
         z-index: 100;
-        background: #141419; /* ADN Selina/Afterglow */
+        background: #0a0a0c;
         border-right: 1px solid var(--tpl-accent);
         overflow-y: auto;
     }
 
-    /* 2. DESPLAZAMIENTO DERECHO: El Hero y el flujo de contenido se mueven para dejar espacio */
+    /* DESPLAZAMIENTO DERECHO: El Hero y el Flujo se mueven para ser visibles */
     .tpl-p5 #mod-hero {
         display: flex !important;
-        margin-left: 38vw;
-        width: 62vw;
+        margin-left: 38vw !important; /* El margen es el ancho del formulario */
+        width: 62vw !important;
         min-height: 100vh;
         z-index: 5;
     }
@@ -565,8 +577,26 @@
     .tpl-p5 #main-content-flow {
         display: flex !important;
         flex-direction: column;
-        margin-left: 38vw;
-        width: 62vw;
+        margin-left: 38vw !important;
+        width: 62vw !important;
+    }
+
+    /* Ajuste de contenido para el nuevo ancho reducido */
+    .tpl-p5 .hero-content {
+        max-width: 90%;
     }
 }
-/* === FIN SEGMENTO: REPARACIÓN DE PARIDAD === */
+
+/* 3. RESET DE INPUTS */
+/* Restaura la visibilidad de los campos de texto tras la limpieza del Master */
+.tpl-p5 input[type="text"], 
+.tpl-p5 input[type="tel"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    padding: 1.2rem;
+    border-radius: 12px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+/* === FIN SEGMENTO: RESTAURACIÓN DE SOBERANÍA === */
