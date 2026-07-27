@@ -51,28 +51,19 @@
 }
 
 /* ------------------------------------------------------------------- 
-   1.5 ACTIVACIÓN ATÓMICA — CONTRATO "ENCHUFE CIEGO" (v1.3.63)
-   Mandato: P5 activa la visibilidad de los 12 módulos funcionales.
+   1.5 ACTIVACIÓN ATÓMICA — CONTRATO "ENCHUFE CIEGO" (v1.3.64)
+   Mandato: P5 activa la visibilidad de los módulos en el flujo derecho.
    ------------------------------------------------------------------- */
-/* Reclamo de Soberanía: Encendemos los IDs detectados por el log v196 */
-.tpl-p5 #mod-hero, 
-.tpl-p5 #mod-lineup, 
-.tpl-p5 #mod-trailer,
-.tpl-p5 #mod-playlist,
-.tpl-p5 #mod-countdown,    
-.tpl-p5 #mod-form,
-/* Fallback para compatibilidad con Baseline v107 */
- { 
+/* Activamos los 5 módulos dinámicos para paridad con el Silo */
+.tpl-p5 #mod-lineup, .tpl-p5 #modulo-lineup,
+.tpl-p5 #mod-gallery, .tpl-p5 #modulo-gallery,
+.tpl-p5 #mod-faq-ubicacion, .tpl-p5 #modulo-faq-ubicacion,
+.tpl-p5 #mod-sponsors, .tpl-p5 #modulo-sponsors { 
     display: flex !important; 
 }
 
-/* Activación del flujo de contenido derecho */
-.tpl-p5 #main-content-flow {
-    display: block !important;
-}
-
-/* El diseño P5 oculta el módulo técnico para mantener estética Afterglow */
-.tpl-p5 #mod-info-tecnica, { 
+/* Ocultamos el módulo técnico para mantener la limpieza Selina */
+.tpl-p5 #mod-info-tecnica, .tpl-p5 #modulo-info-tecnica { 
     display: none !important; 
 }
 
@@ -512,6 +503,11 @@
     box-sizing: border-box;
 }
 
+
+
+
+
+
 /* -------------------------------------------------------------------
    10. RESPONSIVE ADAPTABILITY
    ------------------------------------------------------------------- */
@@ -587,38 +583,20 @@
     color: #ffffff;
 }
 
-
-
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.61) === */
+/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.64) === */
 @media (min-width: 1024px) {
-    /* PANEL IZQUIERDO (38%): Hero de fondo + Formulario flotante */
-    .tpl-p5 #mod-hero {
-        display: flex !important;
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        z-index: 10;
-        background-size: cover !important;
-        background-position: center !important;
-    }
+    /* PANEL IZQUIERDO: Hero y Formulario ya validados */
+    .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; z-index: 10; margin-left: 0 !important; }
+    .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; z-index: 100; background: transparent !important; }
 
-    .tpl-p5 #mod-form {
-        display: flex !important;
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        z-index: 100;
-        background: transparent !important;
-        overflow-y: auto;
-    }
-
-    /* PANEL DERECHO (62%): Empuje de flujo de contenido */
+    /* PANEL DERECHO (62%): EL SALTO A LA DERECHA */
+    /* Este es el contenedor que empuja a todos los módulos activos */
     .tpl-p5 #main-content-flow {
         display: block !important;
-        margin-left: 38vw !important;
+        margin-left: 38vw !important; /* PUSH SAGRADO AL 62% */
         width: 62vw !important;
+        padding: 0;
+        background-color: #050505;
     }
 }
 
