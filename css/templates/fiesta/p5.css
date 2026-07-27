@@ -540,54 +540,30 @@
 
 /* === BLINDAJE DE SOBERANÍA v1.3.53 (Post-Kernel Purge) === */
 
-/* 1. RECUPERACIÓN DEL HERO (Lo que el Master borró) */
+/* === BLINDAJE DE SOBERANÍA v1.3.54 (Split-Screen Parity) === */
+
+/* A. RECUPERACIÓN DEL HERO Y FORMULARIO (ADN Selina) */
 .tpl-p5 #mod-hero {
     position: relative;
     display: flex !important;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: center; justify-content: center;
     background-size: cover !important;
     background-position: center !important;
-    text-align: center;
-    color: #ffffff;
+    min-height: 100vh;
 }
 
-/* Capa de contraste para legibilidad del texto en el Hero */
-.tpl-p5 #mod-hero::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%);
-    z-index: 1;
-}
-
-.tpl-p5 .hero-content { position: relative; z-index: 5; width: 90%; }
-
-/* 2. DISEÑO PREMIUM DEL FORMULARIO (ADN Selina) */
 .tpl-p5 .form-master-box {
     background: rgba(15, 15, 20, 0.98) !important;
     backdrop-filter: blur(20px);
     border: 1px solid var(--tpl-accent);
-    padding: 3.5rem;
-    border-radius: 24px;
+    padding: 3rem; border-radius: 24px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-/* Estilo de Inputs (Geist 900 vibe) */
-.tpl-p5 input[type="text"], 
-.tpl-p5 input[type="tel"],
-.tpl-p5 select {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
-    padding: 1.2rem !important;
-    border-radius: 14px !important;
-    font-family: 'Geist', sans-serif !important;
-    margin-bottom: 1.5rem;
-    width: 100%;
-}
-
-/* 3. DIAGRAMACIÓN SPLIT-SCREEN REAL (Desktop) */
+/* B. DIAGRAMACIÓN DESKTOP (Split-Screen Real) */
 @media (min-width: 1024px) {
+    /* Formulario bloqueado a la izquierda */
     .tpl-p5 #mod-form {
         display: flex !important;
         align-items: center; justify-content: center;
@@ -599,15 +575,14 @@
         overflow-y: auto;
     }
 
+    /* EMPUJE SAGRADO: El Hero y el flujo saltan a la derecha (62%) */
     .tpl-p5 #mod-hero {
-        margin-left: 38vw !important; /* EMPUJE SAGRADO A LA DERECHA */
+        margin-left: 38vw !important;
         width: 62vw !important;
-        min-height: 100vh;
     }
 
     .tpl-p5 #main-content-flow {
         margin-left: 38vw !important;
         width: 62vw !important;
-        display: block !important;
     }
 }
