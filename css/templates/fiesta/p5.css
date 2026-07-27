@@ -195,12 +195,15 @@
     font-weight: 700;
 }
 
-/* -------------------------------------------------------------------
-   4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Dynamic Accent Glow)
-   ------------------------------------------------------------------- */
+/* ===================================================================
+   SECCIÓN 4 & 5: DATA CARDS & LINEUP RECOVERY · v1.3.72
+   Protocolo: Masa Crítica Protegida (Garantía de No-Simplificación)
+   =================================================================== */
+
+/* 4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Dynamic Accent Glow) */
 .tpl-p5 .card-item, .tpl-P5 .card-item,
 .tpl-p5 .data-card-underground, .tpl-P5 .data-card-underground {
-    background: var(--p5-card-bg) !important;
+    background: var(--p5-card-bg, rgba(15, 15, 20, 0.85)) !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--tpl-accent) !important;
@@ -215,21 +218,13 @@
 .tpl-p5 .data-card-underground:hover, .tpl-P5 .data-card-underground:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 35px var(--tpl-accent) !important;
-    border-color: var(--tpl-accent) !important;
 }
 
-.tpl-p5 .data-cards-container, .tpl-P5 .data-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.8rem;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
+/* Tipografía Geist 900 para Valores (Mandato Reglas de Oro) */
 .tpl-p5 .card-item span[id*="-val"], .tpl-P5 .card-item span[id*="-val"],
 .tpl-p5 .data-value, .tpl-P5 .data-value {
-    font-family: var(--p5-font-serif);
-    font-weight: 900;
+    font-family: 'Geist', sans-serif !important;
+    font-weight: 900 !important;
     font-size: 1.6rem;
     color: #ffffff;
     text-shadow: 0 0 15px var(--tpl-accent);
@@ -247,40 +242,94 @@
     margin-bottom: 0.5rem;
 }
 
-
-/* === SEGMENTO: REPARACIÓN ESPACIO POSTER LINEUP v1.3.71 === */
-/* Objetivo: Eliminar el hueco del poster y centrar a los artistas */
-
-/* 1. Colapso del Grid Maestro a una sola columna */
-.tpl-p5 #modulo-lineup > div,
-.tpl-p5 #mod-lineup > div {
+/* 5. REPARACIÓN ESPACIO POSTER LINEUP (Silo Parity) */
+/* Colapso del Grid Maestro a una sola columna para eliminar el hueco izquierdo */
+.tpl-p5 #modulo-lineup > div, .tpl-P5 #modulo-lineup > div,
+.tpl-p5 #mod-lineup > div, .tpl-P5 #mod-lineup > div {
     grid-template-columns: 1fr !important; 
-    max-width: 800px !important; /* Ajuste para legibilidad en panel 62vw */
+    max-width: 800px !important;
+    margin: 0 auto;
 }
 
-/* 2. Neutralización del divisor y padding del lado del Poster */
+/* Ocultación física de la columna del póster manteniendo el contrato de datos */
 .tpl-p5 #modulo-lineup > div > div:first-child,
 .tpl-p5 #mod-lineup > div > div:first-child {
-    padding-right: 0 !important;
-    border-right: none !important;
-    display: none !important; /* Garantiza 0px de ancho para esta columna */
+    display: none !important;
 }
 
-/* 3. Expansión de la lista de artistas */
-.tpl-p5 #db-lineup {
-    padding-left: 0 !important; /* Eliminamos el desplazamiento de 5rem */
+/* Expansión y Estilización de Items de Artistas */
+.tpl-p5 #db-lineup, .tpl-P5 #db-lineup {
+    padding-left: 0 !important; 
     width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-/* Ajuste de los items de artistas para que se vean premium */
-.tpl-p5 .artist-item {
-    justify-content: center; /* Centrado visual si es necesario */
+.tpl-p5 .artist-item, .tpl-P5 .artist-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 18px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.3s ease;
+}
 
+.tpl-p5 .artist-item:hover {
+    background: rgba(255, 255, 255, 0.05);
 
+/* -------------------------------------------------------------------
+   5. LINEUP & MULTIMEDIA
+   ------------------------------------------------------------------- */
+.tpl-p5 .lineup-grid, .tpl-P5 .lineup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+}
 
+.tpl-p5 .artist-row, .tpl-P5 .artist-row {
+    font-family: var(--p5-font-serif);
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.4rem 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: #ffffff;
+}
 
+.tpl-p5 .artist-row:hover, .tpl-P5 .artist-row:hover {
+    color: var(--tpl-accent);
+    padding-left: 1.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom-color: var(--tpl-accent);
+}
+
+.tpl-p5 .artist-avatar, .tpl-P5 .artist-avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid var(--tpl-accent);
+    box-shadow: 0 0 15px var(--tpl-accent);
+    object-fit: cover;
+}
+
+.tpl-p5 .media-grid, .tpl-P5 .media-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
 
 .tpl-p5 .video-wrapper, .tpl-P5 .video-wrapper,
 .tpl-p5 #db-video-content, .tpl-P5 #db-video-content {
