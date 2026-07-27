@@ -49,28 +49,27 @@
     margin-bottom: 2.5rem;
     text-transform: uppercase;
 }
+/* === SEGMENTO: ACTIVACIÓN ATÓMICA v1.3.67 (Total Sovereignty) === */
+/* Mandato: P5 activa la visibilidad de TODOS los módulos funcionales */
 
-/* === INICIO SEGMENTO: ACTIVACIÓN ATÓMICA v1.3.65 (Silo Parity) === */
-/* 1. ACTIVACIÓN DE PANELES (Solo los del Silo evento4.html) */
-.tpl-p5 #mod-hero, 
-.tpl-p5 #mod-form,
-.tpl-p5 #modulo-formulario { 
+/* 1. ACTIVACIÓN DE PANELES (IDs v196 + Fallback v107) */
+.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
+.tpl-p5 #mod-lineup, .tpl-p5 #modulo-lineup,
+.tpl-p5 #mod-gallery, .tpl-p5 #modulo-gallery,
+.tpl-p5 #mod-faq-ubicacion, .tpl-p5 #modulo-faq-ubicacion,
+.tpl-p5 #mod-sponsors, .tpl-p5 #modulo-sponsors { 
     display: flex !important; 
 }
 
-/* 2. OCULTACIÓN DE MÓDULOS NO DESEADOS (Para evitar exceso) */
-.tpl-p5 #mod-lineup, .tpl-p5 #modulo-lineup,
-.tpl-p5 #mod-gallery, .tpl-p5 #modulo-gallery,
-.tpl-p5 #mod-info-tecnica, .tpl-p5 #modulo-info-tecnica,
-.tpl-p5 #mod-faq-ubicacion, .tpl-p5 #modulo-faq-ubicacion,
-.tpl-p5 #mod-sponsors, .tpl-p5 #modulo-sponsors { 
-    display: none !important; 
+/* 2. ACTIVACIÓN DEL CONTENEDOR DE FLUJO (Panel Derecho) */
+.tpl-p5 #main-content-flow { 
+    display: block !important; 
 }
 
-/* 3. ACTIVACIÓN DEL FLUJO DE CONTENIDO */
-.tpl-p5 #main-content-flow { display: block !important; }
-/* === FIN SEGMENTO: ACTIVACIÓN ATÓMICA === */
-
+/* 3. MÓDULOS OCULTOS POR DISEÑO (Afterglow Hygiene) */
+.tpl-p5 #mod-info-tecnica, .tpl-p5 #modulo-info-tecnica { 
+    display: none !important; 
+}
 
 
 
@@ -606,31 +605,21 @@
     }
 }
 
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.65) === */
+/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.67) === */
 @media (min-width: 1024px) {
-    /* PANEL IZQUIERDO: Hero (Fondo) + Formulario (Encima) */
-    .tpl-p5 #mod-hero {
-        display: flex !important;
-        position: fixed !important;
-        left: 0; top: 0; width: 38vw !important; height: 100vh !important;
-        z-index: 10; background-size: cover !important;
-    }
+    /* PANEL IZQUIERDO: Blindaje de Posición */
+    .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; z-index: 10; }
+    .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; z-index: 100; background: transparent !important; }
 
-    .tpl-p5 #mod-form {
-        display: flex !important; /* REPARACIÓN: Fuerza visibilidad */
-        position: fixed !important;
-        left: 0; top: 0; width: 38vw !important; height: 100vh !important;
-        z-index: 100; background: transparent !important; /* Permite ver el hero */
-        overflow-y: auto;
-    }
-
-    /* PANEL DERECHO (62%): Todo lo que no se ocultó arriba */
+    /* PANEL DERECHO: Empuje Sagrado al 62% */
     .tpl-p5 #main-content-flow {
         display: block !important;
-        margin-left: 38vw !important;
+        margin-left: 38vw !important; /* PUSH AL SECTOR DERECHO */
         width: 62vw !important;
     }
 }
+
+
 
 
 
