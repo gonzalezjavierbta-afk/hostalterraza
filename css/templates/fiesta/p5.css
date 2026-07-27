@@ -538,42 +538,62 @@
     }
 }
 
-/* === BLINDAJE NUCLEAR v1.3.56 (Split-Screen Force) === */
+/* === BLINDAJE DE SOBERANÍA v1.3.55 (Split-Screen Parity) === */
 
-/* 1. SECTOR FORMULARIO (ANCLA IZQUIERDA) */
-body.tpl-p5 #mod-form {
+/* A. RECUPERACIÓN ESTRUCTURAL (Lo que el Master ya no provee) */
+.tpl-p5 #mod-hero {
+    position: relative;
     display: flex !important;
+    flex-direction: column;
     align-items: center; justify-content: center;
-    position: fixed; left: 0; top: 0;
-    width: 38vw; height: 100vh;
-    z-index: 100; /* Siempre arriba para interacción */
-    background: #050505;
-    border-right: 1px solid var(--tpl-accent);
-    overflow-y: auto;
+    background-size: cover !important;
+    background-position: center !important;
+    min-height: 100vh;
+    color: #ffffff;
 }
 
-/* 2. SECTOR HERO (EL SALTO A LA DERECHA) */
-/* Usamos el selector de body para garantizar que el margen de 0px muera */
+.tpl-p5 .form-master-box {
+    background: rgba(15, 15, 20, 0.98) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--tpl-accent);
+    padding: 3rem; border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    margin: 2rem;
+}
+
+/* B. DIAGRAMACIÓN DESKTOP REAL (Fidelidad 1px) */
 @media (min-width: 1024px) {
-    body.tpl-p5 #mod-hero {
+    /* Formulario bloqueado a la izquierda */
+    .tpl-p5 #mod-form {
         display: flex !important;
-        margin-left: 38vw !important; /* FUERZA BRUTA: PUSH A LA DERECHA */
-        width: 62vw !important;
-        min-height: 100vh;
-        position: relative;
-        z-index: 5;
+        align-items: center; justify-content: center;
+        position: fixed; left: 0; top: 0;
+        width: 38vw; height: 100vh;
+        z-index: 100;
+        background: #050505;
+        border-right: 1px solid rgba(255,255,255,0.1);
+        overflow-y: auto;
     }
 
-    body.tpl-p5 #main-content-flow {
+    /* EMPUJE SAGRADO: El Hero y el flujo saltan a la derecha */
+    .tpl-p5 #mod-hero {
+        margin-left: 38vw !important; /* Margen compensatorio */
+        width: 62vw !important;
+    }
+
+    .tpl-p5 #main-content-flow {
         margin-left: 38vw !important;
         width: 62vw !important;
         display: block !important;
     }
 }
 
-/* 3. RECUPERACIÓN DE IMAGEN (Tras purga del Master) */
-body.tpl-p5 #mod-hero {
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
+/* C. ESTILO DE INPUTS TRAS PURGA DEL KERNEL */
+.tpl-p5 input[type="text"], .tpl-p5 input[type="tel"], .tpl-p5 select {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+    padding: 1.2rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1.5rem; width: 100%;
 }
