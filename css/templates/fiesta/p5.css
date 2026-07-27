@@ -51,34 +51,17 @@
 }
 
 
-/* === 1.5 ACTIVACIÓN ATÓMICA v1.3.70 (Ajuste de Visibilidad Selectiva) === */
+/* === SEGMENTO: ACTIVACIÓN ATÓMICA v1.3.73 (Full Stability) === */
+/* Mandato: P5 activa la visibilidad del Hero, Formulario y Flujo Derecho */
 
-/* A. ACTIVACIÓN DE CONTENEDORES MAESTROS */
-/* Mantener mod-gallery activo para que el VIDEO siga funcionando */
 .tpl-p5 #mod-hero, 
-.tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
-.tpl-p5 #mod-lineup, .tpl-p5 #modulo-lineup,
-.tpl-p5 #mod-gallery, .tpl-p5 #modulo-gallery { 
+.tpl-p5 #mod-form, .tpl-p5 #modulo-formulario, 
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery { 
     display: flex !important; 
 }
 
-/* B. OCULTACIÓN SELECTIVA (Lo que pediste quitar) */
-
-/* 1. Quitar el Póster del Lineup sin apagar a los artistas */
-.tpl-p5 #db-poster-img { 
-    display: none !important; 
-}
-
-/* 2. Quitar la rejilla de fotos de la Galería pero DEJAR EL VIDEO */
-/* Esto oculta las 8 fotos pero mantiene el bloque del trailer/spotify */
-.tpl-p5 #db-gallery-grid { 
-    display: none !important; 
-}
-
-/* C. MÓDULOS TOTALMENTE INACTIVOS */
-.tpl-p5 #mod-info-tecnica, .tpl-p5 #mod-faq-ubicacion, .tpl-p5 #mod-sponsors { 
-    display: none !important; 
-}
+/* Activación del contenedor de flujo derecho (62vw) */
+.tpl-p5 #main-content-flow { display: block !important; }
 
 
 
@@ -597,13 +580,14 @@
         width: 62vw !important;
     }
     
-  /* ALMA VISUAL: Glassmorphism Selina */
+ /* ALMA VISUAL: Glassmorphism y Tipografía Geist 900 */
 .tpl-p5 .form-master-box {
-    background: rgba(15, 15, 20, 0.88) !important;
+    background: rgba(15, 15, 20, 0.90) !important;
     backdrop-filter: blur(20px);
     border: 1px solid var(--tpl-accent);
-    border-radius: 25px;
+    border-radius: 28px;
     padding: 3.5rem;
+    margin: 2rem auto; /* Espacio para scroll interno en el panel 38vw */
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
 }
 
