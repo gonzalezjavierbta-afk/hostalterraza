@@ -7,6 +7,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
 
+/* TRACE (referencia estática — la emisión real en consola requiere JS, ver nota de handoff):
+   "Countdown Heartbeat Activo | Form Pos: Fixed | 7/7 Módulos Sincronizados" */
+
 /* -------------------------------------------------------------------
    1. RESETEO DE SILO + PUENTE CROMÁTICO DINÁMICO (.tpl-p5)
    ------------------------------------------------------------------- */
@@ -51,13 +54,12 @@
 }
 
 
-/* === SEGMENTO: ACTIVACIÓN ATÓMICA v1.3.73 (Full Stability) === */
-/* Mandato: P5 activa la visibilidad del Hero, Formulario y Flujo Derecho */
+/* === 1.5 ACTIVACIÓN ATÓMICA v1.3.79 (Full Integrity) === */
+/* Mandato: P5 reclama el control de los 7 módulos vitales para que los datos de Supabase fluyan sin restricciones */
 
-.tpl-p5 #mod-hero, 
-.tpl-p5 #mod-form, .tpl-p5 #modulo-formulario, 
-.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery { 
-    display: flex !important; 
+.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame {
+    display: flex !important;
 }
 
 /* Activación del contenedor de flujo derecho (62vw) */
@@ -141,9 +143,9 @@
     gap: 1.5rem;
     padding: 1.5rem 2.5rem;
     background: rgba(10, 26, 10, 0.65) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 2px solid var(--tpl-accent) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tpl-accent) !important;
     border-radius: 25px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--tpl-accent) !important;
     margin: 2rem auto;
@@ -162,12 +164,12 @@
 
 .tpl-p5 [id^="cd-"], .tpl-P5 [id^="cd-"],
 .tpl-p5 .cd-v, .tpl-P5 .cd-v {
-    font-family: var(--p5-font-serif) !important;
-    font-size: 3rem !important;
+    font-family: var(--p5-font-sans) !important;
+    font-size: 2.2rem !important;
     font-weight: 900 !important;
     line-height: 1;
     color: var(--tpl-accent) !important;
-    text-shadow: 0 0 18px var(--tpl-accent);
+    text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
 }
 
 .tpl-p5 .unified-countdown-frame small, .tpl-P5 .unified-countdown-frame small {
@@ -262,6 +264,7 @@
 
 .tpl-p5 .artist-item:hover {
     background: rgba(255, 255, 255, 0.05);
+}
 
 /* -------------------------------------------------------------------
    5. LINEUP & MULTIMEDIA
@@ -358,7 +361,7 @@
     margin-bottom: 1.2rem;
     background: rgba(10, 20, 10, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 15px;
+    border-radius: 14px;
     color: #ffffff;
     font-family: var(--p5-font-sans);
     font-size: 0.95rem;
@@ -583,7 +586,8 @@
  /* ALMA VISUAL: Glassmorphism y Tipografía Geist 900 */
 .tpl-p5 .form-master-box {
     background: rgba(15, 15, 20, 0.90) !important;
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     border: 1px solid var(--tpl-accent);
     border-radius: 28px;
     padding: 3.5rem;
@@ -614,50 +618,47 @@
     color: #ffffff;
 }
 
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.64) === */
-@media (min-width: 1024px) {
-    /* PANEL IZQUIERDO: Hero y Formulario ya validados */
-    .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; z-index: 10; margin-left: 0 !important; }
-    .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; z-index: 100; background: transparent !important; }
-
-    /* PANEL DERECHO (62%): EL SALTO A LA DERECHA */
-    /* Este es el contenedor que empuja a todos los módulos activos */
-    .tpl-p5 #main-content-flow {
-        display: block !important;
-        margin-left: 38vw !important; /* PUSH SAGRADO AL 62% */
-        width: 62vw !important;
-        padding: 0;
-        background-color: #050505;
-    }
-}
-
-/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.73) === */
+/* === REEMPLAZO B: DIAGRAMACIÓN DESKTOP REAL (v1.3.79 · Unificado) === */
 @media (min-width: 1024px) {
     /* PANEL IZQUIERDO (38%): Hero (Fondo) + Formulario (Capa superior) */
-    .tpl-p5 #mod-hero { 
-        position: fixed !important; 
-        left: 0; top: 0; 
-        width: 38vw !important; 
-        height: 100vh !important; 
-        z-index: 10; 
-    }
-    
-    .tpl-p5 #mod-form { 
-        position: fixed !important; 
-        left: 0; top: 0; 
-        width: 38vw !important; 
+    .tpl-p5 #mod-hero {
+        position: fixed !important;
+        left: 0; top: 0;
+        width: 38vw !important;
         height: 100vh !important;
-        z-index: 100; /* Encima del Hero */
+        z-index: 10;
+        margin-left: 0 !important;
+    }
+
+    .tpl-p5 #mod-form {
+        position: fixed !important;
+        left: 0; top: 0;
+        width: 38vw !important;
+        height: 100vh !important;
+        z-index: 100; /* Encima del Hero, debajo del Countdown */
         background: transparent !important; /* Permite ver el Hero detrás */
         display: flex !important;
         align-items: center; /* Centrado vertical del registro */
         overflow-y: auto;
     }
 
+    /* COUNTDOWN: primer impacto visual del panel izquierdo, por encima del Hero y del Form */
+    .tpl-p5 .unified-countdown-frame, .tpl-P5 .unified-countdown-frame,
+    .tpl-p5 #unified-frame, .tpl-P5 #unified-frame {
+        position: fixed !important;
+        top: 6rem !important;
+        left: 2rem !important;
+        margin: 0 !important;
+        z-index: 200; /* Por encima del Form (100) y el Hero (10) */
+    }
+
     /* PANEL DERECHO (62%): Artistas, Video y Playlist */
-    .tpl-p5 #main-content-flow { 
-        margin-left: 38vw !important; /* EMPUJE SAGRADO */
-        width: 62vw !important; 
+    .tpl-p5 #main-content-flow {
+        display: block !important;
+        margin-left: 38vw !important; /* EMPUJE SAGRADO AL 62% */
+        width: 62vw !important;
+        padding: 0;
+        background-color: #050505;
     }
 }
 
