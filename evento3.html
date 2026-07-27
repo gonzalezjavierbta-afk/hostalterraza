@@ -436,13 +436,23 @@ if (document.getElementById('db-poster-img')) {
     logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
     // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
 
-                // ACTIVACIÓN DE MÓDULOS (Regla de Oro: 7 módulos) [cite: 865]
-                const modules = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
-                modules.forEach(id => { if (document.getElementById(id)) { 
-                    document.getElementById(id).style.setProperty('display', 'block', 'important'); 
-                    logStatus(`INFO: Módulo [${id}] -> VALIDADO Y ACTIVO`, "INFO"); 
-                }});
-                logStatus(`INFO: ${modules.length} módulos auditados y activos (Regla de Oro: 7 módulos).`, "INFO");
+                // === MAPEO Y ACTIVACIÓN DINÁMICA POR CATEGORÍA (Kernel SaaS Agnóstico) ===
+                const categoryModuleMap = {
+                    'fiesta': ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'],
+                    'default': ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form']
+                };
+                
+                const catSlug = (ev.categoria_slug || 'fiesta').toLowerCase();
+                const activeModules = categoryModuleMap[catSlug] || categoryModuleMap['default'];
+
+                activeModules.forEach(id => { 
+                    const el = document.getElementById(id);
+                    if (el) { 
+                        el.style.display = 'block'; 
+                        logStatus(`INFO: Módulo [${id}] -> VALIDADO Y ACTIVO`, "INFO"); 
+                    }
+                });
+                logStatus(`INFO: ${activeModules.length} módulos auditados y activos para categoría ${catSlug.toUpperCase()}.`, "INFO");
 
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");
