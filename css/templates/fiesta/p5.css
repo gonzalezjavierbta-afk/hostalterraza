@@ -537,3 +537,75 @@
         padding: 0 0.6rem;
     }
 }
+
+/* -------------------------------------------------------------------
+   11. DIAGRAMACIÓN SPLIT-SCREEN — SILO evento3.html (Master real)
+   Nota: el Silo original habla de "#modulo-formulario", pero el
+   Contrato de Datos v107 / evento3.html usa el id real "#mod-form".
+   Se ancla ese id para que la regla efectivamente aplique.
+   Todo lo de abajo vive exclusivamente en .tpl-p5 / .tpl-P5 y solo
+   se activa desde 1024px en adelante — evento3.html no se toca.
+   ------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+
+    /* 1. Atracción del Formulario: lo saca del flujo y lo ancla a la izquierda */
+    .tpl-p5 #mod-form, .tpl-P5 #mod-form {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 38%;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        box-sizing: border-box;
+        overflow-y: auto;
+        border-right: 1px solid var(--tpl-accent);
+        background: linear-gradient(160deg, rgba(10, 26, 10, 0.95) 0%, rgba(61, 43, 31, 0.9) 100%);
+        z-index: 20;
+    }
+
+    .tpl-p5 #mod-form .form-master-box, .tpl-P5 #mod-form .form-master-box {
+        margin: 0;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: none; /* el panel ya tiene su propio marco lateral, evita doble sombra */
+        background: transparent;
+        backdrop-filter: none;
+        border: none;
+        padding: 0;
+    }
+
+    /* 2. Desplazamiento del contenido: el resto del Silo fluye a la derecha del formulario */
+    .tpl-p5 #mod-hero, .tpl-P5 #mod-hero,
+    .tpl-p5 #main-content-flow, .tpl-P5 #main-content-flow {
+        margin-left: 38%;
+    }
+
+    /* 3. Sincronía de secuencia: Countdown ya vive en el Hero (antes de main por DOM),
+       así que solo reordenamos main: Video/Playlist (Gallery) antes que Lineup. */
+    .tpl-p5 #main-content-flow, .tpl-P5 #main-content-flow {
+        display: flex;
+        flex-direction: column;
+    }
+    .tpl-p5 #mod-gallery, .tpl-P5 #mod-gallery { order: 1; }
+    .tpl-p5 #mod-lineup, .tpl-P5 #mod-lineup { order: 2; }
+    .tpl-p5 #mod-info-tecnica, .tpl-P5 #mod-info-tecnica { order: 3; }
+    .tpl-p5 #mod-faq-ubicacion, .tpl-P5 #mod-faq-ubicacion { order: 4; }
+    .tpl-p5 #mod-sponsors, .tpl-P5 #mod-sponsors { order: 5; }
+    /* #mod-form queda fuera del flujo (position:fixed); order declarado por completitud. */
+    .tpl-p5 #mod-form, .tpl-P5 #mod-form { order: 6; }
+
+    /* 4. Reseteo de Silo: el Hero recupera 100vh real y su propio centrado dentro
+       del ancho reducido que le queda a la derecha del formulario fijo. */
+    .tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
+        height: 100vh;
+        min-height: 100vh;
+        width: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
