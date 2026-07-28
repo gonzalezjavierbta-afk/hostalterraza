@@ -9,38 +9,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
 
 
-/* === 2. SISTEMA DE GRID ATÓMICO v1.4.9.9 (Prioridad Móvil Corregida) === */
-.tpl-p5 #main-content-flow {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    /* FIX: "form" se mueve a la 2da posición tras "hero" [cite: 27, p5css] */
-    grid-template-areas: 
-        "hero"
-        "form"
-        "countdown"
-        "meta"
-        "video"
-        "lineup"
-        "playlist"
-        "info"
-        "faq"
-        "ubicacion"
-        "sponsors";
-    row-gap: 0;
-}
+/* TRACE (referencia estática — la emisión real en consola requiere JS, ver nota de handoff):
+   "Countdown Heartbeat Activo | Form Pos: Fixed | 7/7 Módulos Sincronizados" */
 
-/* ASIGNACIÓN DE SOBERANÍA [cite: 27, p5css] */
-.tpl-p5 #mod-hero         { grid-area: hero; }
-.tpl-p5 #mod-form         { grid-area: form; }
-.tpl-p5 #unified-frame    { grid-area: countdown; }
-.tpl-p5 #mod-hero-meta    { grid-area: meta; }
-.tpl-p5 #mod-video        { grid-area: video; }
-.tpl-p5 #mod-lineup       { grid-area: lineup; }
-.tpl-p5 #mod-playlist     { grid-area: playlist; }
-.tpl-p5 #mod-info-tecnica { grid-area: info; }
-.tpl-p5 #mod-faq          { grid-area: faq; }
-.tpl-p5 #mod-ubicacion    { grid-area: ubicacion; }
-.tpl-p5 #mod-sponsors     { grid-area: sponsors; }
+
+/* -------------------------------------------------------------------
+   1. RESETEO DE SILO + PUENTE CROMÁTICO DINÁMICO (.tpl-p5)
+   ------------------------------------------------------------------- */
+.tpl-p5, .tpl-P5 {
+    --tpl-accent: var(--master-accent, #a3e635);
+    /* --gold: usada directamente en 10+ estilos inline del HTML real
+       (íconos SVG, borde del poster, botones, labels de tarjetas).
+       Nunca estaba definida — quedaban sin color. Se mapea al acento
+       de la plantilla para mantener coherencia visual. */
+    --gold: var(--tpl-accent, #a3e635);
+    --p5-bg-deep: #0a1a0a;
+    --p5-bg-wood: #3d2b1f;
+    --p5-text-main: #f3f6f0;
+    --p5-text-muted: #a3b899;
+    --p5-card-bg: rgba(15, 28, 15, 0.75);
+    --p5-font-serif: 'Playfair Display', Georgia, serif;
+    --p5-font-sans: 'Geist', system-ui, -apple-system, sans-serif;
+   
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at 20% 20%, #132713 0%, #0a1a0a 50%, #3d2b1f 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--p5-text-main);
+    font-family: var(--p5-font-sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
 
 
 .tpl-p5 *, .tpl-P5 * {
