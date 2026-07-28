@@ -1,5 +1,5 @@
 /* ===================================================================
-   TEMPLATE P5 — "SELINA STYLE" · v1.4.2 (Panel Izquierdo Anclado Real)
+   TEMPLATE P5 — "SELINA STYLE" · v1.4.3 (Hero/Form reordenados + Meta liberado)
    Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
    Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
    Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
@@ -72,8 +72,16 @@
 
 
 .tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
-.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame {
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame,
+.tpl-p5 #mod-info-tecnica, .tpl-p5 #mod-faq-ubicacion, .tpl-p5 #mod-sponsors {
     display: flex !important;
+}
+
+/* MÓDULO ATÓMICO: METADATOS (extraído del Hero, v213) — la clase .hero-meta
+   ya trae el estilo visual completo (ver sección 2); aquí solo se define
+   el espaciado propio de su nueva posición, debajo del Countdown. */
+.tpl-p5 #mod-hero-meta, .tpl-P5 #mod-hero-meta {
+    padding: 0 0 1rem;
 }
 
 
@@ -102,7 +110,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 6rem 2rem 4rem;
     text-align: center;
     overflow: hidden;
@@ -690,7 +698,7 @@
     position: relative;
     display: flex !important;
     flex-direction: column;
-    align-items: center; justify-content: center;
+    align-items: center; justify-content: flex-start;
     background-size: cover !important;
     background-position: center !important;
     min-height: 100vh;
@@ -711,6 +719,7 @@
     grid-template-areas:
         "hero"
         "countdown"
+        "meta"
         "lineup"
         "gallery"
         "info"
@@ -722,6 +731,7 @@
 
 .tpl-p5 #mod-hero        { grid-area: hero; }
 .tpl-p5 #unified-frame   { grid-area: countdown; }
+.tpl-p5 #mod-hero-meta   { grid-area: meta; }
 .tpl-p5 #mod-lineup      { grid-area: lineup; }
 .tpl-p5 #mod-gallery     { grid-area: gallery; }
 .tpl-p5 #mod-info-tecnica{ grid-area: info; }
@@ -743,6 +753,7 @@
         grid-template-columns: 38vw 62vw;
         grid-template-areas:
             "hero countdown"
+            "hero meta"
             "hero lineup"
             "hero gallery"
             "hero info"
@@ -760,7 +771,17 @@
         height: 100vh !important;
     }
     .tpl-p5 #mod-hero { z-index: 10; }
-    .tpl-p5 #mod-form { z-index: 100; background: transparent !important; }
+    .tpl-p5 #mod-form {
+        z-index: 100;
+        background: transparent !important;
+        justify-content: center;   /* centra el form-master-box horizontalmente */
+        align-items: flex-end;     /* lo empuja al fondo del panel (v213) */
+        padding-bottom: 3.5rem;
+        pointer-events: none;      /* el hueco transparente no bloquea el Hero */
+    }
+    .tpl-p5 #mod-form .form-master-box {
+        pointer-events: auto;      /* pero el formulario en sí sí es interactivo */
+    }
 
     /* 2. COUNTDOWN: ya no requiere position:absolute para "saltar" al panel
        derecho — es simplemente un ítem más del grid en su propia celda. */
