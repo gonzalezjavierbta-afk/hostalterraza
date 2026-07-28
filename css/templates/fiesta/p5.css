@@ -1,5 +1,5 @@
 /* ===================================================================
-   TEMPLATE P5 — "SELINA STYLE" · v1.4.6 (Rebalanceo Panel Izq. + Split Video/Playlist)
+   TEMPLATE P5 — "SELINA STYLE" · v1.5.0-OMEGA (Rebalanceo de Gravedad Visual + Solapamiento Estético)
    Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
    Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
    Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
@@ -218,7 +218,7 @@
     font-size: 2.2rem !important; /* Tamaño original recuperado */
     font-weight: 900 !important;
     line-height: 1;
-    color: var(--tpl-accent) !important;
+    color: var(--p5-text-main) !important; /* [v1.5.0-OMEGA] Consistencia Cromática Geist 900: color principal de plantilla, el acento queda reservado al glow y a los íconos */
     text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
 }
 
@@ -275,7 +275,7 @@
     height: 32px !important;
     margin-right: 1.5rem !important;  /* AIRE: Espacio sagrado entre icono y texto */
     fill: var(--tpl-accent) !important;
-    filter: drop-shadow(0 0 12px var(--tpl-accent)); /* Resplandor Afterglow */
+    filter: drop-shadow(0 0 25px var(--tpl-accent)); /* [v1.5.0-OMEGA] Resplandor Afterglow 25px, consistente con el box-shadow del Countdown */
 }
 
 /* ===================================================================
@@ -758,6 +758,12 @@
     display: flex !important;
     flex-direction: column;
     align-items: center; justify-content: flex-start;
+    /* [v1.5.0-OMEGA] Gravedad Dinámica: respiro superior proporcional al
+       alto del dispositivo (reemplaza el antiguo supuesto de margen fijo
+       gestionado por el Master). Neutralizado en desktop por el
+       "padding: 4rem 2.5rem !important" del media query >=1024px
+       (línea ~105), por lo que este valor solo tiene efecto en móvil. */
+    padding-top: 12vh;
     background-size: cover !important;
     background-position: center !important;
     min-height: 100vh;
@@ -777,6 +783,7 @@
     grid-template-columns: 1fr;
     grid-template-areas:
         "hero"
+        "form"
         "countdown"
         "meta"
         "video"
@@ -785,8 +792,7 @@
         "info"
         "faq"
         "ubicacion"
-        "sponsors"
-        "form";
+        "sponsors";
     row-gap: 0;
 }
 
@@ -801,6 +807,22 @@
 .tpl-p5 #mod-ubicacion   { grid-area: ubicacion; }
 .tpl-p5 #mod-sponsors    { grid-area: sponsors; }
 .tpl-p5 #mod-form        { grid-area: form; }
+
+/* [v1.5.0-OMEGA] OVERLAY PRO (Móvil): con "form" ahora inmediatamente
+   debajo de "hero" en el grid, el form-master-box se solapa sobre el
+   fondo cinematográfico del Hero. Requiere !important en background y
+   backdrop-filter porque la regla base .form-master-box ("ALMA VISUAL",
+   línea ~735) también trae !important en background con opacidad 0.90
+   (demasiado opaca para dejar ver el Hero) -- misma dinámica de cascada
+   ya documentada para el panel compacto de desktop, línea ~154. */
+@media (max-width: 1023px) {
+    .tpl-p5 .form-master-box, .tpl-P5 .form-master-box {
+        margin-top: -10vh;
+        background: rgba(10, 26, 10, 0.85) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+    }
+}
 
 @media (min-width: 1024px) {
     /* 1. PANEL IZQUIERDO (38vw): Hero y Formulario comparten la misma celda
@@ -852,6 +874,7 @@
        derecho — es simplemente un ítem más del grid en su propia celda. */
     .tpl-p5 #unified-frame {
         margin: 0 !important;
+        margin-top: 20vh !important; /* [v1.5.0-OMEGA] Corrección de Gravedad: centra el Countdown verticalmente en el panel derecho, elimina el efecto "pegado" arriba en monitores grandes */
         padding: 2.5rem !important;
         background: var(--p5-bg-deep, #0a1a0a) !important;
         border-radius: 0 !important;
@@ -897,4 +920,12 @@
 |         |            | existió en el HTML, no cambia comportamiento. Actualizado MODULE_IDS (JS) a     |        | es libre de organizarlos por     |
 |         |            | los 11 átomos reales (antes faltaban countdown/meta en el sensor). Verificado   |        | separado. Verificado balance de  |
 |         |            | balance de divs/secciones/comentarios [OK].                                     |        | divs y comentarios [OK].         |
+| v1.5.0  | 28/07/2026 | OMEGA — Gravedad Dinámica: padding-top:12vh en #mod-hero (móvil).                | [OK]   | Cero borrado: ningún ID ni <svg> |
+| OMEGA   |            | Reordenado grid-template-areas móvil ("form" sigue a "hero"). Overlay Pro:       |        | fue eliminado. Todo el bloque    |
+|         |            | nuevo @media (max-width:1023px) con margin-top:-10vh, background                |        | vive bajo .tpl-p5. Verificado    |
+|         |            | rgba(10,26,10,.85) y backdrop-filter blur(20px) !important en .form-master-box. |        | que el panel fijo desktop        |
+|         |            | Desktop: margin-top:20vh !important en #unified-frame (>=1024px). Consistencia  |        | (>=1024px) no se ve afectado:    |
+|         |            | Cromática: valores del Countdown a var(--p5-text-main); glow de íconos Meta     |        | sus reglas !important (padding,  |
+|         |            | de 12px a 25px.                                                                  |        | margin:0) neutralizan los nuevos |
+|         |            |                                                                                    |        | valores móviles automáticamente. |
 */
