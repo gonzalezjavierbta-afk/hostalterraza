@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v213 · Atomic Grid System</title>
+    <title>Master Orchestrator v214 · Atomic Grid System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
@@ -39,7 +39,7 @@
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">SINCRO TOTAL v210...</div>
+    <div id="loader" class="loading-overlay">SINCRO TOTAL v214...</div>
 
     <!-- CONTENEDOR GRID ÚNICO v210 — Todos los módulos son hermanos planos.
          La plantilla (.tpl-*) decide libremente la ubicación de cada uno vía grid-area. -->
@@ -122,11 +122,15 @@
             </div>
         </section>
 
-        <section id="mod-faq-ubicacion">
-            <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:4rem; max-width:1100px; margin:0 auto;">
-                <div id="mod-faq"><h2>FAQ</h2><div id="db-faq-list"></div></div>
-                <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
-            </div>
+        <!-- MÓDULO 6A: FAQ (split v1.4.8 de #mod-faq-ubicacion, para que FAQ y Ubicación sean hermanos planos independientes) -->
+        <section id="mod-faq">
+            <h2>FAQ</h2>
+            <div id="db-faq-list"></div>
+        </section>
+
+        <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
+        <section id="mod-ubicacion">
+            <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
         </section>
 
         <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
@@ -180,18 +184,7 @@
 
 
 
-        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 ===
-        function injectAtomicCSS(templateId) {
-            const link = document.querySelector('link[data-template-css]') || document.createElement('link');
-            link.setAttribute('data-template-css', '');
-            link.rel = 'stylesheet';
-            // Forzamos la carga de la última versión de p5.css
-            link.href = `css/templates/${templateId}.css?v=${new Date().getTime()}`;
-            if (!link.parentNode) document.head.appendChild(link);
-            
-            logStatus(`LINK: Estilo [${templateId}] solicitado con bypass de caché.`, "LINK");
-        }
-        
+        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
         async function injectAtomicCSS(cat, tplId) {
             return new Promise((resolve) => {
                 const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
@@ -238,7 +231,7 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v210 - Sistema de Grid Atómico Modular.", "INFO");
+            logStatus("Iniciando Orquestador v214 - Sistema de Grid Atómico Modular.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
             try {
@@ -258,7 +251,13 @@
                 }
                 logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
 
-                await injectAtomicCSS(ev.categoria_slug, ev.template_id);
+                const cssLoadedOK = await injectAtomicCSS(ev.categoria_slug, ev.template_id);
+                if (!cssLoadedOK) {
+                    // Degradación visible (v1.4.8): antes este fallo solo quedaba en consola y la
+                    // página se veía en blanco porque el kernel oculta todo por defecto (IoC v212).
+                    document.body.innerHTML = '<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; color:#fff; background:#0a0a0c;"><p style="max-width:400px; opacity:0.8;">No pudimos cargar el diseño de este evento. Por favor recarga la página o vuelve a intentarlo más tarde.</p></div>';
+                    return;
+                }
 
                 // Activación de Ámbito Dual (P3)
                 const tplNormal = `tpl-${ev.template_id || 'F3'}`;
@@ -266,30 +265,10 @@
                 document.body.className = `${tplNormal} ${tplLower}`;
                 logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
 
-                 // === INICIO SEGMENTO: VINCULACIÓN DE VIDEO (v202) ===
-    if (content.video_url) {
-        const videoContainer = document.getElementById('db-video-content');
-        if (videoContainer) {
-            const isYouTube = content.video_url.includes('youtube.com') || content.video_url.includes('youtu.be');
-            
-            if (isYouTube) {
-                // Protocolo ADR-005: Miniatura + Link (Evita Error 153) [cite: 378]
-                const vId = content.video_url.includes('v=') ? content.video_url.split('v=')[1].split('&') : content.video_url.split('/').pop();
-                videoContainer.innerHTML = `
-                    <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
-                         onclick="window.open('${content.video_url}', '_blank')">
-                        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;">
-                            <svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>`;
-            } else {
-                // Fallback para Vimeo u otros proveedores [cite: 319, 816]
-                videoContainer.innerHTML = `<iframe src="${content.video_url}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
-            }
-            logStatus("TRACE: Video inyectado y vinculado con éxito.", "TRACE");
-        }
-    }
-    // === FIN SEGMENTO VIDEO ===
+                // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
+                // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
+                // "MULTIMEDIA FINAL (v205)" más abajo sobreescribe por completo con lógica superior
+                // (soporta ev.video_url, trailer_url y fallback). Ver ese segmento para la lógica vigente.
 
                 const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
                 setInterval(() => {
@@ -437,10 +416,8 @@ if (document.getElementById('db-poster-img')) {
 
     // === INICIO SEGMENTO: VINCULACIÓN DE UBICACIÓN (v201) ===
     if (ev.ubicacion) {
-        // 1. Inyección de Texto del Venue [cite: 302]
-        if (document.getElementById('venue-name')) {
-            document.getElementById('venue-name').innerText = ev.ubicacion.toUpperCase();
-        }
+        // Nota v1.4.8: se retiró la referencia a #venue-name — ese ID nunca existió en el HTML
+        // (remanente huérfano de una versión anterior), la condición nunca era verdadera.
 
         // 2. Construcción Dinámica del Mapa (Google Maps Embed) [cite: 301]
         const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
@@ -500,8 +477,11 @@ if (document.getElementById('db-poster-img')) {
                 // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
                 // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
                 // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
-                const MODULE_IDS = ['mod-hero', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
+                // v1.4.8: contrato corregido a los 11 átomos reales — antes faltaban 'unified-frame'
+                // (countdown) y 'mod-hero-meta' (meta), y 'mod-faq-ubicacion' ya no existe (split en dos).
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form'];
                 let activeModulesCount = 0;
+                let presentInDomCount = 0;
 
                 MODULE_IDS.forEach(id => {
                     const el = document.getElementById(id);
@@ -509,6 +489,7 @@ if (document.getElementById('db-poster-img')) {
                         logStatus(`DEBUG: Módulo [${id}] no existe en el DOM del Master.`, "DEBUG");
                         return;
                     }
+                    presentInDomCount++;
                     const isVisible = window.getComputedStyle(el).display !== 'none';
                     if (isVisible) {
                         activeModulesCount++;
@@ -519,6 +500,12 @@ if (document.getElementById('db-poster-img')) {
                 });
 
                 logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
+
+                // Veredicto estructural explícito (separado de la visibilidad, que es decisión legítima
+                // del template): el contrato de IDs exige que los 11 átomos EXISTAN en el DOM del Master,
+                // aunque un template pueda ocultar algunos por diseño.
+                const contractOK = presentInDomCount === MODULE_IDS.length;
+                logStatus(`SEAL: Contrato de IDs v124-MASTER -> ${contractOK ? '[OK]' : '[FAIL]'} (${presentInDomCount}/${MODULE_IDS.length} átomos presentes en el DOM)`, contractOK ? "INFO" : "ERROR");
 
                  // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA (v210) ===
     // Reemplaza el sensor hardcodeado a tpl-p5. El Master no debe conocer
@@ -533,7 +520,7 @@ if (document.getElementById('db-poster-img')) {
     }
     // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA ===
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
-                logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");
+                logStatus("TRACE: Auditoría v1.4.8 cerrada: injectAtomicCSS duplicado eliminado, video duplicado eliminado, venue-name huérfano eliminado, split FAQ/Ubicación, contrato de 11 átomos corregido, fallback visible de CSS. Sellado Definitivo v124-MASTER.", "TRACE");
 
             } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }

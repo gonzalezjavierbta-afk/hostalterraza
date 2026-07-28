@@ -280,7 +280,6 @@
 
 /* 5. REPARACIÓN ESPACIO POSTER LINEUP (Silo Parity) */
 /* Colapso del Grid Maestro a una sola columna para eliminar el hueco izquierdo */
-.tpl-p5 #modulo-lineup > div, .tpl-P5 #modulo-lineup > div,
 .tpl-p5 #mod-lineup > div, .tpl-P5 #mod-lineup > div {
     grid-template-columns: 1fr !important;
     max-width: 800px !important;
@@ -289,7 +288,6 @@
 
 
 /* Ocultación física de la columna del póster manteniendo el contrato de datos */
-.tpl-p5 #modulo-lineup > div > div:first-child,
 .tpl-p5 #mod-lineup > div > div:first-child {
     display: none !important;
 }
@@ -734,6 +732,7 @@
         "playlist"
         "info"
         "faq"
+        "ubicacion"
         "sponsors"
         "form";
     row-gap: 0;
@@ -746,7 +745,8 @@
 .tpl-p5 #mod-lineup      { grid-area: lineup; }
 .tpl-p5 #mod-playlist    { grid-area: playlist; }
 .tpl-p5 #mod-info-tecnica{ grid-area: info; }
-.tpl-p5 #mod-faq-ubicacion{ grid-area: faq; }
+.tpl-p5 #mod-faq         { grid-area: faq; }
+.tpl-p5 #mod-ubicacion   { grid-area: ubicacion; }
 .tpl-p5 #mod-sponsors    { grid-area: sponsors; }
 .tpl-p5 #mod-form        { grid-area: form; }
 
@@ -770,6 +770,7 @@
             "hero playlist"
             "hero info"
             "hero faq"
+            "hero ubicacion"
             "hero sponsors";
     }
 
@@ -836,4 +837,12 @@
 |         |            | desktop): Countdown, Meta, Video, Lineup, Playlist, Info, FAQ, Sponsors.          |        | en la misma fila (ver nota HTML).|
 |         |            | Actualizado MODULE_IDS en el sensor de salud (JS) para reflejar los nuevos IDs.  |        | Verificado balance de divs/       |
 |         |            |                                                                                    |        | secciones y comentarios [OK].    |
+| v1.4.8  | 28/07/2026 | Split de #mod-faq-ubicacion (HTML) en #mod-faq y #mod-ubicacion, hermanos       | [OK]   | Auditoría de expansión atómica:  |
+|         |            | planos independientes -- se retira el <div style="grid-template-columns:        |        | #mod-faq-ubicacion combinaba dos |
+|         |            | 1fr 1.1fr"> hardcodeado del HTML. Reordenado grid-template-areas (mobile y      |        | dominios de contenido distintos  |
+|         |            | desktop) agregando fila "ubicacion" tras "faq". Limpiado ID muerto              |        | (FAQ y Mapa) soldados con grid   |
+|         |            | #modulo-lineup (gemelo sin corregir de #modulo-formulario, v1.4.6) -- nunca     |        | inline; ahora el CSS del template|
+|         |            | existió en el HTML, no cambia comportamiento. Actualizado MODULE_IDS (JS) a     |        | es libre de organizarlos por     |
+|         |            | los 11 átomos reales (antes faltaban countdown/meta en el sensor). Verificado   |        | separado. Verificado balance de  |
+|         |            | balance de divs/secciones/comentarios [OK].                                     |        | divs y comentarios [OK].         |
 */
