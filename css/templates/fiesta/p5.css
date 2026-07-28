@@ -87,81 +87,150 @@
 /* Activación del contenedor como GRID ÚNICO (v1.4.0) — reemplaza el modelo de flujo/block */
 .tpl-p5 #main-content-flow { display: grid !important; }
 
-/* === 2. SISTEMA DE GRID ATÓMICO v1.5.1-MASTER (vh/vw Optimized) === */
-.tpl-p5 #main-content-flow {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    /* REORDENAMIENTO: Prioridad de conversión móvil [cite: 27] */
-    grid-template-areas: 
-        "hero"
-        "form"
-        "countdown"
-        "meta"
-        "video"
-        "lineup"
-        "playlist"
-        "info"
-        "faq"
-        "ubicacion"
-        "sponsors";
-}
 
-/* GRAVEDAD DINÁMICA MÓVIL: Respiro proporcional [cite: 5] */
-.tpl-p5 #mod-hero {
-    padding-top: 12vh !important; /* Aire editorial dinámico */
-    grid-area: hero;
-    min-height: 80vh; /* Ajuste para permitir solapamiento */
-}
 
-/* SOLAPAMIENTO ESTÉTICO: Efecto de capas Selina [cite: 13, 27] */
-.tpl-p5 #mod-form {
-    grid-area: form;
-    z-index: 20;
-}
-
-.tpl-p5 .form-master-box {
-    margin-top: -10vh !important; /* Sobrepone el formulario al fondo del hero */
-    background: rgba(10, 26, 10, 0.85) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px);
-}
-
-/* ASIGNACIÓN DE SOBERANÍA RESTANTE [cite: 27, 276] */
-.tpl-p5 #unified-frame    { grid-area: countdown; }
-.tpl-p5 #mod-hero-meta    { grid-area: meta; }
-.tpl-p5 #mod-video        { grid-area: video; }
-.tpl-p5 #mod-lineup       { grid-area: lineup; }
-.tpl-p5 #mod-playlist     { grid-area: playlist; }
-.tpl-p5 #mod-info-tecnica { grid-area: info; }
-.tpl-p5 #mod-faq          { grid-area: faq; }
-.tpl-p5 #mod-ubicacion    { grid-area: ubicacion; }
-.tpl-p5 #mod-sponsors     { grid-area: sponsors; }
-
-/* 3. CONFIGURACIÓN DESKTOP (Split-Screen 38/62) [cite: 15, 28] */
+/* --------------------------------------------------------------------------
+   2. REBALANCEO PANEL IZQUIERDO (v1.4.5) - Título Compacto / Form Small
+   -------------------------------------------------------------------------- */
 @media (min-width: 1024px) {
-    .tpl-p5 #main-content-flow {
-        grid-template-columns: 38vw 62vw;
-        grid-template-areas: 
-            "hero countdown" "hero meta" "hero video" 
-            "hero lineup" "hero playlist" "hero info" 
-            "hero faq" "hero ubicacion" "hero sponsors";
-    }
-
-    .tpl-p5 #mod-hero {
+    /* CONTENEDOR DE TÍTULO (Anclaje Superior) */
+    .tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
         position: fixed !important;
+        left: 0; top: 0;
         width: 38vw !important;
         height: 100vh !important;
-        padding-top: 4rem !important; /* Reset fijo para PC */
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start; /* Empuja el título arriba */
+        padding: 4rem 2.5rem !important; /* Respiro superior */
+        z-index: 10;
+        text-align: left !important; /* Estética editorial Selina */
     }
 
-    .tpl-p5 .form-master-box {
-        margin-top: 2rem !important; /* Reset para flujo PC */
+    /* ESCALA TIPOGRÁFICA REDUCIDA ($10,000 Standard) — v1.4.6: se agrega
+       peso Geist 900 explícito y Afterglow verde lima (misma fórmula de
+       resplandor que ya usa .unified-countdown-frame small, línea ~197,
+       para consistencia visual entre módulos). */
+    .tpl-p5 #event-title, .tpl-P5 #event-title {
+        font-family: var(--p5-font-sans); /* Geist */
+        font-weight: 900 !important;
+        font-size: clamp(1.8rem, 4vw, 2.8rem) !important; /* Título no invasivo */
+        line-height: 1.1;
+        margin: 0;
+        max-width: 90%;
+        text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
     }
 
-    .tpl-p5 #unified-frame {
-        margin-top: 20vh !important; /* Centrado visual en panel derecho */
+    /* CONTENEDOR DE "MENÚ" / FORMULARIO (Anclaje Inferior)
+       [FIX v1.4.6] Este selector apuntaba a #modulo-formulario, un ID que
+       NUNCA existió en evento3.html (el módulo real es #mod-form). La regla
+       llevaba 0 renders desde su creación. Se corrige al ID real.
+       Se retira además "flex-direction: column" (no llevaba !important):
+       el sistema Grid Atómico v1.4.0 (línea ~758) ya define
+       align-items:flex-end / justify-content:center para #mod-form
+       ASUMIENDO flex-direction:row (default). Si esta regla activaba
+       column, invertía los ejes y el form terminaba centrado verticalmente
+       pegado al borde derecho en vez de abajo-centrado. Se documenta aquí
+       para trazabilidad (Regla de Oro: No Regresión). */
+    .tpl-p5 #mod-form, .tpl-P5 #mod-form {
+        position: fixed !important;
+        left: 0; top: 0;
+        width: 38vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        padding: 3rem 2.5rem !important;
+        background: transparent !important;
+        z-index: 100;
+        pointer-events: none; /* Permite ver el fondo del Hero */
+    }
+
+    /* CAJA DE REGISTRO COMPACTA (Silo Parity) */
+    .tpl-p5 .form-master-box, .tpl-P5 .form-master-box {
+        pointer-events: auto; /* Habilita clicks solo aquí */
+        max-width: 400px !important; /* Reducido de 550px para ligereza */
+        padding: 2rem !important; /* Reducido de 3rem */
+        border-radius: 22px !important;
+        margin: 0 !important; /* Quitamos márgenes automáticos */
+        backdrop-filter: blur(20px) !important; /* !important: sin esto pierde
+            contra la regla posterior .form-master-box (línea ~656, blur 25px)
+            que no usa !important mientras que esta línea con !important sí
+            lo lleva en todas las demás propiedades salvo esta. Ahora el
+            blur 20px pedido queda garantizado independientemente del orden
+            de cascada. */
+        background: rgba(10, 26, 10, 0.85) !important;
+    }
+
+    /* INPUTS Y BOTONES COMPACTOS */
+    .tpl-p5 .form-input, .tpl-p5 .btn-submit {
+        padding: 0.9rem 1.2rem !important; /* Escala reducida para UX móvil/desktop */
+        font-size: 0.85rem !important;
+        margin-bottom: 0.8rem !important;
+    }
+
+    /* TABS DEL FORMULARIO */
+    .tpl-p5 .form-tabs {
+        margin-bottom: 1.2rem !important;
+        gap: 1rem !important;
     }
 }
+/* -------------------------------------------------------------------
+   3. COUNTDOWN FRAME (Restauración v1.4.9.3 - Selina High-Fidelity)
+   ------------------------------------------------------------------- */
+.tpl-p5 .unified-countdown-frame, .tpl-P5 .unified-countdown-frame,
+.tpl-p5 #unified-frame, .tpl-P5 #unified-frame {
+    /* POSICIONAMIENTO Y CENTRADO EN GRID [cite: 27] */
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    justify-self: center;        /* Centrado horizontal exacto en los 62vw */
+    margin-top: 15rem !important; /* RESPIRO SUPERIOR: Evita que esté pegado arriba */
+    margin-bottom: 3rem;
+    width: fit-content;
+    z-index: 5;
+
+
+    /* RESTAURACIÓN ESTÉTICA ORIGINAL (Masa Crítica Protegida) [cite: 6] */
+    gap: 1.5rem;
+    padding: 1.5rem 2.5rem;      /* Recupera el tamaño robusto solicitado */
+    background: rgba(10, 26, 10, 0.65) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--tpl-accent) !important;
+}
+
+/* BLOQUES INTERNOS (Restauración de Espaciado) [cite: 7] */
+.tpl-p5 .cd-block, .tpl-P5 .cd-block {
+    padding: 0 1.2rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+}
+
+.tpl-p5 .cd-block:last-child, .tpl-P5 .cd-block:last-child {
+    border-right: none;
+}
+
+/* TIPOGRAFÍA GEIST 900 (Restauración de Tamaño 2.2rem) [cite: 7, 727] */
+.tpl-p5 [id^="cd-"], .tpl-P5 [id^="cd-"],
+.tpl-p5 .cd-v, .tpl-P5 .cd-v {
+    font-family: var(--p5-font-sans) !important;
+    font-size: 2.2rem !important; /* Tamaño original recuperado */
+    font-weight: 900 !important;
+    line-height: 1;
+    color: var(--tpl-accent) !important;
+    text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
+}
+
+/* LABELS (Restauración Selina Style) [cite: 8] */
+.tpl-p5 .unified-countdown-frame small, .tpl-P5 .unified-countdown-frame small {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--p5-text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
 /* -------------------------------------------------------------------
    MÓDULO META (Unificación Geist 900 & Iconos Pro - v1.4.9.6)
    ------------------------------------------------------------------- */
