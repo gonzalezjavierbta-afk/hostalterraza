@@ -289,31 +289,38 @@
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
 
-    // === INICIO SEGMENTO: MULTIMEDIA FINAL (v205) ===
-    // 1. Jerarquía de Video: Columna Directa > JSON content > Fallback Silo [cite: 287, 872]
-    const vUrl = ev.video_url || content.video_url || content.trailer_url || "https://player.vimeo.com/video/259411563";
-    const vContainer = document.getElementById('db-video-content');
+
+                
+  // === INICIO SEGMENTO: VÍDEO SEGURO v1.4.9.7 (ADR-005 Compliance) ===
+// Cumple con el blindaje contra Error 153 en Instagram/Facebook [cite: 506, 938]
+const videoContainer = document.getElementById('db-video-content');
+const videoUrl = content.trailer_url || ""; // Preserva la URL capturada de Supabase [cite: 321]
+
+if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+    // 1. Extracción de ID para generar miniatura estática [cite: 506, 1043]
+    const videoId = videoUrl.split('v=')[1]?.split('&') || videoUrl.split('/').pop();
+    const thumbUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     
-    if (vContainer && vUrl) {
-        vContainer.style.borderColor = 'var(--tpl-accent)';
-        const isYT = vUrl.includes('youtube.com') || vUrl.includes('youtu.be');
-        if (isYT) {
-            // Extracción robusta de ID para URLs tipo watch?v= [cite: 395, 874]
-            let vId = vUrl.includes('v=') ? vUrl.split('v=')[1].split('&') : vUrl.split('/').pop();
-            
-            vContainer.innerHTML = `
-                <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
-                     onclick="window.open('${vUrl}', '_blank')">
-                    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center;">
-                        <svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
-                    </div>
-                </div>`;
-        } else {
-            vContainer.innerHTML = `<iframe src="${vUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
-        }
-        // Log cuantitativo con verificación de URL [cite: 772]
-        logStatus(`TRACE: Video real inyectado -> ${vUrl.substring(0, 30)}...`, "TRACE");
-    }
+    // 2. Inyección de Miniatura + Botón Afterglow [cite: 810, 811]
+    videoContainer.innerHTML = `
+        <div class="video-placeholder" style="background-image:url('${thumbUrl}'); background-size:cover; background-position:center; height:100%; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="window.open('${videoUrl}', '_blank')">
+            <div class="play-button" style="width:80px; height:80px; background:rgba(0,0,0,0.7); border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--tpl-accent); box-shadow: 0 0 25px var(--tpl-accent);">
+                <span style="color:var(--tpl-accent); font-size:2.5rem; margin-left:5px;">▶</span>
+            </div>
+            <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
+        </div>`;
+    console.log("%c[TRACE] Vídeo YouTube detectado -> Miniatura segura inyectada.", "color: #e67e22; font-weight: bold;");
+} else if (videoUrl.includes('vimeo.com')) {
+    // 3. Vimeo mantiene soporte nativo de Iframe sin bloqueos [cite: 1037]
+    videoContainer.innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
+    console.log("%c[TRACE] Vídeo Vimeo detectado -> Iframe directo inyectado.", "color: #e67e22; font-weight: bold;");
+} else {
+    // Fallback: Evita el bloque vacío si no hay datos válidos [cite: 913]
+    videoContainer.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
+}
+// === FIN SEGMENTO: VÍDEO SEGURO ===
+
+
 
     // 2. Sincronía Spotify 1:1 [cite: 462, 767]
     if (content.playlist_url) {
