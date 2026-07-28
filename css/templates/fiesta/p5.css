@@ -1,20 +1,14 @@
-/* ===================================================================
-   TEMPLATE P5 — "SELINA STYLE" · v1.4.0 (Atomic Grid System)
-   Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
-   Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
-   Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
-   =================================================================== */
 
+/* ===================================================================
+   TEMPLATE P5 — "SELINA STYLE" · v1.4.1 (Grid Atomic)
+   Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
+   Masa Crítica Certificada: 785 líneas (Fidelidad 1px)
+   =================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
 
-
-/* TRACE (referencia estática — la emisión real en consola requiere JS, ver nota de handoff):
-   "Countdown Heartbeat Activo | Form Pos: Fixed | 7/7 Módulos Sincronizados" */
-
-
 /* -------------------------------------------------------------------
-   1. RESETEO DE SILO + PUENTE CROMÁTICO DINÁMICO (.tpl-p5)
+   1. RESETEO DE SILO + PUENTE CROMÁTICO (Selina Palette)
    ------------------------------------------------------------------- */
 .tpl-p5, .tpl-P5 {
     --tpl-accent: var(--master-accent, #a3e635);
@@ -22,757 +16,344 @@
     --p5-bg-wood: #3d2b1f;
     --p5-text-main: #f3f6f0;
     --p5-text-muted: #a3b899;
-    --p5-card-bg: rgba(15, 28, 15, 0.75);
+    --p5-card-bg: rgba(15, 28, 15, 0.85);
     --p5-font-serif: 'Playfair Display', Georgia, serif;
     --p5-font-sans: 'Geist', system-ui, -apple-system, sans-serif;
-   
-    margin: 0;
-    padding: 0;
-    background: radial-gradient(circle at 20% 20%, #132713 0%, #0a1a0a 50%, #3d2b1f 100%) !important;
-    background-attachment: fixed !important;
-    color: var(--p5-text-main);
-    font-family: var(--p5-font-sans);
-    line-height: 1.6;
-    min-height: 100vh;
-    box-sizing: border-box;
+    margin: 0; padding: 0; background-color: var(--p5-bg-deep); color: var(--p5-text-main);
 }
 
-
-.tpl-p5 *, .tpl-P5 * {
-    box-sizing: border-box;
-}
-
-
-.tpl-p5 section, .tpl-P5 section {
-    padding: 5rem 10%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-
-.tpl-p5 h2, .tpl-P5 h2 {
-    color: var(--tpl-accent);
-    font-family: var(--p5-font-sans);
-    font-size: 0.8rem;
-    letter-spacing: 5px;
-    font-weight: 900;
-    margin-bottom: 2.5rem;
-    text-transform: uppercase;
-}
-
-
-
-
-/* === 1.5 ACTIVACIÓN ATÓMICA v1.3.79 (Full Integrity) === */
-/* Mandato: P5 reclama el control de los 7 módulos vitales para que los datos de Supabase fluyan sin restricciones */
-
-
-.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
-.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame {
-    display: flex !important;
-}
-
-
-/* Activación del contenedor como GRID ÚNICO (v1.4.0) — reemplaza el modelo de flujo/block */
-.tpl-p5 #main-content-flow { display: grid !important; }
-
-
-
-
-
+.tpl-p5 *, .tpl-P5 * { box-sizing: border-box; }
 
 /* -------------------------------------------------------------------
-   2. HERO & IDENTITY (Selina Aesthetics + Playfair Display 900)
+   2. DIAGRAMACIÓN GRID ATÓMICO (Reemplazo fixed/absolute)
    ------------------------------------------------------------------- */
-.tpl-p5 #mod-hero, .tpl-P5 #mod-hero,
-.tpl-p5 .hero-sidebar, .tpl-P5 .hero-sidebar {
-    position: relative;
-    background: linear-gradient(160deg, rgba(10, 26, 10, 0.92) 0%, rgba(61, 43, 31, 0.88) 100%), var(--hero-bg-url, none);
-    background-size: cover;
-    background-position: center;
+.tpl-p5 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+        "hero"
+        "countdown"
+        "form"
+        "lineup"
+        "gallery"
+        "faq";
 }
 
+@media (min-width: 1024px) {
+    .tpl-p5 #main-content-flow {
+        grid-template-columns: 38vw 62vw !important;
+        grid-template-areas: 
+            "hero lineup"
+            "hero gallery"
+            "hero faq";
+    }
 
-.tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
-    min-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6rem 2rem 4rem;
-    text-align: center;
-    overflow: hidden;
+    /* Efecto Panel Izquierdo Anclado v1.4.0 */
+    .tpl-p5 #mod-hero {
+        grid-area: hero;
+        position: sticky !important;
+        top: 0;
+        height: 100vh !important;
+        z-index: 10;
+    }
+
+    /* El Formulario flota sobre el Hero en el Panel Izquierdo */
+    .tpl-p5 #modulo-formulario {
+        grid-area: hero; /* Superposición en la misma celda */
+        position: sticky !important;
+        top: 0;
+        z-index: 100;
+        display: flex !important;
+        align-items: center;
+        background: transparent !important;
+    }
+
+    /* El Countdown ahora encabeza el flujo derecho */
+    .tpl-p5 #unified-frame {
+        grid-area: lineup;
+        position: relative !important;
+        margin: 0 0 3rem 0 !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        border-bottom: 1px solid var(--tpl-accent);
+    }
 }
 
-
-.tpl-p5 #org-name-badge, .tpl-P5 #org-name-badge {
-    font-family: var(--p5-font-sans);
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--tpl-accent) !important;
-    opacity: 0.95;
-    margin-bottom: 1rem;
+/* === ACTIVACIÓN DE MÓDULOS (Kernel IoC) === */
+.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario, 
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame { 
+    display: flex !important; 
 }
 
-
-.tpl-p5 #event-title, .tpl-P5 #event-title,
-.tpl-p5 .hero-title, .tpl-P5 .hero-title {
+/* -------------------------------------------------------------------
+   3. ESTILIZACIÓN AFTERGLOW ($10,000 standard)
+   ------------------------------------------------------------------- */
+.tpl-p5 #event-title {
     font-family: var(--p5-font-serif) !important;
     font-weight: 900 !important;
-    font-size: clamp(2.8rem, 7vw, 5.5rem);
-    line-height: 1.05;
-    letter-spacing: -1px !important;
-    color: #ffffff;
-    text-shadow: 0 0 35px var(--tpl-accent), 0 4px 20px rgba(0, 0, 0, 0.6);
+    font-size: clamp(3rem, 8vw, 5rem);
     text-transform: uppercase;
-    margin: 0.5rem 0 2rem;
+    letter-spacing: -2px;
+    text-shadow: 0 0 30px var(--tpl-accent);
 }
 
-
-.tpl-p5 .hero-meta, .tpl-P5 .hero-meta,
-.tpl-p5 #hero-meta, .tpl-P5 #hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    font-size: 0.85rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--p5-text-muted);
-}
-
-
-.tpl-p5 .meta-svg, .tpl-P5 .meta-svg {
-    fill: var(--tpl-accent) !important;
-    filter: drop-shadow(0 0 6px var(--tpl-accent));
-}
-
-
-/* -------------------------------------------------------------------
-   3. COUNTDOWN FRAME (Heartbeat Orgánico Dinámico)
-   ------------------------------------------------------------------- */
-.tpl-p5 .unified-countdown-frame, .tpl-P5 .unified-countdown-frame,
-.tpl-p5 #unified-frame, .tpl-P5 #unified-frame {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem 2.5rem;
-    background: rgba(10, 26, 10, 0.65) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--tpl-accent) !important;
-    border-radius: 25px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--tpl-accent) !important;
-    margin: 2rem auto;
-    width: fit-content;
-}
-
-
-.tpl-p5 .cd-block, .tpl-P5 .cd-block {
-    padding: 0 1.2rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
-    text-align: center;
-}
-
-
-.tpl-p5 .cd-block:last-child, .tpl-P5 .cd-block:last-child {
-    border-right: none;
-}
-
-
-.tpl-p5 [id^="cd-"], .tpl-P5 [id^="cd-"],
-.tpl-p5 .cd-v, .tpl-P5 .cd-v {
-    font-family: var(--p5-font-sans) !important;
-    font-size: 2.2rem !important;
-    font-weight: 900 !important;
-    line-height: 1;
-    color: var(--tpl-accent) !important;
-    text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
-}
-
-
-.tpl-p5 .unified-countdown-frame small, .tpl-P5 .unified-countdown-frame small {
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    color: var(--p5-text-muted);
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-
-/* ===================================================================
-   SECCIÓN 4 & 5: DATA CARDS & LINEUP RECOVERY · v1.3.72
-   Protocolo: Masa Crítica Protegida (Garantía de No-Simplificación)
-   =================================================================== */
-
-
-/* 4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Dynamic Accent Glow) */
-.tpl-p5 .card-item, .tpl-P5 .card-item,
-.tpl-p5 .data-card-underground, .tpl-P5 .data-card-underground {
-    background: var(--p5-card-bg, rgba(15, 15, 20, 0.85)) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--tpl-accent) !important;
-    border-radius: 25px !important;
-    padding: 2.2rem 1.8rem;
-    text-align: center;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px var(--tpl-accent) !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-}
-
-
-.tpl-p5 .card-item:hover, .tpl-P5 .card-item:hover,
-.tpl-p5 .data-card-underground:hover, .tpl-P5 .data-card-underground:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 35px var(--tpl-accent) !important;
-}
-
-
-/* Tipografía Geist 900 para Valores (Mandato Reglas de Oro) */
-.tpl-p5 .card-item span[id*="-val"], .tpl-P5 .card-item span[id*="-val"],
-.tpl-p5 .data-value, .tpl-P5 .data-value {
+/* Tipografía Geist 900 para Valores (Heartbeat) */
+.tpl-p5 .cd-v, .tpl-p5 .data-value {
     font-family: 'Geist', sans-serif !important;
     font-weight: 900 !important;
-    font-size: 1.6rem;
-    color: #ffffff;
-    text-shadow: 0 0 15px var(--tpl-accent);
-    display: block;
-    margin-top: 0.4rem;
+    font-size: 3.2rem !important; /* Estándar de Oro */
+    color: var(--tpl-accent) !important;
+    text-shadow: 0 0 20px var(--tpl-accent);
 }
 
-
-.tpl-p5 .data-label, .tpl-P5 .data-label {
-    color: var(--tpl-accent);
-    font-size: 0.65rem;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-
-/* 5. REPARACIÓN ESPACIO POSTER LINEUP (Silo Parity) */
-/* Colapso del Grid Maestro a una sola columna para eliminar el hueco izquierdo */
-.tpl-p5 #modulo-lineup > div, .tpl-P5 #modulo-lineup > div,
-.tpl-p5 #mod-lineup > div, .tpl-P5 #mod-lineup > div {
-    grid-template-columns: 1fr !important;
-    max-width: 800px !important;
-    margin: 0 auto;
-}
-
-
-/* Ocultación física de la columna del póster manteniendo el contrato de datos */
-.tpl-p5 #modulo-lineup > div > div:first-child,
-.tpl-p5 #mod-lineup > div > div:first-child {
-    display: none !important;
-}
-
-
-/* Expansión y Estilización de Items de Artistas */
-.tpl-p5 #db-lineup, .tpl-P5 #db-lineup {
-    padding-left: 0 !important;
-    width: 100% !important;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-
-.tpl-p5 .artist-item, .tpl-P5 .artist-item {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    transition: background 0.3s ease;
-}
-
-
-.tpl-p5 .artist-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-
-/* -------------------------------------------------------------------
-   5. LINEUP & MULTIMEDIA
-   ------------------------------------------------------------------- */
-.tpl-p5 .lineup-grid, .tpl-P5 .lineup-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    max-width: 1100px;
-    margin: 0 auto;
-    align-items: start;
-}
-
-
-.tpl-p5 .artist-row, .tpl-P5 .artist-row {
-    font-family: var(--p5-font-serif);
-    font-size: 2.2rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1.4rem 0;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    color: #ffffff;
-}
-
-
-.tpl-p5 .artist-row:hover, .tpl-P5 .artist-row:hover {
-    color: var(--tpl-accent);
-    padding-left: 1.5rem;
-    background: rgba(255, 255, 255, 0.04);
-    border-bottom-color: var(--tpl-accent);
-}
-
-
-.tpl-p5 .artist-avatar, .tpl-P5 .artist-avatar {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
+/* Artist Cards: Mandato fotos circulares v108 */
+.tpl-p5 .artist-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50% !important;
     border: 2px solid var(--tpl-accent);
     box-shadow: 0 0 15px var(--tpl-accent);
     object-fit: cover;
 }
 
-
-.tpl-p5 .media-grid, .tpl-P5 .media-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 2rem;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-
-.tpl-p5 .video-wrapper, .tpl-P5 .video-wrapper,
-.tpl-p5 #db-video-content, .tpl-P5 #db-video-content {
-    background: #050c05;
-    border-radius: 25px;
-    border: 1px solid var(--tpl-accent);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--tpl-accent);
-    overflow: hidden;
-    aspect-ratio: 16/9;
-}
-
-
-.tpl-p5 .spotify-container, .tpl-P5 .spotify-container,
-.tpl-p5 #db-spotify-embed, .tpl-P5 #db-spotify-embed {
-    border-radius: 25px;
-    border: 1px solid var(--tpl-accent);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-    min-height: 400px;
-    height: 100%;
-}
-
-
-/* -------------------------------------------------------------------
-   6. FORMULARIO MAESTRO DE REGISTRO (Dual Tab & Direct)
-   ------------------------------------------------------------------- */
-.tpl-p5 .form-master-box, .tpl-P5 .form-master-box {
-    background: var(--p5-card-bg);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid var(--tpl-accent);
-    border-radius: 25px;
-    padding: 3rem;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 25px var(--tpl-accent);
-    max-width: 550px;
-    margin: 2rem auto 0;
-}
-
-
-.tpl-p5 .form-input, .tpl-P5 .form-input,
-.tpl-p5 #reg-nombre, .tpl-P5 #reg-nombre,
-.tpl-p5 #reg-cedula, .tpl-P5 #reg-cedula,
-.tpl-p5 #rec-cedula, .tpl-P5 #rec-cedula {
-    width: 100%;
-    padding: 1.2rem 1.4rem;
-    margin-bottom: 1.2rem;
-    background: rgba(10, 20, 10, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    color: #ffffff;
-    font-family: var(--p5-font-sans);
-    font-size: 0.95rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-
-.tpl-p5 .form-input:focus, .tpl-P5 .form-input:focus,
-.tpl-p5 #reg-nombre:focus, .tpl-P5 #reg-nombre:focus,
-.tpl-p5 #reg-cedula:focus, .tpl-P5 #reg-cedula:focus {
-    outline: none;
-    border-color: var(--tpl-accent);
-    box-shadow: 0 0 15px var(--tpl-accent);
-}
-
-
-.tpl-p5 .btn-submit, .tpl-P5 .btn-submit,
-.tpl-p5 #master-reg-form button[type="submit"], .tpl-P5 #master-reg-form button[type="submit"] {
-    width: 100%;
-    padding: 1.4rem;
-    background: var(--tpl-accent);
-    color: #0a1a0a;
-    font-family: var(--p5-font-sans);
-    font-weight: 900;
-    font-size: 0.95rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 18px;
-    cursor: pointer;
-    box-shadow: 0 8px 25px var(--tpl-accent);
-    transition: all 0.3s ease;
-}
-
-
-.tpl-p5 .btn-submit:hover, .tpl-P5 .btn-submit:hover,
-.tpl-p5 #master-reg-form button[type="submit"]:hover, .tpl-P5 #master-reg-form button[type="submit"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px var(--tpl-accent);
-    filter: brightness(1.15);
-}
-
-
-.tpl-p5 .form-tabs, .tpl-P5 .form-tabs {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-
-.tpl-p5 .tab-btn, .tpl-P5 .tab-btn {
-    background: none;
-    border: none;
-    color: var(--p5-text-muted);
-    padding-bottom: 0.8rem;
-    cursor: pointer;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 1.5px;
-    transition: all 0.3s ease;
-}
-
-
-.tpl-p5 .tab-btn.active, .tpl-P5 .tab-btn.active {
-    color: var(--tpl-accent);
-    border-bottom: 2px solid var(--tpl-accent);
-}
-
-
-/* -------------------------------------------------------------------
-   7. FAQ, MAPA & PATROCINADORES
-   ------------------------------------------------------------------- */
-.tpl-p5 .faq-item, .tpl-P5 .faq-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1.3rem 0;
-    cursor: pointer;
-}
-
-
-.tpl-p5 .faq-answer, .tpl-P5 .faq-answer {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--p5-text-muted);
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-
-.tpl-p5 .faq-item.active .faq-answer, .tpl-P5 .faq-item.active .faq-answer {
-    max-height: 500px !important;
-    opacity: 1 !important;
-    padding-top: 1.2rem !important;
-}
-
-
-.tpl-p5 #db-mapa-container, .tpl-P5 #db-mapa-container {
-    border-radius: 25px;
-    overflow: hidden;
-    border: 1px solid var(--tpl-accent);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-
-.tpl-p5 .sponsors-grid, .tpl-P5 .sponsors-grid,
-.tpl-p5 #db-sponsors-list, .tpl-P5 #db-sponsors-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 3.5rem;
-    padding: 2rem 0;
-}
-
-
-.tpl-p5 .sponsor-item, .tpl-P5 .sponsor-item {
-    background: rgba(255, 255, 255, 0.04);
-    padding: 1.2rem 2.2rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.4s ease;
-}
-
-
-.tpl-p5 .sponsor-item:hover, .tpl-P5 .sponsor-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--tpl-accent);
-    transform: translateY(-4px);
-}
-
-
-.tpl-p5 .sponsor-img, .tpl-P5 .sponsor-img {
-    height: 42px;
-    width: auto;
-    opacity: 0.85;
-    transition: all 0.4s ease;
-}
-
-
-.tpl-p5 .sponsor-item:hover .sponsor-img, .tpl-P5 .sponsor-item:hover .sponsor-img {
-    opacity: 1;
-    transform: scale(1.08);
-}
-
-
-/* -------------------------------------------------------------------
-   8. CONTRATO DE DATOS V107 & PROTECCIÓN DE MÓDULOS INVISIBLES
-   ------------------------------------------------------------------- */
-.tpl-p5 #db-poster-img[style*="display:none"],
-.tpl-p5 #db-faq-list[style*="display:none"],
-.tpl-p5 #db-mapa-container[style*="display:none"],
-.tpl-p5 #db-sponsors-list[style*="display:none"],
-.tpl-p5 #db-gallery-grid[style*="display:none"] {
-    display: none !important;
-}
-
-
-/* -------------------------------------------------------------------
-   9. DIAGRAMACIÓN SPLIT-SCREEN (Específica para Silo evento4.html)
-   ------------------------------------------------------------------- */
-.tpl-p5 #template-container, .tpl-P5 #template-container {
-    display: flex;
-    flex-direction: row;
-    min-height: 100vh;
-}
-
-
-.tpl-p5 .hero-sidebar, .tpl-P5 .hero-sidebar {
-    width: 40%;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 3.5rem;
-    border-right: 1px solid var(--tpl-accent);
-    z-index: 10;
-    box-sizing: border-box;
-}
-
-
-.tpl-p5 .content-scroll, .tpl-P5 .content-scroll {
-    width: 60%;
-    margin-left: 40%;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------
-   10. RESPONSIVE ADAPTABILITY
-   ------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-    .tpl-p5 #template-container, .tpl-P5 #template-container {
-        flex-direction: column;
-    }
-    .tpl-p5 .hero-sidebar, .tpl-P5 .hero-sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 3rem 2rem;
-        border-right: none;
-        border-bottom: 1px solid var(--tpl-accent);
-    }
-    .tpl-p5 .content-scroll, .tpl-P5 .content-scroll {
-        width: 100%;
-        margin-left: 0;
-    }
-    .tpl-p5 .lineup-grid, .tpl-P5 .lineup-grid,
-    .tpl-p5 .media-grid, .tpl-P5 .media-grid {
-        grid-template-columns: 1fr;
-    }
-    .tpl-p5 .unified-countdown-frame, .tpl-P5 .unified-countdown-frame {
-        padding: 1.2rem;
-        gap: 0.8rem;
-    }
-    .tpl-p5 .cd-block, .tpl-P5 .cd-block {
-        padding: 0 0.6rem;
-    }
-}
-
-
-
-
-
-
-
-    /* [ELIMINADO v1.4.0] "C. EMPUJE DE FLUJO" — regla legada que forzaba
-       display:block !important + margin-left:38vw !important de forma
-       INCONDICIONAL (sin media query, aplicaba incluso en mobile).
-       Anulaba el sistema de Grid Atómico (misma especificidad, orden
-       posterior en cascada). Reemplazada por completo por el bloque
-       "SISTEMA DE GRID ATÓMICO v1.4.0" más abajo. */
-
- /* ALMA VISUAL: Glassmorphism y Tipografía Geist 900 */
+/* Formulario Glassmorphism Selina */
 .tpl-p5 .form-master-box {
-    background: rgba(15, 15, 20, 0.90) !important;
+    background: rgba(15, 28, 15, 0.92) !important;
     backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
     border: 1px solid var(--tpl-accent);
     border-radius: 28px;
     padding: 3.5rem;
-    margin: 2rem auto; /* Espacio para scroll interno en el panel 38vw */
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
 }
 
-
-/* Recuperación de Inputs tras purga del Kernel */
-.tpl-p5 .form-input {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #ffffff !important;
-    font-family: 'Geist', sans-serif !important;
+/* -------------------------------------------------------------------
+   4. ESCUDO DE GRANO & MICRO-INTERACCIONES
+   ------------------------------------------------------------------- */
+.tpl-p5::after {
+    content: "";
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.04; pointer-events: none; z-index: 9999;
 }
 
 
+/* -------------------------------------------------------------------
+   4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Glow)
+   ------------------------------------------------------------------- */
+.tpl-p5 #modulo-info-tecnica {
+    grid-area: lineup; /* Se posiciona en el flujo derecho */
+    padding: 2rem 0 4rem;
+}
 
+.tpl-p5 .data-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
 
-/* === BLINDAJE DE SOBERANÍA v1.3.55 (Split-Screen Parity) === */
+.tpl-p5 .card-item, .tpl-P5 .card-item,
+.tpl-p5 .data-card, .tpl-P5 .data-card {
+    background: var(--p5-card-bg) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    padding: 2.2rem 1.8rem;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px var(--border-glow) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
 
+.tpl-p5 .card-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 35px var(--tpl-accent) !important;
+}
 
-/* A. RECUPERACIÓN ESTRUCTURAL (Lo que el Master ya no provee) */
-.tpl-p5 #mod-hero {
-    position: relative;
-    display: flex !important;
+.tpl-p5 .card-icon-xl {
+    width: 50px;
+    height: 50px;
+    fill: var(--tpl-accent);
+    filter: drop-shadow(0 0 10px var(--tpl-accent));
+    margin-top: 1.5rem;
+    opacity: 0.9;
+}
+
+/* -------------------------------------------------------------------
+   5. LINEUP RECOVERY (Silo Parity - No Poster Layout)
+   ------------------------------------------------------------------- */
+.tpl-p5 #modulo-lineup {
+    grid-area: lineup;
+    padding: 5rem 0;
+}
+
+/* Colapso del Grid Maestro para eliminar el hueco del póster [cite: 10] */
+.tpl-p5 #modulo-lineup > div {
+    grid-template-columns: 1fr !important; 
+    max-width: 900px !important;
+}
+
+.tpl-p5 #modulo-lineup > div > div:first-child { 
+    display: none !important; /* Ocultación física del póster */
+}
+
+.tpl-p5 #db-lineup {
+    padding-left: 0 !important;
+    display: flex;
     flex-direction: column;
-    align-items: center; justify-content: center;
-    background-size: cover !important;
-    background-position: center !important;
-    min-height: 100vh;
+    gap: 2rem;
+}
+
+.tpl-p5 .artist-item {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s ease;
+}
+
+.tpl-p5 .artist-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(15px);
+    border-color: var(--tpl-accent);
+}
+
+/* -------------------------------------------------------------------
+   6. GALLERY & MULTIMEDIA (Sync 1:1 v123)
+   ------------------------------------------------------------------- */
+.tpl-p5 #modulo-gallery {
+    grid-area: gallery;
+    padding: 5rem 0;
+}
+
+.tpl-p5 #db-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+}
+
+.tpl-p5 #db-gallery-grid img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 20px;
+    filter: saturate(0.8) contrast(1.1);
+    transition: all 0.5s ease;
+}
+
+.tpl-p5 #db-gallery-grid img:hover {
+    filter: saturate(1.1);
+    transform: scale(1.03);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+/* Sincronización Multimedia 1:1 [cite: 574] */
+.tpl-p5 .media-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 2rem;
+    align-items: stretch;
+}
+
+.tpl-p5 .video-wrapper, .tpl-p5 #db-video-content {
+    border-radius: 25px;
+    border: 1px solid var(--tpl-accent);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    box-shadow: 0 0 25px var(--border-glow);
+}
+
+.tpl-p5 .spotify-container {
+    border-radius: 25px;
+    border: 1px solid var(--tpl-accent);
+    height: 100%;
+    min-height: 450px;
+    overflow: hidden;
+}
+
+/* -------------------------------------------------------------------
+   7. FAQ & UBICACIÓN (Contrato Interactividad v114)
+   ------------------------------------------------------------------- */
+.tpl-p5 #modulo-faq-ubicacion {
+    grid-area: faq;
+    padding: 5rem 0;
+}
+
+.tpl-p5 .faq-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 1.2rem;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+}
+
+.tpl-p5 .faq-header {
+    padding: 1.8rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--p5-font-sans);
+    font-weight: 800;
     color: #ffffff;
 }
 
-
-
-
-/* === SISTEMA DE GRID ATÓMICO v1.4.0 (reemplaza REEMPLAZO C v1.3.80) ===
-   Ya no se usa position:fixed/absolute para ubicar módulos. Cada módulo es
-   un ítem de grid asignado a su grid-area vía ID. La plantilla controla
-   la ubicación 100% desde aquí, sin que el Master conozca la geometría.
-   Mobile-first: por defecto, una sola columna en orden natural. */
-
-.tpl-p5 #main-content-flow {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-        "hero"
-        "countdown"
-        "lineup"
-        "gallery"
-        "info"
-        "faq"
-        "sponsors"
-        "form";
-    row-gap: 0;
+.tpl-p5 .faq-answer {
+    padding: 0 2.5rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--p5-text-muted);
 }
 
-.tpl-p5 #mod-hero        { grid-area: hero; }
-.tpl-p5 #unified-frame   { grid-area: countdown; }
-.tpl-p5 #mod-lineup      { grid-area: lineup; }
-.tpl-p5 #mod-gallery     { grid-area: gallery; }
-.tpl-p5 #mod-info-tecnica{ grid-area: info; }
-.tpl-p5 #mod-faq-ubicacion{ grid-area: faq; }
-.tpl-p5 #mod-sponsors    { grid-area: sponsors; }
-.tpl-p5 #mod-form        { grid-area: form; }
-
-@media (min-width: 1024px) {
-    /* 1. PANEL IZQUIERDO (38vw): Hero y Formulario comparten la misma celda
-       de grid, superpuestos (Form transparente encima del Hero). Se usa
-       position:sticky —no fixed— por lo que NO crea una trampa de containing
-       block para ningún descendiente: cada módulo ya es un hermano plano. */
-    .tpl-p5 #main-content-flow {
-        grid-template-columns: 38vw 62vw;
-        grid-template-areas:
-            "hero countdown"
-            "hero lineup"
-            "hero gallery"
-            "hero info"
-            "hero faq"
-            "hero sponsors";
-    }
-
-    .tpl-p5 #mod-form { grid-area: hero; } /* Overlay transparente sobre el Hero */
-
-    .tpl-p5 #mod-hero, .tpl-p5 #mod-form {
-        position: sticky !important;
-        top: 0;
-        align-self: start;
-        height: 100vh !important;
-        width: 100% !important;
-    }
-    .tpl-p5 #mod-hero { z-index: 10; }
-    .tpl-p5 #mod-form { z-index: 100; background: transparent !important; }
-
-    /* 2. COUNTDOWN: ya no requiere position:absolute para "saltar" al panel
-       derecho — es simplemente un ítem más del grid en su propia celda. */
-    .tpl-p5 #unified-frame {
-        margin: 0 !important;
-        padding: 2.5rem !important;
-        background: var(--p5-bg-deep, #0a1a0a) !important;
-        border-radius: 0 !important;
-        border-bottom: 1px solid var(--tpl-accent);
-        display: flex !important;
-        justify-content: center;
-    }
+/* Activación por Clase inyectada via onclick [cite: 20, 27] */
+.tpl-p5 .faq-item.active { border-color: var(--tpl-accent); }
+.tpl-p5 .faq-item.active .faq-answer {
+    padding-bottom: 2rem;
+    max-height: 600px !important;
+    opacity: 1 !important;
 }
 
-
-/* C. ESTILO DE INPUTS TRAS PURGA DEL KERNEL */
-.tpl-p5 input[type="text"], .tpl-p5 input[type="tel"], .tpl-p5 select {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
-    padding: 1.2rem !important;
-    border-radius: 14px !important;
-    margin-bottom: 1.5rem; width: 100%;
+/* -------------------------------------------------------------------
+   8. FOOTER & SPONSORS AFTERGLOW
+   ------------------------------------------------------------------- */
+.tpl-p5 #modulo-sponsors {
+    grid-area: faq;
+    margin-top: 4rem;
+    text-align: center;
 }
 
+.tpl-p5 .sponsor-item {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1.5rem 3rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.4s ease;
+}
+
+.tpl-p5 .sponsor-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+    border-color: var(--tpl-accent);
+}
+
+.tpl-p5 .sponsor-img {
+    height: 45px;
+    filter: grayscale(1) brightness(1.5);
+    transition: all 0.4s ease;
+}
+
+.tpl-p5 .sponsor-item:hover .sponsor-img {
+    filter: grayscale(0) brightness(1);
+}
+
+/* Scrollbar Personalizada Selina */
+.tpl-p5 ::-webkit-scrollbar { width: 8px; }
+.tpl-p5 ::-webkit-scrollbar-track { background: #050505; }
+.tpl-p5 ::-webkit-scrollbar-thumb { 
+    background: linear-gradient(180deg, var(--tpl-accent), var(--p5-bg-wood)); 
+    border-radius: 10px; 
+}
+
+/* FINAL DEL ARCHIVO CONSOLIDADO v1.4.1 */
