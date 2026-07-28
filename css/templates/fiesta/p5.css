@@ -66,28 +66,120 @@
 
 
 
+/* ===================================================================
+   BLOQUE TÉCNICO: LAYOUT & GRID MAESTRO (v1.4.9.9 - UNIFICADO)
+   =================================================================== */
 
-/* === 1.5 ACTIVACIÓN ATÓMICA v1.3.79 (Full Integrity) === */
-/* Mandato: P5 reclama el control de los 7 módulos vitales para que los datos de Supabase fluyan sin restricciones */
+/* 1. ACTIVACIÓN ATÓMICA [cite: 4] */
+.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #mod-lineup, 
+.tpl-p5 #mod-video, .tpl-p5 #mod-playlist, .tpl-p5 #unified-frame,
+.tpl-p5 #mod-hero-meta { 
+    display: flex !important; 
+}
 
+/* 2. SISTEMA DE GRID ATÓMICO (Mobile-First / Prioridad Formulario) [cite: 27] */
+.tpl-p5 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    /* REORDENAMIENTO v1.4.9.9: Formulario sigue al título [cite: Turno Actual] */
+    grid-template-areas: 
+        "hero"
+        "form"
+        "countdown"
+        "meta"
+        "video"
+        "lineup"
+        "playlist"
+        "info"
+        "faq"
+        "ubicacion"
+        "sponsors";
+    row-gap: 0;
+}
 
-.tpl-p5 #mod-hero, .tpl-p5 #mod-form,
-.tpl-p5 #mod-lineup, .tpl-p5 #mod-video, .tpl-p5 #mod-playlist, .tpl-p5 #unified-frame{
+/* ASIGNACIÓN DE ÁREAS [cite: 27] */
+.tpl-p5 #mod-hero         { grid-area: hero; }
+.tpl-p5 #unified-frame    { grid-area: countdown; }
+.tpl-p5 #mod-hero-meta    { grid-area: meta; }
+.tpl-p5 #mod-video        { grid-area: video; }
+.tpl-p5 #mod-lineup       { grid-area: lineup; }
+.tpl-p5 #mod-playlist     { grid-area: playlist; }
+.tpl-p5 #mod-info-tecnica { grid-area: info; }
+.tpl-p5 #mod-faq          { grid-area: faq; }
+.tpl-p5 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-p5 #mod-sponsors     { grid-area: sponsors; }
+.tpl-p5 #mod-form         { grid-area: form; }
+
+/* 3. CONFIGURACIÓN DESKTOP (Split-Screen 38/62) [cite: 5, 28] */
+@media (min-width: 1024px) {
+    .tpl-p5 #main-content-flow {
+        grid-template-columns: 38vw 62vw;
+        grid-template-areas: 
+            "hero countdown"
+            "hero meta"
+            "hero video"
+            "hero lineup"
+            "hero playlist"
+            "hero info"
+            "hero faq"
+            "hero ubicacion"
+            "hero sponsors";
+    }
+
+    .tpl-p5 #mod-hero {
+        position: fixed !important;
+        width: 38vw !important;
+        height: 100vh !important;
+        z-index: 10;
+    }
+
+    /* AIRE PREMIUM COUNTDOWN (v1.4.9.4) [cite: 6] */
+    .tpl-p5 #unified-frame {
+        margin-top: 15rem !important; 
+        justify-self: center;
+    }
+}
+
+/* 4. MÓDULO META (Maquetación 2 Líneas & Geist 900) [cite: v1.4.9.6] */
+.tpl-p5 .hero-meta {
     display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 2rem 5rem;
+    margin: 4rem auto 8rem !important;
+    width: 100%;
+    max-width: 1100px;
+    justify-self: center;
 }
 
-/* MÓDULO ATÓMICO: METADATOS (extraído del Hero, v213) — la clase .hero-meta
-   ya trae el estilo visual completo (ver sección 2); aquí solo se define
-   el espaciado propio de su nueva posición, debajo del Countdown. */
-.tpl-p5 #mod-hero-meta, .tpl-P5 #mod-hero-meta {
-    padding: 0 0 1rem;
+.tpl-p5 .hero-meta > div, .tpl-p5 .meta-item {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--p5-font-sans) !important;
+    font-weight: 900 !important; /* AUTORIDAD GEIST 900 [cite: 930] */
+    font-size: 1.2rem !important;
+    color: var(--p5-text-main) !important;
+    text-transform: uppercase;
+    letter-spacing: 4px;
 }
 
+/* SEGUNDA LÍNEA: LUGAR [cite: v1.4.9.6] */
+.tpl-p5 .hero-meta > div:nth-child(3) {
+    flex-basis: 100% !important;
+    justify-content: center;
+    margin-top: 1rem;
+}
 
-/* Activación del contenedor como GRID ÚNICO (v1.4.0) — reemplaza el modelo de flujo/block */
-.tpl-p5 #main-content-flow { display: grid !important; }
-
-
+/* ESCALADO DE ICONOS [cite: v1.4.9.6] */
+.tpl-p5 .meta-svg {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 1.5rem !important;
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 12px var(--tpl-accent));
+}
+/* === FIN SEGMENTO ESTRUCTURAL === */
 
 /* --------------------------------------------------------------------------
    2. REBALANCEO PANEL IZQUIERDO (v1.4.5) - Título Compacto / Form Small
