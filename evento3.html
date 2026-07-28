@@ -12,12 +12,11 @@
     /* 1. RESET ESTRUCTURAL MÍNIMO */
     html, body {
         margin: 0; padding: 0; min-height: 100%;
-        background-color: #050505;
+        background-color: #050505; 
         color: #ffffff;
         font-family: 'Geist', sans-serif;
         overflow-x: hidden;
     }
-
 
     /* 2. ESCUDO DE GRANO (v47) */
     body::before {
@@ -26,25 +25,21 @@
         opacity: 0.04;
     }
 
-
     /* 3. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
     section, header { display: none; }
 
-
     /* 4. CARGA Y FEEDBACK */
-    .loading-overlay {
-        position: fixed; inset: 0; background: #000; z-index: 999;
-        display: flex; align-items: center; justify-content: center;
+    .loading-overlay { 
+        position: fixed; inset: 0; background: #000; z-index: 999; 
+        display: flex; align-items: center; justify-content: center; 
         font-weight: 900; letter-spacing: 3px; text-transform: uppercase;
     }
 </style>
 <!-- === FIN SEGMENTO: KERNEL SaaS AGNOSTICO === -->
 </head>
 
-
 <body class="tpl-init">
     <div id="loader" class="loading-overlay">SINCRO TOTAL v196...</div>
-
 
     <!-- MÓDULO 1: HERO (Z-index 5 Protegido) [cite: 1, 6] -->
     <header id="mod-hero" class="hero">
@@ -65,7 +60,6 @@
         </div>
     </header>
 
-
     <main id="main-content-flow">
         <!-- MÓDULO 2: LINEUP [cite: 2, 863] -->
         <section id="mod-lineup">
@@ -75,7 +69,6 @@
             </div>
         </section>
 
-
         <!-- MÓDULO 3: GALERÍA & MULTIMEDIA [cite: 11, 12] -->
         <section id="mod-gallery">
             <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
@@ -84,7 +77,6 @@
                 <div id="db-spotify-embed" style="border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; height:100%;"></div>
             </div>
         </section>
-
 
         <section id="mod-info-tecnica">
             <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
@@ -107,7 +99,6 @@
             </div>
         </section>
 
-
         <section id="mod-faq-ubicacion">
             <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:4rem; max-width:1100px; margin:0 auto;">
                 <div id="mod-faq"><h2>FAQ</h2><div id="db-faq-list"></div></div>
@@ -115,9 +106,7 @@
             </div>
         </section>
 
-
         <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
-
 
         <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874] -->
         <section id="mod-form">
@@ -134,18 +123,15 @@
         </section>
     </main>
 
-
     <script>
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-
         function logStatus(m, t = 'INFO') {
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
-
 
         // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
         function parseSpanishDate(dateStr, timeStr) {
@@ -160,7 +146,6 @@
             return new Date(`${dateStr}T${timeStr}`);
         }
 
-
         function switchForm(type) {
             const isNew = type === 'nuevo';
             document.getElementById('tab-new').classList.toggle('active', isNew);
@@ -172,9 +157,6 @@
 
 
 
-
-
-
         // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 ===
         function injectAtomicCSS(templateId) {
             const link = document.querySelector('link[data-template-css]') || document.createElement('link');
@@ -183,13 +165,54 @@
             // Forzamos la carga de la última versión de p5.css
             link.href = `css/templates/${templateId}.css?v=${new Date().getTime()}`;
             if (!link.parentNode) document.head.appendChild(link);
-           
+            
             logStatus(`LINK: Estilo [${templateId}] solicitado con bypass de caché.`, "LINK");
         }
+        
+        async function injectAtomicCSS(cat, tplId) {
+            return new Promise((resolve) => {
+                const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
+                let link = document.querySelector('link[data-template-css]');
+                if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
+                
+                let isResolved = false;
+                const timer = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}]. Continuando en degradación suave.`, "ERROR");
+                        resolve(false);
+                    }
+                }, 5000);
 
+                link.onload = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(timer);
+                        let rulesCount = 0;
+                        try {
+                            const sheets = Array.from(document.styleSheets);
+                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
+                            if (targetSheet && targetSheet.cssRules) {
+                                rulesCount = targetSheet.cssRules.length;
+                            }
+                        } catch (e) {}
+                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
+                        resolve(true);
+                    }
+                };
 
-       
+                link.onerror = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(timer);
+                        logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR");
+                        resolve(false);
+                    }
+                };
 
+                link.href = path;
+            });
+        }
 
         async function initEvento() {
             logStatus("Iniciando Orquestador v196 - Fidelidad Absoluta Restablecida.", "INFO");
@@ -201,10 +224,9 @@
                 const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
                 const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
                 if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
-               
+                
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
                 const content = ev.config_landing?.content || {};
-
 
                 // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
                 const primaryColor = ev.color_primario || content.color_primario || content.accent_color;
@@ -213,9 +235,7 @@
                 }
                 logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
 
-
                 await injectAtomicCSS(ev.categoria_slug, ev.template_id);
-
 
                 // Activación de Ámbito Dual (P3)
                 const tplNormal = `tpl-${ev.template_id || 'F3'}`;
@@ -223,18 +243,17 @@
                 document.body.className = `${tplNormal} ${tplLower}`;
                 logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
 
-
                  // === INICIO SEGMENTO: VINCULACIÓN DE VIDEO (v202) ===
     if (content.video_url) {
         const videoContainer = document.getElementById('db-video-content');
         if (videoContainer) {
             const isYouTube = content.video_url.includes('youtube.com') || content.video_url.includes('youtu.be');
-           
+            
             if (isYouTube) {
                 // Protocolo ADR-005: Miniatura + Link (Evita Error 153) [cite: 378]
                 const vId = content.video_url.includes('v=') ? content.video_url.split('v=')[1].split('&') : content.video_url.split('/').pop();
                 videoContainer.innerHTML = `
-                    <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;"
+                    <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
                          onclick="window.open('${content.video_url}', '_blank')">
                         <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;">
                             <svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
@@ -249,7 +268,6 @@
     }
     // === FIN SEGMENTO VIDEO ===
 
-
                 const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
                 setInterval(() => {
                     const diff = target - Date.now();
@@ -260,7 +278,6 @@
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
 
-
                 // MAPEO DE HERO & METADATA
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
@@ -270,22 +287,20 @@
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
 
-
-
     // === INICIO SEGMENTO: MULTIMEDIA FINAL (v205) ===
     // 1. Jerarquía de Video: Columna Directa > JSON content > Fallback Silo [cite: 287, 872]
     const vUrl = ev.video_url || content.video_url || content.trailer_url || "https://player.vimeo.com/video/259411563";
     const vContainer = document.getElementById('db-video-content');
-   
+    
     if (vContainer && vUrl) {
         vContainer.style.borderColor = 'var(--tpl-accent)';
         const isYT = vUrl.includes('youtube.com') || vUrl.includes('youtu.be');
         if (isYT) {
             // Extracción robusta de ID para URLs tipo watch?v= [cite: 395, 874]
             let vId = vUrl.includes('v=') ? vUrl.split('v=')[1].split('&') : vUrl.split('/').pop();
-           
+            
             vContainer.innerHTML = `
-                <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;"
+                <div style="position:relative; width:100%; height:100%; cursor:pointer; background:url('https://img.youtube.com/vi/${vId}/maxresdefault.jpg') center/cover;" 
                      onclick="window.open('${vUrl}', '_blank')">
                     <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center;">
                         <svg width="68" height="68" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
@@ -297,7 +312,6 @@
         // Log cuantitativo con verificación de URL [cite: 772]
         logStatus(`TRACE: Video real inyectado -> ${vUrl.substring(0, 30)}...`, "TRACE");
     }
-
 
     // 2. Sincronía Spotify 1:1 [cite: 462, 767]
     if (content.playlist_url) {
@@ -312,14 +326,11 @@
     // === FIN SEGMENTO MULTIMEDIA ===
 
 
-
-
   // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
     // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
     const sponsorsRaw = content.sponsors || "";
     let sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
     let isFallback = false;
-
 
     if (sponsorsList.length === 0) {
         // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
@@ -331,7 +342,6 @@
         isFallback = true;
     }
 
-
     // 2. Inyección Física en el Contrato de Datos [cite: 757]
     const sponsorsContainer = document.getElementById('db-sponsors-list');
     if (sponsorsContainer) {
@@ -339,13 +349,12 @@
             <div class="sponsor-item" style="padding: 1.5rem;">
                 <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.85;">
             </div>`).join('');
-           
+            
         // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
         const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
         logStatus(`TRACE: ${statusMsg}.`, "TRACE");
     }
     // === FIN SEGMENTO PATROCINADORES ===
-
 
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
 // 1. Verificación de Póster [cite: 343]
@@ -354,26 +363,24 @@ if (document.getElementById('db-poster-img')) {
     logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
 }
 
-
 // === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198) ===
     if (content.dj_lineup && Array.isArray(content.dj_lineup)) {
         document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => {
             // Soporte Dual: Detecta si 'dj' es un texto simple o un objeto {nombre, foto} [cite: 821]
             const name = typeof dj === 'object' ? dj.nombre : dj;
             const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
-           
+            
             return `
                 <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;">
                     <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;">
                     <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
                 </div>`;
         }).join('');
-       
+        
         // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
         logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
     }
     // === FIN SEGMENTO: LINEUP ===
-
 
    // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
     if (content.faq) {
@@ -388,7 +395,6 @@ if (document.getElementById('db-poster-img')) {
             });
         }
 
-
         if (faqItems.length > 0) {
             // Inyección con Contrato de Interactividad Física [cite: 706, 18]
             document.getElementById('db-faq-list').innerHTML = faqItems.map(item => `
@@ -399,13 +405,12 @@ if (document.getElementById('db-poster-img')) {
                     </div>
                     <div class="faq-answer">${item.respuesta}</div>
                 </div>`).join('');
-           
+            
             // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
             logStatus(`TRACE: FAQ inyectado satisfactoriamente (${faqItems.length} preguntas).`, "TRACE");
         }
     }
     // === FIN SEGMENTO FAQ ===
-
 
     // === INICIO SEGMENTO: VINCULACIÓN DE UBICACIÓN (v201) ===
     if (ev.ubicacion) {
@@ -414,41 +419,35 @@ if (document.getElementById('db-poster-img')) {
             document.getElementById('venue-name').innerText = ev.ubicacion.toUpperCase();
         }
 
-
         // 2. Construcción Dinámica del Mapa (Google Maps Embed) [cite: 301]
         const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
         const mapContainer = document.getElementById('db-mapa-container');
-       
+        
         if (mapContainer) {
             mapContainer.style.border = '1px solid var(--tpl-accent)';
             mapContainer.innerHTML = `
-                <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen
+                <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen 
                         style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
         }
-
 
         // Certificación de Salud Escudo GOLD [cite: 805, 811]
         logStatus("TRACE: Módulo de ubicación vinculado y mapa inyectado.", "TRACE");
     }
     // === FIN SEGMENTO UBICACIÓN ===
 
-
     // === INICIO SEGMENTO: TECHNICAL DATA RESTORED CON FALLBACK (v209) ===
     // technical data restored
     let technicalCount = 0;
     let isTechFallback = false;
-
 
     const dressVal = content.dresscode || 'NEON';
     const guestVal = content.guest_list || '+200';
     const aforoVal = ev.aforo_max ? `${ev.aforo_max}` : '100';
     const ticketVal = content.tickets_info || 'DISPONIBLES';
 
-
     if (!content.dresscode || !content.guest_list || !ev.aforo_max || !content.tickets_info) {
         isTechFallback = true;
     }
-
 
     if (document.getElementById('db-dress-val')) {
         document.getElementById('db-dress-val').innerText = dressVal.toUpperCase();
@@ -467,13 +466,11 @@ if (document.getElementById('db-poster-img')) {
         technicalCount++;
     }
 
-
-    const techStatus = isTechFallback
-        ? `Tarjetas técnicas de REFERENCIA/FALLBACK (${technicalCount} tarjetas)`
+    const techStatus = isTechFallback 
+        ? `Tarjetas técnicas de REFERENCIA/FALLBACK (${technicalCount} tarjetas)` 
         : `Tarjetas técnicas REALES (${technicalCount} tarjetas)`;
     logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
     // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
-
 
                 // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
                 // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
@@ -482,7 +479,6 @@ if (document.getElementById('db-poster-img')) {
                 // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
                 const MODULE_IDS = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
                 let activeModulesCount = 0;
-
 
                 MODULE_IDS.forEach(id => {
                     const el = document.getElementById(id);
@@ -499,9 +495,7 @@ if (document.getElementById('db-poster-img')) {
                     }
                 });
 
-
                 logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
-
 
                  // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL P5 con SENSOR (v1.3.55) ===
     if (document.body.classList.contains('tpl-p5')) {
@@ -509,13 +503,12 @@ if (document.getElementById('db-poster-img')) {
         // Leemos la física real calculada por el motor de renderizado del navegador
         const heroMargin = window.getComputedStyle(heroEl).marginLeft;
         const heroDisplay = window.getComputedStyle(heroEl).display;
-       
+        
         logStatus(`TRACE: Split-Screen P5 Audit | Margen Hero: ${heroMargin} | Estado: ${heroDisplay}`, "TRACE");
     }
     // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL P5 con SENSOR ===
                 logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
                 logStatus("TRACE: 5/5 Fixes Prioritarios + 3 Gaps F+ cerrados con éxito. Sellado Definitivo v123-MASTER.", "TRACE");
-
 
             } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
@@ -523,4 +516,3 @@ if (document.getElementById('db-poster-img')) {
     </script>
 </body>
 </html>
-
