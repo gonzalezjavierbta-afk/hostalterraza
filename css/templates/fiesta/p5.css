@@ -183,10 +183,11 @@
     justify-content: center;
     align-items: center;
     justify-self: center;        /* Centrado horizontal exacto en los 62vw */
-    margin-top: 10rem !important; /* RESPIRO SUPERIOR: Evita que esté pegado arriba */
+    margin-top: 15rem !important; /* RESPIRO SUPERIOR: Evita que esté pegado arriba */
     margin-bottom: 3rem;
     width: fit-content;
     z-index: 5;
+
 
     /* RESTAURACIÓN ESTÉTICA ORIGINAL (Masa Crítica Protegida) [cite: 6] */
     gap: 1.5rem;
@@ -229,6 +230,43 @@
     text-transform: uppercase;
     font-weight: 700;
 }
+
+/* -------------------------------------------------------------------
+   MÓDULO META (Maquetación Editorial v1.4.9.4)
+   ------------------------------------------------------------------- */
+.tpl-p5 .hero-meta, .tpl-P5 .hero-meta {
+    display: flex !important;
+    flex-direction: column !important; /* Fuerza las 2 líneas solicitadas */
+    align-items: center !important;    /* Centrado horizontal total */
+    gap: 1.5rem;                       /* Aire entre líneas */
+    margin-top: 2rem;
+    margin-bottom: 4rem;               /* Aire ante el siguiente módulo */
+    justify-self: center;              /* Centrado en grid de 62vw [cite: 27, 28] */
+}
+
+/* LÍNEA 1: FECHA Y HORA (Tipografía Geist 900) [cite: 2, 10] */
+.tpl-p5 .hero-meta > div:not(#meta-lugar), 
+.tpl-P5 .hero-meta > div:not(#meta-lugar) {
+    display: inline-flex;
+    font-family: var(--p5-font-sans) !important;
+    font-weight: 900 !important;       /* Estándar de autoridad Geist 900 */
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: var(--p5-text-main);
+    text-transform: uppercase;
+}
+
+/* LÍNEA 2: LUGAR (Elegancia Playfair Display) [cite: 2] */
+.tpl-p5 #meta-lugar, .tpl-P5 #meta-lugar {
+    display: block;
+    font-family: var(--p5-font-serif) !important; /* Serif para toque Selina */
+    font-size: 1.8rem;
+    color: var(--tpl-accent) !important;
+    font-style: italic;
+    margin-top: 0.5rem;
+    text-shadow: 0 0 15px var(--tpl-accent); /* Glow sutil */
+}
+
 
 /* ===================================================================
    SECCIÓN 4 & 5: DATA CARDS & LINEUP RECOVERY · v1.3.72
