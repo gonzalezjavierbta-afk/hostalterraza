@@ -1,5 +1,5 @@
 /* ===================================================================
-   TEMPLATE P5 — "SELINA STYLE" · v1.4.1 (7/7 Módulos + --gold vinculado)
+   TEMPLATE P5 — "SELINA STYLE" · v1.4.2 (Panel Izquierdo Anclado Real)
    Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
    Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
    Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
@@ -72,7 +72,8 @@
 
 
 .tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario,
-.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame {
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame,
+.tpl-p5 #mod-info-tecnica, .tpl-p5 #mod-faq-ubicacion, .tpl-p5 #mod-sponsors {
     display: flex !important;
 }
 
@@ -84,66 +85,77 @@
 
 
 
-/* --------------------------------------------------------------------------
-   02. CONTENEDOR MAESTRO (GRID ATÓMICO) & BLOQUEO PANEL IZQUIERDO (v1.4.2)
-   -------------------------------------------------------------------------- */
-.tpl-p5 #main-content-flow {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    align-items: start; /* CRUCIAL: Permite que el sticky no se estire */
-    grid-template-areas: 
-        "hero"
-        "countdown"
-        "form"
-        "lineup"
-        "gallery"
-        "faq";
+
+/* -------------------------------------------------------------------
+   2. HERO & IDENTITY (Selina Aesthetics + Playfair Display 900)
+   ------------------------------------------------------------------- */
+.tpl-p5 #mod-hero, .tpl-P5 #mod-hero,
+.tpl-p5 .hero-sidebar, .tpl-P5 .hero-sidebar {
     position: relative;
+    background: linear-gradient(160deg, rgba(10, 26, 10, 0.92) 0%, rgba(61, 43, 31, 0.88) 100%), var(--hero-bg-url, none);
+    background-size: cover;
+    background-position: center;
 }
 
-@media (min-width: 1024px) {
-    .tpl-p5 #main-content-flow {
-        grid-template-columns: 38vw 62vw !important;
-        grid-template-areas: 
-            "hero lineup"
-            "hero gallery"
-            "hero faq";
-    }
 
-    /* BLOQUEO PANEL IZQUIERDO: Hero estático mientras la derecha scrolea */
-    .tpl-p5 #mod-hero {
-        grid-area: hero;
-        position: sticky !important;
-        top: 0;
-        height: 100vh !important;
-        z-index: 10;
-        overflow: hidden;
-    }
-
-    /* BLOQUEO FORMULARIO: Superpuesto al hero y anclado al scroll */
-    .tpl-p5 #modulo-formulario {
-        grid-area: hero; /* Misma celda que el hero para superposición */
-        position: sticky !important;
-        top: 0;
-        height: 100vh !important;
-        z-index: 100;
-        display: flex !important;
-        align-items: center;
-        background: transparent !important;
-        overflow-y: auto; /* Scroll interno si el contenido es largo */
-    }
-
-    /* FLUJO DERECHO: El Countdown encabeza la columna de contenido */
-    .tpl-p5 #unified-frame {
-        grid-area: lineup;
-        position: relative !important;
-        margin: 0 !important;
-        width: 100% !important;
-        z-index: 50;
-        border-radius: 0 !important;
-        border-bottom: 1px solid var(--tpl-accent);
-    }
+.tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
 }
+
+
+.tpl-p5 #org-name-badge, .tpl-P5 #org-name-badge {
+    font-family: var(--p5-font-sans);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--tpl-accent) !important;
+    opacity: 0.95;
+    margin-bottom: 1rem;
+}
+
+
+.tpl-p5 #event-title, .tpl-P5 #event-title,
+.tpl-p5 .hero-title, .tpl-P5 .hero-title {
+    font-family: var(--p5-font-serif) !important;
+    font-weight: 900 !important;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -1px !important;
+    color: #ffffff;
+    text-shadow: 0 0 35px var(--tpl-accent), 0 4px 20px rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
+    margin: 0.5rem 0 2rem;
+}
+
+
+.tpl-p5 .hero-meta, .tpl-P5 .hero-meta,
+.tpl-p5 #hero-meta, .tpl-P5 #hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--p5-text-muted);
+}
+
+
+.tpl-p5 .meta-svg, .tpl-P5 .meta-svg {
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 6px var(--tpl-accent));
+}
+
 
 /* -------------------------------------------------------------------
    3. COUNTDOWN FRAME (Heartbeat Orgánico Dinámico)
@@ -721,8 +733,13 @@
 @media (min-width: 1024px) {
     /* 1. PANEL IZQUIERDO (38vw): Hero y Formulario comparten la misma celda
        de grid, superpuestos (Form transparente encima del Hero). Se usa
-       position:sticky —no fixed— por lo que NO crea una trampa de containing
-       block para ningún descendiente: cada módulo ya es un hermano plano. */
+       position:fixed — ahora es SEGURO usarla porque ningún módulo (ni
+       #unified-frame ni ningún otro) es descendiente del Hero: son
+       hermanos planos. La Trampa del DOM original ocurría porque un
+       descendiente absoluto quedaba atrapado dentro de un padre fixed;
+       sin descendientes, fixed ya no tiene a quién atrapar.
+       El grid reserva el ancho de 38vw igual (columnas de longitud fija,
+       no dependen de que la celda "hero" tenga contenido en flujo). */
     .tpl-p5 #main-content-flow {
         grid-template-columns: 38vw 62vw;
         grid-template-areas:
@@ -737,11 +754,11 @@
     .tpl-p5 #mod-form { grid-area: hero; } /* Overlay transparente sobre el Hero */
 
     .tpl-p5 #mod-hero, .tpl-p5 #mod-form {
-        position: sticky !important;
+        position: fixed !important;
         top: 0;
-        align-self: start;
+        left: 0;
+        width: 38vw !important;
         height: 100vh !important;
-        width: 100% !important;
     }
     .tpl-p5 #mod-hero { z-index: 10; }
     .tpl-p5 #mod-form { z-index: 100; background: transparent !important; }
