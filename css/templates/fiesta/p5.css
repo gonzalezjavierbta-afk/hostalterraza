@@ -89,62 +89,79 @@
 
 
 
-/* --------------------------------------------------------------------------
-   2. REBALANCEO PANEL IZQUIERDO (v1.4.4) - Título Arriba / Menú Abajo
-   -------------------------------------------------------------------------- */
-@media (min-width: 1024px) {
-    /* PANEL IZQUIERDO: CONTENEDOR DE TÍTULO */
-    .tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        display: flex !important;
-        flex-direction: column;
-        justify-content: flex-start; /* Empuja el título al techo */
-        padding: 8rem 3rem !important; /* Espacio para el badge superior */
-        z-index: 10;
-    }
 
-    /* REDUCCIÓN DE ESCALA: Título no invasivo */
-    .tpl-p5 #event-title, .tpl-P5 #event-title {
-        font-size: clamp(2rem, 5vw, 3.5rem) !important; /* Ajustado de 5.5rem [1] */
-        line-height: 0.95;
-        margin-bottom: 0;
-    }
 
-    /* PANEL IZQUIERDO: CONTENEDOR DE "MENÚ" (FORMULARIO) */
-    .tpl-p5 #modulo-formulario, .tpl-P5 #modulo-formulario {
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        display: flex !important;
-        flex-direction: column;
-        justify-content: flex-end; /* Empuja la caja de registro al suelo */
-        padding: 4rem 3.5rem !important;
-        background: transparent !important;
-        z-index: 100;
-        pointer-events: none; /* Permite ver el Hero detrás [6] */
-    }
 
-    /* Rehabilitar interacción solo en la caja del formulario */
-    .tpl-p5 .form-master-box { 
-        pointer-events: auto; 
-        margin-top: auto; /* Refuerzo de anclaje inferior */
-    }
-
-    /* METADATOS: Liberación total al panel derecho [2, 7] */
-    .tpl-p5 .hero-meta, .tpl-P5 #mod-hero-meta {
-        grid-area: meta; /* Se ubica bajo el contador en el flujo derecho */
-        display: flex !important;
-        justify-content: flex-start !important;
-        gap: 2.5rem;
-        padding: 1.5rem 0;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        margin-bottom: 2rem;
-    }
+/* -------------------------------------------------------------------
+   2. HERO & IDENTITY (Selina Aesthetics + Playfair Display 900)
+   ------------------------------------------------------------------- */
+.tpl-p5 #mod-hero, .tpl-P5 #mod-hero,
+.tpl-p5 .hero-sidebar, .tpl-P5 .hero-sidebar {
+    position: relative;
+    background: linear-gradient(160deg, rgba(10, 26, 10, 0.92) 0%, rgba(61, 43, 31, 0.88) 100%), var(--hero-bg-url, none);
+    background-size: cover;
+    background-position: center;
 }
+
+
+.tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 6rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+
+.tpl-p5 #org-name-badge, .tpl-P5 #org-name-badge {
+    font-family: var(--p5-font-sans);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--tpl-accent) !important;
+    opacity: 0.95;
+    margin-bottom: 1rem;
+}
+
+
+.tpl-p5 #event-title, .tpl-P5 #event-title,
+.tpl-p5 .hero-title, .tpl-P5 .hero-title {
+    font-family: var(--p5-font-serif) !important;
+    font-weight: 900 !important;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -1px !important;
+    color: #ffffff;
+    text-shadow: 0 0 35px var(--tpl-accent), 0 4px 20px rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
+    margin: 0.5rem 0 2rem;
+}
+
+
+.tpl-p5 .hero-meta, .tpl-P5 .hero-meta,
+.tpl-p5 #hero-meta, .tpl-P5 #hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--p5-text-muted);
+}
+
+
+.tpl-p5 .meta-svg, .tpl-P5 .meta-svg {
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 6px var(--tpl-accent));
+}
+
 
 /* -------------------------------------------------------------------
    3. COUNTDOWN FRAME (Heartbeat Orgánico Dinámico)
