@@ -645,14 +645,14 @@
 
 
 
- 
-    /* C. EMPUJE DE FLUJO (Todo lo que va a la derecha) */
-    .tpl-p5 #main-content-flow {
-        display: block !important;
-        margin-left: 38vw !important; /* Salto sagrado a la zona del 62% */
-        width: 62vw !important;
-    }
-   
+
+    /* [ELIMINADO v1.4.0] "C. EMPUJE DE FLUJO" — regla legada que forzaba
+       display:block !important + margin-left:38vw !important de forma
+       INCONDICIONAL (sin media query, aplicaba incluso en mobile).
+       Anulaba el sistema de Grid Atómico (misma especificidad, orden
+       posterior en cascada). Reemplazada por completo por el bloque
+       "SISTEMA DE GRID ATÓMICO v1.4.0" más abajo. */
+
  /* ALMA VISUAL: Glassmorphism y Tipografía Geist 900 */
 .tpl-p5 .form-master-box {
     background: rgba(15, 15, 20, 0.90) !important;
