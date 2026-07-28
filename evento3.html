@@ -70,7 +70,23 @@
     </div>
 
 
-        <!-- MÓDULO 2: LINEUP [cite: 2, 863] -->
+        <!-- MÓDULO 3A: VIDEO & GALERÍA DE FOTOS (split v1.4.6 de #mod-gallery,
+             para permitir que #mod-lineup se intercale antes del Playlist.
+             NOTA: al separarse de #mod-playlist, Video y Playlist dejan de
+             compartir fila -- el "sync 1:1 de altura" original (pensado para
+             cuando estaban lado a lado) ya no aplica visualmente; cada uno
+             mantiene su propio tamaño (16:9 para video, min-height:400px
+             para playlist, ver p5.css) [cite: 11, 12] -->
+        <section id="mod-video">
+            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
+            <div style="max-width: 1100px; margin: 0 auto;">
+                <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--gold); overflow: hidden;"></div>
+            </div>
+        </section>
+
+        <!-- MÓDULO 2: LINEUP [cite: 2, 863] — reubicado en v1.4.6 entre
+             Video y Playlist en el DOM para que coincida con el orden
+             visual real definido por grid-area en p5.css -->
         <section id="mod-lineup">
             <div class="lineup-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:3rem; max-width:1100px; margin:0 auto; align-items:start;">
                 <div style="display:flex; justify-content:center; border-right:1px solid rgba(255,255,255,0.1); padding-right:5rem;"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold);" alt="Poster"></div>
@@ -78,12 +94,10 @@
             </div>
         </section>
 
-        <!-- MÓDULO 3: GALERÍA & MULTIMEDIA [cite: 11, 12] -->
-        <section id="mod-gallery">
-            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
-            <div class="media-grid" style="display:grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; max-width: 1100px; margin: 0 auto; align-items: stretch;">
-                <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--gold); overflow: hidden;"></div>
-                <div id="db-spotify-embed" style="border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; height:100%;"></div>
+        <!-- MÓDULO 3B: PLAYLIST (split v1.4.6 de #mod-gallery) -->
+        <section id="mod-playlist">
+            <div style="max-width: 1100px; margin: 0 auto;">
+                <div id="db-spotify-embed" style="border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; min-height: 400px;"></div>
             </div>
         </section>
 
@@ -486,7 +500,7 @@ if (document.getElementById('db-poster-img')) {
                 // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
                 // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
                 // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
-                const MODULE_IDS = ['mod-hero', 'mod-lineup', 'mod-gallery', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
+                const MODULE_IDS = ['mod-hero', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq-ubicacion', 'mod-sponsors', 'mod-form'];
                 let activeModulesCount = 0;
 
                 MODULE_IDS.forEach(id => {
