@@ -88,78 +88,70 @@
 .tpl-p5 #main-content-flow { display: grid !important; }
 
 
+ PUNTO DE ENTRADA: /* ------------------------------------------------------------------- 2. HERO & IDENTITY */ 📍 PUNTO DE SALIDA: /* ------------------------------------------------------------------- 3. COUNTDOWN FRAME */
+/* --------------------------------------------------------------------------
+   2. REBALANCEO PANEL IZQUIERDO (v1.4.5) - Título Compacto / Form Small
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+    /* PANEL IZQUIERDO: Título anclado al techo */
+    .tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
+        position: fixed !important;
+        left: 0; top: 0;
+        width: 38vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start; 
+        padding: 5rem 2.5rem !important;
+        z-index: 10;
+    }
 
+    /* ESCALA TIPOGRÁFICA REDUCIDA ($10,000 Standard) */
+    .tpl-p5 #event-title, .tpl-P5 #event-title {
+        font-size: clamp(1.8rem, 4vw, 2.8rem) !important; /* Título no invasivo */
+        line-height: 1.1;
+        text-align: left;
+        margin: 0;
+    }
 
+    /* PANEL IZQUIERDO: Formulario/Menú anclado al suelo */
+    .tpl-p5 #modulo-formulario, .tpl-P5 #modulo-formulario {
+        position: fixed !important;
+        left: 0; top: 0;
+        width: 38vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-end; 
+        padding: 3rem 2.5rem !important;
+        background: transparent !important;
+        z-index: 100;
+        pointer-events: none; 
+    }
 
+    /* CAJA DE REGISTRO COMPACTA (Silo Parity) */
+    .tpl-p5 .form-master-box, .tpl-P5 .form-master-box {
+        pointer-events: auto;
+        max-width: 380px !important; /* Compactación extrema para dejar espacio */
+        padding: 2rem !important;
+        border-radius: 22px !important;
+        backdrop-filter: blur(20px);
+        background: rgba(10, 26, 10, 0.88) !important;
+    }
 
-/* -------------------------------------------------------------------
-   2. HERO & IDENTITY (Selina Aesthetics + Playfair Display 900)
-   ------------------------------------------------------------------- */
-.tpl-p5 #mod-hero, .tpl-P5 #mod-hero,
-.tpl-p5 .hero-sidebar, .tpl-P5 .hero-sidebar {
-    position: relative;
-    background: linear-gradient(160deg, rgba(10, 26, 10, 0.92) 0%, rgba(61, 43, 31, 0.88) 100%), var(--hero-bg-url, none);
-    background-size: cover;
-    background-position: center;
+    /* INPUTS Y BOTONES COMPACTOS */
+    .tpl-p5 .form-input, .tpl-p5 .btn-submit {
+        padding: 0.8rem 1rem !important;
+        font-size: 0.85rem !important;
+        margin-bottom: 0.6rem !important;
+    }
 }
 
-
-.tpl-p5 #mod-hero, .tpl-P5 #mod-hero {
-    min-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 6rem 2rem 4rem;
-    text-align: center;
-    overflow: hidden;
-}
-
-
-.tpl-p5 #org-name-badge, .tpl-P5 #org-name-badge {
-    font-family: var(--p5-font-sans);
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--tpl-accent) !important;
-    opacity: 0.95;
-    margin-bottom: 1rem;
-}
-
-
-.tpl-p5 #event-title, .tpl-P5 #event-title,
-.tpl-p5 .hero-title, .tpl-P5 .hero-title {
-    font-family: var(--p5-font-serif) !important;
-    font-weight: 900 !important;
-    font-size: clamp(2.8rem, 7vw, 5.5rem);
-    line-height: 1.05;
-    letter-spacing: -1px !important;
-    color: #ffffff;
-    text-shadow: 0 0 35px var(--tpl-accent), 0 4px 20px rgba(0, 0, 0, 0.6);
-    text-transform: uppercase;
-    margin: 0.5rem 0 2rem;
-}
-
-
-.tpl-p5 .hero-meta, .tpl-P5 .hero-meta,
-.tpl-p5 #hero-meta, .tpl-P5 #hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    font-size: 0.85rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--p5-text-muted);
-}
-
-
-.tpl-p5 .meta-svg, .tpl-P5 .meta-svg {
-    fill: var(--tpl-accent) !important;
-    filter: drop-shadow(0 0 6px var(--tpl-accent));
+/* ACTIVACIÓN TOTAL DE MÓDULOS (Corrige el log 4/7) */
+.tpl-p5 #mod-hero, .tpl-p5 #mod-form, .tpl-p5 #modulo-formulario, 
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-gallery, .tpl-p5 #unified-frame,
+.tpl-p5 #mod-info-tecnica, .tpl-p5 #mod-faq-ubicacion, .tpl-p5 #mod-sponsors { 
+    display: flex !important; 
 }
 
 
