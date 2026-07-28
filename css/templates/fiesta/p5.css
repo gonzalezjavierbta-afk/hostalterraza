@@ -1,5 +1,5 @@
 /* ===================================================================
-   TEMPLATE P5 — "SELINA STYLE" · v1.3.0 (Dynamic Color Bridge)
+   TEMPLATE P5 — "SELINA STYLE" · v1.4.0 (Atomic Grid System)
    Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-p5 / .tpl-P5
    Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
    Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
@@ -72,8 +72,8 @@
 }
 
 
-/* Activación del contenedor de flujo derecho (62vw) */
-.tpl-p5 #main-content-flow { display: block !important; }
+/* Activación del contenedor como GRID ÚNICO (v1.4.0) — reemplaza el modelo de flujo/block */
+.tpl-p5 #main-content-flow { display: grid !important; }
 
 
 
@@ -695,35 +695,73 @@
 
 
 
-/* === REEMPLAZO C: COUNTDOWN AL PANEL DERECHO v1.3.80 === */
+/* === SISTEMA DE GRID ATÓMICO v1.4.0 (reemplaza REEMPLAZO C v1.3.80) ===
+   Ya no se usa position:fixed/absolute para ubicar módulos. Cada módulo es
+   un ítem de grid asignado a su grid-area vía ID. La plantilla controla
+   la ubicación 100% desde aquí, sin que el Master conozca la geometría.
+   Mobile-first: por defecto, una sola columna en orden natural. */
+
+.tpl-p5 #main-content-flow {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "countdown"
+        "lineup"
+        "gallery"
+        "info"
+        "faq"
+        "sponsors"
+        "form";
+    row-gap: 0;
+}
+
+.tpl-p5 #mod-hero        { grid-area: hero; }
+.tpl-p5 #unified-frame   { grid-area: countdown; }
+.tpl-p5 #mod-lineup      { grid-area: lineup; }
+.tpl-p5 #mod-gallery     { grid-area: gallery; }
+.tpl-p5 #mod-info-tecnica{ grid-area: info; }
+.tpl-p5 #mod-faq-ubicacion{ grid-area: faq; }
+.tpl-p5 #mod-sponsors    { grid-area: sponsors; }
+.tpl-p5 #mod-form        { grid-area: form; }
+
 @media (min-width: 1024px) {
-    /* 1. ANCLAJE IZQUIERDO (Hero y Formulario permanecen estables) */
-    .tpl-p5 #mod-hero { position: fixed !important; left: 0; width: 38vw !important; height: 100vh !important; z-index: 10; }
-    .tpl-p5 #mod-form { position: fixed !important; left: 0; width: 38vw !important; height: 100vh !important; z-index: 100; background: transparent !important; }
+    /* 1. PANEL IZQUIERDO (38vw): Hero y Formulario comparten la misma celda
+       de grid, superpuestos (Form transparente encima del Hero). Se usa
+       position:sticky —no fixed— por lo que NO crea una trampa de containing
+       block para ningún descendiente: cada módulo ya es un hermano plano. */
+    .tpl-p5 #main-content-flow {
+        grid-template-columns: 38vw 62vw;
+        grid-template-areas:
+            "hero countdown"
+            "hero lineup"
+            "hero gallery"
+            "hero info"
+            "hero faq"
+            "hero sponsors";
+    }
 
+    .tpl-p5 #mod-form { grid-area: hero; } /* Overlay transparente sobre el Hero */
 
-    /* 2. REUBICACIÓN DEL COUNTDOWN (Salto al Panel Derecho) */
+    .tpl-p5 #mod-hero, .tpl-p5 #mod-form {
+        position: sticky !important;
+        top: 0;
+        align-self: start;
+        height: 100vh !important;
+        width: 100% !important;
+    }
+    .tpl-p5 #mod-hero { z-index: 10; }
+    .tpl-p5 #mod-form { z-index: 100; background: transparent !important; }
+
+    /* 2. COUNTDOWN: ya no requiere position:absolute para "saltar" al panel
+       derecho — es simplemente un ítem más del grid en su propia celda. */
     .tpl-p5 #unified-frame {
-        position: absolute !important; /* Rompe el anclaje fixed del Hero padre */
-        left: 38vw !important;         /* Inicia exactamente donde termina el panel izquierdo */
-        top: 0 !important;             /* Se posiciona al tope del flujo derecho */
-        width: 62vw !important;        /* Ocupa el 100% del ancho del panel de contenido */
-        z-index: 200;                  /* Prioridad máxima sobre artistas y video */
         margin: 0 !important;
         padding: 2.5rem !important;
-        background: var(--p5-bg-deep, #0a1a0a) !important; /* Fondo sólido para legibilidad */
+        background: var(--p5-bg-deep, #0a1a0a) !important;
         border-radius: 0 !important;
         border-bottom: 1px solid var(--tpl-accent);
         display: flex !important;
         justify-content: center;
-    }
-
-
-    /* 3. EMPUJE SAGRADO (Compensación para el flujo derecho) */
-    .tpl-p5 #main-content-flow {
-        margin-left: 38vw !important;
-        width: 62vw !important;
-        padding-top: 140px !important; /* Espacio para que el Countdown no tape el Lineup */
     }
 }
 
