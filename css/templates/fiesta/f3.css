@@ -1,130 +1,488 @@
 /* ===================================================================
-   TEMPLATE f2 — "ROOFTOP SUNSET" · v1.6.0-STABLE
-   Inspiración: Edition Hotels / Golden Hour
-   Protocolo: Aislamiento Atómico bajo .tpl-f2
-   Cerebro: evento3.html (v1.6.0 Compliance)
+   TEMPLATE f3 — "AFTERGLOW ROOFTOP PARTY" · v1.6.0-STABLE (Reconstrucción)
+   Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-f3
+   Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
+   Estética: Neón nocturno — Magenta (#d72dc0) + Cian Skyline (#2fe4ff)
+   Cerebro: evento3.html (v1.6.0) — este es el template por DEFECTO del
+   sistema (fallback duro: tplId || 'f3', ruta CSS .../f3.css), por lo
+   que --gold y --tpl-accent DEBEN resolver siempre a un valor válido.
+
+   NOTA DE CASING: el Cerebro asigna SIEMPRE dos clases al <body> de
+   forma simultánea: `tpl-F3 tpl-f3` (nunca una sin la otra). Por eso
+   este archivo usa exclusivamente el selector `.tpl-f3` (minúsculas) —
+   es funcionalmente equivalente a duplicar `.tpl-f3, .tpl-F3` en cada
+   regla, pero preserva masa crítica útil en vez de repetición vacía.
    =================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Geist:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
 
-/* 1. RESETEO DE SILO + PALETA DE LUJO */
-.tpl-f2 {
-    --f2-gold: #c8a96e;
-    --f2-bg-warm: #0a0a0a;
-    --f2-bg-card: rgba(20, 20, 20, 0.85);
-    --f2-text-main: #f3f6f0;
-    --f2-text-muted: rgba(255,255,255,0.5);
-    --f2-accent-glow: rgba(200, 169, 110, 0.4);
-    --f2-font-title: 'Cinzel', serif;
-    --f2-font-body: 'Geist', sans-serif;
-    
-    background-color: var(--f2-bg-warm);
-    color: var(--f2-text-main);
-    font-family: var(--f2-font-body);
+/* -------------------------------------------------------------------
+   1. RESETEO DE SILO + PUENTE CROMÁTICO DINÁMICO (.tpl-f3)
+   ------------------------------------------------------------------- */
+.tpl-f3 {
+    --tpl-accent: var(--master-accent, #d72dc0);
+    /* --gold: usada directamente en 10+ estilos inline del HTML real
+       (íconos SVG de meta, borde del poster, avatares, botones). Se
+       mapea al acento de la plantilla para coherencia visual total. */
+    --gold: var(--tpl-accent, #d72dc0);
+    --f3-cyan: #2fe4ff;                 /* Acento nocturno secundario (skyline) */
+    --f3-bg-void: #0a0414;
+    --f3-bg-nebula: #1a0b2e;
+    --f3-card-bg: rgba(20, 8, 32, 0.72);
+    --f3-text-main: #f6effc;
+    --f3-text-muted: rgba(246, 239, 252, 0.55);
+    --f3-font-sans: 'Geist', system-ui, -apple-system, sans-serif;
+    --f3-font-serif: 'Playfair Display', Georgia, serif;
+
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at 15% 10%, rgba(215, 45, 192, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 85% 90%, rgba(47, 228, 255, 0.22) 0%, transparent 50%),
+                linear-gradient(180deg, var(--f3-bg-void) 0%, var(--f3-bg-nebula) 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f3-text-main);
+    font-family: var(--f3-font-sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
 }
 
-/* 2. SISTEMA DE GRID ATÓMICO v1.4.0 (Sincronía con html3) */
-.tpl-f2 #main-content-flow { 
-    display: grid !important;
-    grid-template-columns: 1fr; 
-    grid-template-areas: "hero" "form" "countdown" "meta" "video" "lineup" "playlist" "info" "faq" "ubicacion" "sponsors";
+.tpl-f3 * { box-sizing: border-box; }
+
+.tpl-f3 section {
+    padding: 5rem 8%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
 }
 
-@media (min-width: 1024px) {
-    .tpl-f2 #main-content-flow { 
-        grid-template-columns: 38vw 62vw; 
-        grid-template-areas: 
-            "hero countdown" "hero meta" "hero video" 
-            "hero lineup" "hero playlist" "hero info" 
-            "hero faq" "hero ubicacion" "hero sponsors";
+.tpl-f3 h2 {
+    color: var(--f3-cyan);
+    font-family: var(--f3-font-sans);
+    font-size: 0.8rem;
+    letter-spacing: 5px;
+    font-weight: 900;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(47, 228, 255, 0.5);
+}
+
+/* -------------------------------------------------------------------
+   1.1 ESCUDO DE GRANO CINEMATOGRÁFICO (pseudo-elemento en el raíz)
+   Vignette + textura de ruido vía SVG feTurbulence, en capa superior
+   con blend "overlay" para no tapar contenido (pointer-events:none).
+   ------------------------------------------------------------------- */
+.tpl-f3::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    background:
+        radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.65) 100%),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* -------------------------------------------------------------------
+   2. ACTIVACIÓN ATÓMICA (ADR-007: Bloque sobre Flex)
+   ------------------------------------------------------------------- */
+.tpl-f3 #mod-hero, .tpl-f3 #mod-form, .tpl-f3 #unified-frame, .tpl-f3 #mod-hero-meta {
+    display: flex !important;
+}
+
+/* Módulos multimedia masivos: display:block obligatorio para que el
+   patrón max-width + margin:auto no colapse tras la inyección JS
+   (mismo bug documentado en ADR-007 para #mod-video/#mod-lineup). */
+.tpl-f3 #mod-video, .tpl-f3 #mod-lineup, .tpl-f3 #mod-playlist {
+    display: block !important;
+    width: 100%;
+}
+
+/* Integración de Proximidad (ADR-010): sin respiro entre countdown/meta y video */
+.tpl-f3 #mod-video { padding-top: 0 !important; margin-top: 0 !important; }
+
+.tpl-f3 #main-content-flow { display: grid !important; }
+
+/* -------------------------------------------------------------------
+   3. GRID ATÓMICO v1.4.0 — Columna única a ancho completo (decisión de
+   producto: sin panel fijo lateral tipo f1/f2; hero y fondo ocupan
+   100% del viewport en todos los breakpoints). Ciertas filas usan una
+   sub-rejilla de 2 columnas (video/playlist, faq/ubicación) para
+   replicar el mockup "Afterglow" sin romper la filosofía de columna
+   única de la página en general (ADR-009: todo vía grid-template-areas).
+   ------------------------------------------------------------------- */
+.tpl-f3 #main-content-flow {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2.5rem;
+    row-gap: 0;
+    grid-template-areas:
+        "hero      hero"
+        "countdown countdown"
+        "meta      meta"
+        "lineup    lineup"
+        "video     playlist"
+        "info      info"
+        "faq       ubicacion"
+        "sponsors  sponsors"
+        "form      form";
+}
+
+@media (max-width: 900px) {
+    .tpl-f3 #main-content-flow {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "hero" "countdown" "meta" "lineup" "video"
+            "playlist" "info" "faq" "ubicacion" "sponsors" "form";
     }
 }
 
-/* Mapeo de Átomos */
-.tpl-f2 #mod-hero      { grid-area: hero; }
-.tpl-f2 #mod-form      { grid-area: form; }
-.tpl-f2 #unified-frame { grid-area: countdown; }
-.tpl-f2 #mod-hero-meta { grid-area: meta; }
-.tpl-f2 #mod-video     { grid-area: video; }
-.tpl-f2 #mod-lineup    { grid-area: lineup; }
-.tpl-f2 #mod-playlist  { grid-area: playlist; }
-.tpl-f2 #mod-info-tecnica { grid-area: info; }
-.tpl-f2 #mod-faq       { grid-area: faq; }
-.tpl-f2 #mod-ubicacion { grid-area: ubicacion; }
-.tpl-f2 #mod-sponsors  { grid-area: sponsors; }
+.tpl-f3 #mod-hero         { grid-area: hero; }
+.tpl-f3 #unified-frame    { grid-area: countdown; }
+.tpl-f3 #mod-hero-meta    { grid-area: meta; }
+.tpl-f3 #mod-lineup       { grid-area: lineup; }
+.tpl-f3 #mod-video        { grid-area: video; }
+.tpl-f3 #mod-playlist     { grid-area: playlist; }
+.tpl-f3 #mod-info-tecnica { grid-area: info; }
+.tpl-f3 #mod-faq          { grid-area: faq; }
+.tpl-f3 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f3 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f3 #mod-form         { grid-area: form; }
 
-/* 3. BLINDAJE ESTRUCTURAL (Fix de Colapso) */
-.tpl-f2 #mod-video, .tpl-f2 #mod-lineup, .tpl-f2 #mod-playlist { 
-    display: block !important; 
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-/* Integración de Proximidad (Regla ADR-010) */
-.tpl-f2 #mod-video { padding-top: 0 !important; margin-top: 0 !important; }
-
-/* 4. DISEÑO HERO & TÍTULO (Fidelidad 1px) */
-.tpl-f2 #mod-hero {
+/* -------------------------------------------------------------------
+   4. HERO — Full-bleed nocturno (ancho 100% en todos los breakpoints)
+   ------------------------------------------------------------------- */
+.tpl-f3 #mod-hero {
     position: relative;
-    padding-top: 12vh;
-    min-height: 100vh;
-    display: flex !important;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
+    width: 100%;
+    min-height: 92vh;
+    padding: 7rem 6% 5rem;
     background-size: cover !important;
     background-position: center !important;
+    color: #ffffff;
+    overflow: hidden;
+    border-bottom: none;
 }
 
-@media (min-width: 1024px) {
-    .tpl-f2 #mod-hero {
-        position: fixed !important;
-        width: 38vw !important;
-        left: 0; top: 0;
-        padding: 4rem 2.5rem !important;
-        border-right: 1px solid rgba(200, 169, 110, 0.2);
-    }
+.tpl-f3 #mod-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(180deg, rgba(10, 4, 20, 0.25) 0%, rgba(10, 4, 20, 0.92) 90%),
+                radial-gradient(circle at 50% 25%, rgba(215, 45, 192, 0.3), transparent 60%);
 }
 
-.tpl-f2 #event-title {
-    font-family: var(--f2-font-title) !important;
+.tpl-f3 .hero-content { position: relative; z-index: 2; max-width: 900px; }
+
+.tpl-f3 #org-name-badge {
+    background: rgba(10, 4, 20, 0.55);
+    border: 1px solid var(--tpl-accent);
+    border-radius: 999px;
+    padding: 0.6rem 1.4rem !important;
+    font-size: 0.75rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(215, 45, 192, 0.35);
+    z-index: 3;
+}
+
+.tpl-f3 #event-title {
+    font-family: var(--f3-font-sans) !important;
     font-weight: 900 !important;
-    font-size: clamp(2.5rem, 8vw, 4.5rem) !important;
-    color: var(--f2-gold) !important;
-    text-shadow: 0 0 30px var(--f2-accent-glow);
+    font-size: clamp(2.6rem, 7vw, 5rem) !important;
+    line-height: 1.05;
     text-transform: uppercase;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
+    color: #ffffff;
+    text-shadow: 0 0 20px var(--tpl-accent), 0 0 55px var(--f3-cyan);
 }
 
-/* 5. COUNTDOWN HEARTBEAT (Geist 900) */
-.tpl-f2 .cd-v {
-    font-family: 'Geist', sans-serif !important;
+/* -------------------------------------------------------------------
+   5. COUNTDOWN HEARTBEAT (Geist 900 · 3.5rem — Estándar $10,000)
+   ------------------------------------------------------------------- */
+.tpl-f3 #unified-frame {
+    justify-content: center;
+    align-items: center;
+    justify-self: center;
+    margin: 3.5rem auto 3rem !important;
+    width: fit-content;
+    gap: 1.5rem;
+    padding: 1.6rem 2.6rem;
+    background: rgba(15, 5, 25, 0.65) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(215, 45, 192, 0.4) !important;
+}
+
+.tpl-f3 .cd-block { padding: 0 1.3rem; border-right: 1px solid rgba(255, 255, 255, 0.15); text-align: center; }
+.tpl-f3 .cd-block:last-child { border-right: none; }
+
+.tpl-f3 [id^="cd-"] {
+    font-family: var(--f3-font-sans) !important;
+    font-size: 3.5rem !important;
     font-weight: 900 !important;
-    font-size: 3.2rem !important;
-    color: #fff;
-    text-shadow: 0 0 20px var(--f2-gold);
+    line-height: 1;
+    color: #ffffff !important;
+    text-shadow: 0 0 18px var(--tpl-accent), 0 0 34px var(--f3-cyan); /* Afterglow doble capa */
 }
 
-/* 6. FORMULARIO DUAL TAB (Glassmorphism) */
-.tpl-f2 .form-master-box {
-    background: var(--f2-bg-card);
-    backdrop-filter: blur(25px);
-    border: 1px solid var(--f2-gold);
-    border-radius: 25px;
-    padding: 3rem;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+.tpl-f3 #unified-frame small {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--f3-text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
-.tpl-f2 .tab-btn.active { 
-    color: var(--f2-gold); 
-    border-bottom: 2px solid var(--f2-gold); 
+/* -------------------------------------------------------------------
+   6. META — Badge de fecha/hora/lugar en píldora única
+   ------------------------------------------------------------------- */
+.tpl-f3 .hero-meta {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1rem 3rem;
+    margin: 0 auto 3rem !important;
+    max-width: 900px;
+    width: fit-content;
+    padding: 1.2rem 2.5rem;
+    background: rgba(15, 5, 25, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
 }
 
-.tpl-f2 .btn-submit {
-    background: var(--f2-gold);
-    color: #000;
-    font-weight: 900;
+.tpl-f3 .meta-item {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+    color: var(--f3-text-main) !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.tpl-f3 .meta-svg {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 0.8rem !important;
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 10px var(--tpl-accent));
+}
+
+/* -------------------------------------------------------------------
+   7. LINEUP — Póster + DJs (poster SIEMPRE visible, a diferencia de f1)
+   ------------------------------------------------------------------- */
+.tpl-f3 .lineup-grid {
+    grid-template-columns: 1fr 1.2fr !important;
+    max-width: 1100px !important;
+    gap: 3rem !important;
+}
+
+.tpl-f3 #db-poster-img {
+    border: 3px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 30px rgba(215, 45, 192, 0.45), 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.tpl-f3 .artist-item {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+}
+
+.tpl-f3 .artist-item:hover { background: rgba(255, 255, 255, 0.06); padding-left: 0.8rem; }
+.tpl-f3 .artist-item:hover .artist-name { color: var(--f3-cyan); }
+
+.tpl-f3 .artist-name {
+    font-family: var(--f3-font-serif) !important;
+    font-style: italic;
+    font-size: 1.9rem;
+    letter-spacing: 0;
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
+.tpl-f3 .artist-avatar {
+    border: 2px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 18px var(--tpl-accent);
+}
+
+@media (max-width: 900px) {
+    .tpl-f3 .lineup-grid { grid-template-columns: 1fr !important; }
+    .tpl-f3 .artist-name { font-size: 1.5rem; }
+}
+
+/* -------------------------------------------------------------------
+   8. GALERÍA + TRÁILER (izq) — PLAYLIST (der), sincronía de altura
+   ------------------------------------------------------------------- */
+.tpl-f3 #db-gallery-grid img {
     border-radius: 14px;
-    box-shadow: 0 0 15px var(--f2-accent-glow);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.tpl-f3 #db-gallery-grid img:hover { transform: scale(1.04); box-shadow: 0 0 22px var(--tpl-accent); }
+
+.tpl-f3 #db-video-content, .tpl-f3 .video-placeholder {
+    border-radius: 18px !important;
+    border: 1px solid var(--tpl-accent) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(215, 45, 192, 0.35);
+}
+
+.tpl-f3 .play-button { border-color: var(--f3-cyan) !important; box-shadow: 0 0 25px var(--f3-cyan) !important; }
+.tpl-f3 .play-button span { color: var(--f3-cyan) !important; }
+
+.tpl-f3 #mod-playlist { align-self: stretch; }
+.tpl-f3 #mod-playlist > div { height: 100%; }
+.tpl-f3 #db-spotify-embed {
+    border-radius: 18px !important;
+    border: 1px solid var(--f3-cyan) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(47, 228, 255, 0.3);
+    min-height: 100% !important; /* Regla de Oro #5: gana sobre el inline min-height:400px del Cerebro */
+    height: 100%;
+}
+
+@media (max-width: 900px) {
+    .tpl-f3 #db-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* -------------------------------------------------------------------
+   9. TARJETAS DE DATOS (Dresscode / Guest List / Aforo / Tickets)
+   ------------------------------------------------------------------- */
+.tpl-f3 .card-item {
+    background: var(--f3-card-bg) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 18px rgba(215, 45, 192, 0.3) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.tpl-f3 .card-item:hover { transform: translateY(-5px); box-shadow: 0 0 30px var(--f3-cyan) !important; }
+
+.tpl-f3 .card-item span[id*="-val"] {
+    font-family: var(--f3-font-sans) !important;
+    font-weight: 900 !important;
+    font-size: 1.5rem !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 14px var(--tpl-accent);
+}
+
+@media (max-width: 900px) {
+    .tpl-f3 .data-cards-container { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* -------------------------------------------------------------------
+   10. FAQ + UBICACIÓN (fila compartida)
+   ------------------------------------------------------------------- */
+.tpl-f3 .faq-item { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+
+.tpl-f3 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    color: var(--f3-text-muted);
+    font-size: 0.95rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* !important obligatorio: anula el max-height:0 base del acordeón CSS
+   cuando el JS del Cerebro alterna la clase .active vía onclick físico */
+.tpl-f3 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1.2rem !important;
+}
+
+.tpl-f3 .faq-icon-circle { transition: transform 0.3s ease; }
+.tpl-f3 .faq-item.active .faq-icon-circle { transform: rotate(45deg); }
+
+.tpl-f3 #db-mapa-container {
+    border-radius: 18px;
+    border: 1px solid var(--f3-cyan);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 900px) {
+    .tpl-f3 #mod-faq, .tpl-f3 #mod-ubicacion { grid-column: 1 / -1; }
+}
+
+/* -------------------------------------------------------------------
+   11. SPONSORS — Sin filtros de inversión (ADR-008: canal alfa no confirmado)
+   ------------------------------------------------------------------- */
+.tpl-f3 .sponsor-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+}
+.tpl-f3 .sponsor-item:hover { border-color: var(--tpl-accent); transform: translateY(-4px); }
+/* !important: el <img> trae opacity:0.85 inline (Cerebro); sin !important
+   ninguna regla externa, ni siquiera en :hover, podría vencerla nunca. */
+.tpl-f3 .sponsor-img { opacity: 0.8 !important; transition: opacity 0.4s ease, transform 0.4s ease; }
+.tpl-f3 .sponsor-item:hover .sponsor-img { opacity: 1 !important; transform: scale(1.06); }
+
+/* -------------------------------------------------------------------
+   12. FORMULARIO MAESTRO (Dual Tab)
+   ------------------------------------------------------------------- */
+.tpl-f3 .form-master-box {
+    background: var(--f3-card-bg) !important;
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--tpl-accent) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(215, 45, 192, 0.35) !important;
+}
+
+.tpl-f3 .tab-btn { color: var(--f3-text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; }
+.tpl-f3 .tab-btn.active { color: var(--f3-cyan); border-bottom-color: var(--f3-cyan) !important; }
+
+.tpl-f3 #reg-nombre, .tpl-f3 #rec-cedula {
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.tpl-f3 #reg-nombre:focus, .tpl-f3 #rec-cedula:focus {
+    outline: none;
+    border-color: var(--f3-cyan) !important;
+    box-shadow: 0 0 15px var(--f3-cyan);
+}
+
+.tpl-f3 .btn-submit, .tpl-f3 #master-reg-form button[type="submit"] {
+    background: linear-gradient(90deg, var(--tpl-accent), var(--f3-cyan)) !important;
+    color: #0a0414 !important;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    box-shadow: 0 10px 25px rgba(215, 45, 192, 0.4);
+    transition: all 0.3s ease;
+}
+.tpl-f3 .btn-submit:hover, .tpl-f3 #master-reg-form button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(47, 228, 255, 0.5);
+}
+
+/* -------------------------------------------------------------------
+   13. PROTECCIÓN DE MÓDULOS INVISIBLES (Contrato v107 — Cero Borrado)
+   ------------------------------------------------------------------- */
+.tpl-f3 #db-poster-img[style*="display:none"],
+.tpl-f3 #db-faq-list[style*="display:none"],
+.tpl-f3 #db-mapa-container[style*="display:none"],
+.tpl-f3 #db-sponsors-list[style*="display:none"],
+.tpl-f3 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* -------------------------------------------------------------------
+   14. RECALIBRACIÓN MÓVIL (<768px)
+   ------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .tpl-f3 section { padding: 3.5rem 6%; }
+    .tpl-f3 #event-title { letter-spacing: -0.5px; }
+    .tpl-f3 [id^="cd-"] { font-size: 2.4rem !important; }
+    .tpl-f3 .hero-meta { flex-direction: column; gap: 0.8rem; padding: 1.2rem 1.8rem; }
 }
