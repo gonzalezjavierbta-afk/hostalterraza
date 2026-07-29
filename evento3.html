@@ -283,7 +283,14 @@
                 // MAPEO DE HERO & METADATA
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-  /* =================================================================== 
+                document.getElementById('meta-fecha').innerText = ev.fecha;
+                document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
+                document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
+                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
+
+
+
+ /* =================================================================== 
    INICIO DE VIDEO SEGURO 
    =================================================================== */
 
@@ -314,6 +321,7 @@ if (videoContainer) {
 /* =================================================================== 
    FIN DE VIDEO SEGURO 
    =================================================================== */
+
 
 
     // 2. Sincronía Spotify 1:1 [cite: 462, 767]
