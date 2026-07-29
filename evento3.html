@@ -224,12 +224,22 @@
 
 
 
-        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
+// === INICIO SEGMENTO: INYECCIÓN DINÁMICA DE CSS (v1.6.0-GOLD) ===
         async function injectAtomicCSS(cat, tplId) {
             return new Promise((resolve) => {
-                const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
+                // Normalización estricta de Casing para prevenir 404 en Vercel
+                const safeCat = (cat || 'fiesta').toLowerCase();
+                const safeTpl = (tplId || 'f1').toLowerCase();
+                const path = `css/templates/${safeCat}/${safeTpl}.css?v=${Date.now()}`;
+                
+                // Limpieza de ámbito: Reciclar o crear el link sin duplicar
                 let link = document.querySelector('link[data-template-css]');
-                if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
+                if (!link) { 
+                    link = document.createElement('link'); 
+                    link.rel = 'stylesheet'; 
+                    link.setAttribute('data-template-css', 'true'); 
+                    document.head.appendChild(link); 
+                }
                 
                 let isResolved = false;
                 const timer = setTimeout(() => {
@@ -247,12 +257,12 @@
                         let rulesCount = 0;
                         try {
                             const sheets = Array.from(document.styleSheets);
-                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
+                            const targetSheet = sheets.find(s => s.href && s.href.includes(safeTpl));
                             if (targetSheet && targetSheet.cssRules) {
                                 rulesCount = targetSheet.cssRules.length;
                             }
                         } catch (e) {}
-                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
+                        logStatus(`LINK: Estilo [${safeTpl}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
                         resolve(true);
                     }
                 };
@@ -269,7 +279,9 @@
                 link.href = path;
             });
         }
+        // === FIN SEGMENTO: INYECCIÓN DINÁMICA DE CSS ===
 
+        // === INICIO SEGMENTO: INICIALIZACIÓN DEL ORQUESTADOR (v1.6.0-GOLD) ===
         async function initEvento() {
             logStatus("Iniciando Orquestador v214 - Sistema de Grid Atómico Modular.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
@@ -281,7 +293,7 @@
                 const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
                 if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
                 
-                // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
+                // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError)
                 const content = ev.config_landing?.content || {};
 
                 // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
@@ -291,24 +303,19 @@
                 }
                 logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
 
-                const cssLoadedOK = await injectAtomicCSS(ev.categoria_slug, ev.template_id);
+                // Normalización y captura dinámica (Erradicación de hardcodeo "b2")
+                const targetTemplateId = (ev.template_id || content.template_id || 'f1').toLowerCase();
+                const targetCategoriaSlug = (ev.categoria_slug || content.categoria_slug || 'fiesta').toLowerCase();
+
+                const cssLoadedOK = await injectAtomicCSS(targetCategoriaSlug, targetTemplateId);
                 if (!cssLoadedOK) {
-                    // Degradación visible (v1.4.8): antes este fallo solo quedaba en consola y la
-                    // página se veía en blanco porque el kernel oculta todo por defecto (IoC v212).
                     document.body.innerHTML = '<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; color:#fff; background:#0a0a0c;"><p style="max-width:400px; opacity:0.8;">No pudimos cargar el diseño de este evento. Por favor recarga la página o vuelve a intentarlo más tarde.</p></div>';
                     return;
                 }
 
-                // Activación de Ámbito Dual (P3)
-                const tplNormal = `tpl-${ev.template_id || 'F3'}`;
-                const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
-                document.body.className = `${tplNormal} ${tplLower}`;
-                logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
-
-                // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
-                // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
-                // "MULTIMEDIA FINAL (v205)" más abajo sobreescribe por completo con lógica superior
-                // (soporta ev.video_url, trailer_url y fallback). Ver ese segmento para la lógica vigente.
+                // Body Class Sync: Inyección dinámica limpia y exacta
+                document.body.className = `tpl-${targetTemplateId}`;
+                logStatus(`DEBUG: Ámbito Atómico inyectado [tpl-${targetTemplateId}]`, "DEBUG");
 
                 const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
                 setInterval(() => {
@@ -328,6 +335,10 @@
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
+                // ... [EL RESTO DE LA LÓGICA DE INYECCIÓN DE LOS 14 ÁTOMOS CONTINÚA INTACTA AQUÍ] ...
+        // === FIN SEGMENTO: INICIALIZACIÓN DEL ORQUESTADOR ===
+
+               
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
   // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
   const videoContainer = document.getElementById('db-video-content');
