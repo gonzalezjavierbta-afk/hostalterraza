@@ -290,53 +290,52 @@
 
 
 
-                
-  // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.8 (ADR-005 Compliance + Migración video_url) ===
-// Cumple con el blindaje contra Error 153 en Instagram/Facebook [cite: 506, 938]
-// FIX v1.5.8: video_url (columna plana en `eventos`) es ahora la fuente de verdad;
-// content.trailer_url (JSONB legado en config_landing) queda como fallback unicamente
-// para eventos que aun no fueron migrados a la columna plana. Antes este bloque leia
-// solo content.trailer_url pese a que el comentario original afirmaba lo contrario.
-const videoContainer = document.getElementById('db-video-content');
-const videoUrl = ev.video_url || content.trailer_url || ""; // video_url = fuente de verdad, trailer_url = fallback legado
+ /* =================================================================== 
+   INICIO DE VIDEO SEGURO (Mapeo de Columna 'video_url')
+   =================================================================== */
 
-if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-    // 1. Extraccion de ID para generar miniatura estatica [cite: 506, 1043]
-    // FIX v1.5.8: se agrega [0] tras el .split('&') -- antes devolvia un ARRAY
-    // (no un string) cuando la URL traia mas de un parametro despues de v=
-    // (ej. ?v=abc123&list=..., muy comun en links compartidos reales), lo que
-    // rompia la URL de la miniatura al interpolarse. Tambien se limpia el
-    // query string del fallback de youtu.be/{id}?si=... con .split('?')[0].
-    const videoId = videoUrl.split('v=')[1]?.split('&')[0] || videoUrl.split('/').pop().split('?')[0];
-    const thumbUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    
-    // 2. Inyeccion de Miniatura + Boton Afterglow [cite: 810, 811]
-    videoContainer.innerHTML = `
-        <div class="video-placeholder" style="background-image:url('${thumbUrl}'); background-size:cover; background-position:center; height:100%; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="window.open('${videoUrl}', '_blank')">
-            <div class="play-button" style="width:80px; height:80px; background:rgba(0,0,0,0.7); border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--tpl-accent); box-shadow: 0 0 25px var(--tpl-accent);">
-                <span style="color:var(--tpl-accent); font-size:2.5rem; margin-left:5px;">▶</span>
-            </div>
-            <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
-        </div>`;
-    console.log("%c[TRACE] Vídeo YouTube detectado -> Miniatura segura inyectada.", "color: #e67e22; font-weight: bold;");
-} else if (videoUrl.includes('vimeo.com')) {
-    // 3. FIX v1.5.8 (ADR-005): normaliza SIEMPRE a la URL de embed
-    // player.vimeo.com/video/{id}. Un link "normal" de vimeo.com/{id} (o con
-    // segmentos extra tipo /channels/nombre/{id}) no funciona embebido en un
-    // iframe. Si la URL ya viene en formato player.vimeo.com se deja intacta
-    // (transformacion idempotente).
-    let vimeoEmbedUrl = videoUrl;
-    if (!videoUrl.includes('player.vimeo.com')) {
-        const vimeoIdMatch = videoUrl.match(/vimeo\.com\/(?:.*\/)?(\d+)/);
-        vimeoEmbedUrl = vimeoIdMatch ? `https://player.vimeo.com/video/${vimeoIdMatch[1]}` : videoUrl;
+// A. Prioridad de Fuente: video_url manda, trailer_url es el respaldo [cite: Análisis Claude]
+const rawVideoUrl = evento.video_url || content.trailer_url || "";
+const videoContainer = document.getElementById('db-video-content');
+
+if (videoContainer && rawVideoUrl) {
+    if (rawVideoUrl.includes("youtube.com") || rawVideoUrl.includes("youtu.be")) {
+        // --- LÓGICA YOUTUBE: ADR-005 (Evita Error 153 en móviles) [cite: 471, 818] ---
+        const ytId = rawVideoUrl.includes("v=") 
+            ? rawVideoUrl.split("v=").pop().split("&") 
+            : rawVideoUrl.split("/").pop().split("?");
+        
+        const thumbUrl = `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
+
+        videoContainer.innerHTML = `
+            <a href="${rawVideoUrl}" target="_blank" class="yt-thumb-link">
+                <img src="${thumbUrl}" alt="Thumbnail YouTube" style="width:100%; height:100%; object-fit:cover;">
+                <div class="play-overlay">
+                    <svg width="68" height="68" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </div>
+            </a>`;
+        logStatus("TRACE: Miniatura de YouTube inyectada (ADR-005).", "TRACE");
+
+    } else if (rawVideoUrl.includes("vimeo.com")) {
+        // --- LÓGICA VIMEO: Normalización Automática [cite: 818] ---
+        const vimeoId = rawVideoUrl.split('/').pop().split('?');
+        const vimeoEmbed = `https://player.vimeo.com/video/${vimeoId}`;
+        
+        videoContainer.innerHTML = `
+            <iframe src="${vimeoEmbed}" style="width:100%; height:100%; border:none; position:absolute; inset:0;" 
+                    allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+        logStatus("TRACE: iFrame de Vimeo normalizado e inyectado.", "TRACE");
     }
-    videoContainer.innerHTML = `<iframe src="${vimeoEmbedUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
-    console.log("%c[TRACE] Vídeo Vimeo detectado -> URL normalizada a player.vimeo.com e iframe inyectado.", "color: #e67e22; font-weight: bold;");
-} else {
-    // Fallback: Evita el bloque vacio si no hay datos validos [cite: 913]
-    videoContainer.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
+} else if (videoContainer) {
+    // Fallback: Video por defecto si no hay URL en base de datos [cite: 338]
+    videoContainer.innerHTML = `<iframe src="https://player.vimeo.com/video/259411563" style="width:100%; height:100%; border:none; position:absolute; inset:0;" allowfullscreen></iframe>`;
 }
-// === FIN SEGMENTO: VÍDEO SEGURO ===
+
+/* =================================================================== 
+   FIN DE VIDEO SEGURO 
+   =================================================================== */
 
 
 
