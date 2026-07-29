@@ -442,6 +442,45 @@
     aspect-ratio: 16/9;
 }
 
+/* =================================================================== 
+   INICIO SEGMENTO: FIX MINIATURA YOUTUBE (v1.5.9)
+   Objetivo: Expansión total de la miniatura ADR-005
+   =================================================================== */
+
+/* Fuerza al enlace de la miniatura a ocupar todo el espacio absoluto */
+.tpl-p5 .yt-thumb-link, .tpl-P5 .yt-thumb-link {
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Garantiza que la imagen de YouTube no se vea pequeña ni deformada [cite: 843] */
+.tpl-p5 .yt-thumb-link img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: transform 0.5s ease;
+}
+
+.tpl-p5 .yt-thumb-link:hover img {
+    transform: scale(1.05); /* Efecto zoom premium al pasar el mouse */
+}
+
+/* Estilo del botón de Play (Overlay) */
+.tpl-p5 .play-overlay svg {
+    filter: drop-shadow(0 0 15px var(--tpl-accent)) !important;
+    transition: transform 0.3s ease;
+}
+
+.tpl-p5 .yt-thumb-link:hover .play-overlay svg {
+    transform: scale(1.15);
+}
+
+/* =================================================================== 
+   FIN DEL BLOQUE DE CAMBIO
+   =================================================================== */
 
 .tpl-p5 .spotify-container, .tpl-P5 .spotify-container,
 .tpl-p5 #db-spotify-embed, .tpl-P5 #db-spotify-embed {
@@ -672,15 +711,6 @@
     padding: 0;
     box-sizing: border-box;
 }
-
-
-
-
-
-
-
-
-
 
 
 
