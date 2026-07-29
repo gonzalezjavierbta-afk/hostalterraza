@@ -330,6 +330,95 @@
 }
 
 
+/* 5. REPARACIÓN ESPACIO POSTER LINEUP (Silo Parity) */
+/* Colapso del Grid Maestro a una sola columna para eliminar el hueco izquierdo */
+.tpl-p5 #mod-lineup > div, .tpl-P5 #mod-lineup > div {
+    grid-template-columns: 1fr !important;
+    max-width: 800px !important;
+    margin: 0 auto;
+}
+
+
+/* Ocultación física de la columna del póster manteniendo el contrato de datos */
+.tpl-p5 #mod-lineup > div > div:first-child {
+    display: none !important;
+}
+
+
+/* Expansión y Estilización de Items de Artistas */
+.tpl-p5 #db-lineup, .tpl-P5 #db-lineup {
+    padding-left: 0 !important;
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+
+.tpl-p5 .artist-item, .tpl-P5 .artist-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.3s ease;
+}
+
+
+.tpl-p5 .artist-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+
+/* -------------------------------------------------------------------
+   5. LINEUP & MULTIMEDIA
+   ------------------------------------------------------------------- */
+.tpl-p5 .lineup-grid, .tpl-P5 .lineup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+
+.tpl-p5 .artist-row, .tpl-P5 .artist-row {
+    font-family: var(--p5-font-serif);
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.4rem 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: #ffffff;
+}
+
+
+.tpl-p5 .artist-row:hover, .tpl-P5 .artist-row:hover {
+    color: var(--tpl-accent);
+    padding-left: 1.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom-color: var(--tpl-accent);
+}
+
+
+.tpl-p5 .artist-avatar, .tpl-P5 .artist-avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid var(--tpl-accent);
+    box-shadow: 0 0 15px var(--tpl-accent);
+    object-fit: cover;
+}
+
+
 
 /* =================================================================== 
    INICIO SEGMENTO: LINEUP HIGH-FIDELITY (Silo evento4.html Parity) 
