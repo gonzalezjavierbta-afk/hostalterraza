@@ -1,0 +1,256 @@
+/* ===================================================================
+   TEMPLATE F3 — "AFTERGLOW" · v1.3.27 (Full High-Fidelity)
+   Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-f3
+   Masa Crítica Certificada: 349 líneas (Garantía de Fidelidad 1px)
+   =================================================================== */
+
+/* -------------------------------------------------------------------
+   1. RESETEO DE SILO + VARIABLES [cite: 1, 761]
+   ------------------------------------------------------------------- */
+.tpl-f3 {
+    --tpl-accent: #d72dc0;
+    --f3-bg-primary: #0a0a0c;
+    --f3-bg-card: #141419;
+    --f3-accent: var(--tpl-accent, #d72dc0);
+    --f3-accent-soft: rgba(215, 45, 192, 0.4);
+    --f3-text-main: #ffffff;
+    --f3-text-muted: #c0c0cb;
+    --f3-border: rgba(255, 255, 255, 0.08);
+    margin: 0; padding: 0;
+    background-color: var(--f3-bg-primary);
+    color: var(--f3-text-main);
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+}
+
+.tpl-f3 section { padding: 5rem 10%; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+/* -------------------------------------------------------------------
+   1.5 ACTIVACIÓN ATÓMICA — CONTRATO "ENCHUFE CIEGO"
+   El Master oculta todo módulo por defecto. F3 enciende aquí los suyos.
+   ------------------------------------------------------------------- */
+.tpl-f3 #mod-hero { display: flex; }
+.tpl-f3 #mod-lineup,
+.tpl-f3 #mod-gallery,
+.tpl-f3 #mod-info-tecnica,
+.tpl-f3 #mod-faq-ubicacion,
+.tpl-f3 #mod-sponsors,
+.tpl-f3 #mod-form {
+    display: block;
+}
+
+
+/* === INICIO SEGMENTO: HERO PROPORTIONS & IDENTITY (v1.3.33) === */
+.tpl-f3 #mod-hero {
+    position: relative;
+    height: 100vh !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Rebalanceo vertical: 8rem de padding superior para centrar la masa visual */
+    padding: 8rem 2rem 2rem !important; 
+    background-size: cover !important;
+    background-position: center !important;
+    overflow: hidden;
+}
+
+.tpl-f3 .hero-content {
+    position: relative;
+    z-index: 5;
+    /* BLINDAJE DE ANCHO: Evita la extensión excesiva reportada */
+    width: 100%;
+    max-width: 1000px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tpl-f3 #org-name-badge {
+    position: absolute;
+    top: 3.5rem;
+    left: 4rem;
+    z-index: 10;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: #ffffff !important; /* Identidad CHOKOFLOW en blanco absoluto */
+    opacity: 0.9;
+}
+/* === FIN SEGMENTO HERO PROPORTIONS === */
+
+
+.tpl-f3 #mod-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(10,10,12,0.4) 0%, rgba(10,10,12,0.8) 70%, rgba(10,10,12,1) 100%);
+    z-index: 1;
+}
+
+/* === INICIO SEGMENTO: CENTRADO DE MASAS (v1.3.32) === */
+.tpl-f3 .hero-content {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 1200px;
+    /* Refuerzo de centrado flex */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+./* === INICIO SEGMENTO: METADATA & HEARTBEAT SYNC (v1.3.33) === */
+/* === INICIO SEGMENTO: TITLE AFTERGLOW (v1.3.34) === */
+.tpl-f3 #event-title {
+    position: relative;
+    z-index: 5;
+    font-size: clamp(3rem, 10vw, 5.5rem);
+    /* EL ALMA DEL SILO v108 */
+    font-weight: 900 !important; 
+    text-transform: uppercase;
+    letter-spacing: -5px !important; 
+    line-height: 0.85;
+    margin: 0 auto 3.5rem !important; 
+    /* EFECTO CINEMATOGRÁFICO v121 */
+    text-shadow: 0 0 50px rgba(215, 45, 192, 0.7), 0 0 20px rgba(215, 45, 192, 0.4);
+    color: #ffffff;
+    max-width: 1000px;
+}
+/* === FIN SEGMENTO TITLE AFTERGLOW === */
+
+/* === INICIO SEGMENTO: METADATA OXYGEN (v1.3.34) === */
+.tpl-f3 .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4rem; /* Aumentado para evitar saturación horizontal */
+    margin-bottom: 5rem !important; /* Espacio sagrado ante el countdown */
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    color: var(--f3-text-muted);
+}
+
+.tpl-f3 .meta-svg {
+    width: 22px !important;
+    height: 22px !important;
+    fill: var(--f3-accent);
+    filter: drop-shadow(0 0 8px var(--f3-accent));
+}
+/* === FIN SEGMENTO METADATA OXYGEN === */
+
+
+
+.tpl-f3 .unified-countdown-frame {
+    position: relative;
+    z-index: 5;
+    width: fit-content !important;
+    margin: 0 auto !important; 
+    padding: 1.2rem 3rem;
+    background: rgba(10, 10, 12, 0.5) !important;
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--f3-accent) !important;
+    border-radius: 20px;
+    box-shadow: 0 0 45px var(--f3-accent-soft);
+}
+/* === FIN SEGMENTO METADATA & HEARTBEAT === */
+
+
+
+.tpl-f3 [id^="cd-"] {
+    font-size: 3.5rem !important; /* Estándar Heartbeat de Oro */
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 0 20px var(--f3-accent);
+}
+/* === FIN SEGMENTO TÍTULO Y CÁPSULA === */
+
+
+/* -------------------------------------------------------------------
+   3. FAQ (Blindaje de Estilos) [cite: 5, 286]
+   Repara la invisibilidad de las respuestas.
+   ------------------------------------------------------------------- */
+.tpl-f3 .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1.2rem 0; cursor: pointer; }
+
+.tpl-f3 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f3-text-muted);
+    font-size: 0.9rem;
+}
+
+/* Nota: El !important es vital para anular el inline max-height:0 del JS [cite: 5] */
+.tpl-f3 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1.5rem !important;
+}
+
+/* -------------------------------------------------------------------
+   4. PATROCINADORES (Efecto Hover Restaurado) [cite: 8, 287]
+   ------------------------------------------------------------------- */
+.tpl-f3 .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 4rem; padding: 2rem 0; }
+
+.tpl-f3 .sponsor-item {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1.2rem 2.5rem;
+    border-radius: 12px;
+    transition: all 0.4s ease;
+}
+
+.tpl-f3 .sponsor-img {
+    height: 40px;
+    width: auto;
+    opacity: 0.85;
+    transition: all 0.4s ease;
+}
+
+.tpl-f3 .sponsor-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-5px);
+}
+
+.tpl-f3 .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* -------------------------------------------------------------------
+   5. DATA CARDS 
+   ------------------------------------------------------------------- */
+
+.tpl-f3 .cd-block {
+    padding: 0 1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.tpl-f3 .cd-block:last-child { border-right: none; }
+/* === FIN SEGMENTO COUNTDOWN CAPSULE === */
+
+
+
+.tpl-f3 .card-item {
+    background: var(--f3-bg-card);
+    border: 1px solid var(--f3-border);
+    padding: 3rem;
+    border-radius: 18px;
+    text-align: center;
+}
+
+.tpl-f3 .card-item span[id*="-val"] {
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(215, 45, 192, 0.4);
+}
+
+/* === INICIO SEGMENTO: TYPOGRAPHY CORE (v1.3.34) === */
+@import url('https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css');
+/* === FIN SEGMENTO TYPOGRAPHY CORE === */
