@@ -72,8 +72,22 @@
 
 
 .tpl-p5 #mod-hero, .tpl-p5 #mod-form,
-.tpl-p5 #mod-lineup, .tpl-p5 #mod-video, .tpl-p5 #mod-playlist, .tpl-p5 #unified-frame{
+.tpl-p5 #mod-lineup, .tpl-p5 #mod-playlist, .tpl-p5 #unified-frame{
     display: flex !important;
+}
+
+/* FIX (auditoria video roto): #mod-video se retira de la lista de arriba.
+   El HTML real de #mod-video usa el patron bloque + margin:0 auto para
+   centrar un max-width (<div style="max-width:1100px;margin:0 auto;">).
+   Ese patron depende de que el div se comporte como caja de bloque
+   (width:auto = llena el ancho disponible). display:flex convertia a
+   #db-video-content en un item flex sin flex-grow, que por defecto se
+   encoge a su contenido (shrink-to-fit) -- como empieza vacio y solo
+   tiene aspect-ratio:16/9 sin ancho explicito, colapsaba a una caja
+   diminuta. #mod-lineup y #mod-playlist tienen el mismo riesgo latente
+   pero no se tocan aqui porque no estan rotos hoy. */
+.tpl-p5 #mod-video, .tpl-P5 #mod-video {
+    display: block;
 }
 
 /* MÓDULO ATÓMICO: METADATOS (extraído del Hero, v213) — la clase .hero-meta
@@ -443,7 +457,6 @@
 }
 
 
-
 .tpl-p5 .spotify-container, .tpl-P5 .spotify-container,
 .tpl-p5 #db-spotify-embed, .tpl-P5 #db-spotify-embed {
     border-radius: 25px;
@@ -673,6 +686,15 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+
+
+
+
+
+
+
+
 
 
 
