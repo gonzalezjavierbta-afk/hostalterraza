@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Master Orchestrator v214 · Atomic Grid System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
+    <!-- === INICIO SEGMENTO: KERNEL SaaS AGNOSTICO (v1.3.50) === -->
+<style>
+    /* 1. RESET ESTRUCTURAL MÍNIMO */
+    html, body {
+        margin: 0; padding: 0; min-height: 100%;
+        background-color: #050505; 
+        color: #ffffff;
+        font-family: 'Geist', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* 2. ESCUDO DE GRANO (v47) */
+    body::before {
+        content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.04;
+    }
+
+    /* 3. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
+    section, header, footer { display: none; } /* v220: footer sumado al kernel IoC */
+
+    /* 4. CARGA Y FEEDBACK */
+    .loading-overlay { 
+        position: fixed; inset: 0; background: #000; z-index: 999; 
+        display: flex; align-items: center; justify-content: center; 
+        font-weight: 900; letter-spacing: 3px; text-transform: uppercase;
+    }
+</style>
+<!-- === FIN SEGMENTO: KERNEL SaaS AGNOSTICO === -->
+</head>
+
+<body class="tpl-init">
+    <div id="loader" class="loading-overlay">SINCRO TOTAL v214...</div>
+
+    <!-- CONTENEDOR GRID ÚNICO v210 — Todos los módulos son hermanos planos.
+         La plantilla (.tpl-*) decide libremente la ubicación de cada uno vía grid-area. -->
+    <main id="main-content-flow">
+
+    <!-- MÓDULO 1: HERO (Z-index 5 Protegido) [cite: 1, 6] -->
+    <header id="mod-hero" class="hero">
+        <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
+        <div class="hero-content" style="position:relative; z-index:5;">
+            <h1 id="event-title">--</h1>
+        </div>
+    </header>
+
+    <!-- MÓDULO ATÓMICO: COUNTDOWN (Slot Independiente v210 — ya NO es hijo de #mod-hero) -->
+    <div id="unified-frame" class="unified-countdown-frame" style="display:flex; justify-content:center; margin-top:3rem;">
+        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-days" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>DÍAS</small></div>
+        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-hours" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>HORAS</small></div>
+        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-mins" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>MIN</small></div>
+        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-secs" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>SEG</small></div>
+    </div>
+
+    <!-- MÓDULO ATÓMICO: METADATOS DEL EVENTO (Slot Independiente v213 — extraído de #mod-hero,
+         ahora hermano plano ubicado debajo del Countdown por decisión del template) -->
+    <div id="mod-hero-meta" class="hero-meta">
+        <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
+        <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
+        <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
+    </div>
+
+
+        <!-- ============================================================
+             EXTENSIÓN ADITIVA DEL CONTRATO (v215 · Contrato v107 → v108)
+             Los 3 átomos siguientes son NUEVOS y GENÉRICOS: cualquier
+             categoría/plantilla (fiesta, cine, campaña, futuras) puede
+             activarlos vía su propio .tpl-{id}.css. No se borra ni se
+             modifica ningún átomo previo (Protocolo de Cero Borrado
+             intacto). Por defecto permanecen ocultos gracias al kernel
+             IoC ("section, header { display:none }"): solo se encienden
+             si el silo activo los referencia explícitamente. ============ -->
+
+        <!-- MÓDULO EXTENDIDO: HISTORIA (narrativa de la causa/evento) -->
+        <section id="mod-historia">
+            <div class="historia-inner" style="max-width:900px; margin:0 auto; text-align:center;">
+                <h2 id="db-historia-titulo" style="font-weight:900; text-transform:uppercase;">--</h2>
+                <img id="db-historia-img" src="" alt="" style="width:100%; max-width:700px; border-radius:15px; margin:2rem auto; display:block;" onerror="this.style.display='none';">
+                <p id="db-historia-texto" style="line-height:1.8; opacity:0.85;">--</p>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: OBJETIVO (meta económica + barra de progreso) -->
+        <section id="mod-objetivo">
+            <div class="objetivo-inner" style="max-width:900px; margin:0 auto;">
+                <div class="objetivo-stats" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; margin-bottom:1.5rem;">
+                    <div class="objetivo-stat-block"><span class="objetivo-label">RECAUDADO</span><span id="db-objetivo-recaudado" class="objetivo-value">--</span></div>
+                    <div class="objetivo-stat-block"><span class="objetivo-label">META</span><span id="db-objetivo-meta" class="objetivo-value">--</span></div>
+                    <div class="objetivo-stat-block"><span class="objetivo-label">DONANTES</span><span id="db-objetivo-donantes" class="objetivo-value">--</span></div>
+                </div>
+                <div class="objetivo-barra-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="db-objetivo-barra" class="objetivo-barra-fill" style="width:0%;"></div>
+                </div>
+                <span id="db-objetivo-pct" class="objetivo-pct">0%</span>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: IMPACTO (grid de niveles/tarjetas de donación) -->
+        <section id="mod-impacto">
+            <div id="db-impacto-grid" class="impacto-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:1.5rem; max-width:1100px; margin:0 auto;"></div>
+        </section>
+        <!-- ======================= FIN EXTENSIÓN ADITIVA ================= -->
+
+        <!-- MÓDULO 3A: VIDEO & GALERÍA DE FOTOS (split v1.4.6 de #mod-gallery,
+             para permitir que #mod-lineup se intercale antes del Playlist.
+             NOTA: al separarse de #mod-playlist, Video y Playlist dejan de
+             compartir fila -- el "sync 1:1 de altura" original (pensado para
+             cuando estaban lado a lado) ya no aplica visualmente; cada uno
+             mantiene su propio tamaño (16:9 para video, min-height:400px
+             para playlist, ver p5.css) [cite: 11, 12] -->
+        <section id="mod-video">
+            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
+            <div style="max-width: 1100px; margin: 0 auto;">
+                <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--gold); overflow: hidden;"></div>
+            </div>
+        </section>
+
+        <!-- MÓDULO 2: LINEUP [cite: 2, 863] — reubicado en v1.4.6 entre
+             Video y Playlist en el DOM para que coincida con el orden
+             visual real definido por grid-area en p5.css -->
+        <section id="mod-lineup">
+            <div class="lineup-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:3rem; max-width:1100px; margin:0 auto; align-items:start;">
+                <div style="display:flex; justify-content:center; border-right:1px solid rgba(255,255,255,0.1); padding-right:5rem;"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold);" alt="Poster"></div>
+                <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem; padding-left:5rem;"></div>
+            </div>
+        </section>
+
+        <!-- MÓDULO 3B: PLAYLIST (split v1.4.6 de #mod-gallery) -->
+        <section id="mod-playlist">
+            <div style="max-width: 1100px; margin: 0 auto;">
+                <div id="db-spotify-embed" style="border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; min-height: 400px;"></div>
+            </div>
+        </section>
+
+        <section id="mod-info-tecnica">
+            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">DRESS CODE</span>
+                    <span id="db-dress-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">GUEST LIST</span>
+                    <span id="db-guest-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">AFORO</span>
+                    <span id="db-aforo-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
+                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">TICKETS</span>
+                    <span id="db-ticket-val" style="font-size:1.4rem; font-weight:900;">--</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MÓDULO 6A: FAQ (split v1.4.8 de #mod-faq-ubicacion, para que FAQ y Ubicación sean hermanos planos independientes) -->
+        <section id="mod-faq">
+            <h2>FAQ</h2>
+            <div id="db-faq-list"></div>
+        </section>
+
+        <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
+        <section id="mod-ubicacion">
+            <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
+        </section>
+
+        <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
+
+        <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874] -->
+        <section id="mod-form">
+            <div class="form-master-box" style="max-width:550px; margin:0 auto; padding:3rem; border-radius:20px; border:1px solid rgba(255,255,255,0.1); background:#141419;">
+                <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
+                <div id="form-nuevo">
+                    <form id="master-reg-form">
+                        <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
+                        <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR →</button>
+                    </form>
+                </div>
+                <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *" style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;"><button class="btn-submit" style="width:100%; padding:1.5rem; margin-top:1.5rem; background:transparent; border:1px solid var(--gold); color:white; font-weight:900; border-radius:15px; cursor:pointer;" onclick="alert('Sistema de verificación operativo.')">VERIFICAR →</button></div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             EXTENSIÓN ADITIVA II DEL CONTRATO (v220 · Contrato v108 → v109)
+             3 átomos nuevos, genéricos, opcionales. Ocultos por defecto
+             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
+
+        <!-- MÓDULO EXTENDIDO: EQUIPO (staff / voluntarios con foto + rol) -->
+        <section id="mod-equipo">
+            <div id="db-equipo-grid" class="equipo-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2.5rem; max-width:1100px; margin:0 auto;"></div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: CTA FINAL (franja de cierre antes del footer) -->
+        <section id="mod-cta-final">
+            <div class="cta-final-inner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; max-width:1200px; margin:0 auto;">
+                <div class="cta-final-text">
+                    <span id="db-cta-final-titulo" style="display:block; font-weight:900;">--</span>
+                    <p id="db-cta-final-subtitulo" style="margin:0.3rem 0 0;">--</p>
+                </div>
+                <button id="cta-final-btn" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">DONAR AHORA</button>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: FOOTER (marca, enlaces, redes, contacto) -->
+        <footer id="mod-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span id="footer-org-name">--</span>
+                    <p id="footer-tagline">--</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces rápidos</h4>
+                    <ul id="db-footer-links" class="footer-links"></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Síguenos</h4>
+                    <div id="db-footer-social" class="footer-social"></div>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <div id="db-footer-contacto" class="footer-contacto"></div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span id="footer-copy">--</span>
+            </div>
+        </footer>
+        <!-- ==================== FIN EXTENSIÓN ADITIVA II ================= -->
+
+    </main>
+
+    <script>
+        const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
+        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+
+        function logStatus(m, t = 'INFO') {
+            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
+            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
+        }
+
+        // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
+        function parseSpanishDate(dateStr, timeStr) {
+            const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
+            const parts = dateStr.toLowerCase().split(' de ');
+            if (parts.length === 3) {
+                const d = parts[0].trim().padStart(2, '0');
+                const m = months[parts[1].trim()];
+                const a = parts[2].trim();
+                return new Date(`${a}-${m}-${d}T${timeStr}`);
+            }
+            return new Date(`${dateStr}T${timeStr}`);
+        }
+
+        function switchForm(type) {
+            const isNew = type === 'nuevo';
+            document.getElementById('tab-new').classList.toggle('active', isNew);
+            document.getElementById('tab-old').classList.toggle('active', !isNew);
+            document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
+            document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
+            logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
+        }
+
+
+
+        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
+        async function injectAtomicCSS(cat, tplId) {
+            return new Promise((resolve) => {
+                const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
+                let link = document.querySelector('link[data-template-css]');
+                if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
+                
+                let isResolved = false;
+                const timer = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}]. Continuando en degradación suave.`, "ERROR");
+                        resolve(false);
+                    }
+                }, 5000);
+
+                link.onload = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(timer);
+                        let rulesCount = 0;
+                        try {
+                            const sheets = Array.from(document.styleSheets);
+                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
+                            if (targetSheet && targetSheet.cssRules) {
+                                rulesCount = targetSheet.cssRules.length;
+                            }
+                        } catch (e) {}
+                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
+                        resolve(true);
+                    }
+                };
+
+                link.onerror = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(timer);
+                        logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR");
+                        resolve(false);
+                    }
+                };
+
+                link.href = path;
+            });
+        }
+
+        async function initEvento() {
+            logStatus("Iniciando Orquestador v214 - Sistema de Grid Atómico Modular.", "INFO");
+            const slug = new URLSearchParams(window.location.search).get('slug');
+            if (!slug) return;
+            try {
+                // Timeout de 8s para sbQuery (Resiliencia P4)
+                const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
+                const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
+                if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
+                
+                // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
+                const content = ev.config_landing?.content || {};
+
+                // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
+                const primaryColor = ev.color_primario || content.color_primario || content.accent_color;
+                if (primaryColor) {
+                    document.documentElement.style.setProperty('--master-accent', primaryColor);
+                }
+                logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
+
+                const cssLoadedOK = await injectAtomicCSS(ev.categoria_slug, ev.template_id);
+                if (!cssLoadedOK) {
+                    // Degradación visible (v1.4.8): antes este fallo solo quedaba en consola y la
+                    // página se veía en blanco porque el kernel oculta todo por defecto (IoC v212).
+                    document.body.innerHTML = '<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; color:#fff; background:#0a0a0c;"><p style="max-width:400px; opacity:0.8;">No pudimos cargar el diseño de este evento. Por favor recarga la página o vuelve a intentarlo más tarde.</p></div>';
+                    return;
+                }
+
+                // Activación de Ámbito Dual (P3)
+                const tplNormal = `tpl-${ev.template_id || 'F3'}`;
+                const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
+                document.body.className = `${tplNormal} ${tplLower}`;
+                logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
+
+                // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
+                // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
+                // "MULTIMEDIA FINAL (v205)" más abajo sobreescribe por completo con lógica superior
+                // (soporta ev.video_url, trailer_url y fallback). Ver ese segmento para la lógica vigente.
+
+                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
+                setInterval(() => {
+                    const diff = target - Date.now();
+                    if (diff <= 0) return;
+                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+
+                // MAPEO DE HERO & METADATA
+                document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
+                document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
+                document.getElementById('meta-fecha').innerText = ev.fecha;
+                document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
+                document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
+                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
+
+// === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
+  // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
+  const videoContainer = document.getElementById('db-video-content');
+  const videoUrl = ev.video_url || content.trailer_url || ""; 
+
+  if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+      // Extracción limpia de ID de YouTube neutralizando ?si=, &list= y anchors
+      let videoId = "";
+      if (videoUrl.includes('youtu.be/')) {
+          videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
+      } else if (videoUrl.includes('v=')) {
+          videoId = videoUrl.split('v=')[1]?.split('&')[0]?.split('?')[0];
+      }
+      
+      const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : "";
+
+      if (thumbUrl) {
+          // Inyección de Miniatura con dimensiones forzadas a 100% y object-fit para p5.css
+          videoContainer.innerHTML = `
+              <div class="video-placeholder" style="background-image:url('${thumbUrl}'); background-size:cover; background-position:center; width:100%; height:100%; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="window.open('${videoUrl}', '_blank')">
+                  <div class="play-button" style="width:80px; height:80px; background:rgba(0,0,0,0.7); border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--tpl-accent); box-shadow: 0 0 25px var(--tpl-accent);">
+                      <span style="color:var(--tpl-accent); font-size:2.5rem; margin-left:5px;">▶</span>
+                  </div>
+                  <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
+              </div>`;
+          console.log("%c[TRACE] Vídeo YouTube detectado -> Miniatura segura inyectada.", "color: #e67e22; font-weight: bold;");
+      } else {
+          videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">URL DE YOUTUBE INVÁLIDA</div>`;
+      }
+  } else if (videoUrl.includes('vimeo.com')) {
+      // Normalización robusta para Vimeo a formato player
+      let vimeoEmbedUrl = videoUrl;
+      if (!videoUrl.includes('player.vimeo.com')) {
+          const vimeoIdMatch = videoUrl.match(/vimeo\.com\/(?:.*\/)?(\d+)/);
+          vimeoEmbedUrl = vimeoIdMatch ? `https://player.vimeo.com/video/${vimeoIdMatch[1]}` : videoUrl;
+      }
+      videoContainer.innerHTML = `<iframe src="${vimeoEmbedUrl}" style="width:100%; height:100%; border:none; object-fit:cover;" allowfullscreen></iframe>`;
+      console.log("%c[TRACE] Vídeo Vimeo detectado -> URL normalizada e iframe inyectado.", "color: #e67e22; font-weight: bold;");
+  } else {
+      // Fallback estricto anti-bloques vacíos
+      videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
+  }
+  // === FIN SEGMENTO: VÍDEO SEGURO ===
+
+
+
+
+
+    // 2. Sincronía Spotify 1:1 [cite: 462, 767]
+    if (content.playlist_url) {
+        const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
+        const sContainer = document.getElementById('db-spotify-embed');
+        if (sContainer) {
+            sContainer.style.borderColor = 'var(--tpl-accent)';
+            sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+            logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
+        }
+    }
+    // === FIN SEGMENTO MULTIMEDIA ===
+
+
+  // === INICIO SEGMENTO: HISTORIA DE LA CAUSA CON FALLBACK (v215) ===
+    const historiaData = content.historia || {};
+    const isHistoriaFallback = !content.historia;
+    const histTitulo = historiaData.titulo || 'Una causa que nos une';
+    const histTexto = historiaData.texto || 'Cada aporte se convierte en ayuda real y directa para quienes más lo necesitan. Esta es la historia detrás de la campaña.';
+
+    if (document.getElementById('db-historia-titulo')) {
+        document.getElementById('db-historia-titulo').innerText = histTitulo.toUpperCase();
+    }
+    if (document.getElementById('db-historia-texto')) {
+        document.getElementById('db-historia-texto').innerText = histTexto;
+    }
+    const histImgEl = document.getElementById('db-historia-img');
+    if (histImgEl) {
+        const histImgUrl = historiaData.imagen || ev.imagen_url || '';
+        if (histImgUrl) { histImgEl.src = histImgUrl; } else { histImgEl.style.display = 'none'; }
+    }
+    logStatus(`TRACE: Historia ${isHistoriaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada.`, "TRACE");
+    // === FIN SEGMENTO HISTORIA ===
+
+    // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
+    const objetivoData = content.objetivo || {};
+    const isObjetivoFallback = !content.objetivo;
+    const metaVal = Number(objetivoData.meta) || 10000000;
+    const recaudadoVal = Number(objetivoData.recaudado) || 0;
+    const monedaVal = objetivoData.moneda || 'COP';
+    const donantesVal = (objetivoData.donantes !== undefined && objetivoData.donantes !== null) ? objetivoData.donantes : '--';
+    const pctVal = metaVal > 0 ? Math.min(100, Math.round((recaudadoVal / metaVal) * 100)) : 0;
+    const fmtMoney = (n) => new Intl.NumberFormat('es-CO').format(n);
+
+    if (document.getElementById('db-objetivo-meta')) document.getElementById('db-objetivo-meta').innerText = `${monedaVal} ${fmtMoney(metaVal)}`;
+    if (document.getElementById('db-objetivo-recaudado')) document.getElementById('db-objetivo-recaudado').innerText = `${monedaVal} ${fmtMoney(recaudadoVal)}`;
+    if (document.getElementById('db-objetivo-donantes')) document.getElementById('db-objetivo-donantes').innerText = donantesVal;
+    if (document.getElementById('db-objetivo-pct')) document.getElementById('db-objetivo-pct').innerText = `${pctVal}%`;
+    const barraEl = document.getElementById('db-objetivo-barra');
+    if (barraEl) {
+        barraEl.style.width = `${pctVal}%`;
+        const trackEl = barraEl.closest('.objetivo-barra-track');
+        if (trackEl) trackEl.setAttribute('aria-valuenow', pctVal);
+    }
+    logStatus(`TRACE: Objetivo ${isObjetivoFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (${pctVal}% alcanzado).`, "TRACE");
+    // === FIN SEGMENTO OBJETIVO ===
+
+    // === INICIO SEGMENTO: TARJETAS DE IMPACTO CON FALLBACK (v215) — FORMATO DUAL (v220) ===
+    // Soporte Dual (mismo patrón que dj_lineup/faq): cada item se auto-detecta como
+    // "métrica" (icono+valor+etiqueta, ej. "120+ Niños educados", no clicable) o como
+    // "donación" (monto+título+descripción, clicable → scroll al form) según sus campos.
+    const IMPACTO_ICONS = {
+        ninos:          '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c1.4 0 2.5 1.1 2.5 2.5S13.4 7 12 7 9.5 5.9 9.5 4.5 10.6 2 12 2z"/><path d="M6 21v-4a6 6 0 0 1 12 0v4"/></svg>',
+        familias:       '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 21v-2a5 5 0 0 1 5-5h2M22 21v-2a5 5 0 0 0-5-5h-2"/></svg>',
+        comunidades:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>',
+        transparencia:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2s7 4 7 10a7 7 0 0 1-14 0c0-6 7-10 7-10z"/></svg>',
+        compromiso:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>',
+        general:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>'
+    };
+
+    let impactoList = Array.isArray(content.impacto) ? content.impacto : [];
+    let isImpactoFallback = false;
+    if (impactoList.length === 0) {
+        impactoList = [
+            { monto: 20000, titulo: 'Kit básico', descripcion: 'Cubre una necesidad inmediata puntual.' },
+            { monto: 50000, titulo: 'Apoyo sostenido', descripcion: 'Ayuda continua durante una semana.' },
+            { monto: 100000, titulo: 'Impacto mayor', descripcion: 'Cubre una necesidad crítica completa.' }
+        ];
+        isImpactoFallback = true;
+    }
+    const impactoGridEl = document.getElementById('db-impacto-grid');
+    if (impactoGridEl) {
+        // Contrato de Interactividad Física [cite: 37, 724]: el onclick se inyecta
+        // físicamente en el innerHTML, no se asume un listener externo.
+        impactoGridEl.innerHTML = impactoList.map(item => {
+            const esMetrica = item.monto === undefined && (item.valor !== undefined || item.icono !== undefined || item.etiqueta !== undefined);
+            if (esMetrica) {
+                const iconoSvg = IMPACTO_ICONS[item.icono] || IMPACTO_ICONS.general;
+                return `
+                <div class="impacto-card impacto-card--metrica">
+                    <div class="impacto-icono">${iconoSvg}</div>
+                    <span class="impacto-valor">${item.valor || ''}</span>
+                    <span class="impacto-etiqueta">${(item.etiqueta || item.titulo || '').toUpperCase()}</span>
+                </div>`;
+            }
+            return `
+                <div class="impacto-card impacto-card--donacion" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
+                    <span class="impacto-monto">${item.moneda || monedaVal} ${fmtMoney(item.monto || 0)}</span>
+                    <span class="impacto-titulo">${(item.titulo || '').toUpperCase()}</span>
+                    <p class="impacto-desc">${item.descripcion || ''}</p>
+                </div>`;
+        }).join('');
+        const impactoStatus = isImpactoFallback ? `Tarjetas de impacto de REFERENCIA/FALLBACK (${impactoList.length})` : `Tarjetas de impacto REALES (${impactoList.length})`;
+        logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
+    }
+    // === FIN SEGMENTO IMPACTO ===
+
+  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
+    // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
+    const sponsorsRaw = content.sponsors || "";
+    let sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    let isFallback = false;
+
+    if (sponsorsList.length === 0) {
+        // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
+        sponsorsList = [
+            "https://supabase.com/favicon/favicon-196x196.png",
+            "https://github.com/apple-touch-icon.png",
+            "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
+        ];
+        isFallback = true;
+    }
+
+    // 2. Inyección Física en el Contrato de Datos [cite: 757]
+    const sponsorsContainer = document.getElementById('db-sponsors-list');
+    if (sponsorsContainer) {
+        sponsorsContainer.innerHTML = sponsorsList.map(url => `
+            <div class="sponsor-item" style="padding: 1.5rem;">
+                <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.85;">
+            </div>`).join('');
+            
+        // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
+        const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
+        logStatus(`TRACE: ${statusMsg}.`, "TRACE");
+    }
+    // === FIN SEGMENTO PATROCINADORES ===
+
+    // === INICIO SEGMENTO: EQUIPO CON FALLBACK (v220) ===
+    let equipoList = Array.isArray(content.equipo) ? content.equipo : [];
+    let isEquipoFallback = false;
+    if (equipoList.length === 0) {
+        equipoList = [
+            { nombre: 'María López', rol: 'Directora Ejecutiva' },
+            { nombre: 'Juan Camacho', rol: 'Coordinador de Campo' },
+            { nombre: 'Laura Torres', rol: 'Gestora Comunitaria' }
+        ];
+        isEquipoFallback = true;
+    }
+    const equipoGridEl = document.getElementById('db-equipo-grid');
+    if (equipoGridEl) {
+        equipoGridEl.innerHTML = equipoList.map(p => {
+            const foto = p.foto || 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+            return `
+            <div class="equipo-item">
+                <img src="${foto}" class="equipo-avatar" onerror="this.src='https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';">
+                <span class="equipo-nombre">${p.nombre || '--'}</span>
+                <span class="equipo-rol">${p.rol || ''}</span>
+            </div>`;
+        }).join('');
+        const equipoStatus = isEquipoFallback ? `Equipo de REFERENCIA/FALLBACK (${equipoList.length})` : `Equipo REAL (${equipoList.length})`;
+        logStatus(`TRACE: ${equipoStatus} inyectado.`, "TRACE");
+    }
+    // === FIN SEGMENTO EQUIPO ===
+
+    // === INICIO SEGMENTO: CTA FINAL CON FALLBACK (v220) ===
+    const ctaFinalData = content.cta_final || {};
+    const isCtaFallback = !content.cta_final;
+    if (document.getElementById('db-cta-final-titulo')) document.getElementById('db-cta-final-titulo').innerText = ctaFinalData.titulo || 'Tu apoyo hoy transforma vidas mañana.';
+    if (document.getElementById('db-cta-final-subtitulo')) document.getElementById('db-cta-final-subtitulo').innerText = ctaFinalData.subtitulo || 'Sé parte del cambio.';
+    const ctaBtnEl = document.getElementById('cta-final-btn');
+    if (ctaBtnEl && ctaFinalData.boton_texto) ctaBtnEl.innerText = ctaFinalData.boton_texto;
+    logStatus(`TRACE: CTA final ${isCtaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado.`, "TRACE");
+    // === FIN SEGMENTO CTA FINAL ===
+
+    // === INICIO SEGMENTO: FOOTER CON FALLBACK (v220) ===
+    const FOOTER_SOCIAL_ICONS = {
+        instagram: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>',
+        facebook:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h-2a5 5 0 0 0-5 5v2H6v4h2v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg>',
+        youtube:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg>',
+        email:     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'
+    };
+
+    const footerData = content.footer || {};
+    if (document.getElementById('footer-org-name')) document.getElementById('footer-org-name').innerText = (ev.organizaciones?.nombre || '--').toUpperCase();
+    if (document.getElementById('footer-tagline')) document.getElementById('footer-tagline').innerText = footerData.tagline || 'Trabajamos por comunidades fuertes, sostenibles y llenas de oportunidades.';
+
+    const footerLinksData = Array.isArray(footerData.links) ? footerData.links : [
+        { texto: 'La causa', href: '#mod-historia' },
+        { texto: 'Impacto', href: '#mod-impacto' },
+        { texto: 'Actualizaciones', href: '#mod-faq' },
+        { texto: 'Contacto', href: '#mod-ubicacion' }
+    ];
+    const footerLinksEl = document.getElementById('db-footer-links');
+    if (footerLinksEl) {
+        footerLinksEl.innerHTML = footerLinksData.map(l => `<li><a href="${l.href || '#'}">${l.texto || ''}</a></li>`).join('');
+    }
+
+    const footerSocialData = footerData.social || {};
+    const footerSocialEl = document.getElementById('db-footer-social');
+    if (footerSocialEl) {
+        const platforms = ['instagram', 'facebook', 'youtube', 'email'];
+        footerSocialEl.innerHTML = platforms.map(p => {
+            const url = footerSocialData[p];
+            const icon = FOOTER_SOCIAL_ICONS[p];
+            const href = url ? (p === 'email' ? `mailto:${url}` : url) : '#';
+            return `<a href="${href}" ${url ? 'target="_blank" rel="noopener"' : ''} class="footer-social-icon">${icon}</a>`;
+        }).join('');
+    }
+
+    const footerContactoData = footerData.contacto || {};
+    const footerContactoEl = document.getElementById('db-footer-contacto');
+    if (footerContactoEl) {
+        footerContactoEl.innerHTML = `
+            <span>${footerContactoData.email || '--'}</span>
+            <span>${footerContactoData.telefono || '--'}</span>
+            <span>${(ev.ubicacion || '--')}</span>`;
+    }
+
+    if (document.getElementById('footer-copy')) {
+        document.getElementById('footer-copy').innerText = `© ${new Date().getFullYear()} ${(ev.organizaciones?.nombre || '--')}. Todos los derechos reservados.`;
+    }
+    logStatus("TRACE: Footer inyectado (marca, enlaces, redes, contacto).", "TRACE");
+    // === FIN SEGMENTO FOOTER ===
+
+// === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
+// 1. Verificación de Póster [cite: 343]
+if (document.getElementById('db-poster-img')) {
+    document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
+    logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
+}
+
+// === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198) ===
+    if (content.dj_lineup && Array.isArray(content.dj_lineup)) {
+        document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => {
+            // Soporte Dual: Detecta si 'dj' es un texto simple o un objeto {nombre, foto} [cite: 821]
+            const name = typeof dj === 'object' ? dj.nombre : dj;
+            const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
+            
+            return `
+                <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;">
+                    <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;">
+                    <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
+                </div>`;
+        }).join('');
+        
+        // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
+        logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
+    }
+    // === FIN SEGMENTO: LINEUP ===
+
+   // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
+    if (content.faq) {
+        let faqItems = [];
+        // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
+        if (Array.isArray(content.faq)) {
+            faqItems = content.faq;
+        } else if (typeof content.faq === 'string') {
+            faqItems = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
+                const [q, a] = l.split('|');
+                return { pregunta: q.trim(), respuesta: a.trim() };
+            });
+        }
+
+        if (faqItems.length > 0) {
+            // Inyección con Contrato de Interactividad Física [cite: 706, 18]
+            document.getElementById('db-faq-list').innerHTML = faqItems.map(item => `
+                <div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${(item.pregunta || "").toUpperCase()}</span>
+                        <div class="faq-icon-circle" style="width:22px; height:22px; border-radius:50%; border:1px solid var(--tpl-accent, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--tpl-accent, #d72dc0);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                    </div>
+                    <div class="faq-answer">${item.respuesta}</div>
+                </div>`).join('');
+            
+            // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
+            logStatus(`TRACE: FAQ inyectado satisfactoriamente (${faqItems.length} preguntas).`, "TRACE");
+        }
+    }
+    // === FIN SEGMENTO FAQ ===
+
+    // === INICIO SEGMENTO: VINCULACIÓN DE UBICACIÓN (v201) ===
+    if (ev.ubicacion) {
+        // Nota v1.4.8: se retiró la referencia a #venue-name — ese ID nunca existió en el HTML
+        // (remanente huérfano de una versión anterior), la condición nunca era verdadera.
+
+        // 2. Construcción Dinámica del Mapa (Google Maps Embed) [cite: 301]
+        const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        const mapContainer = document.getElementById('db-mapa-container');
+        
+        if (mapContainer) {
+            mapContainer.style.border = '1px solid var(--tpl-accent)';
+            mapContainer.innerHTML = `
+                <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen 
+                        style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+        }
+
+        // Certificación de Salud Escudo GOLD [cite: 805, 811]
+        logStatus("TRACE: Módulo de ubicación vinculado y mapa inyectado.", "TRACE");
+    }
+    // === FIN SEGMENTO UBICACIÓN ===
+
+    // === INICIO SEGMENTO: TECHNICAL DATA RESTORED CON FALLBACK (v209) ===
+    // technical data restored
+    let technicalCount = 0;
+    let isTechFallback = false;
+
+    const dressVal = content.dresscode || 'NEON';
+    const guestVal = content.guest_list || '+200';
+    const aforoVal = ev.aforo_max ? `${ev.aforo_max}` : '100';
+    const ticketVal = content.tickets_info || 'DISPONIBLES';
+
+    if (!content.dresscode || !content.guest_list || !ev.aforo_max || !content.tickets_info) {
+        isTechFallback = true;
+    }
+
+    if (document.getElementById('db-dress-val')) {
+        document.getElementById('db-dress-val').innerText = dressVal.toUpperCase();
+        technicalCount++;
+    }
+    if (document.getElementById('db-guest-val')) {
+        document.getElementById('db-guest-val').innerText = guestVal;
+        technicalCount++;
+    }
+    if (document.getElementById('db-aforo-val')) {
+        document.getElementById('db-aforo-val').innerText = aforoVal;
+        technicalCount++;
+    }
+    if (document.getElementById('db-ticket-val')) {
+        document.getElementById('db-ticket-val').innerText = ticketVal.toUpperCase();
+        technicalCount++;
+    }
+
+    const techStatus = isTechFallback 
+        ? `Tarjetas técnicas de REFERENCIA/FALLBACK (${technicalCount} tarjetas)` 
+        : `Tarjetas técnicas REALES (${technicalCount} tarjetas)`;
+    logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
+    // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
+
+                // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
+                // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
+                // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
+                // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
+                // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
+                // v1.4.8: contrato corregido a los 11 átomos reales — antes faltaban 'unified-frame'
+                // (countdown) y 'mod-hero-meta' (meta), y 'mod-faq-ubicacion' ya no existe (split en dos).
+                // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
+                // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
+                // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer'];
+                let activeModulesCount = 0;
+                let presentInDomCount = 0;
+
+                MODULE_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) {
+                        logStatus(`DEBUG: Módulo [${id}] no existe en el DOM del Master.`, "DEBUG");
+                        return;
+                    }
+                    presentInDomCount++;
+                    const isVisible = window.getComputedStyle(el).display !== 'none';
+                    if (isVisible) {
+                        activeModulesCount++;
+                        logStatus(`INFO: Módulo [${id}] -> ACTIVADO POR CSS (template: ${ev.template_id || 'f3'})`, "INFO");
+                    } else {
+                        logStatus(`DEBUG: Módulo [${id}] -> INACTIVO (el template no lo enciende)`, "DEBUG");
+                    }
+                });
+
+                logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
+
+                // Veredicto estructural explícito (separado de la visibilidad, que es decisión legítima
+                // del template): el contrato de IDs exige que los 11 átomos EXISTAN en el DOM del Master,
+                // aunque un template pueda ocultar algunos por diseño.
+                const contractOK = presentInDomCount === MODULE_IDS.length;
+                logStatus(`SEAL: Contrato de IDs v124-MASTER -> ${contractOK ? '[OK]' : '[FAIL]'} (${presentInDomCount}/${MODULE_IDS.length} átomos presentes en el DOM)`, contractOK ? "INFO" : "ERROR");
+
+                 // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA (v210) ===
+    // Reemplaza el sensor hardcodeado a tpl-p5. El Master no debe conocer
+    // el nombre de ninguna plantilla específica: audita el contenedor grid
+    // (#main-content-flow) de forma genérica, cualquiera sea la plantilla activa.
+    const activeTplClass = Array.from(document.body.classList).find(c => c.toLowerCase().startsWith('tpl-'));
+    const gridEl = document.getElementById('main-content-flow');
+    if (activeTplClass && gridEl) {
+        const gridDisplay = window.getComputedStyle(gridEl).display;
+        const gridColumns = window.getComputedStyle(gridEl).gridTemplateColumns;
+        logStatus(`TRACE: Structural Audit [${activeTplClass}] | Display: ${gridDisplay} | Columns: ${gridColumns}`, "TRACE");
+    }
+    // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA ===
+                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
+                logStatus("TRACE: Auditoría v1.4.8 cerrada: injectAtomicCSS duplicado eliminado, video duplicado eliminado, venue-name huérfano eliminado, split FAQ/Ubicación, contrato de 11 átomos corregido, fallback visible de CSS. Sellado Definitivo v124-MASTER.", "TRACE");
+
+            } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+        }
+        window.onload = initEvento;
+    </script>
+</body>
+</html>
