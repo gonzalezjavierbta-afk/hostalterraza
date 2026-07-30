@@ -26,7 +26,7 @@
     }
 
     /* 3. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
-    section, header { display: none; }
+    section, header, footer { display: none; } /* v220: footer sumado al kernel IoC */
 
     /* 4. CARGA Y FEEDBACK */
     .loading-overlay { 
@@ -188,6 +188,54 @@
                 <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *" style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;"><button class="btn-submit" style="width:100%; padding:1.5rem; margin-top:1.5rem; background:transparent; border:1px solid var(--gold); color:white; font-weight:900; border-radius:15px; cursor:pointer;" onclick="alert('Sistema de verificación operativo.')">VERIFICAR →</button></div>
             </div>
         </section>
+
+        <!-- ============================================================
+             EXTENSIÓN ADITIVA II DEL CONTRATO (v220 · Contrato v108 → v109)
+             3 átomos nuevos, genéricos, opcionales. Ocultos por defecto
+             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
+
+        <!-- MÓDULO EXTENDIDO: EQUIPO (staff / voluntarios con foto + rol) -->
+        <section id="mod-equipo">
+            <div id="db-equipo-grid" class="equipo-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2.5rem; max-width:1100px; margin:0 auto;"></div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: CTA FINAL (franja de cierre antes del footer) -->
+        <section id="mod-cta-final">
+            <div class="cta-final-inner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; max-width:1200px; margin:0 auto;">
+                <div class="cta-final-text">
+                    <span id="db-cta-final-titulo" style="display:block; font-weight:900;">--</span>
+                    <p id="db-cta-final-subtitulo" style="margin:0.3rem 0 0;">--</p>
+                </div>
+                <button id="cta-final-btn" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">DONAR AHORA</button>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: FOOTER (marca, enlaces, redes, contacto) -->
+        <footer id="mod-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span id="footer-org-name">--</span>
+                    <p id="footer-tagline">--</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces rápidos</h4>
+                    <ul id="db-footer-links" class="footer-links"></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Síguenos</h4>
+                    <div id="db-footer-social" class="footer-social"></div>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <div id="db-footer-contacto" class="footer-contacto"></div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span id="footer-copy">--</span>
+            </div>
+        </footer>
+        <!-- ==================== FIN EXTENSIÓN ADITIVA II ================= -->
+
     </main>
 
     <script>
@@ -432,7 +480,19 @@
     logStatus(`TRACE: Objetivo ${isObjetivoFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (${pctVal}% alcanzado).`, "TRACE");
     // === FIN SEGMENTO OBJETIVO ===
 
-    // === INICIO SEGMENTO: TARJETAS DE IMPACTO CON FALLBACK (v215) ===
+    // === INICIO SEGMENTO: TARJETAS DE IMPACTO CON FALLBACK (v215) — FORMATO DUAL (v220) ===
+    // Soporte Dual (mismo patrón que dj_lineup/faq): cada item se auto-detecta como
+    // "métrica" (icono+valor+etiqueta, ej. "120+ Niños educados", no clicable) o como
+    // "donación" (monto+título+descripción, clicable → scroll al form) según sus campos.
+    const IMPACTO_ICONS = {
+        ninos:          '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c1.4 0 2.5 1.1 2.5 2.5S13.4 7 12 7 9.5 5.9 9.5 4.5 10.6 2 12 2z"/><path d="M6 21v-4a6 6 0 0 1 12 0v4"/></svg>',
+        familias:       '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 21v-2a5 5 0 0 1 5-5h2M22 21v-2a5 5 0 0 0-5-5h-2"/></svg>',
+        comunidades:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>',
+        transparencia:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2s7 4 7 10a7 7 0 0 1-14 0c0-6 7-10 7-10z"/></svg>',
+        compromiso:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>',
+        general:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>'
+    };
+
     let impactoList = Array.isArray(content.impacto) ? content.impacto : [];
     let isImpactoFallback = false;
     if (impactoList.length === 0) {
@@ -447,12 +507,24 @@
     if (impactoGridEl) {
         // Contrato de Interactividad Física [cite: 37, 724]: el onclick se inyecta
         // físicamente en el innerHTML, no se asume un listener externo.
-        impactoGridEl.innerHTML = impactoList.map(item => `
-            <div class="impacto-card" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
-                <span class="impacto-monto">${item.moneda || monedaVal} ${fmtMoney(item.monto || 0)}</span>
-                <span class="impacto-titulo">${(item.titulo || '').toUpperCase()}</span>
-                <p class="impacto-desc">${item.descripcion || ''}</p>
-            </div>`).join('');
+        impactoGridEl.innerHTML = impactoList.map(item => {
+            const esMetrica = item.monto === undefined && (item.valor !== undefined || item.icono !== undefined || item.etiqueta !== undefined);
+            if (esMetrica) {
+                const iconoSvg = IMPACTO_ICONS[item.icono] || IMPACTO_ICONS.general;
+                return `
+                <div class="impacto-card impacto-card--metrica">
+                    <div class="impacto-icono">${iconoSvg}</div>
+                    <span class="impacto-valor">${item.valor || ''}</span>
+                    <span class="impacto-etiqueta">${(item.etiqueta || item.titulo || '').toUpperCase()}</span>
+                </div>`;
+            }
+            return `
+                <div class="impacto-card impacto-card--donacion" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
+                    <span class="impacto-monto">${item.moneda || monedaVal} ${fmtMoney(item.monto || 0)}</span>
+                    <span class="impacto-titulo">${(item.titulo || '').toUpperCase()}</span>
+                    <p class="impacto-desc">${item.descripcion || ''}</p>
+                </div>`;
+        }).join('');
         const impactoStatus = isImpactoFallback ? `Tarjetas de impacto de REFERENCIA/FALLBACK (${impactoList.length})` : `Tarjetas de impacto REALES (${impactoList.length})`;
         logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
     }
@@ -487,6 +559,93 @@
         logStatus(`TRACE: ${statusMsg}.`, "TRACE");
     }
     // === FIN SEGMENTO PATROCINADORES ===
+
+    // === INICIO SEGMENTO: EQUIPO CON FALLBACK (v220) ===
+    let equipoList = Array.isArray(content.equipo) ? content.equipo : [];
+    let isEquipoFallback = false;
+    if (equipoList.length === 0) {
+        equipoList = [
+            { nombre: 'María López', rol: 'Directora Ejecutiva' },
+            { nombre: 'Juan Camacho', rol: 'Coordinador de Campo' },
+            { nombre: 'Laura Torres', rol: 'Gestora Comunitaria' }
+        ];
+        isEquipoFallback = true;
+    }
+    const equipoGridEl = document.getElementById('db-equipo-grid');
+    if (equipoGridEl) {
+        equipoGridEl.innerHTML = equipoList.map(p => {
+            const foto = p.foto || 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+            return `
+            <div class="equipo-item">
+                <img src="${foto}" class="equipo-avatar" onerror="this.src='https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';">
+                <span class="equipo-nombre">${p.nombre || '--'}</span>
+                <span class="equipo-rol">${p.rol || ''}</span>
+            </div>`;
+        }).join('');
+        const equipoStatus = isEquipoFallback ? `Equipo de REFERENCIA/FALLBACK (${equipoList.length})` : `Equipo REAL (${equipoList.length})`;
+        logStatus(`TRACE: ${equipoStatus} inyectado.`, "TRACE");
+    }
+    // === FIN SEGMENTO EQUIPO ===
+
+    // === INICIO SEGMENTO: CTA FINAL CON FALLBACK (v220) ===
+    const ctaFinalData = content.cta_final || {};
+    const isCtaFallback = !content.cta_final;
+    if (document.getElementById('db-cta-final-titulo')) document.getElementById('db-cta-final-titulo').innerText = ctaFinalData.titulo || 'Tu apoyo hoy transforma vidas mañana.';
+    if (document.getElementById('db-cta-final-subtitulo')) document.getElementById('db-cta-final-subtitulo').innerText = ctaFinalData.subtitulo || 'Sé parte del cambio.';
+    const ctaBtnEl = document.getElementById('cta-final-btn');
+    if (ctaBtnEl && ctaFinalData.boton_texto) ctaBtnEl.innerText = ctaFinalData.boton_texto;
+    logStatus(`TRACE: CTA final ${isCtaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado.`, "TRACE");
+    // === FIN SEGMENTO CTA FINAL ===
+
+    // === INICIO SEGMENTO: FOOTER CON FALLBACK (v220) ===
+    const FOOTER_SOCIAL_ICONS = {
+        instagram: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>',
+        facebook:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h-2a5 5 0 0 0-5 5v2H6v4h2v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg>',
+        youtube:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg>',
+        email:     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'
+    };
+
+    const footerData = content.footer || {};
+    if (document.getElementById('footer-org-name')) document.getElementById('footer-org-name').innerText = (ev.organizaciones?.nombre || '--').toUpperCase();
+    if (document.getElementById('footer-tagline')) document.getElementById('footer-tagline').innerText = footerData.tagline || 'Trabajamos por comunidades fuertes, sostenibles y llenas de oportunidades.';
+
+    const footerLinksData = Array.isArray(footerData.links) ? footerData.links : [
+        { texto: 'La causa', href: '#mod-historia' },
+        { texto: 'Impacto', href: '#mod-impacto' },
+        { texto: 'Actualizaciones', href: '#mod-faq' },
+        { texto: 'Contacto', href: '#mod-ubicacion' }
+    ];
+    const footerLinksEl = document.getElementById('db-footer-links');
+    if (footerLinksEl) {
+        footerLinksEl.innerHTML = footerLinksData.map(l => `<li><a href="${l.href || '#'}">${l.texto || ''}</a></li>`).join('');
+    }
+
+    const footerSocialData = footerData.social || {};
+    const footerSocialEl = document.getElementById('db-footer-social');
+    if (footerSocialEl) {
+        const platforms = ['instagram', 'facebook', 'youtube', 'email'];
+        footerSocialEl.innerHTML = platforms.map(p => {
+            const url = footerSocialData[p];
+            const icon = FOOTER_SOCIAL_ICONS[p];
+            const href = url ? (p === 'email' ? `mailto:${url}` : url) : '#';
+            return `<a href="${href}" ${url ? 'target="_blank" rel="noopener"' : ''} class="footer-social-icon">${icon}</a>`;
+        }).join('');
+    }
+
+    const footerContactoData = footerData.contacto || {};
+    const footerContactoEl = document.getElementById('db-footer-contacto');
+    if (footerContactoEl) {
+        footerContactoEl.innerHTML = `
+            <span>${footerContactoData.email || '--'}</span>
+            <span>${footerContactoData.telefono || '--'}</span>
+            <span>${(ev.ubicacion || '--')}</span>`;
+    }
+
+    if (document.getElementById('footer-copy')) {
+        document.getElementById('footer-copy').innerText = `© ${new Date().getFullYear()} ${(ev.organizaciones?.nombre || '--')}. Todos los derechos reservados.`;
+    }
+    logStatus("TRACE: Footer inyectado (marca, enlaces, redes, contacto).", "TRACE");
+    // === FIN SEGMENTO FOOTER ===
 
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
 // 1. Verificación de Póster [cite: 343]
@@ -609,10 +768,10 @@ if (document.getElementById('db-poster-img')) {
                 // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
                 // v1.4.8: contrato corregido a los 11 átomos reales — antes faltaban 'unified-frame'
                 // (countdown) y 'mod-hero-meta' (meta), y 'mod-faq-ubicacion' ya no existe (split en dos).
-                // v215: Contrato extendido a 14 átomos (v107 → v108, aditivo, no-breaking).
-                // Se agregan mod-historia/mod-objetivo/mod-impacto — genéricos, disponibles
-                // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b2.
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form'];
+                // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
+                // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
+                // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 
