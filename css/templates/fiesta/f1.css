@@ -992,6 +992,53 @@
 }
 
 
+/* ============================================================================
+   FIX CRÍTICO 400px: PARIDAD VISUAL Y ORDEN (v1.7.0-GOLD)
+   ============================================================================ */
+@media (max-width: 1023px) {
+    /* 1. Evitar que la página se vea cortada (Reset de Ancho) */
+    .tpl-f1 #main-content-flow {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
+        /* RE-SECUENCIA: Formulario inmediatamente tras el Hero */
+        grid-template-areas: 
+            "hero"
+            "form"        
+            "countdown"
+            "meta"
+            "video"
+            "lineup"
+            "playlist"
+            "info"
+            "faq"
+            "ubicacion"
+            "sponsors" !important;
+    }
+
+    /* 2. Fix de Metadatos (El culpable de que se vea cortado) */
+    .tpl-f1 .hero-meta {
+        gap: 1.5rem 1rem !important; /* Reduce el espacio de 5rem que empuja el borde */
+        padding: 0 1rem !important;
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* 3. Posicionamiento del Formulario (Efecto OMEGA) */
+    .tpl-f1 #mod-form { 
+        grid-area: form !important; 
+        z-index: 50 !important;
+        margin-top: -5vh !important; /* Sube ligeramente para integrarse al hero */
+    }
+
+    .tpl-f1 .form-master-box {
+        width: calc(100% - 2rem) !important; /* Asegura respiro lateral en 400px */
+        margin: 0 auto !important;
+        padding: 2rem 1.5rem !important;
+    }
+}
+
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
