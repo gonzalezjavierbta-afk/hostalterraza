@@ -1,0 +1,394 @@
+/* ============================================================================
+   b5.css — Silo Atómico "Emergencia Crítica" (Categoría: campana)
+   Sistema QR Hostal Terraza · v1.6.0-STABLE · Contrato v110
+   Campaña: "Emergencia por Venezuela" (slug: venezuela-en-emergencia-g7e2)
+   Aislamiento: TODO selector inicia con .tpl-b5 (Regla de Oro #9 / ADR-006).
+   Prohibido :root global — todas las variables usan prefijo --b5-.
+   Ruta de despliegue: css/templates/campana/b5.css
+   ============================================================================ */
+
+.tpl-b5 {
+    /* --- TOKENS DE COLOR (paleta fija del brief, 4-6 valores nombrados) --- */
+    --b5-bg: #f4f4f4;
+    --b5-bg-alt: #ffffff;
+    --b5-ink: #141414;
+    --b5-ink-soft: #55555a;
+    --b5-line: rgba(20, 20, 20, 0.10);
+    --b5-red: #e11d48;
+    --b5-red-deep: #9f0f30;
+
+    /* Puentes con variables usadas por el Master (Cerebro) para íconos/acordes */
+    --gold: var(--b5-red);
+    --tpl-accent: var(--master-accent, var(--b5-red));
+
+    background-color: var(--b5-bg) !important;
+    color: var(--b5-ink) !important;
+    font-family: 'Geist', sans-serif;
+}
+
+/* Grano decorativo del kernel: apagado — no encaja con el registro institucional/humanitario */
+.tpl-b5::before { opacity: 0 !important; content: none !important; }
+
+/* ============================================================================
+   1. GRID ATÓMICO — Flujo Central Inmersivo (1200px), Regla de Oro #4/#9
+   ============================================================================ */
+.tpl-b5 #main-content-flow {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 pistas: la fila "crisis" usa ambas, el resto abarca las 2 (span completo) */
+    grid-template-areas:
+        "hero        hero"
+        "meta        meta"
+        "form        form"
+        "crisismap   crisisstats"
+        "comoayudar  comoayudar"
+        "historia    historia"
+        "impactohist impactohist"
+        "video       video"
+        "faq         faq"
+        "ubicacion   ubicacion"
+        "ctafinal    ctafinal"
+        "footer      footer";
+    row-gap: 0;
+    width: 100%;
+}
+
+.tpl-b5 #mod-hero          { grid-area: hero; }
+.tpl-b5 #mod-hero-meta     { grid-area: meta; }
+.tpl-b5 #mod-form          { grid-area: form; }
+.tpl-b5 #mod-mapa-crisis   { grid-area: crisismap; }
+.tpl-b5 #mod-impacto       { grid-area: crisisstats; }
+.tpl-b5 #mod-como-ayudar   { grid-area: comoayudar; }
+.tpl-b5 #mod-historia      { grid-area: historia; }
+.tpl-b5 #mod-impacto-historico { grid-area: impactohist; }
+.tpl-b5 #mod-video         { grid-area: video; }
+.tpl-b5 #mod-faq           { grid-area: faq; }
+.tpl-b5 #mod-ubicacion     { grid-area: ubicacion; }
+.tpl-b5 #mod-cta-final     { grid-area: ctafinal; }
+.tpl-b5 #mod-footer        { grid-area: footer; }
+
+/* En mobile, "crisis" también colapsa a una sola columna (mapa arriba, stats abajo) */
+@media (max-width: 899px) {
+    .tpl-b5 #main-content-flow {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "hero" "meta" "form" "crisismap" "crisisstats" "comoayudar"
+            "historia" "impactohist" "video" "faq" "ubicacion" "ctafinal" "footer";
+    }
+}
+
+/* Regla de Bloque sobre Flex (ADR-007): módulos masivos con inyección JS */
+.tpl-b5 #mod-impacto,
+.tpl-b5 #mod-impacto-historico,
+.tpl-b5 #mod-video,
+.tpl-b5 #mod-como-ayudar,
+.tpl-b5 #mod-mapa-crisis { display: block !important; }
+
+/* Átomos activos pero sin uso en esta campaña (Cero Borrado: quedan en el DOM ocultos) */
+.tpl-b5 #unified-frame,      /* la fecha del sismo ya ocurrió: countdown no aplica */
+.tpl-b5 #mod-objetivo,       /* no hay meta monetaria visible en este diseño */
+.tpl-b5 #mod-lineup,
+.tpl-b5 #mod-playlist,
+.tpl-b5 #mod-info-tecnica,
+.tpl-b5 #mod-equipo,
+.tpl-b5 #mod-sponsors { display: none !important; } /* mandato explícito de Dirección */
+
+.tpl-b5 section, .tpl-b5 header, .tpl-b5 footer { display: block; }
+.tpl-b5 #mod-hero { display: block; }
+.tpl-b5 #mod-footer { display: block; }
+
+/* ============================================================================
+   2. HERO
+   ============================================================================ */
+.tpl-b5 #mod-hero {
+    position: relative;
+    min-height: 460px;
+    padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
+    background-color: #1a1a1a;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+}
+.tpl-b5 #mod-hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.55) 55%, rgba(10,10,10,0.15) 100%);
+    z-index: 1;
+}
+.tpl-b5 .hero-nav {
+    position: relative; z-index: 10;
+    display: flex; justify-content: flex-end; align-items: center; gap: 1.8rem;
+    margin-bottom: 5.5rem; flex-wrap: wrap;
+}
+.tpl-b5 .hero-nav a {
+    color: rgba(255,255,255,0.82); text-decoration: none;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em;
+}
+.tpl-b5 .hero-nav a:hover { color: #fff; }
+.tpl-b5 .hero-nav-cta {
+    background: var(--b5-red); color: #fff !important; padding: 0.6rem 1.2rem;
+    border-radius: 999px; font-weight: 800 !important;
+}
+.tpl-b5 #org-name-badge {
+    position: static !important; z-index: 10;
+    display: none; /* el badge de org se sustituye por el eyebrow de emergencia abajo */
+}
+.tpl-b5 .hero-content { max-width: 640px; padding-top: 1rem; }
+.tpl-b5 .hero-eyebrow {
+    display: inline-block; background: var(--b5-red); color: #fff;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.4rem 0.9rem; border-radius: 4px; margin-bottom: 1.2rem;
+}
+.tpl-b5 #event-title {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: clamp(2.4rem, 5.5vw, 4rem);
+    line-height: 1.02; letter-spacing: -0.01em; text-transform: uppercase; margin: 0;
+}
+.tpl-b5 #event-title::after { content: ""; } /* placeholder de énfasis, sin recortar texto real */
+
+/* ============================================================================
+   3. META (fecha / hora / lugar / magnitud) — barra oscura bajo el hero
+   ============================================================================ */
+.tpl-b5 #mod-hero-meta {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1200px; margin: -2.2rem auto 0; position: relative; z-index: 5;
+    background: var(--b5-bg-alt);
+    border: 1px solid var(--b5-line);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    padding: 1.6rem 1rem;
+}
+.tpl-b5 .meta-item {
+    display: flex; align-items: center; gap: 0.6rem; justify-content: center;
+    padding: 0 1rem; border-right: 1px solid var(--b5-line); color: var(--b5-ink);
+}
+.tpl-b5 .meta-item:last-child { border-right: none; }
+.tpl-b5 .meta-svg { fill: var(--b5-red) !important; stroke: var(--b5-red) !important; flex-shrink: 0; }
+.tpl-b5 .meta-item span { font-weight: 800; font-size: 0.85rem; text-transform: uppercase; }
+
+/* ============================================================================
+   4. FORMULARIO DUAL-PHASE
+   ============================================================================ */
+.tpl-b5 #mod-form { padding: 4.5rem 1.5rem 3rem; }
+.tpl-b5 .form-master-box {
+    max-width: 640px; margin: 0 auto; padding: 2.6rem clamp(1.5rem, 4vw, 3rem);
+    background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 18px;
+    box-shadow: 0 10px 34px rgba(0,0,0,0.06);
+}
+.tpl-b5 .form-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.4rem; }
+.tpl-b5 .tab-btn {
+    flex: 1; padding: 0.75rem 1rem; border: 1px solid var(--b5-line); background: transparent;
+    color: var(--b5-ink-soft); font-weight: 800; font-size: 0.72rem; letter-spacing: 0.04em;
+    text-transform: uppercase; border-radius: 10px; cursor: pointer;
+}
+.tpl-b5 .tab-btn.active { background: var(--b5-ink); color: #fff; border-color: var(--b5-ink); }
+.tpl-b5 .form-lead { font-size: 0.95rem; color: var(--b5-ink-soft); margin: 0 0 1.4rem; line-height: 1.5; }
+
+.tpl-b5 #master-reg-form input[type="text"],
+.tpl-b5 #master-reg-form input[type="tel"],
+.tpl-b5 #master-reg-form select {
+    width: 100%; padding: 1rem 1.1rem; margin-bottom: 1rem;
+    background: var(--b5-bg); color: var(--b5-ink);
+    border: 1px solid var(--b5-line); border-radius: 10px;
+    font-family: 'Geist', sans-serif; font-size: 0.95rem;
+}
+.tpl-b5 .reg-phone-row { display: grid; grid-template-columns: 100px 1fr; gap: 0.7rem; }
+.tpl-b5 .reg-phone-row select,
+.tpl-b5 .reg-phone-row input { margin-bottom: 0; }
+
+.tpl-b5 .form-checkbox {
+    display: flex; align-items: flex-start; gap: 0.7rem; margin: 0.4rem 0 1.4rem;
+    font-size: 0.82rem; color: var(--b5-ink-soft); line-height: 1.5; cursor: pointer;
+}
+.tpl-b5 .form-checkbox input { margin-top: 0.2rem; accent-color: var(--b5-red); flex-shrink: 0; }
+
+.tpl-b5 .btn-submit,
+.tpl-b5 #master-reg-form button[type="submit"] {
+    width: 100%; padding: 1.1rem; background: var(--b5-red); border: none; color: #fff;
+    font-weight: 900; font-size: 0.85rem; letter-spacing: 0.03em; text-transform: uppercase;
+    border-radius: 10px; cursor: pointer; transition: background 0.15s ease;
+}
+.tpl-b5 .btn-submit:hover, .tpl-b5 #master-reg-form button[type="submit"]:hover { background: var(--b5-red-deep); }
+.tpl-b5 .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.tpl-b5 .form-security-note {
+    display: block; text-align: center; margin-top: 0.9rem;
+    font-size: 0.75rem; color: var(--b5-ink-soft);
+}
+.tpl-b5 .form-success-msg {
+    text-align: center; font-weight: 700; color: var(--b5-ink); padding: 1rem 0;
+}
+.tpl-b5 #form-ya input,
+.tpl-b5 #form-ya .btn-submit { width: 100%; padding: 1rem; border-radius: 10px; }
+.tpl-b5 #form-ya input { background: var(--b5-bg); border: 1px solid var(--b5-line); margin-bottom: 1rem; color: var(--b5-ink); }
+.tpl-b5 #form-ya .btn-submit { background: transparent; border: 1px solid var(--b5-red); color: var(--b5-red); }
+
+/* ============================================================================
+   5. ESTADO DE EMERGENCIA — mapa-crisis + impacto (comparten fila)
+   ============================================================================ */
+.tpl-b5 #mod-mapa-crisis,
+.tpl-b5 #mod-impacto {
+    padding: 3.5rem 1.5rem 3rem;
+}
+.tpl-b5 #mod-mapa-crisis { padding-right: 1.2rem; }
+.tpl-b5 #mod-impacto { padding-left: 1.2rem; }
+.tpl-b5 #mod-impacto #db-impacto-grid { grid-template-columns: 1fr 1fr; max-width: none; margin: 0; }
+
+.tpl-b5 .mapacrisis-eyebrow,
+.tpl-b5 .comoayudar-eyebrow,
+.tpl-b5 .impactohist-eyebrow {
+    display: inline-block; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--b5-red); margin-bottom: 1.2rem;
+    padding-left: 1rem; border-left: 4px solid var(--b5-red);
+}
+.tpl-b5 .mapacrisis-eyebrow em, .tpl-b5 .impactohist-eyebrow em { font-style: normal; color: var(--b5-ink-soft); font-weight: 700; }
+
+.tpl-b5 .mapacrisis-svg-wrap { max-width: 420px; margin: 0 auto; }
+.tpl-b5 .mc-ring { fill: none; stroke: var(--b5-red); }
+.tpl-b5 .mc-ring--outer { stroke-opacity: 0.10; }
+.tpl-b5 .mc-ring--mid { stroke-opacity: 0.18; }
+.tpl-b5 .mc-ring--inner { fill: var(--b5-red); fill-opacity: 0.08; stroke-opacity: 0.3; }
+.tpl-b5 .mc-dots circle { r: 3.5; fill: #9a9aa0; opacity: 0.55; }
+.tpl-b5 .mc-epicentro { fill: var(--b5-red); }
+.tpl-b5 .mc-pulse { fill: var(--b5-red); opacity: 0.55; animation: b5-mapPulse 2.4s ease-out infinite; transform-origin: 190px 150px; }
+
+.tpl-b5 .mapacrisis-legend { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0 1rem; font-size: 0.78rem; color: var(--b5-ink-soft); }
+.tpl-b5 .mapacrisis-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.tpl-b5 .mapacrisis-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.tpl-b5 .mapacrisis-dot--epicentro { background: var(--b5-red); }
+.tpl-b5 .mapacrisis-dot--zona { background: #9a9aa0; }
+.tpl-b5 .mapacrisis-dot--falla { background: var(--b5-ink); }
+.tpl-b5 .mapacrisis-link { display: block; text-align: center; color: var(--b5-red); font-weight: 800; font-size: 0.8rem; text-decoration: none; }
+.tpl-b5 .mapacrisis-link:hover { text-decoration: underline; }
+
+/* ============================================================================
+   6. TARJETAS DE IMPACTO (métrica) — reutilizadas por #mod-impacto y #mod-impacto-historico
+   ============================================================================ */
+.tpl-b5 .impacto-card--metrica {
+    background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 14px;
+    padding: 1.6rem 1.2rem; text-align: left; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.tpl-b5 .impacto-icono { color: var(--b5-red); margin-bottom: 0.2rem; }
+.tpl-b5 .impacto-valor {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 3.2rem; line-height: 1;
+    color: var(--b5-ink);
+    filter: drop-shadow(0 0 0 rgba(225,29,72,0)); /* base para el afterglow animado */
+    animation: b5-afterglow 3.2s ease-in-out infinite;
+}
+.tpl-b5 .impacto-etiqueta { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; color: var(--b5-ink-soft); text-transform: uppercase; }
+
+/* ============================================================================
+   7. ¿CÓMO PUEDO AYUDAR?
+   ============================================================================ */
+.tpl-b5 .comoayudar-inner { max-width: 1200px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+.tpl-b5 .comoayudar-lead { max-width: 640px; color: var(--b5-ink-soft); line-height: 1.6; margin: 0 0 2.2rem; }
+.tpl-b5 .comoayudar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.4rem; }
+.tpl-b5 .comoayudar-card {
+    background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 14px;
+    padding: 1.8rem 1.4rem; cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.tpl-b5 .comoayudar-card:hover { border-color: var(--b5-red); transform: translateY(-3px); }
+.tpl-b5 .comoayudar-icono { color: var(--b5-red); margin-bottom: 0.9rem; }
+.tpl-b5 .comoayudar-titulo { display: block; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.02em; margin-bottom: 0.4rem; }
+.tpl-b5 .comoayudar-desc { color: var(--b5-ink-soft); font-size: 0.85rem; line-height: 1.5; margin: 0 0 0.9rem; }
+.tpl-b5 .comoayudar-link { font-size: 0.75rem; font-weight: 800; color: var(--b5-red); }
+
+/* ============================================================================
+   8. HISTORIA
+   ============================================================================ */
+.tpl-b5 #mod-historia { background: var(--b5-bg-alt); border-top: 1px solid var(--b5-line); border-bottom: 1px solid var(--b5-line); }
+.tpl-b5 .historia-inner { padding: 4rem 1.5rem; }
+.tpl-b5 #db-historia-titulo { font-weight: 900; font-size: 1.8rem; letter-spacing: -0.01em; }
+.tpl-b5 #db-historia-texto { color: var(--b5-ink-soft); }
+
+/* ============================================================================
+   9. IMPACTO HISTÓRICO (sección 05) + banner de frase
+   ============================================================================ */
+.tpl-b5 .impactohist-inner { max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem; }
+.tpl-b5 .impactohist-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.tpl-b5 .impactohist-banner {
+    margin-top: 2.4rem; background: var(--b5-red); color: #fff; border-radius: 16px;
+    padding: 2.6rem 2rem; text-align: center;
+}
+.tpl-b5 .impactohist-banner span {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: clamp(1.4rem, 3vw, 2.1rem);
+    line-height: 1.2; letter-spacing: -0.01em;
+}
+
+/* ============================================================================
+   10. VIDEO + GALERÍA
+   ============================================================================ */
+.tpl-b5 #mod-video { padding: 4rem 1.5rem; max-width: 1200px; margin: 0 auto; padding-top: 0 !important; }
+.tpl-b5 #db-gallery-grid img,
+.tpl-b5 #db-gallery-grid > * { border-radius: 10px; }
+.tpl-b5 #db-video-content { border: 1px solid var(--b5-line) !important; }
+
+/* ============================================================================
+   11. FAQ
+   ============================================================================ */
+.tpl-b5 #mod-faq { max-width: 800px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+.tpl-b5 #mod-faq h2 { font-weight: 900; font-size: 1.6rem; margin-bottom: 1.5rem; }
+.tpl-b5 .faq-item { border-bottom: 1px solid var(--b5-line) !important; }
+.tpl-b5 .faq-item span { color: var(--b5-ink) !important; }
+.tpl-b5 .faq-answer { max-height: 0; overflow: hidden; color: var(--b5-ink-soft); transition: max-height 0.25s ease; font-size: 0.88rem; line-height: 1.6; }
+.tpl-b5 .faq-item.active .faq-answer { max-height: 300px; padding-top: 0.6rem; }
+.tpl-b5 .faq-icon-circle { border-color: var(--b5-red) !important; color: var(--b5-red) !important; }
+
+/* ============================================================================
+   12. UBICACIÓN ("mapa ampliado" real — target del link de la sección 02)
+   ============================================================================ */
+.tpl-b5 #mod-ubicacion { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 4rem; scroll-margin-top: 2rem; }
+.tpl-b5 #db-mapa-container { border: 1px solid var(--b5-line) !important; }
+
+/* ============================================================================
+   13. CTA FINAL
+   ============================================================================ */
+.tpl-b5 #mod-cta-final { background: var(--b5-ink); color: #fff; padding: 3rem 1.5rem; }
+.tpl-b5 .cta-final-inner { color: #fff; }
+.tpl-b5 #db-cta-final-titulo { font-size: 1.4rem; }
+.tpl-b5 #cta-final-btn {
+    background: var(--b5-red); color: #fff; border: none; padding: 1rem 1.8rem;
+    border-radius: 10px; font-weight: 900; font-size: 0.82rem; text-transform: uppercase; cursor: pointer;
+}
+
+/* ============================================================================
+   14. FOOTER
+   ============================================================================ */
+.tpl-b5 #mod-footer { background: var(--b5-bg-alt); border-top: 1px solid var(--b5-line); padding: 3.5rem 1.5rem 1.5rem; }
+.tpl-b5 .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2rem; }
+.tpl-b5 #footer-org-name { font-weight: 900; letter-spacing: 0.02em; }
+.tpl-b5 #footer-tagline { color: var(--b5-ink-soft); font-size: 0.85rem; }
+.tpl-b5 .footer-col h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--b5-ink-soft); margin-bottom: 0.8rem; }
+.tpl-b5 .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.tpl-b5 .footer-links a { color: var(--b5-ink); text-decoration: none; font-size: 0.85rem; }
+.tpl-b5 .footer-social { display: flex; gap: 0.8rem; }
+.tpl-b5 .footer-social-icon { color: var(--b5-ink); }
+.tpl-b5 .footer-contacto { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--b5-ink-soft); }
+.tpl-b5 .footer-bottom { max-width: 1200px; margin: 2.5rem auto 0; padding-top: 1.2rem; border-top: 1px solid var(--b5-line); font-size: 0.75rem; color: var(--b5-ink-soft); }
+
+/* ============================================================================
+   15. MICRO-INTERACCIÓN: pulso de alerta (brief II — obligatorio)
+   ============================================================================ */
+@keyframes b5-mapPulse {
+    0%   { transform: scale(1);   opacity: 0.55; }
+    70%  { transform: scale(6.4); opacity: 0; }
+    100% { transform: scale(6.4); opacity: 0; }
+}
+@keyframes b5-afterglow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(225,29,72,0)); }
+    50%      { filter: drop-shadow(0 0 10px rgba(225,29,72,0.35)); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .tpl-b5 .mc-pulse, .tpl-b5 .impacto-valor { animation: none !important; }
+}
+
+/* ============================================================================
+   16. RESPONSIVE — mobile (landing-mobile.jpg)
+   ============================================================================ */
+@media (max-width: 899px) {
+    .tpl-b5 #mod-hero-meta { grid-template-columns: repeat(2, 1fr); row-gap: 1rem; margin-top: -1.6rem; }
+    .tpl-b5 .meta-item:nth-child(2n) { border-right: none; }
+    .tpl-b5 .meta-item:nth-child(-n+2) { border-bottom: 1px solid var(--b5-line); padding-bottom: 0.8rem; }
+    .tpl-b5 .hero-nav { display: none; } /* en mobile el mockup usa menú hamburguesa; fuera de alcance de este pase */
+    .tpl-b5 .footer-inner { grid-template-columns: 1fr 1fr; }
+    .tpl-b5 #mod-mapa-crisis, .tpl-b5 #mod-impacto { padding-top: 2.5rem; }
+    .tpl-b5 .impacto-valor { font-size: 2.4rem; }
+}

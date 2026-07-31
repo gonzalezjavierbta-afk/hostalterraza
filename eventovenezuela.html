@@ -47,8 +47,20 @@
 
     <!-- MÓDULO 1: HERO (Z-index 5 Protegido) [cite: 1, 6] -->
     <header id="mod-hero" class="hero">
+        <!-- Nav decorativo NO-atómico (no forma parte del Contrato v108/v110): navegación
+             de anclas simples a secciones ya existentes. No introduce IDs de datos nuevos. -->
+        <nav class="hero-nav">
+            <a href="#mod-historia">Historia</a>
+            <a href="#mod-mapa-crisis">Emergencia</a>
+            <a href="#mod-como-ayudar">Ayuda</a>
+            <a href="#mod-impacto-historico">Impacto</a>
+            <a href="#mod-video">Galería</a>
+            <a href="#mod-faq">FAQ</a>
+            <a href="#mod-form" class="hero-nav-cta">Únete a la Red</a>
+        </nav>
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
         <div class="hero-content" style="position:relative; z-index:5;">
+            <span class="hero-eyebrow">Emergencia Humanitaria</span>
             <h1 id="event-title">--</h1>
         </div>
     </header>
@@ -67,6 +79,8 @@
         <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
         <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
         <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
+        <!-- ÁTOMO NUEVO (v221 · Contrato v109 → v110): 4to meta-item, magnitud sísmica -->
+        <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13h3l2-6 3 12 3-16 3 10h3l2-4 3 4"/></svg><span id="meta-magnitud">--</span></div>
     </div>
 
 
@@ -175,17 +189,58 @@
 
         <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
 
-        <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874] -->
+        <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874]
+             v221: se agrega Lógica Dual-Phase (Fase 1 -> INSERT en 'inscritos';
+             Fase 2 -> UPDATE con cedula/autorizacion/respuestas_custom) sin
+             recargar la página. #reg-nombre, #master-reg-form y la estructura
+             de tabs REGISTRO/RECUPERAR del Contrato original se conservan
+             intactos; los campos nuevos son aditivos dentro del mismo átomo. -->
         <section id="mod-form">
-            <div class="form-master-box" style="max-width:550px; margin:0 auto; padding:3rem; border-radius:20px; border:1px solid rgba(255,255,255,0.1); background:#141419;">
-                <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
+            <div class="form-master-box">
+                <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">SÚMATE A LA RED</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
                 <div id="form-nuevo">
-                    <form id="master-reg-form">
-                        <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
-                        <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR →</button>
+                    <p class="form-lead">Cada evento es un acto de solidaridad que transforma vidas. Cuéntanos cómo quieres ayudar.</p>
+                    <form id="master-reg-form" novalidate>
+                        <div id="fase1-fields">
+                            <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
+                            <div class="reg-phone-row">
+                                <select id="reg-pais" aria-label="País">
+                                    <option value="+58" selected>🇻🇪 +58</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+56">🇨🇱 +56</option>
+                                    <option value="+593">🇪🇨 +593</option>
+                                    <option value="+507">🇵🇦 +507</option>
+                                </select>
+                                <input type="tel" id="reg-whatsapp" placeholder="WhatsApp *" required>
+                            </div>
+                            <select id="reg-tipo-ayuda" required>
+                                <option value="" disabled selected>¿Cómo te gustaría ayudar?</option>
+                                <option value="espacio">Espacio — pongo mi venue</option>
+                                <option value="artista">Artista — mi talento</option>
+                                <option value="marca">Marca — mi marca deja huella</option>
+                                <option value="voluntario">Voluntario — mi tiempo</option>
+                            </select>
+                            <button type="submit" class="btn-submit">QUIERO SUMARME →</button>
+                            <span class="form-security-note">🔒 Es rápido, seguro y gratuito.</span>
+                        </div>
+                        <div id="form-fase2" style="display:none;">
+                            <p class="form-lead">Un último paso para verificar tu registro.</p>
+                            <input type="text" id="reg-cedula" placeholder="Cédula *" required>
+                            <label class="form-checkbox">
+                                <input type="checkbox" id="reg-autorizacion" required>
+                                <span>Autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la organización. *</span>
+                            </label>
+                            <button type="submit" class="btn-submit">CONFIRMAR REGISTRO →</button>
+                        </div>
+                        <div id="form-fase-success" style="display:none;">
+                            <p class="form-success-msg">¡Gracias por sumarte! Te contactaremos muy pronto por WhatsApp.</p>
+                        </div>
                     </form>
                 </div>
-                <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *" style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;"><button class="btn-submit" style="width:100%; padding:1.5rem; margin-top:1.5rem; background:transparent; border:1px solid var(--gold); color:white; font-weight:900; border-radius:15px; cursor:pointer;" onclick="alert('Sistema de verificación operativo.')">VERIFICAR →</button></div>
+                <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *"><button class="btn-submit" onclick="alert('Sistema de verificación operativo.')">VERIFICAR →</button></div>
             </div>
         </section>
 
@@ -206,7 +261,7 @@
                     <span id="db-cta-final-titulo" style="display:block; font-weight:900;">--</span>
                     <p id="db-cta-final-subtitulo" style="margin:0.3rem 0 0;">--</p>
                 </div>
-                <button id="cta-final-btn" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">DONAR AHORA</button>
+                <button id="cta-final-btn" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">QUIERO SUMARME →</button>
             </div>
         </section>
 
@@ -235,6 +290,50 @@
             </div>
         </footer>
         <!-- ==================== FIN EXTENSIÓN ADITIVA II ================= -->
+
+        <!-- ============================================================
+             EXTENSIÓN ADITIVA III DEL CONTRATO (v221 · Contrato v109 → v110)
+             Motivada por la campaña "Emergencia por Venezuela" (b5), pero
+             los 3 átomos son GENÉRICOS y reutilizables por cualquier
+             categoría/plantilla futura que necesite estado de crisis en
+             tiempo real, categorías de colaboración o un histórico de
+             impacto separado del objetivo económico. Ocultos por defecto
+             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
+
+        <!-- MÓDULO EXTENDIDO: MAPA DE CRISIS (visualización ilustrativa del área afectada) -->
+        <section id="mod-mapa-crisis">
+            <div class="mapacrisis-inner">
+                <span class="mapacrisis-eyebrow">Estado de emergencia <em>(en tiempo real)</em></span>
+                <div id="db-mapa-crisis-svg" class="mapacrisis-svg-wrap"></div>
+                <div class="mapacrisis-legend">
+                    <span><i class="mapacrisis-dot mapacrisis-dot--epicentro"></i>Epicentro</span>
+                    <span><i class="mapacrisis-dot mapacrisis-dot--zona"></i>Zona afectada</span>
+                    <span><i class="mapacrisis-dot mapacrisis-dot--falla"></i><span id="db-mapa-crisis-falla">--</span></span>
+                </div>
+                <a href="#mod-ubicacion" id="db-mapa-crisis-link" class="mapacrisis-link" onclick="event.preventDefault(); document.getElementById('mod-ubicacion')?.scrollIntoView({behavior:'smooth', block:'start'});">Ver mapa ampliado →</a>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: CÓMO AYUDAR (categorías de colaboración) -->
+        <section id="mod-como-ayudar">
+            <div class="comoayudar-inner">
+                <span class="comoayudar-eyebrow">¿Cómo puedo ayudar? <em>(sinergia cultural)</em></span>
+                <p id="db-como-ayudar-lead" class="comoayudar-lead">--</p>
+                <div id="db-como-ayudar-grid" class="comoayudar-grid"></div>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: IMPACTO HISTÓRICO (segundo bloque de métricas + frase destacada) -->
+        <section id="mod-impacto-historico">
+            <div class="impactohist-inner">
+                <span class="impactohist-eyebrow">Impacto hasta hoy</span>
+                <div id="db-impacto-historico-grid" class="impacto-grid impactohist-grid"></div>
+                <div class="impactohist-banner">
+                    <span id="db-impacto-historico-frase">--</span>
+                </div>
+            </div>
+        </section>
+        <!-- ==================== FIN EXTENSIÓN ADITIVA III ================= -->
 
     </main>
 
@@ -269,6 +368,96 @@
             document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
             logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
         }
+
+        // === INICIO SEGMENTO: FORMULARIO DUAL-PHASE (v221) ===
+        // Fase 1 -> INSERT en 'inscritos' (nombre, whatsapp, tipo_ayuda). Si tiene éxito,
+        // revela Fase 2 sin recargar. Fase 2 -> UPDATE del mismo registro (cedula,
+        // autorizacion, respuestas_custom), usando el id devuelto por el INSERT.
+        // ASUNCIÓN A VERIFICAR (ver nota de Dirección 30-jul-2026): nombres de columna
+        // 'evento_id', 'org_id', 'nombre', 'whatsapp', 'tipo_ayuda', 'cedula',
+        // 'autorizacion', 'respuestas_custom' en la tabla `inscritos`.
+        let regPhase = 1;
+        let regInscritoId = null;
+
+        document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const activeWrap = document.getElementById(regPhase === 1 ? 'fase1-fields' : 'form-fase2');
+            const submitBtn = activeWrap.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+
+            if (regPhase === 1) {
+                const nombre = document.getElementById('reg-nombre').value.trim();
+                const paisCod = document.getElementById('reg-pais').value;
+                const whatsappNum = document.getElementById('reg-whatsapp').value.trim();
+                const tipoAyuda = document.getElementById('reg-tipo-ayuda').value;
+
+                if (!nombre || !whatsappNum || !tipoAyuda) {
+                    alert('Por favor completa nombre, WhatsApp y cómo quieres ayudar.');
+                    return;
+                }
+
+                submitBtn.disabled = true; submitBtn.innerText = 'ENVIANDO...';
+                try {
+                    const { data, error } = await sbClient.from('inscritos').insert({
+                        evento_id: window.__ctxEventoId,
+                        org_id: window.__ctxOrgId,
+                        nombre: nombre,
+                        whatsapp: `${paisCod} ${whatsappNum}`,
+                        tipo_ayuda: tipoAyuda,
+                        respuestas_custom: {}
+                    }).select().single();
+                    if (error) throw error;
+
+                    regInscritoId = data.id;
+                    regPhase = 2;
+                    document.getElementById('fase1-fields').style.display = 'none';
+                    document.getElementById('form-fase2').style.display = 'block';
+                    logStatus(`TRACE: Fase 1 registrada en 'inscritos' (id ${regInscritoId}).`, "TRACE");
+                } catch (err) {
+                    logStatus(`ERROR: Fallo INSERT Fase 1 -> ${err.message}`, "ERROR");
+                    alert('No pudimos procesar tu registro. Por favor intenta de nuevo en unos segundos.');
+                } finally {
+                    submitBtn.disabled = false; submitBtn.innerText = originalText;
+                }
+            } else {
+                const cedula = document.getElementById('reg-cedula').value.trim();
+                const autorizado = document.getElementById('reg-autorizacion').checked;
+
+                if (!cedula || !autorizado) {
+                    alert('Ingresa tu cédula y acepta la autorización de datos para continuar.');
+                    return;
+                }
+                if (!regInscritoId) {
+                    logStatus('ERROR: No hay inscrito activo en memoria para completar Fase 2.', "ERROR");
+                    alert('Hubo un problema con tu sesión de registro. Por favor vuelve a intentar desde el inicio.');
+                    return;
+                }
+
+                submitBtn.disabled = true; submitBtn.innerText = 'GUARDANDO...';
+                try {
+                    const { error } = await sbClient.from('inscritos').update({
+                        cedula: cedula,
+                        autorizacion: true,
+                        respuestas_custom: {
+                            cedula: cedula,
+                            autorizacion: true,
+                            autorizacion_fecha: new Date().toISOString()
+                        }
+                    }).eq('id', regInscritoId);
+                    if (error) throw error;
+
+                    document.getElementById('form-fase2').style.display = 'none';
+                    document.getElementById('form-fase-success').style.display = 'block';
+                    logStatus(`TRACE: Fase 2 completada para inscrito ${regInscritoId}.`, "TRACE");
+                } catch (err) {
+                    logStatus(`ERROR: Fallo UPDATE Fase 2 -> ${err.message}`, "ERROR");
+                    alert('No pudimos guardar tu cédula/autorización. Intenta de nuevo.');
+                } finally {
+                    submitBtn.disabled = false; submitBtn.innerText = originalText;
+                }
+            }
+        });
+        // === FIN SEGMENTO FORMULARIO DUAL-PHASE ===
 
 
 
@@ -332,6 +521,12 @@
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
                 const content = ev.config_landing?.content || {};
 
+                // CONTEXTO GLOBAL PARA EL FORMULARIO DUAL-PHASE (v221)
+                // ASUNCIÓN A VERIFICAR: se asume ev.org_id como FK real en la tabla `eventos`
+                // (nomenclatura usada en PROJECT.md para RLS). Confirmar antes de producción.
+                window.__ctxEventoId = ev.id;
+                window.__ctxOrgId = ev.org_id || null;
+
                 // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
                 const primaryColor = ev.color_primario || content.color_primario || content.accent_color;
                 if (primaryColor) {
@@ -374,6 +569,8 @@
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
+                const magnitudVal = ev.magnitud || content.magnitud;
+                if (document.getElementById('meta-magnitud')) document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
@@ -490,24 +687,21 @@
         comunidades:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>',
         transparencia:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2s7 4 7 10a7 7 0 0 1-14 0c0-6 7-10 7-10z"/></svg>',
         compromiso:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>',
-        general:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>'
+        general:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>',
+        // --- Extensión v221 (campaña de emergencia) — claves nuevas, ninguna previa fue tocada ---
+        victimas:       '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="15.5" x2="12" y2="15.6"/></svg>',
+        desplazados:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+        estados:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
+        municipios:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-6h4v6"/></svg>'
     };
 
-    let impactoList = Array.isArray(content.impacto) ? content.impacto : [];
-    let isImpactoFallback = false;
-    if (impactoList.length === 0) {
-        impactoList = [
-            { monto: 20000, titulo: 'Kit básico', descripcion: 'Cubre una necesidad inmediata puntual.' },
-            { monto: 50000, titulo: 'Apoyo sostenido', descripcion: 'Ayuda continua durante una semana.' },
-            { monto: 100000, titulo: 'Impacto mayor', descripcion: 'Cubre una necesidad crítica completa.' }
-        ];
-        isImpactoFallback = true;
-    }
-    const impactoGridEl = document.getElementById('db-impacto-grid');
-    if (impactoGridEl) {
-        // Contrato de Interactividad Física [cite: 37, 724]: el onclick se inyecta
-        // físicamente en el innerHTML, no se asume un listener externo.
-        impactoGridEl.innerHTML = impactoList.map(item => {
+    // Renderizador reutilizable de tarjetas de impacto (mismo formato dual usado por
+    // #db-impacto-grid); se extrae como función para poder alimentar también el nuevo
+    // átomo #db-impacto-historico-grid (v221) sin duplicar la lógica de mapeo.
+    function renderImpactoCards(list, targetId, moneda, fmt) {
+        const el = document.getElementById(targetId);
+        if (!el) return 0;
+        el.innerHTML = list.map(item => {
             const esMetrica = item.monto === undefined && (item.valor !== undefined || item.icono !== undefined || item.etiqueta !== undefined);
             if (esMetrica) {
                 const iconoSvg = IMPACTO_ICONS[item.icono] || IMPACTO_ICONS.general;
@@ -520,15 +714,115 @@
             }
             return `
                 <div class="impacto-card impacto-card--donacion" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
-                    <span class="impacto-monto">${item.moneda || monedaVal} ${fmtMoney(item.monto || 0)}</span>
+                    <span class="impacto-monto">${item.moneda || moneda} ${fmt(item.monto || 0)}</span>
                     <span class="impacto-titulo">${(item.titulo || '').toUpperCase()}</span>
                     <p class="impacto-desc">${item.descripcion || ''}</p>
                 </div>`;
         }).join('');
-        const impactoStatus = isImpactoFallback ? `Tarjetas de impacto de REFERENCIA/FALLBACK (${impactoList.length})` : `Tarjetas de impacto REALES (${impactoList.length})`;
-        logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
+        return list.length;
     }
+
+    // NOTA v221: el fallback de este segmento se personalizó para esta campaña de
+    // emergencia (este archivo es un clon de un único evento, no el Master compartido —
+    // decisión de Dirección del 30-jul-2026). El fallback genérico de "Kit básico /
+    // Apoyo sostenido / Impacto mayor" queda documentado aquí abajo por si se necesita
+    // restaurar el comportamiento estándar de donación monetaria en otro clon.
+    // Fallback genérico original (no usado en este clon):
+    //   [{monto:20000,titulo:'Kit básico',...}, {monto:50000,...}, {monto:100000,...}]
+    let impactoList = Array.isArray(content.impacto) ? content.impacto : [];
+    let isImpactoFallback = false;
+    if (impactoList.length === 0) {
+        impactoList = [
+            { valor: '5,500', etiqueta: 'Víctimas', icono: 'victimas' },
+            { valor: '23,000', etiqueta: 'Desplazados', icono: 'desplazados' },
+            { valor: '18/24', etiqueta: 'Estados afectados', icono: 'estados' },
+            { valor: '226', etiqueta: 'Municipios', icono: 'municipios' }
+        ];
+        isImpactoFallback = true;
+    }
+    const impactoCount = renderImpactoCards(impactoList, 'db-impacto-grid', monedaVal, fmtMoney);
+    const impactoStatus = isImpactoFallback ? `Tarjetas de impacto (crisis) de REFERENCIA/FALLBACK (${impactoCount})` : `Tarjetas de impacto (crisis) REALES (${impactoCount})`;
+    logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
     // === FIN SEGMENTO IMPACTO ===
+
+    // === INICIO SEGMENTO: MAPA DE CRISIS — nuevo átomo v221 (Contrato v109 → v110) ===
+    const mapaCrisisData = content.mapa_crisis || {};
+    const isMapaCrisisFallback = !content.mapa_crisis;
+    const fallaVal = mapaCrisisData.falla || 'Falla de San Sebastián';
+    if (document.getElementById('db-mapa-crisis-falla')) document.getElementById('db-mapa-crisis-falla').innerText = fallaVal;
+    const mapaCrisisSvgEl = document.getElementById('db-mapa-crisis-svg');
+    if (mapaCrisisSvgEl) {
+        // Visualización ILUSTRATIVA (no cartográfica): anillos concéntricos + pulso
+        // animado sobre el epicentro. Deliberadamente NO traza fronteras geográficas
+        // reales para evitar presentar un mapa impreciso como si fuera oficial.
+        mapaCrisisSvgEl.innerHTML = `
+            <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visualización ilustrativa de la zona de emergencia">
+                <circle cx="190" cy="150" r="130" class="mc-ring mc-ring--outer"/>
+                <circle cx="190" cy="150" r="90" class="mc-ring mc-ring--mid"/>
+                <circle cx="190" cy="150" r="50" class="mc-ring mc-ring--inner"/>
+                <g class="mc-dots">
+                    <circle cx="120" cy="90"/><circle cx="255" cy="105"/><circle cx="100" cy="205"/>
+                    <circle cx="270" cy="215"/><circle cx="190" cy="245"/><circle cx="155" cy="65"/>
+                </g>
+                <circle cx="190" cy="150" r="6" class="mc-epicentro"/>
+                <circle cx="190" cy="150" r="6" class="mc-pulse"/>
+            </svg>`;
+    }
+    logStatus(`TRACE: Mapa de crisis ${isMapaCrisisFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (falla: ${fallaVal}).`, "TRACE");
+    // === FIN SEGMENTO MAPA DE CRISIS ===
+
+    // === INICIO SEGMENTO: CÓMO AYUDAR — nuevo átomo v221 (Contrato v109 → v110) ===
+    const COMO_AYUDAR_ICONS = {
+        espacio:    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>',
+        artista:    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+        marca:      '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z"/><circle cx="8" cy="8" r="1.2"/></svg>',
+        voluntario: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>'
+    };
+    const comoAyudarData = content.como_ayudar || {};
+    const isComoAyudarFallback = !content.como_ayudar;
+    const comoAyudarLead = comoAyudarData.lead || 'Unimos la energía de la Salsa y el Dancehall para recaudar fondos y llevar ayuda real. Cada evento es un acto de solidaridad que transforma vidas.';
+    let comoAyudarList = Array.isArray(comoAyudarData.categorias) ? comoAyudarData.categorias : [
+        { titulo: 'Espacios', descripcion: 'Pon tu venue y súmate.', icono: 'espacio', tipo_ayuda: 'espacio' },
+        { titulo: 'Artistas', descripcion: 'Tu talento puede salvar.', icono: 'artista', tipo_ayuda: 'artista' },
+        { titulo: 'Marcas', descripcion: 'Tu marca deja huella.', icono: 'marca', tipo_ayuda: 'marca' },
+        { titulo: 'Voluntarios', descripcion: 'Tu tiempo transforma.', icono: 'voluntario', tipo_ayuda: 'voluntario' }
+    ];
+    if (document.getElementById('db-como-ayudar-lead')) document.getElementById('db-como-ayudar-lead').innerText = comoAyudarLead;
+    const comoAyudarGridEl = document.getElementById('db-como-ayudar-grid');
+    if (comoAyudarGridEl) {
+        // Contrato de Interactividad Física: onclick inyectado físicamente en el innerHTML.
+        // Al hacer clic, preselecciona la categoría en el formulario y hace scroll a él.
+        comoAyudarGridEl.innerHTML = comoAyudarList.map(item => `
+            <div class="comoayudar-card" onclick="const sel=document.getElementById('reg-tipo-ayuda'); if(sel){sel.value='${item.tipo_ayuda || ''}';} document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
+                <div class="comoayudar-icono">${COMO_AYUDAR_ICONS[item.icono] || COMO_AYUDAR_ICONS.voluntario}</div>
+                <span class="comoayudar-titulo">${(item.titulo || '').toUpperCase()}</span>
+                <p class="comoayudar-desc">${item.descripcion || ''}</p>
+                <span class="comoayudar-link">VER MÁS →</span>
+            </div>`).join('');
+        const caStatus = isComoAyudarFallback ? `Categorías "Cómo Ayudar" de REFERENCIA/FALLBACK (${comoAyudarList.length})` : `Categorías "Cómo Ayudar" REALES (${comoAyudarList.length})`;
+        logStatus(`TRACE: ${caStatus} inyectadas.`, "TRACE");
+    }
+    // === FIN SEGMENTO CÓMO AYUDAR ===
+
+    // === INICIO SEGMENTO: IMPACTO HISTÓRICO — nuevo átomo v221 (Contrato v109 → v110) ===
+    let impactoHistList = Array.isArray(content.impacto_historico) ? content.impacto_historico : [];
+    let isImpactoHistFallback = false;
+    if (impactoHistList.length === 0) {
+        impactoHistList = [
+            { valor: '12,660+', etiqueta: 'Personas ayudadas', icono: 'general' },
+            { valor: '3,800+', etiqueta: 'Familias apoyadas', icono: 'familias' },
+            { valor: '18', etiqueta: 'Estados atendidos', icono: 'estados' },
+            { valor: '226', etiqueta: 'Municipios activos', icono: 'municipios' }
+        ];
+        isImpactoHistFallback = true;
+    }
+    const impactoHistCount = renderImpactoCards(impactoHistList, 'db-impacto-historico-grid', monedaVal, fmtMoney);
+    if (document.getElementById('db-impacto-historico-frase')) {
+        document.getElementById('db-impacto-historico-frase').innerText = content.impacto_historico_frase || 'LA CULTURA NOS UNE. LA SOLIDARIDAD NOS MUEVE.';
+    }
+    const ihStatus = isImpactoHistFallback ? `Impacto histórico de REFERENCIA/FALLBACK (${impactoHistCount})` : `Impacto histórico REAL (${impactoHistCount})`;
+    logStatus(`TRACE: ${ihStatus} inyectado.`, "TRACE");
+    // === FIN SEGMENTO IMPACTO HISTÓRICO ===
 
   // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
     // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
@@ -771,7 +1065,12 @@ if (document.getElementById('db-poster-img')) {
                 // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
                 // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
                 // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer'];
+                // v221: Contrato extendido a 20 átomos (v109 → v110, aditivo, no-breaking).
+                // Se agregan mod-mapa-crisis/mod-como-ayudar/mod-impacto-historico — nacidos
+                // para la campaña "Emergencia por Venezuela" (b5) pero genéricos y reutilizables
+                // por cualquier categoría futura que necesite crisis en tiempo real, categorías
+                // de colaboración, o un histórico de impacto separado del objetivo económico.
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 
