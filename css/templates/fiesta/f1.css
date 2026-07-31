@@ -1118,6 +1118,43 @@
     min-height: 500px !important;
 }
 
+/* ============================================================================
+   LIBERACIÓN DE ANCHO COMPLETO: CADENA DE ANIDAMIENTO (v2.1.0-GOLD)
+   ============================================================================ */
+
+/* 1. LIBERAR LA SECCIÓN PADRE (Rompe el 10% de padding del kernel) */
+.tpl-f1 section#modulo-gallery {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+}
+
+/* 2. LIBERAR EL MEDIA-GRID (Contenedor intermedio de 1100px) */
+.tpl-f1 .media-grid {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    grid-template-columns: 1fr !important; /* Fuerza stack vertical en móvil */
+}
+
+/* 3. AJUSTE DE PLAYLIST Y SPOTIFY (Impacto Total) */
+.tpl-f1 #modulo-playlist, 
+.tpl-f1 .spotify-container {
+    width: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important; /* Elimina redondeos para tocar bordes */
+}
+
+/* 4. FORZAR AL IFRAME (El contenido real) */
+.tpl-f1 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
