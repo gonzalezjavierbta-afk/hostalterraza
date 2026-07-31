@@ -1043,7 +1043,36 @@
         }
     }
 
+/* ============================================================================
+   AMPLIACIÓN CRÍTICA DE CARTEL: BLINDAJE TOTAL (v1.8.5-GOLD)
+   ============================================================================ */
 
+/* 1. Forzar expansión del contenedor en todos los IDs posibles */
+.tpl-f1 #mod-lineup > div, 
+.tpl-f1 #modulo-lineup > div {
+    max-width: 1200px !important; /* Rompe el límite de 800px [cite: 14] */
+    width: 100% !important;
+    padding-left: 5% !important;  /* Reduce el estrangulamiento lateral */
+    padding-right: 5% !important;
+}
+
+/* 2. Escalar la imagen del cartel al estándar premium */
+.tpl-f1 .poster-main-img {
+    max-width: 900px !important;  /* Subimos de 700px a 900px para impacto total */
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto 3rem !important;
+    /* Mantenemos estética Selina [cite: 14] */
+    border-radius: 28px !important;
+    border: 4px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 60px var(--tpl-accent) !important;
+}
+
+/* 3. Ajuste de los artistas para que no queden pegados al cartel gigante */
+.tpl-f1 #db-lineup {
+    margin-top: 2rem !important;
+}
 
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
