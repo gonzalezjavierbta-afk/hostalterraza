@@ -1044,34 +1044,41 @@
     }
 
 /* ============================================================================
-   AMPLIACIÓN CRÍTICA DE CARTEL: BLINDAJE TOTAL (v1.8.5-GOLD)
+   AMPLIACIÓN CRÍTICA DE CARTEL: ESTRUCTURA Y MASA (v1.9.0-GOLD)
    ============================================================================ */
 
-/* 1. Forzar expansión del contenedor en todos los IDs posibles */
-.tpl-f1 #mod-lineup > div, 
-.tpl-f1 #modulo-lineup > div {
-    max-width: 1200px !important; /* Rompe el límite de 800px [cite: 14] */
-    width: 100% !important;
-    padding-left: 5% !important;  /* Reduce el estrangulamiento lateral */
-    padding-right: 5% !important;
+/* 1. Liberar el contenedor maestro de toda restricción de ancho */
+.tpl-f1 #mod-lineup, 
+.tpl-f1 #modulo-lineup {
+    padding-left: 0 !important;   /* Elimina el 10% de la sección [cite: 3] */
+    padding-right: 0 !important;
 }
 
-/* 2. Escalar la imagen del cartel al estándar premium */
+.tpl-f1 #mod-lineup > div, 
+.tpl-f1 #modulo-lineup > div {
+    max-width: 100% !important;   /* Rompe el límite de 800px [cite: 14] */
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 1rem !important;   /* Mantiene un respiro mínimo de seguridad */
+}
+
+/* 2. Escalar la imagen del cartel al máximo impacto */
 .tpl-f1 .poster-main-img {
-    max-width: 900px !important;  /* Subimos de 700px a 900px para impacto total */
+    max-width: 95vw !important;   /* Ocupa el 95% del ancho de la pantalla */
     width: 100% !important;
     height: auto !important;
     display: block !important;
     margin: 0 auto 3rem !important;
-    /* Mantenemos estética Selina [cite: 14] */
-    border-radius: 28px !important;
-    border: 4px solid var(--tpl-accent) !important;
-    box-shadow: 0 0 60px var(--tpl-accent) !important;
+    /* Estética Selina [cite: 14] */
+    border-radius: 20px !important; 
+    border: 3px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 40px var(--tpl-accent) !important;
 }
 
-/* 3. Ajuste de los artistas para que no queden pegados al cartel gigante */
+/* 3. Reajuste del Grid de Artistas para balancear la nueva masa */
 .tpl-f1 #db-lineup {
-    margin-top: 2rem !important;
+    padding: 0 2rem !important;   /* Centra los nombres bajo el cartel grande */
+    margin-top: 0 !important;
 }
 
 /* ===================================================================
