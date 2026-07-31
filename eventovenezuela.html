@@ -59,7 +59,7 @@
             <a href="#mod-form" class="hero-nav-cta">Únete a la Red</a>
         </nav>
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
-        
+        <div class="hero-content" style="position:relative; z-index:5;">
     <span class="hero-eyebrow">Emergencia Humanitaria</span>
     <h1 id="event-title">--</h1>
     <!-- NUEVO NODO PARA LA DESCRIPCIÓN -->
@@ -75,8 +75,6 @@
         <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-secs" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>SEG</small></div>
     </div>
 
-    
-    
     <!-- MÓDULO ATÓMICO: METADATOS DEL EVENTO (Slot Independiente v213 — extraído de #mod-hero,
          ahora hermano plano ubicado debajo del Countdown por decisión del template) -->
     <div id="mod-hero-meta" class="hero-meta">
@@ -569,11 +567,6 @@
 
                 // MAPEO DE HERO & METADATA
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
-                
-                if (evento.descripcion) {
-                    document.getElementById('event-description').innerText = evento.descripcion;
-                }
-
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
