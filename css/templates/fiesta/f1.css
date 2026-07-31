@@ -729,6 +729,13 @@
         word-wrap: break-word;
     }
 
+    /* 3. SOLAPAMIENTO AGRESIVO: El formulario sube más sobre el fondo */
+    .tpl-f1 #mod-form {
+        grid-area: form !important; /* <--- AGREGA ESTA LÍNEA AQUÍ */
+        z-index: 30; 
+    }
+
+
     /* 3. FIX META-DATA (Evita que la página se vea cortada) */
     .tpl-f1 .hero-meta {
         gap: 1.5rem 1rem !important; /* Reducción de gap horizontal de 5rem a 1rem */
@@ -818,7 +825,7 @@
     grid-template-columns: 1fr;
     grid-template-areas:
         "hero"
-        "form"
+        "form"        /* <--- POSICIÓN FORZADA: Tras el Hero */
         "countdown"
         "meta"
         "video"
