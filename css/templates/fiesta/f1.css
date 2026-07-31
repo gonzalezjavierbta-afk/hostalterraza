@@ -1082,44 +1082,41 @@
 }
 
 /* ============================================================================
-   AMPLIACIÓN NUCLEAR 400px: ELIMINACIÓN DE RESTRICCIONES (v2.0.0-GOLD)
+   [ENTRADA] — LIBERACIÓN DE RESTRICCIONES DE ANCHO (v1.9.8-GOLD)
    ============================================================================ */
 
-/* 1. RESET DE SECCIÓN: Elimina el estrangulamiento del 10% lateral [cite: 3] */
-.tpl-f1 section#mod-lineup, 
-.tpl-f1 section#modulo-lineup {
+/* 1. Punto de Entrada A: Neutralizar el padding del 10% de la sección [cite: 3] */
+.tpl-f1 section#modulo-playlist, 
+.tpl-f1 section#mod-playlist {
     padding-left: 0 !important;
     padding-right: 0 !important;
-    width: 100vw !important;
     max-width: 100vw !important;
-    overflow-x: hidden !important;
-}
-
-/* 2. FUERZA BRUTA EN CONTENEDOR: Rompe el techo de 800px [cite: 14] */
-.tpl-f1 #mod-lineup > div, 
-.tpl-f1 #modulo-lineup > div {
-    display: block !important;
-    max-width: 100% !important;
     width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
 }
 
-/* 3. ESCALADO DE IMAGEN: El cartel es soberano sobre el viewport */
-.tpl-f1 .poster-main-img {
-    width: 100% !important;        /* Ocupa el 100% del ancho disponible */
-    max-width: 100% !important;
-    height: auto !important;
-    border-radius: 0 !important;   /* Opcional: quita el redondeo para que pegue a los bordes */
-    border: none !important;       /* Elimina bordes que puedan restar pixeles */
-    box-shadow: none !important;
-    margin: 0 !important;
+/* 2. Punto de Entrada B: Romper el límite de 1100px del Media Grid [cite: 18] */
+.tpl-f1 .media-grid {
+    max-width: 100% !important; 
+    width: 100% !important;
+    gap: 0 !important; /* Elimina espacio entre video y playlist si están juntos */
 }
 
-/* 4. REUBICACIÓN DE ARTISTAS: Los empuja bajo el cartel expandido */
-.tpl-f1 #db-lineup {
-    padding: 2rem !important;      /* Devuelve el aire solo al texto */
-    background: var(--f1-bg-deep); /* Asegura contraste tras la expansión */
+/* 3. Ajuste de Contenedor: Eliminar bordes y radios para look "Edge-to-Edge" */
+.tpl-f1 .spotify-container {
+    width: 100% !important;
+    border-radius: 0 !important; /* Opcional: quita el redondeo Selina [cite: 19] */
+    border: none !important;
+}
+
+/* ============================================================================
+   [SALIDA] — PROYECCIÓN VISUAL FINAL
+   ============================================================================ */
+
+/* 4. Punto de Salida: Forzar al iframe inyectado a llenar el nuevo espacio [cite: 293] */
+.tpl-f1 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 600px !important; /* Aumentamos altura para compensar el ancho */
+}
 
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
