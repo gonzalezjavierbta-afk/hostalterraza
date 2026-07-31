@@ -1180,7 +1180,61 @@
     min-height: 550px !important;
 }
 
+/* ============================================================================
+   CORRECCIÓN CRÍTICA: FIX DE SELECTORES FANTASMA (v2.4.0-GOLD)
+   AUDITORÍA: Los bloques v2.1.0/v2.2.0/v2.3.0 (líneas ~1049-1181) apuntan a
+   IDs/clases que NUNCA existieron en evento3.html:
+     - #modulo-lineup / #modulo-gallery -> NO EXISTEN. Los IDs reales son
+       #mod-video, #mod-lineup, #mod-playlist: 3 <section> hermanas
+       independientes desde el split v1.4.6, nunca una "gallery" unificada.
+     - .media-grid       -> nunca existió en el HTML.
+     - .poster-main-img  -> nunca existió. El póster real es <img id="db-poster-img">.
+     - .spotify-container -> nunca existió. El contenedor real es #db-spotify-embed.
+   Los bloques anteriores se conservan como registro de auditoría (código
+   muerto, no interfieren). Este bloque los reemplaza funcionalmente. */
 
+/* 1. PADDING DE SECCIÓN sobre los 3 IDs reales, margen 0.5rem uniforme */
+.tpl-f1 section#mod-video,
+.tpl-f1 section#mod-lineup,
+.tpl-f1 section#mod-playlist {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* 2. STACK MÓVIL DEL LINEUP: causa real del desborde visible.
+      .lineup-grid trae grid-template-columns:1fr 1fr inline SIN media query,
+      más padding-right:5rem hardcodeado en el wrapper del póster. */
+@media (max-width: 1023px) {
+    .tpl-f1 .lineup-grid {
+        grid-template-columns: 1fr !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        gap: 2rem !important;
+    }
+    .tpl-f1 .lineup-grid > div:first-child {
+        border-right: none !important;
+        padding-right: 0 !important;
+        padding-bottom: 1.5rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* 3. PÓSTER real: #db-poster-img, fijo en 320px por inline style */
+.tpl-f1 #db-poster-img {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0.25rem !important;
+}
+
+/* 4. PLAYLIST: #db-spotify-embed ya es block-level (100% del padre por
+      defecto); con el padding de sección corregido (punto 1) queda
+      automáticamente alineado al margen uniforme de 0.5rem. */
+.tpl-f1 #db-spotify-embed {
+    width: 100% !important;
+}
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
