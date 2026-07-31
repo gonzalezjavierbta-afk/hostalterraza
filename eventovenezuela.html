@@ -590,16 +590,28 @@
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
 
-                // MAPEO DE HERO & METADATA
+                // === INICIO SEGMENTO: MAPEO DE HERO & METADATA (v1.10-NEUTRALIZED) ===
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
- //               document.getElementById('meta-fecha').innerText = ev.fecha;
+
+                // NEUTRALIZADO: Se comenta para preservar el texto hardcodeado en el HTML
+                // document.getElementById('meta-fecha').innerText = ev.fecha; 
+
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
-                const magnitudVal = ev.magnitud || content.magnitud;
-                if (document.getElementById('meta-magnitud')) document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
-                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
+                // NEUTRALIZADO: Esta línea no existía; la añadimos comentada para blindar el ID
+                // document.getElementById('event-description').innerText = ev.descripcion;
+
+                const magnitudVal = ev.magnitud || content.magnitud;
+                if (document.getElementById('meta-magnitud')) {
+                    document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
+                }
+
+                if (ev.imagen_url) {
+                    document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
+                }
+                // === FIN SEGMENTO: MAPEO DE HERO ===
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
   // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
   const videoContainer = document.getElementById('db-video-content');
