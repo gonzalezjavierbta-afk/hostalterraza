@@ -1235,6 +1235,46 @@
 .tpl-f1 #db-spotify-embed {
     width: 100% !important;
 }
+
+/* ============================================================================
+   AJUSTE FINO: CENTRADO DESKTOP + FULL-WIDTH VIDEO/PLAYLIST (v2.5.0-GOLD)
+   ============================================================================ */
+
+/* 1. FIX CENTRADO PÓSTER EN ESCRITORIO
+   El bloque v2.3.0 (línea ~1147) "#mod-lineup > div { max-width:100% !important }"
+   nunca tuvo media query: rompía el tope inline de 1100px + margin:0 auto
+   TAMBIÉN en escritorio. Se restaura el comportamiento original solo en
+   desktop; el edge-to-edge móvil (<1024px) del punto 2 del bloque v2.4.0
+   sigue intacto, sin cambios. */
+@media (min-width: 1024px) {
+    .tpl-f1 #mod-lineup > div {
+        max-width: 1100px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+}
+
+/* 2. PADDING DE SECCIÓN DIFERENCIADO: lineup conserva 0.5rem (margen de
+   seguridad, decisión previa); video y playlist pasan a 0 (edge-to-edge
+   real, decisión "Ambos edge-to-edge" ya confirmada) */
+.tpl-f1 section#mod-video,
+.tpl-f1 section#mod-playlist {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* 3. FULL-WIDTH REAL EN VIDEO Y PLAYLIST
+   #db-video-content y #db-spotify-embed viven dentro de un div wrapper con
+   "max-width:1100px; margin:0 auto" inline que ningún parche anterior tocó
+   -- por eso el width:100% de los hijos solo llenaba ese contenedor ya
+   limitado a 1100px, nunca la pantalla completa. */
+.tpl-f1 #mod-video > div:not(#db-gallery-grid),
+.tpl-f1 #mod-playlist > div {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
