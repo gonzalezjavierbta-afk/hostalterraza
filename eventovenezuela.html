@@ -401,14 +401,15 @@
             logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
         }
 
-        //<!-- === MÓDULO 04: FORMULARIO CENTRADO (v1.10-GOLD) === -->
+        <!-- === MÓDULO 04: FORMULARIO CENTRADO (v1.10-GOLD) === -->
         <section id="mod-form" class="form-section">
             <div class="form-master-box">
+                <!-- Títulos de Autoridad Geist 900 -->
                 <h2 class="form-title">SÚMATE A LA RED DE SOLIDARIDAD</h2>
                 <p class="form-lead">Cada evento es un acto de solidaridad que transforma vidas. Cuéntanos cómo quieres ayudar.</p>
 
                 <form id="master-reg-form">
-                    <!-- FILA ÚNICA: El contenedor que organiza los 3 campos -->
+                    <!-- FILA ÚNICA DE CAMPOS (Fidelidad 1px) -->
                     <div class="form-input-row">
                         <input type="text" id="reg-nombre" placeholder="Nombre completo" required>
                         
@@ -424,13 +425,14 @@
                         </select>
                     </div>
 
+                    <!-- Botón Potente Centrado -->
                     <button type="submit" class="btn-submit">QUIERO SUMARME</button>
                 </form>
             </div>
         </section>
 
 
-        // <! === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
+        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
         async function injectAtomicCSS(cat, tplId) {
             return new Promise((resolve) => {
                 const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
