@@ -567,6 +567,11 @@
 
                 // MAPEO DE HERO & METADATA
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
+                
+                if (evento.descripcion) {
+                    document.getElementById('event-description').innerText = evento.descripcion;
+                }
+
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
