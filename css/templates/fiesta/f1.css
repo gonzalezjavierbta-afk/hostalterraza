@@ -1081,6 +1081,46 @@
     margin-top: 0 !important;
 }
 
+/* ============================================================================
+   AMPLIACIÓN NUCLEAR 400px: ELIMINACIÓN DE RESTRICCIONES (v2.0.0-GOLD)
+   ============================================================================ */
+
+/* 1. RESET DE SECCIÓN: Elimina el estrangulamiento del 10% lateral [cite: 3] */
+.tpl-f1 section#mod-lineup, 
+.tpl-f1 section#modulo-lineup {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+}
+
+/* 2. FUERZA BRUTA EN CONTENEDOR: Rompe el techo de 800px [cite: 14] */
+.tpl-f1 #mod-lineup > div, 
+.tpl-f1 #modulo-lineup > div {
+    display: block !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 3. ESCALADO DE IMAGEN: El cartel es soberano sobre el viewport */
+.tpl-f1 .poster-main-img {
+    width: 100% !important;        /* Ocupa el 100% del ancho disponible */
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 0 !important;   /* Opcional: quita el redondeo para que pegue a los bordes */
+    border: none !important;       /* Elimina bordes que puedan restar pixeles */
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+
+/* 4. REUBICACIÓN DE ARTISTAS: Los empuja bajo el cartel expandido */
+.tpl-f1 #db-lineup {
+    padding: 2rem !important;      /* Devuelve el aire solo al texto */
+    background: var(--f1-bg-deep); /* Asegura contraste tras la expansión */
+
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
