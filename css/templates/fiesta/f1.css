@@ -716,35 +716,6 @@
    10. RESPONSIVE ADAPTABILITY — Fix Crítico 400px (.tpl-f1)
    ============================================================================ */
 
-/* ============================================================================
-   FIX CRÍTICO: REORDENAMIENTO FORZADO MÓVIL (f1 v1.6.9-GOLD)
-   ============================================================================ */
-    @media (max-width: 1023px) {
-        .tpl-f1 #main-content-flow {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-            /* SECUENCIA SUPREMA: El formulario pisa al Hero */
-            grid-template-areas: 
-                "hero"
-                "form"        /* <--- EL FORMULARIO SUBE AQUÍ */
-                "countdown"
-                "meta"
-                "video"
-                "lineup"
-                "playlist"
-                "info"
-                "faq"
-                "ubicacion"
-                "sponsors" !important;
-            row-gap: 0 !important;
-        }
-
-        /* Anclaje físico del ID al área */
-        .tpl-f1 #mod-form { 
-            grid-area: form !important; 
-            z-index: 50 !important;
-        }
-    }
 
 
    
@@ -1040,6 +1011,40 @@
 .tpl-f1 #mod-lineup > div > div:first-child {
     margin-bottom: 2rem !important; /* Reduce el espacio inferior para balancear la masa */
 }
+
+
+/* ============================================================================
+   FIX CRÍTICO: REORDENAMIENTO FORZADO MÓVIL (f1 v1.6.9-GOLD)
+   ============================================================================ */
+    @media (max-width: 1023px) {
+        .tpl-f1 #main-content-flow {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            /* SECUENCIA SUPREMA: El formulario pisa al Hero */
+            grid-template-areas: 
+                "hero"
+                "form"        /* <--- EL FORMULARIO SUBE AQUÍ */
+                "countdown"
+                "meta"
+                "video"
+                "lineup"
+                "playlist"
+                "info"
+                "faq"
+                "ubicacion"
+                "sponsors" !important;
+            row-gap: 0 !important;
+        }
+
+        /* Anclaje físico del ID al área */
+        .tpl-f1 #mod-form { 
+            grid-area: form !important; 
+            z-index: 50 !important;
+        }
+    }
+
+
+
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
