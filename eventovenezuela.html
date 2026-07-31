@@ -75,41 +75,46 @@
         <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-secs" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>SEG</small></div>
     </div>
 
-    <!-- MÓDULO ATÓMICO: METADATOS DEL EVENTO (v1.10-GOLD) -->
+    <!-- MÓDULO 03: METADATOS (v1.10-GOLD / Paridad hero-ejemplo.jpg) -->
     <div id="mod-hero-meta" class="hero-meta">
-        <!-- ITEM: FECHA (Actualizado a formato humano) -->
+        
+        <!-- CAMPO 01: FECHA -->
         <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)">
-                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
-            </svg>
-            <span id="meta-fecha">24 de Junio del 2026</span> <!-- CAMBIO REALIZADO AQUÍ -->
+            <svg class="meta-svg" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+            <div class="meta-data">
+                <label class="meta-label">FECHA</label>
+                <span id="meta-fecha">24 de Junio del 2026</span>
+            </div>
         </div>
 
-        <!-- ITEM: HORA -->
+        <!-- CAMPO 02: HORA -->
         <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)">
-                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-            </svg>
-            <span id="meta-hora">11:56 AM (HORA LOCAL)</span>
+            <svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            <div class="meta-data">
+                <label class="meta-label">HORA</label>
+                <span id="meta-hora">11:56 AM (HORA LOCAL)</span>
+            </div>
         </div>
 
-        <!-- ITEM: UBICACIÓN -->
+        <!-- CAMPO 03: UBICACIÓN -->
         <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            <span id="meta-lugar">Catia La Mar, Venezuela</span>
+            <svg class="meta-svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <div class="meta-data">
+                <label class="meta-label">UBICACIÓN</label>
+                <span id="meta-lugar">CATIA LA MAR, VENEZUELA</span>
+            </div>
         </div>
 
-        <!-- ÁTOMO NUEVO: MAGNITUD SÍSMICA -->
+        <!-- CAMPO 04: MAGNITUD -->
         <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 13h3l2-6 3 12 3-16 3 10h3l2-4 3 4"/>
-            </svg>
-            <span id="meta-magnitud">7.5 Mw</span>
+            <svg class="meta-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 13h3l2-6 3 12 3-16 3 10h3l2-4 3 4"/></svg>
+            <div class="meta-data">
+                <label class="meta-label">MAGNITUD</label>
+                <span id="meta-magnitud">7.5 Mw</span>
+            </div>
         </div>
+
     </div>
-
 
         <!-- ============================================================
              EXTENSIÓN ADITIVA DEL CONTRATO (v215 · Contrato v107 → v108)
@@ -590,28 +595,16 @@
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }, 1000);
 
-                // === INICIO SEGMENTO: MAPEO DE HERO & METADATA (v1.10-NEUTRALIZED) ===
+                // MAPEO DE HERO & METADATA
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-
-                // NEUTRALIZADO: Se comenta para preservar el texto hardcodeado en el HTML
-                // document.getElementById('meta-fecha').innerText = ev.fecha; 
-
+ //               document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
-
-                // NEUTRALIZADO: Esta línea no existía; la añadimos comentada para blindar el ID
-                // document.getElementById('event-description').innerText = ev.descripcion;
-
                 const magnitudVal = ev.magnitud || content.magnitud;
-                if (document.getElementById('meta-magnitud')) {
-                    document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
-                }
+                if (document.getElementById('meta-magnitud')) document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
+                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
-                if (ev.imagen_url) {
-                    document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
-                }
-                // === FIN SEGMENTO: MAPEO DE HERO ===
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
   // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
   const videoContainer = document.getElementById('db-video-content');
