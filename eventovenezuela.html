@@ -401,35 +401,96 @@
             logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
         }
 
-        <!-- === MÓDULO 04: FORMULARIO CENTRADO (v1.10-GOLD) === -->
-        <section id="mod-form" class="form-section">
-            <div class="form-master-box">
-                <!-- Títulos de Autoridad Geist 900 -->
-                <h2 class="form-title">SÚMATE A LA RED DE SOLIDARIDAD</h2>
-                <p class="form-lead">Cada evento es un acto de solidaridad que transforma vidas. Cuéntanos cómo quieres ayudar.</p>
+        // === INICIO SEGMENTO: FORMULARIO DUAL-PHASE (v221) ===
+        // Fase 1 -> INSERT en 'inscritos' (nombre, whatsapp, tipo_ayuda). Si tiene éxito,
+        // revela Fase 2 sin recargar. Fase 2 -> UPDATE del mismo registro (cedula,
+        // autorizacion, respuestas_custom), usando el id devuelto por el INSERT.
+        // ASUNCIÓN A VERIFICAR (ver nota de Dirección 30-jul-2026): nombres de columna
+        // 'evento_id', 'org_id', 'nombre', 'whatsapp', 'tipo_ayuda', 'cedula',
+        // 'autorizacion', 'respuestas_custom' en la tabla `inscritos`.
+        let regPhase = 1;
+        let regInscritoId = null;
 
-                <form id="master-reg-form">
-                    <!-- FILA ÚNICA DE CAMPOS (Fidelidad 1px) -->
-                    <div class="form-input-row">
-                        <input type="text" id="reg-nombre" placeholder="Nombre completo" required>
-                        
-                        <div class="phone-group">
-                            <span class="prefix-flag">🇻🇪 +58</span>
-                            <input type="tel" id="reg-tel" placeholder="WhatsApp" required>
-                        </div>
+        document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const activeWrap = document.getElementById(regPhase === 1 ? 'fase1-fields' : 'form-fase2');
+            const submitBtn = activeWrap.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
 
-                        <select id="reg-tipo-ayuda">
-                            <option value="">¿Cómo te gustaría ayudar?</option>
-                            <option value="voluntario">Voluntario</option>
-                            <option value="donante">Donante</option>
-                        </select>
-                    </div>
+            if (regPhase === 1) {
+                const nombre = document.getElementById('reg-nombre').value.trim();
+                const paisCod = document.getElementById('reg-pais').value;
+                const whatsappNum = document.getElementById('reg-whatsapp').value.trim();
+                const tipoAyuda = document.getElementById('reg-tipo-ayuda').value;
 
-                    <!-- Botón Potente Centrado -->
-                    <button type="submit" class="btn-submit">QUIERO SUMARME</button>
-                </form>
-            </div>
-        </section>
+                if (!nombre || !whatsappNum || !tipoAyuda) {
+                    alert('Por favor completa nombre, WhatsApp y cómo quieres ayudar.');
+                    return;
+                }
+
+                submitBtn.disabled = true; submitBtn.innerText = 'ENVIANDO...';
+                try {
+                    const { data, error } = await sbClient.from('inscritos').insert({
+                        evento_id: window.__ctxEventoId,
+                        org_id: window.__ctxOrgId,
+                        nombre: nombre,
+                        whatsapp: `${paisCod} ${whatsappNum}`,
+                        tipo_ayuda: tipoAyuda,
+                        respuestas_custom: {}
+                    }).select().single();
+                    if (error) throw error;
+
+                    regInscritoId = data.id;
+                    regPhase = 2;
+                    document.getElementById('fase1-fields').style.display = 'none';
+                    document.getElementById('form-fase2').style.display = 'block';
+                    logStatus(`TRACE: Fase 1 registrada en 'inscritos' (id ${regInscritoId}).`, "TRACE");
+                } catch (err) {
+                    logStatus(`ERROR: Fallo INSERT Fase 1 -> ${err.message}`, "ERROR");
+                    alert('No pudimos procesar tu registro. Por favor intenta de nuevo en unos segundos.');
+                } finally {
+                    submitBtn.disabled = false; submitBtn.innerText = originalText;
+                }
+            } else {
+                const cedula = document.getElementById('reg-cedula').value.trim();
+                const autorizado = document.getElementById('reg-autorizacion').checked;
+
+                if (!cedula || !autorizado) {
+                    alert('Ingresa tu cédula y acepta la autorización de datos para continuar.');
+                    return;
+                }
+                if (!regInscritoId) {
+                    logStatus('ERROR: No hay inscrito activo en memoria para completar Fase 2.', "ERROR");
+                    alert('Hubo un problema con tu sesión de registro. Por favor vuelve a intentar desde el inicio.');
+                    return;
+                }
+
+                submitBtn.disabled = true; submitBtn.innerText = 'GUARDANDO...';
+                try {
+                    const { error } = await sbClient.from('inscritos').update({
+                        cedula: cedula,
+                        autorizacion: true,
+                        respuestas_custom: {
+                            cedula: cedula,
+                            autorizacion: true,
+                            autorizacion_fecha: new Date().toISOString()
+                        }
+                    }).eq('id', regInscritoId);
+                    if (error) throw error;
+
+                    document.getElementById('form-fase2').style.display = 'none';
+                    document.getElementById('form-fase-success').style.display = 'block';
+                    logStatus(`TRACE: Fase 2 completada para inscrito ${regInscritoId}.`, "TRACE");
+                } catch (err) {
+                    logStatus(`ERROR: Fallo UPDATE Fase 2 -> ${err.message}`, "ERROR");
+                    alert('No pudimos guardar tu cédula/autorización. Intenta de nuevo.');
+                } finally {
+                    submitBtn.disabled = false; submitBtn.innerText = originalText;
+                }
+            }
+        });
+        // === FIN SEGMENTO FORMULARIO DUAL-PHASE ===
+
 
 
         // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
