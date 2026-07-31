@@ -712,50 +712,42 @@
     box-sizing: border-box;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-/* -------------------------------------------------------------------
-   10. RESPONSIVE ADAPTABILITY
-   ------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-    .tpl-f1 #template-container, .tpl-f1 #template-container {
-        flex-direction: column;
+/* ============================================================================
+   10. RESPONSIVE ADAPTABILITY — Fix Crítico 400px (.tpl-f1)
+   ============================================================================ */
+@media (max-width: 1023px) {
+    /* 1. Reset de anclajes f1 */
+    .tpl-f1 #main-content-flow {
+        display: block !important; /* Salida del modo Split-Screen */
+        overflow-x: hidden;
     }
-    .tpl-f1 .hero-sidebar, .tpl-f1 .hero-sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 3rem 2rem;
-        border-right: none;
-        border-bottom: 1px solid var(--tpl-accent);
+
+    /* 2. Ajuste de Título para evitar desborde */
+    .tpl-f1 #event-title {
+        font-size: clamp(2rem, 8vw, 3.2rem) !important;
+        padding: 0 1rem;
+        word-wrap: break-word;
     }
-    .tpl-f1 .content-scroll, .tpl-f1 .content-scroll {
-        width: 100%;
-        margin-left: 0;
+
+    /* 3. FIX META-DATA (Evita que la página se vea cortada) */
+    .tpl-f1 .hero-meta {
+        gap: 1.5rem 1rem !important; /* Reducción de gap horizontal de 5rem a 1rem */
+        padding: 0 1rem !important;
+        justify-content: space-around !important;
     }
-    .tpl-f1 .lineup-grid, .tpl-f1 .lineup-grid,
-    .tpl-f1 .media-grid, .tpl-f1 .media-grid {
-        grid-template-columns: 1fr;
+
+    .tpl-f1 .meta-item {
+        font-size: 0.9rem !important; /* Reducción de masa crítica Geist */
+        letter-spacing: 2px !important; /* Respiro tipográfico contenido */
     }
-    .tpl-f1 .unified-countdown-frame, .tpl-f1 .unified-countdown-frame {
-        padding: 1.2rem;
-        gap: 0.8rem;
-    }
-    .tpl-f1 .cd-block, .tpl-f1 .cd-block {
-        padding: 0 0.6rem;
+
+    /* 4. Ajuste de Formulario f1 */
+    .tpl-f1 .form-master-box {
+        margin: -5vh 1rem 2rem !important; /* Superposición controlada */
+        padding: 2rem 1.5rem !important;
+        width: calc(100% - 2rem) !important;
     }
 }
-
-
 
 
 
