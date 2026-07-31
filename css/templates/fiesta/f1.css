@@ -991,21 +991,33 @@
     margin-bottom: 1.5rem; width: 100%;
 }
 
-/* ELIMINAR LÍNEA DIVISORIA TRAS EL PÓSTER (BLINDAJE TOTAL) */
+/* ============================================================================
+   ELIMINAR LÍNEA DIVISORIA VÍDEO-PÓSTER (v1.7.5-GOLD)
+   ============================================================================ */
+
+/* 1. Anular borde de la sección de Video (que está arriba del póster) */
+.tpl-f1 #mod-video, 
+.tpl-f1 #modulo-video {
+    border-bottom: none !important;
+    padding-bottom: 2rem !important; /* Reduce el aire para acercar los bloques */
+}
+
+/* 2. Anular borde de la sección de Lineup/Póster */
 .tpl-f1 #mod-lineup, 
 .tpl-f1 #modulo-lineup {
-    border-bottom: none !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* FIX ADICIONAL: Quitar borde superior del siguiente módulo (Playlist) */
-.tpl-f1 #mod-playlist,
-.tpl-f1 #modulo-playlist {
     border-top: none !important;
-    padding-top: 2rem !important; /* Mantiene el aire visual sin la línea */
+    padding-top: 2rem !important;
 }
 
+/* 3. FIX BASELINE: Eliminar la línea vertical del HTML que se ve en móvil */
+@media (max-width: 1023px) {
+    .tpl-f1 #mod-lineup > div > div:first-child,
+    .tpl-f1 #modulo-lineup > div > div:first-child {
+        border-right: none !important; /* Quita la raya vertical heredada de v108 */
+        padding-right: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
 /* ===================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    =================================================================== */
