@@ -715,12 +715,39 @@
 /* ============================================================================
    10. RESPONSIVE ADAPTABILITY — Fix Crítico 400px (.tpl-f1)
    ============================================================================ */
-@media (max-width: 1023px) {
-    /* 1. Reset de anclajes f1 */
-    .tpl-f1 #main-content-flow {
-        display: block !important; /* Salida del modo Split-Screen */
-        overflow-x: hidden;
+
+/* ============================================================================
+   FIX CRÍTICO: REORDENAMIENTO FORZADO MÓVIL (f1 v1.6.9-GOLD)
+   ============================================================================ */
+    @media (max-width: 1023px) {
+        .tpl-f1 #main-content-flow {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            /* SECUENCIA SUPREMA: El formulario pisa al Hero */
+            grid-template-areas: 
+                "hero"
+                "form"        /* <--- EL FORMULARIO SUBE AQUÍ */
+                "countdown"
+                "meta"
+                "video"
+                "lineup"
+                "playlist"
+                "info"
+                "faq"
+                "ubicacion"
+                "sponsors" !important;
+            row-gap: 0 !important;
+        }
+
+        /* Anclaje físico del ID al área */
+        .tpl-f1 #mod-form { 
+            grid-area: form !important; 
+            z-index: 50 !important;
+        }
     }
+
+
+   
 
     /* 2. Ajuste de Título para evitar desborde */
     .tpl-f1 #event-title {
@@ -729,11 +756,7 @@
         word-wrap: break-word;
     }
 
-    /* 3. SOLAPAMIENTO AGRESIVO: El formulario sube más sobre el fondo */
-    .tpl-f1 #mod-form {
-        grid-area: form !important; /* <--- AGREGA ESTA LÍNEA AQUÍ */
-        z-index: 30; 
-    }
+   
 
 
     /* 3. FIX META-DATA (Evita que la página se vea cortada) */
