@@ -50,12 +50,10 @@
         <!-- Nav decorativo NO-atómico (no forma parte del Contrato v108/v110): navegación
              de anclas simples a secciones ya existentes. No introduce IDs de datos nuevos. -->
         <nav class="hero-nav">
-            <a href="#mod-hero">La Causa</a>
+            <a href="#mod-historia">Historia</a>
             <a href="#mod-mapa-crisis">Emergencia</a>
             <a href="#mod-como-ayudar">Ayuda</a>
-            <a href="#mod-historia">Historia</a>
             <a href="#mod-impacto-historico">Impacto</a>
-            <a href="#mod-actualizaciones">Actualizaciones</a>
             <a href="#mod-video">Galería</a>
             <a href="#mod-faq">FAQ</a>
             <a href="#mod-form" class="hero-nav-cta">Únete a la Red</a>
@@ -131,15 +129,9 @@
         <!-- MÓDULO EXTENDIDO: HISTORIA (narrativa de la causa/evento) -->
         <section id="mod-historia">
             <div class="historia-inner" style="max-width:900px; margin:0 auto; text-align:center;">
-                <span class="b5-num-eyebrow historia-eyebrow" data-num="04">Historia</span>
-                <!-- Átomos originales v107 (Cero Borrado): permanecen en el DOM; ocultos
-                     solo en b5 vía CSS porque este silo usa el nuevo #db-historia-lista
-                     aditivo para soportar varios hitos narrativos (ver landing-escritorio.jpg). -->
                 <h2 id="db-historia-titulo" style="font-weight:900; text-transform:uppercase;">--</h2>
                 <img id="db-historia-img" src="" alt="" style="width:100%; max-width:700px; border-radius:15px; margin:2rem auto; display:block;" onerror="this.style.display='none';">
                 <p id="db-historia-texto" style="line-height:1.8; opacity:0.85;">--</p>
-                <!-- NUEVO ÁTOMO ADITIVO (v222): lista de hitos narrativos numerados -->
-                <div id="db-historia-lista" class="historia-lista"></div>
             </div>
         </section>
 
@@ -161,9 +153,6 @@
         <!-- MÓDULO EXTENDIDO: IMPACTO (grid de niveles/tarjetas de donación) -->
         <section id="mod-impacto">
             <div id="db-impacto-grid" class="impacto-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:1.5rem; max-width:1100px; margin:0 auto;"></div>
-            <!-- NUEVO ÁTOMO ADITIVO (v222): resumen del sismo + link reubicado desde #mod-mapa-crisis -->
-            <p id="db-mapa-crisis-resumen" class="mapacrisis-resumen">--</p>
-            <a href="#mod-ubicacion" id="db-mapa-crisis-link" class="mapacrisis-link" onclick="event.preventDefault(); document.getElementById('mod-ubicacion')?.scrollIntoView({behavior:'smooth', block:'start'});">Ver mapa ampliado →</a>
         </section>
         <!-- ======================= FIN EXTENSIÓN ADITIVA ================= -->
 
@@ -175,16 +164,9 @@
              mantiene su propio tamaño (16:9 para video, min-height:400px
              para playlist, ver p5.css) [cite: 11, 12] -->
         <section id="mod-video">
-            <div class="b5-video-col b5-video-col--gallery">
-                <span class="b5-num-eyebrow" data-num="06">Galería de memoria</span>
-                <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
-                <span class="video-col-link">Ver más fotos y videos →</span>
-            </div>
-            <div class="b5-video-col b5-video-col--video">
-                <span class="b5-num-eyebrow" data-num="07">Video documental</span>
-                <div style="max-width: 1100px; margin: 0 auto;">
-                    <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--gold); overflow: hidden;"></div>
-                </div>
+            <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
+            <div style="max-width: 1100px; margin: 0 auto;">
+                <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--gold); overflow: hidden;"></div>
             </div>
         </section>
 
@@ -228,7 +210,7 @@
 
         <!-- MÓDULO 6A: FAQ (split v1.4.8 de #mod-faq-ubicacion, para que FAQ y Ubicación sean hermanos planos independientes) -->
         <section id="mod-faq">
-            <span class="b5-num-eyebrow" data-num="09">Preguntas frecuentes</span>
+            <h2>FAQ</h2>
             <div id="db-faq-list"></div>
         </section>
 
@@ -247,8 +229,8 @@
              intactos; los campos nuevos son aditivos dentro del mismo átomo. -->
         <section id="mod-form">
             <div class="form-master-box">
+                <div class="form-tabs"><button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">SÚMATE A LA RED</button><button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button></div>
                 <div id="form-nuevo">
-                    <h2 class="form-titulo">Súmate a la red de solidaridad</h2>
                     <p class="form-lead">Cada evento es un acto de solidaridad que transforma vidas. Cuéntanos cómo quieres ayudar.</p>
                     <form id="master-reg-form" novalidate>
                         <div id="fase1-fields">
@@ -290,6 +272,7 @@
                         </div>
                     </form>
                 </div>
+                <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *"><button class="btn-submit" onclick="alert('Sistema de verificación operativo.')">VERIFICAR →</button></div>
             </div>
         </section>
 
@@ -318,17 +301,19 @@
         <footer id="mod-footer">
             <div class="footer-inner">
                 <div class="footer-brand">
-                    <span id="footer-brand-mark" class="footer-brand-mark" aria-hidden="true"></span>
                     <span id="footer-org-name">--</span>
                     <p id="footer-tagline">--</p>
                 </div>
                 <div class="footer-col">
-                    <h4>Enlaces</h4>
+                    <h4>Enlaces rápidos</h4>
                     <ul id="db-footer-links" class="footer-links"></ul>
                 </div>
                 <div class="footer-col">
                     <h4>Síguenos</h4>
                     <div id="db-footer-social" class="footer-social"></div>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
                     <div id="db-footer-contacto" class="footer-contacto"></div>
                 </div>
             </div>
@@ -350,20 +335,21 @@
         <!-- MÓDULO EXTENDIDO: MAPA DE CRISIS (visualización ilustrativa del área afectada) -->
         <section id="mod-mapa-crisis">
             <div class="mapacrisis-inner">
-                <span class="b5-num-eyebrow mapacrisis-eyebrow" data-num="02">Estado de emergencia <em>(en tiempo real)</em></span>
+                <span class="mapacrisis-eyebrow">Estado de emergencia <em>(en tiempo real)</em></span>
                 <div id="db-mapa-crisis-svg" class="mapacrisis-svg-wrap"></div>
                 <div class="mapacrisis-legend">
                     <span><i class="mapacrisis-dot mapacrisis-dot--epicentro"></i>Epicentro</span>
                     <span><i class="mapacrisis-dot mapacrisis-dot--zona"></i>Zona afectada</span>
                     <span><i class="mapacrisis-dot mapacrisis-dot--falla"></i><span id="db-mapa-crisis-falla">--</span></span>
                 </div>
+                <a href="#mod-ubicacion" id="db-mapa-crisis-link" class="mapacrisis-link" onclick="event.preventDefault(); document.getElementById('mod-ubicacion')?.scrollIntoView({behavior:'smooth', block:'start'});">Ver mapa ampliado →</a>
             </div>
         </section>
 
         <!-- MÓDULO EXTENDIDO: CÓMO AYUDAR (categorías de colaboración) -->
         <section id="mod-como-ayudar">
             <div class="comoayudar-inner">
-                <span class="b5-num-eyebrow comoayudar-eyebrow" data-num="03">¿Cómo puedo ayudar? <em>(sinergia cultural)</em></span>
+                <span class="comoayudar-eyebrow">¿Cómo puedo ayudar? <em>(sinergia cultural)</em></span>
                 <p id="db-como-ayudar-lead" class="comoayudar-lead">--</p>
                 <div id="db-como-ayudar-grid" class="comoayudar-grid"></div>
             </div>
@@ -372,7 +358,7 @@
         <!-- MÓDULO EXTENDIDO: IMPACTO HISTÓRICO (segundo bloque de métricas + frase destacada) -->
         <section id="mod-impacto-historico">
             <div class="impactohist-inner">
-                <span class="b5-num-eyebrow impactohist-eyebrow" data-num="05">Impacto hasta hoy</span>
+                <span class="impactohist-eyebrow">Impacto hasta hoy</span>
                 <div id="db-impacto-historico-grid" class="impacto-grid impactohist-grid"></div>
                 <div class="impactohist-banner">
                     <span id="db-impacto-historico-frase">--</span>
@@ -380,25 +366,6 @@
             </div>
         </section>
         <!-- ==================== FIN EXTENSIÓN ADITIVA III ================= -->
-
-        <!-- ============================================================
-             EXTENSIÓN ADITIVA IV DEL CONTRATO (v222 · Contrato v110 → v111)
-             1 átomo nuevo, genérico y reutilizable: diario de actualizaciones
-             (carrusel de tarjetas de noticias/hitos). Nace de "landing-escritorio.jpg"
-             (paridad visual absoluta) pero no es exclusivo de b5. Oculto por defecto
-             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
-
-        <!-- MÓDULO EXTENDIDO: ACTUALIZACIONES (diario de impacto / carrusel de noticias) -->
-        <section id="mod-actualizaciones">
-            <div class="actualizaciones-inner">
-                <div class="actualizaciones-head">
-                    <span class="b5-num-eyebrow actualizaciones-eyebrow" data-num="08">Actualizaciones <em>(diario de impacto)</em></span>
-                    <span class="actualizaciones-vertodas">Ver todas las actualizaciones →</span>
-                </div>
-                <div id="db-actualizaciones-grid" class="actualizaciones-grid"></div>
-            </div>
-        </section>
-        <!-- ==================== FIN EXTENSIÓN ADITIVA IV ================= -->
 
     </main>
 
@@ -423,6 +390,15 @@
                 return new Date(`${a}-${m}-${d}T${timeStr}`);
             }
             return new Date(`${dateStr}T${timeStr}`);
+        }
+
+        function switchForm(type) {
+            const isNew = type === 'nuevo';
+            document.getElementById('tab-new').classList.toggle('active', isNew);
+            document.getElementById('tab-old').classList.toggle('active', !isNew);
+            document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
+            document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
+            logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
         }
 
         // === INICIO SEGMENTO: FORMULARIO DUAL-PHASE (v221) ===
@@ -622,29 +598,12 @@
                 // MAPEO DE HERO & METADATA
                 document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                // BUG HISTÓRICO CORREGIDO (v222): esta línea estaba comentada, así que la fecha
-                // real de Supabase nunca llegaba a #meta-fecha (se quedaba en el placeholder
-                // hardcodeado del HTML). Se capitaliza para mantener consistencia visual.
-                if (ev.fecha && document.getElementById('meta-fecha')) {
-                    document.getElementById('meta-fecha').innerText = ev.fecha.replace(/\b\w/g, c => c.toUpperCase());
-                }
-                // BUG HISTÓRICO CORREGIDO (v222): el sufijo " HRS" no coincide con el estándar
-                // "(HORA LOCAL)" del diseño de referencia (landing-escritorio.jpg).
-                if (document.getElementById('meta-hora')) {
-                    document.getElementById('meta-hora').innerText = `${ev.hora} (HORA LOCAL)`;
-                }
+ //               document.getElementById('meta-fecha').innerText = ev.fecha;
+                document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
                 const magnitudVal = ev.magnitud || content.magnitud;
                 if (document.getElementById('meta-magnitud')) document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
-
-                // BUG HISTÓRICO CORREGIDO (v222 / Incidencia 01 de ERRORES_HISTORICOS.md):
-                // #event-description nunca se inyectaba desde JS en ninguna versión anterior;
-                // el párrafo del Hero quedaba vacío ("--") de forma permanente.
-                if (document.getElementById('event-description')) {
-                    document.getElementById('event-description').innerText = ev.descripcion || content.descripcion
-                        || 'Sismo 7.5 Mw que sacudió la costa central de Venezuela. Nuestra cultura se une para ayudar, hoy y siempre.';
-                }
 
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
   // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
@@ -694,31 +653,6 @@
 
 
 
-    // === INICIO SEGMENTO: GALERÍA DE MEMORIA CON FALLBACK (v222) ===
-    // BUG HISTÓRICO CORREGIDO: #db-gallery-grid existía en el HTML pero ningún
-    // segmento de JS lo alimentaba; el módulo quedaba permanentemente vacío.
-    let galeriaList = Array.isArray(content.gallery) ? content.gallery : [];
-    let isGaleriaFallback = false;
-    if (galeriaList.length === 0) {
-        // Sin fotos reales todavía en Supabase: se muestran 8 placeholders neutros
-        // en vez de depender de un host externo (Silent Fallback, ADR-008).
-        galeriaList = new Array(8).fill(null);
-        isGaleriaFallback = true;
-    }
-    const galeriaGridEl = document.getElementById('db-gallery-grid');
-    if (galeriaGridEl) {
-        galeriaGridEl.innerHTML = galeriaList.map((item) => {
-            const url = (item && (item.url || item)) || '';
-            if (url) {
-                return `<div class="gallery-thumb"><img src="${url}" alt="" loading="lazy" onerror="this.closest('.gallery-thumb').classList.add('gallery-thumb--empty'); this.remove();"></div>`;
-            }
-            return `<div class="gallery-thumb gallery-thumb--empty"></div>`;
-        }).join('');
-        const galStatus = isGaleriaFallback ? `Galería de REFERENCIA/FALLBACK (${galeriaList.length} espacios)` : `Galería REAL (${galeriaList.length} fotos)`;
-        logStatus(`TRACE: ${galStatus} inyectada.`, "TRACE");
-    }
-    // === FIN SEGMENTO GALERÍA ===
-
     // 2. Sincronía Spotify 1:1 [cite: 462, 767]
     if (content.playlist_url) {
         const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
@@ -750,33 +684,6 @@
         if (histImgUrl) { histImgEl.src = histImgUrl; } else { histImgEl.style.display = 'none'; }
     }
     logStatus(`TRACE: Historia ${isHistoriaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada.`, "TRACE");
-
-    // NUEVO ÁTOMO ADITIVO (v222): #db-historia-lista — varios hitos narrativos numerados
-    // (ej. "01 El terremoto", "02 Nuestra misión"), como en landing-escritorio.jpg.
-    // No reemplaza los campos legacy de arriba: si content.historia_items no viene de
-    // Supabase, se usa un fallback de 2 hitos en vez del fallback legacy de un solo bloque.
-    let historiaItemsList = Array.isArray(content.historia_items) ? content.historia_items : [];
-    let isHistoriaItemsFallback = false;
-    if (historiaItemsList.length === 0) {
-        historiaItemsList = [
-            { titulo: 'El terremoto', texto: 'El 24 de junio de 2026, a las 11:56 a.m., un sismo de 7.5 Mw sacudió violentamente la costa central en Catia La Mar. Miles perdieron sus hogares, pero nuestra gente no ha perdido la esperanza. Catia La Mar, La Guaira es una de las zonas más golpeadas por este desastre.' },
-            { titulo: 'Nuestra misión: red de ayuda continua', texto: 'Sonidos por el Cambio nace para convertir la cultura en una red de apoyo permanente. A través de eventos culturales en simultáneo, creamos conexión y esperanza. Juntos, la cultura no solo se expresa: se convierte en ayuda que transforma vidas, hoy y siempre.' }
-        ];
-        isHistoriaItemsFallback = true;
-    }
-    const historiaListaEl = document.getElementById('db-historia-lista');
-    if (historiaListaEl) {
-        historiaListaEl.innerHTML = historiaItemsList.map((item, idx) => `
-            <div class="historia-item">
-                <span class="historia-item-num">${String(idx + 1).padStart(2, '0')}</span>
-                <div class="historia-item-body">
-                    <span class="historia-item-titulo">${(item.titulo || '').toUpperCase()}</span>
-                    <p class="historia-item-texto">${item.texto || ''}</p>
-                </div>
-            </div>`).join('');
-        const hiStatus = isHistoriaItemsFallback ? `Hitos de Historia de REFERENCIA/FALLBACK (${historiaItemsList.length})` : `Hitos de Historia REALES (${historiaItemsList.length})`;
-        logStatus(`TRACE: ${hiStatus} inyectados.`, "TRACE");
-    }
     // === FIN SEGMENTO HISTORIA ===
 
     // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
@@ -894,23 +801,6 @@
             </svg>`;
     }
     logStatus(`TRACE: Mapa de crisis ${isMapaCrisisFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (falla: ${fallaVal}).`, "TRACE");
-
-    // NUEVO ÁTOMO ADITIVO (v222): #db-mapa-crisis-resumen — párrafo junto a las 4
-    // estadísticas (#mod-impacto), compuesto con los mismos campos reales que ya
-    // alimentan la caja de metadatos del Hero (fecha, hora, magnitud, ubicación).
-    const resumenEl = document.getElementById('db-mapa-crisis-resumen');
-    if (resumenEl) {
-        const resumenManual = mapaCrisisData.resumen || content.mapa_crisis_resumen;
-        if (resumenManual) {
-            resumenEl.innerText = resumenManual;
-        } else {
-            const magTxt = magnitudVal ? `${magnitudVal} Mw` : '7.5 Mw';
-            const fechaTxt = (ev.fecha || '24 de junio de 2026').replace(/\b\w/g, c => c.toUpperCase());
-            const horaTxt = ev.hora || '11:56 a.m.';
-            const lugarTxt = ev.ubicacion || 'Catia La Mar, La Guaira';
-            resumenEl.innerText = `Un sismo de ${magTxt} sacudió la costa central de Venezuela, el ${fechaTxt} a las ${horaTxt}. Miles de familias lo perdieron todo. ${lugarTxt} es una de las zonas más afectadas.`;
-        }
-    }
     // === FIN SEGMENTO MAPA DE CRISIS ===
 
     // === INICIO SEGMENTO: CÓMO AYUDAR — nuevo átomo v221 (Contrato v109 → v110) ===
@@ -965,34 +855,6 @@
     const ihStatus = isImpactoHistFallback ? `Impacto histórico de REFERENCIA/FALLBACK (${impactoHistCount})` : `Impacto histórico REAL (${impactoHistCount})`;
     logStatus(`TRACE: ${ihStatus} inyectado.`, "TRACE");
     // === FIN SEGMENTO IMPACTO HISTÓRICO ===
-
-    // === INICIO SEGMENTO: ACTUALIZACIONES — nuevo átomo v222 (Contrato v110 → v111) ===
-    let actualizacionesList = Array.isArray(content.actualizaciones) ? content.actualizaciones : [];
-    let isActualizacionesFallback = false;
-    if (actualizacionesList.length === 0) {
-        actualizacionesList = [
-            { categoria: 'Brigada médica', fecha: '24 JUN 2026 · 10:30 AM', titulo: 'Brigada médica en Catia La Mar', resumen: 'Atención gratuita a más de 400 familias afectadas por el sismo.' },
-            { categoria: 'Logística', fecha: '24 JUN 2026 · 08:45 AM', titulo: 'Entrega de kits de higiene en Caraballeda', resumen: 'Más de 600 kits entregados a familias damnificadas.' },
-            { categoria: 'Evento', fecha: '23 JUN 2026 · 09:00 PM', titulo: 'Evento solidario en Caracas', resumen: 'Gracias a la energía de la música recaudamos $12,500 para ayuda.' },
-            { categoria: 'Coordinación', fecha: '23 JUN 2026 · 02:15 PM', titulo: 'Nuevos puntos de acopio activos', resumen: 'Ya contamos con 16 puntos activos en la red de ayuda.' }
-        ];
-        isActualizacionesFallback = true;
-    }
-    const actualizacionesGridEl = document.getElementById('db-actualizaciones-grid');
-    if (actualizacionesGridEl) {
-        actualizacionesGridEl.innerHTML = actualizacionesList.map(item => `
-            <div class="actualizacion-card">
-                <div class="actualizacion-thumb" ${item.imagen ? `style="background-image:url('${item.imagen}')"` : ''}></div>
-                <span class="actualizacion-categoria">${(item.categoria || '').toUpperCase()}</span>
-                <span class="actualizacion-fecha">${item.fecha || ''}</span>
-                <span class="actualizacion-titulo">${item.titulo || ''}</span>
-                <p class="actualizacion-resumen">${item.resumen || ''}</p>
-                <span class="actualizacion-link">Leer más →</span>
-            </div>`).join('');
-        const actStatus = isActualizacionesFallback ? `Actualizaciones de REFERENCIA/FALLBACK (${actualizacionesList.length})` : `Actualizaciones REALES (${actualizacionesList.length})`;
-        logStatus(`TRACE: ${actStatus} inyectadas.`, "TRACE");
-    }
-    // === FIN SEGMENTO ACTUALIZACIONES ===
 
   // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
     // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
@@ -1074,24 +936,14 @@
     if (document.getElementById('footer-tagline')) document.getElementById('footer-tagline').innerText = footerData.tagline || 'Trabajamos por comunidades fuertes, sostenibles y llenas de oportunidades.';
 
     const footerLinksData = Array.isArray(footerData.links) ? footerData.links : [
-        { texto: 'La causa', href: '#mod-hero' },
-        { texto: 'Emergencia', href: '#mod-mapa-crisis' },
-        { texto: 'Ayuda', href: '#mod-como-ayudar' },
-        { texto: 'Historia', href: '#mod-historia' },
-        { texto: 'Impacto', href: '#mod-impacto-historico' },
-        { texto: 'Actualizaciones', href: '#mod-actualizaciones' },
-        { texto: 'Galería', href: '#mod-video' },
-        { texto: 'FAQ', href: '#mod-faq' }
+        { texto: 'La causa', href: '#mod-historia' },
+        { texto: 'Impacto', href: '#mod-impacto' },
+        { texto: 'Actualizaciones', href: '#mod-faq' },
+        { texto: 'Contacto', href: '#mod-ubicacion' }
     ];
     const footerLinksEl = document.getElementById('db-footer-links');
     if (footerLinksEl) {
         footerLinksEl.innerHTML = footerLinksData.map(l => `<li><a href="${l.href || '#'}">${l.texto || ''}</a></li>`).join('');
-    }
-    // Marca decorativa (no es parte del Contrato de Datos): pequeño ícono de onda
-    // de sonido junto al nombre de la organización en el footer.
-    const footerBrandMarkEl = document.getElementById('footer-brand-mark');
-    if (footerBrandMarkEl) {
-        footerBrandMarkEl.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="3" y2="12"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="11" y1="4" x2="11" y2="20"/><line x1="15" y1="7" x2="15" y2="17"/><line x1="19" y1="10" x2="19" y2="14"/></svg>';
     }
 
     const footerSocialData = footerData.social || {};
@@ -1148,9 +1000,8 @@ if (document.getElementById('db-poster-img')) {
     // === FIN SEGMENTO: LINEUP ===
 
    // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
-    {
+    if (content.faq) {
         let faqItems = [];
-        let isFaqFallback = false;
         // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
         if (Array.isArray(content.faq)) {
             faqItems = content.faq;
@@ -1159,19 +1010,6 @@ if (document.getElementById('db-poster-img')) {
                 const [q, a] = l.split('|');
                 return { pregunta: q.trim(), respuesta: a.trim() };
             });
-        }
-        // BUG HISTÓRICO CORREGIDO (v222): este segmento antes solo corría si content.faq
-        // venía de Supabase; sin datos reales el módulo quedaba vacío. Se agrega fallback.
-        if (faqItems.length === 0) {
-            faqItems = [
-                { pregunta: '¿Cómo puedo donar?', respuesta: 'Completa el formulario "Súmate a la Red" con tu WhatsApp; nuestro equipo te contacta con las vías de aporte disponibles.' },
-                { pregunta: '¿A dónde se envían los recursos?', respuesta: 'Directamente a los puntos de acopio activos en los estados afectados, priorizando Catia La Mar y La Guaira.' },
-                { pregunta: '¿Cómo funciona el Pasaporte Solidario QR?', respuesta: 'Cada persona que se suma recibe un código QR de seguimiento para conocer en qué se usó su aporte.' },
-                { pregunta: '¿Cómo puedo verificar el impacto?', respuesta: 'Publicamos actualizaciones periódicas en la sección "Actualizaciones" con cifras y evidencia de cada brigada.' },
-                { pregunta: '¿Cómo se validan las ayudas?', respuesta: 'Trabajamos junto a organizaciones locales que verifican la entrega directa a las familias afectadas.' },
-                { pregunta: '¿Puedo ser voluntario desde el extranjero?', respuesta: 'Sí — puedes apoyar como embajador cultural, difundiendo la campaña o aportando recursos a distancia.' }
-            ];
-            isFaqFallback = true;
         }
 
         if (faqItems.length > 0) {
@@ -1186,8 +1024,7 @@ if (document.getElementById('db-poster-img')) {
                 </div>`).join('');
             
             // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
-            const faqStatus = isFaqFallback ? `FAQ de REFERENCIA/FALLBACK (${faqItems.length} preguntas)` : `FAQ REAL (${faqItems.length} preguntas)`;
-            logStatus(`TRACE: ${faqStatus} inyectado.`, "TRACE");
+            logStatus(`TRACE: FAQ inyectado satisfactoriamente (${faqItems.length} preguntas).`, "TRACE");
         }
     }
     // === FIN SEGMENTO FAQ ===
@@ -1265,9 +1102,7 @@ if (document.getElementById('db-poster-img')) {
                 // para la campaña "Emergencia por Venezuela" (b5) pero genéricos y reutilizables
                 // por cualquier categoría futura que necesite crisis en tiempo real, categorías
                 // de colaboración, o un histórico de impacto separado del objetivo económico.
-                // v222: Contrato extendido a 21 átomos (v110 → v111, aditivo, no-breaking).
-                // Se agrega mod-actualizaciones (diario de impacto / carrusel de noticias).
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico', 'mod-actualizaciones'];
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 
