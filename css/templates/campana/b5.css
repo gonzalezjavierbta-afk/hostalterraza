@@ -580,5 +580,45 @@
     padding: 0 2rem !important;
 }
 
+/* ============================================================================
+   REORGANIZACIÓN DE IMPACTO HISTÓRICO: HORIZONTAL + BANNER (v2.4.0-GOLD)
+   ============================================================================ */
 
+/* 1. Forzar 4 columnas horizontales en Escritorio */
+.tpl-b5 .impactohist-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; 
+    gap: 1rem !important;
+}
+
+/* 2. Ajuste de tarjetas de métrica para este bloque */
+.tpl-b5 #mod-impacto-historico .impacto-card--metrica {
+    padding: 1.2rem 1rem !important;
+    min-height: auto !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+.tpl-b5 #mod-impacto-historico .impacto-valor {
+    font-size: 1.8rem !important; /* Tamaño optimizado para 4 columnas */
+}
+
+/* 3. Banner de Cultura: Sincronía Inferior */
+.tpl-b5 .impactohist-banner {
+    margin-top: 1.5rem !important;
+    padding: 3rem 2rem !important;
+    background: var(--b5-red) !important;
+    border-radius: 12px !important;
+    /* Efecto Waveform (opcional si Supabase envía la imagen de fondo) */
+    background-image: url('https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/waveform-overlay.png');
+    background-size: cover;
+    background-position: center;
+}
+
+/* 4. Responsive: Colapso en Tablet/Mobile */
+@media (max-width: 1024px) {
+    .tpl-b5 .impactohist-grid {
+        grid-template-columns: repeat(2, 1fr) !important; /* 2x2 en tablets */
+    }
+}
 
