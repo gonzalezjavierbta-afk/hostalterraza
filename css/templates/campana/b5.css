@@ -113,7 +113,11 @@
    ============================================================================ */
 .tpl-b5 #mod-hero {
     position: relative;
-    min-height: 460px;
+    /* Soberanía del Hero (Context Package v4.0.0-GOLD): inmersión total.
+       100vh como base universal + 100svh donde el navegador lo soporta,
+       para no quedar recortado por la barra de UI de Safari/Chrome mobile. */
+    min-height: 100vh;
+    min-height: 100svh;
     padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
     background-color: #1a1a1a;
     background-size: cover;
@@ -251,6 +255,7 @@
 
 .tpl-b5 #master-reg-form input[type="text"],
 .tpl-b5 #master-reg-form input[type="tel"],
+.tpl-b5 #master-reg-form input[type="email"],
 .tpl-b5 #master-reg-form select {
     width: 100%; padding: 1rem 1.1rem; margin-bottom: 0;
     background: var(--b5-bg); color: var(--b5-ink);
@@ -283,7 +288,12 @@
     text-align: center; font-weight: 700; color: var(--b5-ink); padding: 1rem 0;
 }
 /* #form-fase2 (perfilamiento in-place): hereda el mismo ancho de columna única */
-.tpl-b5 #form-fase2 input[type="text"] { margin-bottom: 1rem; }
+.tpl-b5 #form-fase2 input[type="text"],
+.tpl-b5 #form-fase2 input[type="email"] { margin-bottom: 1rem; }
+/* Bloques de preguntas por categoría (Contrato v112): mismo look que el resto
+   del formulario; display:none/block se controla por JS (mostrarBloqueFase2). */
+.tpl-b5 .fase2-cat-block input,
+.tpl-b5 .fase2-cat-block select { margin-bottom: 1rem; width: 100%; }
 
 /* ============================================================================
    5. ESTADO DE EMERGENCIA — mapa-crisis + impacto (comparten fila)
@@ -321,7 +331,30 @@
     color: var(--b5-ink-soft); font-size: 0.85rem; letter-spacing: 0.02em;
 }
 
-.tpl-b5 .mapacrisis-svg-wrap { max-width: 420px; margin: 0 auto; }
+/* Textura satelital (Context Package v4.0.0-GOLD, req. II.2): placeholder de
+   terreno bajo los anillos sísmicos mientras se recibe un asset real. Es un
+   patrón CSS generado (sin imagen externa) para no romper Silent Fallback
+   (ADR-008) ni depender de una URL que aún no existe. Cuando llegue el asset
+   satelital real, reemplazar background por background-image: url('...')
+   manteniendo el overlay oscuro para legibilidad de los anillos rojos. */
+.tpl-b5 .mapacrisis-svg-wrap {
+    max-width: 420px; margin: 0 auto;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(154,154,160,0.16) 0%, transparent 45%),
+        radial-gradient(circle at 72% 68%, rgba(154,154,160,0.12) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 26px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 26px),
+        #16181c;
+}
+.tpl-b5 .mapacrisis-svg-wrap::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 35%, rgba(10,10,10,0.35) 100%);
+    pointer-events: none;
+}
 .tpl-b5 .mc-ring { fill: none; stroke: var(--b5-red); }
 .tpl-b5 .mc-ring--outer { stroke-opacity: 0.10; }
 .tpl-b5 .mc-ring--mid { stroke-opacity: 0.18; }
@@ -476,7 +509,13 @@
     font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
     padding: 0.28rem 0.6rem; border-radius: 4px;
 }
-.tpl-b5 .actualizacion-fecha { margin: 0.7rem 1.1rem 0; font-size: 0.7rem; color: var(--b5-ink-soft); font-weight: 700; }
+.tpl-b5 .actualizacion-categoria {
+    display: inline-block; margin: 0.9rem 1.1rem 0; padding: 0.2rem 0.55rem;
+    background: rgba(225, 29, 72, 0.1); color: var(--b5-red);
+    font-size: 0.64rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+    border-radius: 5px;
+}
+.tpl-b5 .actualizacion-fecha { margin: 0.5rem 1.1rem 0; font-size: 0.7rem; color: var(--b5-ink-soft); font-weight: 700; }
 .tpl-b5 .actualizacion-titulo { display: block; margin: 0.4rem 1.1rem 0; font-weight: 900; font-size: 0.92rem; line-height: 1.35; }
 .tpl-b5 .actualizacion-resumen {
     margin: 0.5rem 1.1rem 0; color: var(--b5-ink-soft); font-size: 0.82rem; line-height: 1.5; flex-grow: 1;

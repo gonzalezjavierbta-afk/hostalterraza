@@ -282,6 +282,7 @@
                                 <option value="artista">Artista — mi talento</option>
                                 <option value="marca">Marca — mi marca deja huella</option>
                                 <option value="voluntario">Voluntario — mi tiempo</option>
+                                <option value="donacion">Donación — mi aporte</option>
                             </select>
                             <button type="submit" class="btn-submit">QUIERO SUMARME →</button>
                             <span class="form-security-note">🔒 Es rápido, seguro y gratuito.</span>
@@ -289,6 +290,59 @@
                         <div id="form-fase2" style="display:none;">
                             <p class="form-lead">Un último paso para verificar tu registro.</p>
                             <input type="text" id="reg-cedula" placeholder="Cédula *" required>
+                            <input type="email" id="reg-email" placeholder="Correo electrónico *" required>
+
+                            <!-- Contrato Ramificado v112 (Context Package v4.0.0-GOLD): 5 bloques de
+                                 perfilamiento, uno por categoría de reg-tipo-ayuda. Cero Borrado: los
+                                 5 bloques permanecen siempre en el DOM; JS solo muestra el activo vía
+                                 display:none/block (ver mostrarBloqueFase2 más abajo). -->
+                            <div id="fase2-cat-espacio" class="fase2-cat-block" style="display:none;">
+                                <input type="text" id="reg-espacio-direccion" placeholder="Dirección exacta del espacio *">
+                                <input type="text" id="reg-espacio-aforo" placeholder="Aforo aproximado *">
+                                <select id="reg-espacio-sonido">
+                                    <option value="" disabled selected>¿Tiene equipo de sonido?</option>
+                                    <option value="si">Sí</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            <div id="fase2-cat-artista" class="fase2-cat-block" style="display:none;">
+                                <input type="text" id="reg-artista-portafolio" placeholder="Instagram / portafolio *">
+                                <input type="text" id="reg-artista-especialidad" placeholder="Especialidad artística *">
+                                <input type="text" id="reg-artista-requerimiento" placeholder="Requerimiento técnico">
+                            </div>
+                            <div id="fase2-cat-marca" class="fase2-cat-block" style="display:none;">
+                                <input type="text" id="reg-marca-tipoapoyo" placeholder="Tipo de apoyo que ofreces *">
+                                <select id="reg-marca-logo">
+                                    <option value="" disabled selected>¿Tu marca tiene logo para exhibir?</option>
+                                    <option value="si">Sí</option>
+                                    <option value="no">No</option>
+                                </select>
+                                <input type="text" id="reg-marca-cargo" placeholder="Tu cargo en la marca *">
+                            </div>
+                            <div id="fase2-cat-voluntario" class="fase2-cat-block" style="display:none;">
+                                <input type="text" id="reg-voluntario-profesion" placeholder="Profesión / oficio *">
+                                <input type="text" id="reg-voluntario-disponibilidad" placeholder="Disponibilidad *">
+                                <select id="reg-voluntario-rescate">
+                                    <option value="" disabled selected>¿Tienes experiencia en rescate?</option>
+                                    <option value="si">Sí</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            <div id="fase2-cat-donacion" class="fase2-cat-block" style="display:none;">
+                                <input type="text" id="reg-donacion-monto" placeholder="Monto proyectado (aprox.) *">
+                                <select id="reg-donacion-canal">
+                                    <option value="" disabled selected>Canal preferido</option>
+                                    <option value="transferencia">Transferencia</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="especie">En especie</option>
+                                </select>
+                                <select id="reg-donacion-certificado">
+                                    <option value="" disabled selected>¿Deseas certificado de donación?</option>
+                                    <option value="si">Sí</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+
                             <label class="form-checkbox">
                                 <input type="checkbox" id="reg-autorizacion" required>
                                 <span>Autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la organización. *</span>
@@ -445,9 +499,9 @@
             if (!item) return;
             const modal = document.getElementById('actualizacion-modal');
             if (!modal) return;
-            document.getElementById('actualizacion-modal-fecha').innerText = item.fecha || '';
-            document.getElementById('actualizacion-modal-detalle').innerText = item.detalle || '';
-            document.getElementById('actualizacion-modal-ampliado').innerText = item.ampliado || '';
+            document.getElementById('actualizacion-modal-fecha').innerText = item.categoria ? `${item.categoria} · ${item.fecha || ''}` : (item.fecha || '');
+            document.getElementById('actualizacion-modal-detalle').innerText = item.titulo || '';
+            document.getElementById('actualizacion-modal-ampliado').innerText = item.resumen || '';
             const img = document.getElementById('actualizacion-modal-img');
             if (item.imagen) { img.src = item.imagen; img.style.display = 'block'; }
             else { img.removeAttribute('src'); img.style.display = 'none'; }
@@ -475,15 +529,32 @@
             return new Date(`${dateStr}T${timeStr}`);
         }
 
-        // === INICIO SEGMENTO: FORMULARIO DUAL-PHASE (v221) ===
+        // === INICIO SEGMENTO: FORMULARIO RAMIFICADO DUAL-PHASE (v222 → Contrato v112) ===
         // Fase 1 -> INSERT en 'inscritos' (nombre, whatsapp, tipo_ayuda). Si tiene éxito,
-        // revela Fase 2 sin recargar. Fase 2 -> UPDATE del mismo registro (cedula,
-        // autorizacion, respuestas_custom), usando el id devuelto por el INSERT.
-        // ASUNCIÓN A VERIFICAR (ver nota de Dirección 30-jul-2026): nombres de columna
-        // 'evento_id', 'org_id', 'nombre', 'whatsapp', 'tipo_ayuda', 'cedula',
-        // 'autorizacion', 'respuestas_custom' en la tabla `inscritos`.
+        // revela Fase 2 sin recargar y muestra el bloque de preguntas de la categoría
+        // elegida. Fase 2 -> UPDATE del mismo registro (cedula, email, autorizacion,
+        // respuestas_custom + las 3 columnas dedicadas de esa categoría), usando el id
+        // devuelto por el INSERT.
+        // Columnas verificadas directamente en admin.html (uso real, no asunción):
+        // 'evento_id', 'org_id', 'nombre', 'whatsapp', 'tipo_ayuda', 'cedula', 'email',
+        // 'autorizacion', 'respuestas_custom' ya existen en `inscritos`.
+        // Columnas NUEVAS (Contrato v112, ver migración SQL adjunta — deben crearse en
+        // Supabase antes de desplegar): espacio_direccion, espacio_aforo,
+        // espacio_tiene_sonido, artista_portafolio, artista_especialidad,
+        // artista_requerimiento_tecnico, marca_tipo_apoyo, marca_tiene_logo, marca_cargo,
+        // voluntario_profesion, voluntario_disponibilidad, voluntario_experiencia_rescate,
+        // donacion_monto_proyectado, donacion_canal_preferido, donacion_desea_certificado.
         let regPhase = 1;
         let regInscritoId = null;
+        let regTipoAyuda = null;
+
+        // Muestra solo el bloque de preguntas de la categoría elegida en Fase 1;
+        // Cero Borrado: los 5 bloques quedan en el DOM, nunca se eliminan del HTML.
+        function mostrarBloqueFase2(tipoAyuda) {
+            document.querySelectorAll('.fase2-cat-block').forEach(el => { el.style.display = 'none'; });
+            const activo = document.getElementById(`fase2-cat-${tipoAyuda}`);
+            if (activo) activo.style.display = 'block';
+        }
 
         document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -515,10 +586,12 @@
                     if (error) throw error;
 
                     regInscritoId = data.id;
+                    regTipoAyuda = tipoAyuda;
                     regPhase = 2;
                     document.getElementById('fase1-fields').style.display = 'none';
                     document.getElementById('form-fase2').style.display = 'block';
-                    logStatus(`TRACE: Fase 1 registrada en 'inscritos' (id ${regInscritoId}).`, "TRACE");
+                    mostrarBloqueFase2(tipoAyuda);
+                    logStatus(`TRACE: Fase 1 registrada en 'inscritos' (id ${regInscritoId}, categoría: ${tipoAyuda}).`, "TRACE");
                 } catch (err) {
                     logStatus(`ERROR: Fallo INSERT Fase 1 -> ${err.message}`, "ERROR");
                     alert('No pudimos procesar tu registro. Por favor intenta de nuevo en unos segundos.');
@@ -527,10 +600,11 @@
                 }
             } else {
                 const cedula = document.getElementById('reg-cedula').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
                 const autorizado = document.getElementById('reg-autorizacion').checked;
 
-                if (!cedula || !autorizado) {
-                    alert('Ingresa tu cédula y acepta la autorización de datos para continuar.');
+                if (!cedula || !email || !autorizado) {
+                    alert('Ingresa tu cédula, correo, y acepta la autorización de datos para continuar.');
                     return;
                 }
                 if (!regInscritoId) {
@@ -539,15 +613,57 @@
                     return;
                 }
 
+                // Recolección de las 3 preguntas especializadas de la categoría activa
+                // (Contrato v112). getVal() tolera inputs/selects ausentes por si el
+                // bloque de otra categoría se está usando; solo se envían las columnas
+                // de regTipoAyuda, el resto de las 15 quedan null en la fila.
+                const getVal = (id) => document.getElementById(id)?.value?.trim() || null;
+                let camposCategoria = {};
+                if (regTipoAyuda === 'espacio') {
+                    camposCategoria = {
+                        espacio_direccion: getVal('reg-espacio-direccion'),
+                        espacio_aforo: getVal('reg-espacio-aforo'),
+                        espacio_tiene_sonido: getVal('reg-espacio-sonido') === 'si'
+                    };
+                } else if (regTipoAyuda === 'artista') {
+                    camposCategoria = {
+                        artista_portafolio: getVal('reg-artista-portafolio'),
+                        artista_especialidad: getVal('reg-artista-especialidad'),
+                        artista_requerimiento_tecnico: getVal('reg-artista-requerimiento')
+                    };
+                } else if (regTipoAyuda === 'marca') {
+                    camposCategoria = {
+                        marca_tipo_apoyo: getVal('reg-marca-tipoapoyo'),
+                        marca_tiene_logo: getVal('reg-marca-logo') === 'si',
+                        marca_cargo: getVal('reg-marca-cargo')
+                    };
+                } else if (regTipoAyuda === 'voluntario') {
+                    camposCategoria = {
+                        voluntario_profesion: getVal('reg-voluntario-profesion'),
+                        voluntario_disponibilidad: getVal('reg-voluntario-disponibilidad'),
+                        voluntario_experiencia_rescate: getVal('reg-voluntario-rescate') === 'si'
+                    };
+                } else if (regTipoAyuda === 'donacion') {
+                    camposCategoria = {
+                        donacion_monto_proyectado: getVal('reg-donacion-monto'),
+                        donacion_canal_preferido: getVal('reg-donacion-canal'),
+                        donacion_desea_certificado: getVal('reg-donacion-certificado') === 'si'
+                    };
+                }
+
                 submitBtn.disabled = true; submitBtn.innerText = 'GUARDANDO...';
                 try {
                     const { error } = await sbClient.from('inscritos').update({
                         cedula: cedula,
+                        email: email,
                         autorizacion: true,
+                        ...camposCategoria,
                         respuestas_custom: {
                             cedula: cedula,
+                            email: email,
                             autorizacion: true,
-                            autorizacion_fecha: new Date().toISOString()
+                            autorizacion_fecha: new Date().toISOString(),
+                            ...camposCategoria
                         }
                     }).eq('id', regInscritoId);
                     if (error) throw error;
@@ -972,7 +1088,9 @@
         espacio:    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>',
         artista:    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
         marca:      '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z"/><circle cx="8" cy="8" r="1.2"/></svg>',
-        voluntario: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>'
+        voluntario: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>',
+        // --- Extensión Context Package v4.0.0-GOLD: 5ta ruta del formulario ramificado ---
+        donacion:   '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
     };
     const comoAyudarData = content.como_ayudar || {};
     const isComoAyudarFallback = !content.como_ayudar;
@@ -981,7 +1099,8 @@
         { titulo: 'Espacios', descripcion: 'Pon tu venue y súmate.', icono: 'espacio', tipo_ayuda: 'espacio' },
         { titulo: 'Artistas', descripcion: 'Tu talento puede salvar.', icono: 'artista', tipo_ayuda: 'artista' },
         { titulo: 'Marcas', descripcion: 'Tu marca deja huella.', icono: 'marca', tipo_ayuda: 'marca' },
-        { titulo: 'Voluntarios', descripcion: 'Tu tiempo transforma.', icono: 'voluntario', tipo_ayuda: 'voluntario' }
+        { titulo: 'Voluntarios', descripcion: 'Tu tiempo transforma.', icono: 'voluntario', tipo_ayuda: 'voluntario' },
+        { titulo: 'Donaciones', descripcion: 'Tu aporte llega directo.', icono: 'donacion', tipo_ayuda: 'donacion' }
     ];
     if (document.getElementById('db-como-ayudar-lead')) document.getElementById('db-como-ayudar-lead').innerText = comoAyudarLead;
     const comoAyudarGridEl = document.getElementById('db-como-ayudar-grid');
@@ -1050,21 +1169,19 @@
     logStatus(`TRACE: ${ihStatus} inyectado.`, "TRACE");
     // === FIN SEGMENTO IMPACTO HISTÓRICO ===
 
-    // === INICIO SEGMENTO: ACTUALIZACIONES — nuevo átomo v222 (Contrato v110 → v111) ===
-    // Corregido (v1.2.6): el campo de Admin para Actualizaciones guardaba {fecha, texto}
-    // (2 segmentos), pero este render siempre esperó {categoria, fecha, titulo, resumen,
-    // imagen} (5 campos) — un desajuste real que hacía que el admin nunca pudiera producir
-    // contenido válido para esta sección. Contrato nuevo, ya alineado en ambos lados:
-    // {fecha, detalle, ampliado, imagen} — se retira "categoría" por mandato de Dirección
-    // y se agrega "ampliado" (cuerpo largo) para el modal de lectura.
+    // === INICIO SEGMENTO: ACTUALIZACIONES — nuevo átomo v222 (Contrato v111 → v112) ===
+    // v1.2.6 había retirado "categoría" del contrato (ver DECISIONS.md ADR anterior).
+    // REVERTIDO por mandato explícito de Dirección (Context Package v4.0.0-GOLD,
+    // ago-2026): se reintroduce "categoria" como 1er segmento. Contrato vigente:
+    // {categoria, fecha, titulo, resumen, imagen} (5 campos, admin.html alineado).
     let actualizacionesList = Array.isArray(content.actualizaciones) ? content.actualizaciones : [];
     let isActualizacionesFallback = false;
     if (actualizacionesList.length === 0) {
         actualizacionesList = [
-            { fecha: '24 JUN 2026 · 10:30 AM', detalle: 'Brigada médica en Catia La Mar', ampliado: 'Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico de la red de solidaridad instaló un punto de atención primaria, entrega de medicamentos básicos y acompañamiento psicológico para quienes perdieron su hogar.' },
-            { fecha: '24 JUN 2026 · 08:45 AM', detalle: 'Entrega de kits de higiene en Caraballeda', ampliado: 'Más de 600 kits de higiene y aseo personal fueron entregados a familias damnificadas en Caraballeda, en coordinación con voluntarios locales y los puntos de acopio activos en la zona.' },
-            { fecha: '23 JUN 2026 · 09:00 PM', detalle: 'Evento solidario en Caracas', ampliado: 'Gracias a la energía de la música recaudamos fondos para ayuda directa. El evento reunió a artistas y marcas aliadas en una noche de solidaridad cultural que transformó en tangible el apoyo a las víctimas del sismo.' },
-            { fecha: '23 JUN 2026 · 02:15 PM', detalle: 'Nuevos puntos de acopio activos', ampliado: 'Ya contamos con 16 puntos de acopio activos en la red de ayuda, distribuidos en los estados más afectados, para centralizar la recepción y distribución de donaciones.' }
+            { categoria: 'Salud', fecha: '24 JUN 2026 · 10:30 AM', titulo: 'Brigada médica en Catia La Mar', resumen: 'Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico de la red de solidaridad instaló un punto de atención primaria, entrega de medicamentos básicos y acompañamiento psicológico para quienes perdieron su hogar.' },
+            { categoria: 'Logística', fecha: '24 JUN 2026 · 08:45 AM', titulo: 'Entrega de kits de higiene en Caraballeda', resumen: 'Más de 600 kits de higiene y aseo personal fueron entregados a familias damnificadas en Caraballeda, en coordinación con voluntarios locales y los puntos de acopio activos en la zona.' },
+            { categoria: 'Cultura', fecha: '23 JUN 2026 · 09:00 PM', titulo: 'Evento solidario en Caracas', resumen: 'Gracias a la energía de la música recaudamos fondos para ayuda directa. El evento reunió a artistas y marcas aliadas en una noche de solidaridad cultural que transformó en tangible el apoyo a las víctimas del sismo.' },
+            { categoria: 'Logística', fecha: '23 JUN 2026 · 02:15 PM', titulo: 'Nuevos puntos de acopio activos', resumen: 'Ya contamos con 16 puntos de acopio activos en la red de ayuda, distribuidos en los estados más afectados, para centralizar la recepción y distribución de donaciones.' }
         ];
         isActualizacionesFallback = true;
     }
@@ -1075,9 +1192,10 @@
         actualizacionesGridEl.innerHTML = actualizacionesList.map((item, idx) => `
             <div class="actualizacion-card" onclick="abrirActualizacionModal(${idx});">
                 <div class="actualizacion-thumb" ${item.imagen ? `style="background-image:url('${item.imagen}')"` : ''}></div>
+                ${item.categoria ? `<span class="actualizacion-categoria">${item.categoria}</span>` : ''}
                 <span class="actualizacion-fecha">${item.fecha || ''}</span>
-                <span class="actualizacion-titulo">${item.detalle || ''}</span>
-                <p class="actualizacion-resumen">${item.ampliado || ''}</p>
+                <span class="actualizacion-titulo">${item.titulo || ''}</span>
+                <p class="actualizacion-resumen">${item.resumen || ''}</p>
                 <span class="actualizacion-link">Leer más →</span>
             </div>`).join('');
         const actStatus = isActualizacionesFallback ? `Actualizaciones de REFERENCIA/FALLBACK (${actualizacionesList.length})` : `Actualizaciones REALES (${actualizacionesList.length})`;
