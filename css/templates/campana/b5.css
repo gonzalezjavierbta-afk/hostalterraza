@@ -115,11 +115,9 @@
 /* ============================================================================
    2. HERO
    ============================================================================ */
+
 .tpl-b5 #mod-hero {
     position: relative;
-    /* Soberanía del Hero (Context Package v4.0.0-GOLD): inmersión total.
-       100vh como base universal + 100svh donde el navegador lo soporta,
-       para no quedar recortado por la barra de UI de Safari/Chrome mobile. */
     min-height: 100vh;
     min-height: 100svh;
     padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
@@ -127,7 +125,15 @@
     background-size: cover;
     background-position: center;
     color: #fff;
+
+    /* --- INYECCIÓN DE ELEVACIÓN v5.3.0 --- */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important; /* Cambiamos centrado por alineación superior */
+    padding-top: 10rem !important;        /* Margen de seguridad para elevar la masa */
 }
+
+
 .tpl-b5 #mod-hero::after {
     content: "";
     position: absolute; inset: 0;
