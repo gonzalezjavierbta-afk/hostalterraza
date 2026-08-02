@@ -739,32 +739,26 @@
     }
 }
 
-/* Ocultación de módulos bajo Protocolo de Cero Borrado */
+/* Intervención Atómica: Ocultación de columna de video y ajuste de layout */
 
-/* .tpl-b5 #mod-video { 
-    display: none !important; 
-} */
-/* Intervención de Layout: Galería a ancho completo sin Video */
-
-/* 1. Forzar el contenedor a una sola columna para eliminar el espacio del video */
-.tpl-b5 #mod-video {
-    display: block !important; /* Cambiamos de grid a bloque simple */
-    padding-top: 0 !important;
-}
-
-/* 2. Esconder físicamente el título (h2) y el contenedor del video */
-.tpl-b5 #mod-video h2,
-.tpl-b5 #mod-video > div:not(#db-gallery-grid) {
+/* 1. Esconde todo el div de la columna de video, incluyendo el título 07 */
+.tpl-b5 .b5-video-col--video {
     display: none !important;
 }
 
-/* 3. Asegurar que la galería use todo el espacio disponible */
+/* 2. Forzar el contenedor padre a bloque para que la galería tome el 100% del ancho */
+.tpl-b5 #mod-video {
+    display: block !important;
+    padding-top: 0 !important;
+}
+
+/* 3. Asegurar que la galería use una rejilla de 4 columnas en escritorio ahora que tiene espacio */
 .tpl-b5 #db-gallery-grid {
-    grid-template-columns: repeat(4, 1fr) !important; /* 4 fotos por fila en escritorio */
+    grid-template-columns: repeat(4, 1fr) !important;
     width: 100% !important;
 }
 
-/* 4. Esconder el footer */
+/* 4. Esconder el footer (requerimiento previo mantenido) */
 .tpl-b5 #mod-footer { 
     display: none !important; 
 }
