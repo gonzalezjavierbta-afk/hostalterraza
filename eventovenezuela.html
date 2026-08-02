@@ -234,7 +234,17 @@
 
         <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
         <section id="mod-ubicacion">
-            <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
+            <span class="b5-num-eyebrow" data-num="10">Ubicación</span>
+            <div class="mapa-wrap">
+                <div id="db-mapa-container" style="border-radius:15px; overflow:hidden;"></div>
+                <!-- Pin de zona afectada (v1.2.6): posición aproximada superpuesta al iframe,
+                     ya que el embed simple de Google Maps no admite overlays reales sin API
+                     key de Maps JS (ver DECISIONS.md). No es georreferenciado con precisión. -->
+                <div class="mapa-zona-pin" title="Zona afectada: Catia La Mar / La Guaira">
+                    <span class="mapa-zona-pin-dot"></span>
+                    <span class="mapa-zona-pin-label">Zona afectada</span>
+                </div>
+            </div>
         </section>
 
         <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
@@ -363,9 +373,14 @@
         <!-- MÓDULO EXTENDIDO: CÓMO AYUDAR (categorías de colaboración) -->
         <section id="mod-como-ayudar">
             <div class="comoayudar-inner">
-                <span class="b5-num-eyebrow comoayudar-eyebrow" data-num="03">¿Cómo puedo ayudar? <em>(sinergia cultural)</em></span>
-                <p id="db-como-ayudar-lead" class="comoayudar-lead">--</p>
-                <div id="db-como-ayudar-grid" class="comoayudar-grid"></div>
+                <div class="comoayudar-col comoayudar-col--main">
+                    <span class="b5-num-eyebrow comoayudar-eyebrow" data-num="03">¿Cómo puedo ayudar? <em>(sinergia cultural)</em></span>
+                    <p id="db-como-ayudar-lead" class="comoayudar-lead">--</p>
+                    <div id="db-como-ayudar-grid" class="comoayudar-grid"></div>
+                </div>
+                <div class="comoayudar-col comoayudar-col--stats">
+                    <div id="db-como-ayudar-stats" class="comoayudar-stats"></div>
+                </div>
             </div>
         </section>
 
@@ -398,6 +413,17 @@
                 <div id="db-actualizaciones-grid" class="actualizaciones-grid"></div>
             </div>
         </section>
+
+        <!-- Modal de lectura ampliada (v1.2.6) — se activa con .actualizacion-link -->
+        <div id="actualizacion-modal" class="actualizacion-modal" onclick="if(event.target===this) cerrarActualizacionModal();">
+            <div class="actualizacion-modal-card">
+                <button type="button" class="actualizacion-modal-cerrar" onclick="cerrarActualizacionModal();" aria-label="Cerrar">×</button>
+                <img id="actualizacion-modal-img" class="actualizacion-modal-img" src="" alt="" style="display:none;">
+                <span id="actualizacion-modal-fecha" class="actualizacion-modal-fecha"></span>
+                <h3 id="actualizacion-modal-detalle" class="actualizacion-modal-detalle"></h3>
+                <p id="actualizacion-modal-ampliado" class="actualizacion-modal-ampliado"></p>
+            </div>
+        </div>
         <!-- ==================== FIN EXTENSIÓN ADITIVA IV ================= -->
 
     </main>
@@ -411,6 +437,30 @@
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
+
+        // === MODAL DE LECTURA AMPLIADA — ACTUALIZACIONES (v1.2.6) ===
+        // window._actualizacionesData se puebla en el segmento de render de Actualizaciones.
+        function abrirActualizacionModal(idx) {
+            const item = (window._actualizacionesData || [])[idx];
+            if (!item) return;
+            const modal = document.getElementById('actualizacion-modal');
+            if (!modal) return;
+            document.getElementById('actualizacion-modal-fecha').innerText = item.fecha || '';
+            document.getElementById('actualizacion-modal-detalle').innerText = item.detalle || '';
+            document.getElementById('actualizacion-modal-ampliado').innerText = item.ampliado || '';
+            const img = document.getElementById('actualizacion-modal-img');
+            if (item.imagen) { img.src = item.imagen; img.style.display = 'block'; }
+            else { img.removeAttribute('src'); img.style.display = 'none'; }
+            modal.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+        }
+        function cerrarActualizacionModal() {
+            const modal = document.getElementById('actualizacion-modal');
+            if (!modal) return;
+            modal.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarActualizacionModal(); });
 
         // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
         function parseSpanishDate(dateStr, timeStr) {
@@ -767,12 +817,13 @@
     const historiaListaEl = document.getElementById('db-historia-lista');
     if (historiaListaEl) {
         historiaListaEl.innerHTML = historiaItemsList.map((item, idx) => `
-            <div class="historia-item">
+            <div class="historia-item${item.imagen ? ' historia-item--conimg' : ''}">
                 <span class="historia-item-num">${String(idx + 1).padStart(2, '0')}</span>
                 <div class="historia-item-body">
                     <span class="historia-item-titulo">${(item.titulo || '').toUpperCase()}</span>
                     <p class="historia-item-texto">${item.texto || ''}</p>
                 </div>
+                ${item.imagen ? `<img class="historia-item-img" src="${item.imagen}" alt="" loading="lazy" onerror="this.remove(); this.closest('.historia-item')?.classList.remove('historia-item--conimg');">` : ''}
             </div>`).join('');
         const hiStatus = isHistoriaItemsFallback ? `Hitos de Historia de REFERENCIA/FALLBACK (${historiaItemsList.length})` : `Hitos de Historia REALES (${historiaItemsList.length})`;
         logStatus(`TRACE: ${hiStatus} inyectados.`, "TRACE");
@@ -817,7 +868,10 @@
         victimas:       '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="15.5" x2="12" y2="15.6"/></svg>',
         desplazados:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
         estados:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
-        municipios:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-6h4v6"/></svg>'
+        municipios:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-6h4v6"/></svg>',
+        // --- Extensión v1.2.6 (Impacto hasta hoy: eventos/asistentes/recaudación) ---
+        eventos:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+        recaudacion:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 15s1 1.5 3 1.5 3-1 3-2.2-1.2-1.8-3-2.3-3-1.1-3-2.3S10 8 12 8s3 1.5 3 1.5M12 6.5v11"/></svg>'
     };
 
     // Renderizador reutilizable de tarjetas de impacto (mismo formato dual usado por
@@ -944,17 +998,47 @@
         const caStatus = isComoAyudarFallback ? `Categorías "Cómo Ayudar" de REFERENCIA/FALLBACK (${comoAyudarList.length})` : `Categorías "Cómo Ayudar" REALES (${comoAyudarList.length})`;
         logStatus(`TRACE: ${caStatus} inyectadas.`, "TRACE");
     }
+
+    // Columna 2 (v1.2.6): métricas de impacto de crisis junto a las tarjetas de roles.
+    // Dato editable desde Admin (campo "¿Cómo puedo ayudar? — métricas"); mientras no se
+    // cargue, se usa el placeholder acordado con Dirección para esta campaña.
+    let comoAyudarStatsList = Array.isArray(comoAyudarData.stats) ? comoAyudarData.stats : [];
+    let isComoAyudarStatsFallback = false;
+    if (comoAyudarStatsList.length === 0) {
+        comoAyudarStatsList = [
+            { valor: '150.000+', etiqueta: 'Personas ayudadas', icono: 'general' },
+            { valor: '10', etiqueta: 'Estados afectados', icono: 'estados' },
+            { valor: '23.000', etiqueta: 'Desplazados', icono: 'desplazados' }
+        ];
+        isComoAyudarStatsFallback = true;
+    }
+    const comoAyudarStatsEl = document.getElementById('db-como-ayudar-stats');
+    if (comoAyudarStatsEl) {
+        comoAyudarStatsEl.innerHTML = comoAyudarStatsList.map(item => `
+            <div class="comoayudar-stat">
+                <div class="comoayudar-stat-icono">${IMPACTO_ICONS[item.icono] || IMPACTO_ICONS.general}</div>
+                <div class="comoayudar-stat-body">
+                    <span class="comoayudar-stat-valor">${item.valor || ''}</span>
+                    <span class="comoayudar-stat-etiqueta">${(item.etiqueta || '').toUpperCase()}</span>
+                </div>
+            </div>`).join('');
+        const casStatus = isComoAyudarStatsFallback ? `Métricas "Cómo Ayudar" de REFERENCIA/FALLBACK — dato editable desde Admin (${comoAyudarStatsList.length})` : `Métricas "Cómo Ayudar" REALES (${comoAyudarStatsList.length})`;
+        logStatus(`TRACE: ${casStatus} inyectadas.`, "TRACE");
+    }
     // === FIN SEGMENTO CÓMO AYUDAR ===
 
     // === INICIO SEGMENTO: IMPACTO HISTÓRICO — nuevo átomo v221 (Contrato v109 → v110) ===
+    // NOTA (v1.2.6): valores de ejemplo para la maqueta — Dirección confirmó que por ahora
+    // se usan cifras inventadas, con la condición de que quedaran editables desde Admin
+    // (ver campo "Impacto hasta hoy — métricas" en admin.html). No son cifras reales.
     let impactoHistList = Array.isArray(content.impacto_historico) ? content.impacto_historico : [];
     let isImpactoHistFallback = false;
     if (impactoHistList.length === 0) {
         impactoHistList = [
-            { valor: '12,660+', etiqueta: 'Personas ayudadas', icono: 'general' },
-            { valor: '3,800+', etiqueta: 'Familias apoyadas', icono: 'familias' },
-            { valor: '18', etiqueta: 'Estados atendidos', icono: 'estados' },
-            { valor: '226', etiqueta: 'Municipios activos', icono: 'municipios' }
+            { valor: '12', etiqueta: 'Eventos', icono: 'eventos' },
+            { valor: '3,400+', etiqueta: 'Asistentes', icono: 'familias' },
+            { valor: '150,000+', etiqueta: 'Personas ayudadas', icono: 'general' },
+            { valor: '$45.000.000 COP', etiqueta: 'Recaudación', icono: 'recaudacion' }
         ];
         isImpactoHistFallback = true;
     }
@@ -967,26 +1051,33 @@
     // === FIN SEGMENTO IMPACTO HISTÓRICO ===
 
     // === INICIO SEGMENTO: ACTUALIZACIONES — nuevo átomo v222 (Contrato v110 → v111) ===
+    // Corregido (v1.2.6): el campo de Admin para Actualizaciones guardaba {fecha, texto}
+    // (2 segmentos), pero este render siempre esperó {categoria, fecha, titulo, resumen,
+    // imagen} (5 campos) — un desajuste real que hacía que el admin nunca pudiera producir
+    // contenido válido para esta sección. Contrato nuevo, ya alineado en ambos lados:
+    // {fecha, detalle, ampliado, imagen} — se retira "categoría" por mandato de Dirección
+    // y se agrega "ampliado" (cuerpo largo) para el modal de lectura.
     let actualizacionesList = Array.isArray(content.actualizaciones) ? content.actualizaciones : [];
     let isActualizacionesFallback = false;
     if (actualizacionesList.length === 0) {
         actualizacionesList = [
-            { categoria: 'Brigada médica', fecha: '24 JUN 2026 · 10:30 AM', titulo: 'Brigada médica en Catia La Mar', resumen: 'Atención gratuita a más de 400 familias afectadas por el sismo.' },
-            { categoria: 'Logística', fecha: '24 JUN 2026 · 08:45 AM', titulo: 'Entrega de kits de higiene en Caraballeda', resumen: 'Más de 600 kits entregados a familias damnificadas.' },
-            { categoria: 'Evento', fecha: '23 JUN 2026 · 09:00 PM', titulo: 'Evento solidario en Caracas', resumen: 'Gracias a la energía de la música recaudamos $12,500 para ayuda.' },
-            { categoria: 'Coordinación', fecha: '23 JUN 2026 · 02:15 PM', titulo: 'Nuevos puntos de acopio activos', resumen: 'Ya contamos con 16 puntos activos en la red de ayuda.' }
+            { fecha: '24 JUN 2026 · 10:30 AM', detalle: 'Brigada médica en Catia La Mar', ampliado: 'Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico de la red de solidaridad instaló un punto de atención primaria, entrega de medicamentos básicos y acompañamiento psicológico para quienes perdieron su hogar.' },
+            { fecha: '24 JUN 2026 · 08:45 AM', detalle: 'Entrega de kits de higiene en Caraballeda', ampliado: 'Más de 600 kits de higiene y aseo personal fueron entregados a familias damnificadas en Caraballeda, en coordinación con voluntarios locales y los puntos de acopio activos en la zona.' },
+            { fecha: '23 JUN 2026 · 09:00 PM', detalle: 'Evento solidario en Caracas', ampliado: 'Gracias a la energía de la música recaudamos fondos para ayuda directa. El evento reunió a artistas y marcas aliadas en una noche de solidaridad cultural que transformó en tangible el apoyo a las víctimas del sismo.' },
+            { fecha: '23 JUN 2026 · 02:15 PM', detalle: 'Nuevos puntos de acopio activos', ampliado: 'Ya contamos con 16 puntos de acopio activos en la red de ayuda, distribuidos en los estados más afectados, para centralizar la recepción y distribución de donaciones.' }
         ];
         isActualizacionesFallback = true;
     }
+    // Se expone para que las tarjetas puedan abrir el modal por índice sin re-serializar el HTML.
+    window._actualizacionesData = actualizacionesList;
     const actualizacionesGridEl = document.getElementById('db-actualizaciones-grid');
     if (actualizacionesGridEl) {
-        actualizacionesGridEl.innerHTML = actualizacionesList.map(item => `
-            <div class="actualizacion-card">
+        actualizacionesGridEl.innerHTML = actualizacionesList.map((item, idx) => `
+            <div class="actualizacion-card" onclick="abrirActualizacionModal(${idx});">
                 <div class="actualizacion-thumb" ${item.imagen ? `style="background-image:url('${item.imagen}')"` : ''}></div>
-                <span class="actualizacion-categoria">${(item.categoria || '').toUpperCase()}</span>
                 <span class="actualizacion-fecha">${item.fecha || ''}</span>
-                <span class="actualizacion-titulo">${item.titulo || ''}</span>
-                <p class="actualizacion-resumen">${item.resumen || ''}</p>
+                <span class="actualizacion-titulo">${item.detalle || ''}</span>
+                <p class="actualizacion-resumen">${item.ampliado || ''}</p>
                 <span class="actualizacion-link">Leer más →</span>
             </div>`).join('');
         const actStatus = isActualizacionesFallback ? `Actualizaciones de REFERENCIA/FALLBACK (${actualizacionesList.length})` : `Actualizaciones REALES (${actualizacionesList.length})`;
@@ -1205,7 +1296,7 @@ if (document.getElementById('db-poster-img')) {
             mapContainer.style.border = '1px solid var(--tpl-accent)';
             mapContainer.innerHTML = `
                 <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen 
-                        style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+                        style="border:none;"></iframe>`;
         }
 
         // Certificación de Salud Escudo GOLD [cite: 805, 811]
