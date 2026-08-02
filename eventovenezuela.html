@@ -159,7 +159,7 @@
         </section>
 
         <!-- MÓDULO EXTENDIDO: IMPACTO (grid de niveles/tarjetas de donación) -->
-        <section id="mod-impacto">
+        <section id="mod-impacto-humanitario">
             <div id="db-impacto-grid" class="impacto-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:1.5rem; max-width:1100px; margin:0 auto;"></div>
             <!-- NUEVO ÁTOMO ADITIVO (v222): resumen del sismo + link reubicado desde #mod-mapa-crisis -->
             <p id="db-mapa-crisis-resumen" class="mapacrisis-resumen">--</p>
@@ -879,7 +879,10 @@
         galeriaGridEl.innerHTML = galeriaList.map((item) => {
             const url = (item && (item.url || item)) || '';
             if (url) {
-                return `<div class="gallery-thumb"><img src="${url}" alt="" loading="lazy" onerror="this.closest('.gallery-thumb').classList.add('gallery-thumb--empty'); this.remove();"></div>`;
+                // ADR-016: onclick abre el lightbox con esta misma URL (ver
+                // abrirGaleriaLightbox más abajo). Solo se activa si la imagen cargó
+                // bien (si el onerror la remueve, el div ya no tiene <img> que clickear).
+                return `<div class="gallery-thumb"><img src="${url}" alt="" loading="lazy" onclick="abrirGaleriaLightbox('${url.replace(/'/g, "\\'")}')" onerror="this.closest('.gallery-thumb').classList.add('gallery-thumb--empty'); this.remove();"></div>`;
             }
             return `<div class="gallery-thumb gallery-thumb--empty"></div>`;
         }).join('');
@@ -887,6 +890,33 @@
         logStatus(`TRACE: ${galStatus} inyectada.`, "TRACE");
     }
     // === FIN SEGMENTO GALERÍA ===
+
+    // === INICIO SEGMENTO: LIGHTBOX DE GALERÍA (ADR-016) ===
+    // Modal reutilizable, inyectado una sola vez en <body>, en el mismo patrón que
+    // .actualizacion-modal (misma clase de overlay .activo, sin dependencias externas).
+    if (!document.getElementById('gallery-lightbox-root')) {
+        const lightboxEl = document.createElement('div');
+        lightboxEl.id = 'gallery-lightbox-root';
+        lightboxEl.className = 'gallery-lightbox';
+        lightboxEl.innerHTML = `
+            <button type="button" class="gallery-lightbox-cerrar" onclick="cerrarGaleriaLightbox()" aria-label="Cerrar">&times;</button>
+            <img class="gallery-lightbox-img" id="gallery-lightbox-img" src="" alt="">`;
+        lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) cerrarGaleriaLightbox(); });
+        document.body.appendChild(lightboxEl);
+    }
+    window.abrirGaleriaLightbox = function (url) {
+        const root = document.getElementById('gallery-lightbox-root');
+        const img = document.getElementById('gallery-lightbox-img');
+        if (!root || !img) return;
+        img.src = url;
+        root.classList.add('activo');
+    };
+    window.cerrarGaleriaLightbox = function () {
+        const root = document.getElementById('gallery-lightbox-root');
+        if (root) root.classList.remove('activo');
+    };
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarGaleriaLightbox(); });
+    // === FIN SEGMENTO LIGHTBOX ===
 
     // 2. Sincronía Spotify 1:1 [cite: 462, 767]
     if (content.playlist_url) {
@@ -924,7 +954,16 @@
     // (ej. "01 El terremoto", "02 Nuestra misión"), como en landing-escritorio.jpg.
     // No reemplaza los campos legacy de arriba: si content.historia_items no viene de
     // Supabase, se usa un fallback de 2 hitos en vez del fallback legacy de un solo bloque.
-    let historiaItemsList = Array.isArray(content.historia_items) ? content.historia_items : [];
+    // ADR-016 — CAUSA RAÍZ REAL de "hitos 1 y 2 sin imagen": admin.html/content.historia_items
+    // espera un array plano en la raíz de `content`, pero el registro real de la campaña
+    // Venezuela guarda los hitos anidados en content.historia.hitos (con imagen real por
+    // hito). Como no existía este segundo camino de lectura, el sistema descartaba los
+    // datos reales por completo y caía en el fallback genérico (que nunca tuvo imágenes) —
+    // no era un fallo de carga de imagen puntual. Se agrega el segundo camino como
+    // fallback aditivo, sin dejar de soportar el esquema plano ya documentado.
+    let historiaItemsList = Array.isArray(content.historia_items)
+        ? content.historia_items
+        : (Array.isArray(content.historia?.hitos) ? content.historia.hitos : []);
     let isHistoriaItemsFallback = false;
     if (historiaItemsList.length === 0) {
         historiaItemsList = [
@@ -993,6 +1032,23 @@
         recaudacion:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 15s1 1.5 3 1.5 3-1 3-2.2-1.2-1.8-3-2.3-3-1.1-3-2.3S10 8 12 8s3 1.5 3 1.5M12 6.5v11"/></svg>'
     };
 
+    // ADR-016 — CAUSA RAÍZ REAL DEL BUG "COP0": antes de admin.html v1.2.6, el campo de
+    // Impacto se guardaba como {label:"Título | Valor | Icono"} (un solo string), pero
+    // renderImpactoCards() SIEMPRE leyó {etiqueta, valor, icono} como propiedades separadas
+    // (ver comentario ya existente en admin.html sobre la corrección v1.2.6). Cualquier
+    // registro guardado ANTES de esa corrección y nunca vuelto a guardar sigue con el
+    // esquema viejo, cae en la rama "donación" por descarte, y muestra "COP 0" vacío.
+    // Este normalizador detecta ese esquema legado y lo traduce al vigente, sin requerir
+    // que el Director reabra y regrabe cada evento afectado desde admin.html.
+    function normalizeImpactoLegacy(list) {
+        return list.map(item => {
+            const yaEstructurado = item.etiqueta !== undefined || item.valor !== undefined || item.icono !== undefined || item.monto !== undefined;
+            if (yaEstructurado || typeof item.label !== 'string') return item;
+            const partes = item.label.split('|').map(p => p.trim());
+            return { etiqueta: partes[0] || '', valor: partes[1] || '', icono: partes[2] || undefined };
+        });
+    }
+
     // Renderizador reutilizable de tarjetas de impacto (mismo formato dual usado por
     // #db-impacto-grid); se extrae como función para poder alimentar también el nuevo
     // átomo #db-impacto-historico-grid (v221) sin duplicar la lógica de mapeo.
@@ -1002,7 +1058,11 @@
         el.innerHTML = list.map(item => {
             const esMetrica = item.monto === undefined && (item.valor !== undefined || item.icono !== undefined || item.etiqueta !== undefined);
             if (esMetrica) {
-                const iconoSvg = IMPACTO_ICONS[item.icono] || IMPACTO_ICONS.general;
+                // Si el icono no es una clave conocida de IMPACTO_ICONS (ej. viene como
+                // emoji suelto desde datos legados: "⚠️", "⛺"...), se muestra tal cual en
+                // vez de descartarlo silenciosamente al ícono genérico (ADR-016).
+                const iconoSvg = IMPACTO_ICONS[item.icono]
+                    || (item.icono ? `<span class="impacto-icono-emoji">${item.icono}</span>` : IMPACTO_ICONS.general);
                 return `
                 <div class="impacto-card impacto-card--metrica">
                     <div class="impacto-icono">${iconoSvg}</div>
@@ -1027,7 +1087,7 @@
     // restaurar el comportamiento estándar de donación monetaria en otro clon.
     // Fallback genérico original (no usado en este clon):
     //   [{monto:20000,titulo:'Kit básico',...}, {monto:50000,...}, {monto:100000,...}]
-    let impactoList = Array.isArray(content.impacto) ? content.impacto : [];
+    let impactoList = Array.isArray(content.impacto) ? normalizeImpactoLegacy(content.impacto) : [];
     let isImpactoFallback = false;
     if (impactoList.length === 0) {
         impactoList = [
@@ -1069,7 +1129,7 @@
     logStatus(`TRACE: Mapa de crisis ${isMapaCrisisFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (falla: ${fallaVal}).`, "TRACE");
 
     // NUEVO ÁTOMO ADITIVO (v222): #db-mapa-crisis-resumen — párrafo junto a las 4
-    // estadísticas (#mod-impacto), compuesto con los mismos campos reales que ya
+    // estadísticas (#mod-impacto-humanitario), compuesto con los mismos campos reales que ya
     // alimentan la caja de metadatos del Hero (fecha, hora, magnitud, ubicación).
     const resumenEl = document.getElementById('db-mapa-crisis-resumen');
     if (resumenEl) {
@@ -1153,7 +1213,7 @@
     // NOTA (v1.2.6): valores de ejemplo para la maqueta — Dirección confirmó que por ahora
     // se usan cifras inventadas, con la condición de que quedaran editables desde Admin
     // (ver campo "Impacto hasta hoy — métricas" en admin.html). No son cifras reales.
-    let impactoHistList = Array.isArray(content.impacto_historico) ? content.impacto_historico : [];
+    let impactoHistList = Array.isArray(content.impacto_historico) ? normalizeImpactoLegacy(content.impacto_historico) : [];
     let isImpactoHistFallback = false;
     if (impactoHistList.length === 0) {
         impactoHistList = [
@@ -1479,7 +1539,7 @@ if (document.getElementById('db-poster-img')) {
                 // de colaboración, o un histórico de impacto separado del objetivo económico.
                 // v222: Contrato extendido a 21 átomos (v110 → v111, aditivo, no-breaking).
                 // Se agrega mod-actualizaciones (diario de impacto / carrusel de noticias).
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico', 'mod-actualizaciones'];
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto-humanitario', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico', 'mod-actualizaciones'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 
