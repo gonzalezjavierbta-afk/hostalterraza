@@ -1,0 +1,741 @@
+/* ============================================================================
+   b5.css — Silo Atómico "Emergencia Crítica" (Categoría: campana)
+   Sistema QR Hostal Terraza · v1.6.0-STABLE · Contrato v110
+   Campaña: "Emergencia por Venezuela" (slug: venezuela-en-emergencia-g7e2)
+   Aislamiento: TODO selector inicia con .tpl-b5 (Regla de Oro #9 / ADR-006).
+   Prohibido :root global — todas las variables usan prefijo --b5-.
+   Ruta de despliegue: css/templates/campana/b5.css
+   ============================================================================ */
+
+.tpl-b5 {
+    /* --- TOKENS DE COLOR (paleta fija del brief, 4-6 valores nombrados) --- */
+    --b5-bg: #f4f4f4;
+    --b5-bg-alt: #ffffff;
+    --b5-ink: #141414;
+    --b5-ink-soft: #55555a;
+    --b5-line: rgba(20, 20, 20, 0.10);
+    --b5-red: #e11d48;
+    --b5-red-deep: #9f0f30;
+
+    /* Puentes con variables usadas por el Master (Cerebro) para íconos/acordes */
+    --gold: var(--b5-red);
+    --tpl-accent: var(--master-accent, var(--b5-red));
+
+    background-color: var(--b5-bg) !important;
+    color: var(--b5-ink) !important;
+    font-family: 'Geist', sans-serif;
+}
+
+/* Grano decorativo del kernel: apagado — no encaja con el registro institucional/humanitario */
+.tpl-b5::before { opacity: 0 !important; content: none !important; }
+
+/* ============================================================================
+   1. GRID ATÓMICO — Flujo Central Inmersivo (1200px), Regla de Oro #4/#9
+   ============================================================================ */
+.tpl-b5 #main-content-flow {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 pistas: la fila "crisis" usa ambas, el resto abarca las 2 (span completo) */
+    grid-template-areas:
+        "hero        hero"
+        "meta        meta"
+        "form        form"
+        "crisismap   crisisstats"
+        "comoayudar  comoayudar"
+        "historia    impactohist"
+        "video       video"
+        "actualiz    actualiz"
+        "faq         ubicacion"
+        "ctafinal    ctafinal"
+        "footer      footer";
+    row-gap: 0;
+    width: 100%;
+}
+
+.tpl-b5 #mod-hero          { grid-area: hero; }
+.tpl-b5 #mod-hero-meta     { grid-area: meta; }
+.tpl-b5 #mod-form          { grid-area: form; }
+.tpl-b5 #mod-mapa-crisis   { grid-area: crisismap; }
+.tpl-b5 #mod-impacto       { grid-area: crisisstats; }
+.tpl-b5 #mod-como-ayudar   { grid-area: comoayudar; }
+.tpl-b5 #mod-historia      { grid-area: historia; }
+.tpl-b5 #mod-impacto-historico { grid-area: impactohist; }
+.tpl-b5 #mod-video         { grid-area: video; }
+.tpl-b5 #mod-actualizaciones { grid-area: actualiz; }
+.tpl-b5 #mod-faq           { grid-area: faq; }
+.tpl-b5 #mod-ubicacion     { grid-area: ubicacion; }
+.tpl-b5 #mod-cta-final     { grid-area: ctafinal; }
+.tpl-b5 #mod-footer        { grid-area: footer; }
+
+/* En mobile, "crisis" también colapsa a una sola columna (mapa arriba, stats abajo) */
+@media (max-width: 899px) {
+    .tpl-b5 #main-content-flow {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "hero" "meta" "form" "crisismap" "crisisstats" "comoayudar"
+            "historia" "impactohist" "video" "actualiz" "faq" "ubicacion" "ctafinal" "footer";
+    }
+}
+
+/* Regla de Bloque sobre Flex (ADR-007): módulos masivos con inyección JS */
+.tpl-b5 #mod-impacto,
+.tpl-b5 #mod-impacto-historico,
+.tpl-b5 #mod-como-ayudar,
+.tpl-b5 #mod-mapa-crisis { display: block !important; }
+
+/* #mod-video (v222): ya no es "bloque sobre flex" — pasa a Grid con pistas 1fr
+   fijas (no auto/max-content), que NO se colapsan a 0px con hijos vacíos antes
+   de la inyección JS (a diferencia de Flex, que sí sufría el bug de ADR-007). */
+.tpl-b5 #mod-video {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+@media (max-width: 899px) {
+    .tpl-b5 #mod-video { grid-template-columns: 1fr; gap: 3rem; }
+}
+
+/* Átomos activos pero sin uso en esta campaña (Cero Borrado: quedan en el DOM ocultos) */
+.tpl-b5 #unified-frame,      /* la fecha del sismo ya ocurrió: countdown no aplica */
+.tpl-b5 #mod-objetivo,       /* no hay meta monetaria visible en este diseño */
+.tpl-b5 #mod-lineup,
+.tpl-b5 #mod-playlist,
+.tpl-b5 #mod-info-tecnica,
+.tpl-b5 #mod-equipo,
+.tpl-b5 #mod-sponsors { display: none !important; } /* mandato explícito de Dirección */
+
+.tpl-b5 section, .tpl-b5 header, .tpl-b5 footer { display: block; }
+.tpl-b5 #mod-hero { display: block; }
+.tpl-b5 #mod-footer { display: block; }
+
+/* ============================================================================
+   2. HERO
+   ============================================================================ */
+.tpl-b5 #mod-hero {
+    position: relative;
+    /* Soberanía del Hero (Context Package v4.0.0-GOLD): inmersión total.
+       100vh como base universal + 100svh donde el navegador lo soporta,
+       para no quedar recortado por la barra de UI de Safari/Chrome mobile. */
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 3.5rem;
+    background-color: #1a1a1a;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+}
+.tpl-b5 #mod-hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.55) 55%, rgba(10,10,10,0.15) 100%);
+    z-index: 1;
+}
+.tpl-b5 .hero-nav {
+    position: relative; z-index: 10;
+    display: flex; justify-content: flex-end; align-items: center; gap: 1.8rem;
+    margin-bottom: 5.5rem; flex-wrap: wrap;
+}
+.tpl-b5 .hero-nav a {
+    color: rgba(255,255,255,0.82); text-decoration: none;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em;
+}
+.tpl-b5 .hero-nav a:hover { color: #fff; }
+.tpl-b5 .hero-nav-cta {
+    background: var(--b5-red); color: #fff !important; padding: 0.6rem 1.2rem;
+    border-radius: 999px; font-weight: 800 !important;
+}
+.tpl-b5 #org-name-badge {
+    position: static !important; z-index: 10;
+    display: none; /* el badge de org se sustituye por el eyebrow de emergencia abajo */
+}
+.tpl-b5 .hero-content { max-width: 640px; padding-top: 1rem; }
+.tpl-b5 .hero-eyebrow {
+    display: inline-block; background: var(--b5-red); color: #fff;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.4rem 0.9rem; border-radius: 4px; margin-bottom: 1.2rem;
+}
+.tpl-b5 #event-title {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: clamp(2.4rem, 5.5vw, 4rem);
+    line-height: 1.02; letter-spacing: -0.01em; text-transform: uppercase; margin: 0;
+}
+.tpl-b5 #event-title::after { content: ""; } /* placeholder de énfasis, sin recortar texto real */
+.tpl-b5 .hero-description {
+    margin: 1.1rem 0 0; max-width: 480px;
+    font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.86);
+}
+
+/* ============================================================================
+   3. META (v1.10-GOLD) — Configuración High-Fidelity: Iconos XL a la Izquierda
+   ============================================================================ */
+.tpl-b5 #mod-hero-meta {
+    display: grid !important;
+    grid-template-columns: repeat(4, auto); /* Columnas adaptables al contenido */
+    width: fit-content;
+    max-width: 1200px;
+    margin: -4.5rem 0 0 0 !important;      /* Pegado a la izquierda del layout */
+    position: relative;
+    z-index: 5;
+    background: #ffffff;
+    border-radius: 2px;                     /* Estética cuadrada institucional */
+    box-shadow: 20px 20px 60px rgba(0,0,0,0.15);
+    padding: 2.5rem 3.5rem;                 /* Caja significativamente más grande */
+}
+
+/* Item individual: Alineación horizontal de Icono + Textos */
+.tpl-b5 .meta-item {
+    display: flex !important;
+    flex-direction: row !important;         /* ICONO A LA IZQUIERDA DEL TEXTO */
+    align-items: center;                    /* Centrado vertical perfecto */
+    gap: 1.4rem;                            /* Espacio sagrado entre icono y datos */
+    padding: 0 2.5rem;
+    border-right: 1px solid rgba(20, 20, 20, 0.08);
+}
+
+.tpl-b5 .meta-item:last-child {
+    border-right: none;
+}
+
+/* Escalado de Iconos XL */
+.tpl-b5 .meta-svg {
+    width: 32px !important;                 /* TAMAÑO AGRANDADO */
+    height: 32px !important;
+    fill: var(--b5-red) !important;         /* Rojo Humanitario */
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(225, 29, 72, 0.2));
+}
+
+/* Bloque de texto apilado (Label arriba, Dato abajo) */
+.tpl-b5 .meta-data {
+    display: flex;
+    flex-direction: column;                 /* Mantiene el stack de dos líneas */
+    align-items: flex-start;
+}
+
+.tpl-b5 .meta-label {
+    color: var(--b5-red);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* Refuerzo Geist 900 para el dato */
+.tpl-b5 .meta-item span {
+    font-family: 'Geist', sans-serif !important;
+    font-weight: 900 !important;            /* Mandato de Reglas de Oro #8 */
+    font-size: 1.15rem;
+    color: var(--b5-ink);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+/* ============================================================================
+   4. FORMULARIO DUAL-PHASE
+   ============================================================================ */
+.tpl-b5 #mod-form { padding: 4.5rem 1.5rem 3rem; }
+.tpl-b5 .form-master-box {
+    max-width: 1100px; margin: 0 auto; padding: 2.8rem clamp(1.5rem, 4vw, 3.5rem);
+    background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 18px;
+    box-shadow: 0 10px 34px rgba(0,0,0,0.06);
+}
+.tpl-b5 .form-titulo {
+    font-weight: 900; text-transform: uppercase; font-size: 1.4rem;
+    letter-spacing: -0.01em; margin: 0 0 0.6rem; text-align: center;
+}
+.tpl-b5 .form-lead { font-size: 0.95rem; color: var(--b5-ink-soft); margin: 0 0 1.6rem; line-height: 1.5; text-align: center; }
+
+/* Fila única horizontal (Nombre | WhatsApp | Cómo ayudar), botón y nota a ancho completo */
+.tpl-b5 #fase1-fields {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem 1.2rem; align-items: start;
+}
+.tpl-b5 #fase1-fields .btn-submit,
+.tpl-b5 #fase1-fields .form-security-note { grid-column: 1 / -1; }
+@media (max-width: 780px) {
+    .tpl-b5 #fase1-fields { grid-template-columns: 1fr; }
+}
+
+.tpl-b5 #master-reg-form input[type="text"],
+.tpl-b5 #master-reg-form input[type="tel"],
+.tpl-b5 #master-reg-form input[type="email"],
+.tpl-b5 #master-reg-form select {
+    width: 100%; padding: 1rem 1.1rem; margin-bottom: 0;
+    background: var(--b5-bg); color: var(--b5-ink);
+    border: 1px solid var(--b5-line); border-radius: 10px;
+    font-family: 'Geist', sans-serif; font-size: 0.95rem;
+}
+.tpl-b5 .reg-phone-row { display: grid; grid-template-columns: 100px 1fr; gap: 0.7rem; }
+.tpl-b5 .reg-phone-row select,
+.tpl-b5 .reg-phone-row input { margin-bottom: 0; }
+
+.tpl-b5 .form-checkbox {
+    display: flex; align-items: flex-start; gap: 0.7rem; margin: 0.4rem 0 1.4rem;
+    font-size: 0.82rem; color: var(--b5-ink-soft); line-height: 1.5; cursor: pointer;
+}
+.tpl-b5 .form-checkbox input { margin-top: 0.2rem; accent-color: var(--b5-red); flex-shrink: 0; }
+
+.tpl-b5 .btn-submit,
+.tpl-b5 #master-reg-form button[type="submit"] {
+    width: 100%; padding: 1.1rem; background: var(--b5-red); border: none; color: #fff;
+    font-weight: 900; font-size: 0.85rem; letter-spacing: 0.03em; text-transform: uppercase;
+    border-radius: 10px; cursor: pointer; transition: background 0.15s ease; margin-top: 0.4rem;
+}
+.tpl-b5 .btn-submit:hover, .tpl-b5 #master-reg-form button[type="submit"]:hover { background: var(--b5-red-deep); }
+.tpl-b5 .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.tpl-b5 .form-security-note {
+    display: block; text-align: center; margin-top: 0.9rem;
+    font-size: 0.75rem; color: var(--b5-ink-soft);
+}
+.tpl-b5 .form-success-msg {
+    text-align: center; font-weight: 700; color: var(--b5-ink); padding: 1rem 0;
+}
+/* #form-fase2 (perfilamiento in-place): hereda el mismo ancho de columna única */
+.tpl-b5 #form-fase2 input[type="text"],
+.tpl-b5 #form-fase2 input[type="email"] { margin-bottom: 1rem; }
+/* Bloques de preguntas por categoría (Contrato v112): mismo look que el resto
+   del formulario; display:none/block se controla por JS (mostrarBloqueFase2). */
+.tpl-b5 .fase2-cat-block input,
+.tpl-b5 .fase2-cat-block select { margin-bottom: 1rem; width: 100%; }
+
+/* ============================================================================
+   5. ESTADO DE EMERGENCIA — mapa-crisis + impacto (comparten fila)
+   ============================================================================ */
+.tpl-b5 #mod-mapa-crisis,
+.tpl-b5 #mod-impacto {
+    padding: 3.5rem 1.5rem 3rem;
+}
+.tpl-b5 #mod-mapa-crisis { padding-right: 1.2rem; }
+.tpl-b5 #mod-impacto { padding-left: 1.2rem; }
+.tpl-b5 #mod-impacto #db-impacto-grid { grid-template-columns: 1fr 1fr; max-width: none; margin: 0; }
+
+/* ============================================================================
+   5b. INSIGNIA NUMERADA (v222) — cabecera compartida por toda sección numerada
+   de la paridad visual absoluta (02 Estado de Emergencia ... 09 FAQ). Un único
+   componente, alimentado por el atributo data-num de cada instancia, evita
+   repetir la regla 8 veces y no depende del orden real en el DOM (que no
+   coincide con el orden visual, controlado por grid-template-areas).
+   ============================================================================ */
+.tpl-b5 .b5-num-eyebrow {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.8rem;
+    font-size: 1.35rem; font-weight: 900; letter-spacing: -0.01em;
+    text-transform: uppercase; color: var(--b5-ink); margin-bottom: 1.3rem;
+    text-align: left;
+}
+.tpl-b5 .b5-num-eyebrow::before {
+    content: attr(data-num);
+    flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.9rem; height: 1.9rem; border-radius: 4px;
+    background: var(--b5-red); color: #fff;
+    font-size: 0.8rem; font-weight: 900; letter-spacing: 0;
+}
+.tpl-b5 .b5-num-eyebrow em {
+    font-style: normal; font-weight: 700; text-transform: uppercase;
+    color: var(--b5-ink-soft); font-size: 0.85rem; letter-spacing: 0.02em;
+}
+
+/* Textura satelital (Context Package v4.0.0-GOLD, req. II.2): placeholder de
+   terreno bajo los anillos sísmicos mientras se recibe un asset real. Es un
+   patrón CSS generado (sin imagen externa) para no romper Silent Fallback
+   (ADR-008) ni depender de una URL que aún no existe. Cuando llegue el asset
+   satelital real, reemplazar background por background-image: url('...')
+   manteniendo el overlay oscuro para legibilidad de los anillos rojos. */
+.tpl-b5 .mapacrisis-svg-wrap {
+    max-width: 420px; margin: 0 auto;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(154,154,160,0.16) 0%, transparent 45%),
+        radial-gradient(circle at 72% 68%, rgba(154,154,160,0.12) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 26px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 26px),
+        #16181c;
+}
+.tpl-b5 .mapacrisis-svg-wrap::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 35%, rgba(10,10,10,0.35) 100%);
+    pointer-events: none;
+}
+.tpl-b5 .mc-ring { fill: none; stroke: var(--b5-red); }
+.tpl-b5 .mc-ring--outer { stroke-opacity: 0.10; }
+.tpl-b5 .mc-ring--mid { stroke-opacity: 0.18; }
+.tpl-b5 .mc-ring--inner { fill: var(--b5-red); fill-opacity: 0.08; stroke-opacity: 0.3; }
+.tpl-b5 .mc-dots circle { r: 3.5; fill: #9a9aa0; opacity: 0.55; }
+.tpl-b5 .mc-epicentro { fill: var(--b5-red); }
+.tpl-b5 .mc-pulse { fill: var(--b5-red); opacity: 0.55; animation: b5-mapPulse 2.4s ease-out infinite; transform-origin: 190px 150px; }
+
+.tpl-b5 .mapacrisis-legend { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0 1rem; font-size: 0.78rem; color: var(--b5-ink-soft); }
+.tpl-b5 .mapacrisis-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.tpl-b5 .mapacrisis-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.tpl-b5 .mapacrisis-dot--epicentro { background: var(--b5-red); }
+.tpl-b5 .mapacrisis-dot--zona { background: #9a9aa0; }
+.tpl-b5 .mapacrisis-dot--falla { background: var(--b5-ink); }
+/* .mapacrisis-resumen (v222): párrafo nuevo junto a las 4 estadísticas */
+.tpl-b5 .mapacrisis-resumen {
+    max-width: 480px; margin: 1.6rem 0 0.8rem; font-size: 0.92rem;
+    line-height: 1.7; color: var(--b5-ink-soft);
+}
+/* .mapacrisis-link (v222): reubicado de debajo del mapa a la columna de estadísticas */
+.tpl-b5 .mapacrisis-link { display: inline-block; text-align: left; color: var(--b5-red); font-weight: 800; font-size: 0.8rem; text-decoration: none; }
+.tpl-b5 .mapacrisis-link:hover { text-decoration: underline; }
+
+/* ============================================================================
+   6. TARJETAS DE IMPACTO (métrica) — reutilizadas por #mod-impacto y #mod-impacto-historico
+   ============================================================================ */
+.tpl-b5 .impacto-card--metrica {
+    background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 14px;
+    padding: 1.6rem 1.2rem; text-align: left; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.tpl-b5 .impacto-icono { color: var(--b5-red); margin-bottom: 0.2rem; }
+.tpl-b5 .impacto-valor {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 3.2rem; line-height: 1;
+    color: var(--b5-ink);
+    filter: drop-shadow(0 0 0 rgba(225,29,72,0)); /* base para el afterglow animado */
+    animation: b5-afterglow 3.2s ease-in-out infinite;
+}
+.tpl-b5 .impacto-etiqueta { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; color: var(--b5-ink-soft); text-transform: uppercase; }
+
+/* ============================================================================
+   7. ¿CÓMO PUEDO AYUDAR?
+   ============================================================================ */
+.tpl-b5 .comoayudar-inner {
+    max-width: 1200px; margin: 0 auto; padding: 3rem 1.5rem 4rem;
+    display: grid; grid-template-columns: 1.6fr 1fr; gap: 3rem; align-items: start;
+}
+.tpl-b5 .comoayudar-col--main { min-width: 0; }
+.tpl-b5 .comoayudar-col--stats { border-left: 1px solid var(--b5-line); padding: 3.6rem 0 0 2.6rem; }
+.tpl-b5 .comoayudar-lead { max-width: 640px; color: var(--b5-ink-soft); line-height: 1.6; margin: 0 0 2.2rem; }
+.tpl-b5 .comoayudar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.4rem; }
+.tpl-b5 .comoayudar-stats { display: flex; flex-direction: column; gap: 1.8rem; }
+.tpl-b5 .comoayudar-stat { display: flex; align-items: center; gap: 1rem; }
+.tpl-b5 .comoayudar-stat-icono { color: var(--b5-red); flex-shrink: 0; }
+.tpl-b5 .comoayudar-stat-valor {
+    display: block; font-family: 'Geist', sans-serif; font-weight: 900;
+    font-size: 1.9rem; line-height: 1; color: var(--b5-ink);
+}
+.tpl-b5 .comoayudar-stat-etiqueta {
+    display: block; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em;
+    color: var(--b5-ink-soft); text-transform: uppercase; margin-top: 0.3rem;
+}
+@media (max-width: 899px) {
+    .tpl-b5 .comoayudar-inner { grid-template-columns: 1fr; gap: 2.4rem; }
+    .tpl-b5 .comoayudar-col--stats { border-left: none; border-top: 1px solid var(--b5-line); padding: 2rem 0 0; }
+}
+.tpl-b5 .comoayudar-card {
+    background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 14px;
+    padding: 1.8rem 1.4rem; cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.tpl-b5 .comoayudar-card:hover { border-color: var(--b5-red); transform: translateY(-3px); }
+.tpl-b5 .comoayudar-icono { color: var(--b5-red); margin-bottom: 0.9rem; }
+.tpl-b5 .comoayudar-titulo { display: block; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.02em; margin-bottom: 0.4rem; }
+.tpl-b5 .comoayudar-desc { color: var(--b5-ink-soft); font-size: 0.85rem; line-height: 1.5; margin: 0 0 0.9rem; }
+.tpl-b5 .comoayudar-link { font-size: 0.75rem; font-weight: 800; color: var(--b5-red); }
+
+/* ============================================================================
+   8. HISTORIA (sección 04) — pareja de fila con Impacto Histórico (05)
+   ============================================================================ */
+.tpl-b5 #mod-historia { background: var(--b5-bg-alt); border-top: 1px solid var(--b5-line); border-bottom: 1px solid var(--b5-line); }
+.tpl-b5 .historia-inner { padding: 4rem 2.2rem; text-align: left !important; max-width: none !important; }
+/* Átomos legacy v107 (Cero Borrado: permanecen en el DOM, ocultos solo en b5) */
+.tpl-b5 #db-historia-titulo,
+/.tpl-b5 #db-historia-img,
+.tpl-b5 #db-historia-texto { display: none !important; }
+/* Nuevo átomo aditivo: lista de hitos numerados */
+.tpl-b5 .historia-lista { display: flex; flex-direction: column; gap: 2.2rem; }
+.tpl-b5 .historia-item { display: flex; gap: 1.2rem; align-items: flex-start; }
+.tpl-b5 .historia-item-num {
+    flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    width: 1.9rem; height: 1.9rem; border-radius: 4px;
+    background: var(--b5-ink); color: #fff; font-size: 0.8rem; font-weight: 900;
+}
+.tpl-b5 .historia-item-titulo { display: block; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.01em; margin-bottom: 0.5rem; }
+.tpl-b5 .historia-item-texto { color: var(--b5-ink-soft); line-height: 1.7; font-size: 0.92rem; margin: 0; }
+/* Soporte de imagen por hito (v1.2.6): solo se activa si el JSON trae `imagen`;
+   sin imagen, .historia-item sigue siendo el flex de 2 hijos de siempre (num+body). */
+.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 1fr 0.72fr; gap: 1.2rem 1.5rem; align-items: start; }
+.tpl-b5 .historia-item-img { grid-column: 3; grid-row: 1; width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; background: #e7e7e9; }
+@media (max-width: 640px) {
+    .tpl-b5 .historia-item--conimg { grid-template-columns: auto 1fr; }
+    .tpl-b5 .historia-item-img { grid-column: 1 / -1; grid-row: 2; aspect-ratio: 16/9; margin-top: 0.3rem; }
+}
+
+/* ============================================================================
+   9. IMPACTO HISTÓRICO (sección 05) + banner de frase
+   ============================================================================ */
+.tpl-b5 .impactohist-inner { max-width: none; margin: 0; padding: 4rem 2.2rem; }
+.tpl-b5 .impactohist-grid { grid-template-columns: repeat(2, 1fr); }
+.tpl-b5 .impactohist-banner {
+    margin-top: 2.4rem; background: var(--b5-red); color: #fff; border-radius: 16px;
+    padding: 2.6rem 2rem; text-align: center;
+}
+.tpl-b5 .impactohist-banner span {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: clamp(1.4rem, 3vw, 2.1rem);
+    line-height: 1.2; letter-spacing: -0.01em;
+}
+
+/* ============================================================================
+   10. VIDEO (07) + GALERÍA DE MEMORIA (06) — ahora en columnas (v222)
+   ============================================================================ */
+.tpl-b5 #mod-video { padding: 4rem 1.5rem; max-width: 1200px; margin: 0 auto; padding-top: 0 !important; }
+/* El padding superior se mueve a las columnas hijas (ADR-010 protege el padding-top:0
+   del nodo raíz #mod-video, así que el respiro se agrega aquí en vez de ahí). */
+.tpl-b5 .b5-video-col { padding-top: 2.5rem; }
+.tpl-b5 #db-gallery-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 0.7rem !important; margin-bottom: 1.4rem !important; }
+.tpl-b5 #db-gallery-grid img,
+.tpl-b5 #db-gallery-grid > * { border-radius: 10px; }
+.tpl-b5 .gallery-thumb { aspect-ratio: 1/1; overflow: hidden; border-radius: 10px; background: #e7e7e9; }
+.tpl-b5 .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tpl-b5 .gallery-thumb--empty { background: linear-gradient(135deg, #ececee, #e2e2e5); }
+.tpl-b5 .video-col-link { display: inline-block; color: var(--b5-red); font-weight: 800; font-size: 0.8rem; text-decoration: none; cursor: default; }
+.tpl-b5 #db-video-content { border: 1px solid var(--b5-line) !important; }
+
+/* ============================================================================
+   10b. ACTUALIZACIONES (sección 08) — diario de impacto / carrusel de noticias
+   ============================================================================ */
+.tpl-b5 .actualizaciones-inner { max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem; }
+.tpl-b5 .actualizaciones-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.tpl-b5 .actualizaciones-head .b5-num-eyebrow { margin-bottom: 0; }
+.tpl-b5 .actualizaciones-vertodas { color: var(--b5-red); font-weight: 800; font-size: 0.8rem; cursor: default; }
+.tpl-b5 .actualizaciones-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-top: 2rem; }
+.tpl-b5 .actualizacion-card {
+    display: flex; flex-direction: column; background: var(--b5-bg-alt);
+    border: 1px solid var(--b5-line); border-radius: 14px; overflow: hidden;
+}
+.tpl-b5 .actualizacion-thumb {
+    aspect-ratio: 16/10; background: linear-gradient(135deg, #2a2a2a, #111);
+    background-size: cover; background-position: center;
+}
+.tpl-b5 .actualizacion-categoria {
+    margin: 1rem 1.1rem 0; align-self: flex-start; background: var(--b5-red); color: #fff;
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 0.28rem 0.6rem; border-radius: 4px;
+}
+.tpl-b5 .actualizacion-categoria {
+    display: inline-block; margin: 0.9rem 1.1rem 0; padding: 0.2rem 0.55rem;
+    background: rgba(225, 29, 72, 0.1); color: var(--b5-red);
+    font-size: 0.64rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+    border-radius: 5px;
+}
+.tpl-b5 .actualizacion-fecha { margin: 0.5rem 1.1rem 0; font-size: 0.7rem; color: var(--b5-ink-soft); font-weight: 700; }
+.tpl-b5 .actualizacion-titulo { display: block; margin: 0.4rem 1.1rem 0; font-weight: 900; font-size: 0.92rem; line-height: 1.35; }
+.tpl-b5 .actualizacion-resumen {
+    margin: 0.5rem 1.1rem 0; color: var(--b5-ink-soft); font-size: 0.82rem; line-height: 1.5; flex-grow: 1;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tpl-b5 .actualizacion-card { cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease; }
+.tpl-b5 .actualizacion-card:hover { border-color: var(--b5-red); transform: translateY(-3px); }
+.tpl-b5 .actualizacion-link { display: block; margin: 0.8rem 1.1rem 1.1rem; color: var(--b5-red); font-weight: 800; font-size: 0.78rem; }
+@media (max-width: 899px) {
+    .tpl-b5 .actualizaciones-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+    .tpl-b5 .actualizaciones-grid { grid-template-columns: 1fr; }
+}
+
+/* Modal de lectura ampliada (v1.2.6) — Fecha|Detalle|Ampliado|Imagen */
+.tpl-b5 .actualizacion-modal {
+    position: fixed; inset: 0; z-index: 9999; background: rgba(20, 20, 20, 0.72);
+    display: flex; align-items: center; justify-content: center; padding: 2rem;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+.tpl-b5 .actualizacion-modal.activo { opacity: 1; pointer-events: auto; }
+.tpl-b5 .actualizacion-modal-card {
+    background: var(--b5-bg-alt); border-radius: 16px; max-width: 560px; width: 100%;
+    max-height: 86vh; overflow-y: auto; padding: 2.4rem; position: relative;
+}
+.tpl-b5 .actualizacion-modal-cerrar {
+    position: absolute; top: 1rem; right: 1.1rem; width: 2.2rem; height: 2.2rem;
+    border-radius: 50%; border: 1px solid var(--b5-line); background: var(--b5-bg-alt);
+    font-size: 1.4rem; line-height: 1; cursor: pointer; color: var(--b5-ink);
+}
+.tpl-b5 .actualizacion-modal-img { width: 100%; border-radius: 12px; margin-bottom: 1.4rem; display: block; max-height: 280px; object-fit: cover; }
+.tpl-b5 .actualizacion-modal-fecha { display: block; font-size: 0.75rem; font-weight: 700; color: var(--b5-ink-soft); margin-bottom: 0.5rem; }
+.tpl-b5 .actualizacion-modal-detalle { font-family: 'Geist', sans-serif; font-weight: 900; font-size: 1.3rem; margin: 0 0 1rem; line-height: 1.3; color: var(--b5-ink); }
+.tpl-b5 .actualizacion-modal-ampliado { font-size: 0.95rem; line-height: 1.7; color: var(--b5-ink-soft); margin: 0; white-space: pre-line; }
+
+/* ============================================================================
+   11. FAQ (sección 09) — ahora en fila paralela con Ubicación (v1.2.6)
+   ============================================================================ */
+.tpl-b5 #mod-faq { padding: 4rem 2.2rem; }
+/* Antes ocupaba los 1200px completos y usaba 2 columnas; al compartir fila con el
+   mapa (mitad del ancho cada uno) pasa a 1 columna para no quedar apretado. */
+.tpl-b5 #db-faq-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+.tpl-b5 .faq-item { border-bottom: 1px solid var(--b5-line) !important; }
+.tpl-b5 .faq-item span { color: var(--b5-ink) !important; }
+.tpl-b5 .faq-answer { max-height: 0; overflow: hidden; color: var(--b5-ink-soft); transition: max-height 0.25s ease; font-size: 0.88rem; line-height: 1.6; }
+.tpl-b5 .faq-item.active .faq-answer { max-height: 300px; padding-top: 0.6rem; }
+.tpl-b5 .faq-icon-circle { border-color: var(--b5-red) !important; color: var(--b5-red) !important; }
+
+/* ============================================================================
+   12. UBICACIÓN ("mapa ampliado" real — target del link de la sección 02)
+   El mapa se estira al 100% de la altura de la fila (igualando siempre a FAQ,
+   incluso cuando el acordeón de preguntas crece): #mod-ubicacion es un ítem de
+   Grid que ya se estira por defecto (align-items:stretch de #main-content-flow);
+   solo falta que su contenido interno también ocupe esa altura completa.
+   ============================================================================ */
+.tpl-b5 #mod-ubicacion { padding: 4rem 2.2rem; scroll-margin-top: 2rem; display: flex; flex-direction: column; }
+.tpl-b5 .mapa-wrap { position: relative; flex: 1; min-height: 320px; }
+.tpl-b5 #db-mapa-container { border: 1px solid var(--b5-line) !important; height: 100%; width: 100%; }
+/* Pin de zona afectada (v1.2.6): superposición aproximada, sin API de Google Maps JS
+   (ver DECISIONS.md) — no georreferenciado con precisión real. */
+.tpl-b5 .mapa-zona-pin {
+    position: absolute; top: 42%; left: 46%; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    pointer-events: none; z-index: 2;
+}
+.tpl-b5 .mapa-zona-pin-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(225, 29, 72, 0.35); border: 2px solid var(--b5-red);
+    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0.14);
+    animation: b5-mapPulse 2.4s ease-out infinite;
+}
+.tpl-b5 .mapa-zona-pin-label {
+    background: var(--b5-ink); color: #fff; font-size: 0.68rem; font-weight: 800;
+    letter-spacing: 0.02em; padding: 0.25rem 0.6rem; border-radius: 5px; white-space: nowrap;
+}
+@media (max-width: 899px) {
+    .tpl-b5 #mod-ubicacion { display: block; }
+    .tpl-b5 .mapa-wrap { min-height: 340px; height: 340px; }
+}
+
+/* ============================================================================
+   13. CTA FINAL
+   ============================================================================ */
+.tpl-b5 #mod-cta-final { background: var(--b5-ink); color: #fff; padding: 3rem 1.5rem; }
+.tpl-b5 .cta-final-inner { color: #fff; }
+.tpl-b5 #db-cta-final-titulo { font-size: 1.4rem; }
+.tpl-b5 #cta-final-btn {
+    background: var(--b5-red); color: #fff; border: none; padding: 1rem 1.8rem;
+    border-radius: 10px; font-weight: 900; font-size: 0.82rem; text-transform: uppercase; cursor: pointer;
+}
+
+/* ============================================================================
+   14. FOOTER
+   ============================================================================ */
+.tpl-b5 #mod-footer { background: var(--b5-bg-alt); border-top: 1px solid var(--b5-line); padding: 3.5rem 1.5rem 1.5rem; }
+.tpl-b5 .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2.5rem; }
+.tpl-b5 .footer-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+.tpl-b5 .footer-brand-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.1rem; height: 2.1rem; border-radius: 6px; background: var(--b5-red); color: #fff;
+    margin-bottom: 0.3rem;
+}
+.tpl-b5 #footer-org-name { font-weight: 900; letter-spacing: 0.02em; }
+.tpl-b5 #footer-tagline { color: var(--b5-ink-soft); font-size: 0.85rem; margin: 0; }
+.tpl-b5 .footer-col h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--b5-ink-soft); margin-bottom: 0.8rem; }
+.tpl-b5 .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.tpl-b5 .footer-links a { color: var(--b5-ink); text-decoration: none; font-size: 0.85rem; }
+.tpl-b5 .footer-social { display: flex; gap: 0.8rem; margin-bottom: 0.9rem; }
+.tpl-b5 .footer-social:empty { margin-bottom: 0; }
+.tpl-b5 .footer-social-icon { color: var(--b5-ink); }
+.tpl-b5 .footer-contacto { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem; color: var(--b5-ink-soft); }
+.tpl-b5 .footer-bottom { max-width: 1200px; margin: 2.5rem auto 0; padding-top: 1.2rem; border-top: 1px solid var(--b5-line); font-size: 0.75rem; color: var(--b5-ink-soft); }
+
+/* ============================================================================
+   15. MICRO-INTERACCIÓN: pulso de alerta (brief II — obligatorio)
+   ============================================================================ */
+@keyframes b5-mapPulse {
+    0%   { transform: scale(1);   opacity: 0.55; }
+    70%  { transform: scale(6.4); opacity: 0; }
+    100% { transform: scale(6.4); opacity: 0; }
+}
+@keyframes b5-afterglow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(225,29,72,0)); }
+    50%      { filter: drop-shadow(0 0 10px rgba(225,29,72,0.35)); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .tpl-b5 .mc-pulse, .tpl-b5 .impacto-valor { animation: none !important; }
+}
+
+/* ============================================================================
+   16. RESPONSIVE — mobile (landing-mobile.jpg)
+   ============================================================================ */
+@media (max-width: 899px) {
+    .tpl-b5 #mod-hero-meta { grid-template-columns: repeat(2, 1fr); row-gap: 1rem; margin-top: -1.6rem; }
+    .tpl-b5 .meta-item:nth-child(2n) { border-right: none; }
+    .tpl-b5 .meta-item:nth-child(-n+2) { border-bottom: 1px solid var(--b5-line); padding-bottom: 0.8rem; }
+    .tpl-b5 .hero-nav { display: none; } /* en mobile el mockup usa menú hamburguesa; fuera de alcance de este pase */
+    .tpl-b5 .footer-inner { grid-template-columns: 1fr 1fr; }
+    .tpl-b5 #mod-mapa-crisis, .tpl-b5 #mod-impacto { padding-top: 2.5rem; }
+    .tpl-b5 .impacto-valor { font-size: 2.4rem; }
+    .tpl-b5 #db-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .tpl-b5 .impactohist-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+    .tpl-b5 .footer-inner { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================================
+   REBALANCEO DE MASA META: ALINEACIÓN IZQUIERDA 60% (v2.2.5-GOLD)
+   ============================================================================ */
+
+.tpl-b5 #mod-hero-meta, 
+.tpl-f1 .hero-meta {
+    display: grid !important;
+    /* 1. Control de Masa: Cubre el 60% del viewport */
+    width: 60vw !important; 
+    max-width: 1200px !important;
+    
+    /* 2. Alineación de Caja: Pegado a la izquierda */
+    margin: -4.5rem auto 0 0 !important; 
+    justify-content: start !important;
+    text-align: left !important;
+
+    /* 3. Estética de Ejemplo: Caja institucional sólida */
+    background: #ffffff !important;
+    padding: 2.5rem 3.5rem !important;
+    border-radius: 2px !important;
+    box-shadow: 20px 20px 60px rgba(0,0,0,0.15) !important;
+    z-index: 10;
+}
+
+/* Ajuste de ítems para alineación horizontal icono-texto */
+.tpl-b5 .meta-item,
+.tpl-f1 .meta-item {
+    justify-content: flex-start !important;
+    border-right: 1px solid rgba(20, 20, 20, 0.08);
+    padding: 0 2rem !important;
+}
+
+/* ============================================================================
+   REORGANIZACIÓN DE IMPACTO HISTÓRICO: HORIZONTAL + BANNER (v2.4.0-GOLD)
+   ============================================================================ */
+
+/* 1. Forzar 4 columnas horizontales en Escritorio */
+.tpl-b5 .impactohist-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; 
+    gap: 1rem !important;
+}
+
+/* 2. Ajuste de tarjetas de métrica para este bloque */
+.tpl-b5 #mod-impacto-historico .impacto-card--metrica {
+    padding: 1.2rem 1rem !important;
+    min-height: auto !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+.tpl-b5 #mod-impacto-historico .impacto-valor {
+    font-size: 1.8rem !important; /* Tamaño optimizado para 4 columnas */
+}
+
+/* 3. Banner de Cultura: Sincronía Inferior */
+.tpl-b5 .impactohist-banner {
+    margin-top: 1.5rem !important;
+    padding: 3rem 2rem !important;
+    background: var(--b5-red) !important;
+    border-radius: 12px !important;
+    /* Efecto Waveform (opcional si Supabase envía la imagen de fondo) */
+    background-image: url('https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/waveform-overlay.png');
+    background-size: cover;
+    background-position: center;
+}
+
+/* 4. Responsive: Colapso en Tablet/Mobile */
+@media (max-width: 1024px) {
+    .tpl-b5 .impactohist-grid {
+        grid-template-columns: repeat(2, 1fr) !important; /* 2x2 en tablets */
+    }
+}
+
