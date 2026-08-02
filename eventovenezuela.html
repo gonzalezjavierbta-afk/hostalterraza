@@ -575,14 +575,17 @@
 
                 submitBtn.disabled = true; submitBtn.innerText = 'ENVIANDO...';
                 try {
-                    const { data, error } = await sbClient.from('inscritos').insert({
-                        evento_id: window.__ctxEventoId,
-                        org_id: window.__ctxOrgId,
-                        nombre: nombre,
-                        whatsapp: `${paisCod} ${whatsappNum}`,
-                        tipo_ayuda: tipoAyuda,
-                        respuestas_custom: {}
-                    }).select().single();
+
+                const { data, error } = await sbClient.from('inscritos').insert({
+                    evento_id: window.__ctxEventoId,
+                    org_id: window.__ctxOrgId,
+                    nombre: nombre,
+                    whatsapp: `${paisCod} ${whatsappNum}`,
+                    tipo: tipoAyuda,      // <--- Mapeamos 'tipo_ayuda' a la columna 'tipo'
+                    tipo_ayuda: tipoAyuda, // <--- (Opcional) Mantenerlo también en su propia columna
+                    respuestas_custom: {}
+                }).select().single();
+
                     if (error) throw error;
 
                     regInscritoId = data.id;
