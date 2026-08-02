@@ -744,11 +744,27 @@
 /* .tpl-b5 #mod-video { 
     display: none !important; 
 } */
+/* Intervención de Layout: Galería a ancho completo sin Video */
 
-.tpl-b5 #db-video-content { 
-    display: none !important; 
+/* 1. Forzar el contenedor a una sola columna para eliminar el espacio del video */
+.tpl-b5 #mod-video {
+    display: block !important; /* Cambiamos de grid a bloque simple */
+    padding-top: 0 !important;
 }
 
+/* 2. Esconder físicamente el título (h2) y el contenedor del video */
+.tpl-b5 #mod-video h2,
+.tpl-b5 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
+/* 3. Asegurar que la galería use todo el espacio disponible */
+.tpl-b5 #db-gallery-grid {
+    grid-template-columns: repeat(4, 1fr) !important; /* 4 fotos por fila en escritorio */
+    width: 100% !important;
+}
+
+/* 4. Esconder el footer */
 .tpl-b5 #mod-footer { 
     display: none !important; 
 }
