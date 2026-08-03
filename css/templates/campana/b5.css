@@ -35,22 +35,37 @@
 
 /* ============================================================================
    1. GRID ATÓMICO — Flujo Central Inmersivo (1200px), Regla de Oro #4/#9
+   ADR-018 — CAUSA RAÍZ del "split 50/50 que no daba protagonismo al mapa":
+   `grid-template-columns` es UNA sola definición para TODO #main-content-flow;
+   las 3 filas de dos átomos (crisismap/crisisstats, historia/impactohist,
+   faq/ubicacion) comparten literalmente las mismas 2 pistas físicas. Cambiar
+   esa única propiedad a 60/40 le habría dado el mismo 60/40 a las otras 2
+   filas también (rompiendo el 65/35 pedido para Historia y alterando FAQ/
+   Ubicación sin que nadie lo pidiera) -- por eso nunca se tocó antes, y por
+   eso "el mapa no ganaba protagonismo": técnicamente no podía, con una sola
+   pista compartida, sin sacrificar las otras dos filas.
+   SOLUCIÓN (100% CSS, cero cambios de HTML -- Invariabilidad del Cerebro
+   intacta, sigue usando grid-template-areas per NEXT.md regla #3): se sube
+   la resolución a 20 columnas iguales (mínimo común múltiplo de 60/40=3:2,
+   65/35=13:7 y 50/50=1:1) y cada fila de 2 átomos reparte esas 20 columnas
+   en la proporción exacta que le corresponde; las filas de un solo átomo
+   simplemente ocupan las 20 columnas completas.
    ============================================================================ */
 .tpl-b5 #main-content-flow {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 pistas: la fila "crisis" usa ambas, el resto abarca las 2 (span completo) */
+    grid-template-columns: repeat(20, 1fr);
     grid-template-areas:
-        "hero        hero"
-        "meta        meta"
-        "form        form"
-        "crisismap   crisisstats"
-        "comoayudar  comoayudar"
-        "historia    impactohist"
-        "video       video"
-        "actualiz    actualiz"
-        "faq         ubicacion"
-        "ctafinal    ctafinal"
-        "footer      footer";
+        "hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero"
+        "meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta"
+        "form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form"
+        "crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats"
+        "comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar"
+        "historia    historia    historia    historia    historia    historia    historia    historia    historia    historia    historia    historia    historia    impactohist impactohist impactohist impactohist impactohist impactohist impactohist"
+        "video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video"
+        "actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz    actualiz"
+        "faq         faq         faq         faq         faq         faq         faq         faq         faq         faq         ubicacion   ubicacion   ubicacion   ubicacion   ubicacion   ubicacion   ubicacion   ubicacion   ubicacion   ubicacion"
+        "ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal    ctafinal"
+        "footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer      footer";
     row-gap: 0;
     width: 100%;
 }
@@ -70,8 +85,11 @@
 .tpl-b5 #mod-cta-final     { grid-area: ctafinal; }
 .tpl-b5 #mod-footer        { grid-area: footer; }
 
-/* En mobile, "crisis" también colapsa a una sola columna (mapa arriba, stats abajo) */
-@media (max-width: 899px) {
+/* ADR-018: breakpoint subido de 899px a 991px (mandato "menores a 992px") --
+   antes quedaba una franja 900-991px donde los splits 60/40 y 65/35 seguían
+   activos en pantallas ya angostas (tablets/laptops pequeños), comprimiendo
+   el mapa y las tarjetas de historia antes de tiempo. */
+@media (max-width: 991px) {
     .tpl-b5 #main-content-flow {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -192,65 +210,73 @@
    ADR-017 y el stub de comentario que quedó en la ubicación original del
    bloque REBALANCEO (Sección 16b) documentando el hueco.
    ============================================================================ */
-/* --- COMPACTACIÓN META v5.9.0 (Paridad landing-escritorio.jpg) --- */
 .tpl-b5 #mod-hero-meta {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important; /* Fuerza una sola fila de 4 columnas */
-    width: 100%;
-    max-width: 1100px;
-    margin: -10rem auto 0 0 !important; 
+    grid-template-columns: repeat(4, auto); /* Columnas adaptables al contenido */
+    width: 60vw !important;                 /* Control de masa: cubre el 60% del viewport */
+    max-width: 1200px !important;
+    margin: -10rem auto 0 0 !important;     /* v2.6.0-GOLD (ADR-017): elevación inicial — "vamos ajustando" desde aquí en iteraciones visuales sucesivas */
+    justify-content: start !important;
+    text-align: left !important;
     position: relative;
-    z-index: 20;
-    background: #ffffff;
-    border-radius: 2px;
-    box-shadow: 10px 10px 40px rgba(0,0,0,0.1);
-    /* Reducción drástica de padding para evitar el aspecto "grande" */
-    padding: 0.5rem 1rem !important; 
+    z-index: 10;
+    background: #ffffff !important;
+    border-radius: 2px;                     /* Estética cuadrada institucional */
+    box-shadow: 20px 20px 60px rgba(0,0,0,0.15);
+    padding: 2.5rem 3.5rem;                 /* Caja significativamente más grande */
 }
 
-/* Ítem: Alineación Icono (Izquierda) + Textos (Derecha en columna) */
+/* Item individual: Alineación horizontal de Icono + Textos.
+   Padding consolidado a 2rem (ADR-017): el bloque REBALANCEO duplicado
+   forzaba 2rem !important sobre el 2.5rem original y, por orden de cascada,
+   ese era el valor que realmente se veía en producción. */
 .tpl-b5 .meta-item {
     display: flex !important;
-    align-items: center !important;
-    gap: 1rem !important;
-    padding: 0 1.5rem !important;
+    flex-direction: row !important;         /* ICONO A LA IZQUIERDA DEL TEXTO */
+    align-items: center;                    /* Centrado vertical perfecto */
+    justify-content: flex-start;
+    gap: 1.4rem;                            /* Espacio sagrado entre icono y datos */
+    padding: 0 2rem;
     border-right: 1px solid rgba(20, 20, 20, 0.08);
 }
 
-.tpl-b5 .meta-item:last-child { border-right: none; }
-
-/* Iconos escalados a la referencia */
-.tpl-b5 .meta-svg {
-    width: 24px !important; 
-    height: 24px !important;
-    fill: var(--b5-red) !important;
-    flex-shrink: 0;
+.tpl-b5 .meta-item:last-child {
+    border-right: none;
 }
 
-/* Bloque de texto: Título (L1) e Info (L2) */
+/* Escalado de Iconos XL */
+.tpl-b5 .meta-svg {
+    width: 32px !important;                 /* TAMAÑO AGRANDADO */
+    height: 32px !important;
+    fill: var(--b5-red) !important;         /* Rojo Humanitario */
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(225, 29, 72, 0.2));
+}
+
+/* Bloque de texto apilado (Label arriba, Dato abajo) */
 .tpl-b5 .meta-data {
     display: flex;
-    flex-direction: column;
-    line-height: 1.2;
+    flex-direction: column;                 /* Mantiene el stack de dos líneas */
+    align-items: flex-start;
 }
 
 .tpl-b5 .meta-label {
     color: var(--b5-red);
-    font-size: 0.55rem !important; /* Más pequeño y sobrio */
+    font-size: 0.65rem;
     font-weight: 800;
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 
+/* Refuerzo Geist 900 para el dato */
 .tpl-b5 .meta-item span {
     font-family: 'Geist', sans-serif !important;
-    font-weight: 900 !important; /* Geist 900 Mandatorio */
-    font-size: 0.95rem !important; /* Tamaño reducido para paridad visual */
+    font-weight: 900 !important;            /* Mandato de Reglas de Oro #8 */
+    font-size: 1.15rem;
     color: var(--b5-ink);
+    line-height: 1.1;
     letter-spacing: -0.01em;
 }
-
-
 /* ============================================================================
    4. FORMULARIO DUAL-PHASE
    ============================================================================ */
@@ -349,6 +375,17 @@
 }
 .tpl-b5 #mod-impacto-humanitario .impacto-icono { display: none !important; }
 .tpl-b5 #db-mapa-crisis-link { display: none !important; }
+/* ADR-018: columna de datos ahora al 40% (antes 50%) -- valores compactos,
+   título arriba / cifra abajo (orden invertido al de #mod-impacto-historico,
+   que no fue mencionado en este mandato y conserva su tamaño Geist 900
+   estándar de NEXT.md). Solo se reordena/reduce vía CSS (order + font-size),
+   sin tocar el render compartido renderImpactoCards() en JS. */
+.tpl-b5 #mod-impacto-humanitario .impacto-etiqueta {
+    order: 1; font-size: 0.78rem; line-height: 1.25;
+}
+.tpl-b5 #mod-impacto-humanitario .impacto-valor {
+    order: 2; font-size: 1.85rem; line-height: 1.1;
+}
 /* "(en tiempo real)" retirado visualmente del eyebrow de la sección 02;
    el nodo <em> permanece en el DOM (Cero Borrado). */
 .tpl-b5 .mapacrisis-eyebrow em { display: none !important; }
@@ -441,7 +478,7 @@
 .tpl-b5 .impacto-icono { color: var(--b5-red); margin-bottom: 0.2rem; }
 .tpl-b5 .impacto-icono-emoji { font-size: 1.75rem; line-height: 1; display: inline-block; }
 .tpl-b5 .impacto-valor {
-    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 1.5rem; line-height: 1;
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 3.2rem; line-height: 1;
     color: var(--b5-ink);
     filter: drop-shadow(0 0 0 rgba(225,29,72,0)); /* base para el afterglow animado */
     animation: b5-afterglow 3.2s ease-in-out infinite;
@@ -526,16 +563,19 @@
 .tpl-b5 .historia-item { display: flex; gap: 1.2rem; align-items: flex-start; }
 .tpl-b5 .historia-item-num {
     flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-    width: 1.9rem; height: 1.9rem; border-radius: 4px;
-    background: var(--b5-ink); color: #fff; font-size: 0.8rem; font-weight: 900;
+    width: 1.7rem; height: 1.7rem; border-radius: 4px;
+    background: var(--b5-ink); color: #fff; font-size: 0.72rem; font-weight: 900;
 }
-.tpl-b5 .historia-item-titulo { display: block; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.01em; margin-bottom: 0.5rem; }
-.tpl-b5 .historia-item-texto { color: var(--b5-ink-soft); line-height: 1.7; font-size: 0.92rem; margin: 0; }
+/* ADR-018: escala tipográfica reducida -- se veía desproporcionadamente
+   grande frente a la sobriedad de landing-escritorio.jpg (0.95/0.92rem → 0.85/0.83rem). */
+.tpl-b5 .historia-item-titulo { display: block; font-weight: 900; font-size: 0.85rem; letter-spacing: 0.01em; margin-bottom: 0.45rem; }
+.tpl-b5 .historia-item-texto { color: var(--b5-ink-soft); line-height: 1.6; font-size: 0.83rem; margin: 0; }
 /* Soporte de imagen por hito (v1.2.6): solo se activa si el JSON trae `imagen`;
    sin imagen, .historia-item sigue siendo el flex de 2 hijos de siempre (num+body). */
-/* ADR-017: columna de texto a 60% / imagen a 40% del espacio restante tras
-   el número (1.5fr : 1fr = 60% / 40% exacto), antes 1fr : 0.72fr (~58/42). */
-.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 1.5fr 1fr; gap: 1.2rem 1.5rem; align-items: start; }
+/* ADR-018: columna de texto a 65% / imagen a 35% (antes 60/40 de ADR-017;
+   65fr:35fr expresa la proporción directamente, sin necesidad de reducir a
+   una fracción común como 1.5fr:1fr). */
+.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 65fr 35fr; gap: 1.2rem 1.5rem; align-items: start; }
 .tpl-b5 .historia-item-img { grid-column: 3; grid-row: 1; width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; background: #e7e7e9; }
 @media (max-width: 640px) {
     .tpl-b5 .historia-item--conimg { grid-template-columns: auto 1fr; }
@@ -679,21 +719,30 @@
 .tpl-b5 #db-mapa-container { height: 100%; width: 100%; }
 .tpl-b5 .ubicacion-contacto {
     height: 100%; width: 100%; box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: center; gap: 1.7rem;
-    padding: 2.6rem; background: var(--b5-bg-alt); border: 1px solid var(--b5-line);
+    display: flex; flex-direction: column; justify-content: center; gap: 2.2rem;
+    padding: 3rem 2.8rem; background: var(--b5-bg-alt); border: 1px solid var(--b5-line);
     border-radius: 15px;
 }
-.tpl-b5 .ubicacion-contacto-item { display: flex; align-items: center; gap: 1.2rem; }
-.tpl-b5 .ubicacion-contacto-icono { color: var(--b5-red); flex-shrink: 0; }
-.tpl-b5 .ubicacion-contacto-icono svg { width: 28px; height: 28px; }
+/* ADR-018: layout bicolumna explícito (icono en columna fija angosta | texto
+   en columna flexible con aire) en vez de una fila simple icono+valor —
+   mandato de Dirección para evitar la sensación de columnas apretadas
+   equitativas y dar más aire visual a la información de contacto. */
+.tpl-b5 .ubicacion-contacto-item { display: grid; grid-template-columns: 3.2rem 1fr; align-items: center; gap: 1.4rem; }
+.tpl-b5 .ubicacion-contacto-icono {
+    color: #fff; background: var(--b5-red); width: 3.2rem; height: 3.2rem; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.tpl-b5 .ubicacion-contacto-icono svg { width: 22px; height: 22px; }
+.tpl-b5 .ubicacion-contacto-label {
+    display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--b5-ink-soft); margin-bottom: 0.25rem;
+}
 .tpl-b5 .ubicacion-contacto-valor {
-    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 1.05rem;
-    color: var(--b5-ink); letter-spacing: -0.01em;
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 1.15rem;
+    color: var(--b5-ink); letter-spacing: -0.01em; word-break: break-word;
 }
 .tpl-b5 .ubicacion-contacto-vacio { color: var(--b5-ink-soft); font-size: 0.9rem; text-align: center; margin: 0; }
-/* Pin de zona afectada (v1.2.6): ya no aplica sin mapa de fondo debajo.
-   Cero Borrado: el nodo permanece en el DOM, solo se oculta. */
-.tpl-b5 .mapa-zona-pin { display: none !important; }
+/* .mapa-zona-pin retirado definitivamente en ADR-018 (markup ya no existe en el DOM). */
 @media (max-width: 899px) {
     .tpl-b5 #mod-ubicacion { display: block; }
     .tpl-b5 .mapa-wrap { min-height: 340px; height: 340px; }
@@ -751,8 +800,26 @@
 /* ============================================================================
    16. RESPONSIVE — mobile (landing-mobile.jpg)
    ============================================================================ */
+/* ADR-018 — HALLAZGO: esta regla no tenía !important, así que el margin-top:
+   -10rem !important de escritorio (Sección 3) ganaba SIEMPRE, incluso dentro
+   de este media query -- en mobile el meta hubiera intentado subir 10rem en
+   un viewport angosto, con alto riesgo de solaparse con el nav o salirse de
+   pantalla. Corregido con !important para que el valor mobile realmente
+   aplique (mismo tipo de bug de cascada que motivó ADR-017). */
+/* ADR-018 — SEGUNDO HALLAZGO en la misma zona: sin este override, el mobile
+   heredaba width:60vw !important + padding:2.5rem 3.5rem (content-box) del
+   escritorio -- en un teléfono de ~375px eso es ~330px de ancho MÁS 112px de
+   padding horizontal, desbordando el viewport. Se fija box-sizing, un ancho
+   seguro basado en el gutter de 1.5rem ya usado en el resto del template
+   (`.impactohist-inner`, etc.) y padding proporcional al viewport móvil. */
 @media (max-width: 899px) {
-    .tpl-b5 #mod-hero-meta { grid-template-columns: repeat(2, 1fr); row-gap: 1rem; margin-top: -1.6rem; }
+    .tpl-b5 #mod-hero-meta {
+        grid-template-columns: repeat(2, 1fr); row-gap: 1rem;
+        margin: -1.6rem auto 0 auto !important;
+        width: calc(100% - 3rem) !important;
+        box-sizing: border-box !important;
+        padding: 1.6rem 1.8rem !important;
+    }
     .tpl-b5 .meta-item:nth-child(2n) { border-right: none; }
     .tpl-b5 .meta-item:nth-child(-n+2) { border-bottom: 1px solid var(--b5-line); padding-bottom: 0.8rem; }
     .tpl-b5 .hero-nav { display: none; } /* en mobile el mockup usa menú hamburguesa; fuera de alcance de este pase */

@@ -235,15 +235,14 @@
         <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
         <section id="mod-ubicacion">
             <span class="b5-num-eyebrow" data-num="10">Ubicación</span>
+            <!-- ADR-018: el overlay de pin (.mapa-zona-pin, v1.2.6) se retira de forma
+                 definitiva del marcado -- dependía visualmente del iframe de mapa que
+                 ADR-017 ya reemplazó por el bloque de contacto directo, así que superponer
+                 un pin sobre texto de contacto no tenía sentido visual. Autorizado
+                 explícitamente por Dirección ("eliminar definitivamente"), a diferencia del
+                 resto de átomos del Contrato de Datos, que solo se ocultan (Cero Borrado). -->
             <div class="mapa-wrap">
                 <div id="db-mapa-container" style="border-radius:15px; overflow:hidden;"></div>
-                <!-- Pin de zona afectada (v1.2.6): posición aproximada superpuesta al iframe,
-                     ya que el embed simple de Google Maps no admite overlays reales sin API
-                     key de Maps JS (ver DECISIONS.md). No es georreferenciado con precisión. -->
-                <div class="mapa-zona-pin" title="Zona afectada: Catia La Mar / La Guaira">
-                    <span class="mapa-zona-pin-dot"></span>
-                    <span class="mapa-zona-pin-label">Zona afectada</span>
-                </div>
             </div>
         </section>
 
@@ -1513,18 +1512,21 @@ if (document.getElementById('db-poster-img')) {
         const contactoContainer = document.getElementById('db-mapa-container');
         if (contactoContainer) {
             const filas = [];
-            if (contactoData.tel) filas.push({ icono: UBICACION_CONTACTO_ICONS.tel, valor: contactoData.tel });
-            if (contactoData.email) filas.push({ icono: UBICACION_CONTACTO_ICONS.email, valor: contactoData.email });
+            if (contactoData.tel) filas.push({ icono: UBICACION_CONTACTO_ICONS.tel, label: 'Teléfono', valor: contactoData.tel });
+            if (contactoData.email) filas.push({ icono: UBICACION_CONTACTO_ICONS.email, label: 'Email', valor: contactoData.email });
             // Fallback aditivo: si no hay dirección explícita en content.contacto.dir,
             // se usa ev.ubicacion (el mismo campo que antes construía el mapa).
             const direccion = contactoData.dir || ev.ubicacion || '';
-            if (direccion) filas.push({ icono: UBICACION_CONTACTO_ICONS.dir, valor: direccion });
+            if (direccion) filas.push({ icono: UBICACION_CONTACTO_ICONS.dir, label: 'Dirección', valor: direccion });
 
             contactoContainer.innerHTML = filas.length
                 ? `<div class="ubicacion-contacto">${filas.map(f => `
                     <div class="ubicacion-contacto-item">
                         <span class="ubicacion-contacto-icono">${f.icono}</span>
-                        <span class="ubicacion-contacto-valor">${f.valor}</span>
+                        <div class="ubicacion-contacto-texto">
+                            <span class="ubicacion-contacto-label">${f.label}</span>
+                            <span class="ubicacion-contacto-valor">${f.valor}</span>
+                        </div>
                     </div>`).join('')}</div>`
                 : `<div class="ubicacion-contacto"><p class="ubicacion-contacto-vacio">Contacto próximamente.</p></div>`;
 
