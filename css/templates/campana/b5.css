@@ -180,29 +180,45 @@
 }
 
 /* ============================================================================
-   3. META (v1.10-GOLD) — Configuración High-Fidelity: Iconos XL a la Izquierda
+   3. META (v2.6.0-GOLD / ADR-017) — Fuente única consolidada.
+   HALLAZGO DE AUDITORÍA (Fase de Interrogación Prioritaria, ago-2026): esta
+   regla y el bloque "REBALANCEO DE MASA META v2.2.5-GOLD" (sin ADR, ubicado
+   más abajo en el archivo) declaraban AMBOS `.tpl-b5 #mod-hero-meta` con
+   igual especificidad (ID + !important). Al tener el REBALANCEO orden de
+   aparición posterior, ganaba siempre en cascada — por eso cambiar el
+   margin-top aquí (histórico: -10rem) nunca tuvo efecto visual real; el
+   valor que de verdad renderizaba era el -4.5rem del bloque duplicado.
+   Consolidado en una sola regla por mandato de Dirección. Ver DECISIONS.md
+   ADR-017 y el stub de comentario que quedó en la ubicación original del
+   bloque REBALANCEO (Sección 16b) documentando el hueco.
    ============================================================================ */
 .tpl-b5 #mod-hero-meta {
     display: grid !important;
     grid-template-columns: repeat(4, auto); /* Columnas adaptables al contenido */
-    width: fit-content;
-    max-width: 1200px;
-    margin: -10rem 0 0 0 !important;      /* Pegado a la izquierda del layout */
+    width: 60vw !important;                 /* Control de masa: cubre el 60% del viewport */
+    max-width: 1200px !important;
+    margin: -10rem auto 0 0 !important;     /* v2.6.0-GOLD (ADR-017): elevación inicial — "vamos ajustando" desde aquí en iteraciones visuales sucesivas */
+    justify-content: start !important;
+    text-align: left !important;
     position: relative;
-    z-index: 5;
-    background: #ffffff;
+    z-index: 10;
+    background: #ffffff !important;
     border-radius: 2px;                     /* Estética cuadrada institucional */
     box-shadow: 20px 20px 60px rgba(0,0,0,0.15);
     padding: 2.5rem 3.5rem;                 /* Caja significativamente más grande */
 }
 
-/* Item individual: Alineación horizontal de Icono + Textos */
+/* Item individual: Alineación horizontal de Icono + Textos.
+   Padding consolidado a 2rem (ADR-017): el bloque REBALANCEO duplicado
+   forzaba 2rem !important sobre el 2.5rem original y, por orden de cascada,
+   ese era el valor que realmente se veía en producción. */
 .tpl-b5 .meta-item {
     display: flex !important;
     flex-direction: row !important;         /* ICONO A LA IZQUIERDA DEL TEXTO */
     align-items: center;                    /* Centrado vertical perfecto */
+    justify-content: flex-start;
     gap: 1.4rem;                            /* Espacio sagrado entre icono y datos */
-    padding: 0 2.5rem;
+    padding: 0 2rem;
     border-right: 1px solid rgba(20, 20, 20, 0.08);
 }
 
@@ -296,7 +312,8 @@
 .tpl-b5 .btn-submit:hover, .tpl-b5 #master-reg-form button[type="submit"]:hover { background: var(--b5-red-deep); }
 .tpl-b5 .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 .tpl-b5 .form-security-note {
-    display: block; text-align: center; margin-top: 0.9rem;
+    display: none !important; /* ADR-017: oculto por mandato del Context Package; nodo conservado (Cero Borrado) */
+    text-align: center; margin-top: 0.9rem;
     font-size: 0.75rem; color: var(--b5-ink-soft);
 }
 .tpl-b5 .form-success-msg {
@@ -320,6 +337,29 @@
 .tpl-b5 #mod-mapa-crisis { padding-right: 1.2rem; }
 .tpl-b5 #mod-impacto-humanitario { padding-left: 1.2rem; }
 .tpl-b5 #mod-impacto-humanitario #db-impacto-grid { grid-template-columns: 1fr 1fr; max-width: none; margin: 0; }
+
+/* ADR-017 — Cifras de Impacto (sección 02): se retira el look de "tarjeta"
+   (fondo/borde/radio) y se sustituye por separadores lineales; se ocultan
+   los iconos y el link "Ver mapa ampliado →". Cero Borrado: `.impacto-icono`
+   y `#db-mapa-crisis-link` permanecen en el DOM, solo display:none. Scoped
+   a #mod-impacto-humanitario para no afectar las tarjetas de Impacto
+   Histórico (sección 05), que reutilizan la misma clase base. */
+.tpl-b5 #mod-impacto-humanitario .impacto-card--metrica {
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 1.5rem 0 !important;
+    border-bottom: 1px solid var(--b5-line) !important;
+}
+.tpl-b5 #mod-impacto-humanitario .impacto-card--metrica:nth-last-child(-n+2) {
+    border-bottom: none !important; /* última fila (2 columnas) sin separador colgante */
+}
+.tpl-b5 #mod-impacto-humanitario .impacto-icono { display: none !important; }
+.tpl-b5 #db-mapa-crisis-link { display: none !important; }
+/* "(en tiempo real)" retirado visualmente del eyebrow de la sección 02;
+   el nodo <em> permanece en el DOM (Cero Borrado). */
+.tpl-b5 .mapacrisis-eyebrow em { display: none !important; }
 
 /* ============================================================================
    5b. INSIGNIA NUMERADA (v222) — cabecera compartida por toda sección numerada
@@ -430,10 +470,15 @@
 .tpl-b5 .comoayudar-col--main { min-width: 0; }
 .tpl-b5 .comoayudar-col--stats { display: none !important; }
 .tpl-b5 .comoayudar-lead { max-width: 640px; color: var(--b5-ink-soft); line-height: 1.6; margin: 0 0 2.2rem; }
-/* 4 columnas fijas en escritorio (ADR-016); auto-fit se retira para que el
-   Director controle el número exacto de columnas en vez de que fluya según
-   el ancho disponible. */
-.tpl-b5 .comoayudar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+/* 5 columnas fijas en escritorio (ADR-017: sube de 4 a 5 — el Contrato v112/
+   ADR-015 agregó la categoría "Donación" al fallback real (5 categorías),
+   pero el grid se había quedado en repeat(4,1fr) tras ADR-016, así que la
+   5ta tarjeta saltaba a una fila propia en vez de quedar en una sola línea
+   horizontal. Dirección confirmó mantener las 5 categorías visibles). */
+.tpl-b5 .comoayudar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem; }
+@media (max-width: 1099px) {
+    .tpl-b5 .comoayudar-grid { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 899px) {
     .tpl-b5 .comoayudar-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -458,13 +503,22 @@
 }
 .tpl-b5 .comoayudar-card {
     background: var(--b5-bg-alt); border: 1px solid var(--b5-line); border-radius: 14px;
-    padding: 1.8rem 1.4rem; cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease;
+    padding: 2.2rem 1.2rem; cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease;
+    text-align: center; /* Paridad visual: iconos y texto centrados (ADR-017) */
 }
 .tpl-b5 .comoayudar-card:hover { border-color: var(--b5-red); transform: translateY(-3px); }
-.tpl-b5 .comoayudar-icono { color: var(--b5-red); margin-bottom: 0.9rem; }
+/* Iconos agrandados y centrados (ADR-017): antes 26x26 heredado del SVG inline,
+   se escalan visualmente sin tocar el atributo width/height del <svg> físico
+   (Cero Borrado del marcado inyectado por JS). */
+.tpl-b5 .comoayudar-icono {
+    color: var(--b5-red); margin: 0 auto 1.2rem; display: flex; justify-content: center;
+    transform: scale(1.55);
+}
 .tpl-b5 .comoayudar-titulo { display: block; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.02em; margin-bottom: 0.4rem; }
-.tpl-b5 .comoayudar-desc { color: var(--b5-ink-soft); font-size: 0.85rem; line-height: 1.5; margin: 0 0 0.9rem; }
-.tpl-b5 .comoayudar-link { font-size: 0.75rem; font-weight: 800; color: var(--b5-red); }
+.tpl-b5 .comoayudar-desc { color: var(--b5-ink-soft); font-size: 0.85rem; line-height: 1.5; margin: 0; }
+/* Enlace "VER MÁS →" oculto (Context Package): se conserva en el DOM (Cero
+   Borrado) por si una futura iteración visual lo reactiva. */
+.tpl-b5 .comoayudar-link { display: none !important; }
 
 /* ============================================================================
    8. HISTORIA (sección 04) — pareja de fila con Impacto Histórico (05)
@@ -487,7 +541,9 @@
 .tpl-b5 .historia-item-texto { color: var(--b5-ink-soft); line-height: 1.7; font-size: 0.92rem; margin: 0; }
 /* Soporte de imagen por hito (v1.2.6): solo se activa si el JSON trae `imagen`;
    sin imagen, .historia-item sigue siendo el flex de 2 hijos de siempre (num+body). */
-.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 1fr 0.72fr; gap: 1.2rem 1.5rem; align-items: start; }
+/* ADR-017: columna de texto a 60% / imagen a 40% del espacio restante tras
+   el número (1.5fr : 1fr = 60% / 40% exacto), antes 1fr : 0.72fr (~58/42). */
+.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 1.5fr 1fr; gap: 1.2rem 1.5rem; align-items: start; }
 .tpl-b5 .historia-item-img { grid-column: 3; grid-row: 1; width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; background: #e7e7e9; }
 @media (max-width: 640px) {
     .tpl-b5 .historia-item--conimg { grid-template-columns: auto 1fr; }
@@ -617,32 +673,35 @@
 .tpl-b5 .faq-icon-circle { border-color: var(--b5-red) !important; color: var(--b5-red) !important; }
 
 /* ============================================================================
-   12. UBICACIÓN ("mapa ampliado" real — target del link de la sección 02)
-   El mapa se estira al 100% de la altura de la fila (igualando siempre a FAQ,
-   incluso cuando el acordeón de preguntas crece): #mod-ubicacion es un ítem de
-   Grid que ya se estira por defecto (align-items:stretch de #main-content-flow);
-   solo falta que su contenido interno también ocupe esa altura completa.
+   12. UBICACIÓN → CONTACTO DIRECTO (ADR-017, Opción B mandato de Dirección)
+   Se retira el iframe de Google Maps de esta columna (compartía fila con
+   FAQ) y se sustituye por información de contacto directa, leyendo
+   content.contacto (dir/tel/email) — campo del Contrato de Datos que ya
+   existía pero no tenía consumidor hasta ahora. Cero Borrado: #mod-ubicacion
+   y #db-mapa-container permanecen como los mismos IDs/targets de inyección;
+   solo cambia lo que el JS inyecta dentro (ver eventovenezuela.html). Se
+   conserva el estirado 100% de altura para igualar siempre a la columna FAQ.
    ============================================================================ */
 .tpl-b5 #mod-ubicacion { padding: 4rem 2.2rem; scroll-margin-top: 2rem; display: flex; flex-direction: column; }
 .tpl-b5 .mapa-wrap { position: relative; flex: 1; min-height: 320px; }
-.tpl-b5 #db-mapa-container { border: 1px solid var(--b5-line) !important; height: 100%; width: 100%; }
-/* Pin de zona afectada (v1.2.6): superposición aproximada, sin API de Google Maps JS
-   (ver DECISIONS.md) — no georreferenciado con precisión real. */
-.tpl-b5 .mapa-zona-pin {
-    position: absolute; top: 42%; left: 46%; transform: translate(-50%, -50%);
-    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-    pointer-events: none; z-index: 2;
+.tpl-b5 #db-mapa-container { height: 100%; width: 100%; }
+.tpl-b5 .ubicacion-contacto {
+    height: 100%; width: 100%; box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center; gap: 1.7rem;
+    padding: 2.6rem; background: var(--b5-bg-alt); border: 1px solid var(--b5-line);
+    border-radius: 15px;
 }
-.tpl-b5 .mapa-zona-pin-dot {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(225, 29, 72, 0.35); border: 2px solid var(--b5-red);
-    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0.14);
-    animation: b5-mapPulse 2.4s ease-out infinite;
+.tpl-b5 .ubicacion-contacto-item { display: flex; align-items: center; gap: 1.2rem; }
+.tpl-b5 .ubicacion-contacto-icono { color: var(--b5-red); flex-shrink: 0; }
+.tpl-b5 .ubicacion-contacto-icono svg { width: 28px; height: 28px; }
+.tpl-b5 .ubicacion-contacto-valor {
+    font-family: 'Geist', sans-serif; font-weight: 900; font-size: 1.05rem;
+    color: var(--b5-ink); letter-spacing: -0.01em;
 }
-.tpl-b5 .mapa-zona-pin-label {
-    background: var(--b5-ink); color: #fff; font-size: 0.68rem; font-weight: 800;
-    letter-spacing: 0.02em; padding: 0.25rem 0.6rem; border-radius: 5px; white-space: nowrap;
-}
+.tpl-b5 .ubicacion-contacto-vacio { color: var(--b5-ink-soft); font-size: 0.9rem; text-align: center; margin: 0; }
+/* Pin de zona afectada (v1.2.6): ya no aplica sin mapa de fondo debajo.
+   Cero Borrado: el nodo permanece en el DOM, solo se oculta. */
+.tpl-b5 .mapa-zona-pin { display: none !important; }
 @media (max-width: 899px) {
     .tpl-b5 #mod-ubicacion { display: block; }
     .tpl-b5 .mapa-wrap { min-height: 340px; height: 340px; }
@@ -717,31 +776,31 @@
 
 
 /* ============================================================================
-   REBALANCEO DE MASA META: ALINEACIÓN IZQUIERDA 60% (v2.2.5-GOLD)
+   16b. [CONSOLIDADO — ADR-017] Antes vivía aquí "REBALANCEO DE MASA META
+   v2.2.5-GOLD", un bloque sin ADR asociado que redeclaraba
+   `.tpl-b5 #mod-hero-meta` con margin: -4.5rem !important — shadowing en
+   silencio el intento de -10rem de la Sección 3 por simple orden de
+   aparición en el archivo (misma especificidad, ambos !important). Esa
+   parte se fusionó en la regla única de la Sección 3 (arriba). Se conserva
+   este hueco documentado para que quede rastro de dónde vivía el parche NO
+   soberano y por qué nunca hubo efecto al tocar el -10rem original.
+   Las reglas de `.tpl-f1` que compartían este bloque (fuera de alcance de
+   este sprint, silo distinto) se preservan sin cambios como reglas propias
+   más abajo, para no regresar el silo f1. Ver DECISIONS.md ADR-017.
    ============================================================================ */
-
-.tpl-b5 #mod-hero-meta, 
 .tpl-f1 .hero-meta {
     display: grid !important;
-    /* 1. Control de Masa: Cubre el 60% del viewport */
-    width: 60vw !important; 
+    width: 60vw !important;
     max-width: 1200px !important;
-    
-    /* 2. Alineación de Caja: Pegado a la izquierda */
-    margin: -4.5rem auto 0 0 !important; 
+    margin: -4.5rem auto 0 0 !important;
     justify-content: start !important;
     text-align: left !important;
-
-    /* 3. Estética de Ejemplo: Caja institucional sólida */
     background: #ffffff !important;
     padding: 2.5rem 3.5rem !important;
     border-radius: 2px !important;
     box-shadow: 20px 20px 60px rgba(0,0,0,0.15) !important;
     z-index: 10;
 }
-
-/* Ajuste de ítems para alineación horizontal icono-texto */
-.tpl-b5 .meta-item,
 .tpl-f1 .meta-item {
     justify-content: flex-start !important;
     border-right: 1px solid rgba(20, 20, 20, 0.08);
@@ -771,10 +830,14 @@
     font-size: 1.8rem !important; /* Tamaño optimizado para 4 columnas */
 }
 
-/* 3. Banner de Cultura: Sincronía Inferior */
+/* 3. Banner de Cultura: Sincronía Inferior (ADR-017: altura aumentada) */
 .tpl-b5 .impactohist-banner {
     margin-top: 1.5rem !important;
-    padding: 3rem 2rem !important;
+    padding: 4.5rem 2rem !important;
+    min-height: 200px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     background: var(--b5-red) !important;
     border-radius: 12px !important;
     /* Efecto Waveform (opcional si Supabase envía la imagen de fondo) */

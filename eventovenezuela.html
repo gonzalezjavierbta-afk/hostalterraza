@@ -265,8 +265,8 @@
                             <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
                             <div class="reg-phone-row">
                                 <select id="reg-pais" aria-label="País">
-                                    <option value="+58" selected>🇻🇪 +58</option>
-                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+58">🇻🇪 +58</option>
+                                    <option value="+57" selected>🇨🇴 +57</option>
                                     <option value="+1">🇺🇸 +1</option>
                                     <option value="+34">🇪🇸 +34</option>
                                     <option value="+51">🇵🇪 +51</option>
@@ -501,7 +501,7 @@
             if (!modal) return;
             document.getElementById('actualizacion-modal-fecha').innerText = item.categoria ? `${item.categoria} · ${item.fecha || ''}` : (item.fecha || '');
             document.getElementById('actualizacion-modal-detalle').innerText = item.titulo || '';
-            document.getElementById('actualizacion-modal-ampliado').innerText = item.resumen || '';
+            document.getElementById('actualizacion-modal-ampliado').innerText = item.resumen_ampliado || item.resumen || '';
             const img = document.getElementById('actualizacion-modal-img');
             if (item.imagen) { img.src = item.imagen; img.style.display = 'block'; }
             else { img.removeAttribute('src'); img.style.display = 'none'; }
@@ -1226,7 +1226,7 @@
     }
     const impactoHistCount = renderImpactoCards(impactoHistList, 'db-impacto-historico-grid', monedaVal, fmtMoney);
     if (document.getElementById('db-impacto-historico-frase')) {
-        document.getElementById('db-impacto-historico-frase').innerText = content.impacto_historico_frase || 'LA CULTURA NOS UNE. LA SOLIDARIDAD NOS MUEVE.';
+        document.getElementById('db-impacto-historico-frase').innerText = content.impacto_historico_frase || 'LA MÚSICA NOS UNE. LA SOLIDARIDAD NOS MUEVE.';
     }
     const ihStatus = isImpactoHistFallback ? `Impacto histórico de REFERENCIA/FALLBACK (${impactoHistCount})` : `Impacto histórico REAL (${impactoHistCount})`;
     logStatus(`TRACE: ${ihStatus} inyectado.`, "TRACE");
@@ -1237,7 +1237,38 @@
     // REVERTIDO por mandato explícito de Dirección (Context Package v4.0.0-GOLD,
     // ago-2026): se reintroduce "categoria" como 1er segmento. Contrato vigente:
     // {categoria, fecha, titulo, resumen, imagen} (5 campos, admin.html alineado).
-    let actualizacionesList = Array.isArray(content.actualizaciones) ? content.actualizaciones : [];
+    //
+    // ADR-017 — CAUSA RAÍZ REAL DE "TARJETAS VACÍAS": auditado el JSON real del
+    // evento Venezuela, content.actualizaciones NO es un array de objetos: es un
+    // array de STRINGS con formato legado "fecha | titulo | resumen | ampliado |
+    // imagen" (4 o 5 segmentos separados por "|"). El render leía item.categoria,
+    // item.fecha, item.titulo... sobre un string -- todas esas propiedades son
+    // undefined en un string, de ahí las tarjetas vacías pese a haber datos reales.
+    // Mismo patrón que el bug "COP0" de ADR-016 (esquema legado vs. esquema
+    // vigente). normalizeActualizacionesLegacy() detecta strings y los traduce;
+    // los objetos ya estructurados (contrato v112) pasan intactos.
+    function normalizeActualizacionesLegacy(list) {
+        return list.map(item => {
+            if (typeof item !== 'string') return item;
+            const partes = item.split('|').map(p => p.trim());
+            // Legado no traía "categoria" (se retiró y reintrodujo después, ver
+            // nota arriba) -- por eso el string legado tiene 4-5 segmentos, no 6.
+            return {
+                fecha: partes[0] || '',
+                titulo: partes[1] || '',
+                resumen: partes[2] || '',
+                // El 4to segmento es un texto ampliado que el esquema legado sí
+                // tenía y el objeto vigente no contemplaba (un único "resumen").
+                // Se preserva de forma aditiva en resumen_ampliado (Cero Borrado
+                // de información): la tarjeta sigue usando el resumen corto
+                // (partes[2]) recortado a 3 líneas; el modal usa el ampliado si
+                // existe, o cae al resumen corto si no.
+                resumen_ampliado: partes[3] || '',
+                imagen: partes[4] || ''
+            };
+        });
+    }
+    let actualizacionesList = Array.isArray(content.actualizaciones) ? normalizeActualizacionesLegacy(content.actualizaciones) : [];
     let isActualizacionesFallback = false;
     if (actualizacionesList.length === 0) {
         actualizacionesList = [
@@ -1464,24 +1495,41 @@ if (document.getElementById('db-poster-img')) {
     }
     // === FIN SEGMENTO FAQ ===
 
-    // === INICIO SEGMENTO: VINCULACIÓN DE UBICACIÓN (v201) ===
-    if (ev.ubicacion) {
-        // Nota v1.4.8: se retiró la referencia a #venue-name — ese ID nunca existió en el HTML
-        // (remanente huérfano de una versión anterior), la condición nunca era verdadera.
+    // === INICIO SEGMENTO: UBICACIÓN → CONTACTO DIRECTO (ADR-017, Opción B) ===
+    // Antes: iframe de Google Maps embebido en #db-mapa-container. Mandato de
+    // Dirección (Context Package, ago-2026): sustituir por información de
+    // contacto directa. Se lee content.contacto (dir/tel/email) -- campo del
+    // Contrato de Datos que ya existía en el JSON del evento pero no tenía
+    // ningún consumidor en este archivo hasta ahora (auditado: cero matches
+    // de "content.contacto" antes de este cambio). Cero Borrado: el target de
+    // inyección sigue siendo el mismo ID, #db-mapa-container.
+    {
+        const UBICACION_CONTACTO_ICONS = {
+            tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+            email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6 12 13 2 6"/></svg>',
+            dir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>'
+        };
+        const contactoData = content.contacto || {};
+        const contactoContainer = document.getElementById('db-mapa-container');
+        if (contactoContainer) {
+            const filas = [];
+            if (contactoData.tel) filas.push({ icono: UBICACION_CONTACTO_ICONS.tel, valor: contactoData.tel });
+            if (contactoData.email) filas.push({ icono: UBICACION_CONTACTO_ICONS.email, valor: contactoData.email });
+            // Fallback aditivo: si no hay dirección explícita en content.contacto.dir,
+            // se usa ev.ubicacion (el mismo campo que antes construía el mapa).
+            const direccion = contactoData.dir || ev.ubicacion || '';
+            if (direccion) filas.push({ icono: UBICACION_CONTACTO_ICONS.dir, valor: direccion });
 
-        // 2. Construcción Dinámica del Mapa (Google Maps Embed) [cite: 301]
-        const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-        const mapContainer = document.getElementById('db-mapa-container');
-        
-        if (mapContainer) {
-            mapContainer.style.border = '1px solid var(--tpl-accent)';
-            mapContainer.innerHTML = `
-                <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen 
-                        style="border:none;"></iframe>`;
+            contactoContainer.innerHTML = filas.length
+                ? `<div class="ubicacion-contacto">${filas.map(f => `
+                    <div class="ubicacion-contacto-item">
+                        <span class="ubicacion-contacto-icono">${f.icono}</span>
+                        <span class="ubicacion-contacto-valor">${f.valor}</span>
+                    </div>`).join('')}</div>`
+                : `<div class="ubicacion-contacto"><p class="ubicacion-contacto-vacio">Contacto próximamente.</p></div>`;
+
+            logStatus(`TRACE: Contacto directo inyectado en #mod-ubicacion (${filas.length} campos, ADR-017 Opción B).`, "TRACE");
         }
-
-        // Certificación de Salud Escudo GOLD [cite: 805, 811]
-        logStatus("TRACE: Módulo de ubicación vinculado y mapa inyectado.", "TRACE");
     }
     // === FIN SEGMENTO UBICACIÓN ===
 
