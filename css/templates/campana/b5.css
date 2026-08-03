@@ -330,41 +330,7 @@
 .tpl-b5 #mod-impacto-humanitario { padding-left: 1.2rem; }
 .tpl-b5 #mod-impacto-humanitario #db-impacto-grid { grid-template-columns: 1fr 1fr; max-width: none; margin: 0; }
 
-/* --- LAYOUT 50/50 ESTADO DE EMERGENCIA v5.10.0 --- */
 
-/* Forzamos a los dos módulos a comportarse como celdas de una sola fila */
-.tpl-b5 #mod-mapa-crisis, 
-.tpl-b5 #mod-impacto-humanitario {
-    display: inline-block !important; /* Permite convivencia horizontal */
-    vertical-align: top;
-    width: 50% !important;            /* División exacta solicitada */
-    padding: 4rem clamp(1.5rem, 5vw, 5rem) !important;
-    min-height: 500px;
-    background: #ffffff;              /* Fondo unificado según mockup */
-}
-
-/* Ajuste específico para el contenedor del Mapa */
-.tpl-b5 #mod-mapa-crisis {
-    border-right: 1px solid rgba(20, 20, 20, 0.05); /* Separador sutil */
-}
-
-/* Ajuste de la información (Derecha) */
-.tpl-b5 #mod-impacto-humanitario {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center; /* Centrado vertical de las cifras */
-}
-
-/* Responsividad: En móviles volvemos al stack 100% */
-@media (max-width: 992px) {
-    .tpl-b5 #mod-mapa-crisis, 
-    .tpl-b5 #mod-impacto-humanitario {
-        display: block !important;
-        width: 100% !important;
-        min-height: auto;
-        border-right: none;
-    }
-}
 
 /* ADR-017 — Cifras de Impacto (sección 02): se retira el look de "tarjeta"
    (fondo/borde/radio) y se sustituye por separadores lineales; se ocultan
