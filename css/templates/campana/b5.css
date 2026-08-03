@@ -586,18 +586,24 @@
    9. IMPACTO HISTÓRICO (sección 05) + banner de frase
    ============================================================================ */
 .tpl-b5 .impactohist-inner { max-width: none; margin: 0; padding: 4rem 2.2rem; }
-/* --- REFACTORIZACIÓN SECCIÓN 05: SOLO BANNER v1.4.1 --- */
 
-/* 1. Ocultamos el grid de cifras preservando la integridad del Contrato de Datos */
+/* --- REFACTORIZACIÓN SECCIÓN 05: SOLO BANNER v1.4.2 --- */
+
+/* 1. Ocultamos el título "Impacto hasta hoy" y la insignia "05" */
+.tpl-b5 .impactohist-eyebrow {
+    display: none !important;
+}
+
+/* 2. Ocultamos el grid de cifras (mantenemos el nodo en el DOM por integridad) */
 .tpl-b5 #db-impacto-historico-grid {
     display: none !important; 
 }
 
-/* 2. Ajuste del Recuadro Rojo (Banner) para protagonismo absoluto en la columna */
+/* 3. Ajuste del Banner Rojo para protagonismo absoluto en la columna */
 .tpl-b5 .impactohist-banner {
-    margin-top: 0 !important;             /* Eliminamos el margen superior al no haber tarjetas arriba */
-    padding: 5rem 2.5rem !important;      /* Aumentamos respiro para mayor peso visual */
-    min-height: 400px !important;         /* Forzamos una altura que equilibre con la columna de Historia */
+    margin-top: 0 !important;             /* Eliminamos margen superior al no haber elementos arriba */
+    padding: 6rem 2.5rem !important;      /* Mayor respiro para compensar la ausencia de título */
+    min-height: 480px !important;         /* Altura calibrada para equilibrar con el bloque de Historia */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -611,12 +617,12 @@
 .tpl-b5 .impactohist-banner span {
     font-family: 'Geist', sans-serif;
     font-weight: 900;
-    font-size: clamp(1.6rem, 4vw, 2.4rem); /* Frase Geist 900 de autoridad */
-    line-height: 1.2;
+    font-size: clamp(1.8rem, 4vw, 2.6rem); /* Escala Geist 900 incrementada */
+    line-height: 1.1;
     color: #fff;
     text-transform: uppercase;
+    text-align: center;
 }
-
 
 /* ============================================================================
    10. VIDEO (07) + GALERÍA DE MEMORIA (06) — ahora en columnas (v222)
