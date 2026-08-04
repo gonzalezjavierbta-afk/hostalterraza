@@ -1171,18 +1171,19 @@
 }
 
 /* =============================================================
-   REFACTORIZACIÓN DE TRÍADA ADAPTATIVA v2.1.0
-   Segmentación independiente: Escritorio | Tablet | Mobile
+   REFACTORIZACIÓN DE SINCRONÍA VISUAL v2.2.0
+   Sintonía 1:1 con landing-mobile.jpg | Orden Explícito Total
    ============================================================= */
 
-/* --- [1] RESET GLOBAL DE CAJA (Blindaje para todas las resoluciones) --- */
+/* --- RESET GLOBAL DE CAJA (Blindaje Universal) --- */
 .tpl-b5, .tpl-b5 * { 
     box-sizing: border-box !important; 
 }
 
-/* --- [2] CAPA TABLET: iPAD & LAPTOPS PEQUEÑOS (max-width: 1024px) --- 
-   Mandato: Forzar colapso a una columna ("a una línea") desde iPad. */
+/* --- CAPA ADAPTATIVA TABLET & MOBILE (max-width: 1024px) --- 
+   Mandato: Stack vertical puro ("a una línea") y orden idéntico a escritorio. */
 @media (max-width: 1024px) {
+    /* 1. Reset del Contenedor Maestro a Flex-Column */
     .tpl-b5 #main-content-flow {
         display: flex !important;
         flex-direction: column !important;
@@ -1191,50 +1192,61 @@
         overflow-x: hidden !important;
     }
 
-    /* REORDENAMIENTO EXPLÍCITO (Mandato Director) */
-    .tpl-b5 #mod-hero        { order: 1 !important; }
-    .tpl-b5 #mod-hero-meta   { order: 2 !important; margin: -1.6rem auto 2rem !important; width: 92% !important; }
-    .tpl-b5 #mod-form        { order: 3 !important; }
-    .tpl-b5 #mod-mapa-crisis { order: 4 !important; }
-    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; }
-    .tpl-b5 #mod-historia    { order: 6 !important; }
+    /* 2. MAPEADO DE SECUENCIA TOTAL (Según landing-mobile.jpg) */
+    .tpl-b5 #mod-hero                { order: 1 !important; display: block !important; }
+    .tpl-b5 #mod-hero-meta           { order: 2 !important; display: grid !important; margin: -1.6rem auto 2rem !important; width: 92% !important; }
+    .tpl-b5 #mod-form                { order: 3 !important; display: block !important; }
+    .tpl-b5 #mod-mapa-crisis         { order: 4 !important; display: block !important; }
+    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; display: block !important; }
+    .tpl-b5 #mod-como-ayudar         { order: 6 !important; display: block !important; }
+    .tpl-b5 #mod-historia            { order: 7 !important; display: block !important; }
+    .tpl-b5 #mod-impacto-historico   { order: 8 !important; display: block !important; }
+    .tpl-b5 #mod-video               { order: 9 !important; display: flex !important; flex-direction: column !important; }
+    .tpl-b5 #mod-actualizaciones     { order: 10 !important; display: block !important; }
+    .tpl-b5 #mod-faq                 { order: 11 !important; display: block !important; }
+    .tpl-b5 #mod-ubicacion           { order: 12 !important; display: block !important; }
+    .tpl-b5 #mod-cta-final           { order: 13 !important; display: block !important; }
+    .tpl-b5 #mod-footer              { order: 14 !important; display: block !important; }
 
-    /* COLAPSO DE SUB-GRILLAS (Fin de la estrangulación en iPad) */
+    /* 3. COLAPSO DE SUB-GRILLAS (Fin de la estrangulación) */
     .tpl-b5 #mod-hero-meta,
     .tpl-b5 #db-impacto-grid,
     .tpl-b5 .impacto-grid,
     .tpl-b5 .comoayudar-grid {
-        display: flex !important;
-        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
         width: 100% !important;
         gap: 1.5rem !important;
     }
 
-    /* AJUSTE DE HISTORIA: Texto antes que imagen */
+    /* 4. REORDENAMIENTO INTERNO (Fidelidad 1px) */
+    /* Historia: Texto antes que imagen */
     .tpl-b5 .historia-item--conimg { display: flex !important; flex-direction: column !important; }
     .tpl-b5 .historia-item-body { order: 1 !important; }
-    .tpl-b5 .historia-item-img  { order: 2 !important; width: 100% !important; aspect-ratio: 16/9 !important; }
+    .tpl-b5 .historia-item-img  { order: 2 !important; width: 100% !important; aspect-ratio: 16/9 !important; margin-top: 1rem; }
+
+    /* Video: Galería 06 antes que Video 07 */
+    .tpl-b5 .b5-video-col--gallery { order: 1 !important; }
+    .tpl-b5 .b5-video-col--video   { order: 2 !important; padding-top: 3rem !important; }
 }
 
-/* --- [3] CAPA MOBILE: SMARTPHONES (max-width: 640px) --- 
-   Cambios específicos solo para celulares (iPhone SE, Pixel, etc.) */
+/* --- AJUSTES FINOS PARA MOBILE ESTRECHO (max-width: 640px) --- */
 @media (max-width: 640px) {
-    /* Reducción de escala Geist 900 para pantallas ultra-estrechas */
     .tpl-b5 .impacto-valor {
         font-size: clamp(1.8rem, 10vw, 2.6rem) !important;
     }
 
-    /* Blindaje de texto contra desbordamiento lateral */
+    /* Blindaje contra desbordamiento de texto */
     .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2 {
         white-space: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
     }
 
-    /* Ajuste de respiro lateral para ganar área de lectura */
+    /* Margen de lectura optimizado */
     .tpl-b5 .historia-inner, 
+    .tpl-b5 .impactohist-inner,
     .tpl-b5 .form-master-box {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
     }
 }
