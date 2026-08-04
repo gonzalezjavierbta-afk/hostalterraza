@@ -685,12 +685,19 @@
 
 
 
-        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8: se retiró la versión previa de un solo parámetro, que quedaba muerta/sobreescrita por hoisting de JS y nunca se ejecutaba) ===
+        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8) ===
         async function injectAtomicCSS(cat, tplId) {
             return new Promise((resolve) => {
-                const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${Date.now()}`;
-                let link = document.querySelector('link[data-template-css]');
-                if (!link) { link = document.createElement('link'); link.rel = 'stylesheet'; link.setAttribute('data-template-css', 'true'); document.head.appendChild(link); }
+                const timestamp = Date.now();
+                const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${timestamp}`;
+                
+                // Hard Reset de Estilos: elimina hojas previas para evitar colisión de caché
+                const oldLinks = document.querySelectorAll('link[data-template-css]');
+                oldLinks.forEach(el => el.remove());
+
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.setAttribute('data-template-css', 'true');
                 
                 let isResolved = false;
                 const timer = setTimeout(() => {
@@ -713,7 +720,7 @@
                                 rulesCount = targetSheet.cssRules.length;
                             }
                         } catch (e) {}
-                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
+                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS, cache bypass v=${timestamp}).`, "LINK");
                         resolve(true);
                     }
                 };
@@ -728,6 +735,7 @@
                 };
 
                 link.href = path;
+                document.head.appendChild(link);
             });
         }
 
