@@ -33,6 +33,20 @@
 /* Grano decorativo del kernel: apagado — no encaja con el registro institucional/humanitario */
 .tpl-b5::before { opacity: 0 !important; content: none !important; }
 
+/* ADR-019 — Blindaje de Caja (box-sizing), Sprint de Salud Mobile v5.13.0.
+   AUDITORÍA: ningún selector de b5.css fijaba box-sizing; el kernel tampoco
+   trae un reset global (`html, body` únicamente). Bajo content-box (default
+   del navegador), cualquier átomo con ancho fijo (vw/px/%) + padding propio
+   suma el padding POR ENCIMA de ese ancho -- la causa exacta que ya había
+   forzado un parche puntual en #mod-hero-meta (ADR-018, mobile). En vez de
+   seguir parchando átomo por átomo cada vez que aparezca la misma combinación
+   en un breakpoint nuevo, se fija border-box una sola vez para todo el silo
+   (baja especificidad, sin !important, por lo que cualquier override puntual
+   ya existente -- incluida la propia regla mobile de #mod-hero-meta con su
+   `box-sizing:border-box !important` -- sigue funcionando igual). Cero
+   cambios de HTML; no afecta a otros silos (scoped a .tpl-b5). */
+.tpl-b5, .tpl-b5 *, .tpl-b5 *::before, .tpl-b5 *::after { box-sizing: border-box; }
+
 /* ============================================================================
    1. GRID ATÓMICO — Flujo Central Inmersivo (1200px), Regla de Oro #4/#9
    ADR-018 — CAUSA RAÍZ del "split 50/50 que no daba protagonismo al mapa":
@@ -574,8 +588,14 @@
    sin imagen, .historia-item sigue siendo el flex de 2 hijos de siempre (num+body). */
 /* ADR-018: columna de texto a 65% / imagen a 35% (antes 60/40 de ADR-017;
    65fr:35fr expresa la proporción directamente, sin necesidad de reducir a
-   una fracción común como 1.5fr:1fr). */
-.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 50fr 50fr; gap: 1.2rem 1.5rem; align-items: start; }
+   una fracción común como 1.5fr:1fr).
+   ADR-019 — HALLAZGO DE AUDITORÍA (Fase de Interrogación Prioritaria): el
+   valor real shippeado era `50fr 50fr` (50/50), contradiciendo tanto este
+   comentario como la decisión textual de ADR-018 en DECISIONS.md ("Historia:
+   grid a 65fr/35fr"). Bug de transcripción silencioso -- sin error de
+   consola, sin white screen, solo una proporción visual distinta a la
+   ratificada. Corregido a los valores realmente decididos. */
+.tpl-b5 .historia-item--conimg { display: grid; grid-template-columns: auto 65fr 35fr; gap: 1.2rem 1.5rem; align-items: start; }
 .tpl-b5 .historia-item-img { grid-column: 3; grid-row: 1; width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; background: #e7e7e9; }
 @media (max-width: 640px) {
     .tpl-b5 .historia-item--conimg { grid-template-columns: auto 1fr; }
@@ -840,7 +860,22 @@
    padding horizontal, desbordando el viewport. Se fija box-sizing, un ancho
    seguro basado en el gutter de 1.5rem ya usado en el resto del template
    (`.impactohist-inner`, etc.) y padding proporcional al viewport móvil. */
-@media (max-width: 899px) {
+/* ADR-019 — TERCER HALLAZGO en la misma zona (Sprint de Salud Mobile v5.13.0,
+   mandato II.1): esta regla vivía en @media(max-width:899px), pero el
+   breakpoint de colapso de #main-content-flow a una columna subió a 991px
+   en ADR-018 (Sección 1). Quedaba una franja de 92px (900px-991px) donde el
+   layout YA está apilado a una columna (mobile) pero #mod-hero-meta seguía
+   heredando la regla de escritorio íntegra: width:60vw !important,
+   margin:-10rem auto 0 0 !important y padding:2.5rem 3.5rem sin box-sizing
+   -- una caja angosta, flotando a la izquierda del layout ya no
+   split-screen, empujada 10rem hacia arriba. Exactamente el tipo de
+   "elemento invisible" que el mandato pedía auditar. Se sube el breakpoint
+   de esta regla puntual a 991px para que coincida con el punto real donde
+   el grid dejar de ser split-screen. El resto del bloque original de 899px
+   (nav, footer, galería, impactohist-grid, impacto-valor) no forma parte de
+   este hallazgo -- ninguno depende del split-screen de escritorio -- y se
+   mantiene sin cambios en su propio breakpoint más abajo. */
+@media (max-width: 991px) {
     .tpl-b5 #mod-hero-meta {
         grid-template-columns: repeat(2, 1fr); row-gap: 1rem;
         margin: -1.6rem auto 0 auto !important;
@@ -850,6 +885,8 @@
     }
     .tpl-b5 .meta-item:nth-child(2n) { border-right: none; }
     .tpl-b5 .meta-item:nth-child(-n+2) { border-bottom: 1px solid var(--b5-line); padding-bottom: 0.8rem; }
+}
+@media (max-width: 899px) {
     .tpl-b5 .hero-nav { display: none; } /* en mobile el mockup usa menú hamburguesa; fuera de alcance de este pase */
     .tpl-b5 .footer-inner { grid-template-columns: 1fr 1fr; }
     .tpl-b5 #mod-mapa-crisis, .tpl-b5 #mod-impacto-humanitario { padding-top: 2.5rem; }
@@ -859,6 +896,28 @@
 }
 @media (max-width: 560px) {
     .tpl-b5 .footer-inner { grid-template-columns: 1fr; }
+}
+
+/* ============================================================================
+   17. RESPONSIVE — capa intermedia de Tablet (992px-1279px), ADR-019
+   HALLAZGO: entre el colapso a una columna (≤991px, Sección 1/16) y el
+   escritorio pleno, no existía ninguna capa intermedia -- un iPad Pro en
+   landscape (1194px/1366px) o un laptop pequeño (1024px-1280px) recibe el
+   grid de escritorio de 20 columnas íntegro, con los mismos valores fijos
+   pensados para >=1400px (width:60vw + margin:-10rem en #mod-hero-meta,
+   4 columnas fijas en .impactohist-grid dentro de una columna que a estos
+   anchos ya es bastante más angosta en términos absolutos). Sin una
+   referencia visual de tablet (el Context Package solo trae mockups de
+   escritorio y mobile), los valores de esta capa son un PUNTO DE PARTIDA
+   -- mismo criterio que el margin:-10rem de #mod-hero-meta en ADR-017/018
+   -- sujeto a ajuste visual iterativo tras la Prueba de Carga Dual en un
+   dispositivo real. Cero cambios de HTML. */
+@media (min-width: 992px) and (max-width: 1279px) {
+    .tpl-b5 #mod-hero-meta {
+        width: 78vw !important;
+        margin: -5rem auto 0 0 !important;
+        padding: 2rem 2.4rem !important;
+    }
 }
 
 
@@ -933,8 +992,17 @@
     background-position: center;
 }
 
-/* 4. Responsive: Colapso en Tablet/Mobile */
-@media (max-width: 1024px) {
+/* 4. Responsive: Colapso en Tablet/Mobile.
+   ADR-019: breakpoint ampliado de 1024px a 1279px para cubrir toda la capa
+   intermedia de tablet definida en la Sección 17 (992px-1279px) con una
+   sola regla — evita declarar `.impactohist-grid` dos veces a anchos
+   solapados (Fuente Única por Selector, ADR-017). Nota: al momento de este
+   audit, `#db-impacto-historico-grid` está oculto vía `display:none
+   !important` (ver "SOLO BANNER v1.4.2" más arriba), así que este grid no
+   es visible en el estado actual — la regla queda lista y correcta para
+   cuando/si esa ocultación se revierta (ver hallazgo de contradicción en el
+   reporte de este sprint). */
+@media (max-width: 1279px) {
     .tpl-b5 .impactohist-grid {
         grid-template-columns: repeat(2, 1fr) !important; /* 2x2 en tablets */
     }
