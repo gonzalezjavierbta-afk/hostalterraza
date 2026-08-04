@@ -459,6 +459,23 @@
     background: radial-gradient(circle at 50% 50%, transparent 35%, rgba(10,10,10,0.35) 100%);
     pointer-events: none;
 }
+
+/* ADR-020 — Blindaje defensivo (Rectificación Responsiva Total v5.14.0): el <svg> inyectado por JS
+   dentro de #db-mapa-crisis-svg solo trae viewBox="0 0 400 300", sin width/height propios, y ningún
+   selector de b5.css fijaba su tamaño -- queda a merced del tamaño intrínseco por defecto del
+   navegador para un <svg> sin dimensiones (históricamente inconsistente entre motores de render).
+   AUDITORÍA: no se detectó ningún `min-width` en el silo forzando scroll horizontal a 320px (el
+   único `min-width` existente en b5.css es `.comoayudar-col--main{min-width:0}`, patrón correcto
+   anti-blowout de grid, ya verificado sin hallazgos en ADR-019 punto 6) -- este blindaje es
+   preventivo, no la corrección de un desborde ya confirmado. Se fuerza el <svg> a llenar el 100%
+   del wrapper (que sí tiene `max-width:420px` seguro) para eliminar la dependencia del tamaño por
+   defecto del navegador. */
+.tpl-b5 .mapacrisis-svg-wrap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .tpl-b5 .mc-ring { fill: none; stroke: var(--b5-red); }
 .tpl-b5 .mc-ring--outer { stroke-opacity: 0.10; }
 .tpl-b5 .mc-ring--mid { stroke-opacity: 0.18; }
@@ -1025,10 +1042,20 @@
     padding-top: 0 !important;
 }
 
-/* 3. Asegurar que la galería use una rejilla de 4 columnas en escritorio ahora que tiene espacio */
-.tpl-b5 #db-gallery-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-    width: 100% !important;
+/* 3. Asegurar que la galería use una rejilla de 4 columnas en escritorio ahora que tiene espacio.
+   ADR-020 — HALLAZGO (Rectificación Responsiva Total v5.14.0): esta regla no llevaba @media, así
+   que su `repeat(4,1fr) !important` (misma especificidad que la Sección 16 mobile, pero con orden
+   de aparición posterior en el archivo) apagaba en silencio el `repeat(2,1fr) !important` de la
+   Sección 16 (`max-width:899px`) en TODOS los anchos, incluidos iPhone SE, Pixel y Galaxy — el
+   comentario original decía "en escritorio" pero el código nunca lo restringió a ese rango (mismo
+   patrón de bug de transcripción que ADR-017/018/019, ahora en la galería en vez de #mod-hero-meta
+   / Historia). Se scopea a `min-width:900px`, espejo exacto del `max-width:899px` ya usado en el
+   resto del template, para restaurar las 2 columnas en mobile sin tocar el resultado en escritorio.
+   `width:100%` se deja sin scope: es el comportamiento por defecto de un contenedor Grid a
+   cualquier ancho, no depende del breakpoint. */
+.tpl-b5 #db-gallery-grid { width: 100% !important; }
+@media (min-width: 900px) {
+    .tpl-b5 #db-gallery-grid { grid-template-columns: repeat(4, 1fr) !important; }
 }
 
 /* 4. Esconder el footer (requerimiento previo mantenido) */
