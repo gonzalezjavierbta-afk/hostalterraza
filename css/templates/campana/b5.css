@@ -1170,54 +1170,53 @@
     }
 }
 
-/* --- CIERRE DEFINITIVO DE FUGAS RESPONSIVAS v1.8.0 --- */
+/* --- RESET MAESTRO Y ORDEN EXPLICITO v1.9.0 --- */
 
+/* 1. RESET DE CAJA: Obligatorio para que el padding no corte la info lateralmente */
+.tpl-b5, .tpl-b5 * { 
+    box-sizing: border-box !important; 
+}
+
+/* 2. REORDENAMIENTO EXPLÍCITO (< 640px / Simulación Móvil) */
 @media (max-width: 640px) {
-    /* 1. SECCIÓN HISTORIA: Forzamos Flex-Column para garantizar el orden visual */
-    .tpl-b5 .historia-item--conimg {
+    /* Forzamos al contenedor principal a ser una lista vertical pura */
+    .tpl-b5 #main-content-flow {
         display: flex !important;
-        flex-direction: column !important; /* Stack vertical puro */
-        gap: 1.2rem !important;
+        flex-direction: column !important;
+        width: 100% !important;
         padding: 0 !important;
     }
 
-    .tpl-b5 .historia-item-body {
-        order: 1 !important; /* 1ro: Texto e información */
-    }
+    /* ASIGNACIÓN DE POSICIÓN (Cambia los números para reordenar) */
+    .tpl-b5 #mod-hero        { order: 1 !important; display: block !important; }
+    .tpl-b5 #mod-hero-meta   { order: 2 !important; display: grid !important; }
+    .tpl-b5 #mod-form        { order: 3 !important; display: block !important; }
+    .tpl-b5 #mod-mapa-crisis { order: 4 !important; display: block !important; }
+    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; display: block !important; }
+    .tpl-b5 #mod-historia    { order: 6 !important; display: block !important; }
+    .tpl-b5 #mod-actualizaciones { order: 7 !important; display: block !important; }
 
-    .tpl-b5 .historia-item-img {
-        order: 2 !important; /* 2do: Imagen descriptiva */
-        width: 100% !important;
-        max-width: 100% !important;
-        aspect-ratio: 16 / 9 !important;
-        margin-top: 0.5rem;
-    }
-
-    /* 2. GRILLAS ANIDADAS: Rompemos todas las sub-grillas de 2 columnas */
-    .tpl-b5 #db-impacto-grid, 
-    .tpl-b5 .impacto-grid,
-    .tpl-b5 .comoayudar-grid,
-    .tpl-b5 #mod-hero-meta {
-        grid-template-columns: 1fr !important; /* Fin de la "estrangulación" */
+    /* 3. COLAPSO DE SUB-GRILLAS: Elimina la "estrangulación" de la info anidada */
+    .tpl-b5 #mod-hero-meta,
+    .tpl-b5 #db-impacto-grid,
+    .tpl-b5 .historia-item--conimg {
+        grid-template-columns: 1fr !important; /* Una sola columna para todo lo interno */
         width: 100% !important;
         gap: 1.5rem !important;
     }
 
-    /* 3. BLINDAJE DE TEXTO: Forzamos el ajuste de línea en TODA la información */
-    .tpl-b5 .impacto-valor,
-    .tpl-b5 .meta-item span,
-    .tpl-b5 .ubicacion-contacto-valor {
-        white-space: normal !important; /* Prohibido el corte lateral */
+    /* 4. BLINDAJE DE TEXTO: Evita que títulos o cifras largas empujen la pantalla */
+    .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2, .tpl-b5 .impacto-valor {
+        white-space: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
-        display: block !important;
     }
 
-    /* 4. AJUSTE DE ESCALA: Cifras Geist 900 contenidas */
-    .tpl-b5 .impacto-valor {
-        font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
+    /* 5. REORDENAMIENTO INTERNO DE HISTORIA: Forzado Texto -> Imagen */
+    .tpl-b5 .historia-item--conimg {
+        display: flex !important;
+        flex-direction: column !important;
     }
-
-    /* 5. RESET DE CAJA: Evitar que el padding sume al ancho */
-    .tpl-b5, .tpl-b5 * { box-sizing: border-box !important; }
+    .tpl-b5 .historia-item-body { order: 1 !important; }
+    .tpl-b5 .historia-item-img  { order: 2 !important; width: 100% !important; margin-top: 1rem; }
 }
