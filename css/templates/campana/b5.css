@@ -1169,3 +1169,43 @@
         box-sizing: border-box !important;
     }
 }
+
+/* --- RECTIFICACIÓN DE SEGURIDAD MOBILE v1.7.0 --- */
+
+@media (max-width: 580px) {
+    /* 1. Forzamos el colapso de las 2 columnas de impacto que Antigravity mantuvo */
+    .tpl-b5 #mod-impacto-humanitario #db-impacto-grid,
+    .tpl-b5 .impactohist-grid {
+        grid-template-columns: 1fr !important; /* Stack vertical obligatorio */
+        gap: 1.5rem !important;
+    }
+
+    /* 2. Blindaje de las tarjetas de impacto */
+    .tpl-b5 .impacto-card {
+        width: 100% !important;
+        padding: 1.2rem 0 !important;
+        border-bottom: 1px solid var(--b5-line) !important;
+    }
+
+    /* 3. Corrección del Cuadro Meta (Nested Info) */
+    .tpl-b5 #mod-hero-meta {
+        grid-template-columns: 1fr !important; /* De 2x2 a 1 columna pura */
+        width: calc(100% - 2rem) !important;
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+    }
+
+    /* 4. Reset de textos para evitar que "empujen" la caja */
+    .tpl-b5 .meta-item span, 
+    .tpl-b5 .impacto-valor,
+    .tpl-b5 .ubicacion-contacto-valor {
+        white-space: normal !important; /* Permite saltos de línea */
+        word-break: break-word !important;
+        max-width: 100% !important;
+    }
+
+    /* 5. Ajuste de escala para cifras Geist 900 en iPhone SE */
+    .tpl-b5 .impacto-valor {
+        font-size: clamp(2rem, 8vw, 2.8rem) !important;
+    }
+}
