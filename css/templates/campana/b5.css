@@ -1171,8 +1171,8 @@
 }
 
 /* =============================================================
-   REFACTORIZACIÓN DE SINCRONÍA VISUAL v2.2.0
-   Sintonía 1:1 con landing-mobile.jpg | Orden Explícito Total
+   REFACTORIZACIÓN DE MASA Y FLUJO v2.3.0
+   Sincronía Hero -> Meta -> Form | Fidelidad landing-mobile.jpg
    ============================================================= */
 
 /* --- RESET GLOBAL DE CAJA (Blindaje Universal) --- */
@@ -1180,35 +1180,45 @@
     box-sizing: border-box !important; 
 }
 
-/* --- CAPA ADAPTATIVA TABLET & MOBILE (max-width: 1024px) --- 
-   Mandato: Stack vertical puro ("a una línea") y orden idéntico a escritorio. */
+/* --- CAPA ADAPTATIVA TABLET (max-width: 1024px) --- 
+   Mandato: Colapso a una línea y reordenamiento secuencial. */
 @media (max-width: 1024px) {
-    /* 1. Reset del Contenedor Maestro a Flex-Column */
     .tpl-b5 #main-content-flow {
         display: flex !important;
         flex-direction: column !important;
-        width: 100vw !important;
-        padding: 0 !important;
+        width: 100% !important;
         overflow-x: hidden !important;
     }
 
-    /* 2. MAPEADO DE SECUENCIA TOTAL (Según landing-mobile.jpg) */
-    .tpl-b5 #mod-hero                { order: 1 !important; display: block !important; }
-    .tpl-b5 #mod-hero-meta           { order: 2 !important; display: grid !important; margin: -1.6rem auto 2rem !important; width: 92% !important; }
-    .tpl-b5 #mod-form                { order: 3 !important; display: block !important; }
-    .tpl-b5 #mod-mapa-crisis         { order: 4 !important; display: block !important; }
-    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; display: block !important; }
-    .tpl-b5 #mod-como-ayudar         { order: 6 !important; display: block !important; }
-    .tpl-b5 #mod-historia            { order: 7 !important; display: block !important; }
-    .tpl-b5 #mod-impacto-historico   { order: 8 !important; display: block !important; }
-    .tpl-b5 #mod-video               { order: 9 !important; display: flex !important; flex-direction: column !important; }
-    .tpl-b5 #mod-actualizaciones     { order: 10 !important; display: block !important; }
-    .tpl-b5 #mod-faq                 { order: 11 !important; display: block !important; }
-    .tpl-b5 #mod-ubicacion           { order: 12 !important; display: block !important; }
-    .tpl-b5 #mod-cta-final           { order: 13 !important; display: block !important; }
-    .tpl-b5 #mod-footer              { order: 14 !important; display: block !important; }
+    /* 1. HERO: Empujamos la descripción hacia el centro de la pantalla */
+    .tpl-b5 .hero-content {
+        margin-top: 35vh !important; /* Baja la descripción a casi mitad de pantalla */
+        text-align: left !important;
+        max-width: 90% !important;
+    }
 
-    /* 3. COLAPSO DE SUB-GRILLAS (Fin de la estrangulación) */
+    .tpl-b5 #event-title {
+        font-size: clamp(2.2rem, 8vw, 3.5rem) !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* 2. ORDEN EXPLICITO DE LA SECUENCIA TOTAL (Según landing-mobile.jpg) */
+    .tpl-b5 #mod-hero                { order: 1 !important; min-height: 90vh !important; }
+    .tpl-b5 #mod-hero-meta           { order: 2 !important; margin: -5rem auto 3rem !important; width: 95% !important; }
+    .tpl-b5 #mod-form                { order: 3 !important; padding: 1rem 0 !important; }
+    .tpl-b5 #mod-mapa-crisis         { order: 4 !important; }
+    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; }
+    .tpl-b5 #mod-como-ayudar         { order: 6 !important; }
+    .tpl-b5 #mod-historia            { order: 7 !important; }
+    .tpl-b5 #mod-impacto-historico   { order: 8 !important; }
+    .tpl-b5 #mod-video               { order: 9 !important; display: flex !important; flex-direction: column !important; }
+    .tpl-b5 #mod-actualizaciones     { order: 10 !important; }
+    .tpl-b5 #mod-faq                 { order: 11 !important; }
+    .tpl-b5 #mod-ubicacion           { order: 12 !important; }
+    .tpl-b5 #mod-cta-final           { order: 13 !important; }
+    .tpl-b5 #mod-footer              { order: 14 !important; }
+
+    /* 3. COLAPSO DE SUB-GRILLAS INTERNAS */
     .tpl-b5 #mod-hero-meta,
     .tpl-b5 #db-impacto-grid,
     .tpl-b5 .impacto-grid,
@@ -1218,35 +1228,40 @@
         gap: 1.5rem !important;
     }
 
-    /* 4. REORDENAMIENTO INTERNO (Fidelidad 1px) */
-    /* Historia: Texto antes que imagen */
+    .tpl-b5 .meta-item { border-right: none !important; border-bottom: 1px solid var(--b5-line); padding: 0.8rem 0 !important; }
+    .tpl-b5 .meta-item:last-child { border-bottom: none; }
+
+    /* 4. AJUSTE DE HISTORIA Y VIDEO */
     .tpl-b5 .historia-item--conimg { display: flex !important; flex-direction: column !important; }
     .tpl-b5 .historia-item-body { order: 1 !important; }
     .tpl-b5 .historia-item-img  { order: 2 !important; width: 100% !important; aspect-ratio: 16/9 !important; margin-top: 1rem; }
-
-    /* Video: Galería 06 antes que Video 07 */
     .tpl-b5 .b5-video-col--gallery { order: 1 !important; }
     .tpl-b5 .b5-video-col--video   { order: 2 !important; padding-top: 3rem !important; }
 }
 
-/* --- AJUSTES FINOS PARA MOBILE ESTRECHO (max-width: 640px) --- */
+/* --- CAPA MOBILE ESTRECHO: SMARTPHONES (max-width: 640px) --- */
 @media (max-width: 640px) {
-    .tpl-b5 .impacto-valor {
-        font-size: clamp(1.8rem, 10vw, 2.6rem) !important;
+    /* 1. FORMULARIO: Expansión de ancho para llenar la pantalla */
+    .tpl-b5 .form-master-box {
+        width: 96% !important;    
+        margin: 0 auto !important;
+        padding: 2.2rem 1.2rem !important; 
+        border-radius: 12px !important;
     }
 
-    /* Blindaje contra desbordamiento de texto */
-    .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2 {
+    /* 2. HERO MOBILE: Ajuste de respiro para pantallas cortas */
+    .tpl-b5 .hero-content {
+        margin-top: 25vh !important; 
+    }
+
+    /* 3. TEXTOS: Blindaje contra desbordamiento */
+    .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2, .tpl-b5 .impacto-valor {
         white-space: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
     }
 
-    /* Margen de lectura optimizado */
-    .tpl-b5 .historia-inner, 
-    .tpl-b5 .impactohist-inner,
-    .tpl-b5 .form-master-box {
-        padding-left: 1.25rem !important;
-        padding-right: 1.25rem !important;
-    }
+    /* 4. ESCALA Y RESPIRO */
+    .tpl-b5 .impacto-valor { font-size: clamp(1.8rem, 10vw, 2.6rem) !important; }
+    .tpl-b5 .historia-inner, .tpl-b5 .impactohist-inner { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
 }
