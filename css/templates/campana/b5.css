@@ -1170,64 +1170,71 @@
     }
 }
 
-/* --- RESET UNIVERSAL Y ORDEN EXPLÍCITO v2.0.0 --- */
+/* =============================================================
+   REFACTORIZACIÓN DE TRÍADA ADAPTATIVA v2.1.0
+   Segmentación independiente: Escritorio | Tablet | Mobile
+   ============================================================= */
 
-/* 1. RESET DE CAJA: Obligatorio para que el padding no "infle" la web */
+/* --- [1] RESET GLOBAL DE CAJA (Blindaje para todas las resoluciones) --- */
 .tpl-b5, .tpl-b5 * { 
     box-sizing: border-box !important; 
 }
 
-/* 2. REORDENAMIENTO TOTAL EN MÓVIL (< 640px) */
-@media (max-width: 640px) {
-    /* Forzamos al contenedor principal a ser una lista vertical pura */
+/* --- [2] CAPA TABLET: iPAD & LAPTOPS PEQUEÑOS (max-width: 1024px) --- 
+   Mandato: Forzar colapso a una columna ("a una línea") desde iPad. */
+@media (max-width: 1024px) {
     .tpl-b5 #main-content-flow {
         display: flex !important;
         flex-direction: column !important;
         width: 100vw !important;
-        max-width: 100vw !important;
-        overflow-x: hidden !important;
         padding: 0 !important;
+        overflow-x: hidden !important;
     }
 
-    /* ASIGNACIÓN DE POSICIÓN (Módulos Independientes) */
-    .tpl-b5 #mod-hero        { order: 1 !important; display: block !important; width: 100% !important; }
-    .tpl-b5 #mod-hero-meta   { order: 2 !important; display: block !important; width: 100% !important; }
-    .tpl-b5 #mod-form        { order: 3 !important; display: block !important; width: 100% !important; }
-    .tpl-b5 #mod-mapa-crisis { order: 4 !important; display: block !important; width: 100% !important; }
-    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; display: block !important; width: 100% !important; }
-    .tpl-b5 #mod-historia    { order: 6 !important; display: block !important; width: 100% !important; }
-    .tpl-b5 #mod-actualizaciones { order: 7 !important; display: block !important; width: 100% !important; }
+    /* REORDENAMIENTO EXPLÍCITO (Mandato Director) */
+    .tpl-b5 #mod-hero        { order: 1 !important; }
+    .tpl-b5 #mod-hero-meta   { order: 2 !important; margin: -1.6rem auto 2rem !important; width: 92% !important; }
+    .tpl-b5 #mod-form        { order: 3 !important; }
+    .tpl-b5 #mod-mapa-crisis { order: 4 !important; }
+    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; }
+    .tpl-b5 #mod-historia    { order: 6 !important; }
 
-    /* 3. COLAPSO DE SUB-GRILLAS: Rompemos las 2 columnas internas */
+    /* COLAPSO DE SUB-GRILLAS (Fin de la estrangulación en iPad) */
     .tpl-b5 #mod-hero-meta,
     .tpl-b5 #db-impacto-grid,
     .tpl-b5 .impacto-grid,
-    .tpl-b5 .comoayudar-grid,
-    .tpl-b5 .historia-lista {
+    .tpl-b5 .comoayudar-grid {
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
         gap: 1.5rem !important;
     }
 
-    /* 4. REORDENAMIENTO INTERNO HISTORIA: Información -> Imagen */
-    .tpl-b5 .historia-item--conimg {
-        display: flex !important;
-        flex-direction: column !important;
-    }
+    /* AJUSTE DE HISTORIA: Texto antes que imagen */
+    .tpl-b5 .historia-item--conimg { display: flex !important; flex-direction: column !important; }
     .tpl-b5 .historia-item-body { order: 1 !important; }
-    .tpl-b5 .historia-item-img  { 
-        order: 2 !important; 
-        width: 100% !important; 
-        aspect-ratio: 16 / 9 !important;
-        margin-top: 1rem !important; 
+    .tpl-b5 .historia-item-img  { order: 2 !important; width: 100% !important; aspect-ratio: 16/9 !important; }
+}
+
+/* --- [3] CAPA MOBILE: SMARTPHONES (max-width: 640px) --- 
+   Cambios específicos solo para celulares (iPhone SE, Pixel, etc.) */
+@media (max-width: 640px) {
+    /* Reducción de escala Geist 900 para pantallas ultra-estrechas */
+    .tpl-b5 .impacto-valor {
+        font-size: clamp(1.8rem, 10vw, 2.6rem) !important;
     }
 
-    /* 5. BLINDAJE DE TEXTO: Evita que la info "empuje" hacia los lados */
-    .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2, .tpl-b5 .impacto-valor {
+    /* Blindaje de texto contra desbordamiento lateral */
+    .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2 {
         white-space: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
-        max-width: 100% !important;
+    }
+
+    /* Ajuste de respiro lateral para ganar área de lectura */
+    .tpl-b5 .historia-inner, 
+    .tpl-b5 .form-master-box {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 }
