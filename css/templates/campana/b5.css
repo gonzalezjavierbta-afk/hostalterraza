@@ -1170,3 +1170,61 @@
     }
 }
 
+/* --- CIERRE DEFINITIVO DE FUGAS RESPONSIVAS v1.8.0 --- */
+
+@media (max-width: 640px) {
+    /* 1. SECCIÓN HISTORIA: Forzamos Flex-Column para garantizar el orden visual */
+    .tpl-b5 .historia-item--conimg {
+        display: flex !important;
+        flex-direction: column !important; /* Stack vertical puro */
+        gap: 1.2rem !important;
+        padding: 0 !important;
+    }
+
+    .tpl-b5 .historia-item-body {
+        order: 1 !important; /* 1ro: Texto e información */
+    }
+
+    .tpl-b5 .historia-item-img {
+        order: 2 !important; /* 2do: Imagen descriptiva */
+        width: 100% !important;
+        max-width: 100% !important;
+        aspect-ratio: 16 / 9 !important; /* Proporción móvil según maqueta */
+        margin-top: 0.5rem;
+    }
+
+    /* 2. GRILLAS ANIDADAS: Rompemos todas las sub-grillas de 2 columnas */
+    .tpl-b5 #db-impacto-grid, 
+    .tpl-b5 .impacto-grid,
+    .tpl-b5 .comoayudar-grid,
+    .tpl-b5 #mod-hero-meta {
+        grid-template-columns: 1fr !important; /* Fin de la "estrangulación" */
+        width: 100% !important;
+        gap: 1.5rem !important;
+    }
+
+    /* 3. BLINDAJE DE TEXTO: Forzamos el ajuste de línea en TODA la información */
+    .tpl-b5 .impacto-valor,
+    .tpl-b5 .historia-item-texto,
+    .tpl-b5 .historia-item-titulo,
+    .tpl-b5 .meta-item span,
+    .tpl-b5 .ubicacion-contacto-valor {
+        white-space: normal !important; /* Prohibido el corte por nowrap */
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        display: block !important;
+    }
+
+    /* 4. AJUSTE DE ESCALA: Cifras Geist 900 contenidas */
+    .tpl-b5 .impacto-valor {
+        font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
+    }
+
+    /* 5. RESPIRO LATERAL: Margen de seguridad para evitar que el texto toque el borde */
+    .tpl-b5 .historia-inner,
+    .tpl-b5 .impactohist-inner,
+    .tpl-b5 .form-master-box {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+    }
+}
