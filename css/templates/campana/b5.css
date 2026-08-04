@@ -479,10 +479,10 @@
 }
 
 .tpl-b5 .mc-ring { fill: none; stroke: var(--b5-red); }
-.tpl-b5 .mc-ring--outer { stroke-opacity: 0.10; }
-.tpl-b5 .mc-ring--mid { stroke-opacity: 0.18; }
-.tpl-b5 .mc-ring--inner { fill: var(--b5-red); fill-opacity: 0.08; stroke-opacity: 0.3; }
-.tpl-b5 .mc-dots circle { r: 3.5; fill: #9a9aa0; opacity: 0.55; }
+.tpl-b5 .mc-ring--outer { stroke-opacity: 0.20; }
+.tpl-b5 .mc-ring--mid { stroke-opacity: 0.40; }
+.tpl-b5 .mc-ring--inner { fill: #f97316; fill-opacity: 0.08; stroke-opacity: 0.3; }
+.tpl-b5 .mc-dots circle { r: 3.5; fill: #f97316; opacity: 0.55; }
 .tpl-b5 .mc-epicentro { fill: var(--b5-red); }
 .tpl-b5 .mc-pulse { fill: var(--b5-red); opacity: 0.55; animation: b5-mapPulse 2.4s ease-out infinite; transform-origin: 190px 150px; }
 
@@ -490,7 +490,7 @@
 .tpl-b5 .mapacrisis-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
 .tpl-b5 .mapacrisis-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .tpl-b5 .mapacrisis-dot--epicentro { background: var(--b5-red); }
-.tpl-b5 .mapacrisis-dot--zona { background: #9a9aa0; }
+.tpl-b5 .mapacrisis-dot--zona { background: #f97316; }
 .tpl-b5 .mapacrisis-dot--falla { background: var(--b5-ink); }
 /* .mapacrisis-resumen (v222): párrafo nuevo junto a las 4 estadísticas */
 .tpl-b5 .mapacrisis-resumen {
@@ -1170,6 +1170,28 @@
     }
 }
 
+
+/* --- CAMBIO A COLOR NARANJA ALERTA v1.10.0 --- */
+
+/* 1. Cambia el color de los puntos (átomos) dentro del mapa */
+.tpl-b5 .mc-dots circle { 
+    fill: #f97316 !important; /* Color Naranja de alta visibilidad */
+    opacity: 0.9 !important;   /* Mayor presencia visual */
+    filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.4));
+}
+
+/* 2. Sincroniza el cuadrito de la leyenda (Debajo del mapa) */
+.tpl-b5 .mapacrisis-dot--zona { 
+    background: #f97316 !important; 
+}
+
+/* 3. Opcional: El anillo más cercano al epicentro también en naranja */
+.tpl-b5 .mc-ring--inner {
+    stroke: #f97316 !important;
+    stroke-opacity: 0.4;
+}
+
+
 /* =============================================================
    REFACTORIZACIÓN DE MASA Y FLUJO v2.3.0
    Sincronía Hero -> Meta -> Form | Fidelidad landing-mobile.jpg
@@ -1265,3 +1287,4 @@
     .tpl-b5 .impacto-valor { font-size: clamp(1.8rem, 10vw, 2.6rem) !important; }
     .tpl-b5 .historia-inner, .tpl-b5 .impactohist-inner { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
 }
+
