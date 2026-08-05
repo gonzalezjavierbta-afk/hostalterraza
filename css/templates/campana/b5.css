@@ -1276,9 +1276,6 @@
         margin-top: 5vh !important; 
     }
 
-    .tpl-b5 #mod-hero {
-        padding-bottom: 0 !important; /* Valor original de 3.5rem anulado */
-    }
 
     /* 3. TEXTOS: Blindaje contra desbordamiento */
     .tpl-b5 span, .tpl-b5 p, .tpl-b5 h1, .tpl-b5 h2, .tpl-b5 .impacto-valor {
@@ -1295,57 +1292,53 @@
 
 
 
-/* Solo afectará a teléfonos y tablets pequeñas */
+ /* --- CAPA MOBILE RECTIFICADA (max-width: 991px) --- */
 @media (max-width: 899px) {
     .tpl-b5 #mod-hero {
         padding-top: 0.5rem !important; 
     }
-}
-
-
- /* --- CAPA MOBILE RECTIFICADA (max-width: 991px) --- */
-@media (max-width: 991px) {
     /* 1. Liberamos el "techo" reduciendo el padding inferior del Hero */
     .tpl-b5 #mod-hero {
         padding-bottom: 0 !important; /* Elimina el parachoques de 3.5rem */
     }
 
-    /* 2. META A UNA LÍNEA: Ajuste de Grid y Masa */
+ /* 2. META EN COLUMNA: Un dato por fila (Vertical Stack) */
     .tpl-b5 #mod-hero-meta {
-        display: flex !important;           /* Cambiamos a Flex para control total de línea */
-        flex-direction: row !important;     /* Fuerza la línea única */
-        flex-wrap: nowrap !important;       /* Prohibido saltar de línea */
-        justify-content: space-between !important;
+        display: flex !important;
+        flex-direction: column !important; /* Fuerza la disposición en columna */
+        align-items: flex-start !important;
         
-        background: transparent !important; 
+        background: transparent !important; /* Mandato de Transparencia Real */
         box-shadow: none !important;
         width: 100% !important;
-        margin: -12rem 0 2rem 0 !important; /* Margen negativo más profundo y libre */
-        padding: 1rem 0.5rem !important;    /* Reducimos padding para que quepan los 4 */
-        overflow-x: auto;                   /* Safe-guard para pantallas mini (iPhone SE) */
+        margin: -14rem 0 3rem 0 !important; /* Elevación agresiva sobre la imagen */
+        padding: 1rem 1.5rem !important;
     }
 
-    /* 3. ITEMS COMPACTOS (Para que quepan los 4 en 320px) */
+    /* 3. AJUSTE DE FILAS (Items) */
     .tpl-b5 .meta-item {
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-        padding: 0 0.6rem !important;
-        gap: 0.5rem !important;             /* Icono más cerca del texto */
-        flex: 1 1 auto;
+        display: flex !important;
+        width: 100% !important;
+        padding: 1.2rem 0 !important;
+        gap: 1.5rem !important;
+        border-right: none !important; /* Eliminamos divisores verticales */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important; /* Divisor horizontal tenue */
     }
 
-    .tpl-b5 .meta-item:last-child { border-right: none !important; }
-
-    /* Reducción de escala para fidelidad 1:1 */
-    .tpl-b5 .meta-svg {
-        width: 18px !important;             /* Iconos más pequeños para la línea única */
-        height: 18px !important;
+    .tpl-b5 .meta-item:last-child {
+        border-bottom: none !important;
     }
 
-    .tpl-b5 .meta-item span {
-        font-size: 0.68rem !important;      /* Texto micro-calibrado per mandato */
-    }
-    
+    /* 4. SINCRONÍA CROMÁTICA: Blanco sobre transparente */
+    .tpl-b5 .meta-item span, 
     .tpl-b5 .meta-label {
-        font-size: 0.5rem !important;       /* Etiquetas ultra-sobrias */
+        color: #ffffff !important; /* Contraste humanitario */
+    }
+
+    .tpl-b5 .meta-svg {
+        fill: #ffffff !important;
+        width: 26px !important; /* Tamaño optimizado para stack vertical */
+        height: 26px !important;
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
     }
 }
