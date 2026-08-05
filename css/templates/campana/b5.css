@@ -1299,27 +1299,49 @@
 }
 
 
-    /* 2. META TRANSPARENTE: Datos blancos flotando sobre la imagen */
+ /* --- CAPA MOBILE RECTIFICADA (max-width: 991px) --- */
+@media (max-width: 991px) {
+    /* 1. Liberamos el "techo" reduciendo el padding inferior del Hero */
+    .tpl-b5 #mod-hero {
+        padding-bottom: 0 !important; /* Elimina el parachoques de 3.5rem */
+    }
+
+    /* 2. META A UNA LÍNEA: Ajuste de Grid y Masa */
     .tpl-b5 #mod-hero-meta {
-        background: transparent !important; /* Mandato de Transparencia Real */
+        display: flex !important;           /* Cambiamos a Flex para control total de línea */
+        flex-direction: row !important;     /* Fuerza la línea única */
+        flex-wrap: nowrap !important;       /* Prohibido saltar de línea */
+        justify-content: space-between !important;
+        
+        background: transparent !important; 
         box-shadow: none !important;
         width: 100% !important;
-        margin: -10rem 0 0 0 !important; /* Espacio bajo la descripción */
-        padding: 1.5rem 1rem !important;
-        grid-template-columns: repeat(2, 1fr) !important; /* Grid 2x2 en móviles */
+        margin: -12rem 0 2rem 0 !important; /* Margen negativo más profundo y libre */
+        padding: 1rem 0.5rem !important;    /* Reducimos padding para que quepan los 4 */
+        overflow-x: auto;                   /* Safe-guard para pantallas mini (iPhone SE) */
     }
 
+    /* 3. ITEMS COMPACTOS (Para que quepan los 4 en 320px) */
     .tpl-b5 .meta-item {
-        border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
-        padding: 0.5rem 1rem !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        padding: 0 0.6rem !important;
+        gap: 0.5rem !important;             /* Icono más cerca del texto */
+        flex: 1 1 auto;
     }
 
-    .tpl-b5 .meta-item span, 
-    .tpl-b5 .meta-label {
-        color: #ffffff !important; /* Contraste humanitario sobre fondo oscuro */
-    }
+    .tpl-b5 .meta-item:last-child { border-right: none !important; }
 
+    /* Reducción de escala para fidelidad 1:1 */
     .tpl-b5 .meta-svg {
-        fill: #ffffff !important;
-        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        width: 18px !important;             /* Iconos más pequeños para la línea única */
+        height: 18px !important;
     }
+
+    .tpl-b5 .meta-item span {
+        font-size: 0.68rem !important;      /* Texto micro-calibrado per mandato */
+    }
+    
+    .tpl-b5 .meta-label {
+        font-size: 0.5rem !important;       /* Etiquetas ultra-sobrias */
+    }
+}
