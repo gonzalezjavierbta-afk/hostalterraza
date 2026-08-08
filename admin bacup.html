@@ -72,27 +72,6 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.85}
 .btn-sm{padding:5px 11px;font-size:12px}
 .btn-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}.btn-red:hover{background:var(--red-border)}
-
-/* ═══ ADR-021: Wizard Inteligente de Creación de Eventos ═══ */
-.wiz-nav{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
-.wiz-pill{flex:1;min-width:120px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500;color:var(--ink3);transition:.15s}
-.wiz-pill:hover{border-color:var(--gold-border)}
-.wiz-pill-n{width:22px;height:22px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
-.wiz-pill.done{color:var(--green);border-color:var(--green-border);background:var(--green-bg)}
-.wiz-pill.done .wiz-pill-n{background:var(--green);color:#fff;border-color:var(--green)}
-.wiz-pill.active{color:#fff;background:var(--ink);border-color:var(--ink)}
-.wiz-pill.active .wiz-pill-n{background:var(--gold);color:#fff;border-color:var(--gold)}
-.wiz-step{display:none}
-.wiz-step.wiz-visible{display:block}
-.wiz-cat-card{border:2px solid var(--border);border-radius:var(--r);padding:1.1rem .75rem;cursor:pointer;text-align:center;transition:.15s;background:#fff}
-.wiz-cat-card:hover{border-color:var(--gold-border)}
-.wiz-cat-card.active{border-color:var(--gold);background:var(--gold-bg)}
-.wiz-cat-emoji{font-size:24px;margin-bottom:.35rem}
-.wiz-cat-title{font-size:13px;font-weight:600;color:var(--ink)}
-.wiz-cat-sub{font-size:11px;color:var(--ink3);margin-top:2px}
-.wiz-swatch{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);cursor:pointer;padding:0}
-.wiz-swatch:hover{box-shadow:0 0 0 2px var(--gold)}
-@media(max-width:600px){.wiz-nav{flex-direction:column}.wiz-pill{width:100%}}
 button:disabled{opacity:.4;cursor:not-allowed}
 
 /* BADGES */
@@ -650,44 +629,12 @@ tr:hover td{background:var(--surface)}
       <div class="ch">Nuevo evento</div>
       <div id="ev-alert"></div>
 
-      <!-- ══ WIZARD INTELIGENTE (ADR-021) — Navegación de 4 pasos ══ -->
-      <div class="wiz-nav" id="wiz-nav">
-        <div class="wiz-pill active" data-pill="1" onclick="wizJump(1)"><span class="wiz-pill-n">1</span> Cimiento</div>
-        <div class="wiz-pill" data-pill="2" onclick="wizJump(2)"><span class="wiz-pill-n">2</span> ADN Visual</div>
-        <div class="wiz-pill" data-pill="3" onclick="wizJump(3)"><span class="wiz-pill-n">3</span> Contenido</div>
-        <div class="wiz-pill" data-pill="4" onclick="wizJump(4)"><span class="wiz-pill-n">4</span> Blindaje</div>
-      </div>
-
-      <!-- ══ PASO 1 · Orquestador de intención (Cine / Fiesta / Campaña) ══ -->
-      <div class="wiz-step" data-wiz-step="1">
-        <div class="fg" style="margin-bottom:1rem">
-          <label>¿Qué tipo de evento estás creando? *</label>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.4rem" id="wiz-cat-cards">
-            <div class="wiz-cat-card" data-cat-card="cinematografia" onclick="seleccionarCategoria('cinematografia')">
-              <div class="wiz-cat-emoji">🎬</div>
-              <div class="wiz-cat-title">Cine</div>
-              <div class="wiz-cat-sub">Fecha y lugar obligatorios</div>
-            </div>
-            <div class="wiz-cat-card" data-cat-card="fiesta" onclick="seleccionarCategoria('fiesta')">
-              <div class="wiz-cat-emoji">🎉</div>
-              <div class="wiz-cat-title">Fiesta</div>
-              <div class="wiz-cat-sub">Fecha y lugar obligatorios</div>
-            </div>
-            <div class="wiz-cat-card" data-cat-card="campana" onclick="seleccionarCategoria('campana')">
-              <div class="wiz-cat-emoji">📣</div>
-              <div class="wiz-cat-title">Campaña</div>
-              <div class="wiz-cat-sub">Fecha opcional</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ PASO 2-3: PLANTILLA VISUAL + CONTENIDO (contenedor compartido, ADR-021) ══ -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem" data-wiz-step="2,3">
+      <!-- ══ PASO 1: PLANTILLA VISUAL (primero) ══════════════ -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:.75rem">
           <div>
             <div style="font-size:13px;font-weight:600;color:var(--ink2)">🎬 Plantilla visual de la página pública</div>
-            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Elige el estilo visual — define qué módulos aparecen en la página del evento</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Elige primero el estilo visual — define qué módulos aparecen en la página del evento</div>
           </div>
           <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;flex-shrink:0">
             <input type="checkbox" id="ev-landing-activa" style="width:14px;height:14px;accent-color:var(--gold)"
@@ -696,11 +643,9 @@ tr:hover td{background:var(--surface)}
           </label>
         </div>
         <div id="ev-landing-config" style="display:none">
-        <!-- ══ Sub-paso 2 · ADN Visual (plantilla + módulos + efectos) ══ -->
-        <div class="wiz-step" data-wiz-step="2">
           <!-- Selector de themes -->
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem" data-cat="cinematografia">🎬 Cinematografía</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" id="ev-theme-cards" data-cat="cinematografia">
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">🎬 Cinematografía</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" id="ev-theme-cards">
             <div class="ld-theme-card" data-theme="arthouse" onclick="seleccionarTheme('arthouse')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div><span style="font-size:12px;font-weight:600;color:#0d0d0b">P1 · Arthouse</span></div>
               <div style="font-size:10px;color:#555">A24 · MUBI · Editorial blanco/negro</div>
@@ -718,8 +663,8 @@ tr:hover td{background:var(--surface)}
               <div style="font-size:10px;color:#3080a0">Multimedia · Por definir</div>
             </div>
           </div>
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="fiesta">🎉 Fiesta</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="fiesta">
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem">🎉 Fiesta</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem">
             <div class="ld-theme-card" data-theme="tropical-hostel" onclick="seleccionarTheme('tropical-hostel')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f1f0f,#1a3010)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-size:12px;font-weight:600;color:#4ade80">P5 · Tropical Hostel</span></div>
               <div style="font-size:10px;color:#2d7040">Selina · Naturaleza · Mochileros</div>
@@ -737,8 +682,8 @@ tr:hover td{background:var(--surface)}
               <div style="font-size:10px;color:#7a7570">Aman · Standard Hotels · VIP</div>
             </div>
           </div>
-          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem">📣 Campaña</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem">
             <div class="ld-theme-card" data-theme="solidario-moderno" onclick="seleccionarTheme('solidario-moderno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a1628,#0d2040)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;box-shadow:0 0 5px #3b82f6"></div><span style="font-size:12px;font-weight:600;color:#3b82f6">P9 · Solidario Moderno</span></div>
               <div style="font-size:10px;color:#4060a0">Azul · Esperanza · ONG profesional</div>
@@ -820,10 +765,6 @@ tr:hover td{background:var(--surface)}
             <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-parallax" style="width:13px;height:13px;accent-color:var(--gold)"> Parallax</label>
           </div>
 
-        </div><!-- /wiz-step 2 -->
-
-        <!-- ══ Sub-paso 3 · Átomos de Contenido (campos dinámicos por tipo) ══ -->
-        <div class="wiz-step" data-wiz-step="3">
           <!-- Contenido de módulos — compartido por todos los tipos -->
           <div id="ld-contenido-campos">
             <!-- CAMPOS CINEMATOGRAFÍA -->
@@ -894,13 +835,9 @@ tr:hover td{background:var(--surface)}
           <div id="ld-preview-badge" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:.4rem .75rem;font-size:12px;color:var(--ink3);margin-top:.5rem">
             <span style="color:var(--gold)">●</span> Plantilla: <strong id="ld-preview-theme-name">—</strong>
           </div>
-        </div><!-- /wiz-step 3 -->
-        </div><!-- /ev-landing-config -->
-      </div><!-- /contenedor compartido pasos 2-3 -->
+        </div>
+      </div>
       <!-- ════════════════════════════════════════════════════ -->
-
-      <!-- ══ Continuación PASO 1 · Cimiento (Identidad) — ADR-021 ══ -->
-      <div class="wiz-step" data-wiz-step="1">
 
       <!-- Toggle único / serie -->
       <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);margin-bottom:1.25rem;width:fit-content">
@@ -925,25 +862,7 @@ tr:hover td{background:var(--surface)}
             <input type="color" id="ev-color" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
             <input id="ev-color-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value)">
           </div>
-          <!-- ADR-021: Armonías cromáticas sugeridas vía TinyColor -->
-          <div id="ev-color-harmony" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"></div>
         </div>
-      </div>
-
-      <!-- Tipo de salida tras el registro (QR o Captura Pura) — ADR-021 -->
-      <div class="fg" style="margin-top:.25rem">
-        <label>Tipo de salida tras el registro</label>
-        <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);width:fit-content">
-          <button type="button" id="ev-salida-qr-btn" onclick="setEvSalida(false)"
-            style="padding:8px 16px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--ink);color:#fff;transition:.15s">
-            🎟 QR / Ticket
-          </button>
-          <button type="button" id="ev-salida-captura-btn" onclick="setEvSalida(true)"
-            style="padding:8px 16px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--surface);color:var(--ink3);transition:.15s">
-            📝 Captura pura (sin QR)
-          </button>
-        </div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:4px" id="ev-salida-hint">Tras registrarse, el asistente recibe su QR de acceso.</div>
       </div>
 
       <!-- Opciones de serie (ocultas por defecto) -->
@@ -961,11 +880,6 @@ tr:hover td{background:var(--surface)}
           </div>
         </div>
       </div>
-
-      </div><!-- /wiz-step 1 -->
-
-      <!-- ══ Continuación PASO 3 · Contenido (descripción + media) — ADR-021 ══ -->
-      <div class="wiz-step" data-wiz-step="3">
 
       <!-- Descripción enriquecida (ancho completo) -->
       <div class="fg" style="margin-top:.75rem">
@@ -1069,11 +983,6 @@ tr:hover td{background:var(--surface)}
 
       </div>
 
-      </div><!-- /wiz-step 3 -->
-
-      <!-- ══ PASO 4 · Blindaje (aforo, campos personalizados, acceso) — ADR-021 ══ -->
-      <div class="wiz-step" data-wiz-step="4">
-
       <!-- Opciones y campos -->
       <div style="margin-top:1rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
@@ -1109,12 +1018,6 @@ tr:hover td{background:var(--surface)}
           <button type="button" class="btn btn-ghost btn-sm" onclick="addCampoCustom('checkbox')" style="font-size:11px">+ Casilla de verificación</button>
         </div>
       </div>
-
-      <!-- Aforo — FIX ADR-021 / ERRORES_HISTORICOS §8: faltaba el <div> de apertura de este
-           bloque; el </div> que cerraba este fragmento en realidad cerraba prematuramente el
-           contenedor flex de "Opciones y campos" abierto más arriba (bug de anidación
-           silenciosa — sin error de consola, sin white screen). Se envuelve correctamente. -->
-      <div class="fg" style="margin-top:1rem">
         <label style="font-size:13px;color:var(--ink2);font-weight:500">Aforo máximo</label>
         <input type="number" id="ev-aforo" min="1" max="9999" placeholder="Sin límite"
           style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif">
@@ -1140,14 +1043,6 @@ tr:hover td{background:var(--surface)}
 
       <div style="margin-top:1rem">
         <button class="btn btn-gold" id="btn-crear-ev" onclick="crearEvento()">Crear evento</button>
-      </div>
-
-      </div><!-- /wiz-step 4 -->
-
-      <!-- Navegación inferior del Wizard (ADR-021) — siempre en el DOM, sin data-wiz-step -->
-      <div style="display:flex;justify-content:space-between;margin-top:1rem;gap:8px" id="wiz-bottom-nav">
-        <button type="button" class="btn btn-ghost" id="wiz-btn-prev" onclick="wizPrev()" style="visibility:hidden">← Atrás</button>
-        <button type="button" class="btn btn-gold" id="wiz-btn-next" onclick="wizNext()">Siguiente →</button>
       </div>
     </div>
 
@@ -2086,9 +1981,6 @@ async function _ensureXLSX() {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
-<!-- ADR-021: TinyColor2 para el selector de armonías cromáticas del Wizard. Mismo dominio CDN
-     (jsdelivr) que qr-creator, sin eval()/new Function() — cumple CSP de Vercel. -->
-<script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.6.0/dist/tinycolor-min.js"></script>
 <script>
 // ════════════════════════════════════════════════════
 // SUPABASE CONFIG
@@ -2383,141 +2275,6 @@ function seleccionarTheme(theme) {
 
   try { sessionStorage.setItem('ld_theme', theme); } catch(e) {}
 }
-
-// ════════════════════════════════════════════════════════════
-// ADR-021 — WIZARD INTELIGENTE DE CREACIÓN DE EVENTOS (4 pasos)
-// ════════════════════════════════════════════════════════════
-let _wizStep      = 1;
-let _evCategoria  = null;    // 'cinematografia' | 'fiesta' | 'campana' — Orquestador de Intención
-let _evCapturaPura = false;  // true = Evento de Captura Pura (omite generación de QR)
-
-// Plantillas aún sin silo CSS/HTML propio (ver PROJECT.md §6 "Silos Operativos Validados").
-// Cero Borrado: se mantienen seleccionables, solo se marcan visualmente como "Próximamente".
-const _TEMAS_POR_DEFINIR = ['neon-cult-cine','interactive-cine','underground','elegant-cocktail','tech-futurista'];
-
-function seleccionarCategoria(tipo) {
-  _evCategoria = tipo;
-
-  document.querySelectorAll('.wiz-cat-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.catCard === tipo);
-  });
-  // Filtrar qué grupo de plantillas (Paso 2) y qué bloque de módulos-tipo se ofrece
-  document.querySelectorAll('[data-cat]').forEach(el => {
-    el.style.display = (el.dataset.cat === tipo) ? '' : 'none';
-  });
-
-  // Preseleccionar automáticamente la primera plantilla de la categoría elegida
-  // (el usuario puede cambiarla libremente en el Paso 2 — ADN Visual).
-  if (!_ldThemeSeleccionado || _THEME_TYPE[_ldThemeSeleccionado] !== tipo) {
-    const primera = Object.keys(_THEME_TYPE).find(k => _THEME_TYPE[k] === tipo);
-    if (primera) seleccionarTheme(primera);
-  }
-}
-
-function setEvSalida(esCaptura) {
-  _evCapturaPura = esCaptura;
-  const qrBtn  = document.getElementById('ev-salida-qr-btn');
-  const capBtn = document.getElementById('ev-salida-captura-btn');
-  if (qrBtn)  { qrBtn.style.background  = esCaptura ? 'var(--surface)' : 'var(--ink)'; qrBtn.style.color  = esCaptura ? 'var(--ink3)' : '#fff'; }
-  if (capBtn) { capBtn.style.background = esCaptura ? 'var(--ink)' : 'var(--surface)'; capBtn.style.color = esCaptura ? '#fff' : 'var(--ink3)'; }
-  const hint = document.getElementById('ev-salida-hint');
-  if (hint) hint.textContent = esCaptura
-    ? 'El asistente NO recibe QR: al registrarse ve un mensaje de agradecimiento personalizado (requiere soporte en evento.html — ver TSK-016 pendiente).'
-    : 'Tras registrarse, el asistente recibe su QR de acceso.';
-}
-
-// Armonías cromáticas sugeridas a partir del color del evento (TinyColor2, ADR-021)
-function renderColorHarmony(hex) {
-  const wrap = document.getElementById('ev-color-harmony');
-  if (!wrap || typeof tinycolor === 'undefined') return;
-  const base = tinycolor(hex);
-  if (!base.isValid()) { wrap.innerHTML = ''; return; }
-  const combos = [
-    { label: 'Complementario', color: base.complement() },
-    ...base.analogous(3).slice(1).map((c, i) => ({ label: 'Análogo ' + (i + 1), color: c })),
-    ...base.triad().slice(1).map((c, i) => ({ label: 'Tríada ' + (i + 1), color: c })),
-  ];
-  wrap.innerHTML = combos.map(c => {
-    const h = c.color.toHexString();
-    return `<button type="button" class="wiz-swatch" title="${c.label}: ${h}" style="background:${h}" onclick="syncColor('${h}');document.getElementById('ev-color-hex').value='${h}'"></button>`;
-  }).join('');
-}
-
-function wizValidate(step) {
-  document.getElementById('ev-alert').innerHTML = '';
-  if (step === 1) {
-    if (!_evCategoria) { alrt('ev-alert', 'Selecciona el tipo de evento (Cine, Fiesta o Campaña).', 'err'); return false; }
-    const n = document.getElementById('ev-n').value.trim();
-    if (!n) { alrt('ev-alert', 'El nombre es obligatorio.', 'err'); return false; }
-    if (_evTipo === 'serie') {
-      if (!document.getElementById('ev-serie-f1').value) { alrt('ev-alert', 'La fecha de la primera sesión es obligatoria.', 'err'); return false; }
-    } else {
-      const f = document.getElementById('ev-f').value;
-      if (!f && _evCategoria !== 'campana') { alrt('ev-alert', 'La fecha es obligatoria.', 'err'); return false; }
-    }
-  }
-  if (step === 2) {
-    if (!_ldThemeSeleccionado) { alrt('ev-alert', 'Elige una plantilla visual.', 'err'); return false; }
-  }
-  return true;
-}
-
-function wizShow(step) {
-  _wizStep = step;
-  document.querySelectorAll('[data-wiz-step]').forEach(el => {
-    const steps = String(el.dataset.wizStep).split(',').map(s => s.trim());
-    el.classList.toggle('wiz-visible', steps.includes(String(step)));
-  });
-  document.querySelectorAll('.wiz-pill').forEach(p => {
-    const n = Number(p.dataset.pill);
-    p.classList.toggle('active', n === step);
-    p.classList.toggle('done', n < step);
-  });
-  const prevBtn = document.getElementById('wiz-btn-prev');
-  const nextBtn = document.getElementById('wiz-btn-next');
-  if (prevBtn) prevBtn.style.visibility = step > 1 ? 'visible' : 'hidden';
-  if (nextBtn) nextBtn.style.display    = step < 4 ? '' : 'none';
-  const card = document.getElementById('pg-admin');
-  if (card) window.scrollTo({ top: card.offsetTop, behavior: 'smooth' });
-}
-
-function wizNext() {
-  if (!wizValidate(_wizStep)) return;
-  if (_wizStep === 1) {
-    // Activa automáticamente la plantilla al avanzar — el checkbox sigue existiendo
-    // y editable (Cero Borrado), solo se preselecciona por coherencia con el Paso 1.
-    const chk = document.getElementById('ev-landing-activa');
-    if (chk && !chk.checked) { chk.checked = true; toggleLandingConfig(true); }
-  }
-  if (_wizStep < 4) wizShow(_wizStep + 1);
-}
-function wizPrev() { if (_wizStep > 1) wizShow(_wizStep - 1); }
-function wizJump(n) {
-  if (n <= _wizStep) { wizShow(n); return; }
-  for (let s = _wizStep; s < n; s++) {
-    if (!wizValidate(s)) { wizShow(s); return; }
-    if (s === 1) {
-      const chk = document.getElementById('ev-landing-activa');
-      if (chk && !chk.checked) { chk.checked = true; toggleLandingConfig(true); }
-    }
-  }
-  wizShow(n);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  wizShow(1);
-  // Marcar visualmente las plantillas "por definir" (Cero Borrado: siguen siendo seleccionables)
-  _TEMAS_POR_DEFINIR.forEach(theme => {
-    const card = document.querySelector(`.ld-theme-card[data-theme="${theme}"]`);
-    if (card && !card.querySelector('.wiz-proximamente-tag')) {
-      const tag = document.createElement('div');
-      tag.className = 'wiz-proximamente-tag';
-      tag.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-d);margin-top:3px';
-      tag.textContent = '● Próximamente';
-      card.appendChild(tag);
-    }
-  });
-});
 
 // Mostrar/ocultar campos de contenido según módulos activos
 (function() {
@@ -4423,12 +4180,6 @@ async function _crearEventoUnico(n) {
     aforo_max: parseInt(document.getElementById('ev-aforo')?.value) || null,
     ...(document.getElementById('ev-poster-url')?.value.trim() ? {poster_url: document.getElementById('ev-poster-url').value.trim()} : {}),
     ...(typeof _buildConfigLanding === 'function' && _buildConfigLanding() ? {config_landing: _buildConfigLanding()} : {}),
-    // ADR-021 — antes solo vivían dentro de config_landing (JSON); BLUEPRINT.md ya los
-    // documentaba como columnas de 'eventos' pero el INSERT nunca los escribía
-    // (ver ERRORES_HISTORICOS.md §8). Requiere la migración de /migrations/adr021.sql.
-    template_id:    _ldThemeSeleccionado || null,
-    categoria_slug: _evCategoria || null,
-    captura_pura:   _evCapturaPura,
     org_id:    ORG_ID,
   }).select().single();
 
@@ -4443,11 +4194,6 @@ async function _crearEventoUnico(n) {
   document.getElementById('ev-img-preview').style.display='none';
   previewVideo('');
   resetCamposCustom();
-  // ADR-021 — reiniciar el estado del Wizard para la siguiente creación
-  _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
-  document.querySelectorAll('.wiz-cat-card').forEach(c => c.classList.remove('active'));
-  setEvSalida(false);
-  wizShow(1);
   loadEventos();
   loadEventosSelects();
 }
@@ -4512,10 +4258,6 @@ async function _crearSerie(n) {
         nota:   document.getElementById('ev-campo-nota')?.checked ?? false,
         custom: getCamposCustom(),
       },
-      // ADR-021 — mismo fix de persistencia que _crearEventoUnico (ver ERRORES_HISTORICOS.md §8)
-      template_id:    _ldThemeSeleccionado || null,
-      categoria_slug: _evCategoria || null,
-      captura_pura:   _evCapturaPura,
       org_id: ORG_ID,
     });
     fecha.setDate(fecha.getDate() + rep);
@@ -7056,7 +6798,6 @@ async function undoCheckin(id, nombre) {
 function syncColor(hex) {
   if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
     document.getElementById('ev-color').value = hex;
-    renderColorHarmony(hex); // ADR-021
   }
 }
 // Sincronizar color picker → hex input
@@ -7065,9 +6806,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const picker = document.getElementById('ev-color');
   if (picker) picker.addEventListener('input', e => {
     document.getElementById('ev-color-hex').value = e.target.value;
-    renderColorHarmony(e.target.value); // ADR-021
   });
-  renderColorHarmony(document.getElementById('ev-color-hex')?.value || '#c9a84c'); // ADR-021 · estado inicial
   // Preview imagen
   const imgInput = document.getElementById('ev-img');
   if (imgInput) imgInput.addEventListener('input', e => {
