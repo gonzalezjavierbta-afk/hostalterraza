@@ -383,6 +383,7 @@
     box-shadow: none !important;
     padding: 1.5rem 0 !important;
     border-bottom: 1px solid var(--b5-line) !important;
+    align-items: center !important;
 }
 .tpl-b5 #mod-impacto-humanitario .impacto-card--metrica:nth-last-child(-n+2) {
     border-bottom: none !important; /* última fila (2 columnas) sin separador colgante */
@@ -1327,6 +1328,22 @@
         width: 100% !important;
         margin: -22rem 0 3rem 0 !important; /* Elevación agresiva sobre la imagen */
         padding: 1rem 1.5rem !important;
+    }
+
+    /* 1. Reducimos el respiro inferior del mapa circular */
+    .tpl-b5 #mod-mapa-crisis {
+        padding-bottom: 2.5rem !important; 
+    }
+
+    /* 2. Eliminamos el respiro superior de las cifras de impacto (5,500 Víctimas, etc.) */
+    .tpl-b5 #mod-impacto-humanitario {
+        padding-top: 0 !important;      /* Anula los 2.5rem que causan la separación */
+        margin-top: -1rem !important; /* Margen negativo para pegar las cifras al mapa */
+    }
+
+    /* 3. Ajuste de respiro para la insignia "02" */
+    .tpl-b5 .mapacrisis-inner {
+        padding-top: 1rem !important;
     }
 
     /* 3. AJUSTE DE FILAS (Items) */
