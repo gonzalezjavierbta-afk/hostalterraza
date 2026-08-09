@@ -93,6 +93,21 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .wiz-swatch{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);cursor:pointer;padding:0}
 .wiz-swatch:hover{box-shadow:0 0 0 2px var(--gold)}
 @media(max-width:600px){.wiz-nav{flex-direction:column}.wiz-pill{width:100%}}
+
+/* ═══ ADR-022: Navegación interna del módulo Admin (Crear / Invitadores / Historial) ═══ */
+.adm-nav{display:flex;gap:8px;margin-bottom:1.25rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.adm-tab{display:flex;align-items:center;gap:6px;padding:10px 4px;margin-bottom:-1px;border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink3);font-family:'DM Sans',sans-serif;transition:.15s}
+.adm-tab:hover{color:var(--ink2)}
+.adm-tab.active{color:var(--ink);border-bottom-color:var(--gold)}
+.adm-tab-badge{background:var(--surface);color:var(--ink3);border-radius:99px;padding:1px 7px;font-size:11px;font-weight:600}
+.adm-tab.active .adm-tab-badge{background:var(--gold-bg);color:var(--gold-d)}
+[data-adm-tab]{display:none}
+[data-adm-tab].adm-visible{display:block}
+.hist-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.hist-time-toggle{display:flex;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
+.hist-time-toggle button{padding:7px 12px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--surface);color:var(--ink3)}
+.hist-time-toggle button.on{background:var(--ink);color:#fff}
+@media(max-width:600px){.hist-filters{flex-direction:column;align-items:stretch}}
 button:disabled{opacity:.4;cursor:not-allowed}
 
 /* BADGES */
@@ -644,8 +659,16 @@ tr:hover td{background:var(--surface)}
 <div class="pg on" id="pg-admin">
   <div class="wrap">
     <h1 style="font-size:24px;margin-bottom:.2rem">Eventos</h1>
-    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Crea eventos únicos o series consecutivas con invitadores.</p>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:1rem">Crea eventos únicos o series consecutivas con invitadores.</p>
 
+    <!-- ══ ADR-022: Navegación interna de Admin ══ -->
+    <div class="adm-nav" id="adm-nav">
+      <button class="adm-tab" data-adm-pill="historial" onclick="admGoTab('historial')">📋 Historial <span class="adm-tab-badge" id="adm-badge-historial">0</span></button>
+      <button class="adm-tab" data-adm-pill="crear" onclick="admGoTab('crear')">+ Nuevo evento</button>
+      <button class="adm-tab" data-adm-pill="invitadores" onclick="admGoTab('invitadores')">🔗 Invitadores <span class="adm-tab-badge" id="adm-badge-invitadores">0</span></button>
+    </div>
+
+    <div data-adm-tab="crear">
     <div class="card">
       <div class="ch">Nuevo evento</div>
       <div id="ev-alert"></div>
@@ -1150,8 +1173,10 @@ tr:hover td{background:var(--surface)}
         <button type="button" class="btn btn-gold" id="wiz-btn-next" onclick="wizNext()">Siguiente →</button>
       </div>
     </div>
+    </div><!-- /data-adm-tab="crear" -->
 
     <!-- INVITADORES -->
+    <div data-adm-tab="invitadores">
     <div class="card" style="margin-top:1rem">
       <div class="ch" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span>Invitadores</span>
@@ -1163,6 +1188,8 @@ tr:hover td{background:var(--surface)}
       <div id="inv-alert"></div>
       <div id="inv-list"><div class="empty" style="padding:.5rem 0">Sin invitadores creados</div></div>
     </div>
+    </div><!-- /data-adm-tab="invitadores" -->
+
 
     <!-- MODAL NUEVO INVITADOR -->
     <div id="mod-nuevo-inv" class="modal-bg" style="display:none" onclick="if(event.target===this)cerrarModalNuevoInv()">
@@ -1252,6 +1279,9 @@ tr:hover td{background:var(--surface)}
       </div>
     </div>
 
+    <!-- HISTORIAL DE EVENTOS (ADR-022) -->
+    <div data-adm-tab="historial">
+
     <!-- NUEVO CLIENTE (visible solo para admin_evento) -->
     <div class="card" id="admin-ev-nuevo-cliente" style="margin-top:1rem;display:none">
       <div class="ch">Nuevo asistente</div>
@@ -1278,7 +1308,27 @@ tr:hover td{background:var(--surface)}
       </div>
     </div>
 
-    <div id="ev-list" style="margin-top:1rem"><div class="empty">Cargando eventos…</div></div>
+    <div class="card" style="margin-top:1rem">
+      <div class="ch">Historial de eventos</div>
+      <div class="hist-filters">
+        <input type="text" id="hist-search" placeholder="🔍 Buscar por nombre…" oninput="renderEventos()" style="flex:1;min-width:160px">
+        <select id="hist-cat-filter" onchange="renderEventos()" style="width:auto">
+          <option value="">Todas las categorías</option>
+          <option value="cinematografia">🎬 Cine</option>
+          <option value="fiesta">🎉 Fiesta</option>
+          <option value="campana">📣 Campaña</option>
+        </select>
+        <div class="hist-time-toggle">
+          <button data-hist-time="todos" class="on" onclick="setHistTime('todos')">Todos</button>
+          <button data-hist-time="proximos" onclick="setHistTime('proximos')">Próximos</button>
+          <button data-hist-time="pasados" onclick="setHistTime('pasados')">Pasados</button>
+        </div>
+      </div>
+      <div id="hist-count" style="font-size:11px;color:var(--ink3);margin-bottom:.5rem"></div>
+      <div id="ev-list"><div class="empty">Cargando eventos…</div></div>
+    </div>
+
+    </div><!-- /data-adm-tab="historial" -->
   </div>
 </div>
 
@@ -2504,8 +2554,52 @@ function wizJump(n) {
   wizShow(n);
 }
 
+// ════════════════════════════════════════════════════════════
+// ADR-022 — NAVEGACIÓN INTERNA DEL MÓDULO ADMIN
+// (Crear evento / Invitadores / Historial de eventos)
+// ════════════════════════════════════════════════════════════
+let _admTab       = 'historial'; // vista por defecto al entrar a Admin
+let _histTimeFilter = 'todos';   // 'todos' | 'proximos' | 'pasados'
+
+function admGoTab(tab) {
+  _admTab = tab;
+  document.querySelectorAll('[data-adm-tab]').forEach(el => {
+    el.classList.toggle('adm-visible', el.dataset.admTab === tab);
+  });
+  document.querySelectorAll('.adm-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.admPill === tab);
+  });
+}
+
+function setHistTime(v) {
+  _histTimeFilter = v;
+  document.querySelectorAll('.hist-time-toggle button').forEach(b => {
+    b.classList.toggle('on', b.dataset.histTime === v);
+  });
+  renderEventos();
+}
+
+// Filtros de búsqueda / categoría / próximos-pasados sobre el historial (ADR-022).
+// Se aplican en memoria sobre lo ya cargado por loadEventos() — sin nuevas consultas a Supabase.
+function _aplicarFiltrosHistorial(lista) {
+  let out = lista;
+  const q = (document.getElementById('hist-search')?.value || '').trim().toLowerCase();
+  if (q) out = out.filter(e => (e.nombre || '').toLowerCase().includes(q));
+  const cat = document.getElementById('hist-cat-filter')?.value || '';
+  if (cat) out = out.filter(e => e.categoria_slug === cat);
+  if (_histTimeFilter !== 'todos') {
+    const hoy = new Date().toISOString().split('T')[0];
+    out = out.filter(e => {
+      if (!e.fecha) return _histTimeFilter === 'proximos'; // sin fecha (ej. campaña) = siempre próximo
+      return _histTimeFilter === 'proximos' ? e.fecha >= hoy : e.fecha < hoy;
+    });
+  }
+  return out;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   wizShow(1);
+  admGoTab('historial'); // ADR-022 — vista por defecto de Admin
   // Marcar visualmente las plantillas "por definir" (Cero Borrado: siguen siendo seleccionables)
   _TEMAS_POR_DEFINIR.forEach(theme => {
     const card = document.querySelector(`.ld-theme-card[data-theme="${theme}"]`);
@@ -3323,7 +3417,10 @@ let _series = [];
 
 function renderEventos() {
   const cont = document.getElementById('ev-list');
-  if (!_eventos.length) { cont.innerHTML='<div class="empty">No hay eventos creados</div>'; return; }
+  // ADR-022 — badge del tab Historial: total de eventos de la org, sin filtrar
+  const badgeHist = document.getElementById('adm-badge-historial');
+  if (badgeHist) badgeHist.textContent = _eventos.length;
+  if (!_eventos.length) { cont.innerHTML='<div class="empty">No hay eventos creados</div>'; document.getElementById('hist-count').textContent=''; return; }
 
   // Si es admin_evento, filtrar solo su evento asignado (o sesiones de su serie)
   let eventosVisibles;
@@ -3339,6 +3436,17 @@ function renderEventos() {
   } else {
     eventosVisibles = _eventos;
   }
+  const totalAntesDeFiltro = eventosVisibles.length;
+
+  // ADR-022 — buscador / categoría / próximos-pasados
+  eventosVisibles = _aplicarFiltrosHistorial(eventosVisibles);
+  const countEl = document.getElementById('hist-count');
+  if (countEl) {
+    countEl.textContent = eventosVisibles.length === totalAntesDeFiltro
+      ? `${totalAntesDeFiltro} evento${totalAntesDeFiltro !== 1 ? 's' : ''}`
+      : `Mostrando ${eventosVisibles.length} de ${totalAntesDeFiltro} eventos`;
+  }
+  if (!eventosVisibles.length) { cont.innerHTML = '<div class="empty">Ningún evento coincide con el filtro</div>'; return; }
 
   // Separar eventos sueltos y sesiones de series
   const sueltos = eventosVisibles.filter(e => !e.serie_id);
@@ -4115,6 +4223,9 @@ async function loadInvitadores() {
 function renderInvitadoresPerfil() {
   const cont = document.getElementById('inv-list');
   if (!cont) return;
+  // ADR-022 — badge del tab Invitadores (cuenta invitadores únicos por código, no filas de links)
+  const badgeInv = document.getElementById('adm-badge-invitadores');
+  if (badgeInv) badgeInv.textContent = new Set(_invitadores.map(i => i.codigo)).size;
   if (!_invitadores.length) {
     cont.innerHTML = '<div class="empty" style="padding:.5rem 0">Sin invitadores creados</div>';
     return;
@@ -7238,9 +7349,17 @@ function aplicarRestriccionesAdminEvento() {
   const evId = currentPerfil.evento_id;
   if (!evId) return;
 
-  // Ocultar card de creación de evento
-  const primerCard = document.querySelector('#pg-admin > .wrap > .card');
-  if (primerCard) primerCard.style.display = 'none';
+  // ADR-022 — FIX: antes se ocultaba la card de creación con el selector posicional
+  // '#pg-admin > .wrap > .card', que dejó de coincidir tras envolver la card en
+  // <div data-adm-tab="crear"> tal que .card pasó a ser NIETA de .wrap, no hija directa
+  // — habría dejado el Wizard de creación visible/accesible para admin_evento sin
+  // querer. Ahora se oculta el tab "Crear" completo (botón + contenido) y, si estaba
+  // activo, se fuerza el aterrizaje en "historial".
+  const crearTabBtn = document.querySelector('.adm-tab[data-adm-pill="crear"]');
+  if (crearTabBtn) crearTabBtn.style.display = 'none';
+  const crearTabContent = document.querySelector('[data-adm-tab="crear"]');
+  if (crearTabContent) crearTabContent.style.display = 'none';
+  if (_admTab === 'crear') admGoTab('historial');
 
   // Mostrar card de nuevo asistente
   const cliCard = document.getElementById('admin-ev-nuevo-cliente');
