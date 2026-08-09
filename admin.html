@@ -101,8 +101,8 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .adm-tab.active{color:var(--ink);border-bottom-color:var(--gold)}
 .adm-tab-badge{background:var(--surface);color:var(--ink3);border-radius:99px;padding:1px 7px;font-size:11px;font-weight:600}
 .adm-tab.active .adm-tab-badge{background:var(--gold-bg);color:var(--gold-d)}
-[data-adm-tab]{display:none}
-[data-adm-tab].adm-visible{display:block}
+[data-adm-tab],[data-pnl-tab]{display:none}
+[data-adm-tab].adm-visible,[data-pnl-tab].adm-visible{display:block}
 .hist-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
 .hist-time-toggle{display:flex;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
 .hist-time-toggle button{padding:7px 12px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--surface);color:var(--ink3)}
@@ -1617,6 +1617,15 @@ tr:hover td{background:var(--surface)}
       </div>
     </div>
 
+    <!-- ══ ADR-023: Navegación interna de Panel ══ -->
+    <div class="adm-nav" id="pnl-nav">
+      <button class="adm-tab" data-pnl-pill="resumen" onclick="pnlGoTab('resumen')">📊 Resumen</button>
+      <button class="adm-tab" data-pnl-pill="tendencias" onclick="pnlGoTab('tendencias')">📈 Tendencias</button>
+      <button class="adm-tab" data-pnl-pill="rankings" onclick="pnlGoTab('rankings')">🏆 Rankings</button>
+      <button class="adm-tab" data-pnl-pill="asistentes" onclick="pnlGoTab('asistentes')">👥 Asistentes <span class="adm-tab-badge" id="pnl-badge-asistentes">0</span></button>
+    </div>
+
+    <div data-pnl-tab="resumen">
     <!-- KPIs principales: fila de 6 -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:1.25rem">
       <div class="stat"><div class="stat-n" id="pn-total">—</div><div class="stat-l">Inscritos</div></div>
@@ -1645,8 +1654,10 @@ tr:hover td{background:var(--surface)}
         <div id="pn-tipo-legend" style="display:flex;gap:8px;margin-top:.5rem;font-size:11px;color:var(--ink3);flex-wrap:wrap"></div>
       </div>
     </div>
+    </div><!-- /data-pnl-tab="resumen" (1/2) -->
 
     <!-- Fila 2: Heatmap + día semana -->
+    <div data-pnl-tab="tendencias">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
       <div class="card">
         <div class="ch" style="margin-bottom:.75rem">Heatmap de ingresos por hora</div>
@@ -1672,8 +1683,10 @@ tr:hover td{background:var(--surface)}
         <div style="position:relative;height:100px;margin-top:.5rem"><canvas id="pn-chart-retencion"></canvas></div>
       </div>
     </div>
+    </div><!-- /data-pnl-tab="tendencias" (1/3) -->
 
     <!-- Ranking inscriptores (nuevo) -->
+    <div data-pnl-tab="rankings">
     <div class="card" style="margin-bottom:1rem">
       <div class="ch" style="margin-bottom:.75rem">Ranking de inscriptores</div>
       <div id="pn-inscriptores"><div class="empty">Sin datos de inscriptores</div></div>
@@ -1709,21 +1722,27 @@ tr:hover td{background:var(--surface)}
         <div id="pn-canales"></div>
       </div>
     </div>
+    </div><!-- /data-pnl-tab="rankings" -->
 
     <!-- NUEVO: Crecimiento de la base -->
+    <div data-pnl-tab="tendencias">
     <div class="card" style="margin-bottom:1rem">
       <div class="ch" style="margin-bottom:.5rem">Crecimiento de la base</div>
       <div id="pn-crec-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.75rem"></div>
       <div style="position:relative;height:120px"><canvas id="pn-chart-crec"></canvas></div>
     </div>
+    </div><!-- /data-pnl-tab="tendencias" (2/3) -->
 
     <!-- Insights -->
+    <div data-pnl-tab="resumen">
     <div class="card" style="margin-bottom:1rem">
       <div class="ch" style="margin-bottom:.75rem">Insights automáticos</div>
       <div id="pn-insights" style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem"></div>
     </div>
+    </div><!-- /data-pnl-tab="resumen" (2/2) -->
 
     <!-- Inscripciones por día y hora -->
+    <div data-pnl-tab="tendencias">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
       <div class="card">
         <div class="ch" style="margin-bottom:.75rem">Inscripciones por día</div>
@@ -1736,8 +1755,10 @@ tr:hover td{background:var(--surface)}
         <div style="font-size:11px;color:var(--ink3);margin-top:.5rem">Más oscuro = más registros en esa hora</div>
       </div>
     </div>
+    </div><!-- /data-pnl-tab="tendencias" (3/3) -->
 
     <!-- Tabla asistentes -->
+    <div data-pnl-tab="asistentes">
     <div class="card" style="margin-bottom:1rem">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:.75rem">
         <div class="ch" style="margin-bottom:0">Lista de asistentes</div>
@@ -1801,6 +1822,7 @@ tr:hover td{background:var(--surface)}
       <div class="ch">Log de accesos</div>
       <div id="pn-log"><div class="empty">Sin actividad</div></div>
     </div>
+    </div><!-- /data-pnl-tab="asistentes" -->
   </div>
 </div>
 
@@ -2566,8 +2588,22 @@ function admGoTab(tab) {
   document.querySelectorAll('[data-adm-tab]').forEach(el => {
     el.classList.toggle('adm-visible', el.dataset.admTab === tab);
   });
-  document.querySelectorAll('.adm-tab').forEach(b => {
+  document.querySelectorAll('.adm-tab[data-adm-pill]').forEach(b => {
     b.classList.toggle('active', b.dataset.admPill === tab);
+  });
+}
+
+// ADR-023 — Navegación interna de Panel (Resumen / Tendencias / Rankings / Asistentes),
+// mismo controlador que admGoTab pero con su propio namespace de atributos (data-pnl-*)
+// para no interferir entre páginas que coexisten en el mismo DOM.
+let _pnlTab = 'resumen'; // vista por defecto al entrar a Panel
+function pnlGoTab(tab) {
+  _pnlTab = tab;
+  document.querySelectorAll('[data-pnl-tab]').forEach(el => {
+    el.classList.toggle('adm-visible', el.dataset.pnlTab === tab);
+  });
+  document.querySelectorAll('.adm-tab[data-pnl-pill]').forEach(b => {
+    b.classList.toggle('active', b.dataset.pnlPill === tab);
   });
 }
 
@@ -2600,6 +2636,7 @@ function _aplicarFiltrosHistorial(lista) {
 document.addEventListener('DOMContentLoaded', () => {
   wizShow(1);
   admGoTab('historial'); // ADR-022 — vista por defecto de Admin
+  pnlGoTab('resumen');   // ADR-023 — vista por defecto de Panel
   // Marcar visualmente las plantillas "por definir" (Cero Borrado: siguen siendo seleccionables)
   _TEMAS_POR_DEFINIR.forEach(theme => {
     const card = document.querySelector(`.ld-theme-card[data-theme="${theme}"]`);
@@ -6161,6 +6198,11 @@ function _renderTablaPagina() {
   const info  = document.getElementById('pn-page-info');
   const prev  = document.getElementById('pn-prev');
   const next  = document.getElementById('pn-next');
+
+  // ADR-023 — badge del tab Asistentes: total sin filtrar (_pnAllList es la lista completa
+  // ya cargada por renderTabla(), independiente de los filtros de búsqueda/tipo/estado)
+  const badgeAsist = document.getElementById('pnl-badge-asistentes');
+  if (badgeAsist) badgeAsist.textContent = _pnAllList?.length || 0;
 
   const q      = (document.getElementById('pn-search')?.value||'').toLowerCase().trim();
   const tipo   = document.getElementById('pn-tipo-filter')?.value||'';
