@@ -5709,12 +5709,15 @@ async function renderPanel() {
     // ── Gráfica por evento ──
     const evStats = _eventos
       .filter(e => evIds.includes(e.id))
-      .sort((a,b) => (a.sesion_num||0)-(b.sesion_num||0) || a.fecha.localeCompare(b.fecha))
+      .sort((a,b) => (a.sesion_num||0)-(b.sesion_num||0) || (a.fecha||'').localeCompare(b.fecha||''))
       .slice(-12)
       .map(ev => {
+        // ADR-024 — Silent Fallback: fecha/nombre pueden venir null (ver ERRORES_HISTORICOS.md §11)
+        const fechaSafe  = ev.fecha || '';
+        const nombreSafe = ev.nombre || '(sin nombre)';
         const evL = list.filter(i=>i.evento_id===ev.id);
-        const label = ev.sesion_num ? `S${ev.sesion_num}·${ev.fecha.slice(5)}` : (ev.nombre.length>10?ev.nombre.substr(0,10)+'…':ev.nombre);
-        return { nombre:ev.nombre, label, fecha:ev.fecha, ins:evL.length, ing:evL.filter(i=>i.used).length };
+        const label = ev.sesion_num ? `S${ev.sesion_num}·${fechaSafe.slice(5)}` : (nombreSafe.length>10?nombreSafe.substr(0,10)+'…':nombreSafe);
+        return { nombre:nombreSafe, label, fecha:fechaSafe, ins:evL.length, ing:evL.filter(i=>i.used).length };
       });
 
     if (_pnChartEv) _pnChartEv.destroy();
@@ -6240,12 +6243,18 @@ function _renderTablaPagina() {
   if (prev) prev.disabled = _pnPage === 0;
   if (next) next.disabled  = _pnPage >= pages - 1;
 
-  tb.innerHTML = page.map(i => `<tr data-id="${i.id}">
+  tb.innerHTML = page.map(i => {
+    // ADR-024 — Silent Fallback (ADR-008): nombre/evento_nombre pueden venir null en
+    // registros incompletos (ver ERRORES_HISTORICOS.md §11) — se blindan antes de usarlos
+    // en .replace(), que truena con TypeError sobre null.
+    const nombreSafe = (i.nombre || '').replace(/'/g,"\\'");
+    const eventoSafe = (i.evento_nombre || '').replace(/'/g,"\\'");
+    return `<tr data-id="${i.id}">
     <td><input type="checkbox" class="row-sel" value="${i.id}" onclick="onRowSel()" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></td>
     <td style="font-weight:500">${esc(i.nombre)}</td>
     <td>${tipoBadge(i.tipo)}</td>
-    <td>${i.cedula}</td>
-    <td style="font-size:12px">${i.evento_nombre}</td>
+    <td>${i.cedula||'—'}</td>
+    <td style="font-size:12px">${i.evento_nombre||'—'}</td>
     <td style="font-size:11px;color:var(--ink3)">${i.ref_nombre||i.ref_codigo
       ?`<span style="background:var(--gold-bg);color:var(--gold-d);border-radius:4px;padding:1px 6px;font-size:11px">👤 ${i.ref_nombre||i.ref_codigo}</span>`
       :'<span style="color:var(--ink3)">—</span>'
@@ -6258,8 +6267,8 @@ function _renderTablaPagina() {
     <td><span class="badge ${i.used?'badge-green':'badge-amber'}">${i.used?'✓ Ingresó':'Pendiente'}</span></td>
     <td style="font-size:12px">${i.hora_ingreso?`<strong>${i.hora_ingreso}</strong> · ${i.fecha_ingreso}`:'—'}</td>
     <td>${!i.used
-      ?`<button class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green-border);white-space:nowrap" onclick="checkinManual('${i.id}','${i.nombre.replace(/'/g,"\\'")}','${i.cedula}','${i.evento_nombre.replace(/'/g,"\\'")}','${i.tipo}')">✓ Check-in</button>`
-      :`<button class="btn btn-ghost btn-sm" style="color:var(--ink3);white-space:nowrap" onclick="undoCheckin('${i.id}','${i.nombre.replace(/'/g,"\\'")}')">↩ Revertir</button>`
+      ?`<button class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green-border);white-space:nowrap" onclick="checkinManual('${i.id}','${nombreSafe}','${i.cedula||''}','${eventoSafe}','${i.tipo||''}')">✓ Check-in</button>`
+      :`<button class="btn btn-ghost btn-sm" style="color:var(--ink3);white-space:nowrap" onclick="undoCheckin('${i.id}','${nombreSafe}')">↩ Revertir</button>`
     }</td>
     <td style="white-space:nowrap">
       <select onchange="cambiarTipoInscrito('${i.id}',this.value)" style="font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;cursor:pointer;max-width:110px">
@@ -6270,9 +6279,16 @@ function _renderTablaPagina() {
         <option value="pago"       ${i.tipo==='pago'      ?'selected':''}>💳 Por pago</option>
       </select>
       <button class="btn btn-ghost btn-sm" style="margin-left:4px" title="Editar datos" onclick="abrirEditInscrito('${i.id}')">✏</button>
-      <button class="btn btn-ghost btn-sm btn-red" style="margin-left:4px" onclick="eliminarInscrito('${i.id}','${i.nombre.replace(/'/g,"\\'")}')">✕</button>
+      <button class="btn btn-ghost btn-sm btn-red" style="margin-left:4px" onclick="eliminarInscrito('${i.id}','${nombreSafe}')">✕</button>
     </td>
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
+
+  // ADR-024 — Escudo GOLD / TRACE: confirma cuántos registros se procesaron y cuántos
+  // requirieron el bypass de nulos, para detectar orgs con datos incompletos sin que
+  // el panel se bloquee.
+  const bypassCount = page.filter(i => !i.nombre || !i.evento_nombre).length;
+  console.log(`[TRACE] _renderTablaPagina: ${page.length} registros renderizados` + (bypassCount ? ` (${bypassCount} con bypass de nulos activo — ver ERRORES_HISTORICOS.md §11)` : ''));
 }
 
 function cambiarPagina(dir) {
