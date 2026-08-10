@@ -1,0 +1,899 @@
+/* ==========================================================================
+   c4.css — SILO ATÓMICO "Interactive Cine" | categoría: CINE (c)
+   Contrato: v107 · Escudo GOLD · Geist 900 · Afterglow · Native Mobile
+   Host: evento2.html · Flujo: #main-content-flow · Cero Borrado .tpl-c4
+   Paleta 60-30-10 · 60% #050505 (negro profundo) · 30% carbono glass ·
+   10% acento (--master-accent) · Experiencia streaming premium.
+   ========================================================================== */
+
+/* ── FUENTE: Geist 900 (gratuita) ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;700;800;900&display=swap');
+
+/* ==========================================================================
+   RAÍZ DEL SILO — .tpl-c4 (sin tocar :root global)
+   ========================================================================== */
+.tpl-c4 {
+  --c4-bg-void: #050505;
+  --c4-bg-carbon: #0d0d10;
+  --c4-bg-panel: rgba(255, 255, 255, 0.03);
+  --c4-bg-panel-strong: rgba(255, 255, 255, 0.06);
+  --c4-line: rgba(255, 255, 255, 0.08);
+  --c4-line-accent: rgba(255, 255, 255, 0.16);
+  --c4-text-strong: #ffffff;
+  --c4-text-muted: rgba(255, 255, 255, 0.55);
+  --c4-accent: var(--master-accent, #df20b6);
+  --c4-accent-soft: color-mix(in srgb, var(--c4-accent) 18%, transparent);
+  --c4-font: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --c4-glow: 0 0 24px var(--c4-accent-soft);
+  background-color: var(--c4-bg-void) !important;
+  color: var(--c4-text-strong);
+  font-family: var(--c4-font);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ==========================================================================
+   ACTIVACIÓN DEL CONTENEDOR PRINCIPAL — grid-template-areas
+   ========================================================================== */
+.tpl-c4 #main-content-flow {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'lineup'
+    'gallery'
+    'info'
+    'faq'
+    'sponsors'
+    'form';
+  row-gap: 0;
+}
+
+.tpl-c4 #modulo-lineup       { grid-area: lineup; }
+.tpl-c4 #modulo-gallery      { grid-area: gallery; }
+.tpl-c4 #modulo-info-tecnica { grid-area: info; }
+.tpl-c4 #modulo-faq-ubicacion{ grid-area: faq; }
+.tpl-c4 #modulo-sponsors     { grid-area: sponsors; }
+.tpl-c4 #modulo-formulario   { grid-area: form; }
+
+/* ==========================================================================
+   RESET CONTROLADO DEL SILO (sin tocar otras plantillas)
+   ========================================================================== */
+.tpl-c4 *, .tpl-c4 *::before, .tpl-c4 *::after { box-sizing: border-box; }
+
+.tpl-c4 section {
+  position: relative;
+  padding: 5rem clamp(1.25rem, 6vw, 5rem);
+  width: 100%;
+}
+
+/* ==========================================================================
+   HERO — marco de cartel cinematográfico (imagen sin iframe)
+   ========================================================================== */
+.tpl-c4 #hero-bg {
+  position: relative;
+  min-height: 92svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, var(--c4-accent-soft), transparent 70%),
+    linear-gradient(180deg, #0a0a0c 0%, var(--c4-bg-void) 78%) !important;
+  overflow: hidden;
+}
+
+.tpl-c4 #hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--c4-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c4-line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
+  pointer-events: none;
+}
+
+.tpl-c4 .hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 860px;
+  padding: 2rem 1.5rem;
+}
+
+.tpl-c4 .hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--c4-accent);
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  margin-bottom: 1.75rem;
+  backdrop-filter: blur(8px);
+}
+
+.tpl-c4 .hero-title {
+  font-size: clamp(2.6rem, 9vw, 6.5rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-shadow: 0 0 40px var(--c4-accent-soft);
+}
+
+.tpl-c4 .hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.tpl-c4 .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--c4-text-muted);
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+}
+
+.tpl-c4 .meta-svg { width: 14px; height: 14px; color: var(--c4-accent); }
+
+.tpl-c4 .hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.8rem 2.2rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--c4-accent), color-mix(in srgb, var(--c4-accent) 60%, #ff3d5a));
+  color: #0a0a0c;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow: var(--c4-glow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tpl-c4 .hero-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 44px var(--c4-accent-soft), 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* ── COUNTDOWN unificado (Afterglow) ─────────────────────────────────────── */
+.tpl-c4 #unified-frame {
+  position: relative;
+  z-index: 2;
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.1rem 1.5rem;
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  border-radius: 20px;
+  backdrop-filter: blur(14px);
+}
+
+.tpl-c4 .cd-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 68px;
+  padding: 0.6rem 0.9rem;
+  border-radius: 14px;
+  background: var(--c4-bg-panel-strong);
+  border: 1px solid var(--c4-line);
+}
+
+.tpl-c4 .cd-v {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--c4-text-strong);
+  text-shadow: 0 0 18px var(--c4-accent-soft);
+}
+
+.tpl-c4 .cd-l {
+  margin-top: 0.3rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--c4-text-muted);
+}
+
+/* ==========================================================================
+   MÓDULO LINEUP — afiche HD + talento (grid de personas)
+   ========================================================================== */
+.tpl-c4 #modulo-lineup {
+  display: grid;
+  grid-template-columns: minmax(240px, 380px) 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 6rem;
+}
+
+.tpl-c4 .poster-wrap {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid var(--c4-line);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), var(--c4-glow);
+}
+
+.tpl-c4 .poster-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, var(--c4-bg-void) 100%);
+  pointer-events: none;
+}
+
+.tpl-c4 .poster-main-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+.tpl-c4 .poster-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 1.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--c4-text-strong);
+}
+
+.tpl-c4 .lineup-copy h2 {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.tpl-c4 .lineup-copy p {
+  color: var(--c4-text-muted);
+  line-height: 1.7;
+  max-width: 54ch;
+}
+
+.tpl-c4 #db-lineup {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.tpl-c4 .artist-card {
+  padding: 1.1rem 1.25rem;
+  border-radius: 16px;
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.tpl-c4 .artist-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--c4-line-accent);
+  background: var(--c4-bg-panel-strong);
+}
+
+.tpl-c4 .artist-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--c4-text-strong);
+}
+
+.tpl-c4 .artist-role {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--c4-text-muted);
+}
+
+/* ==========================================================================
+   MÓDULO GALERÍA — centro cinematográfico (tráiler + playlist)
+   ========================================================================== */
+.tpl-c4 #modulo-gallery {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 5rem;
+}
+
+.tpl-c4 .section-title {
+  font-size: clamp(1.7rem, 3.5vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 2rem;
+}
+
+.tpl-c4 .media-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: stretch;
+}
+
+/* ── Tráiler: pantalla HD estilo streaming (sin <iframe> de YouTube) ─────── */
+.tpl-c4 #modulo-trailer {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--c4-bg-carbon);
+  border: 1px solid var(--c4-line);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.tpl-c4 #modulo-trailer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(5, 5, 5, 0.8) 100%);
+  pointer-events: none;
+}
+
+.tpl-c4 #db-video-content,
+.tpl-c4 #db-video-content iframe,
+.tpl-c4 #db-video-content video,
+.tpl-c4 .trailer-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tpl-c4 .trailer-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.tpl-c4 .trailer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--c4-text-strong);
+  background: rgba(5, 5, 5, 0.55);
+  border: 1px solid var(--c4-line);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.tpl-c4 .trailer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  background: var(--c4-bg-void);
+  border: 1px solid var(--c4-line-accent);
+  color: var(--c4-text-strong);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+.tpl-c4 .trailer-link:hover {
+  border-color: var(--c4-accent);
+  background: var(--c4-accent-soft);
+  transform: translateY(-2px);
+}
+
+/* ── Playlist (Afterglow) ────────────────────────────────────────────────── */
+.tpl-c4 #modulo-playlist {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tpl-c4 .playlist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tpl-c4 .playlist-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.tpl-c4 .playlist-chip {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c4-accent);
+  border: 1px solid var(--c4-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  white-space: nowrap;
+}
+
+.tpl-c4 #db-spotify-embed {
+  flex: 1;
+  min-height: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--c4-bg-carbon);
+  border: 1px solid var(--c4-line);
+}
+
+.tpl-c4 #db-spotify-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* ── Galería de fotogramas ───────────────────────────────────────────────── */
+.tpl-c4 #modulo-gallery .gallery-grid {
+  margin-top: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.9rem, 2vw, 1.4rem);
+}
+
+.tpl-c4 .frame-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: var(--c4-bg-carbon);
+  border: 1px solid var(--c4-line);
+}
+
+.tpl-c4 .frame-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.tpl-c4 .frame-card:hover img { transform: scale(1.04); }
+
+.tpl-c4 .frame-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 65%, rgba(5, 5, 5, 0.75) 100%);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   MÓDULO INFO TÉCNICA — tarjetas Afterglow (Duración · Género · Clasificación)
+   ========================================================================== */
+.tpl-c4 #modulo-info-tecnica {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 5rem;
+}
+
+.tpl-c4 .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.tpl-c4 .info-card {
+  position: relative;
+  padding: 1.75rem 1.5rem;
+  border-radius: 20px;
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  overflow: hidden;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-c4 .info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--c4-accent), transparent);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.tpl-c4 .info-card:hover {
+  border-color: var(--c4-line-accent);
+  background: var(--c4-bg-panel-strong);
+  transform: translateY(-4px);
+}
+
+.tpl-c4 .info-card:hover::before { opacity: 1; }
+
+.tpl-c4 .info-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--c4-text-muted);
+  margin-bottom: 0.85rem;
+}
+
+.tpl-c4 .info-value {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 22px var(--c4-accent-soft);
+}
+
+/* ==========================================================================
+   MÓDULO FAQ + UBICACIÓN
+   ========================================================================== */
+.tpl-c4 #modulo-faq-ubicacion {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 5rem;
+}
+
+.tpl-c4 .split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.tpl-c4 .faq-item {
+  border: 1px solid var(--c4-line);
+  border-radius: 16px;
+  background: var(--c4-bg-panel);
+  margin-bottom: 0.9rem;
+  overflow: hidden;
+}
+
+.tpl-c4 .faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.1rem 1.25rem;
+  background: none;
+  border: 0;
+  color: var(--c4-text-strong);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.tpl-c4 .faq-q:hover { background: var(--c4-bg-panel-strong); }
+
+.tpl-c4 .faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  padding: 0 1.25rem;
+}
+
+.tpl-c4 .faq-item.open .faq-a {
+  max-height: 400px;
+  padding: 0 1.25rem 1.2rem;
+}
+
+.tpl-c4 .faq-a p {
+  margin: 0;
+  color: var(--c4-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.tpl-c4 .venue-card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--c4-line);
+  background: var(--c4-bg-carbon);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+}
+
+.tpl-c4 #db-mapa-container {
+  width: 100%;
+  min-height: 320px;
+}
+
+.tpl-c4 #db-mapa-container iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  display: block;
+  border: 0;
+  filter: grayscale(1) invert(0.9) contrast(0.9) brightness(0.85);
+}
+
+.tpl-c4 .venue-info {
+  padding: 1.25rem 1.5rem;
+}
+
+.tpl-c4 .venue-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.tpl-c4 .venue-address {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--c4-text-muted);
+}
+
+/* ==========================================================================
+   MÓDULO SPONSORS — gris monocromo, acento en hover (sin filtros alfa)
+   ========================================================================== */
+.tpl-c4 #modulo-sponsors {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 5rem;
+}
+
+.tpl-c4 .sponsors-label {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--c4-text-muted);
+  margin-bottom: 2rem;
+}
+
+.tpl-c4 .sponsors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+}
+
+.tpl-c4 .sponsor-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: 0.9rem;
+  border-radius: 16px;
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  opacity: 0.72;
+  transition: opacity 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-c4 .sponsor-logo:hover {
+  opacity: 1;
+  border-color: var(--c4-line-accent);
+  transform: translateY(-3px);
+}
+
+.tpl-c4 .sponsor-logo img { max-width: 100%; max-height: 48px; object-fit: contain; }
+
+/* ==========================================================================
+   MÓDULO FORMULARIO — glassmorphism, thumb-first
+   ========================================================================== */
+.tpl-c4 #modulo-formulario {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 5rem;
+  padding-bottom: 7rem;
+}
+
+.tpl-c4 .form-master-box {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border-radius: 24px;
+  background: var(--c4-bg-panel);
+  border: 1px solid var(--c4-line);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.tpl-c4 .form-tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.tpl-c4 .tab-btn {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 999px;
+  background: var(--c4-bg-panel-strong);
+  border: 1px solid var(--c4-line);
+  color: var(--c4-text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tpl-c4 .tab-btn.active {
+  background: linear-gradient(135deg, var(--c4-accent), color-mix(in srgb, var(--c4-accent) 55%, #ff3d5a));
+  color: #0a0a0c;
+  border-color: transparent;
+  box-shadow: var(--c4-glow);
+}
+
+.tpl-c4 .form-field {
+  margin-bottom: 1.1rem;
+}
+
+.tpl-c4 .form-field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c4-text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.tpl-c4 .form-input,
+.tpl-c4 .form-select,
+.tpl-c4 .form-textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.8rem 1.1rem;
+  border-radius: 14px;
+  background: var(--c4-bg-carbon);
+  border: 1px solid var(--c4-line);
+  color: var(--c4-text-strong);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tpl-c4 .form-textarea { min-height: 120px; resize: vertical; }
+
+.tpl-c4 .form-input:focus,
+.tpl-c4 .form-select:focus,
+.tpl-c4 .form-textarea:focus {
+  outline: none;
+  border-color: var(--c4-accent);
+  box-shadow: var(--c4-glow);
+}
+
+.tpl-c4 .btn-submit {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--c4-accent), color-mix(in srgb, var(--c4-accent) 55%, #ff3d5a));
+  border: 0;
+  color: #0a0a0c;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: var(--c4-glow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
+
+.tpl-c4 .btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 44px var(--c4-accent-soft);
+}
+
+.tpl-c4 .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ==========================================================================
+   CERO BORRADO — ocultar módulos que no pertenecen a este silo
+   ========================================================================== */
+.tpl-c4 #modulo-noticias,
+.tpl-c4 #modulo-comentarios,
+.tpl-c4 #modulo-blog,
+.tpl-c4 #modulo-tienda,
+.tpl-c4 #modulo-redes,
+.tpl-c4 #modulo-barras,
+.tpl-c4 #modulo-eventos {
+  display: none !important;
+}
+
+/* ==========================================================================
+   NATIVE MOBILE — Thumb-First · recalibración táctil
+   ========================================================================== */
+@media (max-width: 980px) {
+  .tpl-c4 #modulo-lineup {
+    grid-template-columns: 1fr;
+  }
+
+  .tpl-c4 .poster-wrap {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  .tpl-c4 .media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tpl-c4 #modulo-playlist {
+    min-height: 320px;
+  }
+
+  .tpl-c4 #modulo-gallery .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tpl-c4 .split-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tpl-c4 #modulo-gallery .gallery-grid { margin-top: 2.5rem; }
+}
+
+@media (max-width: 560px) {
+  .tpl-c4 section { padding: 3.5rem 1.1rem; }
+
+  .tpl-c4 #hero-bg { min-height: 88svh; }
+
+  .tpl-c4 #modulo-gallery .gallery-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .tpl-c4 #db-lineup {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .tpl-c4 .form-tabs { flex-direction: column; }
+  .tpl-c4 .tab-btn { flex: none; width: 100%; }
+
+  .tpl-c4 #unified-frame { gap: 0.6rem; padding: 0.9rem; }
+  .tpl-c4 .cd-block { min-width: 58px; padding: 0.5rem 0.7rem; }
+
+  .tpl-c4 .trailer-overlay { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── Movimiento reducido ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-c4 *,
+  .tpl-c4 *::before,
+  .tpl-c4 *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

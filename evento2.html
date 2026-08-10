@@ -213,7 +213,7 @@
 
 
         function logStatus(m, t = 'INFO') {
-            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'ERROR':'#ff4d4d' };
+            const colors = { 'INFO':'#00ff88', 'DEBUG':'#3498db', 'LINK':'#f1c40f', 'TRACE':'#95a5a6', 'TIME':'#9b59b6', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
@@ -226,12 +226,61 @@
         }
 
 
+        // Escudo GOLD: Bypass de Caché para el silo atómico .tpl-c4
+        function injectAtomicCSS(cat, tplId) {
+            return new Promise((resolve) => {
+                const timestamp = Date.now();
+                const path = `css/templates/${(cat || 'cine').toLowerCase()}/${(tplId || 'c4').toLowerCase()}.css?v=${timestamp}`;
+                const oldLinks = document.querySelectorAll('link[data-template-css]');
+                oldLinks.forEach(el => el.remove());
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.setAttribute('data-template-css', 'true');
+                let isResolved = false;
+                const timer = setTimeout(() => {
+                    if (!isResolved) { isResolved = true; logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}].`, "ERROR"); resolve(false); }
+                }, 5000);
+                link.onload = () => {
+                    if (!isResolved) {
+                        isResolved = true; clearTimeout(timer);
+                        let rulesCount = 0;
+                        try {
+                            const sheets = Array.from(document.styleSheets);
+                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'c4').toLowerCase()));
+                            if (targetSheet && targetSheet.cssRules) rulesCount = targetSheet.cssRules.length;
+                        } catch (e) {}
+                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS, cache bypass v=${timestamp}).`, "LINK");
+                        resolve(true);
+                    }
+                };
+                link.onerror = () => {
+                    if (!isResolved) { isResolved = true; clearTimeout(timer); logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR"); resolve(false); }
+                };
+                link.href = path;
+                document.head.appendChild(link);
+            });
+        }
+
+
         async function initEvento() {
             logStatus("AUDITORÍA V107: Recuperación total del Póster y Blindaje Core.");
+
+            // Escudo GOLD: activación del ámbito del silo atómico Interactive Cine
+            document.body.classList.add('tpl-c4');
+            logStatus("DEBUG: Ámbito .tpl-c4 activado en body.", "DEBUG");
+
             const slug = new URLSearchParams(window.location.search).get('slug');
             try {
                 const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
                 if (error) throw error;
+
+                // PUENTE CROMÁTICO: 10% de acento desde --master-accent
+                const primaryColor = evento.color_primario || evento.config_landing?.content?.accent_color;
+                if (primaryColor) document.documentElement.style.setProperty('--master-accent', primaryColor);
+                logStatus("DEBUG: Acento dinámico cedido a --master-accent.", "DEBUG");
+
+                const cssLoadedOK = await injectAtomicCSS('cine', 'c4');
+                if (!cssLoadedOK) logStatus("WARN: Degradación visible sin silo CSS.", "DEBUG");
                
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
@@ -307,6 +356,11 @@
                     const el = document.getElementById(elId);
                     if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
                 });
+
+
+                // Escudo GOLD: TRACE de cierre — silo atómico y Grid Atómico sellados
+                const activeModules = Object.keys(SANDBOX_CONFIG).filter(k => document.getElementById((k==='faq'||k==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(k)) ? 'modulo-info-tecnica' : (k==='playlist'||k==='trailer'||k==='gallery') ? 'modulo-gallery' : `modulo-${k}`)).length;
+                logStatus(`TRACE: Escudo GOLD sellado — silo c4 inyectado, ${activeModules}/${Object.keys(SANDBOX_CONFIG).length} módulos activos en #main-content-flow.`, "TRACE");
 
 
             } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
