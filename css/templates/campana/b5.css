@@ -1537,3 +1537,41 @@
 .tpl-b5 .b5-num-eyebrow::before {
     content: none !important;
 }
+
+/* ============================================================================
+   21. TÍTULOS MOBILE — TAMAÑO, CENTRADO Y SUBTEXTOS (Director, ago-2026)
+   Aplica en la versión mobile de una sola columna (max-width: 640px):
+   1) Los títulos de sección (.b5-num-eyebrow) suben de 1rem a 1.4rem
+      (tamaño de "EMERGENCIA VENEZUELA") y se centran como grupo
+      (insignia + título + subtexto) con display:flex + justify-content:center.
+   2) "EMERGENCIA VENEZUELA" / "EMERGENCIA COLOMBIA" (.crisis-titulo)
+      reducen de 1.4rem (clamp en mobile) a 1.2rem.
+   3) La información entre paréntesis (<em>) pasa de inline a SUBTEXTO debajo
+      del título (display:block + width:100% = línea propia, centrado).
+   Nota: al generalizarse el subtexto, "(en tiempo real)" del Estado de
+   Emergencia reaparece en mobile (override en cascada de b5.css:420; ambos
+   con !important e igual especificidad, gana el posterior). Si debe seguir
+   oculto, agregar una regla específica posterior. Cero Borrado: no se borra
+   ninguna regla previa — solo se supera en cascada para este rango.
+   ============================================================================ */
+@media (max-width: 640px) {
+    .tpl-b5 .b5-num-eyebrow {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center !important;
+        font-size: 1.4rem !important;
+    }
+    .tpl-b5 .b5-num-eyebrow em {
+        display: block !important;
+        width: 100% !important;
+        font-size: 0.85rem !important;
+        text-align: center !important;
+    }
+    .tpl-b5 .crisis-titulo {
+        font-size: 1.2rem !important;
+    }
+    .tpl-b5 .form-titulo {
+        font-size: 1.4rem !important;
+    }
+}
