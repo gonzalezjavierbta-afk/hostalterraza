@@ -1539,22 +1539,27 @@
 }
 
 /* ============================================================================
-   21. TÍTULOS MOBILE — TAMAÑO, CENTRADO Y SUBTEXTOS (Director, ago-2026)
-   Aplica en la versión mobile de una sola columna (max-width: 640px):
-   1) Los títulos de sección (.b5-num-eyebrow) suben de 1rem a 1.4rem
-      (tamaño de "EMERGENCIA VENEZUELA") y se centran como grupo
-      (insignia + título + subtexto) con display:flex + justify-content:center.
-   2) "EMERGENCIA VENEZUELA" / "EMERGENCIA COLOMBIA" (.crisis-titulo)
-      reducen de 1.4rem (clamp en mobile) a 1.2rem.
-   3) La información entre paréntesis (<em>) pasa de inline a SUBTEXTO debajo
-      del título (display:block + width:100% = línea propia, centrado).
-   Nota: al generalizarse el subtexto, "(en tiempo real)" del Estado de
-   Emergencia reaparece en mobile (override en cascada de b5.css:420; ambos
-   con !important e igual especificidad, gana el posterior). Si debe seguir
+   21. TÍTULOS EN UNA COLUMNA — TAMAÑO, CENTRADO Y SUBTEXTOS (Director, ago-2026)
+   Aplica en TODAS las versiones de una sola columna (max-width: 1024px):
+   1) TAMAÑO UNIFORME: los títulos de sección (.b5-num-eyebrow) usan un único
+      tamaño (1.4rem), igual al de "Contacto", para que ninguno se vea más
+      grande que otro. Se centran como grupo (insignia + título + subtexto)
+      con display:flex + justify-content:center.
+   2) "EMERGENCIA VENEZUELA" / "EMERGENCIA COLOMBIA" (.crisis-titulo) se
+      mantienen reducidos a 1.2rem.
+   3) La información entre paréntesis (<em>) va como SUBTEXTO debajo del
+      título (display:block + width:100% = línea propia, centrado).
+   4) "Impacto hasta hoy" (.impactohist-eyebrow) se oculta (override del
+      display:flex del punto 1; la sección 05 sigue SOLO BANNER, ADR-016).
+   5) Historia (.historia-eyebrow) restaura su número (content: attr(data-num))
+      seguido del subtítulo (override de la Sección 20 solo para este rango).
+   Nota: con el subtexto generalizado, "(en tiempo real)" del Estado de
+   Emergencia reaparece en una columna (override en cascada de b5.css:420;
+   ambos !important e igual especificidad, gana el posterior). Si debe seguir
    oculto, agregar una regla específica posterior. Cero Borrado: no se borra
    ninguna regla previa — solo se supera en cascada para este rango.
    ============================================================================ */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
     .tpl-b5 .b5-num-eyebrow {
         display: flex !important;
         width: 100% !important;
@@ -1573,5 +1578,11 @@
     }
     .tpl-b5 .form-titulo {
         font-size: 1.4rem !important;
+    }
+    .tpl-b5 .impactohist-eyebrow {
+        display: none !important;
+    }
+    .tpl-b5 .historia-eyebrow::before {
+        content: attr(data-num) !important;
     }
 }
