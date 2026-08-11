@@ -1,863 +1,140 @@
 /* ==========================================================================
-   c1.css — SILO ATÓMICO "Arthouse" | categoría: CINE (c)
-   Contrato: v110 · Escudo GOLD · Geist 900 + Serif Editorial · Afterglow
-   Host: evento2.html · Flujo: #main-content-flow · Cero Borrado .tpl-c1
-   Paleta 60-30-10 · 60% papel hueso #f5f0e8 · 30% gris editorial ·
-   10% acento (--master-accent) · Estética A24 / MUBI (editorial B/N).
+   SILO ATÓMICO: c1 (Arthouse)
+   CATEGORÍA: Cinematografía
+   VERSIÓN: 1.7.7-CINEMA
+   ESTÁNDAR: AI-DOS v1.2 / Contrato v107
    ========================================================================== */
 
-/* ── FUENTES: Serif editorial (display) + Geist (sistema) ─────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
-
-/* ==========================================================================
-   RAÍZ DEL SILO — .tpl-c1 (sin tocar :root global)
-   ========================================================================== */
+/* --- FASE 1: GOBERNANZA ATÓMICA Y VARIABLES LOCALES --- */
 .tpl-c1 {
-  --c1-paper: #f5f0e8;
-  --c1-paper-deep: #e8e3d8;
-  --c1-ink: #0d0d0b;
-  --c1-ink-soft: #4a4a46;
-  --c1-ink-muted: #6f6f68;
-  --c1-line: rgba(13, 13, 11, 0.12);
-  --c1-line-strong: rgba(13, 13, 11, 0.24);
-  --c1-card-bg: #ffffff;
-  --c1-accent: var(--master-accent, #8a6d3b);
-  --c1-accent-soft: color-mix(in srgb, var(--c1-accent) 16%, transparent);
-  --c1-font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --c1-font-sans: 'Geist', system-ui, -apple-system, sans-serif;
-  --c1-glow: 0 0 18px var(--c1-accent-soft);
-  background-color: var(--c1-paper) !important;
-  color: var(--c1-ink) !important;
-  font-family: var(--c1-font-sans);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+    /* Paleta Editorial (60-30-10) */
+    --c1-bg-primary: #fcfcfc;
+    --c1-text-primary: #141414;
+    --c1-text-muted: #555555;
+    --c1-glass-bg: rgba(255, 255, 255, 0.7);
+    --c1-glass-border: rgba(20, 20, 20, 0.08);
+    --c1-afterglow-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+    
+    background-color: var(--c1-bg-primary);
+    color: var(--c1-text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
 }
 
-/* Puente cromático con el kernel (íconos, bordes, labels inline) */
-.tpl-c1 {
-  --gold: var(--c1-accent);
-  --tpl-accent: var(--c1-accent);
-}
-
-/* Grano del kernel: suavizado para tono papel */
-.tpl-c1::before { opacity: 0.025 !important; }
-
-/* ==========================================================================
-   ACTIVACIÓN DEL CONTENEDOR PRINCIPAL — grid-template-areas
-   ========================================================================== */
+/* --- FASE 2: MOTOR DE DIAGRAMACIÓN (GRID ATÓMICO) --- */
 .tpl-c1 #main-content-flow {
-  display: grid !important;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    'lineup'
-    'gallery'
-    'info'
-    'faq'
-    'sponsors'
-    'form';
-  row-gap: 0;
-}
-
-.tpl-c1 #modulo-lineup       { grid-area: lineup; }
-.tpl-c1 #modulo-gallery      { grid-area: gallery; }
-.tpl-c1 #modulo-info-tecnica { grid-area: info; }
-.tpl-c1 #modulo-faq-ubicacion{ grid-area: faq; }
-.tpl-c1 #modulo-sponsors     { grid-area: sponsors; }
-.tpl-c1 #modulo-formulario   { grid-area: form; }
-
-/* ==========================================================================
-   RESET CONTROLADO DEL SILO (sin tocar otras plantillas)
-   ========================================================================== */
-.tpl-c1 *, .tpl-c1 *::before, .tpl-c1 *::after { box-sizing: border-box; }
-
-.tpl-c1 section {
-  position: relative;
-  padding: 5rem clamp(1.25rem, 6vw, 5rem);
-  width: 100%;
-  border-bottom: 1px solid var(--c1-line);
-}
-
-.tpl-c1 h2 {
-  color: var(--c1-ink) !important;
-  letter-spacing: 0.28em !important;
-  text-transform: uppercase !important;
-  font-family: var(--c1-font-sans) !important;
-  font-size: 0.72rem !important;
-  font-weight: 900 !important;
-}
-
-.tpl-c1 h2::after {
-  content: '';
-  display: block;
-  width: 48px;
-  height: 2px;
-  margin-top: 0.75rem;
-  background: var(--c1-accent);
-}
-
-/* ==========================================================================
-   HERO — marco editorial tipo cartel de autor
-   ========================================================================== */
-.tpl-c1 #hero-bg {
-  position: relative;
-  min-height: 88svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    linear-gradient(180deg, var(--c1-paper) 0%, var(--c1-paper-deep) 100%) !important;
-  overflow: hidden;
-  border-bottom: 1px solid var(--c1-line);
-}
-
-.tpl-c1 #hero-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(13, 13, 11, 0.028) 0 1px,
-    transparent 1px 3px
-  );
-  pointer-events: none;
-}
-
-.tpl-c1 .hero-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  max-width: 880px;
-  padding: 2rem 1.5rem;
-}
-
-.tpl-c1 .hero-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--c1-accent);
-  padding: 0.4rem 0;
-  margin-bottom: 1.75rem;
-}
-
-.tpl-c1 .hero-title {
-  font-family: var(--c1-font-serif);
-  font-size: clamp(2.8rem, 9vw, 6.5rem);
-  font-weight: 900;
-  line-height: 0.98;
-  letter-spacing: -0.01em;
-  margin: 0 0 1.25rem;
-  text-transform: uppercase;
-}
-
-.tpl-c1 .hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem 2rem;
-  margin-bottom: 2.25rem;
-}
-
-.tpl-c1 .meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--c1-ink-soft);
-}
-
-.tpl-c1 .meta-svg { width: 15px !important; height: 15px !important; fill: var(--c1-accent) !important; }
-
-.tpl-c1 .hero-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  min-height: 48px;
-  padding: 0.85rem 2.4rem;
-  border-radius: 2px;
-  background: var(--c1-ink);
-  color: var(--c1-paper);
-  font-family: var(--c1-font-sans);
-  font-weight: 800;
-  font-size: 0.82rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.tpl-c1 .hero-cta:hover {
-  background: var(--c1-accent);
-  color: #fff;
-  box-shadow: var(--c1-glow);
-}
-
-/* ── COUNTDOWN unificado (Afterglow editorial) ────────────────────────────── */
-.tpl-c1 #unified-frame {
-  position: relative;
-  z-index: 2;
-  margin-top: 2.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0;
-  border: 1px solid var(--c1-line);
-  background: var(--c1-card-bg);
-  box-shadow: 0 18px 40px rgba(13, 13, 11, 0.08);
-}
-
-.tpl-c1 .cd-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 78px;
-  padding: 1rem 1.25rem;
-  border-right: 1px solid var(--c1-line);
-}
-
-.tpl-c1 .cd-block:last-child { border-right: none; }
-
-.tpl-c1 .cd-v {
-  font-size: clamp(1.7rem, 4vw, 2.5rem) !important;
-  font-weight: 900;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.tpl-c1 .cd-l {
-  margin-top: 0.35rem;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--c1-ink-muted);
-}
-
-/* ==========================================================================
-   MÓDULO LINEUP — afiche editorial + talento
-   ========================================================================== */
-.tpl-c1 #modulo-lineup {
-  display: grid;
-  grid-template-columns: minmax(240px, 400px) 1fr;
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 6rem;
-}
-
-.tpl-c1 .poster-wrap {
-  position: relative;
-  border-radius: 3px;
-  overflow: hidden;
-  background: var(--c1-card-bg);
-  box-shadow: 0 24px 56px rgba(13, 13, 11, 0.14);
-  border: 1px solid var(--c1-line);
-}
-
-.tpl-c1 .poster-main-img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  filter: grayscale(0.18) contrast(1.02);
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-.tpl-c1 .poster-caption {
-  padding: 1.1rem 1.25rem;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--c1-ink-soft);
-}
-
-.tpl-c1 .lineup-copy h2 { margin-bottom: 1.1rem; }
-
-.tpl-c1 .lineup-copy p {
-  color: var(--c1-ink-soft);
-  line-height: 1.8;
-  max-width: 54ch;
-}
-
-.tpl-c1 #db-lineup {
-  margin-top: 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 0.75rem;
-}
-
-.tpl-c1 .artist-card {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 0.9rem 1.1rem;
-  border: 1px solid var(--c1-line);
-  background: var(--c1-card-bg);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.tpl-c1 .artist-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--c1-line-strong);
-  box-shadow: 0 10px 26px rgba(13, 13, 11, 0.08);
-}
-
-.tpl-c1 .artist-avatar {
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 50% !important;
-  object-fit: cover;
-  filter: grayscale(1);
-  border: none !important;
-}
-
-.tpl-c1 .artist-name {
-  font-size: 0.95rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.tpl-c1 .artist-role {
-  margin-top: 0.2rem;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--c1-ink-muted);
-}
-
-/* ==========================================================================
-   MÓDULO GALERÍA — fotogramas editoriales
-   ========================================================================== */
-.tpl-c1 #modulo-gallery {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 5rem;
-}
-
-.tpl-c1 .media-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  gap: clamp(1.25rem, 3vw, 2rem);
-  align-items: stretch;
-}
-
-/* ── Tráiler: marco editorial con miniatura HD + link externo ─────────────── */
-.tpl-c1 #modulo-trailer {
-  position: relative;
-  border-radius: 3px;
-  overflow: hidden;
-  aspect-ratio: 16 / 9;
-  background: var(--c1-ink);
-  border: 1px solid var(--c1-line-strong);
-  box-shadow: 0 20px 44px rgba(13, 13, 11, 0.16);
-}
-
-.tpl-c1 #db-video-content,
-.tpl-c1 #db-video-content iframe,
-.tpl-c1 #db-video-content video,
-.tpl-c1 .trailer-poster {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(0.25) contrast(1.05);
-}
-
-.tpl-c1 .trailer-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.4rem;
-  background: linear-gradient(180deg, transparent 55%, rgba(13, 13, 11, 0.82) 100%);
-}
-
-.tpl-c1 .trailer-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--c1-paper);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 2px;
-  padding: 0.4rem 0.9rem;
-  background: rgba(13, 13, 11, 0.4);
-}
-
-.tpl-c1 .trailer-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding: 0.7rem 1.4rem;
-  border-radius: 2px;
-  background: var(--c1-paper);
-  color: var(--c1-ink);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.tpl-c1 .trailer-link:hover {
-  background: var(--c1-accent);
-  color: #fff;
-  box-shadow: var(--c1-glow);
-}
-
-/* ── Playlist ─────────────────────────────────────────────────────────────── */
-.tpl-c1 #modulo-playlist {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.tpl-c1 .playlist-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.tpl-c1 .playlist-title {
-  font-family: var(--c1-font-serif);
-  font-size: 1.25rem;
-  font-weight: 900;
-  margin: 0;
-}
-
-.tpl-c1 .playlist-chip {
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--c1-accent);
-  border: 1px solid var(--c1-line-strong);
-  border-radius: 2px;
-  padding: 0.35rem 0.85rem;
-  white-space: nowrap;
-}
-
-.tpl-c1 #db-spotify-embed {
-  flex: 1;
-  min-height: 220px;
-  border-radius: 3px;
-  overflow: hidden;
-  background: var(--c1-ink);
-  border: 1px solid var(--c1-line);
-}
-
-.tpl-c1 #db-spotify-embed iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  display: block;
-  filter: grayscale(0.4) contrast(1.04);
-}
-
-/* ── Galería de fotogramas ────────────────────────────────────────────────── */
-.tpl-c1 #modulo-gallery .gallery-grid {
-  margin-top: 2.5rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(0.9rem, 2vw, 1.4rem);
-}
-
-.tpl-c1 .frame-card {
-  position: relative;
-  border-radius: 3px;
-  overflow: hidden;
-  aspect-ratio: 3 / 4;
-  background: var(--c1-paper-deep);
-  border: 1px solid var(--c1-line);
-}
-
-.tpl-c1 .frame-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: grayscale(0.3) contrast(1.05);
-  transition: transform 0.5s ease, filter 0.5s ease;
-}
-
-.tpl-c1 .frame-card:hover img { transform: scale(1.04); filter: grayscale(0) contrast(1.02); }
-
-/* ==========================================================================
-   MÓDULO INFO TÉCNICA — fichas editoriales B/N (Afterglow)
-   ========================================================================== */
-.tpl-c1 #modulo-info-tecnica {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 5rem;
-}
-
-.tpl-c1 .data-cards-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.2rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.tpl-c1 .data-card {
-  background: var(--c1-card-bg) !important;
-  border: 1px solid var(--c1-line) !important;
-  border-radius: 3px !important;
-  padding: 2.4rem 1rem !important;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 240px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.tpl-c1 .data-card:hover {
-  border-color: var(--c1-accent) !important;
-  box-shadow: var(--c1-glow);
-  transform: translateY(-3px);
-}
-
-.tpl-c1 .data-card span {
-  color: var(--c1-ink);
-}
-
-.tpl-c1 .data-card span[style*="color:var(--gold)"] {
-  color: var(--c1-accent) !important;
-}
-
-.tpl-c1 .card-icon-xl {
-  width: 56px !important;
-  height: 56px !important;
-  fill: var(--c1-accent) !important;
-  filter: none !important;
-  opacity: 0.85 !important;
-  margin-top: 1.5rem;
-}
-
-/* ==========================================================================
-   MÓDULO FAQ + UBICACIÓN
-   ========================================================================== */
-.tpl-c1 #modulo-faq-ubicacion {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 5rem;
-}
-
-.tpl-c1 #modulo-faq-ubicacion h2 { margin-bottom: 1.75rem; }
-
-.tpl-c1 .faq-item {
-  border: 1px solid var(--c1-line);
-  border-bottom: 1px solid var(--c1-line) !important;
-  background: var(--c1-card-bg);
-  margin-bottom: 0.75rem;
-  cursor: pointer;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.tpl-c1 .faq-item:hover { border-color: var(--c1-line-strong); box-shadow: 0 8px 22px rgba(13,13,11,0.06); }
-
-.tpl-c1 .faq-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.1rem 1.2rem !important;
-  font-size: 0.9rem !important;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.tpl-c1 .faq-icon-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid var(--c1-accent) !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--c1-accent) !important;
-  font-weight: 900;
-}
-
-.tpl-c1 .faq-answer {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: 0.4s ease;
-  font-size: 0.85rem;
-  color: var(--c1-ink-soft);
-  padding: 0 1.2rem;
-}
-
-.tpl-c1 .faq-item.active .faq-answer {
-  max-height: 200px;
-  opacity: 1;
-  padding-bottom: 1.3rem;
-}
-
-/* ── Mapa: tratado B/N editorial ──────────────────────────────────────────── */
-.tpl-c1 #venue-name {
-  color: var(--c1-ink);
-  border-left: 3px solid var(--c1-accent);
-  padding-left: 0.9rem;
-}
-
-.tpl-c1 #db-mapa-container {
-  width: 100%;
-  height: 380px;
-  border-radius: 3px !important;
-  overflow: hidden;
-  border: 1px solid var(--c1-line) !important;
-  background: var(--c1-paper-deep);
-}
-
-.tpl-c1 #db-mapa-container iframe {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border: none;
-  filter: grayscale(1) contrast(1.05);
-}
-
-/* ==========================================================================
-   MÓDULO SPONSORS — monocromo editorial
-   ========================================================================== */
-.tpl-c1 #modulo-sponsors {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 5rem;
-}
-
-.tpl-c1 .sponsors-label {
-  color: var(--c1-ink-muted) !important;
-  font-size: 0.6rem !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.36em !important;
-  text-transform: uppercase !important;
-  margin-bottom: 2.25rem !important;
-  display: block;
-}
-
-.tpl-c1 .sponsors-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 3.5rem;
-}
-
-.tpl-c1 .sponsor-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 64px;
-  padding: 0.8rem;
-  opacity: 0.7;
-  filter: grayscale(1);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.tpl-c1 .sponsor-logo:hover { opacity: 1; transform: translateY(-2px); }
-
-.tpl-c1 .sponsor-img {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
-}
-
-/* ==========================================================================
-   MÓDULO FORMULARIO — editorial limpio, thumb-first
-   ========================================================================== */
-.tpl-c1 #modulo-formulario {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 5rem;
-  padding-bottom: 7rem;
-}
-
-.tpl-c1 .form-master-box {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: clamp(1.5rem, 4vw, 2.75rem);
-  border-radius: 3px;
-  background: var(--c1-card-bg);
-  border: 1px solid var(--c1-line);
-  box-shadow: 0 20px 48px rgba(13, 13, 11, 0.1);
-}
-
-.tpl-c1 .form-tabs {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.75rem;
-  border-bottom: 1px solid var(--c1-line);
-}
-
-.tpl-c1 .tab-btn {
-  flex: 1;
-  min-height: 46px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--c1-ink-muted);
-  font-family: var(--c1-font-sans);
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  cursor: pointer;
-  transition: color 0.25s ease, border-color 0.25s ease;
-}
-
-.tpl-c1 .tab-btn.active {
-  color: var(--c1-accent);
-  border-bottom: 2px solid var(--c1-accent);
-}
-
-.tpl-c1 .form-input {
-  background: var(--c1-paper);
-  border: 1px solid var(--c1-line-strong);
-  padding: 1.05rem 1.1rem;
-  border-radius: 2px;
-  color: var(--c1-ink);
-  width: 100%;
-  box-sizing: border-box;
-  font-family: var(--c1-font-sans);
-  margin-bottom: 1.1rem;
-  font-size: 0.95rem;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.tpl-c1 .form-input:focus {
-  outline: none;
-  border-color: var(--c1-accent);
-  box-shadow: var(--c1-glow);
-}
-
-.tpl-c1 .form-input::placeholder { color: var(--c1-ink-muted); }
-
-.tpl-c1 .btn-submit {
-  background: var(--c1-ink);
-  color: var(--c1-paper);
-  border: none;
-  padding: 1.15rem;
-  border-radius: 2px;
-  font-weight: 900;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-family: var(--c1-font-sans);
-  width: 100%;
-  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.tpl-c1 .btn-submit:hover {
-  background: var(--c1-accent);
-  color: #fff;
-  box-shadow: var(--c1-glow);
-}
-
-.tpl-c1 .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* ==========================================================================
-   CERO BORRADO — ocultar módulos que no pertenecen a este silo
-   ========================================================================== */
-.tpl-c1 #modulo-noticias,
-.tpl-c1 #modulo-comentarios,
-.tpl-c1 #modulo-blog,
-.tpl-c1 #modulo-tienda,
-.tpl-c1 #modulo-redes,
-.tpl-c1 #modulo-barras,
-.tpl-c1 #modulo-eventos {
-  display: none !important;
-}
-
-/* ==========================================================================
-   NATIVE MOBILE — Thumb-First · recalibración táctil
-   ========================================================================== */
-@media (max-width: 980px) {
-  .tpl-c1 #modulo-lineup {
+    display: grid !important;
     grid-template-columns: 1fr;
-  }
-
-  .tpl-c1 .poster-wrap {
-    max-width: 400px;
+    grid-template-areas:
+        "hero"
+        "video"
+        "sinopsis"
+        "director"
+        "gallery"
+        "info";
+    gap: 4rem;
+    padding-bottom: 8rem;
+    max-width: 1400px;
     margin: 0 auto;
-  }
-
-  .tpl-c1 .media-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tpl-c1 #modulo-playlist {
-    min-height: 320px;
-  }
-
-  .tpl-c1 #modulo-gallery .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .tpl-c1 .data-cards-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
-@media (max-width: 560px) {
-  .tpl-c1 section { padding: 3.5rem 1.1rem; }
-
-  .tpl-c1 #hero-bg { min-height: 84svh; }
-
-  .tpl-c1 #modulo-gallery .gallery-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.8rem;
-  }
-
-  .tpl-c1 #db-lineup {
-    grid-template-columns: 1fr;
-  }
-
-  .tpl-c1 .data-cards-container {
-    grid-template-columns: 1fr;
-  }
-
-  .tpl-c1 .form-tabs { flex-direction: column; }
-  .tpl-c1 .tab-btn { flex: none; width: 100%; }
-
-  .tpl-c1 #unified-frame { width: 100%; }
-  .tpl-c1 .cd-block { min-width: 64px; padding: 0.85rem 0.9rem; }
-
-  .tpl-c1 .trailer-overlay { flex-direction: column; align-items: flex-start; }
+/* --- PROTOCOLO DE CERO BORRADO (SILENCIO ACTIVO) --- */
+.tpl-c1 #db-spotify-embed,
+.tpl-c1 #db-faq-list,
+.tpl-c1 #db-sponsors-list,
+.tpl-c1 #mod-form {
+    display: none !important;
 }
 
-/* ── Movimiento reducido ─────────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .tpl-c1 *,
-  .tpl-c1 *::before,
-  .tpl-c1 *::after {
-    transition: none !important;
-    animation: none !important;
-  }
+/* --- FASE 3: HERO LAYOUT (BOTTOM-LEFT) --- */
+.tpl-c1 #unified-frame {
+    grid-area: hero;
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Bottom */
+    align-items: flex-start;   /* Left */
+    padding: 4rem 5%;
+}
+
+.tpl-c1 #event-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3.2rem, 6vw, 6rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    color: var(--c1-text-primary);
+}
+
+/* --- FASE 4: BLINDAJE MULTIMEDIA Y ADRs --- */
+
+/* ADR-007: Bloque sobre Flex para contenedores masivos */
+.tpl-c1 #db-video-content,
+.tpl-c1 #db-lineup {
+    display: block !important;
+    width: 100%;
+}
+
+/* ADR-010: Proximidad de Video (Eliminación de Respiro) */
+.tpl-c1 #db-video-content {
+    grid-area: video;
+    padding-top: 0 !important;
+    margin-top: -2rem; /* Integración forzada con Hero */
+}
+
+/* Estilización de Miniatura YouTube (ADR-005) */
+.tpl-c1 #db-video-content img {
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: var(--c1-afterglow-shadow);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tpl-c1 #db-video-content img:hover {
+    transform: scale(1.01);
+}
+
+/* --- FASE 5: ESTÁNDAR $10,000 (MÓDULOS CINE) --- */
+
+/* Módulo Director (Mapeado sobre #db-lineup) */
+.tpl-c1 #db-lineup {
+    grid-area: director;
+    padding: 0 5%;
+}
+
+.tpl-c1 #db-lineup .artist-card {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    background: transparent;
+    border-top: 1px solid var(--c1-glass-border);
+    padding: 3rem 0;
+}
+
+.tpl-c1 #db-lineup .artist-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(100%); /* Estética Arthouse */
+}
+
+/* Tarjetas de Información Técnica */
+.tpl-c1 .meta-card,
+.tpl-c1 #meta-fecha, 
+.tpl-c1 #meta-hora, 
+.tpl-c1 #meta-lugar {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    background: var(--c1-glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--c1-glass-border);
+    box-shadow: var(--c1-afterglow-shadow);
+    padding: 1.5rem;
+    border-radius: 8px;
+    color: var(--c1-text-primary);
 }
