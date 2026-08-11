@@ -1677,3 +1677,46 @@
         height: 24px !important;
     }
 }
+
+/* ============================================================================
+   24. SISTEMA MÓVIL FLUIDO GLOBAL (Director, ago-2026)
+   Mandato: garantizar render correcto y proporcionado en TODO el rango móvil
+   (320px → 430px de ancho × 568px → 932px de alto) + tablets portrait hasta
+   991px, sin parches por dispositivo. Estrategia Fuente Única (ADR-017):
+   esta capa re-declara los valores finales del hero para ≤991px usando clamps
+   que interpolan con vw/vh; no depende de franjas cortas+angostas (la Sección
+   23 queda superseded en cascada). Knobs por knob:
+   - #event-title:      clamp(1.45rem, 6.5vw, 2.4rem)
+   - .hero-description: clamp(0.8rem, 1.1vw + 0.6rem, 1rem)
+   - .hero-description margin-top: clamp(1.2rem, 2.6vh, 2.5rem)
+   - .hero-eyebrow margin-bottom: clamp(0.8rem, 1.6vh, 1.2rem)
+   - #mod-hero-meta margin: max(-36vh, -20rem) — proporcional en pantallas
+     bajas (hueco descripción→meta ≥ ~80px en el peor caso 320x568) y ancla
+     fija -20rem en las muy altas (la composición no "vuela").
+   Resultado esperado (hueco descripción→meta): 320x568 ≈ 80px; 375x667
+   ≈ 150px; 414x896 ≈ 310px; 430x932 ancla en -20rem. Matriz QA completa:
+   ADR-027 (DECISIONS.md).
+   ============================================================================ */
+@media (max-width: 991px) {
+    .tpl-b5 #mod-hero {
+        min-height: 100svh !important;
+        min-height: 100vh !important;
+    }
+    .tpl-b5 .hero-content {
+        margin-top: clamp(2.5vh, 2rem, 6vh) !important;
+    }
+    .tpl-b5 .hero-eyebrow {
+        margin-bottom: clamp(0.8rem, 1.6vh, 1.2rem) !important;
+    }
+    .tpl-b5 #event-title {
+        font-size: clamp(1.45rem, 6.5vw, 2.4rem) !important;
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.5rem) !important;
+    }
+    .tpl-b5 .hero-description {
+        margin-top: clamp(1.2rem, 2.6vh, 2.5rem) !important;
+        font-size: clamp(0.8rem, 1.1vw + 0.6rem, 1rem) !important;
+    }
+    .tpl-b5 #mod-hero-meta {
+        margin: max(-36vh, -20rem) 0 0 0 !important;
+    }
+}
