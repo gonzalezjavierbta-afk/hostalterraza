@@ -1738,40 +1738,65 @@ hueco descripción→meta pasa a ~130px, a la par del XR. Cero Borrado:
 
 /* ============================================================================
    25. COMPRESIÓN VERTICAL ENTRE SECCIONES (Director, ago-2026)
-   Mandato: reducir a LA MITAD el respiro superior (espacio en blanco) que
+   Mandato 1: reducir a LA MITAD el respiro superior (espacio en blanco) que
    precede a: ESTADO DE EMERGENCIA (02), BANNER de impacto (05), CÓMO PUEDO
    AYUDAR (03), ACTUALIZACIONES (08), PREGUNTAS FRECUENTES (09) y CONTACTO
-   (10). Capa aditiva final (Fuente Única, ADR-017): cada respiro se recorta
-   a la mitad exacta de su valor original en cascada. Cero Borrado: ninguna
-   regla previa se elimina; esta capa gana por orden de aparición final.
+   (10).
+   Mandato 2 (ago-2026, "reducirlo más"): volver a LA MITAD del estado
+   anterior todos los valores del Mandato 1, y además comprimir el hueco
+   entre los MAPAS y los textos "EMERGENCIA VENEZUELA" / "EMERGENCIA
+   COLOMBIA" (en una columna: padding-bottom del mapa + padding-top del
+   texto; en escritorio: padding-right/left entre columnas de la misma fila).
+   Capa aditiva final (Fuente Única, ADR-017): cada respiro se recorta a la
+   mitad exacta de su valor previo en cascada. Cero Borrado: ninguna regla
+   previa se elimina; esta capa gana por orden de aparición final.
    Detalle sección 05: la sección es "SOLO BANNER" (eyebrow + grid ocultos,
-   v1.4.2), así que su respiro = padding-top de .impactohist-inner (4rem) +
-   margin-top del banner (1.5rem) → 2rem + 0.75rem.
+   v1.4.2), así que su respiro = padding-top de .impactohist-inner + margin-
+   top del banner → 1rem + 0.375rem.
    ============================================================================ */
-.tpl-b5 #mod-mapa-crisis {          /* ESTADO DE EMERGENCIA (02) */
-    padding-top: 1.25rem !important; /* de 3.5rem base / 2.5rem (≤899) */
+.tpl-b5 #mod-mapa-crisis {          /* ESTADO DE EMERGENCIA (02) — mitad 2ª: 1.25 → 0.625 */
+    padding-top: 0.625rem !important;
+    padding-bottom: 1.5rem !important; /* hueco mapa → "EMERGENCIA VENEZUELA" (de 3rem base / 2.5rem ≤899) */
 }
 .tpl-b5 #crisistext-vzla {          /* columna gemela del 02 (misma fila en escritorio) */
-    padding-top: 1.75rem !important; /* de 3.5rem */
+    padding-top: 0.875rem !important;   /* mitad 2ª: 1.75 → 0.875 */
+    padding-bottom: 1.75rem !important; /* de 3.5rem — compresión del bloque de crisis */
 }
 .tpl-b5 .mapacrisis-inner {          /* respiro de la insignia "02" (1rem solo en ≤899) */
-    padding-top: 0.5rem !important;  /* de 1rem — con lo anterior total 1.75rem (mitad) en todo rango */
+    padding-top: 0.25rem !important; /* mitad 2ª: 0.5 → 0.25 — total del 02: 0.875rem */
 }
-.tpl-b5 .impactohist-inner {         /* BANNER (05): respiro superior de la sección */
-    padding-top: 2rem !important;    /* de 4rem */
+.tpl-b5 #crisistext-col {           /* "EMERGENCIA COLOMBIA" — alineación de fila + compresión */
+    padding-top: 0.875rem !important;
+    padding-bottom: 1.75rem !important; /* hueco texto → mapa COLOMBIA (de 3.5rem) */
 }
-.tpl-b5 .impactohist-banner {        /* BANNER (05): hueco sobre la banda roja */
-    margin-top: 0.75rem !important;  /* de 1.5rem */
+.tpl-b5 #mod-mapa-crisis-col {      /* MAPA COLOMBIA (misma fila que "EMERGENCIA COLOMBIA") */
+    padding-top: 0.875rem !important;
+    padding-bottom: 1.5rem !important;
 }
-.tpl-b5 .comoayudar-inner {          /* CÓMO PUEDO AYUDAR (03) */
-    padding-top: 1.5rem !important;  /* de 3rem */
+.tpl-b5 .impactohist-inner {         /* BANNER (05): respiro superior de la sección — mitad 2ª: 2 → 1rem */
+    padding-top: 1rem !important;
 }
-.tpl-b5 .actualizaciones-inner {     /* ACTUALIZACIONES (08) */
-    padding-top: 2rem !important;    /* de 4rem */
+.tpl-b5 .impactohist-banner {        /* BANNER (05): hueco sobre la banda roja — mitad 2ª: 0.75 → 0.375 */
+    margin-top: 0.375rem !important;
 }
-.tpl-b5 #mod-faq {                   /* PREGUNTAS FRECUENTES (09) */
-    padding-top: 2rem !important;    /* de 4rem */
+.tpl-b5 .comoayudar-inner {          /* CÓMO PUEDO AYUDAR (03) — mitad 2ª: 1.5 → 0.75 */
+    padding-top: 0.75rem !important;
 }
-.tpl-b5 #mod-ubicacion {             /* CONTACTO (10) */
-    padding-top: 2rem !important;    /* de 4rem */
+.tpl-b5 .actualizaciones-inner {     /* ACTUALIZACIONES (08) — mitad 2ª: 2 → 1rem */
+    padding-top: 1rem !important;
+}
+.tpl-b5 #mod-faq {                   /* PREGUNTAS FRECUENTES (09) — mitad 2ª: 2 → 1rem */
+    padding-top: 1rem !important;
+}
+.tpl-b5 #mod-ubicacion {             /* CONTACTO (10) — mitad 2ª: 2 → 1rem */
+    padding-top: 1rem !important;
+}
+/* Compresión horizontal escritorio: acerca el mapa a su texto de emergencia en
+   la misma fila (solo ≥992px; en una columna estos padding laterales no se
+   tocan para no descentrar el mapa). */
+@media (min-width: 992px) {
+    .tpl-b5 #mod-mapa-crisis   { padding-right: 0.6rem !important; }   /* de 1.2rem */
+    .tpl-b5 #crisistext-vzla   { padding-left: 0.75rem !important; }   /* de 1.5rem */
+    .tpl-b5 #crisistext-col    { padding-right: 0.75rem !important; }  /* de 1.5rem */
+    .tpl-b5 #mod-mapa-crisis-col { padding-left: 0.6rem !important; }  /* de 1.2rem */
 }
