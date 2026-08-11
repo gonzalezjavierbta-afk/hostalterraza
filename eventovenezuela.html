@@ -978,7 +978,7 @@
     logStatus(`TRACE: Historia ${isHistoriaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada.`, "TRACE");
 
     // NUEVO ÁTOMO ADITIVO (v222): #db-historia-lista — varios hitos narrativos numerados
-    // (ej. "01 El terremoto", "02 Nuestra misión"), como en landing-escritorio.jpg.
+    // (ej. "01 Los terremotos", "02 Nuestra misión"), como en landing-escritorio.jpg.
     // No reemplaza los campos legacy de arriba: si content.historia_items no viene de
     // Supabase, se usa un fallback de 2 hitos en vez del fallback legacy de un solo bloque.
     // ADR-016 — CAUSA RAÍZ REAL de "hitos 1 y 2 sin imagen": admin.html/content.historia_items
@@ -994,7 +994,7 @@
     let isHistoriaItemsFallback = false;
     if (historiaItemsList.length === 0) {
         historiaItemsList = [
-            { titulo: 'El terremoto', texto: 'El 24 de junio de 2026, a las 11:56 a.m., un sismo de 7.5 Mw sacudió violentamente la costa central en Catia La Mar. Miles perdieron sus hogares, pero nuestra gente no ha perdido la esperanza. Catia La Mar, La Guaira es una de las zonas más golpeadas por este desastre.' },
+            { titulo: 'LOS TERREMOTOS', texto: 'Las emergencias cambian la vida de miles de personas en cuestión de segundos, pero la reconstrucción puede tomar meses o incluso años. El 24 de junio de 2026, Venezuela enfrentó dos grandes terremotos; el 10 de agosto, un nuevo sismo de magnitud 7.4 golpeó a Colombia, con epicentro en San José del Palmar, Chocó. Son dos emergencias distintas, en territorios diferentes, pero comparten una misma necesidad: mantener viva la ayuda más allá del impacto inicial. Mientras las noticias desaparecen, las necesidades permanecen. Creemos que la respuesta está en las personas: en quienes donan, participan, comparten información o aportan su tiempo para que la solidaridad continúe creciendo durante la recuperación.' },
             { titulo: 'Nuestra misión: red de ayuda continua', texto: 'Sonidos por el Cambio nace para convertir la cultura en una red de apoyo permanente. A través de eventos culturales en simultáneo, creamos conexión y esperanza. Juntos, la cultura no solo se expresa: se convierte en ayuda que transforma vidas, hoy y siempre.' }
         ];
         isHistoriaItemsFallback = true;
