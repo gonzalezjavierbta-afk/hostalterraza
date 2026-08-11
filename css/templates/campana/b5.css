@@ -1523,3 +1523,18 @@
         z-index: 1;
     }
 }
+
+/* ============================================================================
+   20. JERARQUÍA DE TÍTULOS SIN NUMERACIÓN (Director, ago-2026)
+   Los títulos general y de secciones no deben verse numerados. La numeración
+   la genera `.b5-num-eyebrow::before { content: attr(data-num) }` (Sección 8,
+   b5.css:470). Se anula el pseudo-elemento de forma ADITIVA sin borrar el
+   atributo `data-num` del DOM (Cero Borrado) y sin tocar los breakpoints
+   responsive de la insignia (b5.css:485), que solo ajustan tamaño y nunca
+   redeclaran `content`. Aislado bajo `.tpl-b5` (Aislamiento Atómico).
+   Nota: la columna de "Video documental" (07) ya estaba oculta por ADR-016
+   (b5.css:1141-1143), ratificado por Dirección el 2-ago-2026 — sin cambios.
+   ============================================================================ */
+.tpl-b5 .b5-num-eyebrow::before {
+    content: none !important;
+}
