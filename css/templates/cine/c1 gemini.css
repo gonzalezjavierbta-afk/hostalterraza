@@ -1,0 +1,140 @@
+/* ==========================================================================
+   SILO ATÓMICO: c1 (Arthouse)
+   CATEGORÍA: Cinematografía
+   VERSIÓN: 1.7.7-CINEMA
+   ESTÁNDAR: AI-DOS v1.2 / Contrato v107
+   ========================================================================== */
+
+/* --- FASE 1: GOBERNANZA ATÓMICA Y VARIABLES LOCALES --- */
+.tpl-c1 {
+    /* Paleta Editorial (60-30-10) */
+    --c1-bg-primary: #fcfcfc;
+    --c1-text-primary: #141414;
+    --c1-text-muted: #555555;
+    --c1-glass-bg: rgba(255, 255, 255, 0.7);
+    --c1-glass-border: rgba(20, 20, 20, 0.08);
+    --c1-afterglow-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+    
+    background-color: var(--c1-bg-primary);
+    color: var(--c1-text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+}
+
+/* --- FASE 2: MOTOR DE DIAGRAMACIÓN (GRID ATÓMICO) --- */
+.tpl-c1 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "video"
+        "sinopsis"
+        "director"
+        "gallery"
+        "info";
+    gap: 4rem;
+    padding-bottom: 8rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- PROTOCOLO DE CERO BORRADO (SILENCIO ACTIVO) --- */
+.tpl-c1 #db-spotify-embed,
+.tpl-c1 #db-faq-list,
+.tpl-c1 #db-sponsors-list,
+.tpl-c1 #mod-form {
+    display: none !important;
+}
+
+/* --- FASE 3: HERO LAYOUT (BOTTOM-LEFT) --- */
+.tpl-c1 #unified-frame {
+    grid-area: hero;
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Bottom */
+    align-items: flex-start;   /* Left */
+    padding: 4rem 5%;
+}
+
+.tpl-c1 #event-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3.2rem, 6vw, 6rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    color: var(--c1-text-primary);
+}
+
+/* --- FASE 4: BLINDAJE MULTIMEDIA Y ADRs --- */
+
+/* ADR-007: Bloque sobre Flex para contenedores masivos */
+.tpl-c1 #db-video-content,
+.tpl-c1 #db-lineup {
+    display: block !important;
+    width: 100%;
+}
+
+/* ADR-010: Proximidad de Video (Eliminación de Respiro) */
+.tpl-c1 #db-video-content {
+    grid-area: video;
+    padding-top: 0 !important;
+    margin-top: -2rem; /* Integración forzada con Hero */
+}
+
+/* Estilización de Miniatura YouTube (ADR-005) */
+.tpl-c1 #db-video-content img {
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: var(--c1-afterglow-shadow);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tpl-c1 #db-video-content img:hover {
+    transform: scale(1.01);
+}
+
+/* --- FASE 5: ESTÁNDAR $10,000 (MÓDULOS CINE) --- */
+
+/* Módulo Director (Mapeado sobre #db-lineup) */
+.tpl-c1 #db-lineup {
+    grid-area: director;
+    padding: 0 5%;
+}
+
+.tpl-c1 #db-lineup .artist-card {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    background: transparent;
+    border-top: 1px solid var(--c1-glass-border);
+    padding: 3rem 0;
+}
+
+.tpl-c1 #db-lineup .artist-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(100%); /* Estética Arthouse */
+}
+
+/* Tarjetas de Información Técnica */
+.tpl-c1 .meta-card,
+.tpl-c1 #meta-fecha, 
+.tpl-c1 #meta-hora, 
+.tpl-c1 #meta-lugar {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    background: var(--c1-glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--c1-glass-border);
+    box-shadow: var(--c1-afterglow-shadow);
+    padding: 1.5rem;
+    border-radius: 8px;
+    color: var(--c1-text-primary);
+}
