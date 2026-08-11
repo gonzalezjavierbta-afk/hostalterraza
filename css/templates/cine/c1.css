@@ -1,130 +1,811 @@
-/* ============================================================================
-   c1.css — Silo Atómico "Arthouse" (Categoría: Cine)
-   Sistema QR Hostal Terraza · v1.6.0-STABLE · Contrato v110
-   Referentes: A24, MUBI, Blanco Editorial.
-   Aislamiento: .tpl-c1 | Regla de Oro #9.
-   ============================================================================ */
+/* ===================================================================
+   c1.css — SILO ATÓMICO "Arthouse" · Categoría: CINE
+   Contrato: v107 · Escudo GOLD · Geist 900 · Afterglow · Native Mobile
+   Host: evento3.html · Flujo: #main-content-flow · Cero Borrado .tpl-c1
+   Paleta 60-30-10 · 60% #fcfcfc (hueso editorial) · 30% #141414 (tinta) ·
+   10% acento (--master-accent) · A24 / MUBI minimalismo cinematográfico.
+   =================================================================== */
 
-.tpl-c1 {
-    /* --- TOKENS DE COLOR (Regla 60-30-10) [cite: 679, 703] --- */
-    --c1-bg: #fcfcfc;            /* Dominante 60%: Blanco hueso editorial */
-    --c1-ink: #141414;           /* Secundario 30%: Negro tinta para texto */
-    --c1-ink-soft: #55555a;
-    --c1-line: rgba(20, 20, 20, 0.08);
-    
-    /* Puente Cromático: toma el acento de la organización o usa negro por defecto */
-    --c1-accent: var(--master-accent, #141414); 
-    
-    background-color: var(--c1-bg) !important;
-    color: var(--c1-ink) !important;
-    font-family: 'Geist', sans-serif;
+
+/* ── FUENTE: Geist (única, sin serif) ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;700;800;900&display=swap');
+
+
+/* ===================================================================
+   RAÍZ DEL SILO — .tpl-c1 (sin tocar :root global)
+   =================================================================== */
+.tpl-c1, .tpl-C1 {
+  --c1-bg: #fcfcfc;
+  --c1-bg-warm: #f5f0e8;
+  --c1-bg-card: rgba(20, 20, 20, 0.03);
+  --c1-bg-card-hover: rgba(20, 20, 20, 0.06);
+  --c1-line: rgba(20, 20, 20, 0.08);
+  --c1-line-accent: rgba(20, 20, 20, 0.16);
+  --c1-text: #141414;
+  --c1-text-muted: rgba(20, 20, 20, 0.55);
+  --c1-accent: var(--master-accent, #141414);
+  --c1-accent-soft: color-mix(in srgb, var(--c1-accent) 12%, transparent);
+  --c1-font: 'Geist', system-ui, -apple-system, sans-serif;
+  --c1-glow: 0 0 24px var(--c1-accent-soft);
+  --c1-radius: 14px;
+  background-color: var(--c1-bg) !important;
+  color: var(--c1-text);
+  font-family: var(--c1-font);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+  min-height: 100vh;
 }
 
-/* Hard reset para asegurar fondo claro [cite: 637] */
-.tpl-c1 #hero-bg { background-color: var(--c1-bg) !important; }
+/* Puente cromático: --gold se mapea al acento del silo para compatibilidad
+   con estilos inline del HTML que usan var(--gold) directamente. */
+.tpl-c1, .tpl-C1 {
+  --gold: var(--c1-accent);
+}
 
-/* 1. GRID ATÓMICO (Invariabilidad del HTML) [cite: 701, 748] */
+
+/* ===================================================================
+   RESET CONTROLADO DEL SILO
+   =================================================================== */
+.tpl-c1 *, .tpl-c1 *::before, .tpl-c1 *::after,
+.tpl-C1 *, .tpl-C1 *::before, .tpl-C1 *::after {
+  box-sizing: border-box;
+}
+
+.tpl-c1 section, .tpl-C1 section {
+  padding: 5rem clamp(1.25rem, 6vw, 5rem);
+  border-bottom: 1px solid var(--c1-line);
+}
+
+.tpl-c1 h2, .tpl-C1 h2 {
+  color: var(--c1-text);
+  font-family: var(--c1-font);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  text-align: left;
+}
+
+
+/* ===================================================================
+   ACTIVACIÓN GRID — #main-content-flow (grid-template-areas)
+   =================================================================== */
 .tpl-c1 #main-content-flow {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas:
-        "hero       hero"
-        "meta       meta"
-        "countdown  countdown"
-        "sinopsis   sinopsis"
-        "trailer    gallery"
-        "director   info"
-        "sponsors   sponsors"
-        "form       form"
-        "faq        ubicacion"
-        "footer     footer";
-    gap: 0;
-    width: 100%;
+  display: grid !important;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'hero'
+    'countdown'
+    'meta'
+    'video'
+    'lineup'
+    'playlist'
+    'info'
+    'faq'
+    'ubicacion'
+    'sponsors'
+    'form';
+  row-gap: 0;
 }
 
-/* Asignación de Áreas */
-.tpl-c1 #mod-hero { grid-area: hero; }
-.tpl-c1 #mod-hero-meta { grid-area: meta; }
-.tpl-c1 #unified-frame { grid-area: countdown; }
-.tpl-c1 #modulo-lineup { grid-area: sinopsis; } /* Reutilizado para Sinopsis en Cine */
-.tpl-c1 #modulo-gallery { grid-area: gallery; }
-.tpl-c1 #modulo-trailer { grid-area: trailer; }
-.tpl-c1 #modulo-info-tecnica { grid-area: info; }
-.tpl-c1 #modulo-faq-ubicacion { grid-area: faq; }
-.tpl-c1 #modulo-formulario { grid-area: form; }
+.tpl-c1 #mod-hero        { grid-area: hero; }
+.tpl-c1 #unified-frame   { grid-area: countdown; }
+.tpl-c1 #mod-hero-meta   { grid-area: meta; }
+.tpl-c1 #mod-video       { grid-area: video; }
+.tpl-c1 #mod-lineup      { grid-area: lineup; }
+.tpl-c1 #mod-playlist    { grid-area: playlist; }
+.tpl-c1 #mod-info-tecnica{ grid-area: info; }
+.tpl-c1 #mod-faq         { grid-area: faq; }
+.tpl-c1 #mod-ubicacion   { grid-area: ubicacion; }
+.tpl-c1 #mod-sponsors    { grid-area: sponsors; }
+.tpl-c1 #mod-form        { grid-area: form; }
 
-/* 2. HERO: Estilo Arthouse (Bottom-Left) [cite: 625] */
+
+/* ===================================================================
+   HERO — anclaje inferior izquierda, imagen de fondo, A24 editorial
+   =================================================================== */
 .tpl-c1 #mod-hero {
-    height: 100vh;
-    display: flex;
-    align-items: flex-end; /* Anclaje inferior */
-    justify-content: flex-start;
-    padding: 6rem 8%;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    border-bottom: 1px solid var(--c1-line);
+  position: relative;
+  min-height: 100vh;
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: flex-start;
+  background-size: cover !important;
+  background-position: center !important;
+  overflow: hidden;
+  padding: 0 !important;
+  border-bottom: none !important;
 }
 
 .tpl-c1 #mod-hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(0deg, rgba(252,252,252,0.9) 0%, rgba(252,252,252,0) 50%);
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(252, 252, 252, 0.95) 0%,
+    rgba(252, 252, 252, 0.7) 30%,
+    rgba(252, 252, 252, 0.15) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.tpl-c1 .hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 3rem clamp(1.5rem, 6vw, 5rem);
+  max-width: 720px;
 }
 
 .tpl-c1 #event-title {
-    position: relative;
-    z-index: 10;
-    font-weight: 900;
-    font-size: clamp(3rem, 10vw, 6rem);
-    letter-spacing: -4px;
-    line-height: 0.9;
-    color: var(--c1-ink);
-    text-transform: uppercase;
+  font-family: var(--c1-font);
+  font-weight: 900;
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--c1-text);
+  margin: 0 0 0.5rem;
+  text-shadow: none;
 }
 
-/* 3. DATA CARDS: Estándar Geist 900 + Afterglow [cite: 700, 704] */
-.tpl-c1 .data-card {
-    background: #fff !important;
-    border: 1px solid var(--c1-line) !important;
-    border-radius: 0 !important; /* Estética editorial cuadrada */
-    padding: 3rem 2rem;
+.tpl-c1 #org-name-badge {
+  position: absolute;
+  top: 2.5rem;
+  left: 2.5rem;
+  z-index: 3;
+  font-family: var(--c1-font);
+  font-weight: 900;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--c1-text-muted);
 }
 
-.tpl-c1 .data-card span[id*="-val"] {
-    font-family: 'Geist', sans-serif !important;
-    font-weight: 900 !important;
-    font-size: 2.2rem;
-    color: var(--c1-ink);
-    animation: c1-afterglow 4s ease-in-out infinite;
+
+/* ===================================================================
+   COUNTDOWN — Afterglow editorial sutil
+   =================================================================== */
+.tpl-c1 #unified-frame {
+  position: relative;
+  z-index: 2;
+  display: flex !important;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0;
+  padding: 1.5rem 0;
+  margin: 0 clamp(1.5rem, 6vw, 5rem);
+  background: transparent;
+  border-bottom: 1px solid var(--c1-line);
+  border-radius: 0;
+  backdrop-filter: none;
 }
 
-/* 4. MULTIMEDIA: Sincronía 1:1 [cite: 699] */
+.tpl-c1 .cd-block {
+  padding: 0 1.5rem;
+  border-right: 1px solid var(--c1-line);
+  text-align: center;
+}
+
+.tpl-c1 .cd-block:last-child {
+  border-right: none;
+}
+
+/* Valores del countdown: Geist 900, por clase (.cd-v) y por ID (evento3
+   usa spans con id="cd-days" pero sin clase cd-v). */
+.tpl-c1 .cd-v,
+.tpl-c1 [id^="cd-"] {
+  display: block;
+  font-family: var(--c1-font) !important;
+  font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
+  font-weight: 900 !important;
+  line-height: 1;
+  color: var(--c1-text) !important;
+  text-shadow: none;
+}
+
+.tpl-c1 #unified-frame small {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--c1-text-muted);
+}
+
+/* Loader: ocultar overlay de carga (JS lo hace, pero por si acaso) */
+.tpl-c1 #loader {
+  background: var(--c1-bg) !important;
+  color: var(--c1-text-muted) !important;
+  font-family: var(--c1-font) !important;
+  letter-spacing: 3px;
+}
+
+
+/* ===================================================================
+   HERO META — datos bajo el countdown, editorial compacto
+   =================================================================== */
+.tpl-c1 #mod-hero-meta {
+  padding: 2rem clamp(1.5rem, 6vw, 5rem) !important;
+}
+
+.tpl-c1 .hero-meta {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 1.5rem 3rem;
+  margin: 0;
+}
+
+.tpl-c1 .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--c1-font) !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  color: var(--c1-text) !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.tpl-c1 .meta-svg {
+  width: 18px !important;
+  height: 18px !important;
+  fill: var(--c1-accent) !important;
+  filter: none;
+}
+
+
+/* ===================================================================
+   MÓDULO VIDEO / TRÁILER — pieza central de inmersión
+   =================================================================== */
+.tpl-c1 #mod-video {
+  padding: 5rem clamp(1.5rem, 6vw, 5rem) !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
 .tpl-c1 .media-grid {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: stretch;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tpl-c1 #db-video-content,
+.tpl-c1 #db-video-content iframe {
+  background: var(--c1-bg-warm);
+  border-radius: var(--c1-radius);
+  border: 1px solid var(--c1-line);
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  width: 100%;
+  height: 100%;
+}
+
+.tpl-c1 #db-video-content iframe {
+  display: block;
+  border: 0;
+}
+
+.tpl-c1 #db-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+
+/* ===================================================================
+   MÓDULO PLAYLIST — Spotify
+   =================================================================== */
+.tpl-c1 #mod-playlist {
+  padding: 0 clamp(1.5rem, 6vw, 5rem) 5rem !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tpl-c1 #db-spotify-embed {
+  border-radius: var(--c1-radius);
+  overflow: hidden;
+  border: 1px solid var(--c1-line);
+  background: var(--c1-bg-card);
+  min-height: 400px;
+}
+
+.tpl-c1 #db-spotify-embed iframe {
+  width: 100%;
+  min-height: 400px;
+  border: 0;
+  display: block;
+}
+
+
+/* ===================================================================
+   MÓDULO LINEUP — póster + artistas
+   =================================================================== */
+.tpl-c1 #mod-lineup {
+  padding: 5rem clamp(1.5rem, 6vw, 5rem) !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tpl-c1 .lineup-grid {
+  display: grid;
+  grid-template-columns: minmax(200px, 360px) 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tpl-c1 #db-poster-img {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  border-radius: 4px;
+  border: 1px solid var(--c1-line);
+  object-fit: cover;
+}
+
+.tpl-c1 #db-lineup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tpl-c1 .artist-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.2rem 1.5rem;
+  background: var(--c1-bg-card);
+  border: 1px solid var(--c1-line);
+  border-radius: var(--c1-radius);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-c1 .artist-card:hover {
+  background: var(--c1-bg-card-hover);
+  border-color: var(--c1-line-accent);
+  transform: translateY(-2px);
+}
+
+.tpl-c1 .artist-avatar {
+  width: 56px !important;
+  height: 56px !important;
+  flex-shrink: 0;
+  border-radius: 50% !important;
+  border: 1px solid var(--c1-line) !important;
+  object-fit: cover;
+}
+
+.tpl-c1 .artist-name {
+  font-family: var(--c1-font);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--c1-text);
+}
+
+.tpl-c1 .artist-role {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--c1-text-muted);
+  margin-top: 0.2rem;
+}
+
+
+/* ===================================================================
+   MÓDULO INFO TÉCNICA — tarjetas Geist 900 (Duración · Género · Clasificación)
+   =================================================================== */
+.tpl-c1 #mod-info-tecnica {
+  padding: 5rem clamp(1.5rem, 6vw, 5rem) !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tpl-c1 .data-cards-container {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.2rem !important;
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+}
+
+.tpl-c1 .card-item,
+.tpl-c1 .data-card {
+  background: var(--c1-bg-card) !important;
+  border: 1px solid var(--c1-line) !important;
+  border-radius: var(--c1-radius) !important;
+  padding: 2rem 1rem !important;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-c1 .card-item:hover,
+.tpl-c1 .data-card:hover {
+  background: var(--c1-bg-card-hover) !important;
+  border-color: var(--c1-line-accent) !important;
+  transform: translateY(-3px);
+}
+
+/* Afterglow sutil en hover */
+.tpl-c1 .card-item::before,
+.tpl-c1 .data-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--c1-accent), transparent);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  border-radius: var(--c1-radius) var(--c1-radius) 0 0;
+}
+
+.tpl-c1 .card-item:hover::before,
+.tpl-c1 .data-card:hover::before {
+  opacity: 1;
+}
+
+/* Tipografía Geist 900 para valores ($10,000 Standard) */
+.tpl-c1 .card-item span[id*="-val"],
+.tpl-c1 .data-card span[id*="-val"],
+.tpl-c1 .data-value {
+  font-family: 'Geist', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 1.5rem;
+  color: var(--c1-text);
+  display: block;
+  margin-top: 0.4rem;
+}
+
+.tpl-c1 .data-label {
+  color: var(--c1-text-muted);
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Iconos de tarjetas (SVG inline) */
+.tpl-c1 .card-icon-xl {
+  width: 56px !important;
+  height: 56px !important;
+  fill: var(--c1-accent);
+  opacity: 0.7;
+  margin-top: 1.5rem;
+}
+
+
+/* ===================================================================
+   MÓDULO FAQ
+   =================================================================== */
+.tpl-c1 #mod-faq {
+  padding: 5rem clamp(1.5rem, 6vw, 5rem) !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tpl-c1 .faq-item {
+  border-bottom: 1px solid var(--c1-line);
+  padding: 1.2rem 0;
+  cursor: pointer;
+}
+
+.tpl-c1 .faq-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.tpl-c1 .faq-icon-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--c1-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c1-text-muted);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.tpl-c1 .faq-answer {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+  color: var(--c1-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.tpl-c1 .faq-item.active .faq-answer {
+  max-height: 500px !important;
+  opacity: 1 !important;
+  padding-top: 1rem !important;
+}
+
+
+/* ===================================================================
+   MÓDULO UBICACIÓN / MAPA
+   =================================================================== */
+.tpl-c1 #mod-ubicacion {
+  padding: 5rem clamp(1.5rem, 6vw, 5rem) !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tpl-c1 #db-mapa-container {
+  border-radius: var(--c1-radius);
+  overflow: hidden;
+  border: 1px solid var(--c1-line);
+}
+
+.tpl-c1 #db-mapa-container iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  display: block;
+  border: 0;
+  filter: grayscale(0.8) contrast(1.1);
+}
+
+
+/* ===================================================================
+   MÓDULO SPONSORS
+   =================================================================== */
+.tpl-c1 #mod-sponsors {
+  padding: 4rem clamp(1.5rem, 6vw, 5rem) !important;
+  text-align: center;
+}
+
+.tpl-c1 .sponsors-label {
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--c1-text-muted);
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.tpl-c1 .sponsors-grid,
+.tpl-c1 #db-sponsors-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+}
+
+.tpl-c1 .sponsor-img {
+  height: 38px;
+  width: auto;
+  opacity: 0.6;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  filter: grayscale(1) contrast(1.1);
+}
+
+.tpl-c1 .sponsor-img:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  filter: none;
+}
+
+
+/* ===================================================================
+   MÓDULO FORMULARIO — glassmorphism editorial claro
+   =================================================================== */
+.tpl-c1 #mod-form {
+  padding: 5rem clamp(1.5rem, 6vw, 5rem) 7rem !important;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.tpl-c1 .form-master-box {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border-radius: 20px;
+  background: var(--c1-bg-card);
+  border: 1px solid var(--c1-line);
+  backdrop-filter: blur(16px);
+}
+
+.tpl-c1 .form-tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.tpl-c1 .tab-btn {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--c1-line);
+  color: var(--c1-text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tpl-c1 .tab-btn.active {
+  background: var(--c1-text);
+  color: var(--c1-bg);
+  border-color: var(--c1-text);
+}
+
+.tpl-c1 .form-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  background: var(--c1-bg);
+  border: 1px solid var(--c1-line);
+  color: var(--c1-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tpl-c1 .form-input:focus {
+  outline: none;
+  border-color: var(--c1-accent);
+  box-shadow: var(--c1-glow);
+}
+
+.tpl-c1 .btn-submit {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  background: var(--c1-text);
+  border: 0;
+  color: var(--c1-bg);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tpl-c1 .btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.25);
+}
+
+.tpl-c1 .btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ===================================================================
+   CERO BORRADO — módulos que no pertenecen a cine
+   =================================================================== */
+.tpl-c1 #mod-historia,
+.tpl-c1 #mod-objetivo,
+.tpl-c1 #mod-impacto,
+.tpl-c1 #mod-equipo,
+.tpl-c1 #mod-cta-final,
+.tpl-c1 #mod-footer,
+.tpl-c1 #modulo-noticias,
+.tpl-c1 #modulo-comentarios,
+.tpl-c1 #modulo-blog,
+.tpl-c1 #modulo-tienda,
+.tpl-c1 #modulo-redes,
+.tpl-c1 #modulo-barras,
+.tpl-c1 #modulo-eventos {
+  display: none !important;
+}
+
+
+/* ===================================================================
+   NATIVE MOBILE — Thumb-First · recalibración táctil
+   =================================================================== */
+@media (max-width: 980px) {
+  .tpl-c1 .lineup-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tpl-c1 #db-poster-img {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .tpl-c1 .media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tpl-c1 .data-cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .tpl-c1 #mod-hero {
+    min-height: 80vh;
+  }
+
+  .tpl-c1 .hero-content {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .tpl-c1 section {
+    padding: 3.5rem 1.1rem !important;
+  }
+
+  .tpl-c1 #mod-hero {
+    min-height: 70vh;
+  }
+
+  .tpl-c1 .data-cards-container {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.8rem !important;
+  }
+
+  .tpl-c1 .card-item,
+  .tpl-c1 .data-card {
+    min-height: 160px;
+    padding: 1.5rem 0.8rem !important;
+  }
+
+  .tpl-c1 .form-tabs {
+    flex-direction: column;
+  }
+
+  .tpl-c1 .tab-btn {
+    flex: none;
+    width: 100%;
+  }
+
+  .tpl-c1 #unified-frame {
     gap: 0;
+    margin: 0 1.1rem;
+  }
+
+  .tpl-c1 .cd-block {
+    padding: 0 0.8rem;
+  }
+
+  .tpl-c1 .hero-meta {
+    gap: 1rem 2rem !important;
+  }
 }
 
-.tpl-c1 #db-video-content {
-    aspect-ratio: 16/9;
-    background: #000;
-}
 
-/* 5. CERO BORRADO: Ocultación de módulos no usados [cite: 696] */
-.tpl-c1 #mod-playlist,
-.tpl-c1 #mod-actualizaciones { display: none !important; }
-
-/* --- ANIMACIONES --- */
-@keyframes c1-afterglow {
-    0%, 100% { filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-    50% { filter: drop-shadow(0 0 8px rgba(20,20,20,0.15)); }
-}
-
-/* 6. RESPONSIVE MOBILE (Thumb-first) [cite: 704] */
-@media (max-width: 899px) {
-    .tpl-c1 #main-content-flow { grid-template-columns: 1fr; }
-    .tpl-c1 #mod-hero { align-items: center; text-align: center; justify-content: center; }
+/* ── Movimiento reducido ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tpl-c1 *,
+  .tpl-c1 *::before,
+  .tpl-c1 *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

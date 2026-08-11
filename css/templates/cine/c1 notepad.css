@@ -1,0 +1,130 @@
+/* ============================================================================
+   c1.css — Silo Atómico "Arthouse" (Categoría: Cine)
+   Sistema QR Hostal Terraza · v1.6.0-STABLE · Contrato v110
+   Referentes: A24, MUBI, Blanco Editorial.
+   Aislamiento: .tpl-c1 | Regla de Oro #9.
+   ============================================================================ */
+
+.tpl-c1 {
+    /* --- TOKENS DE COLOR (Regla 60-30-10) [cite: 679, 703] --- */
+    --c1-bg: #fcfcfc;            /* Dominante 60%: Blanco hueso editorial */
+    --c1-ink: #141414;           /* Secundario 30%: Negro tinta para texto */
+    --c1-ink-soft: #55555a;
+    --c1-line: rgba(20, 20, 20, 0.08);
+    
+    /* Puente Cromático: toma el acento de la organización o usa negro por defecto */
+    --c1-accent: var(--master-accent, #141414); 
+    
+    background-color: var(--c1-bg) !important;
+    color: var(--c1-ink) !important;
+    font-family: 'Geist', sans-serif;
+}
+
+/* Hard reset para asegurar fondo claro [cite: 637] */
+.tpl-c1 #hero-bg { background-color: var(--c1-bg) !important; }
+
+/* 1. GRID ATÓMICO (Invariabilidad del HTML) [cite: 701, 748] */
+.tpl-c1 #main-content-flow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+        "hero       hero"
+        "meta       meta"
+        "countdown  countdown"
+        "sinopsis   sinopsis"
+        "trailer    gallery"
+        "director   info"
+        "sponsors   sponsors"
+        "form       form"
+        "faq        ubicacion"
+        "footer     footer";
+    gap: 0;
+    width: 100%;
+}
+
+/* Asignación de Áreas */
+.tpl-c1 #mod-hero { grid-area: hero; }
+.tpl-c1 #mod-hero-meta { grid-area: meta; }
+.tpl-c1 #unified-frame { grid-area: countdown; }
+.tpl-c1 #modulo-lineup { grid-area: sinopsis; } /* Reutilizado para Sinopsis en Cine */
+.tpl-c1 #modulo-gallery { grid-area: gallery; }
+.tpl-c1 #modulo-trailer { grid-area: trailer; }
+.tpl-c1 #modulo-info-tecnica { grid-area: info; }
+.tpl-c1 #modulo-faq-ubicacion { grid-area: faq; }
+.tpl-c1 #modulo-formulario { grid-area: form; }
+
+/* 2. HERO: Estilo Arthouse (Bottom-Left) [cite: 625] */
+.tpl-c1 #mod-hero {
+    height: 100vh;
+    display: flex;
+    align-items: flex-end; /* Anclaje inferior */
+    justify-content: flex-start;
+    padding: 6rem 8%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-bottom: 1px solid var(--c1-line);
+}
+
+.tpl-c1 #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(252,252,252,0.9) 0%, rgba(252,252,252,0) 50%);
+}
+
+.tpl-c1 #event-title {
+    position: relative;
+    z-index: 10;
+    font-weight: 900;
+    font-size: clamp(3rem, 10vw, 6rem);
+    letter-spacing: -4px;
+    line-height: 0.9;
+    color: var(--c1-ink);
+    text-transform: uppercase;
+}
+
+/* 3. DATA CARDS: Estándar Geist 900 + Afterglow [cite: 700, 704] */
+.tpl-c1 .data-card {
+    background: #fff !important;
+    border: 1px solid var(--c1-line) !important;
+    border-radius: 0 !important; /* Estética editorial cuadrada */
+    padding: 3rem 2rem;
+}
+
+.tpl-c1 .data-card span[id*="-val"] {
+    font-family: 'Geist', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 2.2rem;
+    color: var(--c1-ink);
+    animation: c1-afterglow 4s ease-in-out infinite;
+}
+
+/* 4. MULTIMEDIA: Sincronía 1:1 [cite: 699] */
+.tpl-c1 .media-grid {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+}
+
+.tpl-c1 #db-video-content {
+    aspect-ratio: 16/9;
+    background: #000;
+}
+
+/* 5. CERO BORRADO: Ocultación de módulos no usados [cite: 696] */
+.tpl-c1 #mod-playlist,
+.tpl-c1 #mod-actualizaciones { display: none !important; }
+
+/* --- ANIMACIONES --- */
+@keyframes c1-afterglow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+    50% { filter: drop-shadow(0 0 8px rgba(20,20,20,0.15)); }
+}
+
+/* 6. RESPONSIVE MOBILE (Thumb-first) [cite: 704] */
+@media (max-width: 899px) {
+    .tpl-c1 #main-content-flow { grid-template-columns: 1fr; }
+    .tpl-c1 #mod-hero { align-items: center; text-align: center; justify-content: center; }
+}
