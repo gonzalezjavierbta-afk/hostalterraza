@@ -673,11 +673,15 @@
 .tpl-b5 #db-historia-texto { display: none !important; }
 /* Nuevo átomo aditivo: lista de hitos numerados */
 .tpl-b5 .historia-lista { display: flex; flex-direction: column; gap: 2.2rem; }
-.tpl-b5 .historia-item { display: flex; gap: 1.2rem; align-items: flex-start; }
+/* Director (ago-2026): el número del hito ya no va en un cuadrado de
+   numeración; pasa a texto plano en la misma línea que el subtítulo
+   ("01 LOS TERREMOTOS"). Cero Borrado: el span .historia-item-num
+   permanece en el DOM, solo se destila. */
+.tpl-b5 .historia-item { display: flex; gap: 0.6rem; align-items: flex-start; }
 .tpl-b5 .historia-item-num {
-    flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-    width: 1.7rem; height: 1.7rem; border-radius: 4px;
-    background: var(--b5-ink); color: #fff; font-size: 0.72rem; font-weight: 900;
+    flex-shrink: 0;
+    font-size: 0.85rem; font-weight: 900; line-height: 1.6;
+    color: var(--b5-ink);
 }
 /* ADR-018: escala tipográfica reducida -- se veía desproporcionadamente
    grande frente a la sobriedad de landing-escritorio.jpg (0.95/0.92rem → 0.85/0.83rem). */
@@ -1551,8 +1555,9 @@
       título (display:block + width:100% = línea propia, centrado).
    4) "Impacto hasta hoy" (.impactohist-eyebrow) se oculta (override del
       display:flex del punto 1; la sección 05 sigue SOLO BANNER, ADR-016).
-   5) Historia (.historia-eyebrow) restaura su número (content: attr(data-num))
-      seguido del subtítulo (override de la Sección 20 solo para este rango).
+   5) Historia: el título de sección (.historia-eyebrow) NO muestra insignia
+      numérica (Sección 20, igual que el resto); el número que acompaña a los
+      hitos vive en .historia-item-num (Sección 7, destilado sin cuadrado).
    Nota: con el subtexto generalizado, "(en tiempo real)" del Estado de
    Emergencia reaparece en una columna (override en cascada de b5.css:420;
    ambos !important e igual especificidad, gana el posterior). Si debe seguir
@@ -1581,9 +1586,6 @@
     }
     .tpl-b5 .impactohist-eyebrow {
         display: none !important;
-    }
-    .tpl-b5 .historia-eyebrow::before {
-        content: attr(data-num) !important;
     }
 }
 
