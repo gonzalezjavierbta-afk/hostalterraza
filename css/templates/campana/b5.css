@@ -855,6 +855,15 @@
 .tpl-b5 .faq-answer { max-height: 0; overflow: hidden; color: var(--b5-ink-soft); transition: max-height 0.25s ease; font-size: 0.88rem; line-height: 1.6; }
 .tpl-b5 .faq-item.active .faq-answer { max-height: 300px; padding-top: 0.6rem; }
 .tpl-b5 .faq-icon-circle { border-color: var(--b5-red) !important; color: var(--b5-red) !important; }
+/* Director (ago-2026): en móviles pequeños la pregunta larga comprimía el
+   círculo del "+" (flex-shrink:1 por defecto deformaba el 22px/border-radius
+   50% en óvalo). Corrección aditiva: el span de la pregunta gana min-width:0
+   (con flex:1 y word-break) para envolver el texto sin empujar el icono;
+   .faq-icon-circle fija flex-shrink:0 para que el círculo nunca se deforme;
+   gap para que la última línea no roce físicamente el icono. */
+.tpl-b5 .faq-item > div:first-child { gap: 0.8rem; }
+.tpl-b5 .faq-item > div:first-child > span { flex: 1 1 auto; min-width: 0; word-break: break-word; }
+.tpl-b5 .faq-icon-circle { flex-shrink: 0; }
 
 /* ============================================================================
    12. UBICACIÓN → CONTACTO DIRECTO (ADR-017, Opción B mandato de Dirección)
