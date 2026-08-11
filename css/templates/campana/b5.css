@@ -479,6 +479,20 @@
     color: var(--b5-ink-soft); font-size: 0.85rem; letter-spacing: 0.02em;
 }
 
+/* Escala responsiva de la insignia numerada compartida (02-10): en desktop
+   1.35rem/1.9rem es proporcional a las secciones; en pantallas angostas se
+   compacta para no dominar el viewport (mandato de revisión de estilos). */
+@media (max-width: 899px) {
+    .tpl-b5 .b5-num-eyebrow { font-size: 1.05rem; gap: 0.6rem; margin-bottom: 1.1rem; }
+    .tpl-b5 .b5-num-eyebrow::before { width: 1.5rem; height: 1.5rem; font-size: 0.68rem; }
+    .tpl-b5 .b5-num-eyebrow em { font-size: 0.75rem; }
+}
+@media (max-width: 640px) {
+    .tpl-b5 .b5-num-eyebrow { font-size: 1rem; gap: 0.5rem; margin-bottom: 1rem; }
+    .tpl-b5 .b5-num-eyebrow::before { width: 1.45rem; height: 1.45rem; font-size: 0.64rem; }
+    .tpl-b5 .b5-num-eyebrow em { font-size: 0.72rem; }
+}
+
 /* Textura satelital (ADR-016): asset real de prueba en capa superior, con el
    patrón CSS generado (ADR-015) conservado COMO CAPA INFERIOR del mismo
    `background`. Si la URL externa falla (hotlink bloqueado, licencia, etc.),
@@ -656,7 +670,7 @@
 .tpl-b5 .historia-inner { padding: 4rem 2.2rem; text-align: left !important; max-width: none !important; }
 /* Átomos legacy v107 (Cero Borrado: permanecen en el DOM, ocultos solo en b5) */
 .tpl-b5 #db-historia-titulo,
-/.tpl-b5 #db-historia-img,
+.tpl-b5 #db-historia-img,
 .tpl-b5 #db-historia-texto { display: none !important; }
 /* Nuevo átomo aditivo: lista de hitos numerados */
 .tpl-b5 .historia-lista { display: flex; flex-direction: column; gap: 2.2rem; }
@@ -1157,85 +1171,11 @@
 
 /* ============================================================================
    18. HARD RESET RESPONSIVO MOBILE (< 640px) — v5.16.0
+   CONSOLIDADO (ADR-017 Fuente Única): este bloque se fusionó con la "CAPA
+   MOBILE ESTRECHA" en el único @media(max-width:640px) que vive más abajo.
    Garantiza el colapso absoluto de sub-grillas, contención de texto Geist 900
    y eliminación total de desbordamiento horizontal en viewports móviles.
    ============================================================================ */
-@media (max-width: 640px) {
-    /* 1. Cuadro Meta (#mod-hero-meta): 1 columna pura */
-    .tpl-b5 #mod-hero-meta {
-        grid-template-columns: 1fr !important;
-        row-gap: 0.8rem !important;
-        width: calc(100% - 2.5rem) !important;
-        margin: 1.2rem auto 0 auto !important;
-        padding: 1.2rem 1rem !important;
-        box-sizing: border-box !important;
-    }
-    .tpl-b5 .meta-item {
-        border-right: none !important;
-        border-bottom: 1px solid var(--b5-line) !important;
-        padding-bottom: 0.7rem !important;
-        padding-left: 0 !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        min-width: 0 !important;
-    }
-    .tpl-b5 .meta-item:last-child {
-        border-bottom: none !important;
-        padding-bottom: 0 !important;
-    }
-    .tpl-b5 .meta-item span {
-        white-space: normal !important;
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 0 !important;
-    }
-
-    /* 2. Indicadores de Impacto (#db-impacto-grid): 2 columnas compactas con clamp */
-    .tpl-b5 #mod-impacto-humanitario #db-impacto-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.8rem !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-    .tpl-b5 #mod-impacto-humanitario .impacto-valor {
-        font-size: clamp(1.35rem, 5.5vw, 2.2rem) !important;
-        word-break: break-word !important;
-    }
-    .tpl-b5 #mod-impacto-humanitario .impacto-etiqueta {
-        font-size: 0.7rem !important;
-        line-height: 1.2 !important;
-    }
-
-    /* 3. Sección Historia (.historia-item--conimg): 1 columna vertical */
-    .tpl-b5 .historia-inner {
-        padding: 2.5rem 1.25rem !important;
-    }
-    .tpl-b5 .historia-item--conimg {
-        grid-template-columns: 1fr !important;
-        gap: 0.8rem !important;
-    }
-    .tpl-b5 .historia-item-img {
-        grid-column: 1 / -1 !important;
-        grid-row: 2 !important;
-        width: 100% !important;
-        aspect-ratio: 16/9 !important;
-        margin-top: 0.3rem !important;
-    }
-
-    /* 4. Formulario Master Box (#mod-form) */
-    .tpl-b5 .form-master-box {
-        padding: 2rem 1.25rem !important;
-        width: calc(100% - 2.5rem) !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 5. Mapa de Crisis Wrapper */
-    .tpl-b5 .mapacrisis-svg-wrap {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-}
 
 
 /* --- CAMBIO A COLOR NARANJA ALERTA v1.10.0 --- */
@@ -1333,8 +1273,86 @@
 
 
 
-/* --- CAPA MOBILE ESTRECHO: SMARTPHONES (max-width: 640px) --- */
+/* --- CAPA MOBILE ESTRECHO: SMARTPHONES (max-width: 640px) ---
+   CONSOLIDADO (ADR-017 Fuente Única): reglas del antiguo "HARD RESET
+   RESPONSIVO MOBILE" (Sección 18) restauradas aquí con sus valores
+   originales, ANTES de las reglas de esta capa para conservar la cascada. */
 @media (max-width: 640px) {
+
+    /* 0. HARD RESET (Sección 18 restaurada) — Cuadro Meta: 1 columna pura */
+    .tpl-b5 #mod-hero-meta {
+        grid-template-columns: 1fr !important;
+        row-gap: 0.8rem !important;
+        width: calc(100% - 2.5rem) !important;
+        margin: 1.2rem auto 0 auto !important;
+        padding: 1.2rem 1rem !important;
+        box-sizing: border-box !important;
+    }
+    .tpl-b5 .meta-item {
+        border-right: none !important;
+        border-bottom: 1px solid var(--b5-line) !important;
+        padding-bottom: 0.7rem !important;
+        padding-left: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important;
+    }
+    .tpl-b5 .meta-item:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+    }
+    .tpl-b5 .meta-item span {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 0 !important;
+    }
+
+    /* 0. HARD RESET — Indicadores de Impacto: 2 columnas compactas con clamp */
+    .tpl-b5 #mod-impacto-humanitario #db-impacto-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.8rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .tpl-b5 #mod-impacto-humanitario .impacto-valor {
+        font-size: clamp(1.35rem, 5.5vw, 2.2rem) !important;
+        word-break: break-word !important;
+    }
+    .tpl-b5 #mod-impacto-humanitario .impacto-etiqueta {
+        font-size: 0.7rem !important;
+        line-height: 1.2 !important;
+    }
+
+    /* 0. HARD RESET — Sección Historia: 1 columna vertical */
+    .tpl-b5 .historia-inner {
+        padding: 2.5rem 1.25rem !important;
+    }
+    .tpl-b5 .historia-item--conimg {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+    }
+    .tpl-b5 .historia-item-img {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+        width: 100% !important;
+        aspect-ratio: 16/9 !important;
+        margin-top: 0.3rem !important;
+    }
+
+    /* 0. HARD RESET — Formulario Master Box */
+    .tpl-b5 .form-master-box {
+        padding: 2rem 1.25rem !important;
+        width: calc(100% - 2.5rem) !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 0. HARD RESET — Mapa de Crisis Wrapper */
+    .tpl-b5 .mapacrisis-svg-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
 
     .tpl-b5 #mod-form {
             position: relative !important;
