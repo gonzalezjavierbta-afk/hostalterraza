@@ -247,8 +247,8 @@
 
         <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874]
              v221: se agrega Lógica Dual-Phase (Fase 1 -> INSERT en 'inscritos';
-             Fase 2 -> UPDATE con cedula/autorizacion/respuestas_custom) sin
-             recargar la página. #reg-nombre, #master-reg-form y la estructura
+             Fase 2 -> UPDATE con email/autorizacion/respuestas_custom, sin campos
+             obligatorios y sin recargar la página. #reg-nombre, #master-reg-form y la estructura
              de tabs REGISTRO/RECUPERAR del Contrato original se conservan
              intactos; los campos nuevos son aditivos dentro del mismo átomo. -->
         <section id="mod-form">
@@ -302,18 +302,21 @@
                             <button type="submit" class="btn-submit">QUIERO SUMARME →</button>
                             <span class="form-security-note">🔒 Es rápido, seguro y gratuito.</span>
                         </div>
-                        <div id="form-fase2" style="display:none;">
-                            <p class="form-lead">Un último paso para verificar tu registro.</p>
-                            <input type="text" id="reg-cedula" placeholder="Cédula *" required>
-                            <input type="email" id="reg-email" placeholder="Correo electrónico *" required>
+<div id="form-fase2" style="display:none;">
+                             <p class="form-lead">Un último paso para verificar tu registro.</p>
+                             <!-- Fase 2 sin obligatoriedad (Mandato Director, ago-2026): ya ningún
+                                  campo es requerido — el dato esencial (WhatsApp) se capturó en Fase 1.
+                                  El campo 'cedula' se retira del formulario; #reg-email permanece pero
+                                  opcional. Cero Borrado: los 5 bloques de preguntas quedan intactos. -->
+                             <input type="email" id="reg-email" placeholder="Correo electrónico">
 
                             <!-- Contrato Ramificado v112 (Context Package v4.0.0-GOLD): 5 bloques de
                                  perfilamiento, uno por categoría de reg-tipo-ayuda. Cero Borrado: los
                                  5 bloques permanecen siempre en el DOM; JS solo muestra el activo vía
                                  display:none/block (ver mostrarBloqueFase2 más abajo). -->
                             <div id="fase2-cat-espacio" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-espacio-direccion" placeholder="Dirección exacta del espacio *">
-                                <input type="text" id="reg-espacio-aforo" placeholder="Aforo aproximado *">
+                                <input type="text" id="reg-espacio-direccion" placeholder="Dirección exacta del espacio">
+                                <input type="text" id="reg-espacio-aforo" placeholder="Aforo aproximado">
                                 <select id="reg-espacio-sonido">
                                     <option value="" disabled selected>¿Tiene equipo de sonido?</option>
                                     <option value="si">Sí</option>
@@ -321,30 +324,30 @@
                                 </select>
                             </div>
                             <div id="fase2-cat-artista" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-artista-portafolio" placeholder="Instagram / portafolio *">
-                                <input type="text" id="reg-artista-especialidad" placeholder="Especialidad artística *">
+                                <input type="text" id="reg-artista-portafolio" placeholder="Instagram / portafolio">
+                                <input type="text" id="reg-artista-especialidad" placeholder="Especialidad artística">
                                 <input type="text" id="reg-artista-requerimiento" placeholder="Requerimiento técnico">
                             </div>
                             <div id="fase2-cat-marca" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-marca-tipoapoyo" placeholder="Tipo de apoyo que ofreces *">
+                                <input type="text" id="reg-marca-tipoapoyo" placeholder="Tipo de apoyo que ofreces">
                                 <select id="reg-marca-logo">
                                     <option value="" disabled selected>¿Tu marca tiene logo para exhibir?</option>
                                     <option value="si">Sí</option>
                                     <option value="no">No</option>
                                 </select>
-                                <input type="text" id="reg-marca-cargo" placeholder="Tu cargo en la marca *">
+                                <input type="text" id="reg-marca-cargo" placeholder="Tu cargo en la marca">
                             </div>
                             <div id="fase2-cat-voluntario" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-voluntario-profesion" placeholder="Profesión / oficio *">
-                                <input type="text" id="reg-voluntario-disponibilidad" placeholder="Disponibilidad *">
+                                <input type="text" id="reg-voluntario-profesion" placeholder="Profesión / oficio">
+                                <input type="text" id="reg-voluntario-disponibilidad" placeholder="Disponibilidad">
                                 <select id="reg-voluntario-rescate">
-                                    <option value="" disabled selected>¿Tienes experiencia en rescate?</option>
+                                    <option value="" disabled selected>¿Tienes experiencia en voluntariados?</option>
                                     <option value="si">Sí</option>
                                     <option value="no">No</option>
                                 </select>
                             </div>
                             <div id="fase2-cat-donacion" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-donacion-monto" placeholder="Monto proyectado (aprox.) *">
+                                <input type="text" id="reg-donacion-monto" placeholder="Monto proyectado (aprox.)">
                                 <select id="reg-donacion-canal">
                                     <option value="" disabled selected>Canal preferido</option>
                                     <option value="transferencia">Transferencia</option>
@@ -359,8 +362,8 @@
                             </div>
 
                             <label class="form-checkbox">
-                                <input type="checkbox" id="reg-autorizacion" required>
-                                <span>Autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la organización. *</span>
+                                <input type="checkbox" id="reg-autorizacion">
+                                <span>Autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la organización.</span>
                             </label>
                             <button type="submit" class="btn-submit">CONFIRMAR REGISTRO →</button>
                         </div>
@@ -429,7 +432,7 @@
         <!-- MÓDULO EXTENDIDO: MAPA DE CRISIS (visualización ilustrativa del área afectada) -->
         <section id="mod-mapa-crisis">
             <div class="mapacrisis-inner">
-                <span class="b5-num-eyebrow mapacrisis-eyebrow" data-num="02">Estado de emergencia <em>(en tiempo real)</em></span>
+                <span class="b5-num-eyebrow mapacrisis-eyebrow" data-num="02">Estado de emergencia <em></em></span>
                 <div id="db-mapa-crisis-svg" class="mapacrisis-svg-wrap"></div>
                 <div class="mapacrisis-legend">
                     <span><i class="mapacrisis-dot mapacrisis-dot--epicentro"></i>Epicentro</span>
@@ -570,9 +573,10 @@
         // === INICIO SEGMENTO: FORMULARIO RAMIFICADO DUAL-PHASE (v222 → Contrato v112) ===
         // Fase 1 -> INSERT en 'inscritos' (nombre, whatsapp, tipo_ayuda). Si tiene éxito,
         // revela Fase 2 sin recargar y muestra el bloque de preguntas de la categoría
-        // elegida. Fase 2 -> UPDATE del mismo registro (cedula, email, autorizacion,
+        // elegida. Fase 2 -> UPDATE del mismo registro (email, autorizacion,
         // respuestas_custom + las 3 columnas dedicadas de esa categoría), usando el id
-        // devuelto por el INSERT.
+        // devuelto por el INSERT. Mandato Director (ago-2026): ningún campo de Fase 2 es
+        // obligatorio — 'cedula' se retiró del formulario; solo el WhatsApp de Fase 1 es clave.
         // Columnas verificadas directamente en admin.html (uso real, no asunción):
         // 'evento_id', 'org_id', 'nombre', 'whatsapp', 'tipo_ayuda', 'cedula', 'email',
         // 'autorizacion', 'respuestas_custom' ya existen en `inscritos`.
@@ -658,14 +662,9 @@
                     submitBtn.disabled = false; submitBtn.innerText = originalText;
                 }
             } else {
-                const cedula = document.getElementById('reg-cedula').value.trim();
-                const email = document.getElementById('reg-email').value.trim();
+                const email = document.getElementById('reg-email').value.trim() || null;
                 const autorizado = document.getElementById('reg-autorizacion').checked;
 
-                if (!cedula || !email || !autorizado) {
-                    alert('Ingresa tu cédula, correo, y acepta la autorización de datos para continuar.');
-                    return;
-                }
                 if (!regInscritoId) {
                     logStatus('ERROR: No hay inscrito activo en memoria para completar Fase 2.', "ERROR");
                     alert('Hubo un problema con tu sesión de registro. Por favor vuelve a intentar desde el inicio.');
@@ -713,15 +712,13 @@
                 submitBtn.disabled = true; submitBtn.innerText = 'GUARDANDO...';
                 try {
                     const { error } = await sbClient.from('inscritos').update({
-                        cedula: cedula,
                         email: email,
-                        autorizacion: true,
+                        autorizacion: autorizado,
                         ...camposCategoria,
                         respuestas_custom: {
-                            cedula: cedula,
                             email: email,
-                            autorizacion: true,
-                            autorizacion_fecha: new Date().toISOString(),
+                            autorizacion: autorizado,
+                            autorizacion_fecha: autorizado ? new Date().toISOString() : null,
                             ...camposCategoria
                         }
                     }).eq('id', regInscritoId);
@@ -732,7 +729,7 @@
                     logStatus(`TRACE: Fase 2 completada para inscrito ${regInscritoId}.`, "TRACE");
                 } catch (err) {
                     logStatus(`ERROR: Fallo UPDATE Fase 2 -> ${err.message}`, "ERROR");
-                    alert('No pudimos guardar tu cédula/autorización. Intenta de nuevo.');
+                    alert('No pudimos guardar tu registro. Intenta de nuevo.');
                 } finally {
                     submitBtn.disabled = false; submitBtn.innerText = originalText;
                 }
@@ -1237,12 +1234,17 @@
     const isComoAyudarFallback = !content.como_ayudar;
     const comoAyudarLead = comoAyudarData.lead || '<p>Creemos que cada aporte cuenta y que cada esfuerzo suma. Por eso, transformamos la energía colectiva en recursos y acciones concretas que generan un impacto real en las comunidades que más lo necesitan.</p><p>Juntos buscamos unirnos por un propósito común, para brindar ayuda, crear oportunidades y construir un cambio posible.</p>';
     let comoAyudarList = Array.isArray(comoAyudarData.categorias) ? comoAyudarData.categorias : [
-        { titulo: 'Espacios', descripcion: 'Pon tu venue y súmate.', icono: 'espacio', tipo_ayuda: 'espacio' },
+        { titulo: 'Espacios', descripcion: 'Tu lugar suma', icono: 'espacio', tipo_ayuda: 'espacio' },
         { titulo: 'Artistas', descripcion: 'Tu talento puede salvar.', icono: 'artista', tipo_ayuda: 'artista' },
         { titulo: 'Marcas', descripcion: 'Tu marca deja huella.', icono: 'marca', tipo_ayuda: 'marca' },
         { titulo: 'Voluntarios', descripcion: 'Tu tiempo transforma.', icono: 'voluntario', tipo_ayuda: 'voluntario' },
         { titulo: 'Donaciones', descripcion: 'Tu aporte llega directo.', icono: 'donacion', tipo_ayuda: 'donacion' }
     ];
+    // Mandato Director (ago-2026): la tarjeta "Espacio" siempre muestra "Tu lugar suma",
+    // provenga el dato del fallback o de Supabase (display-mapping, sin borrado de dato).
+    if (comoAyudarList.length) comoAyudarList = comoAyudarList.map(item =>
+        item.tipo_ayuda === 'espacio' ? { ...item, descripcion: 'Tu lugar suma' } : item
+    );
     if (document.getElementById('db-como-ayudar-lead')) document.getElementById('db-como-ayudar-lead').innerHTML = comoAyudarLead;
     const comoAyudarGridEl = document.getElementById('db-como-ayudar-grid');
     if (comoAyudarGridEl) {
