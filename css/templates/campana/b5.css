@@ -1461,3 +1461,46 @@
         filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
     }
 }
+
+/* ============================================================================
+   19. CAPA MOBILE CORREGIDA (iPhone SE / viewports angostos) — ADR-026
+   Resuelve dos solapamientos reales en pantallas pequeñas (reportado en
+   375x667, aplicable a todo el rango mobile):
+   1) El bloque "CAPA MOBILE RECTIFICADA" (Sección 16, max-width:899px)
+      elevaba #mod-hero-meta con `margin:-22rem !important`, empujando la caja
+      meta 352px hacia arriba sobre el Hero — justo donde vive #event-description
+      (con .hero-content margin-top:9vh) — cubriendo el texto de descripción.
+      Se reduce a -2rem: elevación sutil de "card flotante" sobre el borde del
+      hero, sin tocar la descripción (estética ratificada por Dirección).
+   2) En max-width:640px, #mod-form ganaba `z-index:40 !important` +
+      position:relative, y .form-master-box `margin:-4vh auto !important`;
+      combinado con el `margin-top:-1rem !important` de #mod-impacto-humanitario
+      (bloque rectificado), la caja blanca del formulario flotaba sobre el
+      inicio de la sección de impacto, ocultando la primera fila de cifras de
+      crisis. Se neutralizan z-index y margen del form, y se da z-index propio
+      a la sección de impacto para que quede siempre sobre cualquier resto.
+   Fuente Única por Selector (ADR-017): este bloque corrige la cascada con
+   valores finales documentados; ninguna regla previa se borra (Cero Borrado).
+   Ver DECISIONS.md ADR-026 para causa raíz completa y auditoría de cascada.
+   ============================================================================ */
+@media (max-width: 899px) {
+    .tpl-b5 #mod-hero-meta {
+        margin: -2rem auto 0 auto !important;
+        width: calc(100% - 2.5rem) !important;
+        padding: 1.2rem 1rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .tpl-b5 #mod-form {
+        z-index: auto !important;
+    }
+    .tpl-b5 .form-master-box {
+        margin: 0 auto 1.5rem auto !important;
+    }
+    .tpl-b5 #mod-impacto-humanitario {
+        margin-top: 0 !important;
+        position: relative;
+        z-index: 1;
+    }
+}
