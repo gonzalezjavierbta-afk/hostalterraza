@@ -4,7 +4,7 @@
 *   **Nombre del Proyecto:** Sistema QR Hostal Terraza.
 *   **Tipo de Producto:** Plataforma Web de Gestión de Eventos, Ticketing y Control de Aforo (SaaS Multi-tenant).
 *   **Ubicación de Referencia:** Bogotá, Colombia.
-*   **Estado del Sistema:** **v1.6.3-FIX** — Piloto Oficial de AI-DOS v1.2 / Baseline f1 Certified. Wizard Inteligente de Creación (ADR-021), navegación en pestañas de Admin (ADR-022) y Panel (ADR-023), y fix "Null Pointer Regression" en el panel (ADR-024) entregados en `admin.html`.
+*   **Estado del Sistema:** **v1.6.4-FIX** — Piloto Oficial de AI-DOS v1.2 / Baseline f1 Certified. Wizard Inteligente de Creación (ADR-021), navegación en pestañas de Admin (ADR-022) y Panel (ADR-023), fix "Null Pointer Regression" en el panel (ADR-024) y Separación Master Admin/Barrio R10 (ADR-025, código entregado, SQL de producción pendiente de ejecución — ver TSK-025) entregados en `admin.html`.
 *   **Framework de Coordinación:** **AI-DOS v1.2 (PM Hub Engine)**.
 *   **Estándar de Calidad:** Calidad Percibida de **$10,000** (Fidelidad de 1px, Afterglow visual, Geist 900).
 *   **URL Producción:** [https://hostalterraza.vercel.app](https://hostalterraza.vercel.app).

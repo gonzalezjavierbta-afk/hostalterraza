@@ -1,4 +1,4 @@
-# 🧬 BLUEPRINT.md — Arquitectura Técnica y Modelo de Datos (v1.6.1 — Contrato v112)
+# 🧬 BLUEPRINT.md — Arquitectura Técnica y Modelo de Datos (v1.6.2 — Contrato v112)
 
 Este documento constituye la **Única Fuente de Verdad** técnica del Sistema QR Hostal Terraza. Ninguna modificación estructural ni de esquema puede realizarse sin el Decision Protocol y la validación del Chief Architect.
 
@@ -42,6 +42,11 @@ Para garantizar la estabilidad estructural antes de la desincronización I/O de 
 
 ## 3. Modelo de Datos: Fuente de Verdad (Supabase)
 Backend centralizado con **Row Level Security (RLS)** para garantizar que ninguna organización acceda a datos de otra mediante el filtro obligatorio `org_id`.
+* **⚠️ Nota de auditoría (ADR-025):** confirmado contra la exportación real de `pg_policies` que esto es cierto para `eventos`, `series`, `inscritos`, `invitadores`, `clientes`, `logs`, `scanner_tokens`, `qr_links` vía las políticas `*_org` (`org_id = get_org_id()`). Sin embargo, varias de esas tablas conservan además políticas legacy permisivas (`auth.role()='authenticated'` o `true`, sin chequeo de `org_id`) que **no fueron retiradas** al migrar a las políticas `_org` y se combinan con ellas (OR, no reemplazo) — el aislamiento por `org_id` no está garantizado en la práctica hasta que se resuelva TSK-026. Ver `DECISIONS.md` ADR-025 para el detalle tabla por tabla.
+
+### 🗄️ Esquema de Tabla `organizaciones`
+* **Columna `is_master_org` (boolean, default `false`, ADR-025):** reemplaza la comparación de `slug === 'hostal-terraza'` como fuente de verdad de "es el operador del SaaS" (System Admin global). Solo la organización maestra (cáscara sin eventos propios, `slug: master-admin`) debe tener este flag en `true`. Gatea `_IS_SYSTEM_ADMIN()` y `applyRoleNav()` en `admin.html`, y las políticas RLS `insert_organizaciones`/`delete_organizaciones`.
+* **`slug`:** identificador único de la organización, editable, sin efecto en URLs públicas de eventos — `evento.html`/`serie.html` enlazan por `eventos.slug`/`series.slug` (el slug del evento o la serie), no por `organizaciones.slug`. Renombrar el slug de una organización es seguro para links ya distribuidos a asistentes.
 
 ### 🗄️ Esquema de Tabla `eventos` e `inscritos` (Normalizada)
 * **Tabla `eventos`:** Incluye `id`, `video_url` (fuente primaria plana), `template_id`, `categoria_slug`, `captura_pura` (boolean, ADR-021 — evento sin generación de QR tras el registro) y `config_landing` (jsonb para metadatos extendidos).

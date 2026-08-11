@@ -226,7 +226,28 @@
         }
 
 
-        // Escudo GOLD: Bypass de Caché para el silo atómico .tpl-c4
+        // Escudo GOLD: resolución del silo atómico (leer todos los templates sin editar este archivo).
+        // Prioridad: ?tpl=/&cat= (override manual) → evento.template_id/categoria_slug → fallback cine/c4.
+        const _THEME_TO_SILO = {
+            'arthouse':'c1', 'premiere-gold':'c2', 'neon-cult-cine':'c3', 'interactive-cine':'c4',
+            'tropical-hostel':'f1', 'rooftop-sunset':'f2', 'underground':'f3', 'elegant-cocktail':'f4',
+            'solidario-moderno':'b1', 'urgente-impactante':'b5', 'tech-futurista':'b2', 'vintage-organico':'b4'
+        };
+        const _CAT_TO_FOLDER = { 'cinematografia':'cine', 'fiesta':'fiesta', 'campana':'campana' };
+
+        function resolveTemplate(evento) {
+            const params = new URLSearchParams(window.location.search);
+            const tplParam = (params.get('tpl') || '').toLowerCase();
+            const catParam = (params.get('cat') || '').toLowerCase();
+            const rawTpl  = (evento && evento.template_id)  ? evento.template_id.toLowerCase()  : '';
+            const rawCat  = (evento && evento.categoria_slug) ? evento.categoria_slug.toLowerCase() : '';
+
+            const tpl = tplParam || (/^[cfb]\d+$/.test(rawTpl) ? rawTpl : (_THEME_TO_SILO[rawTpl] || 'c4'));
+            const cat = catParam || _CAT_TO_FOLDER[rawCat] || (tpl[0] === 'f' ? 'fiesta' : tpl[0] === 'b' ? 'campana' : 'cine');
+            return { cat, tpl };
+        }
+
+        // Escudo GOLD: Bypass de Caché para el silo atómico activo
         function injectAtomicCSS(cat, tplId) {
             return new Promise((resolve) => {
                 const timestamp = Date.now();
@@ -264,24 +285,51 @@
 
         async function initEvento() {
             logStatus("AUDITORÍA V107: Recuperación total del Póster y Blindaje Core.");
-
-            // Escudo GOLD: activación del ámbito del silo atómico Interactive Cine
-            document.body.classList.add('tpl-c4');
-            logStatus("DEBUG: Ámbito .tpl-c4 activado en body.", "DEBUG");
-
             const slug = new URLSearchParams(window.location.search).get('slug');
+
+            // Escudo GOLD: activación dinámica del ámbito del silo atómico.
+            // Resolución sin evento (override ?tpl=/&cat= o fallback cine/c4) para que el
+            // sandbox pueda previsualizar cualquier silo sin tocar la base de datos.
+            let res = resolveTemplate(null);
+            if (slug) {
+                try {
+                    const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
+                    if (error) throw error;
+                    res = resolveTemplate(evento);
+
+                    // PUENTE CROMÁTICO: 10% de acento desde --master-accent
+                    const primaryColor = evento.color_primario || evento.config_landing?.content?.accent_color;
+                    if (primaryColor) document.documentElement.style.setProperty('--master-accent', primaryColor);
+                    logStatus("DEBUG: Acento dinámico cedido a --master-accent.", "DEBUG");
+
+                    window.__evento = evento;
+                } catch (e) { logStatus(`ERROR: No se pudo resolver el evento: ${e.message}`, "ERROR"); }
+            }
+
+            const { cat, tpl } = res;
+            document.body.classList.add(`tpl-${tpl}`);
+            document.body.classList.add(`tpl-${tpl.toUpperCase()}`);
+            logStatus(`DEBUG: Ámbito .tpl-${tpl} activado en body (cat:${cat}).`, "DEBUG");
+
+            const cssLoadedOK = await injectAtomicCSS(cat, tpl);
+            if (!cssLoadedOK) logStatus("WARN: Degradación visible sin silo CSS.", "DEBUG");
+
+            // Revelar módulos (sandbox): sin slug se muestran todos para inspección visual.
+            const evento = window.__evento || {};
+            const content = evento.config_landing?.content || {};
+
+            if (!slug) {
+                Object.keys(SANDBOX_CONFIG).forEach(key => {
+                    const elId = (key==='faq'||key==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(key)) ? 'modulo-info-tecnica' : (key==='playlist'||key==='trailer'||key==='gallery') ? 'modulo-gallery' : `modulo-${key}`;
+                    const el = document.getElementById(elId);
+                    if (el) { el.style.display = 'block'; logStatus(`INFO: Módulo ${key.toUpperCase()} validado.`, "INFO"); }
+                });
+                logStatus(`TRACE: Escudo GOLD sellado — silo ${tpl} inyectado en modo preview (sin evento).`, "TRACE");
+                document.getElementById('loader').style.display = 'none';
+                return;
+            }
+
             try {
-                const { data: evento, error } = await sbClient.from('eventos').select('*').eq('slug', slug).single();
-                if (error) throw error;
-
-                // PUENTE CROMÁTICO: 10% de acento desde --master-accent
-                const primaryColor = evento.color_primario || evento.config_landing?.content?.accent_color;
-                if (primaryColor) document.documentElement.style.setProperty('--master-accent', primaryColor);
-                logStatus("DEBUG: Acento dinámico cedido a --master-accent.", "DEBUG");
-
-                const cssLoadedOK = await injectAtomicCSS('cine', 'c4');
-                if (!cssLoadedOK) logStatus("WARN: Degradación visible sin silo CSS.", "DEBUG");
-               
                 const target = new Date(`${evento.fecha}T${evento.hora}`).getTime();
                 setInterval(() => {
                     const diff = target - new Date().getTime();
@@ -301,9 +349,6 @@
                 document.getElementById('meta-hora').innerText = `${evento.hora} HRS`;
                 document.getElementById('meta-lugar').innerText = (evento.ubicacion || 'LOCALIZACIÓN').toUpperCase();
                 if (evento.imagen_url) document.getElementById('hero-bg').style.backgroundImage = `url('${evento.imagen_url}')`;
-
-
-                const content = evento.config_landing?.content || {};
 
 
                 // 3. Media Sync v97
@@ -360,7 +405,7 @@
 
                 // Escudo GOLD: TRACE de cierre — silo atómico y Grid Atómico sellados
                 const activeModules = Object.keys(SANDBOX_CONFIG).filter(k => document.getElementById((k==='faq'||k==='ubicacion') ? 'modulo-faq-ubicacion' : (['dress_code','guest_list','aforo'].includes(k)) ? 'modulo-info-tecnica' : (k==='playlist'||k==='trailer'||k==='gallery') ? 'modulo-gallery' : `modulo-${k}`)).length;
-                logStatus(`TRACE: Escudo GOLD sellado — silo c4 inyectado, ${activeModules}/${Object.keys(SANDBOX_CONFIG).length} módulos activos en #main-content-flow.`, "TRACE");
+                logStatus(`TRACE: Escudo GOLD sellado — silo ${tpl} inyectado, ${activeModules}/${Object.keys(SANDBOX_CONFIG).length} módulos activos en #main-content-flow.`, "TRACE");
 
 
             } catch (err) { logStatus(`ERROR CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }

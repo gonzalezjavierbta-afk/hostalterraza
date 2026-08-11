@@ -1,10 +1,16 @@
-# 🚀 NEXT.md — Estado de Relevo y Próximos Pasos (v1.13-FIX)
+# 🚀 NEXT.md — Estado de Relevo y Próximos Pasos (v1.14-FIX)
 
 Este documento define el punto de control estratégico y las directrices para la continuación inmediata del desarrollo. Es la hoja de ruta obligatoria para cualquier IA o agente que retome el proyecto para asegurar la fidelidad de 1px y la integridad del núcleo.
 
 ---
 
-#### -2. Hito Más Reciente — Fix "Null Pointer Regression" (ADR-024)
+#### -3. Hito Más Reciente — Separación Master Admin vs. Barrio R10 (ADR-025)
+*   **Qué se corrigió:** Barrio R10 (slug `hostal-terraza`) operaba a la vez como cliente regular y como identidad de System Admin global del SaaS, porque `_IS_SYSTEM_ADMIN()` y `applyRoleNav()` comparaban el slug directamente. Se reemplazó por una columna `organizaciones.is_master_org boolean`, se creó una org maestra nueva ("SaaS Master Admin", cáscara sin eventos propios) y Barrio R10 pasa a ser cliente regular (mismo `org_id`, solo cambia `slug` → `barrio-r10`). Corte directo, sin fallback temporal (mandato de Dirección). Ver `DECISIONS.md` ADR-025.
+*   **Auditoría previa (antes de tocar código o SQL):** grep completo de `admin.html`, `index.html`, `qr.html`, `evento.html`, `evento3.html`, `registro.html`, `scanner.html`, `serie.html` — solo 3 referencias reales al slug hardcodeado, las 3 en `admin.html`. Se validó contra la exportación real de `pg_policies` (no contra suposición) que solo `insert_organizaciones`/`delete_organizaciones` dependían del slug a nivel de Postgres — `eventos`/`inscritos`/`perfiles` se aíslan por `org_id`, no por slug.
+*   **⚠️ Hallazgo colateral, NO corregido en esta sesión (TSK-026):** la misma auditoría de `pg_policies` reveló políticas legacy permisivas en `eventos`, `clientes` y `perfiles` que conceden acceso cross-tenant a *cualquier* cliente autenticado (no solo a Barrio R10) porque conviven sin excluirse con las políticas correctas `org_id = get_org_id()`. Es un riesgo de seguridad más amplio que el problema original de Barrio R10, y requiere su propio Context Package — no se tocó porque estaba fuera del mandato explícito de esta sesión. Ver `DECISIONS.md` ADR-025, diagnóstico punto 3.
+*   **Pendiente de ejecución (no ejecutable por la IA):** correr `migrations/adr025_master_admin_separation.sql` contra Supabase real (incluye pasos manuales de Dashboard para crear el nuevo login operativo de Barrio R10). Hasta que esto se ejecute, `admin.html` en producción seguiría funcionando igual que antes solo si la columna `is_master_org` no existe todavía — **desplegar el código de `admin.html` y ejecutar el SQL deben ir juntos**, no por separado, o la org maestra quedará sin acceso al Panel de Sistema.
+
+#### -2. Hito Anterior — Fix "Null Pointer Regression" (ADR-024)
 *   **Qué se corrigió:** el panel se bloqueaba por completo para organizaciones con registros de `inscritos` incompletos (caso "Barrio R10": `nombre`/`evento_nombre` en `NULL`), porque `_renderTablaPagina()` usaba `.replace()` sin blindar sobre esos campos. **Confirmado que no es regresión de ADR-023** — bug preexistente que esa organización disparó primero. Se corrigió con el patrón Silent Fallback (`(campo||'')`) y, preventivamente, se blindó también `evStats` en `renderPanel()` (mismo riesgo, aún no disparado). Log TRACE agregado. Ver `DECISIONS.md` ADR-024.
 *   **Entregado además:** `migrations/adr024_audit_nulls_inscritos.sql` (solo lectura) para ubicar qué otros registros/organizaciones tienen campos incompletos — incluye nota de que algunos `NULL` en `inscritos` son legítimos por diseño (campos de Fase 2 de `b5`), no corregir a ciegas con `UPDATE` masivo.
 *   **⚠️ Alcance no cubierto, pendiente de priorización (TSK-023):** el mismo patrón de riesgo podría existir en `renderEventos()`/`renderInvitadoresPerfil()` (Admin) y en el resto del archivo no auditado — el mandato de esta sesión se limitó explícitamente a `_renderTablaPagina` y subfunciones de `renderPanel`.
@@ -37,6 +43,8 @@ Para mantener el control del proyecto y la trazabilidad, se debe seguir esta sec
 4.  **Asunción de Roles:** Asumir estrictamente el rol asignado según la **Matriz de Capacidades de AI-DOS v1.2**.
 
 #### 3. Próximos Objetivos Operativos (Sincronía con TASKS.md)
+*   **Prioridad -1 (TSK-025, ⚠️ bloqueante — desplegar junto con el código, no por separado):** Ejecutar `migrations/adr025_master_admin_separation.sql` en Supabase. El código de `admin.html` ya asume que `is_master_org` existe — si se despliega el HTML sin correr el SQL primero, la org maestra se queda sin acceso al Panel de Sistema.
+*   **Prioridad -1b (TSK-026, hallazgo de auditoría de ADR-025):** Evaluar y retirar las políticas RLS legacy permisivas en `eventos`/`clientes`/`perfiles` que permiten acceso cross-tenant a cualquier cliente autenticado — ver `DECISIONS.md` ADR-025, diagnóstico punto 3.
 *   **Prioridad 0 (TSK-017, ⚠️ bloqueante para dar por cerrado ADR-021):** Reconciliar si `evento.html` (al que apunta el link público de `admin.html`) es el mismo motor que `evento3.html` ("El Cerebro" según `BLUEPRINT.md` §1) — de esto depende si `template_id`/`categoria_slug` tienen efecto visual real.
 *   **Prioridad 0b (TSK-016, TSK-018):** Consumir `captura_pura` en `evento.html` y ejecutar `migrations/adr021_eventos_columns.sql` en Supabase.
 *   **Prioridad 1 (TSK-010):** Verificación y despliegue del esquema de base de datos en Supabase para la tabla inscritos (incorporando las columnas críticas: `whatsapp`, `tipo_ayuda`, `autorizacion` y el contenedor `respuestas_custom` en JSONB).
@@ -44,7 +52,8 @@ Para mantener el control del proyecto y la trazabilidad, se debe seguir esta sec
 *   **Prioridad 3:** Retomar las tareas estratégicas de monetización e infraestructura (`TSK-001` Integración Wompi y `TSK-002` Edge Function de webhook).
 
 #### 4. Riesgos Activos y Restricciones a Preservar (STRICT)
-*   **Slug Hardcodeado:** El identificador `'hostal-terraza'` es el único que asigna permisos de System Admin global. No modificar esta cadena en filtros RLS ni guardas de navegación.
+*   **Identidad de System Admin (ADR-025):** desde este ADR, `organizaciones.is_master_org = true` es la única fuente de verdad para permisos de System Admin global — no un slug. No reintroducir comparaciones de slug hardcodeado en filtros RLS ni guardas de navegación. Barrio R10 (`slug: barrio-r10`) es cliente regular; la org maestra es `slug: master-admin`.
+*   **RLS Legacy Cross-Tenant (TSK-026, nuevo):** hasta que se resuelva, cualquier cliente autenticado (no solo la org maestra) puede leer/escribir `eventos`/`clientes`/`perfiles` de otras organizaciones vía políticas permisivas legacy que no fueron retiradas al añadir las políticas `org_id = get_org_id()`. No asumir que el aislamiento multi-tenant está garantizado solo porque existen las políticas `_org` correctas — coexisten con las legacy.
 *   **Cumplimiento CSP de Vercel:** Prohibido introducir librerías que ejecuten `eval()` o `new Function()`. El estándar de referencia para QRs es `qr-creator`.
 *   **Estabilidad de Supabase:** Mantener los websockets de **Realtime deshabilitados** para prevenir bloqueos en la interfaz; usar polling o reconsultas manuales.
 *   **Asunciones de Base de Datos:** El núcleo de `eventovenezuela.html` asume la existencia de las nuevas columnas de la v110 en la tabla `inscritos`; cualquier desajuste interrumpirá la Fase 2 del flujo de conversión.

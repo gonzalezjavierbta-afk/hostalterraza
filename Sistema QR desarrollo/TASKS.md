@@ -1,14 +1,19 @@
-📂 TASKS.md — Tablero Operativo (v1.13-FIX)
+📂 TASKS.md — Tablero Operativo (v1.14-FIX)
 ### TASKS.md — Tablero Operativo de Tareas
 #### Estado General
 *   **Proyecto:** Sistema QR Hostal Terraza
-*   **Checkpoint Actual:** v1.6.3-FIX / Contrato v112 (ADR-021 Wizard + ADR-022 Nav. Admin + ADR-023 Nav. Panel + ADR-024 Null Fix)
+*   **Checkpoint Actual:** v1.6.4-FIX / Contrato v112 (ADR-021 Wizard + ADR-022 Nav. Admin + ADR-023 Nav. Panel + ADR-024 Null Fix + ADR-025 Separación Master Admin)
 *   **Sprint Activo:** Sprint 1 — Monetización SaaS, Automatización y Conversión de Emergencia
-*   **Última Actualización:** 9 de agosto de 2026
+*   **Última Actualización:** 10 de agosto de 2026
 
 --------------------------------------------------------------------------------
 
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
+
+**Separación Master Admin / Barrio R10 (ADR-025) — Pendientes de cierre**
+- [x] **TSK-024 | Chief Architect (Claude):** Código en `admin.html` — reemplazadas las 3 referencias a `slug === 'hostal-terraza'` por `is_master_org === true` (`_IS_SYSTEM_ADMIN()`, `applyRoleNav()`, comentario de `_orgOriginal`). Corte directo sin fallback (mandato de Dirección). Estado: **Completado ✅** en código, 7973→7973 líneas (sin adiciones/eliminaciones fuera de las 3 líneas tocadas). Ver `DECISIONS.md` ADR-025.
+- [ ] **TSK-025 | Dirección / Lead Developer:** Ejecutar `migrations/adr025_master_admin_separation.sql` contra la instancia real de Supabase — columna `is_master_org`, creación de la org "SaaS Master Admin", reasignación del login actual a la org maestra, alta del nuevo login operativo de Barrio R10, y reescritura de las políticas `insert_organizaciones`/`delete_organizaciones`. Incluye pasos manuales de Supabase Dashboard (creación de usuario) que no pueden ejecutarse por SQL puro.
+- [ ] **TSK-026 | Chief Architect (⚠️ hallazgo de auditoría, prioridad alta, fuera del mandato de ADR-025):** Revisar y retirar las políticas RLS legacy permisivas detectadas en `eventos` (`"Admins escriben eventos"`, ALL sin chequeo de `org_id`), `clientes` (`"Clientes acceso total autenticado"`, ALL sin ningún chequeo) y `perfiles` (`is_superadmin()` sin acotar por organización + `org_perfiles_update` sin `WITH CHECK` que impida auto-escalación de `rol`/`org_id`) — hoy permiten a cualquier cliente autenticado, no solo a Barrio R10, leer/escribir datos de otras organizaciones. Requiere su propio Context Package. Ver diagnóstico completo en `DECISIONS.md` ADR-025.
 
 **Wizard Inteligente (ADR-021) — Pendientes de cierre**
 - [ ] **TSK-016 | Lead Developer:** Modificar `evento.html` para leer la nueva columna `captura_pura`: si es `true`, omitir la generación/render del QR tras el registro y mostrar un mensaje de agradecimiento personalizado en su lugar. No se pudo implementar en la sesión de ADR-021 porque `evento.html` no formaba parte de los archivos subidos.
@@ -53,4 +58,4 @@
 - [ ] **TSK-009 | QA / Chief Architect:** Generación e integración de tickets digitales para Apple Wallet (.pkpass) y Google Wallet.
 
 --------------------------------------------------------------------------------
-*TRACE: Sincronía técnica [v1.13-FIX] sellada. Wizard Inteligente (ADR-021), navegación de Admin (ADR-022), navegación de Panel (ADR-023) y fix "Null Pointer Regression" (ADR-024) integrados; TSK-016/017/018/023 en cola. Documentación integrada y análisis de ingeniería entregado.*
+*TRACE: Sincronía técnica [v1.14-FIX] sellada. Wizard Inteligente (ADR-021), navegación de Admin (ADR-022), navegación de Panel (ADR-023), fix "Null Pointer Regression" (ADR-024) y Separación Master Admin/Barrio R10 (ADR-025, código completado, SQL pendiente de ejecución) integrados; TSK-016/017/018/023/025/026 en cola. Documentación integrada y análisis de ingeniería entregado.*

@@ -2413,6 +2413,18 @@ const _THEME_TYPE = {
   'tech-futurista':'campana','vintage-organico':'campana',
 };
 
+// Silo Atómico: traducción theme → silo (BLUEPRINT.md §1). El template se identifica
+// como cine c1 (NUNCA 'arthouse'); la ruta resultante es css/templates/cine/c1.css.
+const _THEME_SILO = {
+  'arthouse':'c1','premiere-gold':'c2','neon-cult-cine':'c3','interactive-cine':'c4',
+  'tropical-hostel':'f1','rooftop-sunset':'f2','underground':'f3','elegant-cocktail':'f4',
+  'solidario-moderno':'b1','urgente-impactante':'b5','tech-futurista':'b2','vintage-organico':'b4',
+};
+// Categoría → carpeta física de silos (carpeta 'cine', no 'cinematografia').
+const _CAT_FOLDER = { 'cinematografia':'cine', 'fiesta':'fiesta', 'campana':'campana' };
+const _siloDe = theme => _THEME_SILO[theme] || theme || null;
+const _carpetaDe = cat => _CAT_FOLDER[cat] || cat || null;
+
 function seleccionarTheme(theme) {
   _ldThemeSeleccionado = theme;
 
@@ -2820,7 +2832,7 @@ let _gaConteos = {};
 let _gaOrgEdit = null;
 
 const _IS_SYSTEM_ADMIN = () =>
-  currentPerfil?.rol === 'superadmin' && _orgData?.slug === 'hostal-terraza';
+  currentPerfil?.rol === 'superadmin' && _orgData?.is_master_org === true; // ADR-025: reemplaza match de slug hardcodeado
 
 // ── Tabs ──────────────────────────────────────────────
 function gaTab(tab) {
@@ -3013,7 +3025,7 @@ async function verDetalleOrg(orgId) {
 
 // ── Crear organización ────────────────────────────────
 // ══ MODO OPERAR COMO ORG (system admin entra a cuenta de cliente) ══
-let _orgOriginal = null; // guarda la org de hostal-terraza mientras opera como cliente
+let _orgOriginal = null; // guarda la org maestra (is_master_org=true) mientras opera como cliente — ADR-025
 
 function entrarComoOrg(orgId) {
   const org = _gaOrgs.find(o => o.id === orgId);
@@ -4574,8 +4586,9 @@ async function _crearEventoUnico(n) {
     // ADR-021 — antes solo vivían dentro de config_landing (JSON); BLUEPRINT.md ya los
     // documentaba como columnas de 'eventos' pero el INSERT nunca los escribía
     // (ver ERRORES_HISTORICOS.md §8). Requiere la migración de /migrations/adr021.sql.
-    template_id:    _ldThemeSeleccionado || null,
-    categoria_slug: _evCategoria || null,
+    // Silo Atómico: se persiste el silo ('c1') y la carpeta ('cine'), no el slug del theme.
+    template_id:    _siloDe(_ldThemeSeleccionado),
+    categoria_slug: _carpetaDe(_evCategoria),
     captura_pura:   _evCapturaPura,
     org_id:    ORG_ID,
   }).select().single();
@@ -4660,9 +4673,10 @@ async function _crearSerie(n) {
         nota:   document.getElementById('ev-campo-nota')?.checked ?? false,
         custom: getCamposCustom(),
       },
-      // ADR-021 — mismo fix de persistencia que _crearEventoUnico (ver ERRORES_HISTORICOS.md §8)
-      template_id:    _ldThemeSeleccionado || null,
-      categoria_slug: _evCategoria || null,
+      // ADR-021 — mismo fix de persistencia que _crearEventoUnico (ver ERRORES_HISTORICOS.md §8).
+      // Silo Atómico: se persiste el silo ('c1') y la carpeta ('cine'), no el slug del theme.
+      template_id:    _siloDe(_ldThemeSeleccionado),
+      categoria_slug: _carpetaDe(_evCategoria),
       captura_pura:   _evCapturaPura,
       org_id: ORG_ID,
     });
@@ -7374,7 +7388,7 @@ async function onLogin(user) {
 function applyRoleNav(rol) {
   const isSuperAdmin  = rol === 'superadmin';
   const isAdminEvento = rol === 'admin_evento';
-  const isSystemAdmin = isSuperAdmin && _orgData?.slug === 'hostal-terraza';
+  const isSystemAdmin = isSuperAdmin && _orgData?.is_master_org === true; // ADR-025: reemplaza match de slug hardcodeado
 
   // Nav tabs — Puerta y Usuarios visibles para CUALQUIER superadmin o admin_evento
   document.getElementById('nav-clientes').style.display  = isSuperAdmin ? '' : 'none';
