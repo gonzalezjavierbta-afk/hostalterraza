@@ -1266,10 +1266,14 @@
     .tpl-b5 .meta-item { border-right: none !important; border-bottom: 1px solid var(--b5-line); padding: 0.8rem 0 !important; }
     .tpl-b5 .meta-item:last-child { border-bottom: none; }
 
-    /* 4. AJUSTE DE HISTORIA Y VIDEO */
-    .tpl-b5 .historia-item--conimg { display: flex !important; flex-direction: column !important; }
-    .tpl-b5 .historia-item-body { order: 1 !important; }
-    .tpl-b5 .historia-item-img  { order: 2 !important; width: 100% !important; aspect-ratio: 16/9 !important; margin-top: 1rem; }
+    /* 4. AJUSTE DE HISTORIA Y VIDEO
+       Número y título en UNA línea (Director, ago-2026): en una columna el
+       item--conimg era flex column (número arriba, subtítulo abajo). Ahora es
+       flex-wrap: row: línea 1 = [número] [body (título + texto)], y la imagen
+       (flex-basis 100%) se envuelve a su propia línea debajo. */
+    .tpl-b5 .historia-item--conimg { display: flex !important; flex-wrap: wrap !important; }
+    .tpl-b5 .historia-item-body { order: 1 !important; flex: 1 1 0% !important; min-width: 0 !important; }
+    .tpl-b5 .historia-item-img  { order: 2 !important; flex: 0 0 100% !important; width: 100% !important; aspect-ratio: 16/9 !important; margin-top: 1rem; }
     .tpl-b5 .b5-video-col--gallery { order: 1 !important; }
     .tpl-b5 .b5-video-col--video   { order: 2 !important; padding-top: 3rem !important; }
 }
