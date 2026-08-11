@@ -1464,14 +1464,21 @@
 
 /* ============================================================================
    19. CAPA MOBILE CORREGIDA (iPhone SE / viewports angostos) — ADR-026
-   Resuelve dos solapamientos reales en pantallas pequeñas (reportado en
-   375x667, aplicable a todo el rango mobile):
-   1) El bloque "CAPA MOBILE RECTIFICADA" (Sección 16, max-width:899px)
-      elevaba #mod-hero-meta con `margin:-22rem !important`, empujando la caja
-      meta 352px hacia arriba sobre el Hero — justo donde vive #event-description
-      (con .hero-content margin-top:9vh) — cubriendo el texto de descripción.
-      Se reduce a -2rem: elevación sutil de "card flotante" sobre el borde del
-      hero, sin tocar la descripción (estética ratificada por Dirección).
+   Resuelve dos defectos reales en pantallas pequeñas (reportado en 375x667,
+   aplicable a todo el rango mobile):
+   1) SOLUCIÓN B (ratificada por Dirección tras screenshot en 375x667):
+      el bloque "CAPA MOBILE RECTIFICADA" (Sección 16, max-width:899px)
+      elevaba #mod-hero-meta con `margin:-22rem !important`, cubriendo la
+      descripción. Un -2rem intermedio dejaba el cuerpo del meta (transparente,
+      texto blanco) por debajo del borde del Hero, sobre el fondo claro de la
+      página / la caja blanca del form -> texto blanco sobre claro, "fondo
+      blanco" percibido. Solución: se conserva la TRANSPARENCIA y el texto
+      blanco (Mandato de Transparencia Real), pero el meta se ancla sobre la
+      zona baja del Hero con `margin:-40vh`, el Hero sube a `min-height:100svh`
+      y la descripción se eleva (.hero-content 6vh / .hero-description 2.5rem)
+      para que TODO el cuerpo del meta quede sobre el área oscura del hero y
+      nada blanco quede detrás. Margen en vh => escala con la altura de la
+      pantalla (robusto en SE, iPhone 12/13, Pixel). Ajuste único: -40vh.
    2) En max-width:640px, #mod-form ganaba `z-index:40 !important` +
       position:relative, y .form-master-box `margin:-4vh auto !important`;
       combinado con el `margin-top:-1rem !important` de #mod-impacto-humanitario
@@ -1484,10 +1491,22 @@
    Ver DECISIONS.md ADR-026 para causa raíz completa y auditoría de cascada.
    ============================================================================ */
 @media (max-width: 899px) {
+    .tpl-b5 #mod-hero {
+        min-height: 100svh !important;          /* más área oscura para el meta (Solución B) */
+        min-height: 100vh !important;
+    }
+    .tpl-b5 .hero-content {
+        margin-top: 6vh !important;             /* sube la descripción (antes 9vh/35vh) */
+    }
+    .tpl-b5 .hero-description {
+        margin-top: 2.5rem !important;          /* menos respiro: desc justo bajo el título */
+    }
     .tpl-b5 #mod-hero-meta {
-        margin: -2rem auto 0 auto !important;
-        width: calc(100% - 2.5rem) !important;
-        padding: 1.2rem 1rem !important;
+        margin: -40vh 0 0 0 !important;         /* ancla el meta en la zona baja del hero */
+        width: 100% !important;
+        padding: 1rem 1.5rem !important;
+        z-index: 10;
+        /* background transparente y texto blanco: se conservan del bloque rectificada */
     }
 }
 
