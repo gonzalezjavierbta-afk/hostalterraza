@@ -72,7 +72,9 @@
         "hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero        hero"
         "meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta        meta"
         "form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form        form"
-        "crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisismap   crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats"
+        "crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats crisisstats"
+        "crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisismap-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla crisistext-vzla"
+        "crisistext-col crisistext-col crisistext-col crisistext-col crisistext-col crisistext-col crisistext-col crisistext-col crisistext-col crisistext-col crisismap-col crisismap-col crisismap-col crisismap-col crisismap-col crisismap-col crisismap-col crisismap-col crisismap-col crisismap-col"
         "comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar  comoayudar"
         "historia    historia    historia    historia    historia    historia    historia    historia    historia    historia    historia    impactohist impactohist impactohist impactohist impactohist impactohist impactohist impactohist impactohist"
         "video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video       video"
@@ -87,8 +89,11 @@
 .tpl-b5 #mod-hero          { grid-area: hero; }
 .tpl-b5 #mod-hero-meta     { grid-area: meta; }
 .tpl-b5 #mod-form          { grid-area: form; }
-.tpl-b5 #mod-mapa-crisis   { grid-area: crisismap; }
 .tpl-b5 #mod-impacto-humanitario { grid-area: crisisstats; }
+.tpl-b5 #mod-mapa-crisis   { grid-area: crisismap-vzla; }
+.tpl-b5 #crisistext-vzla   { grid-area: crisistext-vzla; }
+.tpl-b5 #mod-mapa-crisis-col { grid-area: crisismap-col; }
+.tpl-b5 #crisistext-col    { grid-area: crisistext-col; }
 .tpl-b5 #mod-como-ayudar   { grid-area: comoayudar; }
 .tpl-b5 #mod-historia      { grid-area: historia; }
 .tpl-b5 #mod-impacto-historico { grid-area: impactohist; }
@@ -107,7 +112,8 @@
     .tpl-b5 #main-content-flow {
         grid-template-columns: 1fr;
         grid-template-areas:
-            "hero" "meta" "form" "crisismap" "crisisstats" "comoayudar"
+            "hero" "meta" "form" "crisisstats" "crisismap-vzla" "crisistext-vzla"
+            "crisismap-col" "crisistext-col" "comoayudar"
             "historia" "impactohist" "video" "actualiz" "faq" "ubicacion" "ctafinal" "footer";
     }
 }
@@ -116,7 +122,10 @@
 .tpl-b5 #mod-impacto-humanitario,
 .tpl-b5 #mod-impacto-historico,
 .tpl-b5 #mod-como-ayudar,
-.tpl-b5 #mod-mapa-crisis { display: block !important; }
+.tpl-b5 #mod-mapa-crisis,
+.tpl-b5 #mod-mapa-crisis-col,
+.tpl-b5 #crisistext-vzla,
+.tpl-b5 #crisistext-col { display: block !important; }
 
 /* #mod-video (v222): ya no es "bloque sobre flex" — pasa a Grid con pistas 1fr
    fijas (no auto/max-content), que NO se colapsan a 0px con hijos vacíos antes
@@ -363,10 +372,14 @@
    5. ESTADO DE EMERGENCIA — mapa-crisis + impacto (comparten fila)
    ============================================================================ */
 .tpl-b5 #mod-mapa-crisis,
+.tpl-b5 #mod-mapa-crisis-col,
+.tpl-b5 #crisistext-vzla,
+.tpl-b5 #crisistext-col,
 .tpl-b5 #mod-impacto-humanitario {
     padding: 3.5rem 1.5rem 3rem;
 }
 .tpl-b5 #mod-mapa-crisis { padding-right: 1.2rem; }
+.tpl-b5 #mod-mapa-crisis-col { padding-left: 1.2rem; }
 .tpl-b5 #mod-impacto-humanitario { padding-left: 1.2rem; }
 .tpl-b5 #mod-impacto-humanitario #db-impacto-grid { grid-template-columns: 1fr 1fr; max-width: none; margin: 0; }
 
@@ -404,6 +417,42 @@
 /* "(en tiempo real)" retirado visualmente del eyebrow de la sección 02;
    el nodo <em> permanece en el DOM (Cero Borrado). */
 .tpl-b5 .mapacrisis-eyebrow em { display: none !important; }
+
+/* ============================================================================
+   5b. TEXTOS DESCRIPCIÓN VENEZUELA / COLOMBIA (Fila 02 y 03)
+   ============================================================================ */
+.tpl-b5 #crisistext-vzla,
+.tpl-b5 #crisistext-col {
+    padding: 3.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.tpl-b5 .crisis-titulo {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    text-transform: uppercase;
+    color: var(--b5-ink);
+    margin: 0 0 1.2rem;
+    letter-spacing: -0.01em;
+}
+.tpl-b5 .crisis-texto {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--b5-ink-soft);
+    margin: 0;
+}
+
+/* ============================================================================
+   5c. MAPA DE CRISIS COLOMBIA — espejo horizontal
+   ============================================================================ */
+.tpl-b5 .mapacrisis-svg-wrap--col svg {
+    transform: scaleX(-1);
+}
+.tpl-b5 .mc-pulse--col {
+    animation: b5-mapPulse 2.4s ease-out infinite;
+}
 
 /* ============================================================================
    5b. INSIGNIA NUMERADA (v222) — cabecera compartida por toda sección numerada
@@ -921,7 +970,7 @@
 @media (max-width: 899px) {
     .tpl-b5 .hero-nav { display: none; } /* en mobile el mockup usa menú hamburguesa; fuera de alcance de este pase */
     .tpl-b5 .footer-inner { grid-template-columns: 1fr 1fr; }
-    .tpl-b5 #mod-mapa-crisis, .tpl-b5 #mod-impacto-humanitario { padding-top: 2.5rem; }
+    .tpl-b5 #mod-mapa-crisis, .tpl-b5 #mod-mapa-crisis-col, .tpl-b5 #crisistext-vzla, .tpl-b5 #crisistext-col, .tpl-b5 #mod-impacto-humanitario { padding-top: 2.5rem; }
     .tpl-b5 .impacto-valor { font-size: 2.4rem; }
     .tpl-b5 #db-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .tpl-b5 .impactohist-grid { grid-template-columns: 1fr 1fr; }
@@ -1229,17 +1278,20 @@
     .tpl-b5 #mod-hero                { order: 1 !important; min-height: 90vh !important; }
     .tpl-b5 #mod-hero-meta           { order: 2 !important; margin: -5rem auto 3rem !important; width: 95% !important; }
     .tpl-b5 #mod-form                { order: 3 !important; padding: 1rem 0 !important; }
-    .tpl-b5 #mod-mapa-crisis         { order: 4 !important; }
-    .tpl-b5 #mod-impacto-humanitario { order: 5 !important; }
-    .tpl-b5 #mod-como-ayudar         { order: 6 !important; }
-    .tpl-b5 #mod-historia            { order: 7 !important; }
-    .tpl-b5 #mod-impacto-historico   { order: 8 !important; }
-    .tpl-b5 #mod-video               { order: 9 !important; display: flex !important; flex-direction: column !important; }
-    .tpl-b5 #mod-actualizaciones     { order: 10 !important; }
-    .tpl-b5 #mod-faq                 { order: 11 !important; }
-    .tpl-b5 #mod-ubicacion           { order: 12 !important; }
-    .tpl-b5 #mod-cta-final           { order: 13 !important; }
-    .tpl-b5 #mod-footer              { order: 14 !important; }
+    .tpl-b5 #mod-impacto-humanitario { order: 4 !important; }
+    .tpl-b5 #mod-mapa-crisis         { order: 5 !important; }
+    .tpl-b5 #crisistext-vzla         { order: 6 !important; }
+    .tpl-b5 #crisistext-col          { order: 7 !important; }
+    .tpl-b5 #mod-mapa-crisis-col     { order: 8 !important; }
+    .tpl-b5 #mod-como-ayudar         { order: 9 !important; }
+    .tpl-b5 #mod-historia            { order: 10 !important; }
+    .tpl-b5 #mod-impacto-historico   { order: 11 !important; }
+    .tpl-b5 #mod-video               { order: 12 !important; display: flex !important; flex-direction: column !important; }
+    .tpl-b5 #mod-actualizaciones     { order: 13 !important; }
+    .tpl-b5 #mod-faq                 { order: 14 !important; }
+    .tpl-b5 #mod-ubicacion           { order: 15 !important; }
+    .tpl-b5 #mod-cta-final           { order: 16 !important; }
+    .tpl-b5 #mod-footer              { order: 17 !important; }
 
     /* 3. COLAPSO DE SUB-GRILLAS INTERNAS */
     .tpl-b5 #mod-hero-meta,
@@ -1331,7 +1383,8 @@
     }
 
     /* 1. Reducimos el respiro inferior del mapa circular */
-    .tpl-b5 #mod-mapa-crisis {
+    .tpl-b5 #mod-mapa-crisis,
+    .tpl-b5 #mod-mapa-crisis-col {
         padding-bottom: 2.5rem !important; 
     }
 

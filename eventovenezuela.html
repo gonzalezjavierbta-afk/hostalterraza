@@ -423,6 +423,30 @@
             </div>
         </section>
 
+        <!-- TEXTO DESCRIPCIÓN VENEZUELA (Fila 02, columna derecha) -->
+        <section id="crisistext-vzla">
+            <h3 class="crisis-titulo">EMERGENCIA VENEZUELA</h3>
+            <p class="crisis-texto">El 24 de junio de 2026, dos terremotos masivos de 7.2 y 7.5 Mw devastaron el norte de Venezuela, dejando a La Guaira y Catia La Mar en zona de desastre estructural. Con un balance de 5,546 fallecidos y 16,740 heridos, la ONU estima que 50,000 personas siguen desaparecidas bajo los escombros en un contexto de colapso hospitalario y de servicios básicos. Actualmente, 10,702 damnificados permanecen en campamentos transitorios, mientras la comunidad internacional exige transparencia informativa para coordinar la ayuda urgente a los 6.7 millones de afectados.</p>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: MAPA DE CRISIS COLOMBIA (espejo horizontal) -->
+        <section id="mod-mapa-crisis-col">
+            <div class="mapacrisis-inner">
+                <span class="b5-num-eyebrow mapacrisis-eyebrow" data-num="03">Estado de emergencia Colombia</span>
+                <div id="db-mapa-crisis-svg-col" class="mapacrisis-svg-wrap mapacrisis-svg-wrap--col"></div>
+                <div class="mapacrisis-legend">
+                    <span><i class="mapacrisis-dot mapacrisis-dot--epicentro"></i>Epicentro</span>
+                    <span><i class="mapacrisis-dot mapacrisis-dot--zona"></i>Zona afectada</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEXTO DESCRIPCIÓN COLOMBIA (Fila 03, columna izquierda) -->
+        <section id="crisistext-col">
+            <h3 class="crisis-titulo">EMERGENCIA COLOMBIA</h3>
+            <p class="crisis-texto">El 10 de agosto de 2026, un terremoto de 7.4 Mw sacudió el centro y occidente de Colombia, con epicentro en San José del Palmar, Chocó, a una profundidad de 96 km. Con un balance preliminar de 132 fallecidos y 570 heridos, el sismo provocó daños en viviendas y edificaciones de Chocó, Valle del Cauca, Risaralda y Caldas, mientras continúan las labores de búsqueda, rescate y evaluación de las zonas afectadas. Más de 1.500 viviendas han sido reportadas con daños, en una emergencia que continúa evolucionando y requiere coordinación para atender las necesidades de las comunidades afectadas.</p>
+        </section>
+
         <!-- MÓDULO EXTENDIDO: CÓMO AYUDAR (categorías de colaboración) -->
         <section id="mod-como-ayudar">
             <div class="comoayudar-inner">
@@ -1164,6 +1188,29 @@ if (resumenEl) {
         }
     }
     // === FIN SEGMENTO MAPA DE CRISIS ===
+
+    // === INICIO SEGMENTO: MAPA DE CRISIS COLOMBIA (espejo horizontal) ===
+    const mapaCrisisSvgColEl = document.getElementById('db-mapa-crisis-svg-col');
+    if (mapaCrisisSvgColEl) {
+        mapaCrisisSvgColEl.innerHTML = `
+            <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visualización ilustrativa de la zona de emergencia en Colombia">
+                <circle cx="205" cy="85" r="130" class="mc-ring mc-ring--outer"/>
+                <circle cx="205" cy="85" r="90" class="mc-ring mc-ring--mid"/>
+                <circle cx="205" cy="85" r="50" class="mc-ring mc-ring--inner"/>
+                <g class="mc-dots">
+                    <circle cx="185" cy="95" r="3.5"/>
+                    <circle cx="175" cy="105" r="4"/>
+                    <circle cx="205" cy="98" r="3.5"/>
+                    <circle cx="190" cy="115" r="3"/>
+                    <circle cx="160" cy="95" r="4"/>
+                    <circle cx="215" cy="110" r="3.5"/>
+                </g>
+                <circle cx="205" cy="85" r="6" class="mc-epicentro"/>
+                <circle cx="205" cy="85" r="6" class="mc-pulse mc-pulse--col"/>
+            </svg>`;
+        logStatus("TRACE: Mapa de crisis COLOMBIA (espejo) inyectado.", "TRACE");
+    }
+    // === FIN SEGMENTO MAPA DE CRISIS COLOMBIA ===
 
     // === INICIO SEGMENTO: CÓMO AYUDAR — nuevo átomo v221 (Contrato v109 → v110) ===
     const COMO_AYUDAR_ICONS = {
