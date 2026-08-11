@@ -1800,3 +1800,32 @@ hueco descripción→meta pasa a ~130px, a la par del XR. Cero Borrado:
     .tpl-b5 #crisistext-col    { padding-right: 0.75rem !important; }  /* de 1.5rem */
     .tpl-b5 #mod-mapa-crisis-col { padding-left: 0.6rem !important; }  /* de 1.2rem */
 }
+
+/* ============================================================================
+   26. META XL — AGRANDAMIENTO DE LETRAS Y ELEMENTOS (Director, ago-2026)
+   Mandato: "aumentar un poco el tamaño de las letras y los elementos del
+   meta" (la caja blanca de fecha/hora/lugar). Capa aditiva final sobre el
+   stack móvil (≤991px): etiqueta, dato Geist 900, icono SVG y respiros de la
+   caja escalan un peldaño. Cero Borrado: ninguna regla previa se borra; esta
+   capa gana por orden de aparición (Fuente Única, ADR-017) y supersede la
+   Sección 23 (pantallas cortas) en estos atributos.
+   ============================================================================ */
+@media (max-width: 991px) {
+    .tpl-b5 #mod-hero-meta {
+        padding: 1.6rem 1.4rem !important;    /* de 1.4rem 1.2rem (≤991) / 1.2rem 1rem (≤560) */
+    }
+    .tpl-b5 .meta-item {
+        gap: 1.7rem !important;               /* de 1.4rem (1.2rem en pantallas cortas) */
+    }
+    .tpl-b5 .meta-label {
+        font-size: 0.78rem !important;        /* de 0.65rem */
+        letter-spacing: 0.04em !important;
+    }
+    .tpl-b5 .meta-item span {
+        font-size: 0.95rem !important;        /* de 0.8rem */
+    }
+    .tpl-b5 .meta-svg {
+        width: 36px !important;               /* de 32px (24px en pantallas cortas) */
+        height: 36px !important;
+    }
+}
