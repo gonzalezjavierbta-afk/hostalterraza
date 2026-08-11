@@ -269,9 +269,28 @@
                                     <option value="+56">🇨🇱 +56</option>
                                     <option value="+593">🇪🇨 +593</option>
                                     <option value="+507">🇵🇦 +507</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+52">🇲🇽 +52</option>
+                                    <option value="+55">🇧🇷 +55</option>
+                                    <option value="+33">🇫🇷 +33</option>
+                                    <option value="+44">🇬🇧 +44</option>
+                                    <option value="+49">🇩🇪 +49</option>
+                                    <option value="+39">🇮🇹 +39</option>
+                                    <option value="+41">🇨🇭 +41</option>
+                                    <option value="+1">🇨🇦 +1</option>
+                                    <option value="+598">🇺🇾 +598</option>
+                                    <option value="+591">🇧🇴 +591</option>
+                                    <option value="+506">🇨🇷 +506</option>
+                                    <option value="+53">🇨🇺 +53</option>
+                                    <option value="+351">🇵🇹 +351</option>
+                                    <option value="+61">🇦🇺 +61</option>
+                                    <option value="+31">🇳🇱 +31</option>
+                                    <option value="+353">🇮🇪 +353</option>
+                                    <option value="custom">🌐 Otro — escribir prefijo</option>
                                 </select>
                                 <input type="tel" id="reg-whatsapp" placeholder="WhatsApp *" required>
                             </div>
+                            <input type="text" id="reg-pais-custom" inputmode="numeric" placeholder="Prefijo de tu país (ej. +33)" style="display:none" aria-label="Prefijo de otro país">
                             <select id="reg-tipo-ayuda" required>
                                 <option value="" disabled selected>¿Cómo te gustaría ayudar?</option>
                                 <option value="espacio">Espacio — pongo mi venue</option>
@@ -575,6 +594,16 @@
             if (activo) activo.style.display = 'block';
         }
 
+        // Prefijo libre ("Otro"): revela el input #reg-pais-custom cuando el select
+        // vale 'custom'; en cualquier otro caso lo oculta y limpia.
+        const regPaisSel = document.getElementById('reg-pais');
+        regPaisSel.addEventListener('change', function () {
+            const cust = document.getElementById('reg-pais-custom');
+            const show = this.value === 'custom';
+            cust.style.display = show ? 'block' : 'none';
+            if (show) cust.focus();
+        });
+
         document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const activeWrap = document.getElementById(regPhase === 1 ? 'fase1-fields' : 'form-fase2');
@@ -583,7 +612,15 @@
 
             if (regPhase === 1) {
                 const nombre = document.getElementById('reg-nombre').value.trim();
-                const paisCod = document.getElementById('reg-pais').value;
+                let paisCod = document.getElementById('reg-pais').value;
+                if (paisCod === 'custom') {
+                    const prefijoDigitos = (document.getElementById('reg-pais-custom').value || '').replace(/\D/g, '');
+                    if (!prefijoDigitos) {
+                        alert('Escribe el prefijo de tu país (ej. 33 para Francia).');
+                        return;
+                    }
+                    paisCod = '+' + prefijoDigitos;
+                }
                 const whatsappNum = document.getElementById('reg-whatsapp').value.trim();
                 const tipoAyuda = document.getElementById('reg-tipo-ayuda').value;
 
