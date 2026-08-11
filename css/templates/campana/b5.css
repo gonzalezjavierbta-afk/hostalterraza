@@ -1725,7 +1725,7 @@ hueco descripción→meta pasa a ~130px, a la par del XR. Cero Borrado:
     }
     .tpl-b5 #event-title {
         font-size: clamp(1.9rem, 9.5vw, 3.4rem) !important;
-        margin-bottom: clamp(5.8rem, 1.6vh, 1.3rem) !important;
+        margin-bottom: clamp(0.8rem, 1.6vh, 1.3rem) !important;
     }
     .tpl-b5 .hero-description {
         margin-top: clamp(1.1rem, 2.4vh, 2.2rem) !important;
@@ -1734,4 +1734,44 @@ hueco descripción→meta pasa a ~130px, a la par del XR. Cero Borrado:
 .tpl-b5 #mod-hero-meta {
         margin: max(-36vh, -20rem) 0 clamp(1.25rem, 2.5vh, 2rem) 0 !important;
     }
+}
+
+/* ============================================================================
+   25. COMPRESIÓN VERTICAL ENTRE SECCIONES (Director, ago-2026)
+   Mandato: reducir a LA MITAD el respiro superior (espacio en blanco) que
+   precede a: ESTADO DE EMERGENCIA (02), BANNER de impacto (05), CÓMO PUEDO
+   AYUDAR (03), ACTUALIZACIONES (08), PREGUNTAS FRECUENTES (09) y CONTACTO
+   (10). Capa aditiva final (Fuente Única, ADR-017): cada respiro se recorta
+   a la mitad exacta de su valor original en cascada. Cero Borrado: ninguna
+   regla previa se elimina; esta capa gana por orden de aparición final.
+   Detalle sección 05: la sección es "SOLO BANNER" (eyebrow + grid ocultos,
+   v1.4.2), así que su respiro = padding-top de .impactohist-inner (4rem) +
+   margin-top del banner (1.5rem) → 2rem + 0.75rem.
+   ============================================================================ */
+.tpl-b5 #mod-mapa-crisis {          /* ESTADO DE EMERGENCIA (02) */
+    padding-top: 1.25rem !important; /* de 3.5rem base / 2.5rem (≤899) */
+}
+.tpl-b5 #crisistext-vzla {          /* columna gemela del 02 (misma fila en escritorio) */
+    padding-top: 1.75rem !important; /* de 3.5rem */
+}
+.tpl-b5 .mapacrisis-inner {          /* respiro de la insignia "02" (1rem solo en ≤899) */
+    padding-top: 0.5rem !important;  /* de 1rem — con lo anterior total 1.75rem (mitad) en todo rango */
+}
+.tpl-b5 .impactohist-inner {         /* BANNER (05): respiro superior de la sección */
+    padding-top: 2rem !important;    /* de 4rem */
+}
+.tpl-b5 .impactohist-banner {        /* BANNER (05): hueco sobre la banda roja */
+    margin-top: 0.75rem !important;  /* de 1.5rem */
+}
+.tpl-b5 .comoayudar-inner {          /* CÓMO PUEDO AYUDAR (03) */
+    padding-top: 1.5rem !important;  /* de 3rem */
+}
+.tpl-b5 .actualizaciones-inner {     /* ACTUALIZACIONES (08) */
+    padding-top: 2rem !important;    /* de 4rem */
+}
+.tpl-b5 #mod-faq {                   /* PREGUNTAS FRECUENTES (09) */
+    padding-top: 2rem !important;    /* de 4rem */
+}
+.tpl-b5 #mod-ubicacion {             /* CONTACTO (10) */
+    padding-top: 2rem !important;    /* de 4rem */
 }
