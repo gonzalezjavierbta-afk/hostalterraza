@@ -1645,9 +1645,13 @@
    pequeños; XR y superiores >740px quedan intactos): menor font de
    descripción (menos líneas), respiros recortados (eyebrow, título, margen
    de descripción) y meta más compacto (-38vh, filas y svg reducidos). El
-   hueco descripción→meta pasa a ~130px, a la par del XR. Cero Borrado:
+hueco descripción→meta pasa a ~130px, a la par del XR. Cero Borrado:
    ninguna regla previa se borra; esta capa gana en cascada solo en el rango
    corto+angosto.
+   NOTA (ago-2026, rediseño hero mobile): la Sección 24 (posterior, <=991px)
+   supersede TODOS los valores de hero de esta capa para cualquier viewport
+   móvil (todo <=640px es también <=991px); esta capa conserva solo su meta
+   compacto (padding / meta-item / meta-svg) que la Sección 24 no redeclara.
    ============================================================================ */
 @media (max-width: 640px) and (max-height: 740px) {
     .tpl-b5 .hero-content {
@@ -1685,17 +1689,27 @@
    991px, sin parches por dispositivo. Estrategia Fuente Única (ADR-017):
    esta capa re-declara los valores finales del hero para ≤991px usando clamps
    que interpolan con vw/vh; no depende de franjas cortas+angostas (la Sección
-   23 queda superseded en cascada). Knobs por knob:
-   - #event-title:      clamp(1.45rem, 6.5vw, 2.4rem)
-   - .hero-description: clamp(0.8rem, 1.1vw + 0.6rem, 1rem)
-   - .hero-description margin-top: clamp(1.2rem, 2.6vh, 2.5rem)
-   - .hero-eyebrow margin-bottom: clamp(0.8rem, 1.6vh, 1.2rem)
+   23 queda superseded en cascada).
+
+   REDISEÑO HERO MOBILE (Director, ago-2026 — "últimos cambios de diseño"):
+   (1) eyebrow + título BAJAN (hero-content margin-top con vh), (2) el título
+   crece para llenar mucho más el espacio (9.5vw), (3) la descripción queda
+   cerca de media pantalla. El nav está oculto en mobile (≤899px) y el padding
+   superior del hero es 0.5rem, por lo que el bloque superior es el único
+   control de altura. La descripción real del evento (≈260 caracteres, 6-7
+   líneas en móvil) marca el límite físico en el SE 320x568. Knobs por knob:
+   - .hero-content margin-top: clamp(3rem, 11vh, 5rem)
+   - .hero-eyebrow margin-bottom: clamp(0.7rem, 1.4vh, 1.1rem)
+   - #event-title font-size: clamp(1.9rem, 9.5vw, 3.4rem)
+   - #event-title margin-bottom: clamp(0.8rem, 1.6vh, 1.3rem)
+   - .hero-description margin-top: clamp(1.1rem, 2.4vh, 2.2rem)
+   - .hero-description font-size: clamp(0.8rem, 1.1vw + 0.6rem, 1rem)
    - #mod-hero-meta margin: max(-36vh, -20rem) — proporcional en pantallas
-     bajas (hueco descripción→meta ≥ ~80px en el peor caso 320x568) y ancla
-     fija -20rem en las muy altas (la composición no "vuela").
-   Resultado esperado (hueco descripción→meta): 320x568 ≈ 80px; 375x667
-   ≈ 150px; 414x896 ≈ 310px; 430x932 ancla en -20rem. Matriz QA completa:
-   ADR-027 (DECISIONS.md).
+     bajas y ancla fija -20rem en las muy altas (la composición no "vuela").
+   Resultado esperado con la descripción real (hueco descripción→meta):
+   375x667 ≈ 60-70px; 414x896 ≈ 190px; 320x568 ≈ 15-25px (caso peor real,
+   la descripción larga consume el espacio disponible antes del meta).
+   Matriz QA completa: ADR-027 (DECISIONS.md).
    ============================================================================ */
 @media (max-width: 991px) {
     .tpl-b5 #mod-hero {
@@ -1703,17 +1717,17 @@
         min-height: 100vh !important;
     }
     .tpl-b5 .hero-content {
-        margin-top: clamp(2.5vh, 2rem, 6vh) !important;
+        margin-top: clamp(3rem, 11vh, 5rem) !important;
     }
     .tpl-b5 .hero-eyebrow {
-        margin-bottom: clamp(0.8rem, 1.6vh, 1.2rem) !important;
+        margin-bottom: clamp(0.7rem, 1.4vh, 1.1rem) !important;
     }
     .tpl-b5 #event-title {
-        font-size: clamp(1.45rem, 6.5vw, 2.4rem) !important;
-        margin-bottom: clamp(0.8rem, 1.5vh, 1.5rem) !important;
+        font-size: clamp(1.9rem, 9.5vw, 3.4rem) !important;
+        margin-bottom: clamp(0.8rem, 1.6vh, 1.3rem) !important;
     }
     .tpl-b5 .hero-description {
-        margin-top: clamp(1.2rem, 2.6vh, 2.5rem) !important;
+        margin-top: clamp(1.1rem, 2.4vh, 2.2rem) !important;
         font-size: clamp(0.8rem, 1.1vw + 0.6rem, 1rem) !important;
     }
     .tpl-b5 #mod-hero-meta {
