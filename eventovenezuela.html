@@ -161,9 +161,6 @@
         <!-- MÓDULO EXTENDIDO: IMPACTO (grid de niveles/tarjetas de donación) -->
         <section id="mod-impacto-humanitario">
             <div id="db-impacto-grid" class="impacto-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:1.5rem; max-width:1100px; margin:0 auto;"></div>
-            <!-- NUEVO ÁTOMO ADITIVO (v222): resumen del sismo + link reubicado desde #mod-mapa-crisis -->
-            <p id="db-mapa-crisis-resumen" class="mapacrisis-resumen">--</p>
-            <a href="#mod-ubicacion" id="db-mapa-crisis-link" class="mapacrisis-link" onclick="event.preventDefault(); document.getElementById('mod-ubicacion')?.scrollIntoView({behavior:'smooth', block:'start'});">Ver mapa ampliado →</a>
         </section>
         <!-- ======================= FIN EXTENSIÓN ADITIVA ================= -->
 
@@ -1166,49 +1163,33 @@
     }
     logStatus(`TRACE: Mapa de crisis ${isMapaCrisisFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (falla: ${fallaVal}).`, "TRACE");
 
-    // NUEVO ÁTOMO ADITIVO (v222): #db-mapa-crisis-resumen — párrafo junto a las 4
-    // estadísticas (#mod-impacto-humanitario), compuesto con los mismos campos reales que ya
-    // alimentan la caja de metadatos del Hero (fecha, hora, magnitud, ubicación).
-    const resumenEl = document.getElementById('db-mapa-crisis-resumen');
-    if (resumenEl) {
-        const resumenManual = mapaCrisisData.resumen || content.mapa_crisis_resumen;
-        if (resumenManual) {
-            resumenEl.innerHTML = resumenManual;
-        } else {
-            const magTxt = magnitudVal ? `${magnitudVal} Mw` : '7.5 Mw';
-            const fechaTxt = (ev.fecha || '24 de junio de 2026').replace(/\b\w/g, c => c.toUpperCase());
-            const horaTxt = ev.hora || '11:56 a.m.';
-            const lugarTxt = ev.ubicacion || 'Catia La Mar, La Guaira';
-            // === EDICIÓN DIRECTA: CRÓNICA DE EMERGENCIA AMPLIADA (v2.5.0) ===
-const resumenEl = document.getElementById('db-mapa-crisis-resumen');
-if (resumenEl) {
-    // Inyectamos el texto extendido directamente usando comillas invertidas para respetar los saltos de línea
-    resumenEl.innerHTML = `<p>El 24 de junio de 2026, dos terremotos masivos de 7.2 y 7.5 Mw devastaron el norte de Venezuela, dejando a La Guaira y Catia La Mar en zona de desastre estructural.</p><p> Con un balance de 5,546 fallecidos y 16,740 heridos, la ONU estima que 50,000 personas siguen desaparecidas bajo los escombros en un contexto de colapso hospitalario y de servicios básicos.</p><p> Actualmente, 10,702 damnificados permanecen en campamentos transitorios, mientras la comunidad internacional exige transparencia informativa para coordinar la ayuda urgente a los 6.7 millones de afectados.</p>`;
-}
-        }
-    }
-    // === FIN SEGMENTO MAPA DE CRISIS ===
-
-    // === INICIO SEGMENTO: MAPA DE CRISIS COLOMBIA (espejo horizontal) ===
+    // === INICIO SEGMENTO: MAPA DE CRISIS COLOMBIA ===
     const mapaCrisisSvgColEl = document.getElementById('db-mapa-crisis-svg-col');
     if (mapaCrisisSvgColEl) {
         mapaCrisisSvgColEl.innerHTML = `
             <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visualización ilustrativa de la zona de emergencia en Colombia">
-                <circle cx="205" cy="85" r="130" class="mc-ring mc-ring--outer"/>
-                <circle cx="205" cy="85" r="90" class="mc-ring mc-ring--mid"/>
-                <circle cx="205" cy="85" r="50" class="mc-ring mc-ring--inner"/>
+                <!-- Forma simplificada de Colombia -->
+                <path d="M120,45 L135,40 L150,42 L165,48 L175,55 L185,50 L195,55 L200,65 L210,60 L220,65 L230,75 L235,85 L240,95 L245,110 L250,125 L255,140 L258,155 L260,170 L255,185 L248,195 L240,205 L230,215 L218,220 L205,225 L192,228 L178,230 L165,228 L152,222 L140,215 L128,205 L118,195 L110,182 L105,168 L102,155 L100,140 L98,125 L100,110 L105,95 L110,80 L115,65 Z" 
+                      fill="none" stroke="var(--b5-ink)" stroke-width="1.5" stroke-opacity="0.3"/>
+                <!-- Anillos concéntricos del epicentro: San José del Palmar, Chocó -->
+                <circle cx="130" cy="170" r="60" class="mc-ring mc-ring--outer"/>
+                <circle cx="130" cy="170" r="40" class="mc-ring mc-ring--mid"/>
+                <circle cx="130" cy="170" r="22" class="mc-ring mc-ring--inner"/>
+                <!-- Puntos de impacto: Chocó, Valle del Cauca, Risaralda, Caldas -->
                 <g class="mc-dots">
-                    <circle cx="185" cy="95" r="3.5"/>
-                    <circle cx="175" cy="105" r="4"/>
-                    <circle cx="205" cy="98" r="3.5"/>
-                    <circle cx="190" cy="115" r="3"/>
-                    <circle cx="160" cy="95" r="4"/>
-                    <circle cx="215" cy="110" r="3.5"/>
+                    <circle cx="120" cy="160" r="3.5"/>  <!-- San José del Palmar centro -->
+                    <circle cx="105" cy="145" r="4"/>    <!-- Quibdó / Atrato -->
+                    <circle cx="140" cy="155" r="3.5"/>  <!-- Chocó norte -->
+                    <circle cx="155" cy="180" r="4"/>    <!-- Valle del Cauca / Cali -->
+                    <circle cx="170" cy="165" r="3.5"/>  <!-- Risaralda / Pereira -->
+                    <circle cx="180" cy="155" r="3"/>    <!-- Caldas / Manizales -->
+                    <circle cx="115" cy="175" r="3"/>    <!-- Pacífico sur -->
                 </g>
-                <circle cx="205" cy="85" r="6" class="mc-epicentro"/>
-                <circle cx="205" cy="85" r="6" class="mc-pulse mc-pulse--col"/>
+                <!-- Epicentro -->
+                <circle cx="130" cy="170" r="6" class="mc-epicentro"/>
+                <circle cx="130" cy="170" r="6" class="mc-pulse mc-pulse--col"/>
             </svg>`;
-        logStatus("TRACE: Mapa de crisis COLOMBIA (espejo) inyectado.", "TRACE");
+        logStatus("TRACE: Mapa de crisis COLOMBIA inyectado (San José del Palmar, Chocó).", "TRACE");
     }
     // === FIN SEGMENTO MAPA DE CRISIS COLOMBIA ===
 
