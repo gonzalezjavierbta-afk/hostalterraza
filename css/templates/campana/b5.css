@@ -1586,3 +1586,28 @@
         content: attr(data-num) !important;
     }
 }
+
+/* ============================================================================
+   22. FORMULARIO SIEMPRE SOBRE EL GRADIENTE DEL HERO (Director, ago-2026)
+   Causa (ADR-026, Solución B v1): en una columna el `margin:-40vh` de
+   #mod-hero-meta arrastra a #mod-form hacia arriba, metiendo su parte
+   superior dentro del área del hero. El gradiente `#mod-hero::after` tiene
+   z-index:1 y #mod-form z-index:auto (0) -> el gradiente pinta encima del
+   formulario ("el form se ve debajo de la capa con gradiente").
+   Corrección aditiva: se eleva el z-index de #mod-form a 50 (superior al
+   gradiente 1 y al meta 10) con position:relative, de modo que el form
+   SIEMPRE quede sobre la capa de gradiente en las versiones de una columna.
+   No re-introduce la regresión de ADR-026 en <=640px (form flotando sobre la
+   sección de impacto y ocultando la primera fila de cifras): el
+   .form-master-box ya no usa margin negativo (Sección 19 lo fijó en
+   `0 auto 1.5rem auto`) y #mod-impacto-humanitario conserva su z-index:1
+   sin solapamiento con el form. Cero Borrado: regla aditiva al final del
+   silo; ninguna regla previa se borra (la Sección 19, `z-index:auto` en
+   <=640px, queda superada en cascada por esta regla posterior).
+   ============================================================================ */
+@media (max-width: 991px) {
+    .tpl-b5 #mod-form {
+        position: relative !important;
+        z-index: 50 !important;
+    }
+}
