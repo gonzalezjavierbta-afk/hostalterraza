@@ -1780,6 +1780,15 @@ tr:hover td{background:var(--surface)}
             <option value="ingreso">✓ Ingresaron</option>
             <option value="pendiente">⏳ Pendientes</option>
           </select>
+          <select id="pn-cat-filter" onchange="filtrarTablaCategoria(this.value)"
+            style="font-size:12px;padding:5px 8px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper)">
+            <option value="">Todas las categorías</option>
+            <option value="espacio">🏠 Espacio</option>
+            <option value="artista">🎵 Artista</option>
+            <option value="marca">🏷️ Marca</option>
+            <option value="voluntario">🤝 Voluntario</option>
+            <option value="donacion">💝 Donación</option>
+          </select>
         </div>
       </div>
       <!-- Barra de acciones masivas (aparece al seleccionar) -->
@@ -1803,8 +1812,8 @@ tr:hover td{background:var(--surface)}
       </div>
       <div class="tw">
         <table>
-          <thead><tr><th style="width:32px"><input type="checkbox" id="sel-all" onclick="toggleSelAll(this.checked)" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></th><th>Nombre</th><th>Tipo</th><th>Cédula</th><th>Evento</th><th>Inscriptor</th><th>Registro</th><th>Estado</th><th>Hora ingreso</th><th></th><th>Acciones</th></tr></thead>
-          <tbody id="pn-table"><tr><td colspan="11" class="empty">Cargando…</td></tr></tbody>
+          <thead><tr><th style="width:32px"><input type="checkbox" id="sel-all" onclick="toggleSelAll(this.checked)" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></th><th>Nombre</th><th>Tipo</th><th>Categoría</th><th>Cédula</th><th>Evento</th><th>Inscriptor</th><th>Registro</th><th>Estado</th><th>Hora ingreso</th><th></th><th>Acciones</th></tr></thead>
+          <tbody id="pn-table"><tr><td colspan="12" class="empty">Cargando…</td></tr></tbody>
         </table>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:.5rem">
@@ -2122,6 +2131,13 @@ tr:hover td{background:var(--surface)}
       <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em">Respuestas del formulario</div>
       <div id="ei-respuestas-custom-list"></div>
     </div>
+
+    <!-- Respuestas Fase 2 (b5) — columnas dedicadas por categoría -->
+    <div id="ei-respuestas-b5" style="display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem">
+      <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em">Respuestas de la categoría: <span id="ei-cat-nombre"></span></div>
+      <div id="ei-respuestas-b5-list"></div>
+    </div>
+
     <div style="display:flex;gap:8px;margin-top:.9rem">
       <button class="btn btn-gold" onclick="guardarEditInscrito()" style="flex:1;justify-content:center">Guardar cambios</button>
       <button class="btn btn-ghost" onclick="closeEditIns()">Cancelar</button>
@@ -6188,6 +6204,17 @@ async function renderPanel() {
 
 const tipoColors={frecuente:'#C8A96E',invitado:'#1D9E75',artista:'#534AB7',produccion:'#9B2DDB',pago:'#2D6A4F'};
 
+function catBadge(c) {
+  const map = {
+    espacio:     '<span style="background:#2D6A4F22;color:#2D6A4F;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">🏠 Espacio</span>',
+    artista:     '<span style="background:#534AB722;color:#534AB7;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">🎵 Artista</span>',
+    marca:       '<span style="background:#9B2DDB22;color:#9B2DDB;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">🏷️ Marca</span>',
+    voluntario:  '<span style="background:#1D9E7522;color:#1D9E75;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">🤝 Voluntario</span>',
+    donacion:    '<span style="background:#C8A96E22;color:#C8A96E;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">💝 Donación</span>',
+  };
+  return map[c] || '<span style="color:var(--ink3)">—</span>';
+}
+
 function renderTabla(list) {
   _pnAllList = list;
   _pnPage = 0;
@@ -6210,11 +6237,13 @@ function _renderTablaPagina() {
   const q      = (document.getElementById('pn-search')?.value||'').toLowerCase().trim();
   const tipo   = document.getElementById('pn-tipo-filter')?.value||'';
   const estado = document.getElementById('pn-estado-filter')?.value||'';
+  const cat    = document.getElementById('pn-cat-filter')?.value||'';
   const norm   = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const qn     = norm(q);
 
   const filtered = _pnAllList.filter(i => {
     if (tipo   && i.tipo !== tipo) return false;
+    if (cat    && (i.tipo_ayuda||i.tipo) !== cat) return false;
     if (estado === 'ingreso'   && !i.used) return false;
     if (estado === 'pendiente' && i.used)  return false;
     if (q) {
@@ -6231,8 +6260,8 @@ function _renderTablaPagina() {
   const page  = filtered.slice(start, start + _pnPageSize);
 
   if (!total) {
-    tb.innerHTML = '<tr><td colspan="10" class="empty">Sin registros</td></tr>';
-    if (count) count.textContent = q||tipo||estado ? 'Sin resultados para este filtro' : 'Sin registros';
+    tb.innerHTML = '<tr><td colspan="12" class="empty">Sin registros</td></tr>';
+    if (count) count.textContent = q||tipo||estado||cat ? 'Sin resultados para este filtro' : 'Sin registros';
     if (pag) pag.style.display = 'none';
     return;
   }
@@ -6253,6 +6282,7 @@ function _renderTablaPagina() {
     <td><input type="checkbox" class="row-sel" value="${i.id}" onclick="onRowSel()" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></td>
     <td style="font-weight:500">${esc(i.nombre)}</td>
     <td>${tipoBadge(i.tipo)}</td>
+    <td>${catBadge(i.tipo_ayuda||i.tipo)}</td>
     <td>${i.cedula||'—'}</td>
     <td style="font-size:12px">${i.evento_nombre||'—'}</td>
     <td style="font-size:11px;color:var(--ink3)">${i.ref_nombre||i.ref_codigo
@@ -6300,6 +6330,7 @@ function cambiarPagina(dir) {
 function filtrarTabla(q)      { _pnPage=0; _renderTablaPagina(); }
 function filtrarTablaTipo(v)  { _pnPage=0; _renderTablaPagina(); }
 function filtrarTablaEstado(v){ _pnPage=0; _renderTablaPagina(); }
+function filtrarTablaCategoria(v){ _pnPage=0; _renderTablaPagina(); }
 
 function applyTableFilters()  { _pnPage=0; _renderTablaPagina(); }
 
@@ -7167,6 +7198,34 @@ function abrirEditInscrito(id) {
     respPanel.style.display = 'block';
   } else {
     respPanel.style.display = 'none';
+  }
+
+  // Respuestas Fase 2 (b5) — columnas dedicadas por categoría
+  const cat = ins.tipo_ayuda || ins.tipo;
+  const b5Panel = document.getElementById('ei-respuestas-b5');
+  const b5List  = document.getElementById('ei-respuestas-b5-list');
+  const CAT_LABELS = { espacio:'Espacio', artista:'Artista', marca:'Marca', voluntario:'Voluntario', donacion:'Donación' };
+  const FIELDS = {
+    espacio:    [['espacio_direccion','Dirección del espacio'],['espacio_aforo','Aforo aproximado'],['espacio_tiene_sonido','¿Tiene equipo de sonido?',true]],
+    artista:    [['artista_portafolio','Instagram / portafolio'],['artista_especialidad','Especialidad artística'],['artista_requerimiento_tecnico','Requerimiento técnico']],
+    marca:      [['marca_tipo_apoyo','Tipo de apoyo'],['marca_tiene_logo','¿Tiene logo para exhibir?',true],['marca_cargo','Cargo en la marca']],
+    voluntario: [['voluntario_profesion','Profesión / oficio'],['voluntario_disponibilidad','Disponibilidad'],['voluntario_experiencia_rescate','¿Experiencia en voluntariados?',true]],
+    donacion:   [['donacion_monto_proyectado','Monto proyectado'],['donacion_canal_preferido','Canal preferido'],['donacion_desea_certificado','¿Desea certificado?',true]],
+  };
+  if (CAT_LABELS[cat] && FIELDS[cat]) {
+    document.getElementById('ei-cat-nombre').textContent = CAT_LABELS[cat];
+    b5List.innerHTML = FIELDS[cat].map(([key,label,isBool]) => {
+      let val = ins[key];
+      if (isBool) val = val ? '✓ Sí' : '✗ No';
+      else val = val || '—';
+      return `<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="color:var(--ink3);flex-shrink:0;max-width:55%">${label}</span>
+        <span style="color:var(--ink1);font-weight:500;text-align:right">${esc(String(val))}</span>
+      </div>`;
+    }).join('');
+    b5Panel.style.display = 'block';
+  } else {
+    b5Panel.style.display = 'none';
   }
 
   document.getElementById('mod-edit-ins').style.display = 'flex';
