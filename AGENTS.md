@@ -37,6 +37,23 @@ Al recibir una indicación o prompt, evalúa si conviene delegar la tarea a un s
 3. Consolida el resultado y repórtalo al usuario.
 4. Si la tarea toca dominios distintos, delega en paralelo (varios `task` en una misma respuesta).
 
+### Protocolo de Aprobación de Delegación (Mandatorio)
+
+Antes de invocar la tool `task` con cualquier sub-agente, el agente principal DEBE:
+
+1. **Presentar el Plan de Delegación Completo**, detallando:
+   - Sub-agentes a invocar y su modelo asignado (ej. `js-silo-dev` → opencode/deepseek-v4-flash-free).
+   - Tarea y responsabilidad específica de cada sub-agente.
+   - Orden de ejecución (paralelo si son dominios independientes; secuencial si hay dependencias).
+   - Formato de retorno esperado de cada uno.
+2. **Pedir aprobación explícita del Director** usando la tool `question`, ofreciendo:
+   - Aprobar el plan tal cual.
+   - Ajustar agentes/modelos/distribución (con campo libre para correcciones).
+   - No delegar (resolverlo el agente principal directamente).
+3. **Ejecutar SOLO después de la aprobación** recibida.
+
+Excepción: tareas triviales (≤1 edición, preguntas informativas, lecturas directas) quedan exentas del protocolo, según la regla "Cuándo NO delegar".
+
 ### Cuándo NO delegar
 
 - Tareas triviales: ≤1 edición, preguntas informativas, lectura directa de un archivo.
