@@ -533,6 +533,19 @@
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
         }
 
+        // === TEXTO ENRIQUECIDO MARKDOWN-LITE (anti-XSS) ===
+        // Soporta **negrita** y saltos de línea desde el JSON (historia, actualizaciones, FAQ).
+        // Primero se escapa todo el HTML crudo (blinda contra inyección), luego se re-inyectan
+        // SOLO las etiquetas propias del render (<strong>, <br>). Doble salto \n\n = párrafo.
+        function formatRichText(txt) {
+            if (!txt) return '';
+            return txt
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n{2,}/g, '<br><br>')
+                .replace(/\n/g, '<br>');
+        }
+
         // === MODAL DE LECTURA AMPLIADA — ACTUALIZACIONES (v1.2.6) ===
         // window._actualizacionesData se puebla en el segmento de render de Actualizaciones.
         function abrirActualizacionModal(idx) {
@@ -542,7 +555,7 @@
             if (!modal) return;
             document.getElementById('actualizacion-modal-fecha').innerText = item.categoria ? `${item.categoria} · ${item.fecha || ''}` : (item.fecha || '');
             document.getElementById('actualizacion-modal-detalle').innerText = item.titulo || '';
-            document.getElementById('actualizacion-modal-ampliado').innerText = item.resumen_ampliado || item.resumen || '';
+            document.getElementById('actualizacion-modal-ampliado').innerHTML = formatRichText(item.resumen_ampliado || item.resumen || '');
             const img = document.getElementById('actualizacion-modal-img');
             if (item.imagen) { img.src = item.imagen; img.style.display = 'block'; }
             else { img.removeAttribute('src'); img.style.display = 'none'; }
@@ -1002,7 +1015,7 @@
         document.getElementById('db-historia-titulo').innerText = histTitulo.toUpperCase();
     }
     if (document.getElementById('db-historia-texto')) {
-        document.getElementById('db-historia-texto').innerText = histTexto;
+        document.getElementById('db-historia-texto').innerHTML = formatRichText(histTexto);
     }
     const histImgEl = document.getElementById('db-historia-img');
     if (histImgEl) {
@@ -1040,7 +1053,7 @@
                 <span class="historia-item-num">${String(idx + 1).padStart(2, '0')}</span>
                 <div class="historia-item-body">
                     <span class="historia-item-titulo">${(item.titulo || '').toUpperCase()}</span>
-                    <p class="historia-item-texto">${item.texto || ''}</p>
+                    <p class="historia-item-texto">${formatRichText(item.texto || '')}</p>
                 </div>
                 ${item.imagen ? `<img class="historia-item-img" src="${item.imagen}" alt="" loading="lazy" onerror="this.remove(); this.closest('.historia-item')?.classList.remove('historia-item--conimg');">` : ''}
             </div>`).join('');
@@ -1369,7 +1382,7 @@
                 ${item.categoria ? `<span class="actualizacion-categoria">${item.categoria}</span>` : ''}
                 <span class="actualizacion-fecha">${item.fecha || ''}</span>
                 <span class="actualizacion-titulo">${item.titulo || ''}</span>
-                <p class="actualizacion-resumen">${item.resumen || ''}</p>
+                <p class="actualizacion-resumen">${formatRichText(item.resumen || '')}</p>
                 <span class="actualizacion-link">Leer más →</span>
             </div>`).join('');
         const actStatus = isActualizacionesFallback ? `Actualizaciones de REFERENCIA/FALLBACK (${actualizacionesList.length})` : `Actualizaciones REALES (${actualizacionesList.length})`;
@@ -1564,7 +1577,7 @@ if (document.getElementById('db-poster-img')) {
                         <span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${(item.pregunta || "").toUpperCase()}</span>
                         <div class="faq-icon-circle" style="width:22px; height:22px; border-radius:50%; border:1px solid var(--tpl-accent, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--tpl-accent, #d72dc0);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
                     </div>
-                    <div class="faq-answer">${item.respuesta}</div>
+                    <div class="faq-answer">${formatRichText(item.respuesta || '')}</div>
                 </div>`).join('');
             
             // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
