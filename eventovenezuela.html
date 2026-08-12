@@ -888,9 +888,10 @@
                 // BUG HISTÓRICO CORREGIDO (v222 / Incidencia 01 de ERRORES_HISTORICOS.md):
                 // #event-description nunca se inyectaba desde JS en ninguna versión anterior;
                 // el párrafo del Hero quedaba vacío ("--") de forma permanente.
+                // TEXTO ESTÁTICO FORZADO: se elimina la precedencia de BD para que el fallback
+                // formateado (negrita + saltos de línea) siempre se muestre.
                 if (document.getElementById('event-description')) {
-                    document.getElementById('event-description').innerText = ev.descripcion || content.descripcion
-                        || 'Dos terremotos. Dos países. Una misma red de solidaridad. Venezuela fue golpeada el 24 de junio y Colombia enfrenta desde el 10 de agosto un sismo de magnitud 7.4 en el Chocó. Dos emergencias distintas, una misma oportunidad para convertir la solidaridad en ayuda concreta.';
+                    document.getElementById('event-description').innerHTML = '<strong>Dos terremotos. Dos países. Una misma red de solidaridad.</strong><br><br>Venezuela fue golpeada el 24 de junio y Colombia enfrenta desde el 10 de agosto un sismo de magnitud 7.4 en el Chocó.<br><br>Dos emergencias distintas, una misma oportunidad para convertir la solidaridad en ayuda concreta.';
                 }
 
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===

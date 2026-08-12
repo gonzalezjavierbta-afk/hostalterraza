@@ -336,6 +336,9 @@ async function init() {
   // ── Cargar cache de inscritos para modo offline ──
   await cargarCache();
 
+  // ── Dashboard contextual portero: últimos 5 ingresos (TSK-005) ──
+  await seedUltimosIngresos();
+
   // ── Listeners de conectividad ──
   window.addEventListener('online',  () => { isOnline = true;  actualizarBarraOffline(); sincronizarCola(); });
   window.addEventListener('offline', () => { isOnline = false; actualizarBarraOffline(); });
@@ -436,7 +439,7 @@ async function updateCounter() {
 
   document.getElementById('cnt-num').textContent = ingresos;
   document.getElementById('cnt-last').textContent = ingresos > 0
-    ? 'Último: ' + list[0].nombre + ' · ' + list[0].hora_ingreso : '';
+    ? 'Último: ' + (list[0].nombre || '—') + ' · ' + (list[0].hora_ingreso || '—') : '';
   document.getElementById('cnt-breakdown').innerHTML = ingresos > 0
     ? `<span class="badge badge-gold">★ ${frecs}</span><span class="badge badge-teal">◎ ${invs}</span>` : '';
 
@@ -470,6 +473,47 @@ async function updateCounter() {
       document.getElementById('cnt-aforo-max').textContent = '';
     }
   }
+}
+
+// ── ÚLTIMOS 5 INGRESOS (dashboard contextual portero — TSK-005) ──
+async function seedUltimosIngresos() {
+  let list = null;
+  if (isOnline) {
+    const { data } = await SB.from('inscritos')
+      .select('nombre,hora_ingreso,tipo')
+      .eq('evento_id', eventoId)
+      .eq('used', true)
+      .order('hora_ingreso', { ascending: false })
+      .limit(5);
+    list = data || null;
+  }
+  if (!list || !list.length) {
+    // Fallback offline: derivar desde el cache local (qrCache)
+    list = Object.values(qrCache)
+      .filter(i => i.used && i.hora_ingreso)
+      .sort((a, b) => String(b.hora_ingreso || '').localeCompare(String(a.hora_ingreso || '')))
+      .slice(0, 5);
+  }
+  renderUltimosIngresos(list || []);
+}
+
+function renderUltimosIngresos(list) {
+  const el = document.getElementById('sc-log');
+  if (!el) return;
+  const items = (list || []).slice(0, 5);
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">Sin movimientos aún</div>';
+    return;
+  }
+  el.innerHTML = items.map(i => {
+    const nombre = i.nombre || '—';
+    const hora   = i.hora_ingreso || '—';
+    const tipo   = i.tipo === 'frecuente' ? '★ Frecuente' : i.tipo === 'invitado' ? '◎ Invitado' : '';
+    return `<div class="log-row">
+      <div class="log-dot" style="background:#74c69d"></div>
+      <div><div class="log-name">${nombre}</div><div class="log-sub">${hora}${tipo ? ' · ' + tipo : ''}</div></div>
+    </div>`;
+  }).join('');
 }
 
 // ── CAMERA (universal: BarcodeDetector + jsQR fallback) ──

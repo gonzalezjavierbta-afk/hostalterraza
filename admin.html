@@ -2909,7 +2909,7 @@ function filtrarGlobalOrgs(q) {
 function renderGlobalCharts() {
   if (!_gaOrgs.length) return;
   const sorted=[..._gaOrgs].sort((a,b)=>((_gaConteos[b.id]?.ins||0)-(_gaConteos[a.id]?.ins||0))).slice(0,10);
-  const labels=sorted.map(o=>o.nombre.length>14?o.nombre.slice(0,14)+'…':o.nombre);
+  const labels=sorted.map(o=>{const n=o.nombre||'—';return n.length>14?n.slice(0,14)+'…':n;});
   const colors=sorted.map(o=>o.color_primario||'#C8A96E');
   const mkChart=(id,type,data,opts={})=>{
     const cv=document.getElementById(id); if(!cv) return;
@@ -3202,9 +3202,9 @@ function _runGlobalSearch(q) {
   const grupos = {};
   _invitadores.forEach(inv => { if (!grupos[inv.codigo]) grupos[inv.codigo] = inv; });
   Object.values(grupos).filter(inv =>
-    norm(inv.nombre).includes(qn) || inv.codigo.includes(q.toUpperCase())
+    norm(inv.nombre).includes(qn) || (inv.codigo||'').includes(q.toUpperCase())
   ).slice(0,3).forEach(inv => {
-    hits.push({ type:'invitador', icon:'🔗', label: inv.nombre, sub: 'Código: ' + inv.codigo, action: () => {
+    hits.push({ type:'invitador', icon:'🔗', label: inv.nombre||'—', sub: 'Código: ' + (inv.codigo||'—'), action: () => {
       goPg('admin');
       setTimeout(() => abrirPerfilInvitador(inv.codigo), 400);
     }});
@@ -3499,7 +3499,7 @@ function renderEventos() {
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.6rem">
         <div style="width:10px;height:10px;border-radius:2px;background:${serie.color||'var(--gold)'};flex-shrink:0"></div>
         <div style="flex:1">
-          <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--gold-d)">${serie.nombre} <span style="font-size:11px;font-weight:400;color:var(--ink3)">· ${sesiones.length} sesiones</span></div>
+          <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--gold-d)">${serie.nombre||'—'} <span style="font-size:11px;font-weight:400;color:var(--ink3)">· ${sesiones.length} sesiones</span></div>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="copyLink('${serieLink}',this)">Link serie</button>
@@ -3512,8 +3512,8 @@ function renderEventos() {
           const link = window.location.origin + '/evento.html?slug=' + (s.slug||s.id);
           return `<div style="display:flex;align-items:center;gap:8px;padding:.45rem .75rem;background:var(--surface);border-radius:var(--rsm)">
             <span style="width:22px;height:22px;background:var(--gold-bg);color:var(--gold-d);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">${s.sesion_num}</span>
-            <span style="flex:1;font-size:13px;font-weight:500">${s.fecha}${s.hora?' · '+s.hora:''}</span>
-            <button class="btn btn-gold btn-sm" onclick="openMod('${s.id}','${s.nombre.replace(/'/g,"\\'")}','${s.fecha}','${s.hora||''}')">QR tipos</button>
+            <span style="flex:1;font-size:13px;font-weight:500">${s.fecha||'—'}${s.hora?' · '+s.hora:''}</span>
+            <button class="btn btn-gold btn-sm" onclick="openMod('${s.id}','${(s.nombre||'').replace(/'/g,"\\'")}','${s.fecha||''}','${s.hora||''}')">QR tipos</button>
             <button class="btn btn-ghost btn-sm" onclick="copyLink('${link}',this)">Link</button>
             <button class="btn btn-ghost btn-sm" onclick="openEditMod('${s.id}')">✏</button>
             <button class="btn btn-ghost btn-sm btn-red" onclick="delEvento('${s.id}')">✕</button>
@@ -3531,12 +3531,12 @@ function renderEventos() {
     html.push(`<div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.6rem">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
-          <div style="font-family:'DM Serif Display',serif;font-size:17px">${e.nombre}</div>
-          <div style="font-size:12px;color:var(--ink3);margin-top:2px">${e.fecha}${e.hora?' · '+e.hora:''}${e.ubicacion?' · '+e.ubicacion:''}</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:17px">${e.nombre||'—'}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">${e.fecha||'—'}${e.hora?' · '+e.hora:''}${e.ubicacion?' · '+e.ubicacion:''}</div>
           ${e.aforo_max ? `<div style="font-size:11px;margin-top:3px"><span id="aforo-ev-${e.id}" style="color:var(--ink3)">⬜ Cargando aforo…</span></div>` : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0" class="ev-actions">
-          <button class="btn btn-gold btn-sm" onclick="openMod('${e.id}','${e.nombre.replace(/'/g,"\\'")}','${e.fecha}','${e.hora||''}')">Invitación QR</button>
+          <button class="btn btn-gold btn-sm" onclick="openMod('${e.id}','${(e.nombre||'').replace(/'/g,"\\'")}','${e.fecha||''}','${e.hora||''}')">Invitación QR</button>
           <button class="btn btn-ghost btn-sm" onclick="copyLink('${pubLink}',this)">Página pública</button>
           <button class="btn btn-ghost btn-sm" onclick="openEditMod('${e.id}')">✏ Editar</button>
           <button class="btn btn-ghost btn-sm btn-red" onclick="delEvento('${e.id}')">Eliminar</button>
@@ -4278,12 +4278,12 @@ function renderInvitadoresPerfil() {
   });
 
   cont.innerHTML = Object.values(grupos).map(g => {
-    const ini = g.nombre.split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
+    const ini = (g.nombre||'').split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
     const nLinks = g.links.length;
     return `<div style="background:var(--surface);border-radius:var(--rsm);padding:.75rem 1rem;margin-top:.5rem;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="abrirPerfilInvitador('${g.codigo}')">
       <div style="width:38px;height:38px;border-radius:50%;background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">${ini}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:500;font-size:14px">${g.nombre}</div>
+        <div style="font-weight:500;font-size:14px">${g.nombre||'—'}</div>
         <div style="font-size:11px;color:var(--ink3);margin-top:2px">Código: <code style="background:#fff;padding:1px 5px;border-radius:3px;border:1px solid var(--border)">${g.codigo}</code> · ${nLinks} link${nLinks!==1?'s':''} generado${nLinks!==1?'s':''}</div>
       </div>
       <button class="btn btn-ghost btn-sm" style="flex-shrink:0">Ver perfil →</button>
@@ -4306,10 +4306,10 @@ async function abrirPerfilInvitador(codigo) {
   });
   _perfilInvActivo = grupo;
 
-  const ini = grupo.nombre.split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
+  const ini = (grupo.nombre||'').split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
   document.getElementById('pi-avatar').textContent = ini;
-  document.getElementById('pi-nombre').textContent = grupo.nombre;
-  document.getElementById('pi-codigo').textContent = grupo.codigo;
+  document.getElementById('pi-nombre').textContent = grupo.nombre || '—';
+  document.getElementById('pi-codigo').textContent = grupo.codigo || '—';
   document.getElementById('pi-total-links').textContent = (grupo.links||[]).length;
 
   // Cargar inscritos de este invitador
@@ -4346,13 +4346,13 @@ async function abrirPerfilInvitador(codigo) {
     linksEl.innerHTML = (grupo.links||[]).map(l => {
       const ev = _eventos.find(e => e.id === l.evento_id);
       const tipoLabels = {invitado:'◎',frecuente:'★',artista:'🎵',produccion:'🎬',pago:'💳'};
-      const evNombre = ev?.nombre || l.link_generado.split('slug=')[1]?.split('&')[0] || '—';
+      const evNombre = ev?.nombre || (l.link_generado||'').split('slug=')[1]?.split('&')[0] || '—';
       const nIns = inscritos.filter(i => i.evento_nombre === ev?.nombre).length;
       return `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--rsm);padding:.6rem .9rem;display:flex;align-items:center;gap:10px">
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:500">${evNombre}</div>
           <div style="font-size:11px;color:var(--ink3);margin-top:2px">
-            ${tipoLabels[l.tipo_invitado]||'◎'} ${l.tipo_invitado} · ${nIns} inscrito${nIns!==1?'s':''}
+            ${tipoLabels[l.tipo_invitado]||'◎'} ${l.tipo_invitado||'invitado'} · ${nIns} inscrito${nIns!==1?'s':''}
           </div>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0">
@@ -4395,7 +4395,7 @@ async function abrirPerfilInvitador(codigo) {
       const color  = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--gold)' : 'var(--red)';
       return `<div style="background:var(--surface);border-radius:var(--rsm);padding:.55rem .75rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${ev.nombre}</span>
+          <span style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${ev.nombre||'—'}</span>
           <span style="font-size:11px;color:var(--ink3);margin-left:8px;white-space:nowrap">${ev.total} inscrito${ev.total!==1?'s':''} · ${ev.asistio} asistió (${pct}%)</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
@@ -4928,8 +4928,8 @@ function detectarDuplicados() {
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
         <span style="font-size:11px;background:var(--gold-bg);color:var(--gold-d);border-radius:4px;padding:1px 7px">${p.razon}</span>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm" onclick="buscarEnDir('${p.a.cedula}')">Ver ${p.a.nombre.split(' ')[0]}</button>
-          <button class="btn btn-ghost btn-sm" onclick="buscarEnDir('${p.b.cedula}')">Ver ${p.b.nombre.split(' ')[0]}</button>
+          <button class="btn btn-ghost btn-sm" onclick="buscarEnDir('${p.a.cedula}')">Ver ${(p.a.nombre||'—').split(' ')[0]}</button>
+          <button class="btn btn-ghost btn-sm" onclick="buscarEnDir('${p.b.cedula}')">Ver ${(p.b.nombre||'—').split(' ')[0]}</button>
         </div>
       </div>
     </div>`).join('') +
@@ -5009,7 +5009,7 @@ function renderDirectorio() {
   const tipoColors = { frecuente:'var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border)', invitado:'var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)', artista:'#EEEDFE;color:#534AB7;border:1px solid #AFA9EC', produccion:'#FDE8FF;color:#7B2D8B;border:1px solid #DDA0EE', pago:'var(--green-bg);color:var(--green);border:1px solid var(--green-border)' };
 
   cont.innerHTML = _dirFiltrados.map((p, idx) => {
-    const ini = p.nombre.split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
+    const ini = (p.nombre||'').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
     const tc  = tipoColors[p.tipo] || 'var(--surface);color:var(--ink3)';
     const vip = p.cliente?.vip;
     const totalEv = p.eventos.length;
@@ -5356,7 +5356,7 @@ async function descargarInvitacionTipo(evId, tipo, registroLink) {
     if (_invitacionDataUrl) {
       const a = document.createElement('a');
       a.href = _invitacionDataUrl;
-      a.download = 'invitacion-' + tipo + '-' + ev.nombre.replace(/\s+/g,'-').toLowerCase() + '.jpg';
+      a.download = 'invitacion-' + tipo + '-' + (ev.nombre||'evento').replace(/\s+/g,'-').toLowerCase() + '.jpg';
       a.click();
     }
   } catch(e) {
@@ -5494,7 +5494,7 @@ async function scanQR() {
 }
 
 function showVerify(ins) {
-  const ini=ins.nombre.split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
+  const ini=(ins.nombre||'').split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
   const tipoBadge=ins.tipo==='frecuente'?'<span class="badge badge-gold">★ Cliente frecuente</span>':'<span class="badge badge-teal">◎ Invitado</span>';
   document.getElementById('sc-res').innerHTML=`<div class="verify-card">
     <div class="verify-person">
@@ -6464,7 +6464,7 @@ async function _xlsxEventos() {
     evL.forEach(i=>eRows.push([i.nombre,i.tipo,i.cedula,i.telefono||'',i.email||'',i.ciudad||'',i.ref_nombre||i.ref_codigo||'',i.fecha_inscripcion||'',i.used?'Ingresó':'Pendiente',i.hora_ingreso||'']));
     const wsEv=XLSX.utils.aoa_to_sheet(eRows);
     _setColWidths(wsEv,[28,14,14,14,22,16,20,16,12,12]);
-    const sheetName=ev.nombre.replace(/[\\\/\*\?\[\]]/g,'').substring(0,31);
+    const sheetName=(ev.nombre||'Evento').replace(/[\\\/\*\?\[\]]/g,'').substring(0,31);
     XLSX.utils.book_append_sheet(wb,wsEv,sheetName);
   });
 
