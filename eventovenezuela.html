@@ -1,1739 +1,406 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v214 · Atomic Grid System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
-    <!-- === INICIO SEGMENTO: KERNEL SaaS AGNOSTICO (v1.3.50) === -->
-<style>
-    /* 1. RESET ESTRUCTURAL MÍNIMO */
-    html, body {
-        margin: 0; padding: 0; min-height: 100%;
-        background-color: #050505; 
-        color: #ffffff;
-        font-family: 'Geist', sans-serif;
-        overflow-x: hidden;
-    }
-
-    /* 2. ESCUDO DE GRANO (v47) */
-    body::before {
-        content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        opacity: 0.04;
-    }
-
-    /* 3. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
-    section, header, footer { display: none; } /* v220: footer sumado al kernel IoC */
-
-    /* 4. CARGA Y FEEDBACK */
-    .loading-overlay { 
-        position: fixed; inset: 0; background: #000; z-index: 999; 
-        display: flex; align-items: center; justify-content: center; 
-        font-weight: 900; letter-spacing: 3px; text-transform: uppercase;
-    }
-</style>
-<!-- === FIN SEGMENTO: KERNEL SaaS AGNOSTICO === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sonidos por el cambio | Hostal Terraza</title>
+  <meta name="description" content="Campaña humanitária por los terremotos en Venezuela y Colombia. Únete y ayuda.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/templates/campana/b5.css">
 </head>
+<body>
+  <div id="tpl-b5" class="tpl-b5">
 
-<body class="tpl-init">
-    <div id="loader" class="loading-overlay">SINCRO TOTAL v214...</div>
+    <!-- ═══ HERO ═══ -->
+    <section class="b5-hero">
+      <div class="container">
+        <span class="b5-hero__badge">Campaña Humanitária</span>
+        <h1 class="b5-hero__title">Sonidos por el cambio</h1>
+        <p class="b5-hero__sub">Unidos por Venezuela y Colombia. Cada gesto cuenta. Únete a la solidaridad.</p>
 
-    <!-- CONTENEDOR GRID ÚNICO v210 — Todos los módulos son hermanos planos.
-         La plantilla (.tpl-*) decide libremente la ubicación de cada uno vía grid-area. -->
-    <main id="main-content-flow">
-
-    <!-- MÓDULO 1: HERO (Z-index 5 Protegido) [cite: 1, 6] -->
-    <header id="mod-hero" class="hero">
-        <!-- Nav decorativo NO-atómico (no forma parte del Contrato v108/v110): navegación
-             de anclas simples a secciones ya existentes. No introduce IDs de datos nuevos. -->
-        <nav class="hero-nav">
-            <a href="#mod-hero">La Causa</a>
-            <a href="#mod-mapa-crisis">Emergencia</a>
-            <a href="#mod-como-ayudar">Ayuda</a>
-            <a href="#mod-historia">Historia</a>
-            <a href="#mod-impacto-historico">Impacto</a>
-            <a href="#mod-actualizaciones">Actualizaciones</a>
-            <a href="#mod-video">Galería</a>
-            <a href="#mod-faq">FAQ</a>
-            <a href="#mod-form" class="hero-nav-cta">Únete a la Red</a>
-        </nav>
-        <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
-        <div class="hero-content" style="position:relative; z-index:5;">
-    <span class="hero-eyebrow">Emergencia Humanitaria</span>
-    <h1 id="event-title">--</h1>
-    <!-- NUEVO NODO PARA LA DESCRIPCIÓN -->
-    <p id="event-description" class="hero-description">--</p>
-</div>
-    </header>
-
-    <!-- MÓDULO ATÓMICO: COUNTDOWN (Slot Independiente v210 — ya NO es hijo de #mod-hero) -->
-    <div id="unified-frame" class="unified-countdown-frame" style="display:flex; justify-content:center; margin-top:3rem;">
-        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-days" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>DÍAS</small></div>
-        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-hours" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>HORAS</small></div>
-        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-mins" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>MIN</small></div>
-        <div class="cd-block" style="padding:0 1.5rem; text-align:center;"><span id="cd-secs" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>SEG</small></div>
-    </div>
-
-    <!-- MÓDULO 03: METADATOS (v1.10-GOLD / Paridad hero-ejemplo.jpg) -->
-    <div id="mod-hero-meta" class="hero-meta">
-        
-        <!-- CAMPO 01: FECHA -->
-        <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-            <div class="meta-data">
-                <label class="meta-label">FECHA</label>
-                <span id="meta-fecha">24 de Junio del 2026</span>
-            </div>
+        <div class="b5-countdown" id="countdown">
+          <div class="b5-countdown__item"><span class="b5-countdown__num" id="cd-dias">--</span><span class="b5-countdown__label">Días</span></div>
+          <div class="b5-countdown__item"><span class="b5-countdown__num" id="cd-horas">--</span><span class="b5-countdown__label">Horas</span></div>
+          <div class="b5-countdown__item"><span class="b5-countdown__num" id="cd-mins">--</span><span class="b5-countdown__label">Min</span></div>
+          <div class="b5-countdown__item"><span class="b5-countdown__num" id="cd-segs">--</span><span class="b5-countdown__label">Seg</span></div>
         </div>
+      </div>
+    </section>
 
-        <!-- CAMPO 02: HORA -->
-        <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-            <div class="meta-data">
-                <label class="meta-label">HORA</label>
-                <span id="meta-hora">11:56 AM (HORA LOCAL)</span>
-            </div>
+    <!-- ═══ METADATA ═══ -->
+    <section class="b5-meta container">
+      <div class="b5-meta__card">
+        <div class="b5-meta__icon">📅</div>
+        <div class="b5-meta__info">
+          <span class="b5-meta__label">Fecha</span>
+          <span class="b5-meta__value" id="meta-fecha">--</span>
         </div>
-
-        <!-- CAMPO 03: UBICACIÓN -->
-        <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            <div class="meta-data">
-                <label class="meta-label">UBICACIÓN</label>
-                <span id="meta-lugar">CATIA LA MAR, VENEZUELA</span>
-            </div>
+      </div>
+      <div class="b5-meta__card">
+        <div class="b5-meta__icon">⏰</div>
+        <div class="b5-meta__info">
+          <span class="b5-meta__label">Hora</span>
+          <span class="b5-meta__value" id="meta-hora">--</span>
         </div>
-
-        <!-- CAMPO 04: MAGNITUD -->
-        <div class="meta-item">
-            <svg class="meta-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 13h3l2-6 3 12 3-16 3 10h3l2-4 3 4"/></svg>
-            <div class="meta-data">
-                <label class="meta-label">MAGNITUD</label>
-                <span id="meta-magnitud">7.5 Mw</span>
-            </div>
+      </div>
+      <div class="b5-meta__card">
+        <div class="b5-meta__icon">📍</div>
+        <div class="b5-meta__info">
+          <span class="b5-meta__label">Lugar</span>
+          <span class="b5-meta__value" id="meta-lugar">--</span>
         </div>
+      </div>
+    </section>
 
-    </div>
-
-        <!-- ============================================================
-             EXTENSIÓN ADITIVA DEL CONTRATO (v215 · Contrato v107 → v108)
-             Los 3 átomos siguientes son NUEVOS y GENÉRICOS: cualquier
-             categoría/plantilla (fiesta, cine, campaña, futuras) puede
-             activarlos vía su propio .tpl-{id}.css. No se borra ni se
-             modifica ningún átomo previo (Protocolo de Cero Borrado
-             intacto). Por defecto permanecen ocultos gracias al kernel
-             IoC ("section, header { display:none }"): solo se encienden
-             si el silo activo los referencia explícitamente. ============ -->
-
-        <!-- MÓDULO EXTENDIDO: HISTORIA (narrativa de la causa/evento) -->
-        <section id="mod-historia">
-            <div class="historia-inner" style="max-width:900px; margin:0 auto; text-align:center;">
-                <span class="b5-num-eyebrow historia-eyebrow" data-num="04">Historia</span>
-                <!-- Átomos originales v107 (Cero Borrado): permanecen en el DOM; ocultos
-                     solo en b5 vía CSS porque este silo usa el nuevo #db-historia-lista
-                     aditivo para soportar varios hitos narrativos (ver landing-escritorio.jpg). -->
-                <h2 id="db-historia-titulo" style="font-weight:900; text-transform:uppercase;">--</h2>
-                <img id="db-historia-img" src="" alt="" style="width:100%; max-width:700px; border-radius:15px; margin:2rem auto; display:block;" onerror="this.style.display='none';">
-                <p id="db-historia-texto" style="line-height:1.8; opacity:0.85;">--</p>
-                <!-- NUEVO ÁTOMO ADITIVO (v222): lista de hitos narrativos numerados -->
-                <div id="db-historia-lista" class="historia-lista"></div>
-            </div>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: OBJETIVO (meta económica + barra de progreso) -->
-        <section id="mod-objetivo">
-            <div class="objetivo-inner" style="max-width:900px; margin:0 auto;">
-                <div class="objetivo-stats" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; margin-bottom:1.5rem;">
-                    <div class="objetivo-stat-block"><span class="objetivo-label">RECAUDADO</span><span id="db-objetivo-recaudado" class="objetivo-value">--</span></div>
-                    <div class="objetivo-stat-block"><span class="objetivo-label">META</span><span id="db-objetivo-meta" class="objetivo-value">--</span></div>
-                    <div class="objetivo-stat-block"><span class="objetivo-label">DONANTES</span><span id="db-objetivo-donantes" class="objetivo-value">--</span></div>
-                </div>
-                <div class="objetivo-barra-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                    <div id="db-objetivo-barra" class="objetivo-barra-fill" style="width:0%;"></div>
-                </div>
-                <span id="db-objetivo-pct" class="objetivo-pct">0%</span>
-            </div>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: IMPACTO (grid de niveles/tarjetas de donación) -->
-        <section id="mod-impacto-humanitario">
-            <div id="db-impacto-grid" class="impacto-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:1.5rem; max-width:1100px; margin:0 auto;"></div>
-        </section>
-        <!-- ======================= FIN EXTENSIÓN ADITIVA ================= -->
-
-        <!-- MÓDULO 3A: VIDEO & GALERÍA DE FOTOS (split v1.4.6 de #mod-gallery,
-             para permitir que #mod-lineup se intercale antes del Playlist.
-             NOTA: al separarse de #mod-playlist, Video y Playlist dejan de
-             compartir fila -- el "sync 1:1 de altura" original (pensado para
-             cuando estaban lado a lado) ya no aplica visualmente; cada uno
-             mantiene su propio tamaño (16:9 para video, min-height:400px
-             para playlist, ver p5.css) [cite: 11, 12] -->
-        <section id="mod-video">
-            <div class="b5-video-col b5-video-col--gallery">
-                <span class="b5-num-eyebrow" data-num="06">Galería de memoria</span>
-                <div id="db-gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:4rem;"></div>
-                <span class="video-col-link">Ver más fotos y videos →</span>
-            </div>
-            <div class="b5-video-col b5-video-col--video">
-                <span class="b5-num-eyebrow" data-num="07">Video documental</span>
-                <div style="max-width: 1100px; margin: 0 auto;">
-                    <div id="db-video-content" style="aspect-ratio: 16/9; background: #000; border-radius: 15px; border: 1px solid var(--gold); overflow: hidden;"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- MÓDULO 2: LINEUP [cite: 2, 863] — reubicado en v1.4.6 entre
-             Video y Playlist en el DOM para que coincida con el orden
-             visual real definido por grid-area en p5.css -->
-        <section id="mod-lineup">
-            <div class="lineup-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:3rem; max-width:1100px; margin:0 auto; align-items:start;">
-                <div style="display:flex; justify-content:center; border-right:1px solid rgba(255,255,255,0.1); padding-right:5rem;"><img id="db-poster-img" src="" style="width:320px; border-radius:12px; border:4px solid var(--gold);" alt="Poster"></div>
-                <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem; padding-left:5rem;"></div>
-            </div>
-        </section>
-
-        <!-- MÓDULO 3B: PLAYLIST (split v1.4.6 de #mod-gallery) -->
-        <section id="mod-playlist">
-            <div style="max-width: 1100px; margin: 0 auto;">
-                <div id="db-spotify-embed" style="border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; min-height: 400px;"></div>
-            </div>
-        </section>
-
-        <section id="mod-info-tecnica">
-            <div class="data-cards-container" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
-                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
-                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">DRESS CODE</span>
-                    <span id="db-dress-val" style="font-size:1.4rem; font-weight:900;">--</span>
-                </div>
-                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
-                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">GUEST LIST</span>
-                    <span id="db-guest-val" style="font-size:1.4rem; font-weight:900;">--</span>
-                </div>
-                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
-                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">AFORO</span>
-                    <span id="db-aforo-val" style="font-size:1.4rem; font-weight:900;">--</span>
-                </div>
-                <div class="card-item" style="background:#141419; border:1px solid rgba(255,255,255,0.08); padding:2rem; border-radius:15px; text-align:center;">
-                    <span style="color:var(--gold); font-size:0.6rem; font-weight:900; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:0.5rem;">TICKETS</span>
-                    <span id="db-ticket-val" style="font-size:1.4rem; font-weight:900;">--</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- MÓDULO 6A: FAQ (split v1.4.8 de #mod-faq-ubicacion, para que FAQ y Ubicación sean hermanos planos independientes) -->
-        <section id="mod-faq">
-            <span class="b5-num-eyebrow" data-num="09">Preguntas frecuentes</span>
-            <div id="db-faq-list"></div>
-        </section>
-
-        <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
-        <section id="mod-ubicacion">
-            <span class="b5-num-eyebrow" data-num="10">Contacto</span>
-            <!-- ADR-018: el overlay de pin (.mapa-zona-pin, v1.2.6) se retira de forma
-                 definitiva del marcado -- dependía visualmente del iframe de mapa que
-                 ADR-017 ya reemplazó por el bloque de contacto directo, así que superponer
-                 un pin sobre texto de contacto no tenía sentido visual. Autorizado
-                 explícitamente por Dirección ("eliminar definitivamente"), a diferencia del
-                 resto de átomos del Contrato de Datos, que solo se ocultan (Cero Borrado). -->
-            <div class="mapa-wrap">
-                <div id="db-mapa-container" style="border-radius:15px; overflow:hidden;"></div>
-            </div>
-        </section>
-
-        <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
-
-        <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874]
-             v221: se agrega Lógica Dual-Phase (Fase 1 -> INSERT en 'inscritos';
-             Fase 2 -> UPDATE con email/autorizacion/respuestas_custom, sin campos
-             obligatorios y sin recargar la página. #reg-nombre, #master-reg-form y la estructura
-             de tabs REGISTRO/RECUPERAR del Contrato original se conservan
-             intactos; los campos nuevos son aditivos dentro del mismo átomo. -->
-        <section id="mod-form">
-            <div class="form-master-box">
-                <div id="form-nuevo">
-                    <h2 class="form-titulo">Súmate a la red de solidaridad</h2>
-                    <p class="form-lead">Cada evento es un acto de solidaridad que ayuda a fortalecer este tejido. Cuéntanos, ¿cómo quieres ayudar?</p>
-                    <form id="master-reg-form" novalidate>
-                        <div id="fase1-fields">
-                            <input type="text" id="reg-nombre" placeholder="Nombre completo *" required>
-                            <div class="reg-phone-row">
-                                <select id="reg-pais" aria-label="País">
-                                    <option value="+58">🇻🇪 +58</option>
-                                    <option value="+57" selected>🇨🇴 +57</option>
-                                    <option value="+1">🇺🇸 +1</option>
-                                    <option value="+34">🇪🇸 +34</option>
-                                    <option value="+51">🇵🇪 +51</option>
-                                    <option value="+56">🇨🇱 +56</option>
-                                    <option value="+593">🇪🇨 +593</option>
-                                    <option value="+507">🇵🇦 +507</option>
-                                    <option value="+54">🇦🇷 +54</option>
-                                    <option value="+52">🇲🇽 +52</option>
-                                    <option value="+55">🇧🇷 +55</option>
-                                    <option value="+33">🇫🇷 +33</option>
-                                    <option value="+44">🇬🇧 +44</option>
-                                    <option value="+49">🇩🇪 +49</option>
-                                    <option value="+39">🇮🇹 +39</option>
-                                    <option value="+41">🇨🇭 +41</option>
-                                    <option value="+1">🇨🇦 +1</option>
-                                    <option value="+598">🇺🇾 +598</option>
-                                    <option value="+591">🇧🇴 +591</option>
-                                    <option value="+506">🇨🇷 +506</option>
-                                    <option value="+53">🇨🇺 +53</option>
-                                    <option value="+351">🇵🇹 +351</option>
-                                    <option value="+61">🇦🇺 +61</option>
-                                    <option value="+31">🇳🇱 +31</option>
-                                    <option value="+353">🇮🇪 +353</option>
-                                    <option value="custom">🌐 Otro — escribir prefijo</option>
-                                </select>
-                                <input type="tel" id="reg-whatsapp" placeholder="WhatsApp *" required>
-                            </div>
-                            <input type="text" id="reg-pais-custom" inputmode="numeric" placeholder="Prefijo de tu país (ej. +33)" style="display:none" aria-label="Prefijo de otro país">
-                            <select id="reg-tipo-ayuda" required>
-                                <option value="" disabled selected>¿Cómo te gustaría ayudar?</option>
-                                <option value="espacio">Espacio — pongo mi venue</option>
-                                <option value="artista">Artista — mi talento</option>
-                                <option value="marca">Marca — mi marca deja huella</option>
-                                <option value="voluntario">Voluntario — mi tiempo</option>
-                                <option value="donacion">Donación — mi aporte</option>
-                            </select>
-                            <button type="submit" class="btn-submit">QUIERO SUMARME →</button>
-                            <span class="form-security-note">🔒 Es rápido, seguro y gratuito.</span>
-                        </div>
-<div id="form-fase2" style="display:none;">
-                             <p class="form-lead">Un último paso para verificar tu registro.</p>
-                             <!-- Fase 2 sin obligatoriedad (Mandato Director, ago-2026): ya ningún
-                                  campo es requerido — el dato esencial (WhatsApp) se capturó en Fase 1.
-                                  El campo 'cedula' se retira del formulario; #reg-email permanece pero
-                                  opcional. Cero Borrado: los 5 bloques de preguntas quedan intactos. -->
-                             <input type="email" id="reg-email" placeholder="Correo electrónico">
-
-                            <!-- Contrato Ramificado v112 (Context Package v4.0.0-GOLD): 5 bloques de
-                                 perfilamiento, uno por categoría de reg-tipo-ayuda. Cero Borrado: los
-                                 5 bloques permanecen siempre en el DOM; JS solo muestra el activo vía
-                                 display:none/block (ver mostrarBloqueFase2 más abajo). -->
-                            <div id="fase2-cat-espacio" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-espacio-direccion" placeholder="Dirección exacta del espacio">
-                                <input type="text" id="reg-espacio-aforo" placeholder="Aforo aproximado">
-                                <select id="reg-espacio-sonido">
-                                    <option value="" disabled selected>¿Tiene equipo de sonido?</option>
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                            </div>
-                            <div id="fase2-cat-artista" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-artista-portafolio" placeholder="Instagram / portafolio">
-                                <input type="text" id="reg-artista-especialidad" placeholder="Especialidad artística">
-                                <input type="text" id="reg-artista-requerimiento" placeholder="Requerimiento técnico">
-                            </div>
-                            <div id="fase2-cat-marca" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-marca-tipoapoyo" placeholder="Tipo de apoyo que ofreces">
-                                <select id="reg-marca-logo">
-                                    <option value="" disabled selected>¿Tu marca tiene logo para exhibir?</option>
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                                <input type="text" id="reg-marca-cargo" placeholder="Tu cargo en la marca">
-                            </div>
-                            <div id="fase2-cat-voluntario" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-voluntario-profesion" placeholder="Profesión / oficio">
-                                <input type="text" id="reg-voluntario-disponibilidad" placeholder="Disponibilidad">
-                                <select id="reg-voluntario-rescate">
-                                    <option value="" disabled selected>¿Tienes experiencia en voluntariados?</option>
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                            </div>
-                            <div id="fase2-cat-donacion" class="fase2-cat-block" style="display:none;">
-                                <input type="text" id="reg-donacion-monto" placeholder="Monto proyectado (aprox.)">
-                                <select id="reg-donacion-canal">
-                                    <option value="" disabled selected>Canal preferido</option>
-                                    <option value="transferencia">Transferencia</option>
-                                    <option value="efectivo">Efectivo</option>
-                                    <option value="especie">En especie</option>
-                                </select>
-                                <select id="reg-donacion-certificado">
-                                    <option value="" disabled selected>¿Deseas certificado de donación?</option>
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                            </div>
-
-                            <label class="form-checkbox">
-                                <input type="checkbox" id="reg-autorizacion">
-                                <span>Autorizo el tratamiento de mis datos personales conforme a la política de privacidad de la organización.</span>
-                            </label>
-                            <button type="submit" class="btn-submit">CONFIRMAR REGISTRO →</button>
-                        </div>
-                        <div id="form-fase-success" style="display:none;">
-                            <p class="form-success-msg">¡Gracias por sumarte! Te contactaremos muy pronto por WhatsApp.</p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================================================
-             EXTENSIÓN ADITIVA II DEL CONTRATO (v220 · Contrato v108 → v109)
-             3 átomos nuevos, genéricos, opcionales. Ocultos por defecto
-             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
-
-        <!-- MÓDULO EXTENDIDO: EQUIPO (staff / voluntarios con foto + rol) -->
-        <section id="mod-equipo">
-            <div id="db-equipo-grid" class="equipo-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2.5rem; max-width:1100px; margin:0 auto;"></div>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: CTA FINAL (franja de cierre antes del footer) -->
-        <section id="mod-cta-final">
-            <div class="cta-final-inner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; max-width:1200px; margin:0 auto;">
-                <div class="cta-final-text">
-                    <span id="db-cta-final-titulo" style="display:block; font-weight:900;">--</span>
-                    <p id="db-cta-final-subtitulo" style="margin:0.3rem 0 0;">--</p>
-                </div>
-                <button id="cta-final-btn" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">QUIERO SUMARME →</button>
-            </div>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: FOOTER (marca, enlaces, redes, contacto) -->
-        <footer id="mod-footer">
-            <div class="footer-inner">
-                <div class="footer-brand">
-                    <span id="footer-brand-mark" class="footer-brand-mark" aria-hidden="true"></span>
-                    <span id="footer-org-name">--</span>
-                    <p id="footer-tagline">--</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Enlaces</h4>
-                    <ul id="db-footer-links" class="footer-links"></ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Síguenos</h4>
-                    <div id="db-footer-social" class="footer-social"></div>
-                    <div id="db-footer-contacto" class="footer-contacto"></div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span id="footer-copy">--</span>
-            </div>
-        </footer>
-        <!-- ==================== FIN EXTENSIÓN ADITIVA II ================= -->
-
-        <!-- ============================================================
-             EXTENSIÓN ADITIVA III DEL CONTRATO (v221 · Contrato v109 → v110)
-             Motivada por la campaña "Emergencia por Venezuela" (b5), pero
-             los 3 átomos son GENÉRICOS y reutilizables por cualquier
-             categoría/plantilla futura que necesite estado de crisis en
-             tiempo real, categorías de colaboración o un histórico de
-             impacto separado del objetivo económico. Ocultos por defecto
-             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
-
-        <!-- MÓDULO EXTENDIDO: MAPA DE CRISIS (visualización ilustrativa del área afectada) -->
-        <section id="mod-mapa-crisis">
-            <div class="mapacrisis-inner">
-                <span class="b5-num-eyebrow mapacrisis-eyebrow" data-num="02">Estado de emergencia <em></em></span>
-                <div id="db-mapa-crisis-svg" class="mapacrisis-svg-wrap"></div>
-                <div class="mapacrisis-legend">
-                    <span><i class="mapacrisis-dot mapacrisis-dot--epicentro"></i>Epicentro</span>
-                    <span><i class="mapacrisis-dot mapacrisis-dot--zona"></i>Zona afectada</span>
-                    <span><i class="mapacrisis-dot mapacrisis-dot--falla"></i><span id="db-mapa-crisis-falla">--</span></span>
-                </div>
-            </div>
-        </section>
-
-        <!-- TEXTO DESCRIPCIÓN VENEZUELA (Fila 02, columna derecha) -->
-        <section id="crisistext-vzla">
-            <h3 class="crisis-titulo">EMERGENCIA VENEZUELA</h3>
-            <p class="crisis-texto">El 24 de junio de 2026, dos terremotos masivos de 7.2 y 7.5 Mw devastaron el norte de Venezuela, dejando a La Guaira y Catia La Mar en zona de desastre estructural.</p>
-            <p class="crisis-texto">Con un balance de 5,546 fallecidos y 16,740 heridos, la ONU estima que 50,000 personas siguen desaparecidas bajo los escombros en un contexto de colapso hospitalario y de servicios básicos.</p>
-            <p class="crisis-texto">Actualmente, 10,702 damnificados permanecen en campamentos transitorios, mientras la comunidad internacional exige transparencia informativa para coordinar la ayuda urgente a los 6.7 millones de afectados.</p>
-        </section>
-
-        <!-- TEXTO DESCRIPCIÓN COLOMBIA (Fila 03, columna izquierda) -->
-        <section id="crisistext-col">
-            <h3 class="crisis-titulo">EMERGENCIA COLOMBIA</h3>
-            <p class="crisis-texto">El 10 de agosto de 2026, un terremoto de 7.4 Mw sacudió el centro y occidente de Colombia, con epicentro en San José del Palmar, Chocó, a una profundidad de 96 km.</p>
-            <p class="crisis-texto">Con un balance preliminar de 132 fallecidos y 570 heridos, el sismo provocó daños en viviendas y edificaciones de Chocó, Valle del Cauca, Risaralda y Caldas, mientras continúan las labores de búsqueda, rescate y evaluación de las zonas afectadas.</p>
-            <p class="crisis-texto">Más de 1.500 viviendas han sido reportadas con daños, en una emergencia que continúa evolucionando y requiere coordinación para atender las necesidades de las comunidades afectadas.</p>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: MAPA DE CRISIS COLOMBIA -->
-        <section id="mod-mapa-crisis-col">
-            <div class="mapacrisis-inner">
-                <div id="db-mapa-crisis-svg-col" class="mapacrisis-svg-wrap mapacrisis-svg-wrap--col"></div>
-                <div class="mapacrisis-legend">
-                    <span><i class="mapacrisis-dot mapacrisis-dot--epicentro"></i>Epicentro</span>
-                    <span><i class="mapacrisis-dot mapacrisis-dot--zona"></i>Zona afectada</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: CÓMO AYUDAR (categorías de colaboración) -->
-        <section id="mod-como-ayudar">
-            <div class="comoayudar-inner">
-                <div class="comoayudar-col comoayudar-col--main">
-                    <span class="b5-num-eyebrow comoayudar-eyebrow" data-num="03">¿Cómo puedo ayudar? <em>(sinergia cultural)</em></span>
-                    <p id="db-como-ayudar-lead" class="comoayudar-lead">--</p>
-                    <div id="db-como-ayudar-grid" class="comoayudar-grid"></div>
-                </div>
-                <div class="comoayudar-col comoayudar-col--stats">
-                    <div id="db-como-ayudar-stats" class="comoayudar-stats"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- MÓDULO EXTENDIDO: IMPACTO HISTÓRICO (segundo bloque de métricas + frase destacada) -->
-        <section id="mod-impacto-historico">
-            <div class="impactohist-inner">
-                <span class="b5-num-eyebrow impactohist-eyebrow" data-num="05">Impacto hasta hoy</span>
-                <div id="db-impacto-historico-grid" class="impacto-grid impactohist-grid"></div>
-                <div class="impactohist-banner">
-                    <span id="db-impacto-historico-frase">--</span>
-                </div>
-            </div>
-        </section>
-        <!-- ==================== FIN EXTENSIÓN ADITIVA III ================= -->
-
-        <!-- ============================================================
-             EXTENSIÓN ADITIVA IV DEL CONTRATO (v222 · Contrato v110 → v111)
-             1 átomo nuevo, genérico y reutilizable: diario de actualizaciones
-             (carrusel de tarjetas de noticias/hitos). Nace de "landing-escritorio.jpg"
-             (paridad visual absoluta) pero no es exclusivo de b5. Oculto por defecto
-             (kernel IoC). Ningún átomo previo fue tocado ni removido. ==== -->
-
-        <!-- MÓDULO EXTENDIDO: ACTUALIZACIONES (diario de impacto / carrusel de noticias) -->
-        <section id="mod-actualizaciones">
-            <div class="actualizaciones-inner">
-                <div class="actualizaciones-head">
-                    <span class="b5-num-eyebrow actualizaciones-eyebrow" data-num="08">Actualizaciones <em>(diario de impacto)</em></span>
-                    <span class="actualizaciones-vertodas">Ver todas las actualizaciones →</span>
-                </div>
-                <div id="db-actualizaciones-grid" class="actualizaciones-grid"></div>
-            </div>
-        </section>
-
-        <!-- Modal de lectura ampliada (v1.2.6) — se activa con .actualizacion-link -->
-        <div id="actualizacion-modal" class="actualizacion-modal" onclick="if(event.target===this) cerrarActualizacionModal();">
-            <div class="actualizacion-modal-card">
-                <button type="button" class="actualizacion-modal-cerrar" onclick="cerrarActualizacionModal();" aria-label="Cerrar">×</button>
-                <img id="actualizacion-modal-img" class="actualizacion-modal-img" src="" alt="" style="display:none;">
-                <span id="actualizacion-modal-fecha" class="actualizacion-modal-fecha"></span>
-                <h3 id="actualizacion-modal-detalle" class="actualizacion-modal-detalle"></h3>
-                <p id="actualizacion-modal-ampliado" class="actualizacion-modal-ampliado"></p>
-            </div>
+    <!-- ═══ CRISIS ═══ -->
+    <section class="b5-crisis">
+      <div class="container">
+        <div class="b5-crisis__header">
+          <h2>Solidaridad con las víctimas</h2>
         </div>
-        <!-- ==================== FIN EXTENSIÓN ADITIVA IV ================= -->
+        <div class="b5-crisis__grid">
+          <div class="b5-crisis__col">
+            <h3>Venezuela</h3>
+            <p id="crisis-ven">Las comunidades afectadas necesitan albergue, agua potable, alimentos y atención médica. Tu donación directa salva vidas.</p>
+          </div>
+          <div class="b5-crisis__col">
+            <h3>Colombia</h3>
+            <p id="crisis-col">El terremoto dejó familias sin hogar y infraestructura dañada. La solidaridad transfronteriza es clave para la recuperación.</p>
+          </div>
+        </div>
+        <div class="b5-crisis__maps" id="crisis-maps"></div>
+      </div>
+    </section>
 
-    </main>
+    <!-- ═══ CÓMO AYUDAR ═══ -->
+    <section class="b5-ayuda">
+      <div class="container">
+        <div class="b5-ayuda__header">
+          <h2>Cómo puedes ayudar</h2>
+          <p>Elige la forma de colaborar que mejor se adapte a ti</p>
+        </div>
+        <div class="b5-ayuda__grid">
+          <div class="b5-ayuda__card">
+            <span class="b5-ayuda__emoji">💰</span>
+            <h3>Donar</h3>
+            <p>Aporta fondos para alimentos, medicinas y refugio temporal para las familias afectadas.</p>
+          </div>
+          <div class="b5-ayuda__card">
+            <span class="b5-ayuda__emoji">📦</span>
+            <h3>Donar en especie</h3>
+            <p>Ropa, cobijas, alimentos no perecederos y kit de higiene. Punto de acopio activo.</p>
+          </div>
+          <div class="b5-ayuda__card">
+            <span class="b5-ayuda__emoji">🙌</span>
+            <h3>Voluntariado</h3>
+            <p>Únete como voluntario para logística, distribución y atención directa a damnificados.</p>
+          </div>
+          <div class="b5-ayuda__card">
+            <span class="b5-ayuda__emoji">🎵</span>
+            <h3>Donar talento</h3>
+            <p>Músicos y artistas: parte de la campaña con tu arte. Toda presentación es ensolidaridad.</p>
+          </div>
+          <div class="b5-ayuda__card">
+            <span class="b5-ayuda__emoji">📢</span>
+            <h3>Difundir</h3>
+            <p>Comparte esta campaña. Cada compartida amplifica el impacto y llega a más personas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <script>
-        const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
-        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+    <!-- ═══ FORMULARIO ═══ -->
+    <section class="b5-form" id="b5-form">
+      <div class="container">
+        <div class="b5-form__header">
+          <h2>Regístrate y suma tu granito de arena</h2>
+          <p>Completa el formulario para ser parte de esta campaña humanitária</p>
+        </div>
+        <div class="b5-form__box" id="b5-form-box">
+          <form id="b5-form-el" autocomplete="on">
+            <!-- Fase 1: Datos básicos -->
+            <div class="b5-form__row">
+              <div class="b5-form__group">
+                <label class="b5-form__label" for="b5-nombre">Nombre</label>
+                <input class="b5-form__input" type="text" id="b5-nombre" name="nombre" required placeholder="Tu nombre">
+              </div>
+              <div class="b5-form__group">
+                <label class="b5-form__label" for="b5-email">Correo</label>
+                <input class="b5-form__input" type="email" id="b5-email" name="email" required placeholder="correo@ejemplo.com">
+              </div>
+            </div>
+            <div class="b5-form__row">
+              <div class="b5-form__group">
+                <label class="b5-form__label" for="b5-whatsapp">WhatsApp</label>
+                <input class="b5-form__input" type="tel" id="b5-whatsapp" name="whatsapp" required placeholder="Ej: 3101234567">
+              </div>
+              <div class="b5-form__group">
+                <label class="b5-form__label" for="b5-pais">País</label>
+                <select class="b5-form__select" id="b5-pais" name="pais" required>
+                  <option value="">Selecciona país</option>
+                  <option value="CO">Colombia (+57)</option>
+                  <option value="VE">Venezuela (+58)</option>
+                  <option value="MX">México (+52)</option>
+                  <option value="AR">Argentina (+54)</option>
+                  <option value="CL">Chile (+56)</option>
+                  <option value="PE">Perú (+51)</option>
+                  <option value="EC">Ecuador (+593)</option>
+                  <option value="BO">Bolivia (+591)</option>
+                  <option value="PY">Paraguay (+595)</option>
+                  <option value="UY">Uruguay (+598)</option>
+                  <option value="CR">Costa Rica (+506)</option>
+                  <option value="PA">Panamá (+507)</option>
+                  <option value="GT">Guatemala (+502)</option>
+                  <option value="HN">Honduras (+504)</option>
+                  <option value="NI">Nicaragua (+505)</option>
+                  <option value="SV">El Salvador (+503)</option>
+                  <option value="DO">República Dominicana (+1-809)</option>
+                  <option value="CU">Cuba (+53)</option>
+                  <option value="PR">Puerto Rico (+1-787)</option>
+                  <option value="ES">España (+34)</option>
+                  <option value="US">Estados Unidos (+1)</option>
+                </select>
+              </div>
+            </div>
+            <div class="b5-form__row b5-form__row--full">
+              <div class="b5-form__group">
+                <label class="b5-form__label" for="b5-tipo">¿Cómo quieres ayudar?</label>
+                <select class="b5-form__select" id="b5-tipo" name="tipo_ayuda" required>
+                  <option value="">Selecciona una opción</option>
+                  <option value="donacion">Donación monetaria</option>
+                  <option value="donacion_especie">Donación en especie</option>
+                  <option value="voluntariado">Voluntariado</option>
+                  <option value="talento">Donar talento / Artista</option>
+                  <option value="difusion">Difusión</option>
+                </select>
+              </div>
+            </div>
 
-        function logStatus(m, t = 'INFO') {
-            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
-            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
-        }
+            <!-- Fase 2: Preguntas condicionales -->
+            <div class="b5-form__phase2" id="b5-phase2">
+              <div class="b5-form__phase-label">Respuestas adicionales</div>
 
-        // === TEXTO ENRIQUECIDO MARKDOWN-LITE (anti-XSS) ===
-        // Soporta **negrita** y saltos de línea desde el JSON (historia, actualizaciones, FAQ).
-        // Primero se escapa todo el HTML crudo (blinda contra inyección), luego se re-inyectan
-        // SOLO las etiquetas propias del render (<strong>, <br>). Doble salto \n\n = párrafo.
-        function formatRichText(txt) {
-            if (!txt) return '';
-            return txt
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n{2,}/g, '<br><br>')
-                .replace(/\n/g, '<br>');
-        }
+              <div class="b5-form__row b5-form__row--full" id="b5-f2-dinero-wrap">
+                <div class="b5-form__group">
+                  <label class="b5-form__label" for="b5-f2-dinero">¿Cuánto te gustaría donar (USD)?</label>
+                  <input class="b5-form__input" type="text" id="b5-f2-dinero" placeholder="Ej: 25, 50, 100">
+                </div>
+              </div>
 
-        // === MODAL DE LECTURA AMPLIADA — ACTUALIZACIONES (v1.2.6) ===
-        // window._actualizacionesData se puebla en el segmento de render de Actualizaciones.
-        function abrirActualizacionModal(idx) {
-            const item = (window._actualizacionesData || [])[idx];
-            if (!item) return;
-            const modal = document.getElementById('actualizacion-modal');
-            if (!modal) return;
-            document.getElementById('actualizacion-modal-fecha').innerText = item.categoria ? `${item.categoria} · ${item.fecha || ''}` : (item.fecha || '');
-            document.getElementById('actualizacion-modal-detalle').innerText = item.titulo || '';
-            document.getElementById('actualizacion-modal-ampliado').innerHTML = formatRichText(item.resumen_ampliado || item.resumen || '');
-            const img = document.getElementById('actualizacion-modal-img');
-            if (item.imagen) { img.src = item.imagen; img.style.display = 'block'; }
-            else { img.removeAttribute('src'); img.style.display = 'none'; }
-            modal.classList.add('activo');
-            document.body.style.overflow = 'hidden';
-        }
-        function cerrarActualizacionModal() {
-            const modal = document.getElementById('actualizacion-modal');
-            if (!modal) return;
-            modal.classList.remove('activo');
-            document.body.style.overflow = '';
-        }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarActualizacionModal(); });
+              <div class="b5-form__row b5-form__row--full" id="b5-f2-especie-wrap">
+                <div class="b5-form__group">
+                  <label class="b5-form__label" for="b5-f2-especie">¿Qué ropa o artículo traerías?</label>
+                  <textarea class="b5-form__textarea" id="b5-f2-especie" placeholder="Describe los artículos que puedes donar"></textarea>
+                </div>
+              </div>
 
-        // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
-        function parseSpanishDate(dateStr, timeStr) {
-            const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
-            const parts = dateStr.toLowerCase().split(' de ');
-            if (parts.length === 3) {
-                const d = parts[0].trim().padStart(2, '0');
-                const m = months[parts[1].trim()];
-                const a = parts[2].trim();
-                return new Date(`${a}-${m}-${d}T${timeStr}`);
-            }
-            return new Date(`${dateStr}T${timeStr}`);
-        }
+              <div class="b5-form__row b5-form__row--full" id="b5-f2-voluntario-wrap">
+                <div class="b5-form__group">
+                  <label class="b5-form__label" for="b5-f2-voluntario">¿En qué área te gustaría ser voluntario?</label>
+                  <select class="b5-form__select" id="b5-f2-voluntario">
+                    <option value="">Selecciona un área</option>
+                    <option value="logistica">Logística y distribución</option>
+                    <option value="cocina">Cocina comunitaria</option>
+                    <option value="medica">Atención médica</option>
+                    <option value="educacion">Apoyo educativo</option>
+                    <option value="construccion">Reconstrucción</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+              </div>
 
-        // === INICIO SEGMENTO: FORMULARIO RAMIFICADO DUAL-PHASE (v222 → Contrato v112) ===
-        // Fase 1 -> INSERT en 'inscritos' (nombre, whatsapp, tipo_ayuda). Si tiene éxito,
-        // revela Fase 2 sin recargar y muestra el bloque de preguntas de la categoría
-        // elegida. Fase 2 -> UPDATE del mismo registro (email, autorizacion,
-        // respuestas_custom + las 3 columnas dedicadas de esa categoría), usando el id
-        // devuelto por el INSERT. Mandato Director (ago-2026): ningún campo de Fase 2 es
-        // obligatorio — 'cedula' se retiró del formulario; solo el WhatsApp de Fase 1 es clave.
-        // Columnas verificadas directamente en admin.html (uso real, no asunción):
-        // 'evento_id', 'org_id', 'nombre', 'whatsapp', 'tipo_ayuda', 'cedula', 'email',
-        // 'autorizacion', 'respuestas_custom' ya existen en `inscritos`.
-        // Columnas NUEVAS (Contrato v112, ver migración SQL adjunta — deben crearse en
-        // Supabase antes de desplegar): espacio_direccion, espacio_aforo,
-        // espacio_tiene_sonido, artista_portafolio, artista_especialidad,
-        // artista_requerimiento_tecnico, marca_tipo_apoyo, marca_tiene_logo, marca_cargo,
-        // voluntario_profesion, voluntario_disponibilidad, voluntario_experiencia_rescate,
-        // donacion_monto_proyectado, donacion_canal_preferido, donacion_desea_certificado.
-        let regPhase = 1;
-        let regInscritoId = null;
-        let regTipoAyuda = null;
+              <div class="b5-form__row b5-form__row--full" id="b5-f2-talento-wrap">
+                <div class="b5-form__group">
+                  <label class="b5-form__label" for="b5-f2-talento">¿Qué tipo de talento ofreces?</label>
+                  <textarea class="b5-form__textarea" id="b5-f2-talento" placeholder="Describe tu arte, instrumento o habilidad"></textarea>
+                </div>
+              </div>
 
-        // Muestra solo el bloque de preguntas de la categoría elegida en Fase 1;
-        // Cero Borrado: los 5 bloques quedan en el DOM, nunca se eliminan del HTML.
-        function mostrarBloqueFase2(tipoAyuda) {
-            document.querySelectorAll('.fase2-cat-block').forEach(el => { el.style.display = 'none'; });
-            const activo = document.getElementById(`fase2-cat-${tipoAyuda}`);
-            if (activo) activo.style.display = 'block';
-        }
+              <div class="b5-form__row b5-form__row--full" id="b5-f2-difusion-wrap">
+                <div class="b5-form__group">
+                  <label class="b5-form__label" for="b5-f2-difusion">¿Cómo puedes ayudar a difundir?</label>
+                  <textarea class="b5-form__textarea" id="b5-f2-difusion" placeholder="Redes sociales, medios, contactos, etc."></textarea>
+                </div>
+              </div>
+            </div>
 
-        // Prefijo libre ("Otro"): revela el input #reg-pais-custom cuando el select
-        // vale 'custom'; en cualquier otro caso lo oculta y limpia.
-        const regPaisSel = document.getElementById('reg-pais');
-        regPaisSel.addEventListener('change', function () {
-            const cust = document.getElementById('reg-pais-custom');
-            const show = this.value === 'custom';
-            cust.style.display = show ? 'block' : 'none';
-            if (show) cust.focus();
-        });
+            <button type="submit" class="b5-form__submit" id="b5-submit">Quiero ser parte</button>
+          </form>
 
-        document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const activeWrap = document.getElementById(regPhase === 1 ? 'fase1-fields' : 'form-fase2');
-            const submitBtn = activeWrap.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerText;
+          <div class="b5-form__success" id="b5-success">
+            <h3>¡Gracias por sumarte!</h3>
+            <p>Te contactaremos pronto por WhatsApp con los próximos pasos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            if (regPhase === 1) {
-                const nombre = document.getElementById('reg-nombre').value.trim();
-                let paisCod = document.getElementById('reg-pais').value;
-                if (paisCod === 'custom') {
-                    const prefijoDigitos = (document.getElementById('reg-pais-custom').value || '').replace(/\D/g, '');
-                    if (!prefijoDigitos) {
-                        alert('Escribe el prefijo de tu país (ej. 33 para Francia).');
-                        return;
-                    }
-                    paisCod = '+' + prefijoDigitos;
-                }
-                const whatsappNum = document.getElementById('reg-whatsapp').value.trim();
-                const tipoAyuda = document.getElementById('reg-tipo-ayuda').value;
+    <!-- ═══ FAQ ═══ -->
+    <section class="b5-faq">
+      <div class="container">
+        <div class="b5-faq__header">
+          <h2>Preguntas frecuentes</h2>
+        </div>
+        <div class="b5-faq__list" id="b5-faq-list">
+          <div class="b5-faq__item">
+            <div class="b5-faq__q">¿Cómo se usan las donaciones?</div>
+            <div class="b5-faq__a">El 100% de los fondos recaudados se destina directamente a compra de alimentos, medicinas, materiales de construcción y apoyo logístico para las familias afectadas en Venezuela y Colombia.</div>
+          </div>
+          <div class="b5-faq__item">
+            <div class="b5-faq__q">¿Puedo donar desde cualquier país?</div>
+            <div class="b5-faq__a">Sí. Aceptamos donaciones desde cualquier país de Latinoamérica, España y Estados Unidos. Los medios de pago varían según tu ubicación.</div>
+          </div>
+          <div class="b5-faq__item">
+            <div class="b5-faq__q">¿Cómo me convierto en voluntario?</div>
+            <div class="b5-faq__a">Regístrate en el formulario seleccionando "Voluntariado". Nuestro equipo te contactará para coordinar tu participación según tus habilidades y disponibilidad.</div>
+          </div>
+          <div class="b5-faq__item">
+            <div class="b5-faq__q">¿Qué tipo de ropa y artículos puedo donar?</div>
+            <div class="b5-faq__a">Ropa en buen estado (abrigos, camisetas, pantalones), cobijas, alimentos no perecederos (arroz, pasta, conservas), kit de higiene (jabón, pasta dental, pañales) y artículos de primera necesidad.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                if (!nombre || !whatsappNum || !tipoAyuda) {
-                    alert('Por favor completa nombre, WhatsApp y cómo quieres ayudar.');
-                    return;
-                }
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="b5-footer">
+      <div class="container">
+        <p>© 2026 Hostal Terraza — Sonidos por el cambio. Todos los derechos reservados.</p>
+      </div>
+    </footer>
 
-                submitBtn.disabled = true; submitBtn.innerText = 'ENVIANDO...';
-                try {
+  </div><!-- /.tpl-b5 -->
 
-                const { data, error } = await sbClient.from('inscritos').insert({
-                    evento_id: window.__ctxEventoId,
-                    org_id: window.__ctxOrgId,
-                    nombre: nombre,
-                    whatsapp: `${paisCod} ${whatsappNum}`,
-                    telefono: `${paisCod} ${whatsappNum}`,
-                    tipo: tipoAyuda,      // <--- Mapeamos 'tipo_ayuda' a la columna 'tipo'
-                    tipo_ayuda: tipoAyuda, // <--- (Opcional) Mantenerlo también en su propia columna
-                    respuestas_custom: {}
-                }).select().single();
+  <!-- ═══ SUPABASE ═══ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (async () => {
+    'use strict';
 
-                    if (error) throw error;
+    /* ── Supabase init ── */
+    const SUPABASE_URL = 'https://tylpgvayxoykxbqtjmmq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5bHBndmF5eG95a3hiamhtam1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzOTkzMjMsImV4cCI6MjA2ODk3NTMyM30.p7cN3s6YcG1vMv0jQ6F0uqQw8hG5x0jJ1qZ1vY2n8m4';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const EVENT_ID = 'b5';
+    const CAT_LABELS = { donacion: 'Donación monetaria', donacion_especie: 'Donación en especie', voluntariado: 'Voluntariado', talento: 'Donar talento', difusion: 'Difusión' };
 
-                    regInscritoId = data.id;
-                    regTipoAyuda = tipoAyuda;
-                    regPhase = 2;
-                    document.getElementById('fase1-fields').style.display = 'none';
-                    document.getElementById('form-fase2').style.display = 'block';
-                    mostrarBloqueFase2(tipoAyuda);
-                    logStatus(`TRACE: Fase 1 registrada en 'inscritos' (id ${regInscritoId}, categoría: ${tipoAyuda}).`, "TRACE");
-                } catch (err) {
-                    logStatus(`ERROR: Fallo INSERT Fase 1 -> ${err.message}`, "ERROR");
-                    alert('No pudimos procesar tu registro. Por favor intenta de nuevo en unos segundos.');
-                } finally {
-                    submitBtn.disabled = false; submitBtn.innerText = originalText;
-                }
-            } else {
-                const email = document.getElementById('reg-email').value.trim() || null;
-                const autorizado = document.getElementById('reg-autorizacion').checked;
+    /* ── DOM refs ── */
+    const $form = document.getElementById('b5-form-el');
+    const $phase2 = document.getElementById('b5-phase2');
+    const $submit = document.getElementById('b5-submit');
+    const $success = document.getElementById('b5-success');
+    const $tipo = document.getElementById('b5-tipo');
 
-                if (!regInscritoId) {
-                    logStatus('ERROR: No hay inscrito activo en memoria para completar Fase 2.', "ERROR");
-                    alert('Hubo un problema con tu sesión de registro. Por favor vuelve a intentar desde el inicio.');
-                    return;
-                }
+    /* ── Countdown ── */
+    const EVENT_DATE = new Date('2026-03-21T18:00:00-05:00');
+    function tickCountdown() {
+      const now = new Date();
+      let diff = EVENT_DATE - now;
+      if (diff < 0) diff = 0;
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      document.getElementById('cd-dias').textContent = String(d).padStart(2, '0');
+      document.getElementById('cd-horas').textContent = String(h).padStart(2, '0');
+      document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
+      document.getElementById('cd-segs').textContent = String(s).padStart(2, '0');
+    }
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
 
-                // Recolección de las 3 preguntas especializadas de la categoría activa
-                // (Contrato v112). getVal() tolera inputs/selects ausentes por si el
-                // bloque de otra categoría se está usando; solo se envían las columnas
-                // de regTipoAyuda, el resto de las 15 quedan null en la fila.
-                const getVal = (id) => document.getElementById(id)?.value?.trim() || null;
-                let camposCategoria = {};
-                if (regTipoAyuda === 'espacio') {
-                    camposCategoria = {
-                        espacio_direccion: getVal('reg-espacio-direccion'),
-                        espacio_aforo: getVal('reg-espacio-aforo'),
-                        espacio_tiene_sonido: getVal('reg-espacio-sonido') === 'si'
-                    };
-                } else if (regTipoAyuda === 'artista') {
-                    camposCategoria = {
-                        artista_portafolio: getVal('reg-artista-portafolio'),
-                        artista_especialidad: getVal('reg-artista-especialidad'),
-                        artista_requerimiento_tecnico: getVal('reg-artista-requerimiento')
-                    };
-                } else if (regTipoAyuda === 'marca') {
-                    camposCategoria = {
-                        marca_tipo_apoyo: getVal('reg-marca-tipoapoyo'),
-                        marca_tiene_logo: getVal('reg-marca-logo') === 'si',
-                        marca_cargo: getVal('reg-marca-cargo')
-                    };
-                } else if (regTipoAyuda === 'voluntario') {
-                    camposCategoria = {
-                        voluntario_profesion: getVal('reg-voluntario-profesion'),
-                        voluntario_disponibilidad: getVal('reg-voluntario-disponibilidad'),
-                        voluntario_experiencia_rescate: getVal('reg-voluntario-rescate') === 'si'
-                    };
-                } else if (regTipoAyuda === 'donacion') {
-                    camposCategoria = {
-                        donacion_monto_proyectado: getVal('reg-donacion-monto'),
-                        donacion_canal_preferido: getVal('reg-donacion-canal'),
-                        donacion_desea_certificado: getVal('reg-donacion-certificado') === 'si'
-                    };
-                }
-
-                submitBtn.disabled = true; submitBtn.innerText = 'GUARDANDO...';
-                try {
-                    const { error } = await sbClient.from('inscritos').update({
-                        email: email,
-                        autorizacion: autorizado,
-                        ...camposCategoria,
-                        respuestas_custom: {
-                            email: email,
-                            autorizacion: autorizado,
-                            autorizacion_fecha: autorizado ? new Date().toISOString() : null,
-                            ...camposCategoria
-                        }
-                    }).eq('id', regInscritoId);
-                    if (error) throw error;
-
-                    document.getElementById('form-fase2').style.display = 'none';
-                    document.getElementById('form-fase-success').style.display = 'block';
-                    logStatus(`TRACE: Fase 2 completada para inscrito ${regInscritoId}.`, "TRACE");
-                } catch (err) {
-                    logStatus(`ERROR: Fallo UPDATE Fase 2 -> ${err.message}`, "ERROR");
-                    alert('No pudimos guardar tu registro. Intenta de nuevo.');
-                } finally {
-                    submitBtn.disabled = false; submitBtn.innerText = originalText;
-                }
-            }
-        });
-        // === FIN SEGMENTO FORMULARIO DUAL-PHASE ===
-
-
-
-        // === REEMPLAZO QUIRÚRGICO: Bypass de Caché v1.3.56 (única declaración — v1.4.8) ===
-        async function injectAtomicCSS(cat, tplId) {
-            return new Promise((resolve) => {
-                const timestamp = Date.now();
-                const path = `css/templates/${(cat || 'fiesta').toLowerCase()}/${(tplId || 'f3').toLowerCase()}.css?v=${timestamp}`;
-                
-                // Hard Reset de Estilos: elimina hojas previas para evitar colisión de caché
-                const oldLinks = document.querySelectorAll('link[data-template-css]');
-                oldLinks.forEach(el => el.remove());
-
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.setAttribute('data-template-css', 'true');
-                
-                let isResolved = false;
-                const timer = setTimeout(() => {
-                    if (!isResolved) {
-                        isResolved = true;
-                        logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}]. Continuando en degradación suave.`, "ERROR");
-                        resolve(false);
-                    }
-                }, 5000);
-
-                link.onload = () => {
-                    if (!isResolved) {
-                        isResolved = true;
-                        clearTimeout(timer);
-                        let rulesCount = 0;
-                        try {
-                            const sheets = Array.from(document.styleSheets);
-                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
-                            if (targetSheet && targetSheet.cssRules) {
-                                rulesCount = targetSheet.cssRules.length;
-                            }
-                        } catch (e) {}
-                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS, cache bypass v=${timestamp}).`, "LINK");
-                        resolve(true);
-                    }
-                };
-
-                link.onerror = () => {
-                    if (!isResolved) {
-                        isResolved = true;
-                        clearTimeout(timer);
-                        logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR");
-                        resolve(false);
-                    }
-                };
-
-                link.href = path;
-                document.head.appendChild(link);
-            });
-        }
-
-        async function initEvento() {
-            logStatus("Iniciando Orquestador v214 - Sistema de Grid Atómico Modular.", "INFO");
-            const slug = new URLSearchParams(window.location.search).get('slug');
-            if (!slug) return;
-            try {
-                // Timeout de 8s para sbQuery (Resiliencia P4)
-                const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
-                const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
-                if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
-                
-                // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
-                const content = ev.config_landing?.content || {};
-
-                // CONTEXTO GLOBAL PARA EL FORMULARIO DUAL-PHASE (v221)
-                // ASUNCIÓN A VERIFICAR: se asume ev.org_id como FK real en la tabla `eventos`
-                // (nomenclatura usada en PROJECT.md para RLS). Confirmar antes de producción.
-                window.__ctxEventoId = ev.id;
-                window.__ctxOrgId = ev.org_id || null;
-
-                // PUENTE CROMÁTICO DINÁMICO: Inyección en document.documentElement
-                const primaryColor = ev.color_primario || content.color_primario || content.accent_color;
-                if (primaryColor) {
-                    document.documentElement.style.setProperty('--master-accent', primaryColor);
-                }
-                logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
-
-                const cssLoadedOK = await injectAtomicCSS(ev.categoria_slug, ev.template_id);
-                if (!cssLoadedOK) {
-                    // Degradación visible (v1.4.8): antes este fallo solo quedaba en consola y la
-                    // página se veía en blanco porque el kernel oculta todo por defecto (IoC v212).
-                    document.body.innerHTML = '<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; color:#fff; background:#0a0a0c;"><p style="max-width:400px; opacity:0.8;">No pudimos cargar el diseño de este evento. Por favor recarga la página o vuelve a intentarlo más tarde.</p></div>';
-                    return;
-                }
-
-                // Activación de Ámbito Dual (P3)
-                const tplNormal = `tpl-${ev.template_id || 'F3'}`;
-                const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
-                document.body.className = `${tplNormal} ${tplLower}`;
-                logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
-
-                // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
-                // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
-                // "MULTIMEDIA FINAL (v205)" más abajo sobreescribe por completo con lógica superior
-                // (soporta ev.video_url, trailer_url y fallback). Ver ese segmento para la lógica vigente.
-
-                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
-                setInterval(() => {
-                    const diff = target - Date.now();
-                    if (diff <= 0) return;
-                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                }, 1000);
-
-                // MAPEO DE HERO & METADATA
-                document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
-                document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                // BUG HISTÓRICO CORREGIDO (v222): esta línea estaba comentada, así que la fecha
-                // real de Supabase nunca llegaba a #meta-fecha (se quedaba en el placeholder
-                // hardcodeado del HTML). Se capitaliza para mantener consistencia visual.
-                if (ev.fecha && document.getElementById('meta-fecha')) {
-                    document.getElementById('meta-fecha').innerText = ev.fecha.replace(/\b\w/g, c => c.toUpperCase());
-                }
-                // BUG HISTÓRICO CORREGIDO (v222): el sufijo " HRS" no coincide con el estándar
-                // "(HORA LOCAL)" del diseño de referencia (landing-escritorio.jpg).
-                if (document.getElementById('meta-hora')) {
-                    document.getElementById('meta-hora').innerText = `${ev.hora} (HORA LOCAL)`;
-                }
-                document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
-                const magnitudVal = ev.magnitud || content.magnitud;
-                if (document.getElementById('meta-magnitud')) document.getElementById('meta-magnitud').innerText = magnitudVal ? `${magnitudVal} Mw` : '--';
-                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
-
-                // BUG HISTÓRICO CORREGIDO (v222 / Incidencia 01 de ERRORES_HISTORICOS.md):
-                // #event-description nunca se inyectaba desde JS en ninguna versión anterior;
-                // el párrafo del Hero quedaba vacío ("--") de forma permanente.
-                // TEXTO ESTÁTICO FORZADO: se elimina la precedencia de BD para que el fallback
-                // formateado (negrita + saltos de línea) siempre se muestre.
-                if (document.getElementById('event-description')) {
-                    document.getElementById('event-description').innerHTML = '<strong>Dos terremotos. Dos países. Una misma red de solidaridad.</strong><br><br>Venezuela fue golpeada el 24 de junio y Colombia enfrenta desde el 10 de agosto un sismo de magnitud 7.4 en el Chocó.<br><br>Dos emergencias distintas, una misma oportunidad para convertir la solidaridad en ayuda concreta.';
-                }
-
-// === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
-  // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
-  const videoContainer = document.getElementById('db-video-content');
-  const videoUrl = ev.video_url || content.trailer_url || ""; 
-
-  if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-      // Extracción limpia de ID de YouTube neutralizando ?si=, &list= y anchors
-      let videoId = "";
-      if (videoUrl.includes('youtu.be/')) {
-          videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
-      } else if (videoUrl.includes('v=')) {
-          videoId = videoUrl.split('v=')[1]?.split('&')[0]?.split('?')[0];
+    /* ── Load event data from Supabase ── */
+    try {
+      const { data: ev } = await supabase.from('eventos').select('*').eq('id', EVENT_ID).single();
+      if (ev) {
+        const fmtDate = (d) => { if (!d) return '--'; const p = new Date(d).toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); return p.charAt(0).toUpperCase() + p.slice(1); };
+        const fmtTime = (d) => { if (!d) return '--'; return new Date(d).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }); };
+        document.getElementById('meta-fecha').textContent = ev.fecha ? fmtDate(ev.fecha) : '--';
+        document.getElementById('meta-hora').textContent = ev.hora || (ev.fecha ? fmtTime(ev.fecha) : '--');
+        document.getElementById('meta-lugar').textContent = ev.lugar || '--';
+        // Hero content from DB
+        if (ev.titulo) document.querySelector('.b5-hero__title').textContent = ev.titulo;
+        if (ev.descripcion) document.querySelector('.b5-hero__sub').innerHTML = '<strong>' + ev.descripcion.split('\n').join('</strong><br>') + '</strong>';
       }
-      
-      const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : "";
+    } catch (e) {
+      console.warn('No event data loaded, using static defaults.');
+    }
 
-      if (thumbUrl) {
-          // Inyección de Miniatura con dimensiones forzadas a 100% y object-fit para p5.css
-          videoContainer.innerHTML = `
-              <div class="video-placeholder" style="background-image:url('${thumbUrl}'); background-size:cover; background-position:center; width:100%; height:100%; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="window.open('${videoUrl}', '_blank')">
-                  <div class="play-button" style="width:80px; height:80px; background:rgba(0,0,0,0.7); border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--tpl-accent); box-shadow: 0 0 25px var(--tpl-accent);">
-                      <span style="color:var(--tpl-accent); font-size:2.5rem; margin-left:5px;">▶</span>
-                  </div>
-                  <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
-              </div>`;
-          console.log("%c[TRACE] Vídeo YouTube detectado -> Miniatura segura inyectada.", "color: #e67e22; font-weight: bold;");
-      } else {
-          videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">URL DE YOUTUBE INVÁLIDA</div>`;
+    /* ── Crisis maps (SVG injection) ── */
+    const mapContainer = document.getElementById('crisis-maps');
+    const MAPS = {
+      VE: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 20 L120 30 L135 28 L150 40 L155 60 L160 80 L155 100 L145 120 L130 140 L115 155 L100 160 L85 155 L70 140 L55 120 L45 100 L40 80 L45 60 L50 40 L65 28 L80 30 Z" fill="#FF3B30" opacity="0.3" stroke="#FF3B30" stroke-width="2"/><circle cx="100" cy="80" r="8" fill="#FFD60A"/><text x="100" y="110" text-anchor="middle" fill="#F5F5F7" font-size="11" font-weight="700">Venezuela</text></svg>`,
+      CO: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M90 25 L110 20 L130 25 L145 40 L155 60 L150 85 L140 110 L125 130 L108 145 L90 150 L72 145 L55 130 L42 110 L35 85 L40 60 L50 40 L65 30 Z" fill="#5E5CE6" opacity="0.3" stroke="#5E5CE6" stroke-width="2"/><circle cx="95" cy="80" r="8" fill="#FFD60A"/><text x="95" y="110" text-anchor="middle" fill="#F5F5F7" font-size="11" font-weight="700">Colombia</text></svg>`
+    };
+    mapContainer.innerHTML = `<div class="b5-crisis__map-wrap">${MAPS.VE}</div><div class="b5-crisis__map-wrap">${MAPS.CO}</div>`;
+
+    /* ── Phase 2 toggle ── */
+    const F2_MAP = { donacion: 'b5-f2-dinero-wrap', donacion_especie: 'b5-f2-especie-wrap', voluntariado: 'b5-f2-voluntario-wrap', talento: 'b5-f2-talento-wrap', difusion: 'b5-f2-difusion-wrap' };
+    function showPhase2(tipo) {
+      Object.values(F2_MAP).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+      const target = F2_MAP[tipo];
+      if (target) { document.getElementById(target).style.display = 'block'; $phase2.classList.add('b5-form__phase2--visible'); }
+      else { $phase2.classList.remove('b5-form__phase2--visible'); }
+    }
+    $tipo.addEventListener('change', () => showPhase2($tipo.value));
+
+    /* ── Form submit ── */
+    $form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $submit.disabled = true;
+      $submit.textContent = 'Enviando...';
+      const fd = new FormData($form);
+      const pais = fd.get('pais');
+      const whatsappNum = fd.get('whatsapp').replace(/\D/g, '');
+      const paisCod = { CO: '+57', VE: '+58', MX: '+52', AR: '+54', CL: '+56', PE: '+51', EC: '+593', BO: '+591', PY: '+595', UY: '+598', CR: '+506', PA: '+507', GT: '+502', HN: '+504', NI: '+505', SV: '+503', DO: '+1-809', CU: '+53', PR: '+1-787', ES: '+34', US: '+1' }[pais] || '';
+      const tipo = fd.get('tipo_ayuda');
+      const respuestas = {};
+      const F2_FIELDS = { donacion: 'b5-f2-dinero', donacion_especie: 'b5-f2-especie', voluntariado: 'b5-f2-voluntario', talento: 'b5-f2-talento', difusion: 'b5-f2-difusion' };
+      const f2Field = F2_FIELDS[tipo];
+      if (f2Field) { const val = document.getElementById(f2Field).value.trim(); if (val) respuestas[tipo] = val; }
+      const row = {
+        nombre: fd.get('nombre'),
+        email: fd.get('email'),
+        whatsapp: `${paisCod} ${whatsappNum}`,
+        telefono: `${paisCod} ${whatsappNum}`,
+        pais: pais,
+        tipo_ayuda: tipo,
+        evento_id: EVENT_ID,
+        fase: Object.keys(respuestas).length > 0 ? 2 : 1,
+        respuestas_custom: Object.keys(respuestas).length > 0 ? respuestas : null
+      };
+      // Map tipo to dedicated columns
+      if (tipo === 'donacion') row.monto_usd = respuestas.donacion || null;
+      if (tipo === 'donacion_especie') row.descripcion_especie = respuestas.donacion_especie || null;
+      if (tipo === 'voluntariado') row.area_voluntariado = respuestas.voluntariado || null;
+      if (tipo === 'talento') row.descripcion_talento = respuestas.talento || null;
+      if (tipo === 'difusion') row.canal_difusion = respuestas.difusion || null;
+
+      const { error } = await supabase.from('inscritos').insert([row]);
+      if (error) {
+        console.error('Error al registrar:', error.message);
+        $submit.disabled = false;
+        $submit.textContent = 'Quiero ser parte';
+        alert('Hubo un error. Intenta de nuevo.');
+        return;
       }
-  } else if (videoUrl.includes('vimeo.com')) {
-      // Normalización robusta para Vimeo a formato player
-      let vimeoEmbedUrl = videoUrl;
-      if (!videoUrl.includes('player.vimeo.com')) {
-          const vimeoIdMatch = videoUrl.match(/vimeo\.com\/(?:.*\/)?(\d+)/);
-          vimeoEmbedUrl = vimeoIdMatch ? `https://player.vimeo.com/video/${vimeoIdMatch[1]}` : videoUrl;
-      }
-      videoContainer.innerHTML = `<iframe src="${vimeoEmbedUrl}" style="width:100%; height:100%; border:none; object-fit:cover;" allowfullscreen></iframe>`;
-      console.log("%c[TRACE] Vídeo Vimeo detectado -> URL normalizada e iframe inyectado.", "color: #e67e22; font-weight: bold;");
-  } else {
-      // Fallback estricto anti-bloques vacíos
-      videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
-  }
-  // === FIN SEGMENTO: VÍDEO SEGURO ===
+      $form.style.display = 'none';
+      $success.classList.add('b5-form__success--visible');
+    });
 
+    /* ── FAQ accordion ── */
+    document.querySelectorAll('.b5-faq__q').forEach(q => {
+      q.addEventListener('click', () => {
+        const item = q.parentElement;
+        const wasOpen = item.classList.contains('b5-faq__item--open');
+        document.querySelectorAll('.b5-faq__item--open').forEach(i => i.classList.remove('b5-faq__item--open'));
+        if (!wasOpen) item.classList.add('b5-faq__item--open');
+      });
+    });
 
-
-
-
-    // === INICIO SEGMENTO: GALERÍA DE MEMORIA CON FALLBACK (v222) ===
-    // BUG HISTÓRICO CORREGIDO: #db-gallery-grid existía en el HTML pero ningún
-    // segmento de JS lo alimentaba; el módulo quedaba permanentemente vacío.
-    let galeriaList = Array.isArray(content.gallery) ? content.gallery : [];
-    let isGaleriaFallback = false;
-    if (galeriaList.length === 0) {
-        // Sin fotos reales todavía en Supabase: se muestran 8 placeholders neutros
-        // en vez de depender de un host externo (Silent Fallback, ADR-008).
-        galeriaList = new Array(8).fill(null);
-        isGaleriaFallback = true;
-    }
-    const galeriaGridEl = document.getElementById('db-gallery-grid');
-    if (galeriaGridEl) {
-        galeriaGridEl.innerHTML = galeriaList.map((item) => {
-            const url = (item && (item.url || item)) || '';
-            if (url) {
-                // ADR-016: onclick abre el lightbox con esta misma URL (ver
-                // abrirGaleriaLightbox más abajo). Solo se activa si la imagen cargó
-                // bien (si el onerror la remueve, el div ya no tiene <img> que clickear).
-                return `<div class="gallery-thumb"><img src="${url}" alt="" loading="lazy" onclick="abrirGaleriaLightbox('${url.replace(/'/g, "\\'")}')" onerror="this.closest('.gallery-thumb').classList.add('gallery-thumb--empty'); this.remove();"></div>`;
-            }
-            return `<div class="gallery-thumb gallery-thumb--empty"></div>`;
-        }).join('');
-        const galStatus = isGaleriaFallback ? `Galería de REFERENCIA/FALLBACK (${galeriaList.length} espacios)` : `Galería REAL (${galeriaList.length} fotos)`;
-        logStatus(`TRACE: ${galStatus} inyectada.`, "TRACE");
-    }
-    // === FIN SEGMENTO GALERÍA ===
-
-    // === INICIO SEGMENTO: LIGHTBOX DE GALERÍA (ADR-016) ===
-    // Modal reutilizable, inyectado una sola vez en <body>, en el mismo patrón que
-    // .actualizacion-modal (misma clase de overlay .activo, sin dependencias externas).
-    if (!document.getElementById('gallery-lightbox-root')) {
-        const lightboxEl = document.createElement('div');
-        lightboxEl.id = 'gallery-lightbox-root';
-        lightboxEl.className = 'gallery-lightbox';
-        lightboxEl.innerHTML = `
-            <button type="button" class="gallery-lightbox-cerrar" onclick="cerrarGaleriaLightbox()" aria-label="Cerrar">&times;</button>
-            <img class="gallery-lightbox-img" id="gallery-lightbox-img" src="" alt="">`;
-        lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) cerrarGaleriaLightbox(); });
-        document.body.appendChild(lightboxEl);
-    }
-    window.abrirGaleriaLightbox = function (url) {
-        const root = document.getElementById('gallery-lightbox-root');
-        const img = document.getElementById('gallery-lightbox-img');
-        if (!root || !img) return;
-        img.src = url;
-        root.classList.add('activo');
-    };
-    window.cerrarGaleriaLightbox = function () {
-        const root = document.getElementById('gallery-lightbox-root');
-        if (root) root.classList.remove('activo');
-    };
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarGaleriaLightbox(); });
-    // === FIN SEGMENTO LIGHTBOX ===
-
-    // 2. Sincronía Spotify 1:1 [cite: 462, 767]
-    if (content.playlist_url) {
-        const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
-        const sContainer = document.getElementById('db-spotify-embed');
-        if (sContainer) {
-            sContainer.style.borderColor = 'var(--tpl-accent)';
-            sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
-            logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
-        }
-    }
-    // === FIN SEGMENTO MULTIMEDIA ===
-
-
-  // === INICIO SEGMENTO: HISTORIA DE LA CAUSA CON FALLBACK (v215) ===
-    const historiaData = content.historia || {};
-    const isHistoriaFallback = !content.historia;
-    const histTitulo = historiaData.titulo || 'Una causa que nos une';
-    const histTexto = historiaData.texto || 'Cada aporte se convierte en ayuda real y directa para quienes más lo necesitan. Esta es la historia detrás de la campaña.';
-
-    if (document.getElementById('db-historia-titulo')) {
-        document.getElementById('db-historia-titulo').innerText = histTitulo.toUpperCase();
-    }
-    if (document.getElementById('db-historia-texto')) {
-        document.getElementById('db-historia-texto').innerHTML = formatRichText(histTexto);
-    }
-    const histImgEl = document.getElementById('db-historia-img');
-    if (histImgEl) {
-        const histImgUrl = historiaData.imagen || ev.imagen_url || '';
-        if (histImgUrl) { histImgEl.src = histImgUrl; } else { histImgEl.style.display = 'none'; }
-    }
-    logStatus(`TRACE: Historia ${isHistoriaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada.`, "TRACE");
-
-    // NUEVO ÁTOMO ADITIVO (v222): #db-historia-lista — varios hitos narrativos numerados
-    // (ej. "01 Los terremotos", "02 Nuestra misión"), como en landing-escritorio.jpg.
-    // No reemplaza los campos legacy de arriba: si content.historia_items no viene de
-    // Supabase, se usa un fallback de 2 hitos en vez del fallback legacy de un solo bloque.
-    // ADR-016 — CAUSA RAÍZ REAL de "hitos 1 y 2 sin imagen": admin.html/content.historia_items
-    // espera un array plano en la raíz de `content`, pero el registro real de la campaña
-    // Venezuela guarda los hitos anidados en content.historia.hitos (con imagen real por
-    // hito). Como no existía este segundo camino de lectura, el sistema descartaba los
-    // datos reales por completo y caía en el fallback genérico (que nunca tuvo imágenes) —
-    // no era un fallo de carga de imagen puntual. Se agrega el segundo camino como
-    // fallback aditivo, sin dejar de soportar el esquema plano ya documentado.
-    let historiaItemsList = Array.isArray(content.historia_items)
-        ? content.historia_items
-        : (Array.isArray(content.historia?.hitos) ? content.historia.hitos : []);
-    let isHistoriaItemsFallback = false;
-    if (historiaItemsList.length === 0) {
-        historiaItemsList = [
-            { titulo: 'LOS TERREMOTOS', texto: 'Las emergencias cambian la vida de miles de personas en cuestión de segundos, pero la reconstrucción puede tomar meses o incluso años. El 24 de junio de 2026, Venezuela enfrentó dos grandes terremotos; el 10 de agosto, un nuevo sismo de magnitud 7.4 golpeó a Colombia, con epicentro en San José del Palmar, Chocó. Son dos emergencias distintas, en territorios diferentes, pero comparten una misma necesidad: mantener viva la ayuda más allá del impacto inicial. Mientras las noticias desaparecen, las necesidades permanecen. Creemos que la respuesta está en las personas: en quienes donan, participan, comparten información o aportan su tiempo para que la solidaridad continúe creciendo durante la recuperación.' },
-            { titulo: 'Nuestra misión: red de ayuda continua', texto: 'Sonidos por el Cambio nace para convertir la cultura en una red de apoyo permanente. A través de eventos culturales en simultáneo, creamos conexión y esperanza. Juntos, la cultura no solo se expresa: se convierte en ayuda que transforma vidas, hoy y siempre.' }
-        ];
-        isHistoriaItemsFallback = true;
-    }
-    const historiaListaEl = document.getElementById('db-historia-lista');
-    if (historiaListaEl) {
-        historiaListaEl.innerHTML = historiaItemsList.map((item, idx) => `
-            <div class="historia-item${item.imagen ? ' historia-item--conimg' : ''}">
-                <span class="historia-item-num">${String(idx + 1).padStart(2, '0')}</span>
-                <div class="historia-item-body">
-                    <span class="historia-item-titulo">${(item.titulo || '').toUpperCase()}</span>
-                    <p class="historia-item-texto">${formatRichText(item.texto || '')}</p>
-                </div>
-                ${item.imagen ? `<img class="historia-item-img" src="${item.imagen}" alt="" loading="lazy" onerror="this.remove(); this.closest('.historia-item')?.classList.remove('historia-item--conimg');">` : ''}
-            </div>`).join('');
-        const hiStatus = isHistoriaItemsFallback ? `Hitos de Historia de REFERENCIA/FALLBACK (${historiaItemsList.length})` : `Hitos de Historia REALES (${historiaItemsList.length})`;
-        logStatus(`TRACE: ${hiStatus} inyectados.`, "TRACE");
-    }
-    // === FIN SEGMENTO HISTORIA ===
-
-    // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
-    const objetivoData = content.objetivo || {};
-    const isObjetivoFallback = !content.objetivo;
-    const metaVal = Number(objetivoData.meta) || 10000000;
-    const recaudadoVal = Number(objetivoData.recaudado) || 0;
-    const monedaVal = objetivoData.moneda || 'COP';
-    const donantesVal = (objetivoData.donantes !== undefined && objetivoData.donantes !== null) ? objetivoData.donantes : '--';
-    const pctVal = metaVal > 0 ? Math.min(100, Math.round((recaudadoVal / metaVal) * 100)) : 0;
-    const fmtMoney = (n) => new Intl.NumberFormat('es-CO').format(n);
-
-    if (document.getElementById('db-objetivo-meta')) document.getElementById('db-objetivo-meta').innerText = `${monedaVal} ${fmtMoney(metaVal)}`;
-    if (document.getElementById('db-objetivo-recaudado')) document.getElementById('db-objetivo-recaudado').innerText = `${monedaVal} ${fmtMoney(recaudadoVal)}`;
-    if (document.getElementById('db-objetivo-donantes')) document.getElementById('db-objetivo-donantes').innerText = donantesVal;
-    if (document.getElementById('db-objetivo-pct')) document.getElementById('db-objetivo-pct').innerText = `${pctVal}%`;
-    const barraEl = document.getElementById('db-objetivo-barra');
-    if (barraEl) {
-        barraEl.style.width = `${pctVal}%`;
-        const trackEl = barraEl.closest('.objetivo-barra-track');
-        if (trackEl) trackEl.setAttribute('aria-valuenow', pctVal);
-    }
-    logStatus(`TRACE: Objetivo ${isObjetivoFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (${pctVal}% alcanzado).`, "TRACE");
-    // === FIN SEGMENTO OBJETIVO ===
-
-    // === INICIO SEGMENTO: TARJETAS DE IMPACTO CON FALLBACK (v215) — FORMATO DUAL (v220) ===
-    // Soporte Dual (mismo patrón que dj_lineup/faq): cada item se auto-detecta como
-    // "métrica" (icono+valor+etiqueta, ej. "120+ Niños educados", no clicable) o como
-    // "donación" (monto+título+descripción, clicable → scroll al form) según sus campos.
-    const IMPACTO_ICONS = {
-        ninos:          '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c1.4 0 2.5 1.1 2.5 2.5S13.4 7 12 7 9.5 5.9 9.5 4.5 10.6 2 12 2z"/><path d="M6 21v-4a6 6 0 0 1 12 0v4"/></svg>',
-        familias:       '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 21v-2a5 5 0 0 1 5-5h2M22 21v-2a5 5 0 0 0-5-5h-2"/></svg>',
-        comunidades:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>',
-        transparencia:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2s7 4 7 10a7 7 0 0 1-14 0c0-6 7-10 7-10z"/></svg>',
-        compromiso:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>',
-        general:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>',
-        // --- Extensión v221 (campaña de emergencia) — claves nuevas, ninguna previa fue tocada ---
-        victimas:       '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="15.5" x2="12" y2="15.6"/></svg>',
-        desplazados:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-        estados:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
-        municipios:     '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-6h4v6"/></svg>',
-        // --- Extensión v1.2.6 (Impacto hasta hoy: eventos/asistentes/recaudación) ---
-        eventos:        '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
-        recaudacion:    '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 15s1 1.5 3 1.5 3-1 3-2.2-1.2-1.8-3-2.3-3-1.1-3-2.3S10 8 12 8s3 1.5 3 1.5M12 6.5v11"/></svg>'
-    };
-
-    // ADR-016 — CAUSA RAÍZ REAL DEL BUG "COP0": antes de admin.html v1.2.6, el campo de
-    // Impacto se guardaba como {label:"Título | Valor | Icono"} (un solo string), pero
-    // renderImpactoCards() SIEMPRE leyó {etiqueta, valor, icono} como propiedades separadas
-    // (ver comentario ya existente en admin.html sobre la corrección v1.2.6). Cualquier
-    // registro guardado ANTES de esa corrección y nunca vuelto a guardar sigue con el
-    // esquema viejo, cae en la rama "donación" por descarte, y muestra "COP 0" vacío.
-    // Este normalizador detecta ese esquema legado y lo traduce al vigente, sin requerir
-    // que el Director reabra y regrabe cada evento afectado desde admin.html.
-    function normalizeImpactoLegacy(list) {
-        return list.map(item => {
-            const yaEstructurado = item.etiqueta !== undefined || item.valor !== undefined || item.icono !== undefined || item.monto !== undefined;
-            if (yaEstructurado || typeof item.label !== 'string') return item;
-            const partes = item.label.split('|').map(p => p.trim());
-            return { etiqueta: partes[0] || '', valor: partes[1] || '', icono: partes[2] || undefined };
-        });
-    }
-
-    // Renderizador reutilizable de tarjetas de impacto (mismo formato dual usado por
-    // #db-impacto-grid); se extrae como función para poder alimentar también el nuevo
-    // átomo #db-impacto-historico-grid (v221) sin duplicar la lógica de mapeo.
-    function renderImpactoCards(list, targetId, moneda, fmt) {
-        const el = document.getElementById(targetId);
-        if (!el) return 0;
-        el.innerHTML = list.map(item => {
-            const esMetrica = item.monto === undefined && (item.valor !== undefined || item.icono !== undefined || item.etiqueta !== undefined);
-            if (esMetrica) {
-                // Si el icono no es una clave conocida de IMPACTO_ICONS (ej. viene como
-                // emoji suelto desde datos legados: "⚠️", "⛺"...), se muestra tal cual en
-                // vez de descartarlo silenciosamente al ícono genérico (ADR-016).
-                const iconoSvg = IMPACTO_ICONS[item.icono]
-                    || (item.icono ? `<span class="impacto-icono-emoji">${item.icono}</span>` : IMPACTO_ICONS.general);
-                return `
-                <div class="impacto-card impacto-card--metrica">
-                    <div class="impacto-icono">${iconoSvg}</div>
-                    <span class="impacto-valor">${item.valor || ''}</span>
-                    <span class="impacto-etiqueta">${(item.etiqueta || item.titulo || '').toUpperCase()}</span>
-                </div>`;
-            }
-            return `
-                <div class="impacto-card impacto-card--donacion" onclick="document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
-                    <span class="impacto-monto">${item.moneda || moneda} ${fmt(item.monto || 0)}</span>
-                    <span class="impacto-titulo">${(item.titulo || '').toUpperCase()}</span>
-                    <p class="impacto-desc">${item.descripcion || ''}</p>
-                </div>`;
-        }).join('');
-        return list.length;
-    }
-
-    // NOTA v221: el fallback de este segmento se personalizó para esta campaña de
-    // emergencia (este archivo es un clon de un único evento, no el Master compartido —
-    // decisión de Dirección del 30-jul-2026). El fallback genérico de "Kit básico /
-    // Apoyo sostenido / Impacto mayor" queda documentado aquí abajo por si se necesita
-    // restaurar el comportamiento estándar de donación monetaria en otro clon.
-    // Fallback genérico original (no usado en este clon):
-    //   [{monto:20000,titulo:'Kit básico',...}, {monto:50000,...}, {monto:100000,...}]
-    let impactoList = Array.isArray(content.impacto) ? normalizeImpactoLegacy(content.impacto) : [];
-    let isImpactoFallback = false;
-    if (impactoList.length === 0) {
-        impactoList = [
-            { valor: '5,500', etiqueta: 'Víctimas', icono: 'victimas' },
-            { valor: '23,000', etiqueta: 'Desplazados', icono: 'desplazados' },
-            { valor: '18/24', etiqueta: 'Estados afectados', icono: 'estados' },
-            { valor: '226', etiqueta: 'Municipios', icono: 'municipios' }
-        ];
-        isImpactoFallback = true;
-    }
-    const impactoCount = renderImpactoCards(impactoList, 'db-impacto-grid', monedaVal, fmtMoney);
-    const impactoStatus = isImpactoFallback ? `Tarjetas de impacto (crisis) de REFERENCIA/FALLBACK (${impactoCount})` : `Tarjetas de impacto (crisis) REALES (${impactoCount})`;
-    logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
-    // === FIN SEGMENTO IMPACTO ===
-
-    // === INICIO SEGMENTO: MAPA DE CRISIS — nuevo átomo v221 (Contrato v109 → v110) ===
-    const mapaCrisisData = content.mapa_crisis || {};
-    const isMapaCrisisFallback = !content.mapa_crisis;
-    const fallaVal = mapaCrisisData.falla || 'Falla de San Sebastián';
-    if (document.getElementById('db-mapa-crisis-falla')) document.getElementById('db-mapa-crisis-falla').innerText = fallaVal;
-    const mapaCrisisSvgEl = document.getElementById('db-mapa-crisis-svg');
-    if (mapaCrisisSvgEl) {
-        // Visualización ILUSTRATIVA (no cartográfica): anillos concéntricos + pulso
-        // animado sobre el epicentro. Deliberadamente NO traza fronteras geográficas
-        // reales para evitar presentar un mapa impreciso como si fuera oficial.
-        mapaCrisisSvgEl.innerHTML = `
-            <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visualización ilustrativa de la zona de emergencia">
-                <circle cx="205" cy="85" r="130" class="mc-ring mc-ring--outer"/>
-                <circle cx="205" cy="85" r="90" class="mc-ring mc-ring--mid"/>
-                <circle cx="205" cy="85" r="50" class="mc-ring mc-ring--inner"/>
-                <!-- === INICIO SEGMENTO: PUNTOS DE IMPACTO NARANJA (v1.10.0) === -->
-                <g class="mc-dots">
-                    <!-- Puntos cercanos al epicentro: Catia La Mar, La Guaira, Caracas y cercanías -->
-                    <circle cx="215" cy="95" r="3.5"/>  <!-- Zona costera este -->
-                    <circle cx="225" cy="105" r="4"/>   <!-- Caracas / Miranda -->
-                    <circle cx="185" cy="98" r="3.5"/>  <!-- Carabobo / Costa Oeste -->
-                    <circle cx="200" cy="115" r="3"/>   <!-- Valles del Tuy / Aragua -->
-                    <circle cx="240" cy="95" r="4"/>    <!-- Miranda / Litoral -->
-                    <circle cx="165" cy="110" r="3.5"/> <!-- Yaracuy (Segundo Epicentro) -->
-                </g>
-                <!-- === FIN SEGMENTO: PUNTOS DE IMPACTO === -->
-                <circle cx="205" cy="85" r="6" class="mc-epicentro"/>
-                <circle cx="205" cy="85" r="6" class="mc-pulse"/>
-            </svg>`;
-    }
-    logStatus(`TRACE: Mapa de crisis ${isMapaCrisisFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (falla: ${fallaVal}).`, "TRACE");
-
-    // === INICIO SEGMENTO: MAPA DE CRISIS COLOMBIA ===
-    const mapaCrisisSvgColEl = document.getElementById('db-mapa-crisis-svg-col');
-    if (mapaCrisisSvgColEl) {
-        mapaCrisisSvgColEl.innerHTML = `
-            <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Visualización ilustrativa de la zona de emergencia en Colombia">
-                <!-- Anillos concéntricos del epicentro: San José del Palmar, Chocó -->
-                <circle cx="135" cy="124" r="60" class="mc-ring mc-ring--outer"/>
-                <circle cx="135" cy="124" r="40" class="mc-ring mc-ring--mid"/>
-                <circle cx="135" cy="124" r="22" class="mc-ring mc-ring--inner"/>
-                <!-- Puntos de impacto: Quibdó, Buenaventura, Cali, Pereira, Manizales -->
-                <g class="mc-dots">
-                    <circle cx="135" cy="109" r="4"/>    <!-- Quibdó / Chocó -->
-                    <circle cx="123" cy="140" r="3.5"/>  <!-- Buenaventura / Valle del Cauca -->
-                    <circle cx="140" cy="146" r="4"/>    <!-- Cali / Valle del Cauca -->
-                    <circle cx="153" cy="139" r="3.5"/>  <!-- Pereira / Risaralda -->
-                    <circle cx="157" cy="123" r="3"/>    <!-- Manizales / Caldas -->
-                </g>
-                <!-- Epicentro -->
-                <circle cx="135" cy="124" r="6" class="mc-epicentro"/>
-                <circle cx="135" cy="124" r="6" class="mc-pulse mc-pulse--col"/>
-            </svg>`;
-        logStatus("TRACE: Mapa de crisis COLOMBIA inyectado (San José del Palmar, Chocó).", "TRACE");
-    }
-    // === FIN SEGMENTO MAPA DE CRISIS COLOMBIA ===
-
-    // === INICIO SEGMENTO: CÓMO AYUDAR — nuevo átomo v221 (Contrato v109 → v110) ===
-    const COMO_AYUDAR_ICONS = {
-        espacio:    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></svg>',
-        artista:    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
-        marca:      '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z"/><circle cx="8" cy="8" r="1.2"/></svg>',
-        voluntario: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg>',
-        // --- Extensión Context Package v4.0.0-GOLD: 5ta ruta del formulario ramificado ---
-        donacion:   '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
-    };
-    const comoAyudarData = content.como_ayudar || {};
-    const isComoAyudarFallback = !content.como_ayudar;
-    const comoAyudarLead = comoAyudarData.lead || '<p>Creemos que cada aporte cuenta y que cada esfuerzo suma. Por eso, transformamos la energía colectiva en recursos y acciones concretas que generan un impacto real en las comunidades que más lo necesitan.</p><p>Juntos buscamos unirnos por un propósito común, para brindar ayuda, crear oportunidades y construir un cambio posible.</p>';
-    let comoAyudarList = Array.isArray(comoAyudarData.categorias) ? comoAyudarData.categorias : [
-        { titulo: 'Espacios', descripcion: 'Tu lugar suma', icono: 'espacio', tipo_ayuda: 'espacio' },
-        { titulo: 'Artistas', descripcion: 'Tu talento puede salvar.', icono: 'artista', tipo_ayuda: 'artista' },
-        { titulo: 'Marcas', descripcion: 'Tu marca deja huella.', icono: 'marca', tipo_ayuda: 'marca' },
-        { titulo: 'Voluntarios', descripcion: 'Tu tiempo transforma.', icono: 'voluntario', tipo_ayuda: 'voluntario' },
-        { titulo: 'Donaciones', descripcion: 'Tu aporte llega directo.', icono: 'donacion', tipo_ayuda: 'donacion' }
-    ];
-    // Mandato Director (ago-2026): la tarjeta "Espacio" siempre muestra "Tu lugar suma",
-    // provenga el dato del fallback o de Supabase (display-mapping, sin borrado de dato).
-    if (comoAyudarList.length) comoAyudarList = comoAyudarList.map(item =>
-        item.tipo_ayuda === 'espacio' ? { ...item, descripcion: 'Tu lugar suma' } : item
-    );
-    if (document.getElementById('db-como-ayudar-lead')) document.getElementById('db-como-ayudar-lead').innerHTML = comoAyudarLead;
-    const comoAyudarGridEl = document.getElementById('db-como-ayudar-grid');
-    if (comoAyudarGridEl) {
-        // Contrato de Interactividad Física: onclick inyectado físicamente en el innerHTML.
-        // Al hacer clic, preselecciona la categoría en el formulario y hace scroll a él.
-        comoAyudarGridEl.innerHTML = comoAyudarList.map(item => `
-            <div class="comoayudar-card" onclick="const sel=document.getElementById('reg-tipo-ayuda'); if(sel){sel.value='${item.tipo_ayuda || ''}';} document.getElementById('mod-form')?.scrollIntoView({behavior:'smooth', block:'start'});">
-                <div class="comoayudar-icono">${COMO_AYUDAR_ICONS[item.icono] || COMO_AYUDAR_ICONS.voluntario}</div>
-                <span class="comoayudar-titulo">${(item.titulo || '').toUpperCase()}</span>
-                <p class="comoayudar-desc">${item.descripcion || ''}</p>
-                <span class="comoayudar-link">VER MÁS →</span>
-            </div>`).join('');
-        const caStatus = isComoAyudarFallback ? `Categorías "Cómo Ayudar" de REFERENCIA/FALLBACK (${comoAyudarList.length})` : `Categorías "Cómo Ayudar" REALES (${comoAyudarList.length})`;
-        logStatus(`TRACE: ${caStatus} inyectadas.`, "TRACE");
-    }
-
-    // Columna 2 (v1.2.6): métricas de impacto de crisis junto a las tarjetas de roles.
-    // Dato editable desde Admin (campo "¿Cómo puedo ayudar? — métricas"); mientras no se
-    // cargue, se usa el placeholder acordado con Dirección para esta campaña.
-    let comoAyudarStatsList = Array.isArray(comoAyudarData.stats) ? comoAyudarData.stats : [];
-    let isComoAyudarStatsFallback = false;
-    if (comoAyudarStatsList.length === 0) {
-        comoAyudarStatsList = [
-            { valor: '150.000+', etiqueta: 'Personas ayudadas', icono: 'general' },
-            { valor: '10', etiqueta: 'Estados afectados', icono: 'estados' },
-            { valor: '23.000', etiqueta: 'Desplazados', icono: 'desplazados' }
-        ];
-        isComoAyudarStatsFallback = true;
-    }
-    const comoAyudarStatsEl = document.getElementById('db-como-ayudar-stats');
-    if (comoAyudarStatsEl) {
-        comoAyudarStatsEl.innerHTML = comoAyudarStatsList.map(item => `
-            <div class="comoayudar-stat">
-                <div class="comoayudar-stat-icono">${IMPACTO_ICONS[item.icono] || IMPACTO_ICONS.general}</div>
-                <div class="comoayudar-stat-body">
-                    <span class="comoayudar-stat-valor">${item.valor || ''}</span>
-                    <span class="comoayudar-stat-etiqueta">${(item.etiqueta || '').toUpperCase()}</span>
-                </div>
-            </div>`).join('');
-        const casStatus = isComoAyudarStatsFallback ? `Métricas "Cómo Ayudar" de REFERENCIA/FALLBACK — dato editable desde Admin (${comoAyudarStatsList.length})` : `Métricas "Cómo Ayudar" REALES (${comoAyudarStatsList.length})`;
-        logStatus(`TRACE: ${casStatus} inyectadas.`, "TRACE");
-    }
-    // === FIN SEGMENTO CÓMO AYUDAR ===
-
-    // === INICIO SEGMENTO: IMPACTO HISTÓRICO — nuevo átomo v221 (Contrato v109 → v110) ===
-    // NOTA (v1.2.6): valores de ejemplo para la maqueta — Dirección confirmó que por ahora
-    // se usan cifras inventadas, con la condición de que quedaran editables desde Admin
-    // (ver campo "Impacto hasta hoy — métricas" en admin.html). No son cifras reales.
-    let impactoHistList = Array.isArray(content.impacto_historico) ? normalizeImpactoLegacy(content.impacto_historico) : [];
-    let isImpactoHistFallback = false;
-    if (impactoHistList.length === 0) {
-        impactoHistList = [
-            { valor: '12', etiqueta: 'Eventos', icono: 'eventos' },
-            { valor: '3,400+', etiqueta: 'Asistentes', icono: 'familias' },
-            { valor: '150,000+', etiqueta: 'Personas ayudadas', icono: 'general' },
-            { valor: '$45.000.000 COP', etiqueta: 'Recaudación', icono: 'recaudacion' }
-        ];
-        isImpactoHistFallback = true;
-    }
-    const impactoHistCount = renderImpactoCards(impactoHistList, 'db-impacto-historico-grid', monedaVal, fmtMoney);
-    if (document.getElementById('db-impacto-historico-frase')) {
-        document.getElementById('db-impacto-historico-frase').innerText = content.impacto_historico_frase || 'LA MÚSICA NOS UNE. LA SOLIDARIDAD NOS MUEVE.';
-    }
-    const ihStatus = isImpactoHistFallback ? `Impacto histórico de REFERENCIA/FALLBACK (${impactoHistCount})` : `Impacto histórico REAL (${impactoHistCount})`;
-    logStatus(`TRACE: ${ihStatus} inyectado.`, "TRACE");
-    // === FIN SEGMENTO IMPACTO HISTÓRICO ===
-
-    // === INICIO SEGMENTO: ACTUALIZACIONES — nuevo átomo v222 (Contrato v111 → v112) ===
-    // v1.2.6 había retirado "categoría" del contrato (ver DECISIONS.md ADR anterior).
-    // REVERTIDO por mandato explícito de Dirección (Context Package v4.0.0-GOLD,
-    // ago-2026): se reintroduce "categoria" como 1er segmento. Contrato vigente:
-    // {categoria, fecha, titulo, resumen, imagen} (5 campos, admin.html alineado).
-    //
-    // ADR-017 — CAUSA RAÍZ REAL DE "TARJETAS VACÍAS": auditado el JSON real del
-    // evento Venezuela, content.actualizaciones NO es un array de objetos: es un
-    // array de STRINGS con formato legado "fecha | titulo | resumen | ampliado |
-    // imagen" (4 o 5 segmentos separados por "|"). El render leía item.categoria,
-    // item.fecha, item.titulo... sobre un string -- todas esas propiedades son
-    // undefined en un string, de ahí las tarjetas vacías pese a haber datos reales.
-    // Mismo patrón que el bug "COP0" de ADR-016 (esquema legado vs. esquema
-    // vigente). normalizeActualizacionesLegacy() detecta strings y los traduce;
-    // los objetos ya estructurados (contrato v112) pasan intactos.
-    function normalizeActualizacionesLegacy(list) {
-        return list.map(item => {
-            if (typeof item !== 'string') return item;
-            const partes = item.split('|').map(p => p.trim());
-            // Legado no traía "categoria" (se retiró y reintrodujo después, ver
-            // nota arriba) -- por eso el string legado tiene 4-5 segmentos, no 6.
-            return {
-                fecha: partes[0] || '',
-                titulo: partes[1] || '',
-                resumen: partes[2] || '',
-                // El 4to segmento es un texto ampliado que el esquema legado sí
-                // tenía y el objeto vigente no contemplaba (un único "resumen").
-                // Se preserva de forma aditiva en resumen_ampliado (Cero Borrado
-                // de información): la tarjeta sigue usando el resumen corto
-                // (partes[2]) recortado a 3 líneas; el modal usa el ampliado si
-                // existe, o cae al resumen corto si no.
-                resumen_ampliado: partes[3] || '',
-                imagen: partes[4] || ''
-            };
-        });
-    }
-    let actualizacionesList = Array.isArray(content.actualizaciones) ? normalizeActualizacionesLegacy(content.actualizaciones) : [];
-    let isActualizacionesFallback = false;
-    if (actualizacionesList.length === 0) {
-        actualizacionesList = [
-            { categoria: 'Salud', fecha: '24 JUN 2026 · 10:30 AM', titulo: 'Brigada médica en Catia La Mar', resumen: 'Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico de la red de solidaridad instaló un punto de atención primaria, entrega de medicamentos básicos y acompañamiento psicológico para quienes perdieron su hogar.' },
-            { categoria: 'Logística', fecha: '24 JUN 2026 · 08:45 AM', titulo: 'Entrega de kits de higiene en Caraballeda', resumen: 'Más de 600 kits de higiene y aseo personal fueron entregados a familias damnificadas en Caraballeda, en coordinación con voluntarios locales y los puntos de acopio activos en la zona.' },
-            { categoria: 'Cultura', fecha: '23 JUN 2026 · 09:00 PM', titulo: 'Evento solidario en Caracas', resumen: 'Gracias a la energía de la música recaudamos fondos para ayuda directa. El evento reunió a artistas y marcas aliadas en una noche de solidaridad cultural que transformó en tangible el apoyo a las víctimas del sismo.' },
-            { categoria: 'Logística', fecha: '23 JUN 2026 · 02:15 PM', titulo: 'Nuevos puntos de acopio activos', resumen: 'Ya contamos con 16 puntos de acopio activos en la red de ayuda, distribuidos en los estados más afectados, para centralizar la recepción y distribución de donaciones.' }
-        ];
-        isActualizacionesFallback = true;
-    }
-    // Se expone para que las tarjetas puedan abrir el modal por índice sin re-serializar el HTML.
-    window._actualizacionesData = actualizacionesList;
-    const actualizacionesGridEl = document.getElementById('db-actualizaciones-grid');
-    if (actualizacionesGridEl) {
-        actualizacionesGridEl.innerHTML = actualizacionesList.map((item, idx) => `
-            <div class="actualizacion-card" onclick="abrirActualizacionModal(${idx});">
-                <div class="actualizacion-thumb" ${item.imagen ? `style="background-image:url('${item.imagen}')"` : ''}></div>
-                ${item.categoria ? `<span class="actualizacion-categoria">${item.categoria}</span>` : ''}
-                <span class="actualizacion-fecha">${item.fecha || ''}</span>
-                <span class="actualizacion-titulo">${item.titulo || ''}</span>
-                <p class="actualizacion-resumen">${formatRichText(item.resumen || '')}</p>
-                <span class="actualizacion-link">Leer más →</span>
-            </div>`).join('');
-        const actStatus = isActualizacionesFallback ? `Actualizaciones de REFERENCIA/FALLBACK (${actualizacionesList.length})` : `Actualizaciones REALES (${actualizacionesList.length})`;
-        logStatus(`TRACE: ${actStatus} inyectadas.`, "TRACE");
-    }
-    // === FIN SEGMENTO ACTUALIZACIONES ===
-
-  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
-    // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
-    const sponsorsRaw = content.sponsors || "";
-    let sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    let isFallback = false;
-
-    if (sponsorsList.length === 0) {
-        // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
-        sponsorsList = [
-            "https://supabase.com/favicon/favicon-196x196.png",
-            "https://github.com/apple-touch-icon.png",
-            "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
-        ];
-        isFallback = true;
-    }
-
-    // 2. Inyección Física en el Contrato de Datos [cite: 757]
-    const sponsorsContainer = document.getElementById('db-sponsors-list');
-    if (sponsorsContainer) {
-        sponsorsContainer.innerHTML = sponsorsList.map(url => `
-            <div class="sponsor-item" style="padding: 1.5rem;">
-                <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.85;">
-            </div>`).join('');
-            
-        // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
-        const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
-        logStatus(`TRACE: ${statusMsg}.`, "TRACE");
-    }
-    // === FIN SEGMENTO PATROCINADORES ===
-
-    // === INICIO SEGMENTO: EQUIPO CON FALLBACK (v220) ===
-    let equipoList = Array.isArray(content.equipo) ? content.equipo : [];
-    let isEquipoFallback = false;
-    if (equipoList.length === 0) {
-        equipoList = [
-            { nombre: 'María López', rol: 'Directora Ejecutiva' },
-            { nombre: 'Juan Camacho', rol: 'Coordinador de Campo' },
-            { nombre: 'Laura Torres', rol: 'Gestora Comunitaria' }
-        ];
-        isEquipoFallback = true;
-    }
-    const equipoGridEl = document.getElementById('db-equipo-grid');
-    if (equipoGridEl) {
-        equipoGridEl.innerHTML = equipoList.map(p => {
-            const foto = p.foto || 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
-            return `
-            <div class="equipo-item">
-                <img src="${foto}" class="equipo-avatar" onerror="this.src='https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';">
-                <span class="equipo-nombre">${p.nombre || '--'}</span>
-                <span class="equipo-rol">${p.rol || ''}</span>
-            </div>`;
-        }).join('');
-        const equipoStatus = isEquipoFallback ? `Equipo de REFERENCIA/FALLBACK (${equipoList.length})` : `Equipo REAL (${equipoList.length})`;
-        logStatus(`TRACE: ${equipoStatus} inyectado.`, "TRACE");
-    }
-    // === FIN SEGMENTO EQUIPO ===
-
-    // === INICIO SEGMENTO: CTA FINAL CON FALLBACK (v220) ===
-    const ctaFinalData = content.cta_final || {};
-    const isCtaFallback = !content.cta_final;
-    if (document.getElementById('db-cta-final-titulo')) document.getElementById('db-cta-final-titulo').innerText = ctaFinalData.titulo || 'Tu apoyo hoy transforma vidas mañana.';
-    if (document.getElementById('db-cta-final-subtitulo')) document.getElementById('db-cta-final-subtitulo').innerText = ctaFinalData.subtitulo || 'Sé parte del cambio.';
-    const ctaBtnEl = document.getElementById('cta-final-btn');
-    if (ctaBtnEl && ctaFinalData.boton_texto) ctaBtnEl.innerText = ctaFinalData.boton_texto;
-    logStatus(`TRACE: CTA final ${isCtaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado.`, "TRACE");
-    // === FIN SEGMENTO CTA FINAL ===
-
-    // === INICIO SEGMENTO: FOOTER CON FALLBACK (v220) ===
-    const FOOTER_SOCIAL_ICONS = {
-        instagram: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>',
-        facebook:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h-2a5 5 0 0 0-5 5v2H6v4h2v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg>',
-        youtube:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg>',
-        email:     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'
-    };
-
-    const footerData = content.footer || {};
-    if (document.getElementById('footer-org-name')) document.getElementById('footer-org-name').innerText = (ev.organizaciones?.nombre || '--').toUpperCase();
-    if (document.getElementById('footer-tagline')) document.getElementById('footer-tagline').innerText = footerData.tagline || 'Trabajamos por comunidades fuertes, sostenibles y llenas de oportunidades.';
-
-    const footerLinksData = Array.isArray(footerData.links) ? footerData.links : [
-        { texto: 'La causa', href: '#mod-hero' },
-        { texto: 'Emergencia', href: '#mod-mapa-crisis' },
-        { texto: 'Ayuda', href: '#mod-como-ayudar' },
-        { texto: 'Historia', href: '#mod-historia' },
-        { texto: 'Impacto', href: '#mod-impacto-historico' },
-        { texto: 'Actualizaciones', href: '#mod-actualizaciones' },
-        { texto: 'Galería', href: '#mod-video' },
-        { texto: 'FAQ', href: '#mod-faq' }
-    ];
-    const footerLinksEl = document.getElementById('db-footer-links');
-    if (footerLinksEl) {
-        footerLinksEl.innerHTML = footerLinksData.map(l => `<li><a href="${l.href || '#'}">${l.texto || ''}</a></li>`).join('');
-    }
-    // Marca decorativa (no es parte del Contrato de Datos): pequeño ícono de onda
-    // de sonido junto al nombre de la organización en el footer.
-    const footerBrandMarkEl = document.getElementById('footer-brand-mark');
-    if (footerBrandMarkEl) {
-        footerBrandMarkEl.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="3" y2="12"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="11" y1="4" x2="11" y2="20"/><line x1="15" y1="7" x2="15" y2="17"/><line x1="19" y1="10" x2="19" y2="14"/></svg>';
-    }
-
-    const footerSocialData = footerData.social || {};
-    const footerSocialEl = document.getElementById('db-footer-social');
-    if (footerSocialEl) {
-        const platforms = ['instagram', 'facebook', 'youtube', 'email'];
-        footerSocialEl.innerHTML = platforms.map(p => {
-            const url = footerSocialData[p];
-            const icon = FOOTER_SOCIAL_ICONS[p];
-            const href = url ? (p === 'email' ? `mailto:${url}` : url) : '#';
-            return `<a href="${href}" ${url ? 'target="_blank" rel="noopener"' : ''} class="footer-social-icon">${icon}</a>`;
-        }).join('');
-    }
-
-    const footerContactoData = footerData.contacto || {};
-    const footerContactoEl = document.getElementById('db-footer-contacto');
-    if (footerContactoEl) {
-        footerContactoEl.innerHTML = `
-            <span>${footerContactoData.email || '--'}</span>
-            <span>${footerContactoData.telefono || '--'}</span>
-            <span>${(ev.ubicacion || '--')}</span>`;
-    }
-
-    if (document.getElementById('footer-copy')) {
-        document.getElementById('footer-copy').innerText = `© ${new Date().getFullYear()} ${(ev.organizaciones?.nombre || '--')}. Todos los derechos reservados.`;
-    }
-    logStatus("TRACE: Footer inyectado (marca, enlaces, redes, contacto).", "TRACE");
-    // === FIN SEGMENTO FOOTER ===
-
-// === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
-// 1. Verificación de Póster [cite: 343]
-if (document.getElementById('db-poster-img')) {
-    document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
-    logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
-}
-
-// === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198) ===
-    if (content.dj_lineup && Array.isArray(content.dj_lineup)) {
-        document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => {
-            // Soporte Dual: Detecta si 'dj' es un texto simple o un objeto {nombre, foto} [cite: 821]
-            const name = typeof dj === 'object' ? dj.nombre : dj;
-            const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
-            
-            return `
-                <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;">
-                    <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;">
-                    <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
-                </div>`;
-        }).join('');
-        
-        // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
-        logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
-    }
-    // === FIN SEGMENTO: LINEUP ===
-
-   // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
-    {
-        let faqItems = [];
-        let isFaqFallback = false;
-        // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
-        if (Array.isArray(content.faq)) {
-            faqItems = content.faq;
-        } else if (typeof content.faq === 'string') {
-            faqItems = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
-                const [q, a] = l.split('|');
-                return { pregunta: q.trim(), respuesta: a.trim() };
-            });
-        }
-        // BUG HISTÓRICO CORREGIDO (v222): este segmento antes solo corría si content.faq
-        // venía de Supabase; sin datos reales el módulo quedaba vacío. Se agrega fallback.
-        if (faqItems.length === 0) {
-            faqItems = [
-                { pregunta: '¿Cómo puedo colaborar?', respuesta: 'Completa el formulario "Súmate a la Red" con tu WhatsApp; nuestro equipo se pondrá en contacto contigo para gestionar redes de colaboración.' },
-                { pregunta: '¿A dónde se envían los recursos para donar?', respuesta: 'Durante los eventos que se van a realizar, se abren los espacios como centros de acopio para recolectar las donaciones.' },
-                { pregunta: '¿Cómo puedo verificar el impacto?', respuesta: 'Publicamos actualizaciones periódicas en la sección "Actualizaciones" con cifras y evidencia de cada jornada.' },
-                { pregunta: '¿Cómo se validan las ayudas?', respuesta: 'Trabajamos junto a organizaciones locales que verifican la entrega directa a las familias damnificadas o a las organizaciones que se encuentren realizando los trabajos.' },
-                { pregunta: '¿Puedo ser voluntario desde el extranjero?', respuesta: 'Sí — puedes apoyar como embajador cultural, difundiendo la campaña o aportando recursos a distancia.' }
-            ];
-            isFaqFallback = true;
-        }
-
-        if (faqItems.length > 0) {
-            // Inyección con Contrato de Interactividad Física [cite: 706, 18]
-            document.getElementById('db-faq-list').innerHTML = faqItems.map(item => `
-                <div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${(item.pregunta || "").toUpperCase()}</span>
-                        <div class="faq-icon-circle" style="width:22px; height:22px; border-radius:50%; border:1px solid var(--tpl-accent, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--tpl-accent, #d72dc0);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-                    </div>
-                    <div class="faq-answer">${formatRichText(item.respuesta || '')}</div>
-                </div>`).join('');
-            
-            // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
-            const faqStatus = isFaqFallback ? `FAQ de REFERENCIA/FALLBACK (${faqItems.length} preguntas)` : `FAQ REAL (${faqItems.length} preguntas)`;
-            logStatus(`TRACE: ${faqStatus} inyectado.`, "TRACE");
-        }
-    }
-    // === FIN SEGMENTO FAQ ===
-
-    // === INICIO SEGMENTO: UBICACIÓN → CONTACTO DIRECTO (ADR-017, Opción B) ===
-    // Antes: iframe de Google Maps embebido en #db-mapa-container. Mandato de
-    // Dirección (Context Package, ago-2026): sustituir por información de
-    // contacto directa. Se lee content.contacto (dir/tel/email) -- campo del
-    // Contrato de Datos que ya existía en el JSON del evento pero no tenía
-    // ningún consumidor en este archivo hasta ahora (auditado: cero matches
-    // de "content.contacto" antes de este cambio). Cero Borrado: el target de
-    // inyección sigue siendo el mismo ID, #db-mapa-container.
-    {
-        const UBICACION_CONTACTO_ICONS = {
-            tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
-            email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6 12 13 2 6"/></svg>',
-            dir: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>'
-        };
-        const contactoData = content.contacto || {};
-        const contactoContainer = document.getElementById('db-mapa-container');
-        if (contactoContainer) {
-            const filas = [];
-            if (contactoData.tel) filas.push({ icono: UBICACION_CONTACTO_ICONS.tel, label: 'Teléfono', valor: contactoData.tel });
-            if (contactoData.email) filas.push({ icono: UBICACION_CONTACTO_ICONS.email, label: 'Email', valor: contactoData.email });
-            // Fallback aditivo: si no hay dirección explícita en content.contacto.dir,
-            // se usa ev.ubicacion (el mismo campo que antes construía el mapa).
-            const direccion = contactoData.dir || ev.ubicacion || '';
-            if (direccion) filas.push({ icono: UBICACION_CONTACTO_ICONS.dir, label: 'Dirección', valor: direccion });
-
-            contactoContainer.innerHTML = filas.length
-                ? `<div class="ubicacion-contacto">${filas.map(f => `
-                    <div class="ubicacion-contacto-item">
-                        <span class="ubicacion-contacto-icono">${f.icono}</span>
-                        <div class="ubicacion-contacto-texto">
-                            <span class="ubicacion-contacto-label">${f.label}</span>
-                            <span class="ubicacion-contacto-valor">${f.valor}</span>
-                        </div>
-                    </div>`).join('')}</div>`
-                : `<div class="ubicacion-contacto"><p class="ubicacion-contacto-vacio">Contacto próximamente.</p></div>`;
-
-            logStatus(`TRACE: Contacto directo inyectado en #mod-ubicacion (${filas.length} campos, ADR-017 Opción B).`, "TRACE");
-        }
-    }
-    // === FIN SEGMENTO UBICACIÓN ===
-
-    // === INICIO SEGMENTO: TECHNICAL DATA RESTORED CON FALLBACK (v209) ===
-    // technical data restored
-    let technicalCount = 0;
-    let isTechFallback = false;
-
-    const dressVal = content.dresscode || 'NEON';
-    const guestVal = content.guest_list || '+200';
-    const aforoVal = ev.aforo_max ? `${ev.aforo_max}` : '100';
-    const ticketVal = content.tickets_info || 'DISPONIBLES';
-
-    if (!content.dresscode || !content.guest_list || !ev.aforo_max || !content.tickets_info) {
-        isTechFallback = true;
-    }
-
-    if (document.getElementById('db-dress-val')) {
-        document.getElementById('db-dress-val').innerText = dressVal.toUpperCase();
-        technicalCount++;
-    }
-    if (document.getElementById('db-guest-val')) {
-        document.getElementById('db-guest-val').innerText = guestVal;
-        technicalCount++;
-    }
-    if (document.getElementById('db-aforo-val')) {
-        document.getElementById('db-aforo-val').innerText = aforoVal;
-        technicalCount++;
-    }
-    if (document.getElementById('db-ticket-val')) {
-        document.getElementById('db-ticket-val').innerText = ticketVal.toUpperCase();
-        technicalCount++;
-    }
-
-    const techStatus = isTechFallback 
-        ? `Tarjetas técnicas de REFERENCIA/FALLBACK (${technicalCount} tarjetas)` 
-        : `Tarjetas técnicas REALES (${technicalCount} tarjetas)`;
-    logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
-    // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
-
-                // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
-                // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
-                // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
-                // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
-                // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
-                // v1.4.8: contrato corregido a los 11 átomos reales — antes faltaban 'unified-frame'
-                // (countdown) y 'mod-hero-meta' (meta), y 'mod-faq-ubicacion' ya no existe (split en dos).
-                // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
-                // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
-                // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
-                // v221: Contrato extendido a 20 átomos (v109 → v110, aditivo, no-breaking).
-                // Se agregan mod-mapa-crisis/mod-como-ayudar/mod-impacto-historico — nacidos
-                // para la campaña "Emergencia por Venezuela" (b5) pero genéricos y reutilizables
-                // por cualquier categoría futura que necesite crisis en tiempo real, categorías
-                // de colaboración, o un histórico de impacto separado del objetivo económico.
-                // v222: Contrato extendido a 21 átomos (v110 → v111, aditivo, no-breaking).
-                // Se agrega mod-actualizaciones (diario de impacto / carrusel de noticias).
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto-humanitario', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico', 'mod-actualizaciones'];
-                let activeModulesCount = 0;
-                let presentInDomCount = 0;
-
-                MODULE_IDS.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (!el) {
-                        logStatus(`DEBUG: Módulo [${id}] no existe en el DOM del Master.`, "DEBUG");
-                        return;
-                    }
-                    presentInDomCount++;
-                    const isVisible = window.getComputedStyle(el).display !== 'none';
-                    if (isVisible) {
-                        activeModulesCount++;
-                        logStatus(`INFO: Módulo [${id}] -> ACTIVADO POR CSS (template: ${ev.template_id || 'f3'})`, "INFO");
-                    } else {
-                        logStatus(`DEBUG: Módulo [${id}] -> INACTIVO (el template no lo enciende)`, "DEBUG");
-                    }
-                });
-
-                logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
-
-                // Veredicto estructural explícito (separado de la visibilidad, que es decisión legítima
-                // del template): el contrato de IDs exige que los 11 átomos EXISTAN en el DOM del Master,
-                // aunque un template pueda ocultar algunos por diseño.
-                const contractOK = presentInDomCount === MODULE_IDS.length;
-                logStatus(`SEAL: Contrato de IDs v124-MASTER -> ${contractOK ? '[OK]' : '[FAIL]'} (${presentInDomCount}/${MODULE_IDS.length} átomos presentes en el DOM)`, contractOK ? "INFO" : "ERROR");
-
-                 // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA (v210) ===
-    // Reemplaza el sensor hardcodeado a tpl-p5. El Master no debe conocer
-    // el nombre de ninguna plantilla específica: audita el contenedor grid
-    // (#main-content-flow) de forma genérica, cualquiera sea la plantilla activa.
-    const activeTplClass = Array.from(document.body.classList).find(c => c.toLowerCase().startsWith('tpl-'));
-    const gridEl = document.getElementById('main-content-flow');
-    if (activeTplClass && gridEl) {
-        const gridDisplay = window.getComputedStyle(gridEl).display;
-        const gridColumns = window.getComputedStyle(gridEl).gridTemplateColumns;
-        logStatus(`TRACE: Structural Audit [${activeTplClass}] | Display: ${gridDisplay} | Columns: ${gridColumns}`, "TRACE");
-    }
-    // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA ===
-                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
-                logStatus("TRACE: Auditoría v1.4.8 cerrada: injectAtomicCSS duplicado eliminado, video duplicado eliminado, venue-name huérfano eliminado, split FAQ/Ubicación, contrato de 11 átomos corregido, fallback visible de CSS. Sellado Definitivo v124-MASTER.", "TRACE");
-
-            } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
-        }
-        window.onload = initEvento;
-    </script>
+  })();
+  </script>
 </body>
 </html>
