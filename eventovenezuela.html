@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Orchestrator v214 · Atomic Grid System</title>
+    <title>Sonidos por el cambio</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
@@ -18,28 +18,13 @@
         overflow-x: hidden;
     }
 
-    /* 2. ESCUDO DE GRANO (v47) */
-    body::before {
-        content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        opacity: 0.04;
-    }
-
-    /* 3. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
+    /* 2. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
     section, header, footer { display: none; } /* v220: footer sumado al kernel IoC */
-
-    /* 4. CARGA Y FEEDBACK */
-    .loading-overlay { 
-        position: fixed; inset: 0; background: #000; z-index: 999; 
-        display: flex; align-items: center; justify-content: center; 
-        font-weight: 900; letter-spacing: 3px; text-transform: uppercase;
-    }
 </style>
 <!-- === FIN SEGMENTO: KERNEL SaaS AGNOSTICO === -->
 </head>
 
 <body class="tpl-init">
-    <div id="loader" class="loading-overlay">SINCRO TOTAL v214...</div>
 
     <!-- CONTENEDOR GRID ÚNICO v210 — Todos los módulos son hermanos planos.
          La plantilla (.tpl-*) decide libremente la ubicación de cada uno vía grid-area. -->
@@ -532,11 +517,6 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        function logStatus(m, t = 'INFO') {
-            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
-            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
-        }
-
         // === TEXTO ENRIQUECIDO MARKDOWN-LITE (anti-XSS) ===
         // Soporta **negrita** y saltos de línea desde el JSON (historia, actualizaciones, FAQ).
         // Primero se escapa todo el HTML crudo (blinda contra inyección), luego se re-inyectan
@@ -672,9 +652,7 @@
                     document.getElementById('fase1-fields').style.display = 'none';
                     document.getElementById('form-fase2').style.display = 'block';
                     mostrarBloqueFase2(tipoAyuda);
-                    logStatus(`TRACE: Fase 1 registrada en 'inscritos' (id ${regInscritoId}, categoría: ${tipoAyuda}).`, "TRACE");
                 } catch (err) {
-                    logStatus(`ERROR: Fallo INSERT Fase 1 -> ${err.message}`, "ERROR");
                     alert('No pudimos procesar tu registro. Por favor intenta de nuevo en unos segundos.');
                 } finally {
                     submitBtn.disabled = false; submitBtn.innerText = originalText;
@@ -684,7 +662,6 @@
                 const autorizado = document.getElementById('reg-autorizacion').checked;
 
                 if (!regInscritoId) {
-                    logStatus('ERROR: No hay inscrito activo en memoria para completar Fase 2.', "ERROR");
                     alert('Hubo un problema con tu sesión de registro. Por favor vuelve a intentar desde el inicio.');
                     return;
                 }
@@ -744,9 +721,7 @@
 
                     document.getElementById('form-fase2').style.display = 'none';
                     document.getElementById('form-fase-success').style.display = 'block';
-                    logStatus(`TRACE: Fase 2 completada para inscrito ${regInscritoId}.`, "TRACE");
                 } catch (err) {
-                    logStatus(`ERROR: Fallo UPDATE Fase 2 -> ${err.message}`, "ERROR");
                     alert('No pudimos guardar tu registro. Intenta de nuevo.');
                 } finally {
                     submitBtn.disabled = false; submitBtn.innerText = originalText;
@@ -775,7 +750,6 @@
                 const timer = setTimeout(() => {
                     if (!isResolved) {
                         isResolved = true;
-                        logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}]. Continuando en degradación suave.`, "ERROR");
                         resolve(false);
                     }
                 }, 5000);
@@ -784,15 +758,6 @@
                     if (!isResolved) {
                         isResolved = true;
                         clearTimeout(timer);
-                        let rulesCount = 0;
-                        try {
-                            const sheets = Array.from(document.styleSheets);
-                            const targetSheet = sheets.find(s => s.href && s.href.includes((tplId || 'f3').toLowerCase()));
-                            if (targetSheet && targetSheet.cssRules) {
-                                rulesCount = targetSheet.cssRules.length;
-                            }
-                        } catch (e) {}
-                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS, cache bypass v=${timestamp}).`, "LINK");
                         resolve(true);
                     }
                 };
@@ -801,7 +766,6 @@
                     if (!isResolved) {
                         isResolved = true;
                         clearTimeout(timer);
-                        logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR");
                         resolve(false);
                     }
                 };
@@ -812,7 +776,6 @@
         }
 
         async function initEvento() {
-            logStatus("Iniciando Orquestador v214 - Sistema de Grid Atómico Modular.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
             try {
@@ -836,7 +799,6 @@
                 if (primaryColor) {
                     document.documentElement.style.setProperty('--master-accent', primaryColor);
                 }
-                logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
 
                 const cssLoadedOK = await injectAtomicCSS(ev.categoria_slug, ev.template_id);
                 if (!cssLoadedOK) {
@@ -850,7 +812,6 @@
                 const tplNormal = `tpl-${ev.template_id || 'F3'}`;
                 const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
                 document.body.className = `${tplNormal} ${tplLower}`;
-                logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
 
                 // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
                 // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
@@ -920,7 +881,6 @@
                   </div>
                   <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
               </div>`;
-          console.log("%c[TRACE] Vídeo YouTube detectado -> Miniatura segura inyectada.", "color: #e67e22; font-weight: bold;");
       } else {
           videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">URL DE YOUTUBE INVÁLIDA</div>`;
       }
@@ -932,7 +892,6 @@
           vimeoEmbedUrl = vimeoIdMatch ? `https://player.vimeo.com/video/${vimeoIdMatch[1]}` : videoUrl;
       }
       videoContainer.innerHTML = `<iframe src="${vimeoEmbedUrl}" style="width:100%; height:100%; border:none; object-fit:cover;" allowfullscreen></iframe>`;
-      console.log("%c[TRACE] Vídeo Vimeo detectado -> URL normalizada e iframe inyectado.", "color: #e67e22; font-weight: bold;");
   } else {
       // Fallback estricto anti-bloques vacíos
       videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
@@ -947,12 +906,10 @@
     // BUG HISTÓRICO CORREGIDO: #db-gallery-grid existía en el HTML pero ningún
     // segmento de JS lo alimentaba; el módulo quedaba permanentemente vacío.
     let galeriaList = Array.isArray(content.gallery) ? content.gallery : [];
-    let isGaleriaFallback = false;
     if (galeriaList.length === 0) {
         // Sin fotos reales todavía en Supabase: se muestran 8 placeholders neutros
         // en vez de depender de un host externo (Silent Fallback, ADR-008).
         galeriaList = new Array(8).fill(null);
-        isGaleriaFallback = true;
     }
     const galeriaGridEl = document.getElementById('db-gallery-grid');
     if (galeriaGridEl) {
@@ -966,8 +923,6 @@
             }
             return `<div class="gallery-thumb gallery-thumb--empty"></div>`;
         }).join('');
-        const galStatus = isGaleriaFallback ? `Galería de REFERENCIA/FALLBACK (${galeriaList.length} espacios)` : `Galería REAL (${galeriaList.length} fotos)`;
-        logStatus(`TRACE: ${galStatus} inyectada.`, "TRACE");
     }
     // === FIN SEGMENTO GALERÍA ===
 
@@ -1005,7 +960,6 @@
         if (sContainer) {
             sContainer.style.borderColor = 'var(--tpl-accent)';
             sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
-            logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
         }
     }
     // === FIN SEGMENTO MULTIMEDIA ===
@@ -1013,7 +967,6 @@
 
   // === INICIO SEGMENTO: HISTORIA DE LA CAUSA CON FALLBACK (v215) ===
     const historiaData = content.historia || {};
-    const isHistoriaFallback = !content.historia;
     const histTitulo = historiaData.titulo || 'Una causa que nos une';
     const histTexto = historiaData.texto || 'Cada aporte se convierte en ayuda real y directa para quienes más lo necesitan. Esta es la historia detrás de la campaña.';
 
@@ -1028,7 +981,6 @@
         const histImgUrl = historiaData.imagen || ev.imagen_url || '';
         if (histImgUrl) { histImgEl.src = histImgUrl; } else { histImgEl.style.display = 'none'; }
     }
-    logStatus(`TRACE: Historia ${isHistoriaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada.`, "TRACE");
 
     // NUEVO ÁTOMO ADITIVO (v222): #db-historia-lista — varios hitos narrativos numerados
     // (ej. "01 Los terremotos", "02 Nuestra misión"), como en landing-escritorio.jpg.
@@ -1044,13 +996,11 @@
     let historiaItemsList = Array.isArray(content.historia_items)
         ? content.historia_items
         : (Array.isArray(content.historia?.hitos) ? content.historia.hitos : []);
-    let isHistoriaItemsFallback = false;
     if (historiaItemsList.length === 0) {
         historiaItemsList = [
             { titulo: 'LOS TERREMOTOS', texto: 'Las emergencias cambian la vida de miles de personas en cuestión de segundos, pero la reconstrucción puede tomar meses o incluso años. El 24 de junio de 2026, Venezuela enfrentó dos grandes terremotos; el 10 de agosto, un nuevo sismo de magnitud 7.4 golpeó a Colombia, con epicentro en San José del Palmar, Chocó. Son dos emergencias distintas, en territorios diferentes, pero comparten una misma necesidad: mantener viva la ayuda más allá del impacto inicial. Mientras las noticias desaparecen, las necesidades permanecen. Creemos que la respuesta está en las personas: en quienes donan, participan, comparten información o aportan su tiempo para que la solidaridad continúe creciendo durante la recuperación.' },
             { titulo: 'Nuestra misión: red de ayuda continua', texto: 'Sonidos por el Cambio nace para convertir la cultura en una red de apoyo permanente. A través de eventos culturales en simultáneo, creamos conexión y esperanza. Juntos, la cultura no solo se expresa: se convierte en ayuda que transforma vidas, hoy y siempre.' }
         ];
-        isHistoriaItemsFallback = true;
     }
     const historiaListaEl = document.getElementById('db-historia-lista');
     if (historiaListaEl) {
@@ -1063,14 +1013,11 @@
                 </div>
                 ${item.imagen ? `<img class="historia-item-img" src="${item.imagen}" alt="" loading="lazy" onerror="this.remove(); this.closest('.historia-item')?.classList.remove('historia-item--conimg');">` : ''}
             </div>`).join('');
-        const hiStatus = isHistoriaItemsFallback ? `Hitos de Historia de REFERENCIA/FALLBACK (${historiaItemsList.length})` : `Hitos de Historia REALES (${historiaItemsList.length})`;
-        logStatus(`TRACE: ${hiStatus} inyectados.`, "TRACE");
     }
     // === FIN SEGMENTO HISTORIA ===
 
     // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
     const objetivoData = content.objetivo || {};
-    const isObjetivoFallback = !content.objetivo;
     const metaVal = Number(objetivoData.meta) || 10000000;
     const recaudadoVal = Number(objetivoData.recaudado) || 0;
     const monedaVal = objetivoData.moneda || 'COP';
@@ -1088,7 +1035,6 @@
         const trackEl = barraEl.closest('.objetivo-barra-track');
         if (trackEl) trackEl.setAttribute('aria-valuenow', pctVal);
     }
-    logStatus(`TRACE: Objetivo ${isObjetivoFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (${pctVal}% alcanzado).`, "TRACE");
     // === FIN SEGMENTO OBJETIVO ===
 
     // === INICIO SEGMENTO: TARJETAS DE IMPACTO CON FALLBACK (v215) — FORMATO DUAL (v220) ===
@@ -1168,7 +1114,6 @@
     // Fallback genérico original (no usado en este clon):
     //   [{monto:20000,titulo:'Kit básico',...}, {monto:50000,...}, {monto:100000,...}]
     let impactoList = Array.isArray(content.impacto) ? normalizeImpactoLegacy(content.impacto) : [];
-    let isImpactoFallback = false;
     if (impactoList.length === 0) {
         impactoList = [
             { valor: '5,500', etiqueta: 'Víctimas', icono: 'victimas' },
@@ -1176,16 +1121,12 @@
             { valor: '18/24', etiqueta: 'Estados afectados', icono: 'estados' },
             { valor: '226', etiqueta: 'Municipios', icono: 'municipios' }
         ];
-        isImpactoFallback = true;
     }
-    const impactoCount = renderImpactoCards(impactoList, 'db-impacto-grid', monedaVal, fmtMoney);
-    const impactoStatus = isImpactoFallback ? `Tarjetas de impacto (crisis) de REFERENCIA/FALLBACK (${impactoCount})` : `Tarjetas de impacto (crisis) REALES (${impactoCount})`;
-    logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
+    renderImpactoCards(impactoList, 'db-impacto-grid', monedaVal, fmtMoney);
     // === FIN SEGMENTO IMPACTO ===
 
     // === INICIO SEGMENTO: MAPA DE CRISIS — nuevo átomo v221 (Contrato v109 → v110) ===
     const mapaCrisisData = content.mapa_crisis || {};
-    const isMapaCrisisFallback = !content.mapa_crisis;
     const fallaVal = mapaCrisisData.falla || 'Falla de San Sebastián';
     if (document.getElementById('db-mapa-crisis-falla')) document.getElementById('db-mapa-crisis-falla').innerText = fallaVal;
     const mapaCrisisSvgEl = document.getElementById('db-mapa-crisis-svg');
@@ -1213,7 +1154,6 @@
                 <circle cx="205" cy="85" r="6" class="mc-pulse"/>
             </svg>`;
     }
-    logStatus(`TRACE: Mapa de crisis ${isMapaCrisisFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (falla: ${fallaVal}).`, "TRACE");
 
     // === INICIO SEGMENTO: MAPA DE CRISIS COLOMBIA ===
     const mapaCrisisSvgColEl = document.getElementById('db-mapa-crisis-svg-col');
@@ -1236,7 +1176,6 @@
                 <circle cx="135" cy="124" r="6" class="mc-epicentro"/>
                 <circle cx="135" cy="124" r="6" class="mc-pulse mc-pulse--col"/>
             </svg>`;
-        logStatus("TRACE: Mapa de crisis COLOMBIA inyectado (San José del Palmar, Chocó).", "TRACE");
     }
     // === FIN SEGMENTO MAPA DE CRISIS COLOMBIA ===
 
@@ -1250,7 +1189,6 @@
         donacion:   '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
     };
     const comoAyudarData = content.como_ayudar || {};
-    const isComoAyudarFallback = !content.como_ayudar;
     const comoAyudarLead = comoAyudarData.lead || '<p>Creemos que cada aporte cuenta y que cada esfuerzo suma. Por eso, transformamos la energía colectiva en recursos y acciones concretas que generan un impacto real en las comunidades que más lo necesitan.</p><p>Juntos buscamos unirnos por un propósito común, para brindar ayuda, crear oportunidades y construir un cambio posible.</p>';
     let comoAyudarList = Array.isArray(comoAyudarData.categorias) ? comoAyudarData.categorias : [
         { titulo: 'Espacios', descripcion: 'Tu lugar suma', icono: 'espacio', tipo_ayuda: 'espacio' },
@@ -1276,22 +1214,18 @@
                 <p class="comoayudar-desc">${item.descripcion || ''}</p>
                 <span class="comoayudar-link">VER MÁS →</span>
             </div>`).join('');
-        const caStatus = isComoAyudarFallback ? `Categorías "Cómo Ayudar" de REFERENCIA/FALLBACK (${comoAyudarList.length})` : `Categorías "Cómo Ayudar" REALES (${comoAyudarList.length})`;
-        logStatus(`TRACE: ${caStatus} inyectadas.`, "TRACE");
     }
 
     // Columna 2 (v1.2.6): métricas de impacto de crisis junto a las tarjetas de roles.
     // Dato editable desde Admin (campo "¿Cómo puedo ayudar? — métricas"); mientras no se
     // cargue, se usa el placeholder acordado con Dirección para esta campaña.
     let comoAyudarStatsList = Array.isArray(comoAyudarData.stats) ? comoAyudarData.stats : [];
-    let isComoAyudarStatsFallback = false;
     if (comoAyudarStatsList.length === 0) {
         comoAyudarStatsList = [
             { valor: '150.000+', etiqueta: 'Personas ayudadas', icono: 'general' },
             { valor: '10', etiqueta: 'Estados afectados', icono: 'estados' },
             { valor: '23.000', etiqueta: 'Desplazados', icono: 'desplazados' }
         ];
-        isComoAyudarStatsFallback = true;
     }
     const comoAyudarStatsEl = document.getElementById('db-como-ayudar-stats');
     if (comoAyudarStatsEl) {
@@ -1303,8 +1237,6 @@
                     <span class="comoayudar-stat-etiqueta">${(item.etiqueta || '').toUpperCase()}</span>
                 </div>
             </div>`).join('');
-        const casStatus = isComoAyudarStatsFallback ? `Métricas "Cómo Ayudar" de REFERENCIA/FALLBACK — dato editable desde Admin (${comoAyudarStatsList.length})` : `Métricas "Cómo Ayudar" REALES (${comoAyudarStatsList.length})`;
-        logStatus(`TRACE: ${casStatus} inyectadas.`, "TRACE");
     }
     // === FIN SEGMENTO CÓMO AYUDAR ===
 
@@ -1313,7 +1245,6 @@
     // se usan cifras inventadas, con la condición de que quedaran editables desde Admin
     // (ver campo "Impacto hasta hoy — métricas" en admin.html). No son cifras reales.
     let impactoHistList = Array.isArray(content.impacto_historico) ? normalizeImpactoLegacy(content.impacto_historico) : [];
-    let isImpactoHistFallback = false;
     if (impactoHistList.length === 0) {
         impactoHistList = [
             { valor: '12', etiqueta: 'Eventos', icono: 'eventos' },
@@ -1321,14 +1252,11 @@
             { valor: '150,000+', etiqueta: 'Personas ayudadas', icono: 'general' },
             { valor: '$45.000.000 COP', etiqueta: 'Recaudación', icono: 'recaudacion' }
         ];
-        isImpactoHistFallback = true;
     }
-    const impactoHistCount = renderImpactoCards(impactoHistList, 'db-impacto-historico-grid', monedaVal, fmtMoney);
+    renderImpactoCards(impactoHistList, 'db-impacto-historico-grid', monedaVal, fmtMoney);
     if (document.getElementById('db-impacto-historico-frase')) {
         document.getElementById('db-impacto-historico-frase').innerText = content.impacto_historico_frase || 'LA MÚSICA NOS UNE. LA SOLIDARIDAD NOS MUEVE.';
     }
-    const ihStatus = isImpactoHistFallback ? `Impacto histórico de REFERENCIA/FALLBACK (${impactoHistCount})` : `Impacto histórico REAL (${impactoHistCount})`;
-    logStatus(`TRACE: ${ihStatus} inyectado.`, "TRACE");
     // === FIN SEGMENTO IMPACTO HISTÓRICO ===
 
     // === INICIO SEGMENTO: ACTUALIZACIONES — nuevo átomo v222 (Contrato v111 → v112) ===
@@ -1368,7 +1296,6 @@
         });
     }
     let actualizacionesList = Array.isArray(content.actualizaciones) ? normalizeActualizacionesLegacy(content.actualizaciones) : [];
-    let isActualizacionesFallback = false;
     if (actualizacionesList.length === 0) {
         actualizacionesList = [
             { categoria: 'Salud', fecha: '24 JUN 2026 · 10:30 AM', titulo: 'Brigada médica en Catia La Mar', resumen: 'Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico de la red de solidaridad instaló un punto de atención primaria, entrega de medicamentos básicos y acompañamiento psicológico para quienes perdieron su hogar.' },
@@ -1376,7 +1303,6 @@
             { categoria: 'Cultura', fecha: '23 JUN 2026 · 09:00 PM', titulo: 'Evento solidario en Caracas', resumen: 'Gracias a la energía de la música recaudamos fondos para ayuda directa. El evento reunió a artistas y marcas aliadas en una noche de solidaridad cultural que transformó en tangible el apoyo a las víctimas del sismo.' },
             { categoria: 'Logística', fecha: '23 JUN 2026 · 02:15 PM', titulo: 'Nuevos puntos de acopio activos', resumen: 'Ya contamos con 16 puntos de acopio activos en la red de ayuda, distribuidos en los estados más afectados, para centralizar la recepción y distribución de donaciones.' }
         ];
-        isActualizacionesFallback = true;
     }
     // Se expone para que las tarjetas puedan abrir el modal por índice sin re-serializar el HTML.
     window._actualizacionesData = actualizacionesList;
@@ -1391,8 +1317,6 @@
                 <p class="actualizacion-resumen">${formatRichText(item.resumen || '')}</p>
                 <span class="actualizacion-link">Leer más →</span>
             </div>`).join('');
-        const actStatus = isActualizacionesFallback ? `Actualizaciones de REFERENCIA/FALLBACK (${actualizacionesList.length})` : `Actualizaciones REALES (${actualizacionesList.length})`;
-        logStatus(`TRACE: ${actStatus} inyectadas.`, "TRACE");
     }
     // === FIN SEGMENTO ACTUALIZACIONES ===
 
@@ -1400,7 +1324,6 @@
     // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
     const sponsorsRaw = content.sponsors || "";
     let sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    let isFallback = false;
 
     if (sponsorsList.length === 0) {
         // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
@@ -1409,7 +1332,6 @@
             "https://github.com/apple-touch-icon.png",
             "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
         ];
-        isFallback = true;
     }
 
     // 2. Inyección Física en el Contrato de Datos [cite: 757]
@@ -1419,23 +1341,17 @@
             <div class="sponsor-item" style="padding: 1.5rem;">
                 <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.85;">
             </div>`).join('');
-            
-        // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
-        const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
-        logStatus(`TRACE: ${statusMsg}.`, "TRACE");
     }
     // === FIN SEGMENTO PATROCINADORES ===
 
     // === INICIO SEGMENTO: EQUIPO CON FALLBACK (v220) ===
     let equipoList = Array.isArray(content.equipo) ? content.equipo : [];
-    let isEquipoFallback = false;
     if (equipoList.length === 0) {
         equipoList = [
             { nombre: 'María López', rol: 'Directora Ejecutiva' },
             { nombre: 'Juan Camacho', rol: 'Coordinador de Campo' },
             { nombre: 'Laura Torres', rol: 'Gestora Comunitaria' }
         ];
-        isEquipoFallback = true;
     }
     const equipoGridEl = document.getElementById('db-equipo-grid');
     if (equipoGridEl) {
@@ -1448,19 +1364,15 @@
                 <span class="equipo-rol">${p.rol || ''}</span>
             </div>`;
         }).join('');
-        const equipoStatus = isEquipoFallback ? `Equipo de REFERENCIA/FALLBACK (${equipoList.length})` : `Equipo REAL (${equipoList.length})`;
-        logStatus(`TRACE: ${equipoStatus} inyectado.`, "TRACE");
     }
     // === FIN SEGMENTO EQUIPO ===
 
     // === INICIO SEGMENTO: CTA FINAL CON FALLBACK (v220) ===
     const ctaFinalData = content.cta_final || {};
-    const isCtaFallback = !content.cta_final;
     if (document.getElementById('db-cta-final-titulo')) document.getElementById('db-cta-final-titulo').innerText = ctaFinalData.titulo || 'Tu apoyo hoy transforma vidas mañana.';
     if (document.getElementById('db-cta-final-subtitulo')) document.getElementById('db-cta-final-subtitulo').innerText = ctaFinalData.subtitulo || 'Sé parte del cambio.';
     const ctaBtnEl = document.getElementById('cta-final-btn');
     if (ctaBtnEl && ctaFinalData.boton_texto) ctaBtnEl.innerText = ctaFinalData.boton_texto;
-    logStatus(`TRACE: CTA final ${isCtaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado.`, "TRACE");
     // === FIN SEGMENTO CTA FINAL ===
 
     // === INICIO SEGMENTO: FOOTER CON FALLBACK (v220) ===
@@ -1520,14 +1432,12 @@
     if (document.getElementById('footer-copy')) {
         document.getElementById('footer-copy').innerText = `© ${new Date().getFullYear()} ${(ev.organizaciones?.nombre || '--')}. Todos los derechos reservados.`;
     }
-    logStatus("TRACE: Footer inyectado (marca, enlaces, redes, contacto).", "TRACE");
     // === FIN SEGMENTO FOOTER ===
 
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
 // 1. Verificación de Póster [cite: 343]
 if (document.getElementById('db-poster-img')) {
     document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
-    logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
 }
 
 // === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198) ===
@@ -1543,16 +1453,12 @@ if (document.getElementById('db-poster-img')) {
                     <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
                 </div>`;
         }).join('');
-        
-        // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
-        logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
     }
     // === FIN SEGMENTO: LINEUP ===
 
    // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
     {
         let faqItems = [];
-        let isFaqFallback = false;
         // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
         if (Array.isArray(content.faq)) {
             faqItems = content.faq;
@@ -1572,7 +1478,6 @@ if (document.getElementById('db-poster-img')) {
                 { pregunta: '¿Cómo se validan las ayudas?', respuesta: 'Trabajamos junto a organizaciones locales que verifican la entrega directa a las familias damnificadas o a las organizaciones que se encuentren realizando los trabajos.' },
                 { pregunta: '¿Puedo ser voluntario desde el extranjero?', respuesta: 'Sí — puedes apoyar como embajador cultural, difundiendo la campaña o aportando recursos a distancia.' }
             ];
-            isFaqFallback = true;
         }
 
         if (faqItems.length > 0) {
@@ -1585,10 +1490,6 @@ if (document.getElementById('db-poster-img')) {
                     </div>
                     <div class="faq-answer">${formatRichText(item.respuesta || '')}</div>
                 </div>`).join('');
-            
-            // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
-            const faqStatus = isFaqFallback ? `FAQ de REFERENCIA/FALLBACK (${faqItems.length} preguntas)` : `FAQ REAL (${faqItems.length} preguntas)`;
-            logStatus(`TRACE: ${faqStatus} inyectado.`, "TRACE");
         }
     }
     // === FIN SEGMENTO FAQ ===
@@ -1628,110 +1529,23 @@ if (document.getElementById('db-poster-img')) {
                         </div>
                     </div>`).join('')}</div>`
                 : `<div class="ubicacion-contacto"><p class="ubicacion-contacto-vacio">Contacto próximamente.</p></div>`;
-
-            logStatus(`TRACE: Contacto directo inyectado en #mod-ubicacion (${filas.length} campos, ADR-017 Opción B).`, "TRACE");
         }
     }
     // === FIN SEGMENTO UBICACIÓN ===
 
     // === INICIO SEGMENTO: TECHNICAL DATA RESTORED CON FALLBACK (v209) ===
-    // technical data restored
-    let technicalCount = 0;
-    let isTechFallback = false;
-
     const dressVal = content.dresscode || 'NEON';
     const guestVal = content.guest_list || '+200';
     const aforoVal = ev.aforo_max ? `${ev.aforo_max}` : '100';
     const ticketVal = content.tickets_info || 'DISPONIBLES';
 
-    if (!content.dresscode || !content.guest_list || !ev.aforo_max || !content.tickets_info) {
-        isTechFallback = true;
-    }
-
-    if (document.getElementById('db-dress-val')) {
-        document.getElementById('db-dress-val').innerText = dressVal.toUpperCase();
-        technicalCount++;
-    }
-    if (document.getElementById('db-guest-val')) {
-        document.getElementById('db-guest-val').innerText = guestVal;
-        technicalCount++;
-    }
-    if (document.getElementById('db-aforo-val')) {
-        document.getElementById('db-aforo-val').innerText = aforoVal;
-        technicalCount++;
-    }
-    if (document.getElementById('db-ticket-val')) {
-        document.getElementById('db-ticket-val').innerText = ticketVal.toUpperCase();
-        technicalCount++;
-    }
-
-    const techStatus = isTechFallback 
-        ? `Tarjetas técnicas de REFERENCIA/FALLBACK (${technicalCount} tarjetas)` 
-        : `Tarjetas técnicas REALES (${technicalCount} tarjetas)`;
-    logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
+    if (document.getElementById('db-dress-val')) document.getElementById('db-dress-val').innerText = dressVal.toUpperCase();
+    if (document.getElementById('db-guest-val')) document.getElementById('db-guest-val').innerText = guestVal;
+    if (document.getElementById('db-aforo-val')) document.getElementById('db-aforo-val').innerText = aforoVal;
+    if (document.getElementById('db-ticket-val')) document.getElementById('db-ticket-val').innerText = ticketVal.toUpperCase();
     // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
 
-                // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
-                // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
-                // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
-                // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
-                // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
-                // v1.4.8: contrato corregido a los 11 átomos reales — antes faltaban 'unified-frame'
-                // (countdown) y 'mod-hero-meta' (meta), y 'mod-faq-ubicacion' ya no existe (split en dos).
-                // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
-                // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
-                // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
-                // v221: Contrato extendido a 20 átomos (v109 → v110, aditivo, no-breaking).
-                // Se agregan mod-mapa-crisis/mod-como-ayudar/mod-impacto-historico — nacidos
-                // para la campaña "Emergencia por Venezuela" (b5) pero genéricos y reutilizables
-                // por cualquier categoría futura que necesite crisis en tiempo real, categorías
-                // de colaboración, o un histórico de impacto separado del objetivo económico.
-                // v222: Contrato extendido a 21 átomos (v110 → v111, aditivo, no-breaking).
-                // Se agrega mod-actualizaciones (diario de impacto / carrusel de noticias).
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto-humanitario', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-mapa-crisis', 'mod-como-ayudar', 'mod-impacto-historico', 'mod-actualizaciones'];
-                let activeModulesCount = 0;
-                let presentInDomCount = 0;
-
-                MODULE_IDS.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (!el) {
-                        logStatus(`DEBUG: Módulo [${id}] no existe en el DOM del Master.`, "DEBUG");
-                        return;
-                    }
-                    presentInDomCount++;
-                    const isVisible = window.getComputedStyle(el).display !== 'none';
-                    if (isVisible) {
-                        activeModulesCount++;
-                        logStatus(`INFO: Módulo [${id}] -> ACTIVADO POR CSS (template: ${ev.template_id || 'f3'})`, "INFO");
-                    } else {
-                        logStatus(`DEBUG: Módulo [${id}] -> INACTIVO (el template no lo enciende)`, "DEBUG");
-                    }
-                });
-
-                logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
-
-                // Veredicto estructural explícito (separado de la visibilidad, que es decisión legítima
-                // del template): el contrato de IDs exige que los 11 átomos EXISTAN en el DOM del Master,
-                // aunque un template pueda ocultar algunos por diseño.
-                const contractOK = presentInDomCount === MODULE_IDS.length;
-                logStatus(`SEAL: Contrato de IDs v124-MASTER -> ${contractOK ? '[OK]' : '[FAIL]'} (${presentInDomCount}/${MODULE_IDS.length} átomos presentes en el DOM)`, contractOK ? "INFO" : "ERROR");
-
-                 // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA (v210) ===
-    // Reemplaza el sensor hardcodeado a tpl-p5. El Master no debe conocer
-    // el nombre de ninguna plantilla específica: audita el contenedor grid
-    // (#main-content-flow) de forma genérica, cualquiera sea la plantilla activa.
-    const activeTplClass = Array.from(document.body.classList).find(c => c.toLowerCase().startsWith('tpl-'));
-    const gridEl = document.getElementById('main-content-flow');
-    if (activeTplClass && gridEl) {
-        const gridDisplay = window.getComputedStyle(gridEl).display;
-        const gridColumns = window.getComputedStyle(gridEl).gridTemplateColumns;
-        logStatus(`TRACE: Structural Audit [${activeTplClass}] | Display: ${gridDisplay} | Columns: ${gridColumns}`, "TRACE");
-    }
-    // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA ===
-                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
-                logStatus("TRACE: Auditoría v1.4.8 cerrada: injectAtomicCSS duplicado eliminado, video duplicado eliminado, venue-name huérfano eliminado, split FAQ/Ubicación, contrato de 11 átomos corregido, fallback visible de CSS. Sellado Definitivo v124-MASTER.", "TRACE");
-
-            } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
+            } catch (err) { console.error(err); }
         }
         window.onload = initEvento;
     </script>
