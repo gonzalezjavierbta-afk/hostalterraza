@@ -23,11 +23,12 @@
     /* 2. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
     section, header, footer { display: none; } /* v220: footer sumado al kernel IoC */
 
-    /* 3. HERO BACKGROUND FALLBACK — gradiente oscuro mientras carga la imagen */
+    /* 3. HERO BACKGROUND FALLBACK — gradiente oscuro mientras carga la imagen
+       NOTA: background-image SIN !important para que el inline style del JS
+       (línea ~898: style.backgroundImage) pueda sobreescribirlo cuando cargue */
     #mod-hero {
         background-color: #1a1a1a !important;
-        background-image: linear-gradient(135deg, #0a0a0c 0%, #1a1228 50%, #0a0a10 100%) !important;
-        transition: opacity 0.4s ease;
+        background-image: linear-gradient(135deg, #0a0a0c 0%, #1a1228 50%, #0a0a10 100%);
     }
 
     /* 4. LOADING OVERLAY */
