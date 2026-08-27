@@ -1,27 +1,23 @@
-/* ===================================================================
-   TEMPLATE f1 — "SELINA STYLE" · v1.5.0-OMEGA (Rebalanceo de Gravedad Visual + Solapamiento Estético)
-   Protocolo: Aislamiento Atómico (ATOMIC) bajo .tpl-f1 / .tpl-f1
-   Contrato de Datos: v107 Compliance & SaaS Dynamic Accent Bridge
-   Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent
-   =================================================================== */
-
+/* ============================================================================
+   f1.css — SILO FIESTA F1 "SELINA STYLE" CONSOLIDADO (ADR-028/ADR-029, ago-2026)
+   Consolidation of the additive cascade (prev Sections 1-26) into ONE rule per
+   selector/breakpoint with the effective final value. Zero visual change on desktop,
+   validated by cascade diff vs pre-ADR29 backup. Historic prose lives in
+   Sistema QR desarrollo/DECISIONS.md (ADR-029) and the backup file
+   "f1 pre-ADR29 backup.css".
+   Breakpoints (mobile-first scale): BASE (<480) / 480 / 640 / 641-767 / 899 /
+   900-1023 / 1024+ (desktop split 38vw|62vw).
+   Estética: Deep Forest Green (#0a1a0a) to Wood (#3d2b1f) + --master-accent.
+   Fonts: Playfair Display 900 (titles/artists) + Geist (digits/meta/cards).
+   ============================================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Geist:wght@400;700;800;900&display=swap');
 
-
-/* TRACE (referencia estática — la emisión real en consola requiere JS, ver nota de handoff):
-   "Countdown Heartbeat Activo | Form Pos: Fixed | 7/7 Módulos Sincronizados" */
-
-
-/* -------------------------------------------------------------------
-   1. RESETEO DE SILO + PUENTE CROMÁTICO DINÁMICO (.tpl-f1)
-   ------------------------------------------------------------------- */
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   ========================================================================== */
 .tpl-f1, .tpl-F1 {
     --tpl-accent: var(--master-accent, #a3e635);
-    /* --gold: usada directamente en 10+ estilos inline del HTML real
-       (íconos SVG, borde del poster, botones, labels de tarjetas).
-       Nunca estaba definida — quedaban sin color. Se mapea al acento
-       de la plantilla para mantener coherencia visual. */
     --gold: var(--tpl-accent, #a3e635);
     --f1-bg-deep: #0a1a0a;
     --f1-bg-wood: #3d2b1f;
@@ -30,7 +26,6 @@
     --f1-card-bg: rgba(15, 28, 15, 0.75);
     --f1-font-serif: 'Playfair Display', Georgia, serif;
     --f1-font-sans: 'Geist', system-ui, -apple-system, sans-serif;
-   
     margin: 0;
     padding: 0;
     background: radial-gradient(circle at 20% 20%, #132713 0%, #0a1a0a 50%, #3d2b1f 100%) !important;
@@ -42,17 +37,22 @@
     box-sizing: border-box;
 }
 
-
 .tpl-f1 *, .tpl-F1 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f1 *::before, .tpl-F1 *::before {
     box-sizing: border-box;
 }
 
+.tpl-f1 *::after, .tpl-F1 *::after {
+    box-sizing: border-box;
+}
 
 .tpl-f1 section, .tpl-F1 section {
     padding: 5rem 10%;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 
 .tpl-f1 h2, .tpl-F1 h2 {
     color: var(--tpl-accent);
@@ -64,455 +64,226 @@
     text-transform: uppercase;
 }
 
-
-
-
-/* === 1.5 ACTIVACIÓN ATÓMICA v1.3.79 (Full Integrity) === */
-/* Mandato: f1 reclama el control de los 7 módulos vitales para que los datos de Supabase fluyan sin restricciones */
-
-
+/* ==========================================================================
+   2. ACTIVACIÓN ATÓMICA — display:flex en módulos vitales
+   ========================================================================== */
 .tpl-f1 #mod-hero, .tpl-f1 #mod-form,
-.tpl-f1 #mod-lineup, .tpl-f1 #mod-playlist, .tpl-f1 #unified-frame{
+.tpl-f1 #mod-lineup, .tpl-f1 #mod-playlist, .tpl-f1 #unified-frame {
     display: flex !important;
 }
 
-/* FIX (auditoria video roto): #mod-video se retira de la lista de arriba.
-   El HTML real de #mod-video usa el patron bloque + margin:0 auto para
-   centrar un max-width (<div style="max-width:1100px;margin:0 auto;">).
-   Ese patron depende de que el div se comporte como caja de bloque
-   (width:auto = llena el ancho disponible). display:flex convertia a
-   #db-video-content en un item flex sin flex-grow, que por defecto se
-   encoge a su contenido (shrink-to-fit) -- como empieza vacio y solo
-   tiene aspect-ratio:16/9 sin ancho explicito, colapsaba a una caja
-   diminuta. #mod-lineup y #mod-playlist tienen el mismo riesgo latente
-   pero no se tocan aqui porque no estan rotos hoy. */
-
-
-/* MÓDULO ATÓMICO: METADATOS (extraído del Hero, v213) — la clase .hero-meta
-   ya trae el estilo visual completo (ver sección 2); aquí solo se define
-   el espaciado propio de su nueva posición, debajo del Countdown. */
 .tpl-f1 #mod-hero-meta, .tpl-F1 #mod-hero-meta {
     padding: 0 0 1rem;
 }
 
+.tpl-f1 #main-content-flow {
+    display: grid !important;
+}
 
-/* Activación del contenedor como GRID ÚNICO (v1.4.0) — reemplaza el modelo de flujo/block */
-.tpl-f1 #main-content-flow { display: grid !important; }
+/* ==========================================================================
+   3. GRID ATÓMICO — Mobile-first (columna única) / Desktop split 38vw|62vw
+   ========================================================================== */
+.tpl-f1 #main-content-flow {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "form"
+        "countdown"
+        "meta"
+        "video"
+        "lineup"
+        "playlist"
+        "info"
+        "faq"
+        "ubicacion"
+        "sponsors";
+    row-gap: 0;
+    width: 100%;
+}
 
+.tpl-f1 #mod-hero         { grid-area: hero; }
+.tpl-f1 #mod-form         { grid-area: form; }
+.tpl-f1 #unified-frame    { grid-area: countdown; }
+.tpl-f1 #mod-hero-meta    { grid-area: meta; }
+.tpl-f1 #mod-video        { grid-area: video; }
+.tpl-f1 #mod-lineup       { grid-area: lineup; }
+.tpl-f1 #mod-playlist     { grid-area: playlist; }
+.tpl-f1 #mod-info-tecnica { grid-area: info; }
+.tpl-f1 #mod-faq          { grid-area: faq; }
+.tpl-f1 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f1 #mod-sponsors     { grid-area: sponsors; }
 
-
-/* --------------------------------------------------------------------------
-   2. REBALANCEO PANEL IZQUIERDO (v1.4.5) - Título Compacto / Form Small
-   -------------------------------------------------------------------------- */
+/* Desktop split 38vw | 62vw */
 @media (min-width: 1024px) {
-    /* CONTENEDOR DE TÍTULO (Anclaje Superior) */
-    .tpl-f1 #mod-hero, .tpl-F1 #mod-hero {
+    .tpl-f1 #main-content-flow {
+        grid-template-columns: 38vw 62vw;
+        grid-template-areas:
+            "hero countdown"
+            "hero meta"
+            "hero video"
+            "hero lineup"
+            "hero playlist"
+            "hero info"
+            "hero faq"
+            "hero ubicacion"
+            "hero sponsors";
+    }
+    .tpl-f1 #mod-form { grid-area: hero; }
+}
+
+/* ==========================================================================
+   4. #MOD-HERO — Panel izquierdo fijo desktop / mobile-first
+   ========================================================================== */
+.tpl-f1 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 12vh;
+    background-size: cover !important;
+    background-position: center !important;
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+@media (max-width: 1023px) {
+    .tpl-f1 #mod-hero {
+        padding-top: 8vh !important;
+        min-height: 55vh !important;
+        display: flex !important;
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 899px) {
+    .tpl-f1 #mod-hero {
+        min-height: 70vh !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .tpl-f1 #mod-hero {
         position: fixed !important;
-        left: 0; top: 0;
+        left: 0;
+        top: 0;
         width: 38vw !important;
         height: 100vh !important;
         display: flex !important;
         flex-direction: column;
-        justify-content: flex-start; /* Empuja el título arriba */
-        padding: 4rem 2.5rem !important; /* Respiro superior */
+        justify-content: flex-start;
+        padding: 4rem 2.5rem !important;
         z-index: 10;
-        text-align: left !important; /* Estética editorial Selina */
+        text-align: left !important;
     }
+}
 
-    /* ESCALA TIPOGRÁFICA REDUCIDA ($10,000 Standard) — v1.4.6: se agrega
-       peso Geist 900 explícito y Afterglow verde lima (misma fórmula de
-       resplandor que ya usa .unified-countdown-frame small, línea ~197,
-       para consistencia visual entre módulos). */
-    .tpl-f1 #event-title, .tpl-f1 #event-title {
-        font-family: var(--f1-font-sans); /* Geist */
+/* ==========================================================================
+   5. #EVENT-TITLE — Geist 900 + Afterglow
+   ========================================================================== */
+@media (min-width: 1024px) {
+    .tpl-f1 #event-title {
+        font-family: var(--f1-font-sans);
         font-weight: 900 !important;
-        font-size: clamp(1.8rem, 4vw, 2.8rem) !important; /* Título no invasivo */
+        font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
         line-height: 1.1;
         margin: 0;
         max-width: 90%;
         text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
     }
+}
 
-    /* CONTENEDOR DE "MENÚ" / FORMULARIO (Anclaje Inferior)
-       [FIX v1.4.6] Este selector apuntaba a #modulo-formulario, un ID que
-       NUNCA existió en evento3.html (el módulo real es #mod-form). La regla
-       llevaba 0 renders desde su creación. Se corrige al ID real.
-       Se retira además "flex-direction: column" (no llevaba !important):
-       el sistema Grid Atómico v1.4.0 (línea ~758) ya define
-       align-items:flex-end / justify-content:center para #mod-form
-       ASUMIENDO flex-direction:row (default). Si esta regla activaba
-       column, invertía los ejes y el form terminaba centrado verticalmente
-       pegado al borde derecho en vez de abajo-centrado. Se documenta aquí
-       para trazabilidad (Regla de Oro: No Regresión). */
-    .tpl-f1 #mod-form, .tpl-f1 #mod-form {
-        position: fixed !important;
-        left: 0; top: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-        display: flex !important;
-        padding: 3rem 2.5rem !important;
-        background: transparent !important;
-        z-index: 100;
-        pointer-events: none; /* Permite ver el fondo del Hero */
-    }
-
-    /* CAJA DE REGISTRO COMPACTA (Silo Parity) */
-    .tpl-f1 .form-master-box, .tpl-f1 .form-master-box {
-        pointer-events: auto; /* Habilita clicks solo aquí */
-        max-width: 400px !important; /* Reducido de 550px para ligereza */
-        padding: 2rem !important; /* Reducido de 3rem */
-        border-radius: 22px !important;
-        margin: 0 !important; /* Quitamos márgenes automáticos */
-        backdrop-filter: blur(20px) !important; /* !important: sin esto pierde
-            contra la regla posterior .form-master-box (línea ~656, blur 25px)
-            que no usa !important mientras que esta línea con !important sí
-            lo lleva en todas las demás propiedades salvo esta. Ahora el
-            blur 20px pedido queda garantizado independientemente del orden
-            de cascada. */
-        background: rgba(10, 26, 10, 0.85) !important;
-    }
-
-    /* INPUTS Y BOTONES COMPACTOS */
-    .tpl-f1 .form-input, .tpl-f1 .btn-submit {
-        padding: 0.9rem 1.2rem !important; /* Escala reducida para UX móvil/desktop */
-        font-size: 0.85rem !important;
-        margin-bottom: 0.8rem !important;
-    }
-
-    /* TABS DEL FORMULARIO */
-    .tpl-f1 .form-tabs {
-        margin-bottom: 1.2rem !important;
-        gap: 1rem !important;
+@media (max-width: 1023px) {
+    .tpl-f1 #event-title {
+        text-align: center !important;
+        width: 100%;
+        font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
+        font-weight: 900 !important;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        text-shadow: 0 0 20px var(--tpl-accent), 0 0 40px rgba(0, 0, 0, 0.5) !important;
+        margin-bottom: 2rem !important;
     }
 }
-/* -------------------------------------------------------------------
-   3. COUNTDOWN FRAME (Restauración v1.4.9.3 - Selina High-Fidelity)
-   ------------------------------------------------------------------- */
-.tpl-f1 .unified-countdown-frame, .tpl-f1 .unified-countdown-frame,
-.tpl-f1 #unified-frame, .tpl-f1 #unified-frame {
-    /* POSICIONAMIENTO Y CENTRADO EN GRID [cite: 27] */
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    justify-self: center;        /* Centrado horizontal exacto en los 62vw */
-    margin-top: 7rem !important; /* RESPIRO SUPERIOR: Evita que esté pegado arriba */
-    margin-bottom: 3rem;
-    width: fit-content;
-    z-index: 5;
 
-
-    /* RESTAURACIÓN ESTÉTICA ORIGINAL (Masa Crítica Protegida) [cite: 6] */
-    gap: 1.5rem;
-    padding: 1.5rem 2.5rem;      /* Recupera el tamaño robusto solicitado */
-    background: rgba(10, 26, 10, 0.65) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--tpl-accent) !important;
-    border-radius: 25px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--tpl-accent) !important;
+/* Fix crítico 400px: título con word-wrap */
+@media (max-width: 400px) {
+    .tpl-f1 #event-title {
+        font-size: clamp(2rem, 8vw, 3.2rem) !important;
+        padding: 0 1rem;
+        word-wrap: break-word;
+    }
 }
 
-/* BLOQUES INTERNOS (Restauración de Espaciado) [cite: 7] */
-.tpl-f1 .cd-block, .tpl-f1 .cd-block {
-    padding: 0 1.2rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
-    text-align: center;
-}
-
-.tpl-f1 .cd-block:last-child, .tpl-f1 .cd-block:last-child {
-    border-right: none;
-}
-
-/* TIPOGRAFÍA GEIST 900 (Restauración de Tamaño 2.2rem) [cite: 7, 727] */
-.tpl-f1 [id^="cd-"], .tpl-f1 [id^="cd-"],
-.tpl-f1 .cd-v, .tpl-f1 .cd-v {
-    font-family: var(--f1-font-sans) !important;
-    font-size: 2.2rem !important; /* Tamaño original recuperado */
-    font-weight: 900 !important;
-    line-height: 1;
-    color: var(--f1-text-main) !important; /* [v1.5.0-OMEGA] Consistencia Cromática Geist 900: color principal de plantilla, el acento queda reservado al glow y a los íconos */
-    text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
-}
-
-/* LABELS (Restauración Selina Style) [cite: 8] */
-.tpl-f1 .unified-countdown-frame small, .tpl-f1 .unified-countdown-frame small {
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    color: var(--f1-text-muted);
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-/* -------------------------------------------------------------------
-   MÓDULO META (Unificación Geist 900 & Iconos Pro - v1.4.9.6)
-   ------------------------------------------------------------------- */
-.tpl-f1 .hero-meta, .tpl-f1 .hero-meta {
-    display: flex !important;
-    flex-wrap: wrap !important;       /* Permite el salto de línea */
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 2rem 5rem;                   /* 2rem vertical | 5rem entre fecha y hora */
-    margin: 4rem auto 2rem !important; /* AIRE: Respiro superior e inferior masivo */
-    width: 100%;
-    max-width: 1100px;
-    justify-self: center;
-}
-
-/* ESTILO UNIFICADO PARA TODAS LAS LÍNEAS (Masa Crítica Geist) [cite: 2, 701] */
-.tpl-f1 .hero-meta > div,
-.tpl-f1 .hero-meta > div,
-.tpl-f1 .meta-item,
-.tpl-f1 .meta-item {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--f1-font-sans) !important; /* FUERZA GEIST EN TODO [cite: 7] */
-    font-weight: 900 !important;                 /* Autoridad Geist 900 [cite: 663] */
-    font-size: 1.2rem !important;                /* Tamaño unificado */
-    color: var(--f1-text-main) !important;       /* Color blanco/principal unificado */
-    text-transform: uppercase;
-    letter-spacing: 4px;
-}
-
-/* SEGUNDA LÍNEA: LUGAR (Fuerza salto y mantiene estilo) [cite: 26, 27] */
-.tpl-f1 .hero-meta > div:nth-child(3),
-.tpl-f1 .hero-meta > div:nth-child(3) {
-    flex-basis: 100% !important;      /* Reclama la línea inferior completa */
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-/* ESCALADO DE ICONOS Y AIRE INTERNO (Protocolo SVG) [cite: 30, 703] */
-.tpl-f1 .meta-svg, .tpl-f1 .meta-svg {
-    width: 32px !important;           /* ICONOS AGRANDADOS (Original era 18px) */
-    height: 32px !important;
-    margin-right: 1.5rem !important;  /* AIRE: Espacio sagrado entre icono y texto */
-    fill: var(--tpl-accent) !important;
-    filter: drop-shadow(0 0 25px var(--tpl-accent)); /* [v1.5.0-OMEGA] Resplandor Afterglow 25px, consistente con el box-shadow del Countdown */
-}
-
-/* ===================================================================
-   SECCIÓN 4 & 5: DATA CARDS & LINEUP RECOVERY · v1.3.72
-   Protocolo: Masa Crítica Protegida (Garantía de No-Simplificación)
-   =================================================================== */
-
-
-/* 4. DATA CARDS ORGÁNICAS (Selina 25px Radius + Dynamic Accent Glow) */
-.tpl-f1 .card-item, .tpl-f1 .card-item,
-.tpl-f1 .data-card-underground, .tpl-f1 .data-card-underground {
-    background: var(--f1-card-bg, rgba(15, 15, 20, 0.85)) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--tpl-accent) !important;
-    border-radius: 25px !important;
-    padding: 2.2rem 1.8rem;
-    text-align: center;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px var(--tpl-accent) !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-}
-
-
-.tpl-f1 .card-item:hover, .tpl-f1 .card-item:hover,
-.tpl-f1 .data-card-underground:hover, .tpl-f1 .data-card-underground:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 35px var(--tpl-accent) !important;
-}
-
-
-/* Tipografía Geist 900 para Valores (Mandato Reglas de Oro) */
-.tpl-f1 .card-item span[id*="-val"], .tpl-f1 .card-item span[id*="-val"],
-.tpl-f1 .data-value, .tpl-f1 .data-value {
-    font-family: 'Geist', sans-serif !important;
-    font-weight: 900 !important;
-    font-size: 1.6rem;
-    color: #ffffff;
-    text-shadow: 0 0 15px var(--tpl-accent);
-    display: block;
-    margin-top: 0.4rem;
-}
-
-
-.tpl-f1 .data-label, .tpl-f1 .data-label {
-    color: var(--tpl-accent);
-    font-size: 0.65rem;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-/* ===================================================================
-   SECCION 5: LINEUP & MULTIMEDIA - v1.5.4 (Consolidado)
-   FIX QA (Silo T7 vs Master): las 3 copias previas de este bloque
-   (v1.3.72, v1.5.3 y el bloque sin numerar) apuntaban a ".artist-row",
-   una clase que el Master (evento3.html, funcion de render del lineup)
-   nunca genera. El DOM real usa ".artist-item" > ".artist-avatar" +
-   ".artist-name". Por eso el 100% de la tipografia Playfair Display y
-   el hover quedaban muertos: el selector jamas hacia match. Se unifica
-   aqui en una sola fuente de verdad, apuntando a las clases reales.
-   =================================================================== */
-
-/* 5.1 GRID MAESTRO Y OCULTACION DE POSTER */
-.tpl-f1 #mod-lineup > div, .tpl-f1 #mod-lineup > div {
-    grid-template-columns: 1fr !important;
-    max-width: 800px !important;
-    margin: 0 auto;
-}
-
-/* 5.1 ACTIVACIÓN Y CENTRADO DEL CONTENEDOR */
-.tpl-f1 #mod-lineup > div > div:first-child {
-    display: flex !important;    /* Revoca la ocultación del baseline */
-    justify-content: center;      /* Centrado horizontal exacto */
-    width: 100%;
-    margin-bottom: 4rem;          /* Espacio sagrado antes de los artistas */
-}
-
-/* 5.5 REFINAMIENTO DEL PÓSTER (High-Fidelity) */
-.tpl-f1 .poster-main-img {
-    display: block !important;
-    width: 100%;
-    max-width: 400px;             /* Tamaño premium destacado */
-    border-radius: 28px;          /* Consistencia Selina Style */
-    border: 4px solid var(--tpl-accent); 
-    box-shadow: 0 0 50px var(--tpl-accent); /* Brillo cinematográfico */
-    object-fit: cover;
-}
-
-/* 5.2 GRID DE ARTISTAS */
-.tpl-f1 .lineup-grid, .tpl-f1 .lineup-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    max-width: 1100px;
-    margin: 0 auto;
-    align-items: start;
-}
-
-.tpl-f1 #db-lineup, .tpl-f1 #db-lineup {
-    padding-left: 0 !important;
-    width: 100% !important;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-/* 5.3 FILA DE ARTISTA (clase real: .artist-item, jamas .artist-row) */
-.tpl-f1 .artist-item, .tpl-f1 .artist-item {
-    display: flex;
-    align-items: center;
-    gap: 1.8rem;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.tpl-f1 .artist-item:hover, .tpl-f1 .artist-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    padding-left: 2rem;
-    border-bottom-color: var(--tpl-accent);
-}
-
-.tpl-f1 .artist-item:hover .artist-name, .tpl-f1 .artist-item:hover .artist-name {
-    color: var(--tpl-accent);
-}
-
-/* 5.4 NOMBRE DEL ARTISTA (antes sin ninguna regla propia en el CSS;
-   heredaba el Geist sans-serif del body por defecto) */
-.tpl-f1 .artist-name, .tpl-f1 .artist-name {
-    font-family: var(--f1-font-serif) !important; /* Fuerza Playfair Display */
-    font-size: 2.2rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: #ffffff;
-    transition: color 0.3s ease;
-}
-
-/* Eliminación de aire superior específica para el módulo de video */
-.tpl-f1 #mod-video {
-    padding-top: 0 !important; /* Elimina los 5rem de respiro superior */
-    margin-top: 0 !important;
-}
-
-/* Opcional: Si el espacio persiste, ajusta el contenedor interno */
-.tpl-f1 .media-grid {
-    margin-top: 0 !important; /* Quita márgenes del grid de video/spotify */
-}
-
-
-/* 5.5 AVATAR CIRCULAR CON GLOW.
-   !important en border para que la regla CSS (fuente de verdad, ADR-004)
-   gane siempre sobre el estilo inline del template literal en evento3.html,
-   en vez de depender de que ambos resuelvan a la misma variable por
-   coincidencia. */
-.tpl-f1 .artist-avatar, .tpl-f1 .artist-avatar {
-    width: 65px;
-    height: 65px;
-    flex-shrink: 0;
-    border-radius: 50% !important;
-    border: 2px solid var(--tpl-accent) !important;
-    box-shadow: 0 0 15px var(--tpl-accent);
-    object-fit: cover;
-}
-
-@media (max-width: 1024px) {
-    .tpl-f1 .lineup-grid, .tpl-f1 .lineup-grid { grid-template-columns: 1fr; }
-    .tpl-f1 .artist-name, .tpl-f1 .artist-name { font-size: 1.8rem; }
-}
-
-
-.tpl-f1 .media-grid, .tpl-f1 .media-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 2rem;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-
-.tpl-f1 .video-wrapper, .tpl-f1 .video-wrapper,
-.tpl-f1 #db-video-content, .tpl-f1 #db-video-content {
-    background: #050c05;
-    border-radius: 25px;
-    border: 1px solid var(--tpl-accent);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--tpl-accent);
-    overflow: hidden;
-    aspect-ratio: 16/9;
-}
-
-
-.tpl-f1 .spotify-container, .tpl-f1 .spotify-container,
-.tpl-f1 #db-spotify-embed, .tpl-f1 #db-spotify-embed {
-    border-radius: 25px;
-    border: 1px solid var(--tpl-accent);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-    min-height: 400px;
-    height: 100%;
-}
-
-
-/* -------------------------------------------------------------------
-   6. FORMULARIO MAESTRO DE REGISTRO (Dual Tab & Direct)
-   ------------------------------------------------------------------- */
-.tpl-f1 .form-master-box, .tpl-f1 .form-master-box {
+/* ==========================================================================
+   6. #MOD-FORM — Panel izquierdo overlay (desktop) / mobile-first
+   ========================================================================== */
+.tpl-f1 .form-master-box {
     background: var(--f1-card-bg);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--tpl-accent);
     border-radius: 25px;
     padding: 3rem;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 25px var(--tpl-accent);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px var(--tpl-accent);
     max-width: 550px;
     margin: 2rem auto 0;
 }
 
+@media (min-width: 1024px) {
+    .tpl-f1 #mod-form {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        width: 38vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        padding: 3rem 2.5rem !important;
+        background: transparent !important;
+        z-index: 100;
+        pointer-events: none;
+        justify-content: center;
+        align-items: flex-end;
+        padding-bottom: 3.5rem;
+    }
+    .tpl-f1 #mod-form .form-master-box {
+        pointer-events: auto;
+        max-width: 400px !important;
+        padding: 2rem !important;
+        border-radius: 22px !important;
+        margin: 0 !important;
+        backdrop-filter: blur(20px) !important;
+        background: rgba(10, 26, 10, 0.85) !important;
+    }
+}
 
-.tpl-f1 .form-input, .tpl-f1 .form-input,
-.tpl-f1 #reg-nombre, .tpl-f1 #reg-nombre,
-.tpl-f1 #reg-cedula, .tpl-f1 #reg-cedula,
-.tpl-f1 #rec-cedula, .tpl-f1 #rec-cedula {
+@media (max-width: 1023px) {
+    .tpl-f1 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f1 .form-master-box {
+        margin-top: -20vh !important;
+        background: rgba(10, 26, 10, 0.88) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid var(--tpl-accent);
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+    }
+}
+
+@media (max-width: 400px) {
+    .tpl-f1 .form-master-box {
+        margin: -5vh 1rem 2rem !important;
+        padding: 2rem 1.5rem !important;
+        width: calc(100% - 2rem) !important;
+    }
+}
+
+/* ==========================================================================
+   7. FORMULARIO — Inputs, Botones, Tabs
+   ========================================================================== */
+.tpl-f1 .form-input, .tpl-f1 #reg-nombre,
+.tpl-f1 #reg-cedula, .tpl-f1 #rec-cedula {
     width: 100%;
     padding: 1.2rem 1.4rem;
     margin-bottom: 1.2rem;
@@ -525,18 +296,15 @@
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-.tpl-f1 .form-input:focus, .tpl-f1 .form-input:focus,
-.tpl-f1 #reg-nombre:focus, .tpl-f1 #reg-nombre:focus,
-.tpl-f1 #reg-cedula:focus, .tpl-f1 #reg-cedula:focus {
+.tpl-f1 .form-input:focus, .tpl-f1 #reg-nombre:focus,
+.tpl-f1 #reg-cedula:focus {
     outline: none;
     border-color: var(--tpl-accent);
     box-shadow: 0 0 15px var(--tpl-accent);
 }
 
-
-.tpl-f1 .btn-submit, .tpl-f1 .btn-submit,
-.tpl-f1 #master-reg-form button[type="submit"], .tpl-f1 #master-reg-form button[type="submit"] {
+.tpl-f1 .btn-submit,
+.tpl-f1 #master-reg-form button[type="submit"] {
     width: 100%;
     padding: 1.4rem;
     background: var(--tpl-accent);
@@ -553,24 +321,33 @@
     transition: all 0.3s ease;
 }
 
-
-.tpl-f1 .btn-submit:hover, .tpl-f1 .btn-submit:hover,
-.tpl-f1 #master-reg-form button[type="submit"]:hover, .tpl-f1 #master-reg-form button[type="submit"]:hover {
+.tpl-f1 .btn-submit:hover,
+.tpl-f1 #master-reg-form button[type="submit"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 30px var(--tpl-accent);
     filter: brightness(1.15);
 }
 
+@media (min-width: 1024px) {
+    .tpl-f1 .form-input, .tpl-f1 .btn-submit {
+        padding: 0.9rem 1.2rem !important;
+        font-size: 0.85rem !important;
+        margin-bottom: 0.8rem !important;
+    }
+    .tpl-f1 .form-tabs {
+        margin-bottom: 1.2rem !important;
+        gap: 1rem !important;
+    }
+}
 
-.tpl-f1 .form-tabs, .tpl-f1 .form-tabs {
+.tpl-f1 .form-tabs {
     display: flex;
     gap: 1.5rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-
-.tpl-f1 .tab-btn, .tpl-f1 .tab-btn {
+.tpl-f1 .tab-btn {
     background: none;
     border: none;
     color: var(--f1-text-muted);
@@ -583,365 +360,110 @@
     transition: all 0.3s ease;
 }
 
-
-.tpl-f1 .tab-btn.active, .tpl-f1 .tab-btn.active {
+.tpl-f1 .tab-btn.active {
     color: var(--tpl-accent);
     border-bottom: 2px solid var(--tpl-accent);
 }
 
-
-/* -------------------------------------------------------------------
-   7. FAQ, MAPA & PATROCINADORES
-   ------------------------------------------------------------------- */
-.tpl-f1 .faq-item, .tpl-f1 .faq-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1.3rem 0;
-    cursor: pointer;
-}
-
-
-.tpl-f1 .faq-answer, .tpl-f1 .faq-answer {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--f1-text-muted);
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-
-.tpl-f1 .faq-item.active .faq-answer, .tpl-f1 .faq-item.active .faq-answer {
-    max-height: 500px !important;
-    opacity: 1 !important;
-    padding-top: 1.2rem !important;
-}
-
-
-.tpl-f1 #db-mapa-container, .tpl-f1 #db-mapa-container {
-    border-radius: 25px;
-    overflow: hidden;
-    border: 1px solid var(--tpl-accent);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-
-.tpl-f1 .sponsors-grid, .tpl-f1 .sponsors-grid,
-.tpl-f1 #db-sponsors-list, .tpl-f1 #db-sponsors-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 3.5rem;
-    padding: 2rem 0;
-}
-
-
-.tpl-f1 .sponsor-item, .tpl-f1 .sponsor-item {
-    background: rgba(255, 255, 255, 0.04);
-    padding: 1.2rem 2.2rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.4s ease;
-}
-
-
-.tpl-f1 .sponsor-item:hover, .tpl-f1 .sponsor-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--tpl-accent);
-    transform: translateY(-4px);
-}
-
-
-.tpl-f1 .sponsor-img, .tpl-f1 .sponsor-img {
-    height: 42px;
-    width: auto;
-    opacity: 0.85;
-    transition: all 0.4s ease;
-}
-
-
-.tpl-f1 .sponsor-item:hover .sponsor-img, .tpl-f1 .sponsor-item:hover .sponsor-img {
-    opacity: 1;
-    transform: scale(1.08);
-}
-
-
-/* -------------------------------------------------------------------
-   8. CONTRATO DE DATOS V107 & PROTECCIÓN DE MÓDULOS INVISIBLES
-   ------------------------------------------------------------------- */
-.tpl-f1 #db-poster-img[style*="display:none"],
-.tpl-f1 #db-faq-list[style*="display:none"],
-.tpl-f1 #db-mapa-container[style*="display:none"],
-.tpl-f1 #db-sponsors-list[style*="display:none"],
-.tpl-f1 #db-gallery-grid[style*="display:none"] {
-    display: none !important;
-}
-
-
-/* -------------------------------------------------------------------
-   9. DIAGRAMACIÓN SPLIT-SCREEN (Específica para Silo evento4.html)
-   ------------------------------------------------------------------- */
-.tpl-f1 #template-container, .tpl-f1 #template-container {
-    display: flex;
-    flex-direction: row;
-    min-height: 100vh;
-}
-
-
-.tpl-f1 .hero-sidebar, .tpl-f1 .hero-sidebar {
-    width: 40%;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 3.5rem;
-    border-right: 1px solid var(--tpl-accent);
-    z-index: 10;
-    box-sizing: border-box;
-}
-
-
-.tpl-f1 .content-scroll, .tpl-f1 .content-scroll {
-    width: 60%;
-    margin-left: 40%;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* ============================================================================
-   10. RESPONSIVE ADAPTABILITY — Fix Crítico 400px (.tpl-f1)
-   ============================================================================ */
-
-
-
-   
-
-    /* 2. Ajuste de Título para evitar desborde */
-    .tpl-f1 #event-title {
-        font-size: clamp(2rem, 8vw, 3.2rem) !important;
-        padding: 0 1rem;
-        word-wrap: break-word;
-    }
-
-   
-
-
-    /* 3. FIX META-DATA (Evita que la página se vea cortada) */
-    .tpl-f1 .hero-meta {
-        gap: 1.5rem 1rem !important; /* Reducción de gap horizontal de 5rem a 1rem */
-        padding: 0 1rem !important;
-        justify-content: space-around !important;
-    }
-
-    .tpl-f1 .meta-item {
-        font-size: 0.9rem !important; /* Reducción de masa crítica Geist */
-        letter-spacing: 2px !important; /* Respiro tipográfico contenido */
-    }
-
-    /* 4. Ajuste de Formulario f1 */
-    .tpl-f1 .form-master-box {
-        margin: -5vh 1rem 2rem !important; /* Superposición controlada */
-        padding: 2rem 1.5rem !important;
-        width: calc(100% - 2rem) !important;
-    }
-}
-
-
-
-
-
-    /* [ELIMINADO v1.4.0] "C. EMPUJE DE FLUJO" — regla legada que forzaba
-       display:block !important + margin-left:38vw !important de forma
-       INCONDICIONAL (sin media query, aplicaba incluso en mobile).
-       Anulaba el sistema de Grid Atómico (misma especificidad, orden
-       posterior en cascada). Reemplazada por completo por el bloque
-       "SISTEMA DE GRID ATÓMICO v1.4.0" más abajo. */
-
- /* ALMA VISUAL: Glassmorphism y Tipografía Geist 900 */
-.tpl-f1 .form-master-box {
-    background: rgba(15, 15, 20, 0.90) !important;
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--tpl-accent);
-    border-radius: 28px;
-    padding: 3.5rem;
-    margin: 2rem auto; /* Espacio para scroll interno en el panel 38vw */
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-}
-
-
-/* Recuperación de Inputs tras purga del Kernel */
-.tpl-f1 .form-input {
+.tpl-f1 input[type="text"], .tpl-f1 input[type="tel"], .tpl-f1 select {
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #ffffff !important;
-    font-family: 'Geist', sans-serif !important;
+    color: #fff !important;
+    padding: 1.2rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1.5rem;
+    width: 100%;
 }
 
-
-
-
-/* === BLINDAJE DE SOBERANÍA v1.3.55 (Split-Screen Parity) === */
-
-
-/* A. RECUPERACIÓN ESTRUCTURAL (Lo que el Master ya no provee) */
-.tpl-f1 #mod-hero {
-    position: relative;
+/* ==========================================================================
+   8. COUNTDOWN FRAME — Geist 900 + Afterglow
+   ========================================================================== */
+.tpl-f1 .unified-countdown-frame,
+.tpl-f1 #unified-frame {
     display: flex !important;
-    flex-direction: column;
-    align-items: center; justify-content: flex-start;
-    /* [v1.5.0-OMEGA] Gravedad Dinámica: respiro superior proporcional al
-       alto del dispositivo (reemplaza el antiguo supuesto de margen fijo
-       gestionado por el Master). Neutralizado en desktop por el
-       "padding: 4rem 2.5rem !important" del media query >=1024px
-       (línea ~105), por lo que este valor solo tiene efecto en móvil. */
-    padding-top: 12vh;
-    background-size: cover !important;
-    background-position: center !important;
-    min-height: 100vh;
-    color: #ffffff;
+    justify-content: center;
+    align-items: center;
+    justify-self: center;
+    margin-top: 7rem !important;
+    margin-bottom: 3rem;
+    width: fit-content;
+    max-width: 100%;
+    z-index: 5;
+    gap: 1.5rem;
+    padding: 1.5rem 2.5rem;
+    background: rgba(10, 26, 10, 0.65) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--tpl-accent) !important;
 }
 
-
-
-
-/* === SISTEMA DE GRID ATÓMICO v1.4.0 (reemplaza REEMPLAZO C v1.3.80) ===
-   Ya no se usa position:fixed/absolute para ubicar módulos. Cada módulo es
-   un ítem de grid asignado a su grid-area vía ID. La plantilla controla
-   la ubicación 100% desde aquí, sin que el Master conozca la geometría.
-   Mobile-first: por defecto, una sola columna en orden natural. */
-
-.tpl-f1 #main-content-flow {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-        "hero"
-        "form"        /* <--- POSICIÓN FORZADA: Tras el Hero */
-        "countdown"
-        "meta"
-        "video"
-        "lineup"
-        "playlist"
-        "info"
-        "faq"
-        "ubicacion"
-        "sponsors";
-    row-gap: 0;
+.tpl-f1 .cd-block {
+    padding: 0 1.2rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
 }
 
-.tpl-f1 #mod-hero        { grid-area: hero; }
-.tpl-f1 #mod-form        { grid-area: form; }
-.tpl-f1 #unified-frame   { grid-area: countdown; }
-.tpl-f1 #mod-hero-meta   { grid-area: meta; }
-.tpl-f1 #mod-video       { grid-area: video; }
-.tpl-f1 #mod-lineup      { grid-area: lineup; }
-.tpl-f1 #mod-playlist    { grid-area: playlist; }
-.tpl-f1 #mod-info-tecnica{ grid-area: info; }
-.tpl-f1 #mod-faq         { grid-area: faq; }
-.tpl-f1 #mod-ubicacion   { grid-area: ubicacion; }
-.tpl-f1 #mod-sponsors    { grid-area: sponsors; }
+.tpl-f1 .cd-block:last-child {
+    border-right: none;
+}
 
+/* Dígitos: Geist 900 + Afterglow */
+.tpl-f1 [id^="cd-"] {
+    font-family: var(--f1-font-sans) !important;
+    font-size: 2.2rem !important;
+    font-weight: 900 !important;
+    line-height: 1;
+    color: var(--f1-text-main) !important;
+    text-shadow: 0 0 18px var(--tpl-accent), 0 0 32px var(--tpl-accent);
+}
 
+/* Labels countdown */
+.tpl-f1 .unified-countdown-frame small {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--f1-text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+}
 
-/* =================================================================== 
-   INICIO SEGMENTO: RECALIBRACIÓN VISUAL MÓVIL (v1.5.2-OMEGA) 
-   =================================================================== */
-
-@media (max-width: 1023px) {
-    /* 1. MASA CRÍTICA DEL TÍTULO: Restauración de estilos premium [cite: 731] */
-    .tpl-f1 #event-title {
-        text-align: center !important; /* <--- AGREGAR ESTA LÍNEA */
-        width: 100%;                  /* <--- RECOMENDADO: Asegura el ancho total */
-        font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
-        font-weight: 900 !important;
-        text-transform: uppercase;
-        letter-spacing: -2px;
-        /* FIX: Efecto Afterglow reactivado para autoridad visual */
-        text-shadow: 0 0 20px var(--tpl-accent), 0 0 40px rgba(0,0,0,0.5) !important;
-        margin-bottom: 2rem !important;
+/* Countdown responsive: ≤640px */
+@media (max-width: 640px) {
+    .tpl-f1 #unified-frame {
+        gap: 0.8rem !important;
+        padding: 1rem 1.2rem !important;
+        margin-top: 3rem !important;
+        margin-bottom: 1.5rem !important;
+        border-radius: 18px !important;
     }
-
-    /* 2. OPTIMIZACIÓN DE CONVERSIÓN: Hero compacto [cite: 12, 17] */
-    .tpl-f1 #mod-hero {
-        padding-top: 8vh !important; 
-        min-height: 55vh !important; /* Altura reducida para visibilidad del form */
-        display: flex !important;
-        justify-content: flex-start;
+    .tpl-f1 .cd-block {
+        padding: 0 0.7rem !important;
     }
-
-    /* 3. SOLAPAMIENTO AGRESIVO: El formulario sube más sobre el fondo */
-    .tpl-f1 #mod-form {
-        z-index: 30; 
-    }
-
-    .tpl-f1 .form-master-box {
-        margin-top: -20vh !important; /* REGLA: Subida forzada para impacto visual */
-        background: rgba(10, 26, 10, 0.88) !important; 
-        backdrop-filter: blur(25px) !important;
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid var(--tpl-accent);
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.6); 
+    .tpl-f1 [id^="cd-"] {
+        font-size: 1.7rem !important;
     }
 }
 
-/* =================================================================== 
-   FIN SEGMENTO: RECALIBRACIÓN VISUAL MÓVIL 
-   =================================================================== */
+/* Countdown responsive: ≤400px — flex-wrap 2x2 */
+@media (max-width: 400px) {
+    .tpl-f1 #unified-frame {
+        flex-wrap: wrap !important;
+        gap: 0.6rem !important;
+        padding: 0.8rem 1rem !important;
+        justify-content: center !important;
+    }
+    .tpl-f1 .cd-block {
+        padding: 0.3rem 0.5rem !important;
+        flex: 0 0 calc(50% - 0.6rem) !important;
+    }
+}
 
+/* Desktop countdown override */
 @media (min-width: 1024px) {
-    /* 1. PANEL IZQUIERDO (38vw): Hero y Formulario comparten la misma celda
-       de grid, superpuestos (Form transparente encima del Hero). Se usa
-       position:fixed — ahora es SEGURO usarla porque ningún módulo (ni
-       #unified-frame ni ningún otro) es descendiente del Hero: son
-       hermanos planos. La Trampa del DOM original ocurría porque un
-       descendiente absoluto quedaba atrapado dentro de un padre fixed;
-       sin descendientes, fixed ya no tiene a quién atrapar.
-       El grid reserva el ancho de 38vw igual (columnas de longitud fija,
-       no dependen de que la celda "hero" tenga contenido en flujo). */
-    .tpl-f1 #main-content-flow {
-        grid-template-columns: 38vw 62vw;
-        grid-template-areas:
-            "hero countdown"
-            "hero meta"
-            "hero video"
-            "hero lineup"
-            "hero playlist"
-            "hero info"
-            "hero faq"
-            "hero ubicacion"
-            "hero sponsors";
-    }
-
-    .tpl-f1 #mod-form { grid-area: hero; } /* Overlay transparente sobre el Hero */
-
-    .tpl-f1 #mod-hero, .tpl-f1 #mod-form {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        width: 38vw !important;
-        height: 100vh !important;
-    }
-    .tpl-f1 #mod-hero { z-index: 10; }
-    .tpl-f1 #mod-form {
-        z-index: 100;
-        background: transparent !important;
-        justify-content: center;   /* centra el form-master-box horizontalmente */
-        align-items: flex-end;     /* lo empuja al fondo del panel (v213) */
-        padding-bottom: 3.5rem;
-        pointer-events: none;      /* el hueco transparente no bloquea el Hero */
-    }
-    .tpl-f1 #mod-form .form-master-box {
-        pointer-events: auto;      /* pero el formulario en sí sí es interactivo */
-    }
-
-    /* 2. COUNTDOWN: ya no requiere position:absolute para "saltar" al panel
-       derecho — es simplemente un ítem más del grid en su propia celda. */
     .tpl-f1 #unified-frame {
         margin: 0 !important;
-        margin-top: 10vh !important; /* [v1.5.0-OMEGA] Corrección de Gravedad: centra el Countdown verticalmente en el panel derecho, elimina el efecto "pegado" arriba en monitores grandes */
+        margin-top: 10vh !important;
         padding: 2.5rem !important;
         background: var(--f1-bg-deep, #0a1a0a) !important;
         border-radius: 0 !important;
@@ -951,179 +473,70 @@
     }
 }
 
-
-/* C. ESTILO DE INPUTS TRAS PURGA DEL KERNEL */
-.tpl-f1 input[type="text"], .tpl-f1 input[type="tel"], .tpl-f1 select {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
-    padding: 1.2rem !important;
-    border-radius: 14px !important;
-    margin-bottom: 1.5rem; width: 100%;
+/* ==========================================================================
+   9. HERO-META — Metadatos del evento
+   ========================================================================== */
+.tpl-f1 .hero-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 2rem 5rem;
+    margin: 4rem auto 2rem !important;
+    width: 100%;
+    max-width: 1100px;
+    justify-self: center;
 }
 
-/* ============================================================================
-   ELIMINAR LÍNEA DIVISORIA VÍDEO-PÓSTER (v1.7.5-GOLD)
-   ============================================================================ */
-
-/* 1. Anular borde de la sección de Video (que está arriba del póster) */
-.tpl-f1 #mod-video, 
-.tpl-f1 #modulo-video {
-    border-bottom: none !important;
-    padding-bottom: 2rem !important; /* Reduce el aire para acercar los bloques */
+.tpl-f1 .hero-meta > div,
+.tpl-f1 .meta-item {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--f1-font-sans) !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    color: var(--f1-text-main) !important;
+    text-transform: uppercase;
+    letter-spacing: 4px;
 }
 
-/* 2. Anular borde de la sección de Lineup/Póster */
-.tpl-f1 #mod-lineup, 
-.tpl-f1 #modulo-lineup {
-    border-top: none !important;
-    padding-top: 2rem !important;
+/* Segunda línea: lugar — salto completo */
+.tpl-f1 .hero-meta > div:nth-child(3) {
+    flex-basis: 100% !important;
+    justify-content: center;
+    margin-top: 1rem;
 }
 
-/* 3. FIX BASELINE: Eliminar la línea vertical del HTML que se ve en móvil */
-@media (max-width: 1023px) {
-    .tpl-f1 #mod-lineup > div > div:first-child,
-    .tpl-f1 #modulo-lineup > div > div:first-child {
-        border-right: none !important; /* Quita la raya vertical heredada de v108 */
-        padding-right: 0 !important;
-        margin-bottom: 0 !important;
+/* Íconos SVG: 32px + Afterglow */
+.tpl-f1 .meta-svg {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 1.5rem !important;
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 25px var(--tpl-accent));
+}
+
+/* Hero-meta responsive: ≤640px */
+@media (max-width: 640px) {
+    .tpl-f1 .hero-meta {
+        gap: 1rem 0.8rem !important;
+        padding: 0 0.5rem !important;
+        justify-content: center !important;
+        margin: 2rem auto 1rem !important;
+    }
+    .tpl-f1 .hero-meta > div,
+    .tpl-f1 .meta-item {
+        font-size: 0.9rem !important;
+        letter-spacing: 2px !important;
+    }
+    .tpl-f1 .meta-svg {
+        width: 22px !important;
+        height: 22px !important;
+        margin-right: 0.8rem !important;
     }
 }
 
-/* ============================================================================
-   AMPLIACIÓN DE MASA VISUAL: CARTEL/PÓSTER (v1.8.0-GOLD)
-   ============================================================================ */
-
-/* 1. Ampliar el contenedor maestro del Lineup */
-.tpl-f1 #mod-lineup > div, 
-.tpl-f1 #modulo-lineup > div {
-    max-width: 1200px !important; /* Aumentado de 800px a 1200px para permitir expansión */
-}
-
-/* 2. Incrementar el tamaño del cartel (Póster) */
-.tpl-f1 .poster-main-img {
-    max-width: 700px !important;  /* Aumentado de 400px a 700px */
-    width: 95% !important;        /* Fuerza a la imagen a ocupar casi todo el ancho disponible */
-    margin: 0 auto;               /* Mantiene el centrado */
-}
-
-/* 3. Ajuste para que los artistas respiren con el cartel más grande */
-.tpl-f1 #mod-lineup > div > div:first-child {
-    margin-bottom: 2rem !important; /* Reduce el espacio inferior para balancear la masa */
-}
-
-
-/* ============================================================================
-   FIX CRÍTICO: REORDENAMIENTO FORZADO MÓVIL (f1 v1.6.9-GOLD)
-   ============================================================================ */
-    @media (max-width: 1023px) {
-        .tpl-f1 #main-content-flow {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-            /* SECUENCIA SUPREMA: El formulario pisa al Hero */
-            grid-template-areas: 
-                "hero"
-                "form"        /* <--- EL FORMULARIO SUBE AQUÍ */
-                "countdown"
-                "meta"
-                "video"
-                "lineup"
-                "playlist"
-                "info"
-                "faq"
-                "ubicacion"
-                "sponsors" !important;
-            row-gap: 0 !important;
-        }
-
-        /* Anclaje físico del ID al área */
-        .tpl-f1 #mod-form { 
-            grid-area: form !important; 
-            z-index: 50 !important;
-        }
-    }
-
-/* ============================================================================
-   AMPLIACIÓN CRÍTICA DE CARTEL: ESTRUCTURA Y MASA (v1.9.0-GOLD)
-   ============================================================================ */
-
-/* 1. Liberar el contenedor maestro de toda restricción de ancho */
-.tpl-f1 #mod-lineup, 
-.tpl-f1 #modulo-lineup {
-    padding-left: 0 !important;   /* Elimina el 10% de la sección [cite: 3] */
-    padding-right: 0 !important;
-}
-
-.tpl-f1 #mod-lineup > div, 
-.tpl-f1 #modulo-lineup > div {
-    max-width: 100% !important;   /* Rompe el límite de 800px [cite: 14] */
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 1rem !important;   /* Mantiene un respiro mínimo de seguridad */
-}
-
-/* 2. Escalar la imagen del cartel al máximo impacto */
-.tpl-f1 .poster-main-img {
-    max-width: 95vw !important;   /* Ocupa el 95% del ancho de la pantalla */
-    width: 100% !important;
-    height: auto !important;
-    display: block !important;
-    margin: 0 auto 3rem !important;
-    /* Estética Selina [cite: 14] */
-    border-radius: 20px !important; 
-    border: 3px solid var(--tpl-accent) !important;
-    box-shadow: 0 0 40px var(--tpl-accent) !important;
-}
-
-/* 3. Reajuste del Grid de Artistas para balancear la nueva masa */
-.tpl-f1 #db-lineup {
-    padding: 0 2rem !important;   /* Centra los nombres bajo el cartel grande */
-    margin-top: 0 !important;
-}
-
-/* ============================================================================
-   LIBERACIÓN DE ANCHO COMPLETO: CADENA DE ANIDAMIENTO (v2.1.0-GOLD)
-   ============================================================================ */
-
-/* 1. Liberar la SECCIÓN padre (Rompe el 10% de padding del kernel) [cite: 3] */
-.tpl-f1 section#modulo-gallery,
-.tpl-f1 section#modulo-lineup {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-}
-
-/* 2. Liberar el MEDIA-GRID (Contenedor de Video + Playlist) [cite: 18] */
-.tpl-f1 .media-grid {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    grid-template-columns: 1fr !important; /* Stack obligatorio en mobile */
-}
-
-/* 3. Ajuste de la Playlist para ocupar el 100% real */
-.tpl-f1 #modulo-playlist, 
-.tpl-f1 .spotify-container {
-    width: 100% !important;
-    margin: 0 !important;
-    border: none !important;
-    border-radius: 0 !important; /* Elimina redondeos para pegar a los bordes */
-}
-
-/* 4. Forzar al iframe de Spotify a llenar el ancho recuperado [cite: 261] */
-.tpl-f1 #db-spotify-embed iframe {
-    width: 100% !important;
-    min-height: 500px !important;
-}
-
-/* ============================================================================
-   REFACTORIZACIÓN NUCLEAR: EXPANSIÓN 400px + MARGEN DE SEGURIDAD (v2.3.0-GOLD)
-   Ajuste post-confirmación Director: 0.5rem uniforme, sin diferenciación video/playlist
-   ============================================================================ */
-
-/* 1. FIX DESBORDE: Metadatos compactos en 400px */
+/* Hero-meta responsive: ≤1023px (consolidado) */
 @media (max-width: 1023px) {
     .tpl-f1 .hero-meta {
         gap: 1.2rem 0.8rem !important;
@@ -1132,81 +545,165 @@
     }
 }
 
-/* 2. ROMPER MATRIOSHKA: Liberación de Secciones Padre con margen de seguridad */
-.tpl-f1 section#modulo-lineup,
-.tpl-f1 section#modulo-gallery {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important; /* evita que el padding reintroduzca overflow */
+/* ==========================================================================
+   10. DATA CARDS — Tarjetas técnicas (Dresscode, Guest List, Aforo, Tickets)
+   ========================================================================== */
+.tpl-f1 .card-item {
+    background: var(--f1-card-bg, rgba(15, 15, 20, 0.85)) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    padding: 2.2rem 1.8rem;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px var(--tpl-accent) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
 }
 
-/* 3. EXPANSIÓN POSTER: ruptura del techo de 800px, margen 0.5rem */
+.tpl-f1 .card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 35px var(--tpl-accent) !important;
+}
+
+/* Geist 900 para valores de tarjetas */
+.tpl-f1 .card-item span[id*="-val"] {
+    font-family: 'Geist', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 1.6rem;
+    color: #ffffff;
+    text-shadow: 0 0 15px var(--tpl-accent);
+    display: block;
+    margin-top: 0.4rem;
+}
+
+/* Labels de tarjetas */
+.tpl-f1 .data-label {
+    color: var(--tpl-accent);
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Contenedor grid de tarjetas: vence inline repeat(4,1fr) del master */
+.tpl-f1 .data-cards-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+@media (max-width: 899px) {
+    .tpl-f1 .data-cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .tpl-f1 .data-cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+    }
+}
+
+/* ==========================================================================
+   11. LINEUP — Póster + Grid de artistas
+   ========================================================================== */
+
+/* Contenedor maestro del lineup */
 .tpl-f1 #mod-lineup > div {
-    max-width: 100% !important;
+    grid-template-columns: 1fr !important;
+    max-width: 800px !important;
+    margin: 0 auto;
+}
+
+/* Activación del contenedor del póster */
+.tpl-f1 #mod-lineup > div > div:first-child {
+    display: flex !important;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 4rem;
+}
+
+/* Póster real: #db-poster-img — vence inline width:320px */
+.tpl-f1 #db-poster-img {
+    display: block !important;
     width: 100% !important;
-    padding: 0 !important;
+    max-width: 400px;
+    border-radius: 28px;
+    border: 4px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 50px var(--tpl-accent);
+    object-fit: cover;
 }
 
-.tpl-f1 .poster-main-img {
+/* Grid de artistas */
+.tpl-f1 .lineup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* Contenedor de artistas */
+.tpl-f1 #db-lineup {
+    padding-left: 0 !important;
     width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 0.25rem !important;
-    border: none !important;
-    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-/* 4. EXPANSIÓN UNIFORME: video y playlist reciben idéntico tratamiento (sin margen diferenciado) */
-.tpl-f1 .media-grid {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    gap: 0.5rem !important;
+/* Fila de artista */
+.tpl-f1 .artist-item {
+    display: flex;
+    align-items: center;
+    gap: 1.8rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    flex-wrap: wrap;
 }
 
-.tpl-f1 .spotify-container,
-.tpl-f1 #db-video-content {
-    width: 100% !important;
-    border: none !important;
-    border-radius: 0.25rem !important;
-    margin: 0 !important;
+.tpl-f1 .artist-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    padding-left: 2rem;
+    border-bottom-color: var(--tpl-accent);
 }
 
-.tpl-f1 #db-spotify-embed iframe {
-    width: 100% !important;
-    min-height: 550px !important;
+.tpl-f1 .artist-item:hover .artist-name {
+    color: var(--tpl-accent);
 }
 
-/* ============================================================================
-   CORRECCIÓN CRÍTICA: FIX DE SELECTORES FANTASMA (v2.4.0-GOLD)
-   AUDITORÍA: Los bloques v2.1.0/v2.2.0/v2.3.0 (líneas ~1049-1181) apuntan a
-   IDs/clases que NUNCA existieron en evento3.html:
-     - #modulo-lineup / #modulo-gallery -> NO EXISTEN. Los IDs reales son
-       #mod-video, #mod-lineup, #mod-playlist: 3 <section> hermanas
-       independientes desde el split v1.4.6, nunca una "gallery" unificada.
-     - .media-grid       -> nunca existió en el HTML.
-     - .poster-main-img  -> nunca existió. El póster real es <img id="db-poster-img">.
-     - .spotify-container -> nunca existió. El contenedor real es #db-spotify-embed.
-   Los bloques anteriores se conservan como registro de auditoría (código
-   muerto, no interfieren). Este bloque los reemplaza funcionalmente. */
-
-/* 1. PADDING DE SECCIÓN sobre los 3 IDs reales, margen 0.5rem uniforme */
-.tpl-f1 section#mod-video,
-.tpl-f1 section#mod-lineup,
-.tpl-f1 section#mod-playlist {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
+/* Nombre del artista: Playfair Display 900 */
+.tpl-f1 .artist-name {
+    font-family: var(--f1-font-serif) !important;
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #ffffff;
+    transition: color 0.3s ease;
 }
 
-/* 2. STACK MÓVIL DEL LINEUP: causa real del desborde visible.
-      .lineup-grid trae grid-template-columns:1fr 1fr inline SIN media query,
-      más padding-right:5rem hardcodeado en el wrapper del póster. */
+/* Avatar circular con glow */
+.tpl-f1 .artist-avatar {
+    width: 65px;
+    height: 65px;
+    flex-shrink: 0;
+    border-radius: 50% !important;
+    border: 2px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 15px var(--tpl-accent);
+    object-fit: cover;
+}
+
+/* Lineup responsive: ≤1023px */
 @media (max-width: 1023px) {
     .tpl-f1 .lineup-grid {
         grid-template-columns: 1fr !important;
@@ -1220,32 +717,34 @@
         padding-bottom: 1.5rem !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .tpl-f1 .artist-name {
+        font-size: 1.8rem;
+    }
 }
 
-/* 3. PÓSTER real: #db-poster-img, fijo en 320px por inline style */
-.tpl-f1 #db-poster-img {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 0.25rem !important;
+/* Lineup responsive: ≤640px */
+@media (max-width: 640px) {
+    .tpl-f1 .artist-name {
+        font-size: 1.25rem !important;
+    }
+    .tpl-f1 .artist-item {
+        gap: 0.9rem !important;
+        padding: 1rem !important;
+    }
+    .tpl-f1 .artist-avatar {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    .tpl-f1 #db-lineup {
+        gap: 1rem !important;
+    }
+    .tpl-f1 #db-poster-img {
+        border-radius: 16px !important;
+        border-width: 3px !important;
+    }
 }
 
-/* 4. PLAYLIST: #db-spotify-embed ya es block-level (100% del padre por
-      defecto); con el padding de sección corregido (punto 1) queda
-      automáticamente alineado al margen uniforme de 0.5rem. */
-.tpl-f1 #db-spotify-embed {
-    width: 100% !important;
-}
-
-/* ============================================================================
-   AJUSTE FINO: CENTRADO DESKTOP + FULL-WIDTH VIDEO/PLAYLIST (v2.5.0-GOLD)
-   ============================================================================ */
-
-/* 1. FIX CENTRADO PÓSTER EN ESCRITORIO
-   El bloque v2.3.0 (línea ~1147) "#mod-lineup > div { max-width:100% !important }"
-   nunca tuvo media query: rompía el tope inline de 1100px + margin:0 auto
-   TAMBIÉN en escritorio. Se restaura el comportamiento original solo en
-   desktop; el edge-to-edge móvil (<1024px) del punto 2 del bloque v2.4.0
-   sigue intacto, sin cambios. */
+/* Desktop lineup: póster centrado con glow */
 @media (min-width: 1024px) {
     .tpl-f1 #mod-lineup > div {
         max-width: 1100px !important;
@@ -1255,56 +754,190 @@
     }
 }
 
-/* 2. PADDING DE SECCIÓN DIFERENCIADO: lineup conserva 0.5rem (margen de
-   seguridad, decisión previa); video y playlist pasan a 0 (edge-to-edge
-   real, decisión "Ambos edge-to-edge" ya confirmada) */
+/* Liberar padding de sección lineup */
+.tpl-f1 section#mod-lineup {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   12. VIDEO & PLAYLIST — Contenedores multimedia
+   ========================================================================== */
+.tpl-f1 #mod-video {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Sección video: edge-to-edge */
 .tpl-f1 section#mod-video,
 .tpl-f1 section#mod-playlist {
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
 
-/* 3. FULL-WIDTH REAL EN VIDEO Y PLAYLIST
-   #db-video-content y #db-spotify-embed viven dentro de un div wrapper con
-   "max-width:1100px; margin:0 auto" inline que ningún parche anterior tocó
-   -- por eso el width:100% de los hijos solo llenaba ese contenedor ya
-   limitado a 1100px, nunca la pantalla completa. */
+/* Contenedores internos: full-width */
 .tpl-f1 #mod-video > div:not(#db-gallery-grid),
 .tpl-f1 #mod-playlist > div {
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 !important;
 }
-/* ===================================================================
+
+.tpl-f1 #db-video-content {
+    background: #050c05;
+    border-radius: 25px;
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--tpl-accent);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+}
+
+.tpl-f1 #db-spotify-embed {
+    border-radius: 25px;
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    min-height: 400px;
+    height: 100%;
+}
+
+.tpl-f1 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+/* ==========================================================================
+   13. FAQ, MAPA & PATROCINADORES
+   ========================================================================== */
+.tpl-f1 .faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.3rem 0;
+    cursor: pointer;
+}
+
+.tpl-f1 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f1-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.tpl-f1 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1.2rem !important;
+}
+
+.tpl-f1 #db-mapa-container {
+    border-radius: 25px;
+    overflow: hidden;
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.tpl-f1 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3.5rem;
+    padding: 2rem 0;
+}
+
+.tpl-f1 .sponsor-item {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1.2rem 2.2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+}
+
+.tpl-f1 .sponsor-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--tpl-accent);
+    transform: translateY(-4px);
+}
+
+.tpl-f1 .sponsor-img {
+    height: 42px;
+    width: auto;
+    opacity: 0.85;
+    transition: all 0.4s ease;
+}
+
+.tpl-f1 .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+/* ==========================================================================
+   14. CONTRATO DE DATOS V107 — Protección de módulos invisibles
+   ========================================================================== */
+.tpl-f1 #db-poster-img[style*="display:none"],
+.tpl-f1 #db-faq-list[style*="display:none"],
+.tpl-f1 #db-mapa-container[style*="display:none"],
+.tpl-f1 #db-sponsors-list[style*="display:none"],
+.tpl-f1 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   15. RESPONSIVE MOBILE — Reordenamiento de grid y ajustes finos
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .tpl-f1 #main-content-flow {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "form"
+            "countdown"
+            "meta"
+            "video"
+            "lineup"
+            "playlist"
+            "info"
+            "faq"
+            "ubicacion"
+            "sponsors" !important;
+        row-gap: 0 !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+    .tpl-f1 #mod-form {
+        grid-area: form !important;
+        z-index: 50 !important;
+    }
+    .tpl-f1 #main-content-flow {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}
+
+/* Línea divisoria video-póster anulada */
+@media (max-width: 1023px) {
+    .tpl-f1 #mod-lineup > div > div:first-child {
+        border-right: none !important;
+        padding-right: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* ============================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
-   =================================================================== */
+   ============================================================================ */
 /*
-| Versión | Fecha      | Cambio Realizado                                                                 | Estado | Observaciones/Errores Corregidos |
-|---------|------------|-----------------------------------------------------------------------------------|--------|-----------------------------------|
-| v1.4.6  | 28/07/2026 | Rebalanceo Panel Izquierdo: corregido #modulo-formulario (ID muerto, nunca       | [OK]   | Bug real de colisión visual: la  |
-|         |            | existió en el HTML) -> #mod-form (ID real). Retirado flex-direction:column que   |        | caja de registro se desbordaba   |
-|         |            | invertía los ejes del sistema Grid Atómico v1.4.0. Añadido !important a          |        | del panel de 38vw porque ganaba  |
-|         |            | backdrop-filter para asegurar blur 20px. Añadido font-weight:900 y text-shadow   |        | el inline max-width:550px del    |
-|         |            | verde lima (doble capa) a #event-title.                                          |        | HTML sobre la regla compacta.    |
-|         |            | TAREA 2: Split de #mod-gallery en #mod-video y #mod-playlist (HTML) para          |        | Sync 1:1 de altura Video/Playlist|
-|         |            | intercalar #mod-lineup entre ambos. Reordenado grid-template-areas (mobile y      |        | ya no aplica al dejar de estar   |
-|         |            | desktop): Countdown, Meta, Video, Lineup, Playlist, Info, FAQ, Sponsors.          |        | en la misma fila (ver nota HTML).|
-|         |            | Actualizado MODULE_IDS en el sensor de salud (JS) para reflejar los nuevos IDs.  |        | Verificado balance de divs/       |
-|         |            |                                                                                    |        | secciones y comentarios [OK].    |
-| v1.4.8  | 28/07/2026 | Split de #mod-faq-ubicacion (HTML) en #mod-faq y #mod-ubicacion, hermanos       | [OK]   | Auditoría de expansión atómica:  |
-|         |            | planos independientes -- se retira el <div style="grid-template-columns:        |        | #mod-faq-ubicacion combinaba dos |
-|         |            | 1fr 1.1fr"> hardcodeado del HTML. Reordenado grid-template-areas (mobile y      |        | dominios de contenido distintos  |
-|         |            | desktop) agregando fila "ubicacion" tras "faq". Limpiado ID muerto              |        | (FAQ y Mapa) soldados con grid   |
-|         |            | #modulo-lineup (gemelo sin corregir de #modulo-formulario, v1.4.6) -- nunca     |        | inline; ahora el CSS del template|
-|         |            | existió en el HTML, no cambia comportamiento. Actualizado MODULE_IDS (JS) a     |        | es libre de organizarlos por     |
-|         |            | los 11 átomos reales (antes faltaban countdown/meta en el sensor). Verificado   |        | separado. Verificado balance de  |
-|         |            | balance de divs/secciones/comentarios [OK].                                     |        | divs y comentarios [OK].         |
-| v1.5.0  | 28/07/2026 | OMEGA — Gravedad Dinámica: padding-top:12vh en #mod-hero (móvil).                | [OK]   | Cero borrado: ningún ID ni <svg> |
-| OMEGA   |            | Reordenado grid-template-areas móvil ("form" sigue a "hero"). Overlay Pro:       |        | fue eliminado. Todo el bloque    |
-|         |            | nuevo @media (max-width:1023px) con margin-top:-10vh, background                |        | vive bajo .tpl-f1. Verificado    |
-|         |            | rgba(10,26,10,.85) y backdrop-filter blur(20px) !important en .form-master-box. |        | que el panel fijo desktop        |
-|         |            | Desktop: margin-top:20vh !important en #unified-frame (>=1024px). Consistencia  |        | (>=1024px) no se ve afectado:    |
-|         |            | Cromática: valores del Countdown a var(--f1-text-main); glow de íconos Meta     |        | sus reglas !important (padding,  |
-|         |            | de 12px a 25px.                                                                  |        | margin:0) neutralizan los nuevos |
-|         |            |                                                                                    |        | valores móviles automáticamente. |
+| Versión  | Fecha      | Cambio                                                                            | Estado |
+|----------|------------|-----------------------------------------------------------------------------------|--------|
+| v1.5.0   | 28/07/2026 | OMEGA — Gravedad Dinámica, Grid Atómico v1.4.0, Overlay Pro form,                 | [OK]   |
+| v2.4.0   | 01/08/2026 | Fix selectores fantasma (#modulo-gallery, .poster-main-img, etc.), edge-to-edge     | [OK]   |
+| v3.0.0   | 27/08/2026 | ADR-029 — Consolidación completa: ADR-017 (1 regla/selector), Fix llave huérfana    | [OK]   |
+|          |            | 400px, responsive real (countdown/tarjetas/lineup/artist-name/hero-meta/hero/form), |        |
+|          |            | Cero selectores fantasma, box-sizing global, overflow-x:hidden mobile.              |        |
 */
