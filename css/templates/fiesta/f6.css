@@ -1,0 +1,1155 @@
+/* ============================================================================
+   f6.css — SILO FIESTA F6 "AFROMANGO EDITOR" (P10 · Afromango Editor, oct-2026)
+   Scoped atomic silo. Dirección estética: "NOCHE EDITORIAL OSCURA"
+   (híbrido Vervee Framer × The Deep End).
+   Base tinta/espresso profundo + texto champán + acento mango "ember".
+   Tipografía editorial: Geist 900 display MAYÚSCULAS tracking apretado,
+   micro-etiquetas versales (tracking ancho, 0.3em) estilo "THE PROGRAMME".
+   Efectos: aurora animada de fondo, grano cinematográfico, shimmer en títulos,
+   float del póster, glow pulsante, reveal al hacer scroll (scroll-driven,
+   progressive enhancement). Respeto prefers-reduced-motion.
+   Breakpoints (mobile-first): BASE (<480) / 480 / 640 / 899 / 1024+ (40vw|60vw).
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;700;800;900&display=swap');
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   ========================================================================== */
+.tpl-f6, .tpl-F6 {
+    --tpl-accent: var(--master-accent, #ff9f1c);
+    --gold: var(--tpl-accent, #ff9f1c);
+    --f6-bg-deep: #0b0806;
+    --f6-bg-ink: #120d09;
+    --f6-bg-soft: #18120d;
+    --f6-card-bg: rgba(24, 18, 13, 0.72);
+    --f6-text-main: #f3ead8;
+    --f6-text-cream: #ede2cf;
+    --f6-text-muted: #a89b85;
+    --f6-accent-ember: #ff9f1c;
+    --f6-accent-glow: #ffb84d;
+    --f6-line: rgba(243, 234, 216, 0.1);
+    --f6-line-soft: rgba(243, 234, 216, 0.06);
+    --f6-glow-soft: 0 0 18px rgba(255, 159, 28, 0.28);
+    --f6-glow-strong: 0 0 28px rgba(255, 159, 28, 0.5), 0 0 70px rgba(255, 159, 28, 0.18);
+    --f6-font: 'Geist', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(120% 90% at 18% 4%, #1a110a 0%, #0b0806 48%, #060402 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f6-text-main);
+    font-family: var(--f6-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Box-sizing global dentro del silo (ADR-019) */
+.tpl-f6 *, .tpl-F6 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f6 *::before, .tpl-F6 *::before,
+.tpl-f6 *::after, .tpl-F6 *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1.1. AURORA ANIMADA — Capa de fondo fija (blobs de luz en deriva)
+   ========================================================================== */
+.tpl-f6::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(46% 34% at 12% 18%, rgba(255, 159, 28, 0.16) 0%, transparent 70%),
+        radial-gradient(40% 30% at 86% 72%, rgba(201, 162, 39, 0.12) 0%, transparent 70%),
+        radial-gradient(34% 26% at 68% 12%, rgba(150, 90, 20, 0.14) 0%, transparent 70%),
+        radial-gradient(42% 40% at 28% 88%, rgba(90, 50, 12, 0.16) 0%, transparent 72%);
+    animation: f6AuroraDrift 24s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f6AuroraDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.9; }
+    50%  { transform: translate3d(-2.5%, 1.8%, 0) scale(1.06); opacity: 1; }
+    100% { transform: translate3d(2.2%, -1.6%, 0) scale(1.1); opacity: 0.85; }
+}
+
+/* ==========================================================================
+   1.2. GRANO CINEMATOGRÁFICO — Textura de ruido sutil fija
+   ========================================================================== */
+.tpl-f6::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: f6GrainShift 0.9s steps(4) infinite;
+}
+
+@keyframes f6GrainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1%); }
+    50%  { transform: translate(1%, -2%); }
+    75%  { transform: translate(-1%, 2%); }
+    100% { transform: translate(2%, -1%); }
+}
+
+/* ==========================================================================
+   2. ACTIVACIÓN ATÓMICA — display explícito (kernel IoC oculta todo por defecto)
+   ========================================================================== */
+.tpl-f6 #main-content-flow,
+.tpl-F6 #main-content-flow {
+    position: relative;
+    z-index: 1;
+}
+
+.tpl-f6 #mod-hero, .tpl-F6 #mod-hero,
+.tpl-f6 #mod-form, .tpl-F6 #mod-form,
+.tpl-f6 #mod-cartel, .tpl-F6 #mod-cartel,
+.tpl-f6 #mod-lineup, .tpl-F6 #mod-lineup,
+.tpl-f6 #mod-playlist, .tpl-F6 #mod-playlist,
+.tpl-f6 #unified-frame, .tpl-F6 #unified-frame {
+    display: flex !important;
+}
+
+.tpl-f6 #mod-hero-meta, .tpl-F6 #mod-hero-meta,
+.tpl-f6 #mod-video, .tpl-F6 #mod-video,
+.tpl-f6 #mod-boletos, .tpl-F6 #mod-boletos,
+.tpl-f6 #mod-faq, .tpl-F6 #mod-faq,
+.tpl-f6 #mod-ubicacion, .tpl-F6 #mod-ubicacion,
+.tpl-f6 #mod-sponsors, .tpl-F6 #mod-sponsors,
+.tpl-f6 #mod-whatsapp, .tpl-F6 #mod-whatsapp {
+    display: block !important;
+}
+
+.tpl-f6 #mod-footer, .tpl-F6 #mod-footer {
+    display: block !important;
+}
+
+/* ==========================================================================
+   3. GRID ATÓMICO — Mobile-first (columna única) / Desktop split 40vw|60vw
+   ========================================================================== */
+.tpl-f6 #main-content-flow {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "form"
+        "countdown"
+        "meta"
+        "cartel"
+        "lineup"
+        "whatsapp"
+        "boletos"
+        "playlist"
+        "video"
+        "faq"
+        "ubicacion"
+        "sponsors"
+        "footer";
+    width: 100%;
+}
+
+.tpl-f6 #mod-hero         { grid-area: hero; }
+.tpl-f6 #unified-frame    { grid-area: countdown; }
+.tpl-f6 #mod-hero-meta    { grid-area: meta; }
+.tpl-f6 #mod-cartel       { grid-area: cartel; }
+.tpl-f6 #mod-video        { grid-area: video; }
+.tpl-f6 #mod-lineup       { grid-area: lineup; }
+.tpl-f6 #mod-playlist     { grid-area: playlist; }
+.tpl-f6 #mod-faq          { grid-area: faq; }
+.tpl-f6 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f6 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f6 #mod-form         { grid-area: form; }
+.tpl-f6 #mod-footer       { grid-area: footer; }
+.tpl-f6 #mod-boletos      { grid-area: boletos; }
+.tpl-f6 #mod-whatsapp     { grid-area: whatsapp; }
+
+/* Desktop split 40vw | 60vw */
+@media (min-width: 1024px) {
+    .tpl-f6 #main-content-flow {
+        display: grid !important;
+        grid-template-columns: 40vw 60vw;
+        grid-template-areas:
+            "hero form"
+            "hero countdown"
+            "hero meta"
+            "hero cartel"
+            "hero lineup"
+            "hero whatsapp"
+            "hero boletos"
+            "hero playlist"
+            "hero video"
+            "hero faq"
+            "hero ubicacion"
+            "hero sponsors"
+            "hero footer";
+    }
+}
+
+/* ==========================================================================
+   4. TIPOGRAFÍA EDITORIAL — Eyebrows versales, encabezados de sección
+   ========================================================================== */
+.tpl-f6 h2, .tpl-F6 h2 {
+    color: var(--f6-text-cream);
+    font-family: var(--f6-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.42em;
+    font-weight: 800;
+    margin-bottom: 2.6rem;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 0;
+}
+
+.tpl-f6 h2::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 1px;
+    background: var(--f6-accent-ember);
+    margin-right: 1rem;
+    vertical-align: middle;
+    box-shadow: var(--f6-glow-soft);
+}
+
+.tpl-f6 section {
+    padding: 4.5rem 8%;
+    border-bottom: 1px solid var(--f6-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO — Panel editorial izquierdo (fixed desktop)
+   ========================================================================== */
+.tpl-f6 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 11vh;
+    min-height: 92vh;
+    color: var(--f6-text-main);
+}
+
+@media (min-width: 1024px) {
+    .tpl-f6 #mod-hero {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        width: 40vw !important;
+        height: 100vh !important;
+        justify-content: center;
+        padding: 4rem 3.2rem !important;
+        z-index: 10;
+        text-align: left !important;
+    }
+}
+
+/* ==========================================================================
+   6. #EVENT-TITLE — Display editorial gigante con shimmer
+   ========================================================================== */
+.tpl-f6 #event-title {
+    margin: 0 0 1.2rem;
+    font-family: var(--f6-font);
+    font-weight: 900 !important;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.96;
+    background: linear-gradient(105deg, #f7efdd 0%, var(--f6-accent-glow) 42%, #c9a227 60%, #f7efdd 78%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: f6Shimmer 9s ease-in-out infinite;
+    text-shadow: none;
+}
+
+@keyframes f6Shimmer {
+    0%   { background-position: 120% 0; }
+    55%  { background-position: -20% 0; }
+    100% { background-position: -120% 0; }
+}
+
+@media (min-width: 1024px) {
+    .tpl-f6 #event-title {
+        font-size: clamp(2.6rem, 4.6vw, 4rem) !important;
+        max-width: 92%;
+    }
+}
+
+@media (max-width: 1023px) {
+    .tpl-f6 #event-title {
+        text-align: left !important;
+        width: 100%;
+        font-size: clamp(2.6rem, 11vw, 4.2rem) !important;
+        margin-bottom: 1.4rem !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .tpl-f6 #event-title {
+        font-size: clamp(2.1rem, 9.5vw, 3.4rem) !important;
+        padding: 0 0.4rem;
+        word-wrap: break-word;
+    }
+}
+
+/* ==========================================================================
+   7. #MOD-FORM — Panel overlay (desktop) / mobile-first
+   ========================================================================== */
+.tpl-f6 .form-master-box {
+    background: var(--f6-card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--f6-line);
+    border-top: 2px solid var(--f6-accent-ember);
+    border-radius: 2px;
+    padding: 2.6rem 2.4rem;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+    max-width: 520px;
+    margin: 2rem auto 0;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tpl-f6 .form-master-box:hover {
+    border-color: rgba(255, 159, 28, 0.45);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), var(--f6-glow-soft);
+}
+
+@media (min-width: 1024px) {
+    .tpl-f6 #mod-form {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        width: 40vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        padding: 3rem 2.8rem !important;
+        background: transparent !important;
+        z-index: 100;
+        pointer-events: none;
+        justify-content: center;
+        align-items: flex-end;
+        padding-bottom: 3.6rem;
+    }
+    .tpl-f6 #mod-form .form-master-box {
+        pointer-events: auto;
+        max-width: 360px !important;
+        padding: 1.9rem !important;
+        border-radius: 2px !important;
+        margin: 0 !important;
+        background: rgba(18, 13, 9, 0.88) !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    .tpl-f6 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f6 .form-master-box {
+        max-width: 94vw;
+        padding: 2.2rem 1.8rem !important;
+    }
+}
+
+/* ==========================================================================
+   8. FORMULARIO — Inputs editoriales, Botones, Tabs
+   ========================================================================== */
+.tpl-f6 .form-input, .tpl-f6 #reg-nombre,
+.tpl-f6 #reg-cedula, .tpl-f6 #rec-cedula {
+    width: 100%;
+    padding: 1.1rem 1rem;
+    margin-bottom: 1.1rem;
+    background: rgba(11, 8, 6, 0.8);
+    border: 1px solid var(--f6-line);
+    border-radius: 1px;
+    color: var(--f6-text-main);
+    font-family: var(--f6-font);
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f6 .form-input:focus, .tpl-f6 #reg-nombre:focus,
+.tpl-f6 #reg-cedula:focus, .tpl-f6 #rec-cedula:focus {
+    outline: none;
+    border-color: var(--f6-accent-ember);
+    box-shadow: 0 0 0 1px var(--f6-accent-ember), var(--f6-glow-soft);
+}
+
+.tpl-f6 .form-tabs {
+    display: flex;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--f6-line);
+}
+
+.tpl-f6 .form-tabs .tab-btn,
+.tpl-f6 .tab-btn {
+    flex: 1;
+    padding: 0.9rem 0.4rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--f6-text-muted);
+    font-family: var(--f6-font);
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f6 .form-tabs .tab-btn.active,
+.tpl-f6 .tab-btn.active,
+.tpl-f6 .form-tabs .tab-btn:hover,
+.tpl-f6 .tab-btn:hover {
+    color: var(--f6-accent-glow);
+    border-bottom-color: var(--f6-accent-ember);
+}
+
+.tpl-f6 .btn-submit {
+    display: block;
+    width: 100%;
+    padding: 1.2rem;
+    margin-top: 1.2rem;
+    background: transparent;
+    border: 1px solid var(--f6-accent-ember);
+    border-radius: 1px;
+    color: var(--f6-accent-glow);
+    font-family: var(--f6-font);
+    font-weight: 900;
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f6 .btn-submit:hover {
+    background: var(--f6-accent-ember);
+    color: #0b0806;
+    box-shadow: var(--f6-glow-strong);
+}
+
+/* ==========================================================================
+   9. COUNTDOWN — Estilo Vervee editorial "00 : 00 : 00 : 00"
+   ========================================================================== */
+.tpl-f6 #unified-frame {
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 2.2rem 6% 1.4rem;
+}
+
+.tpl-f6 #unified-frame .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    padding: 0 1rem;
+    position: relative;
+    animation: f6Float 5s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 0.4s);
+}
+
+.tpl-f6 #unified-frame .cd-block:nth-child(1) { --i: 0; }
+.tpl-f6 #unified-frame .cd-block:nth-child(2) { --i: 1; }
+.tpl-f6 #unified-frame .cd-block:nth-child(3) { --i: 2; }
+.tpl-f6 #unified-frame .cd-block:nth-child(4) { --i: 3; }
+
+@keyframes f6Float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+}
+
+.tpl-f6 #unified-frame .cd-block::after {
+    content: ":";
+    position: absolute;
+    right: -0.5rem;
+    top: 0.2rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--f6-accent-ember);
+    text-shadow: var(--f6-glow-soft);
+}
+
+.tpl-f6 #unified-frame .cd-block:last-child::after {
+    content: "";
+}
+
+.tpl-f6 #unified-frame .cd-block > span {
+    display: block;
+    font-size: clamp(1.9rem, 6vw, 3rem) !important;
+    font-weight: 900 !important;
+    font-variant-numeric: tabular-nums;
+    color: var(--f6-text-cream);
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 22px rgba(255, 159, 28, 0.35);
+    line-height: 1;
+}
+
+.tpl-f6 #unified-frame .cd-block small {
+    font-size: 0.58rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--f6-text-muted);
+    margin-top: 0.4rem;
+}
+
+/* ==========================================================================
+   10. METADATOS EDITORIALES — fecha · hora · lugar
+   ========================================================================== */
+.tpl-f6 #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem 2.2rem;
+    padding: 1.2rem 6% 2.6rem;
+}
+
+.tpl-f6 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--f6-text-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.tpl-f6 #mod-hero-meta .meta-item span {
+    border-bottom: 1px solid var(--f6-line);
+    padding-bottom: 2px;
+}
+
+.tpl-f6 #mod-hero-meta .meta-svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--f6-accent-ember);
+    opacity: 0.9;
+}
+
+/* ==========================================================================
+   11. CARTEL — Póster editorial flotante con glow pulsante
+   ========================================================================== */
+.tpl-f6 #mod-cartel {
+    padding: 1.6rem 8% 3.4rem;
+}
+
+.tpl-f6 #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+}
+
+.tpl-f6 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 430px;
+    border-radius: 2px;
+    border: 1px solid var(--f6-line);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f6-glow-soft);
+    object-fit: cover;
+    animation: f6PosterFloat 7s ease-in-out infinite;
+    transition: box-shadow 0.5s ease;
+}
+
+@keyframes f6PosterFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-10px) scale(1.015); }
+}
+
+.tpl-f6 #mod-cartel:hover #db-poster-img {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f6-glow-strong);
+}
+
+@media (max-width: 640px) {
+    .tpl-f6 #db-poster-img {
+        max-width: 100%;
+        border-radius: 1px !important;
+    }
+}
+
+/* ==========================================================================
+   12. LINEUP — Filas editoriales tipo agenda (hora + artista)
+   ========================================================================== */
+.tpl-f6 #mod-lineup {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f6 #mod-lineup > div {
+    max-width: 780px !important;
+    margin: 0 auto;
+}
+
+.tpl-f6 #db-lineup {
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.tpl-f6 .artist-item {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    padding: 1.7rem 0.4rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--f6-line-soft);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+}
+
+.tpl-f6 .artist-item:hover {
+    padding-left: 1.2rem;
+    border-bottom-color: var(--f6-accent-ember);
+}
+
+.tpl-f6 .artist-item:hover::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 2px;
+    background: var(--f6-accent-ember);
+    box-shadow: var(--f6-glow-soft);
+}
+
+/* Avatar */
+.tpl-f6 .artist-avatar {
+    width: 74px;
+    height: 74px;
+    flex-shrink: 0;
+    border-radius: 1px !important;
+    border: 1px solid var(--f6-line) !important;
+    filter: grayscale(35%);
+    object-fit: cover;
+    transition: all 0.4s ease;
+}
+
+.tpl-f6 .artist-item:hover .artist-avatar {
+    filter: grayscale(0%);
+    border-color: var(--f6-accent-ember) !important;
+    transform: scale(1.04);
+    box-shadow: var(--f6-glow-soft);
+}
+
+/* Nombre */
+.tpl-f6 .artist-name {
+    font-family: var(--f6-font) !important;
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--f6-text-cream);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.tpl-f6 .artist-item:hover .artist-name {
+    color: var(--f6-accent-glow);
+    text-shadow: 0 0 16px rgba(255, 159, 28, 0.35);
+}
+
+/* Reseña */
+.tpl-f6 .artist-resena {
+    flex-basis: 100%;
+    font-size: 0.88rem;
+    color: var(--f6-text-muted);
+    line-height: 1.55;
+    margin-top: 0.4rem;
+    max-width: 620px;
+}
+
+/* Botón perfil — editorial underline */
+.tpl-f6 .artist-perfil-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0;
+    margin-top: 0.9rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--f6-accent-ember);
+    color: var(--f6-accent-glow);
+    font-family: var(--f6-font);
+    font-weight: 800;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f6 .artist-perfil-btn:hover {
+    color: #0b0806;
+    background: var(--f6-accent-ember);
+    padding: 0.45rem 0.9rem;
+    box-shadow: var(--f6-glow-soft);
+}
+
+@media (max-width: 640px) {
+    .tpl-f6 .artist-name {
+        font-size: 1.3rem !important;
+    }
+    .tpl-f6 .artist-item {
+        gap: 1rem !important;
+        padding: 1.2rem 0.2rem !important;
+    }
+    .tpl-f6 .artist-avatar {
+        width: 56px !important;
+        height: 56px !important;
+    }
+}
+
+/* ==========================================================================
+   13. WHATSAPP — Franja editorial con botón "ember"
+   ========================================================================== */
+.tpl-f6 #mod-whatsapp {
+    padding: 2.6rem 8%;
+}
+
+.tpl-f6 .whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.15rem 2.8rem;
+    background: linear-gradient(120deg, #1f7a48, #25d366);
+    color: #ffffff;
+    font-family: var(--f6-font);
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 14px 40px rgba(37, 211, 102, 0.3);
+    transition: all 0.3s ease;
+}
+
+.tpl-f6 .whatsapp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 50px rgba(37, 211, 102, 0.42), 0 0 30px rgba(37, 211, 102, 0.25);
+    filter: brightness(1.08);
+}
+
+.tpl-f6 .whatsapp-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
+}
+
+/* ==========================================================================
+   14. BOLETOS — Pestañas preventa/taquilla editoriales + tarjetas precio
+   ========================================================================== */
+.tpl-f6 #mod-boletos {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f6 .boleto-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 2.6rem;
+    border-bottom: 1px solid var(--f6-line);
+}
+
+.tpl-f6 .boleto-tab {
+    padding: 0.95rem 2.4rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--f6-text-muted);
+    font-family: var(--f6-font);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: -1px;
+}
+
+.tpl-f6 .boleto-tab.active,
+.tpl-f6 .boleto-tab:hover {
+    color: var(--f6-accent-glow);
+    border-bottom-color: var(--f6-accent-ember);
+}
+
+.tpl-f6 .boleto-cards-wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.4rem;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.tpl-f6 .boleto-card {
+    background: var(--f6-card-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--f6-line);
+    border-top: 2px solid var(--f6-accent-ember);
+    border-radius: 1px;
+    padding: 2.2rem 1.8rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tpl-f6 .boleto-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--f6-accent-ember);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), var(--f6-glow-soft);
+}
+
+.tpl-f6 .boleto-tipo {
+    font-family: var(--f6-font);
+    font-weight: 800;
+    font-size: 0.62rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--f6-accent-glow);
+    display: block;
+    margin-bottom: 0.8rem;
+}
+
+.tpl-f6 .boleto-precio {
+    font-family: var(--f6-font);
+    font-weight: 900;
+    font-size: 2.6rem;
+    color: var(--f6-text-cream);
+    text-shadow: 0 0 22px rgba(255, 159, 28, 0.4);
+    display: block;
+    margin: 0.6rem 0 0.4rem;
+}
+
+.tpl-f6 .boleto-desc {
+    font-size: 0.85rem;
+    color: var(--f6-text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.4rem;
+}
+
+.tpl-f6 .boleto-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.95rem 2.2rem;
+    background: transparent;
+    color: var(--f6-accent-glow);
+    font-family: var(--f6-font);
+    font-weight: 900;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    border: 1px solid var(--f6-accent-ember);
+    border-radius: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f6 .boleto-btn:hover {
+    background: var(--f6-accent-ember);
+    color: #0b0806;
+    box-shadow: var(--f6-glow-strong);
+}
+
+.tpl-f6 #db-boletos-preventa,
+.tpl-f6 #db-boletos-taquilla {
+    display: none;
+}
+
+/* ==========================================================================
+   15. PLAYLIST
+   ========================================================================== */
+.tpl-f6 #mod-playlist {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f6 #db-spotify-embed {
+    border-radius: 1px;
+    border: 1px solid var(--f6-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.tpl-f6 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+/* ==========================================================================
+   16. GALERÍA — Grid editorial de imágenes (video OFF, solitario)
+   ========================================================================== */
+.tpl-f6 #mod-video {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f6 #mod-video > div:not(#db-gallery-grid),
+.tpl-F6 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
+.tpl-f6 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+    gap: 0.7rem;
+}
+
+.tpl-f6 #db-gallery-grid img {
+    width: 100%;
+    border-radius: 1px;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--f6-line-soft);
+    filter: grayscale(45%);
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.tpl-f6 #db-gallery-grid img:hover {
+    border-color: var(--f6-accent-ember);
+    filter: grayscale(0%);
+    transform: scale(1.02);
+    box-shadow: var(--f6-glow-soft);
+    z-index: 2;
+}
+
+@media (max-width: 640px) {
+    .tpl-f6 #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+}
+
+/* ==========================================================================
+   17. FAQ — Acordeón editorial
+   ========================================================================== */
+.tpl-f6 #mod-faq {
+    padding: 4.5rem 8%;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tpl-f6 .faq-item {
+    border-bottom: 1px solid var(--f6-line);
+    padding: 1.4rem 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.tpl-f6 .faq-q {
+    font-family: var(--f6-font);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--f6-text-cream);
+    transition: color 0.3s ease;
+}
+
+.tpl-f6 .faq-item:hover .faq-q {
+    color: var(--f6-accent-glow);
+}
+
+.tpl-f6 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f6-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.tpl-f6 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
+}
+
+/* ==========================================================================
+   18. UBICACIÓN — Mapa editorial
+   ========================================================================== */
+.tpl-f6 #mod-ubicacion {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f6 #db-mapa-container {
+    border-radius: 1px;
+    overflow: hidden;
+    border: 1px solid var(--f6-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   19. PATROCINADORES — Franja limpia de marcas (sin cajas)
+   ========================================================================== */
+.tpl-f6 #mod-sponsors {
+    padding: 3.2rem 8%;
+}
+
+.tpl-f6 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2.6rem 3.4rem;
+    padding: 1rem 0;
+}
+
+.tpl-f6 .sponsor-item {
+    padding: 0.2rem 0;
+    opacity: 0.55;
+    transition: all 0.4s ease;
+}
+
+.tpl-f6 .sponsor-item:hover {
+    opacity: 1;
+}
+
+.tpl-f6 .sponsor-img {
+    height: 40px;
+    width: auto;
+    filter: brightness(0.9) grayscale(20%);
+    transition: all 0.4s ease;
+}
+
+.tpl-f6 .sponsor-item:hover .sponsor-img {
+    filter: brightness(1.1) grayscale(0%);
+    transform: translateY(-3px);
+}
+
+/* ==========================================================================
+   20. FOOTER — Solo copyright (igual decisión de f5 v222)
+   ========================================================================== */
+.tpl-f6 #mod-footer {
+    background: var(--f6-bg-ink) !important;
+    border-top: 1px solid var(--f6-line-soft);
+}
+
+.tpl-f6 #mod-footer .footer-inner,
+.tpl-F6 #mod-footer .footer-inner {
+    display: none !important;
+}
+
+.tpl-f6 #mod-footer .footer-bottom {
+    text-align: center;
+    padding: 1.6rem 2rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    color: var(--f6-text-muted);
+}
+
+/* ==========================================================================
+   21. CONTRATO DE DATOS — Protección de módulos invisibles
+   ========================================================================== */
+.tpl-f6 #db-poster-img[style*="display:none"],
+.tpl-f6 #db-faq-list[style*="display:none"],
+.tpl-f6 #db-mapa-container[style*="display:none"],
+.tpl-f6 #db-sponsors-list[style*="display:none"],
+.tpl-f6 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   22. RESPONSIVE MOBILE — Reordenamiento de grid y ajustes finos
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .tpl-f6 #main-content-flow {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "form"
+            "countdown"
+            "meta"
+            "cartel"
+            "lineup"
+            "whatsapp"
+            "boletos"
+            "playlist"
+            "video"
+            "faq"
+            "ubicacion"
+            "sponsors"
+            "footer" !important;
+        row-gap: 0 !important;
+        width: 100% !important;
+    }
+    .tpl-f6 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f6 section {
+        padding: 3.4rem 6%;
+    }
+    .tpl-f6 h2 {
+        letter-spacing: 0.32em;
+    }
+}
+
+/* ==========================================================================
+   23. REVEAL AL HACER SCROLL — scroll-driven animation (progressive enhancement)
+       Solamente navegadores con soporte; resto queda visible sin animación.
+   ========================================================================== */
+@supports (animation-timeline: view()) {
+    .tpl-f6 section,
+    .tpl-f6 #unified-frame,
+    .tpl-f6 #mod-hero-meta {
+        animation: f6RevealUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+    }
+
+    @keyframes f6RevealUp {
+        from { opacity: 0; transform: translateY(22px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ==========================================================================
+   24. ACCESIBILIDAD — prefers-reduced-motion: apaga efectos
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f6::before,
+    .tpl-f6::after,
+    .tpl-f6 #event-title,
+    .tpl-f6 #db-poster-img,
+    .tpl-f6 #unified-frame .cd-block {
+        animation: none !important;
+    }
+    .tpl-f6 section,
+    .tpl-f6 #unified-frame,
+    .tpl-f6 #mod-hero-meta {
+        animation: none !important;
+    }
+}
+
+/* ============================================================================
+   LOG DE VERSIONES — Template f6 "Afromango Editor"
+   ============================================================================
+| Versión  | Fecha      | Cambio                                                             | Estado |
+|----------|------------|--------------------------------------------------------------------|--------|
+| v1.0.0   | 01/10/2026 | Silo Afromango Editor (P10). Dirección "noche editorial oscura".  | [OK]   |
+|          |            | Base tinta/espresso + texto champán + acento mango ember.         |        |
+|          |            | Eyebrows versales (THE PROGRAMME), grid-order mobile = f5.        |        |
+|          |            | Efectos: aurora animada, grano cinematográfico, shimmer título,   |        |
+|          |            | float póster, countdown flotante "00:00:00:00", reveal scroll.    |        |
+|          |            | Betos editoriales 1px, footer solo copyright, video/info ocultos. |        |
+============================================================================ */
