@@ -890,7 +890,7 @@ tr:hover td{background:var(--surface)}
             <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
 
             <!-- CAMPOS FIESTA -->
-            <div id="ld-campo-dj-lineup" style="display:none" class="fg"><label style="font-size:12px">DJ Lineup (uno por línea — o formato <code>Nombre|FotoURL|Reseña|PerfilURL</code>)</label><textarea id="ld-dj-lineup-val" rows="4" placeholder="DJ Nombre&#10;DJ Otro|https://foto.jpg|Breve reseña|https://instagram.com/dj" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-dj-lineup" style="display:none" class="fg"><label style="font-size:12px">DJ Lineup (uno por línea — formato: <code>Nombre|FotoURL|Reseña|Hora|Instagram|YouTube|TikTok</code>)</label><textarea id="ld-dj-lineup-val" rows="4" placeholder="ZARA KLYNE|https://foto.jpg|Silky vocals, warm presence|19:00|https://instagram.com/zara||https://tiktok.com/@zara&#10;MALIK RHO|https://foto2.jpg|Deep, steady grooves|20:00|https://instagram.com/malik||https://tiktok.com/@malik" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
             <div id="ld-campo-guest-list" style="display:none" class="fg"><label style="font-size:12px">Instrucciones Guest List</label><input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario"></div>
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
@@ -2845,9 +2845,9 @@ function _buildConfigLanding() {
       trailer_url:    val('ld-trailer-url')      || null,
       dresscode:      val('ld-dresscode-val')    || null,
       // Fiesta
-      // v221: DJ Lineup con reseña y perfil. Formato por línea:
+      // v223: DJ Lineup con foto grande, hora y redes sociales. Formato por línea:
       //   solo nombre  -> "DJ Foo"
-      //   completo      -> "DJ Foo|https://foto.jpg|Breve reseña|https://instagram.com/foo"
+      //   completo      -> "DJ Foo|https://foto.jpg|Breve reseña|19:00|https://instagram.com/foo||https://tiktok.com/@foo"
       // Retrocompat: sin '|' sigue siendo solo nombre (objeto {nombre, foto?}).
       dj_lineup:   val('ld-dj-lineup-val') ? val('ld-dj-lineup-val').split('\n').map(l => {
           const p = l.split('|').map(s => s.trim());
@@ -2855,7 +2855,10 @@ function _buildConfigLanding() {
           const dj = { nombre: p[0] };
           if (p[1]) dj.foto = p[1];
           if (p[2]) dj.resena = p[2];
-          if (p[3]) dj.perfil = p[3];
+          if (p[3]) dj.hora = p[3];
+          if (p[4]) dj.instagram = p[4];
+          if (p[5]) dj.youtube = p[5];
+          if (p[6]) dj.tiktok = p[6];
           return dj;
         }).filter(d => d.nombre) : undefined,
       playlist_url:val('ld-playlist-url')   || null,
@@ -3839,7 +3842,7 @@ function _poblarContenidoWizard(content, suf) {
     set('ld-boletos-taquilla', content.boletos.taquilla);
   }
   if (Array.isArray(content.dj_lineup)) {
-    set('ld-dj-lineup-val', content.dj_lineup.map(d => [d.nombre, d.foto, d.resena, d.perfil].filter(v => v != null && v !== '').join('|')).join('\n'));
+    set('ld-dj-lineup-val', content.dj_lineup.map(d => [d.nombre, d.foto, d.resena, d.hora, d.instagram, d.youtube, d.tiktok].filter(v => v != null && v !== '').join('|')).join('\n'));
   } else { set('ld-dj-lineup-val', null); }
   // Galería / FAQ / Sponsors — id depende de la categoría activa
   if (Array.isArray(content.gallery) && content.gallery.length) {
