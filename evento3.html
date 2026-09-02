@@ -808,8 +808,14 @@ if (document.getElementById('db-poster-img')) {
     if (content.faq) {
         let faqItems = [];
         // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
+        // v223 (fix): el formato real guardado por admin.html es array de
+        // {q, a} (ver línea 2868 en admin.html). Se normaliza AMBOS contratos
+        // ({pregunta,respuesta} y {q,a}) para que el FAQ nunca renderice vacío.
         if (Array.isArray(content.faq)) {
-            faqItems = content.faq;
+            faqItems = content.faq.map(i => ({
+                pregunta: (i.pregunta || i.q || '').trim(),
+                respuesta: (i.respuesta || i.a || '').trim()
+            }));
         } else if (typeof content.faq === 'string') {
             faqItems = content.faq.split('\n').filter(l => l.includes('|')).map(l => {
                 const [q, a] = l.split('|');
@@ -898,15 +904,18 @@ if (document.getElementById('db-poster-img')) {
     const boletosData = content.boletos || {};
     const preventaVal = boletosData.preventa || content.tickets_info || 'POR DEFINIR';
     const taquillaVal = boletosData.taquilla || 'POR DEFINIR';
-    const boletoCard = (precio) => `
+    // v223 (fix): la tarjeta incluye la etiqueta del tipo (PREVENTA/TAQUILLA) para
+    // que el silo pueda mostrar AMBOS precios en dos líneas sin depender del toggle.
+    const boletoCard = (tipo, precio) => `
         <div class="boleto-card" style="background:rgba(255,255,255,0.04); border:1px solid var(--tpl-accent, #d72dc0); border-radius:20px; padding:2.5rem 2rem; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.4), 0 0 25px var(--tpl-accent, #d72dc0);">
+            <span class="boleto-tipo" style="display:block; font-weight:900; font-size:0.72rem; letter-spacing:0.32em; text-transform:uppercase; color:var(--tpl-accent, #d72dc0); margin-bottom:0.6rem;">${tipo}</span>
             <span class="boleto-precio" style="display:block; font-weight:900; font-size:2.4rem; color:#fff; text-shadow:0 0 18px var(--tpl-accent, #d72dc0);">${precio}</span>
             <span class="boleto-desc" style="display:block; margin-top:0.5rem; opacity:0.75; font-size:0.85rem; letter-spacing:1px;">Precio de entrada</span>
         </div>`;
     const bwP = document.getElementById('db-boletos-preventa');
     const bwT = document.getElementById('db-boletos-taquilla');
-    if (bwP) bwP.innerHTML = boletoCard(preventaVal);
-    if (bwT) bwT.innerHTML = boletoCard(taquillaVal);
+    if (bwP) bwP.innerHTML = boletoCard('PREVENTA', preventaVal);
+    if (bwT) bwT.innerHTML = boletoCard('TAQUILLA', taquillaVal);
     logStatus(`TRACE: Boletería preventa/taquilla inyectada (${preventaVal} | ${taquillaVal}).`, "TRACE");
     // === FIN SEGMENTO BOLETERÍA ===
 
