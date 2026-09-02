@@ -127,9 +127,14 @@
         <!-- MÓDULO 2: LINEUP [cite: 2, 863] — reubicado en v1.4.6 entre
              Video y Playlist en el DOM para que coincida con el orden
              visual real definido por grid-area en p5.css -->
-        <section id="mod-lineup">
-            <div class="lineup-grid" style="max-width:1100px; margin:0 auto; align-items:start;">
+        <section id="mod-cartel">
+            <div class="cartel-inner" style="max-width:1100px; margin:0 auto; text-align:center;">
                 <div style="display:flex; justify-content:center;"><img id="db-poster-img" src="" style="border-radius:12px;" alt="Poster"></div>
+            </div>
+        </section>
+
+        <section id="mod-lineup">
+            <div class="lineup-grid" style="max-width:1100px; margin:0 auto; align-items:start; justify-content:center;">
                 <div id="db-lineup" style="display:flex; flex-direction:column; gap:2.5rem;"></div>
             </div>
         </section>
@@ -869,11 +874,27 @@ if (document.getElementById('db-poster-img')) {
 
     // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
     // Fuente: content.whatsapp = número (formato internacional sin +). Mensaje opcional.
+    function formatWaPhone(tel) {
+        const clean = String(tel || '').replace(/\D/g, '');
+        if (clean.length <= 2) return clean;
+        if (clean.length === 10) return clean.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+        if (clean.length >= 11) {
+            const country = clean.slice(0, 2);
+            const rest = clean.slice(2);
+            const zone = rest.length <= 10 ? rest : rest.slice(0, 10);
+            return `${country} ${zone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')}`;
+        }
+        return clean;
+    }
     const waTel = content.whatsapp || '573001234567';
     const waMsg = (content.whatsapp_msg || 'Hola, quiero información sobre el evento ' + (ev.nombre || '')).replace(/ /g, '%20');
     const waBtn = document.getElementById('db-whatsapp-btn');
     if (waBtn) {
         waBtn.href = `https://wa.me/${waTel}?text=${waMsg}`;
+        const waDisplay = document.getElementById('db-whatsapp-text');
+        if (waDisplay) {
+            waDisplay.textContent = `CONTÁCTANOS · +${formatWaPhone(waTel)}`;
+        }
         logStatus(`LINK: WhatsApp de contacto vinculado (wa.me/${waTel}).`, "LINK");
     }
     // === FIN SEGMENTO WHATSAPP ===
@@ -888,7 +909,7 @@ if (document.getElementById('db-poster-img')) {
                 // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
                 // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
                 // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-boletos', 'mod-whatsapp'];
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-cartel', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-boletos', 'mod-whatsapp'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 

@@ -71,6 +71,7 @@
    defecto. Un grid-area por sí solo NO vuelve visible a un bloque display:none. */
 .tpl-f5 #mod-hero, .tpl-F5 #mod-hero,
 .tpl-f5 #mod-form, .tpl-F5 #mod-form,
+.tpl-f5 #mod-cartel, .tpl-F5 #mod-cartel,
 .tpl-f5 #mod-lineup, .tpl-F5 #mod-lineup,
 .tpl-f5 #mod-playlist, .tpl-F5 #mod-playlist,
 .tpl-f5 #unified-frame, .tpl-F5 #unified-frame {
@@ -80,7 +81,6 @@
 .tpl-f5 #mod-hero-meta, .tpl-F5 #mod-hero-meta,
 .tpl-f5 #mod-video, .tpl-F5 #mod-video,
 .tpl-f5 #mod-boletos, .tpl-F5 #mod-boletos,
-.tpl-f5 #mod-info-tecnica, .tpl-F5 #mod-info-tecnica,
 .tpl-f5 #mod-faq, .tpl-F5 #mod-faq,
 .tpl-f5 #mod-ubicacion, .tpl-F5 #mod-ubicacion,
 .tpl-f5 #mod-sponsors, .tpl-F5 #mod-sponsors,
@@ -107,18 +107,18 @@
     grid-template-columns: 1fr;
     grid-template-areas:
         "hero"
+        "form"
         "countdown"
         "meta"
-        "video"
+        "cartel"
         "lineup"
-        "playlist"
+        "whatsapp"
         "boletos"
-        "info"
+        "playlist"
+        "video"
         "faq"
         "ubicacion"
         "sponsors"
-        "whatsapp"
-        "form"
         "footer";
     row-gap: 0;
     width: 100%;
@@ -127,10 +127,10 @@
 .tpl-f5 #mod-hero         { grid-area: hero; }
 .tpl-f5 #unified-frame    { grid-area: countdown; }
 .tpl-f5 #mod-hero-meta    { grid-area: meta; }
+.tpl-f5 #mod-cartel       { grid-area: cartel; }
 .tpl-f5 #mod-video        { grid-area: video; }
 .tpl-f5 #mod-lineup       { grid-area: lineup; }
 .tpl-f5 #mod-playlist     { grid-area: playlist; }
-.tpl-f5 #mod-info-tecnica { grid-area: info; }
 .tpl-f5 #mod-faq          { grid-area: faq; }
 .tpl-f5 #mod-ubicacion    { grid-area: ubicacion; }
 .tpl-f5 #mod-sponsors     { grid-area: sponsors; }
@@ -145,18 +145,18 @@
     .tpl-f5 #main-content-flow {
         grid-template-columns: 40vw 60vw;
         grid-template-areas:
+            "hero form"
             "hero countdown"
             "hero meta"
-            "hero video"
+            "hero cartel"
             "hero lineup"
-            "hero playlist"
+            "hero whatsapp"
             "hero boletos"
-            "hero info"
+            "hero playlist"
+            "hero video"
             "hero faq"
             "hero ubicacion"
             "hero sponsors"
-            "hero whatsapp"
-            "hero form"
             "hero footer";
     }
 }
@@ -651,8 +651,8 @@
     margin: 0 auto;
 }
 
-/* Activación del contenedor del póster */
-.tpl-f5 #mod-lineup > div > div:first-child {
+/* Activación del contenedor del póster (cartel) */
+.tpl-f5 #mod-cartel .cartel-inner {
     display: flex !important;
     justify-content: center;
     width: 100%;
@@ -787,7 +787,7 @@
         padding: 0 !important;
         gap: 2rem !important;
     }
-    .tpl-f5 .lineup-grid > div:first-child {
+    .tpl-f5 #mod-cartel .cartel-inner {
         border-right: none !important;
         padding-right: 0 !important;
         padding-bottom: 1.5rem !important;
@@ -1302,18 +1302,18 @@
         grid-template-columns: 1fr !important;
         grid-template-areas:
             "hero"
+            "form"
             "countdown"
             "meta"
-            "video"
+            "cartel"
             "lineup"
-            "playlist"
+            "whatsapp"
             "boletos"
-            "info"
+            "playlist"
+            "video"
             "faq"
             "ubicacion"
             "sponsors"
-            "whatsapp"
-            "form"
             "footer" !important;
         row-gap: 0 !important;
         overflow-x: hidden !important;
@@ -1331,10 +1331,13 @@
 
 /* Línea divisoria video-póster anulada */
 @media (max-width: 1023px) {
-    .tpl-f5 #mod-lineup > div > div:first-child {
+    .tpl-f5 #mod-cartel .cartel-inner {
         border-right: none !important;
         padding-right: 0 !important;
         margin-bottom: 0 !important;
+    }
+    .tpl-f5 #mod-cartel {
+        padding: 2rem 1rem 1rem;
     }
 }
 
