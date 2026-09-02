@@ -1003,6 +1003,13 @@
     margin: 0 !important;
 }
 
+/* Contenedor de VIDEO: OFF (v222) — Solo se mantiene la galería #db-gallery-grid.
+   Cero Borrado: el contenedor y #db-video-content permanecen en el DOM (display:none). */
+.tpl-f5 #mod-video > div:not(#db-gallery-grid),
+.tpl-F5 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
 .tpl-f5 #db-video-content {
     background: #0a0603;
     border-radius: 25px;
@@ -1190,14 +1197,12 @@
     border-top: 1px solid rgba(255, 157, 0, 0.12);
 }
 
-.tpl-f5 #mod-footer .footer-inner {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 3rem 2rem;
+/* Footer reducido (v222): solo copyright "© 2026 Chongotronik. Todos los
+   derechos reservados.". Cero Borrado: .footer-inner (marca, columnas, redes)
+   permanece en el DOM pero queda oculto (display:none). */
+.tpl-f5 #mod-footer .footer-inner,
+.tpl-F5 #mod-footer .footer-inner {
+    display: none !important;
 }
 
 .tpl-f5 #mod-footer .footer-brand {
