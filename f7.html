@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F7 — Hostal Terraza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/templates/fiesta/f7.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-primary:#090909;--bg-secondary:#171020;
+  --yellow:#F4D000;--yellow-bright:#FFE500;
+  --orange:#FF6B00;--purple:#32104F;--purple-electric:#7B2CFF;
+  --warm-white:#F5F0E6;--white:#FFFFFF;--black:#000000;
+  --font-display:'Anton',sans-serif;--font-ui:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font-ui);background:var(--bg-primary);color:var(--warm-white);overflow-x:hidden;line-height:1.5}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none}
+::selection{background:var(--yellow);color:var(--black)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:var(--yellow);border-radius:0}
+
+.f7-loading{position:fixed;inset:0;background:var(--black);display:flex;align-items:center;justify-content:center;z-index:10000;flex-direction:column;gap:20px}
+.f7-loading .loader-text{font-family:var(--font-display);font-size:clamp(24px,5vw,48px);color:var(--yellow);text-transform:uppercase;letter-spacing:4px;animation:pulse 1.5s ease-in-out infinite}
+.f7-loading .loader-bar{width:200px;height:3px;background:var(--bg-secondary);position:relative;overflow:hidden}
+.f7-loading .loader-bar::after{content:'';position:absolute;left:-100%;width:100%;height:100%;background:var(--yellow);animation:slide 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes slide{0%{left:-100%}100%{left:100%}}
+</style>
+</head>
+<body class="tpl-F7 tpl-f7">
+
+<!-- LOADER -->
+<div class="f7-loading" id="f7-loader">
+  <div class="loader-text">F7</div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- HEADER / NAV -->
+<header id="f7-header">
+  <div class="f7-header-inner">
+    <a href="#" class="f7-logo">
+      <span class="f7-logo-icon">🌴</span>
+      <span class="f7-logo-text">HOSTAL<br>TERRAZA</span>
+    </a>
+    <nav class="f7-nav" id="f7-nav">
+      <a href="#hero" class="f7-nav-link">INICIO</a>
+      <a href="#lineup" class="f7-nav-link">LINEUP</a>
+      <a href="#tickets" class="f7-nav-link">ENTRADAS</a>
+      <a href="#gallery" class="f7-nav-link">GALERÍA</a>
+      <a href="#location" class="f7-nav-link">UBICACIÓN</a>
+    </nav>
+    <div class="f7-header-actions">
+      <span class="f7-lang-toggle">ES / EN</span>
+      <span class="f7-currency-toggle">COP / $</span>
+      <a href="#tickets" class="f7-header-cta">COMPRAR ENTRADAS</a>
+    </div>
+    <button class="f7-hamburger" id="f7-hamburger" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="f7-mobile-menu" id="f7-mobile-menu">
+    <a href="#hero" class="f7-mobile-link">INICIO</a>
+    <a href="#lineup" class="f7-mobile-link">LINEUP</a>
+    <a href="#tickets" class="f7-mobile-link">ENTRADAS</a>
+    <a href="#gallery" class="f7-mobile-link">GALERÍA</a>
+    <a href="#location" class="f7-mobile-link">UBICACIÓN</a>
+    <a href="#tickets" class="f7-mobile-cta">COMPRAR ENTRADAS</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero" class="f7-hero">
+  <div class="f7-hero-bg" id="f7-hero-bg"></div>
+  <div class="f7-hero-overlay"></div>
+  <div class="f7-hero-yellow-block"></div>
+  <div class="f7-hero-purple-block"></div>
+  <div class="f7-hero-content">
+    <div class="f7-hero-badge" id="org-name-badge">
+      <span id="event-badge-text">AFROMANGO FEST 2026</span>
+      <span class="f7-badge-sub">EN VIVO EN HOSTAL TERRAZA</span>
+    </div>
+    <h1 class="f7-hero-title" id="event-title">
+      <span class="f7-title-line1" id="hero-title-line1">AFROMANGO</span>
+      <span class="f7-title-line2 f7-title-yellow" id="hero-title-line2">FEST</span>
+    </h1>
+    <div class="f7-hero-meta">
+      <span class="f7-meta-item" id="meta-fecha">15 NOVIEMBRE 2026</span>
+      <span class="f7-meta-divider">|</span>
+      <span class="f7-meta-item" id="meta-hora">20:00 HRS</span>
+      <span class="f7-meta-divider">|</span>
+      <span class="f7-meta-item" id="meta-lugar">HOSTAL TERRAZA ROOFTOP</span>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="f7-countdown-section" class="f7-countdown-section">
+  <div class="f7-countdown-container">
+    <div class="f7-cd-box">
+      <span class="f7-cd-number" id="cd-days">00</span>
+      <span class="f7-cd-label">DÍAS</span>
+    </div>
+    <div class="f7-cd-sep">:</div>
+    <div class="f7-cd-box">
+      <span class="f7-cd-number" id="cd-hours">00</span>
+      <span class="f7-cd-label">HORAS</span>
+    </div>
+    <div class="f7-cd-sep">:</div>
+    <div class="f7-cd-box">
+      <span class="f7-cd-number" id="cd-mins">00</span>
+      <span class="f7-cd-label">MIN</span>
+    </div>
+    <div class="f7-cd-sep">:</div>
+    <div class="f7-cd-box">
+      <span class="f7-cd-number" id="cd-secs">00</span>
+      <span class="f7-cd-label">SEG</span>
+    </div>
+  </div>
+</section>
+
+<!-- HERO CTAs -->
+<section id="f7-hero-ctas" class="f7-hero-ctas">
+  <div class="f7-ctas-container">
+    <a href="#tickets" class="f7-btn f7-btn-primary">COMPRAR ENTRADAS AHORA</a>
+    <a href="#lineup" class="f7-btn f7-btn-secondary">VER LINEUP COMPLETO</a>
+  </div>
+</section>
+
+<!-- HIGHLIGHTS -->
+<section id="f7-highlights" class="f7-highlights">
+  <div class="f7-highlights-grid">
+    <div class="f7-highlight-block f7-hl-yellow">
+      <div class="f7-hl-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="24" cy="24" r="10"/><path d="M14 24H4M44 24H34M24 14V4M24 44V34M17 17L10 10M38 38L31 31M31 17L38 10M10 38L17 31"/></svg>
+      </div>
+      <h3 class="f7-hl-title">2 STAGES & DJs</h3>
+      <p class="f7-hl-desc">Afrobeats / Amapiano / Dancehall</p>
+    </div>
+    <div class="f7-highlight-block f7-hl-black">
+      <div class="f7-hl-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 38V18l12-10 12 10v20H12z"/><path d="M18 38v-8h12v8"/><circle cx="24" cy="22" r="3"/></svg>
+      </div>
+      <h3 class="f7-hl-title">COCTELERÍA DE AUTOR</h3>
+      <p class="f7-hl-desc">Gastronomía Afro-Caribeña</p>
+    </div>
+    <div class="f7-highlight-block f7-hl-yellow">
+      <div class="f7-hl-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="24" cy="24" r="20"/><path d="M24 4c0 11.046-8.954 20-20 20M24 4c0 11.046 8.954 20 20 20M24 44c0-11.046-8.954-20-20-20M24 44c0-11.046 8.954-20 20-20"/></svg>
+      </div>
+      <h3 class="f7-hl-title">VISTA 360°</h3>
+      <p class="f7-hl-desc">Sunset Rooftop</p>
+    </div>
+    <div class="f7-highlight-block f7-hl-black">
+      <div class="f7-hl-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 40V20l16-12 16 12v20"/><path d="M16 40V28h16v12"/><circle cx="24" cy="20" r="4"/></svg>
+      </div>
+      <h3 class="f7-hl-title">ARTE & CULTURA</h3>
+      <p class="f7-hl-desc">Body Painting / Arte Urbano / Pop-up Store</p>
+    </div>
+  </div>
+</section>
+
+<!-- EVENT STATS -->
+<section id="f7-stats" class="f7-stats">
+  <div class="f7-stats-terminal">
+    <div class="f7-stats-header">
+      <span class="f7-stats-dot f7-dot-red"></span>
+      <span class="f7-stats-dot f7-dot-yellow"></span>
+      <span class="f7-stats-dot f7-dot-green"></span>
+      <span class="f7-stats-title">EVENT STATUS // LIVE</span>
+    </div>
+    <div class="f7-stats-grid">
+      <div class="f7-stat-cell">
+        <span class="f7-stat-label">RECAUDADO</span>
+        <span class="f7-stat-value" id="db-objetivo-recaudado">$0</span>
+      </div>
+      <div class="f7-stat-cell">
+        <span class="f7-stat-label">META</span>
+        <span class="f7-stat-value" id="db-objetivo-meta">$0</span>
+      </div>
+      <div class="f7-stat-cell">
+        <span class="f7-stat-label">DONANTES</span>
+        <span class="f7-stat-value" id="db-objetivo-donantes">0</span>
+      </div>
+      <div class="f7-stat-cell f7-stat-pct">
+        <span class="f7-stat-label">PROGRESO</span>
+        <span class="f7-stat-value" id="db-objetivo-pct">0%</span>
+      </div>
+    </div>
+    <div class="f7-stats-bar-container">
+      <div class="f7-stats-bar" id="db-objetivo-barra" style="width:0%"></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENT METADATA -->
+<section id="f7-metadata" class="f7-metadata">
+  <div class="f7-metadata-grid">
+    <div class="f7-meta-card">
+      <div class="f7-meta-card-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><path d="M24 4L6 14v20l18 10 18-10V14L24 4z"/><path d="M6 14l18 10m0 0v20m0-20l18-10"/></svg>
+      </div>
+      <span class="f7-meta-card-label">DRESS CODE</span>
+      <span class="f7-meta-card-value" id="db-dress-val">Tropical & Colorido</span>
+    </div>
+    <div class="f7-meta-card">
+      <div class="f7-meta-card-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="6"/><circle cx="32" cy="16" r="6"/><path d="M4 40c0-8 8-14 12-14m20 0c4 0 12 6 12 14"/></svg>
+      </div>
+      <span class="f7-meta-card-label">GUEST LIST</span>
+      <span class="f7-meta-card-value" id="db-guest-val">Artistas invitados</span>
+    </div>
+    <div class="f7-meta-card">
+      <div class="f7-meta-card-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="36" height="36" rx="2"/><path d="M6 18h36M18 6v36"/></svg>
+      </div>
+      <span class="f7-meta-card-label">AFORO</span>
+      <span class="f7-meta-card-value" id="db-aforo-val">200 Personas</span>
+    </div>
+  </div>
+</section>
+
+<!-- LINEUP -->
+<section id="lineup" class="f7-lineup">
+  <div class="f7-section-container">
+    <div class="f7-section-header">
+      <h2 class="f7-section-title">LINEUP<br><span class="f7-title-accent">& ARTISTAS</span></h2>
+    </div>
+    <div class="f7-lineup-filters">
+      <button class="f7-filter-btn f7-filter-active" data-filter="all">TODOS</button>
+      <button class="f7-filter-btn" data-filter="terrazza">STAGE TERRAZA</button>
+      <button class="f7-filter-btn" data-filter="tropical">STAGE TROPICAL</button>
+      <button class="f7-filter-btn" data-filter="headliner">HEADLINERS</button>
+    </div>
+    <div class="f7-lineup-grid" id="db-lineup">
+      <!-- Artists injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- TICKETS -->
+<section id="tickets" class="f7-tickets">
+  <div class="f7-section-container">
+    <div class="f7-section-header">
+      <h2 class="f7-section-title">ENTRADAS<br><span class="f7-title-accent">& PRECIOS</span></h2>
+    </div>
+    <div class="f7-tickets-grid">
+      <div class="f7-ticket-card f7-ticket-soldout">
+        <div class="f7-ticket-badge">AGOTADO</div>
+        <h3 class="f7-ticket-name">EARLY BIRD</h3>
+        <div class="f7-ticket-price">$50.000</div>
+        <ul class="f7-ticket-benefits">
+          <li>Acceso general</li>
+          <li>1 bebida de cortesía</li>
+          <li>Estampado exclusivo</li>
+        </ul>
+        <div class="f7-ticket-qty">
+          <button class="f7-qty-btn" disabled>-</button>
+          <span class="f7-qty-value">0</span>
+          <button class="f7-qty-btn" disabled>+</button>
+        </div>
+        <button class="f7-btn f7-btn-ticket f7-btn-disabled" disabled>AGOTADO</button>
+      </div>
+      <div class="f7-ticket-card f7-ticket-featured">
+        <div class="f7-ticket-badge f7-badge-hot">MÁS VENDIDO</div>
+        <h3 class="f7-ticket-name">GENERAL</h3>
+        <div class="f7-ticket-price">$80.000</div>
+        <ul class="f7-ticket-benefits">
+          <li>Acceso general</li>
+          <li>Barra libre 2 horas</li>
+          <li>Zona de arte</li>
+          <li>Afterparty</li>
+        </ul>
+        <div class="f7-ticket-qty">
+          <button class="f7-qty-btn f7-qty-minus" data-action="minus">-</button>
+          <span class="f7-qty-value" id="qty-general">0</span>
+          <button class="f7-qty-btn f7-qty-plus" data-action="plus">+</button>
+        </div>
+        <button class="f7-btn f7-btn-ticket f7-btn-buy" data-ticket="general">COMPRAR AHORA</button>
+      </div>
+      <div class="f7-ticket-card">
+        <div class="f7-ticket-badge f7-badge-vip">VIP</div>
+        <h3 class="f7-ticket-name">VIP PASS</h3>
+        <div class="f7-ticket-price">$150.000</div>
+        <ul class="f7-ticket-benefits">
+          <li>Acceso VIP exclusivo</li>
+          <li>Open bar premium</li>
+          <li>Meet & Greet artistas</li>
+          <li>Merchandise exclusivo</li>
+          <li>Afterparty VIP</li>
+        </ul>
+        <div class="f7-ticket-qty">
+          <button class="f7-qty-btn f7-qty-minus" data-action="minus">-</button>
+          <span class="f7-qty-value" id="qty-vip">0</span>
+          <button class="f7-qty-btn f7-qty-plus" data-action="plus">+</button>
+        </div>
+        <button class="f7-btn f7-btn-ticket f7-btn-buy" data-ticket="vip">COMPRAR AHORA</button>
+      </div>
+    </div>
+    <div class="f7-payment-methods">
+      <span class="f7-payment-label">PAGO SEGURO CON</span>
+      <div class="f7-payment-logos">
+        <span class="f7-pay-logo">VISA</span>
+        <span class="f7-pay-logo">MASTERCARD</span>
+        <span class="f7-pay-logo">PSE</span>
+        <span class="f7-pay-logo">NEQUI</span>
+        <span class="f7-pay-logo">WOMPI</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="f7-gallery">
+  <div class="f7-section-container">
+    <div class="f7-section-header">
+      <h2 class="f7-section-title">GALERÍA<br><span class="f7-title-accent">& AFTERMOVIE</span></h2>
+    </div>
+    <div class="f7-gallery-grid" id="db-gallery-grid">
+      <!-- Gallery images injected by JS -->
+    </div>
+    <div class="f7-gallery-video" id="db-video-content">
+      <div class="f7-video-placeholder" id="f7-video-trigger">
+        <svg viewBox="0 0 64 64" fill="currentColor"><polygon points="24,16 48,32 24,48"/></svg>
+        <span>WATCH AFTERMOVIE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location" class="f7-location">
+  <div class="f7-section-container">
+    <div class="f7-section-header">
+      <h2 class="f7-section-title">¿CÓMO<br><span class="f7-title-accent">LLEGAR?</span></h2>
+    </div>
+    <div class="f7-location-grid">
+      <div class="f7-location-map" id="db-mapa-container">
+        <!-- Map iframe injected by JS -->
+      </div>
+      <div class="f7-location-info">
+        <h3 class="f7-loc-name">HOSTAL TERRAZA</h3>
+        <p class="f7-loc-address" id="f7-loc-address">Cra 15 #82-45, Bogotá</p>
+        <p class="f7-loc-city">Bogotá D.C., Colombia</p>
+        <p class="f7-loc-neighborhood">Chapinero Alto</p>
+        <p class="f7-loc-access">Acceso por escaleras laterales. Se recomienda llegada 30 min antes del evento.</p>
+        <div class="f7-loc-parking">
+          <strong>PARKING:</strong> Zona de parqueo disponible a 2 cuadras. Se recomienda transporte público o apps de movilidad.
+        </div>
+        <div class="f7-loc-buttons">
+          <a href="#" class="f7-btn f7-btn-map" id="f7-maps-btn" target="_blank" rel="noopener">GOOGLE MAPS</a>
+          <a href="#" class="f7-btn f7-btn-map" id="f7-waze-btn" target="_blank" rel="noopener">WAZE</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="f7-faq">
+  <div class="f7-section-container">
+    <div class="f7-section-header">
+      <h2 class="f7-section-title">PREGUNTAS<br><span class="f7-title-accent">FRECUENTES</span></h2>
+    </div>
+    <div class="f7-faq-list" id="db-faq-list">
+      <!-- FAQ items injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- TICKETING / USER ACCESS -->
+<section id="f7-ticketing" class="f7-ticketing">
+  <div class="f7-section-container">
+    <div class="f7-section-header">
+      <h2 class="f7-section-title">BOLETERÍA</h2>
+    </div>
+    <div class="f7-ticketing-tabs">
+      <button class="f7-tab-btn f7-tab-active" id="f7-tab-preventa" onclick="switchBoleto('preventa')">PREVENTA</button>
+      <button class="f7-tab-btn" id="f7-tab-taquilla" onclick="switchBoleto('taquilla')">TAQUILLA</button>
+    </div>
+    <div class="f7-ticketing-panels">
+      <div class="f7-ticketing-panel f7-panel-active" id="f7-panel-preventa">
+        <div class="f7-ticketing-status" id="db-boletos-preventa">
+          <span class="f7-tkt-status-label">ESTADO:</span>
+          <span class="f7-tkt-status-value">CARGANDO...</span>
+        </div>
+      </div>
+      <div class="f7-ticketing-panel" id="f7-panel-taquilla">
+        <div class="f7-ticketing-status" id="db-boletos-taquilla">
+          <span class="f7-tkt-status-label">ESTADO:</span>
+          <span class="f7-tkt-status-value">CARGANDO...</span>
+        </div>
+      </div>
+    </div>
+    <div class="f7-auth-section">
+      <div class="f7-auth-tabs">
+        <button class="f7-auth-tab f7-auth-active" id="f7-tab-registro" onclick="switchForm('registro')">REGISTRO</button>
+        <button class="f7-auth-tab" id="f7-tab-recuperar" onclick="switchForm('recuperar')">RECUPERAR</button>
+      </div>
+      <div class="f7-auth-panels">
+        <div class="f7-auth-panel f7-panel-active" id="f7-panel-registro">
+          <form class="f7-form" id="master-reg-form" onsubmit="return false;">
+            <div class="f7-form-group">
+              <label class="f7-form-label" for="reg-nombre">NOMBRE COMPLETO</label>
+              <input type="text" id="reg-nombre" class="f7-input" placeholder="Tu nombre completo" required>
+            </div>
+            <button type="submit" class="f7-btn f7-btn-submit" id="f7-reg-submit">CONFIRMAR →</button>
+          </form>
+        </div>
+        <div class="f7-auth-panel" id="f7-panel-recuperar">
+          <form class="f7-form" id="f7-recover-form" onsubmit="return false;">
+            <div class="f7-form-group">
+              <label class="f7-form-label" for="recup-cedula">CÉDULA</label>
+              <input type="text" id="recup-cedula" class="f7-input" placeholder="Número de cédula" required>
+            </div>
+            <button type="submit" class="f7-btn f7-btn-submit" id="f7-recover-submit">VERIFICAR →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHATSAPP CTA -->
+<section id="f7-whatsapp" class="f7-whatsapp">
+  <div class="f7-whatsapp-inner">
+    <div class="f7-whatsapp-content">
+      <h2 class="f7-whatsapp-title">¿QUIERES CONTACTARNOS?</h2>
+      <p class="f7-whatsapp-sub">ESCRÍBENOS POR WHATSAPP</p>
+    </div>
+    <a href="#" class="f7-whatsapp-btn" id="db-whatsapp-btn" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <span>ESCRÍBENOS</span>
+    </a>
+  </div>
+</section>
+
+<!-- DONATION CTA -->
+<section id="f7-donation" class="f7-donation">
+  <div class="f7-donation-inner">
+    <div class="f7-donation-icon">❤</div>
+    <h2 class="f7-donation-title">DONA AHORA</h2>
+    <p class="f7-donation-sub">Tu aporte hace posible este evento.</p>
+    <a href="#" class="f7-btn f7-btn-donate" id="f7-donate-btn">DONAR →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="f7-footer" class="f7-footer">
+  <div class="f7-footer-inner">
+    <div class="f7-footer-newsletter">
+      <h3 class="f7-footer-title">RECIBE NOTICIAS Y PROMOCIONES</h3>
+      <form class="f7-newsletter-form" onsubmit="return false;">
+        <input type="email" class="f7-input" placeholder="tu@email.com" required>
+        <button type="submit" class="f7-btn f7-btn-subscribe">SUSCRIBIR</button>
+      </form>
+    </div>
+    <div class="f7-footer-grid">
+      <div class="f7-footer-col">
+        <h4 class="f7-footer-col-title">SÍGUENOS</h4>
+        <div class="f7-social-links">
+          <a href="#" class="f7-social-link" target="_blank" rel="noopener">Instagram</a>
+          <a href="#" class="f7-social-link" target="_blank" rel="noopener">TikTok</a>
+          <a href="#" class="f7-social-link" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="#" class="f7-social-link" target="_blank" rel="noopener">Spotify</a>
+        </div>
+      </div>
+      <div class="f7-footer-col">
+        <h4 class="f7-footer-col-title">NAVEGACIÓN</h4>
+        <div class="f7-footer-links">
+          <a href="#hero" class="f7-footer-link">INICIO</a>
+          <a href="#lineup" class="f7-footer-link">LINEUP</a>
+          <a href="#tickets" class="f7-footer-link">ENTRADAS</a>
+          <a href="#gallery" class="f7-footer-link">GALERÍA</a>
+          <a href="#location" class="f7-footer-link">UBICACIÓN</a>
+        </div>
+      </div>
+      <div class="f7-footer-col">
+        <h4 class="f7-footer-col-title">LEGAL</h4>
+        <div class="f7-footer-links">
+          <a href="#" class="f7-footer-link">TÉRMINOS Y CONDICIONES</a>
+          <a href="#" class="f7-footer-link">POLÍTICA DE PRIVACIDAD</a>
+          <a href="#" class="f7-footer-link">PQR</a>
+        </div>
+      </div>
+    </div>
+    <div class="f7-footer-copy">
+      <p>© 2026 HOSTAL TERRAZA. TODOS LOS DERECHOS RESERVADOS.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL: Lightbox -->
+<div class="f7-modal" id="f7-modal">
+  <button class="f7-modal-close" id="f7-modal-close" aria-label="Cerrar">✕</button>
+  <div class="f7-modal-content" id="f7-modal-content"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var SB_URL='https://mqosmqspsjaklmmbkcnt.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3NtcXNwc2pha2xtbWJrY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1NzIyOTIsImV4cCI6MjA3MjE0ODI5Mn0.sE9A9Z7pQ1VG27t8F0t3-QWhWw5V5hFKPFhGYeVBBjU';
+var sb=window.supabase.createClient(SB_URL,SB_KEY);
+
+function log(m,t){
+  var c={INFO:'#00bcd4',DEBUG:'#9c27b0',LINK:'#4caf50',TRACE:'#ff9800',TIME:'#2196f3',ERROR:'#f44336'};
+  console.log('%c[F7 '+t+'] '+m,'color:'+(c[t]||'#fff')+';font-weight:bold');
+}
+
+function $(id){return document.getElementById(id)}
+
+function parseSpanishDate(d,t){
+  if(!d)return null;
+  var months={'enero':0,'febrero':1,'marzo':2,'abril':3,'mayo':4,'junio':5,'julio':6,'agosto':7,'septiembre':8,'octubre':9,'noviembre':10,'diciembre':11};
+  var p=d.toLowerCase().replace(/de\s+/g,' ').trim().split(' ');
+  if(p.length>=3){
+    var day=parseInt(p[0]),mon=months[p[1]],yr=parseInt(p[2]);
+    if(!isNaN(day)&&mon!==undefined&&!isNaN(yr)){
+      var timeParts=(t||'20:00').replace('hrs','').trim().split(':');
+      var h=parseInt(timeParts[0])||20,m=parseInt(timeParts[1])||0;
+      return new Date(yr,mon,day,h,m,0);
+    }
+  }
+  return new Date(d);
+}
+
+function startCountdown(targetDate){
+  function tick(){
+    var now=new Date(),diff=targetDate-now;
+    if(diff<=0){diff=0;clearInterval(iv)}
+    var d=Math.floor(diff/864e5),h=Math.floor((diff%864e5)/36e5),m=Math.floor((diff%36e5)/6e4),s=Math.floor((diff%6e4)/1e3);
+    $('cd-days').textContent=d<10?'0'+d:d;
+    $('cd-hours').textContent=h<10?'0'+h:h;
+    $('cd-mins').textContent=m<10?'0'+m:m;
+    $('cd-secs').textContent=s<10?'0'+s:s;
+  }
+  tick();
+  var iv=setInterval(tick,1000);
+}
+
+window.switchForm=function(type){
+  var tabs=document.querySelectorAll('.f7-auth-tab');
+  var panels=document.querySelectorAll('.f7-auth-panel');
+  tabs.forEach(function(t){t.classList.remove('f7-auth-active')});
+  panels.forEach(function(p){p.classList.remove('f7-panel-active')});
+  if(type==='registro'){
+    $('f7-tab-registro').classList.add('f7-auth-active');
+    $('f7-panel-registro').classList.add('f7-panel-active');
+  }else{
+    $('f7-tab-recuperar').classList.add('f7-auth-active');
+    $('f7-panel-recuperar').classList.add('f7-panel-active');
+  }
+  log('Form switch: '+type,'DEBUG');
+};
+
+window.switchBoleto=function(tipo){
+  var tabs=document.querySelectorAll('.f7-tab-btn');
+  var panels=document.querySelectorAll('.f7-ticketing-panel');
+  tabs.forEach(function(t){t.classList.remove('f7-tab-active')});
+  panels.forEach(function(p){p.classList.remove('f7-panel-active')});
+  if(tipo==='preventa'){
+    $('f7-tab-preventa').classList.add('f7-tab-active');
+    $('f7-panel-preventa').classList.add('f7-panel-active');
+  }else{
+    $('f7-tab-taquilla').classList.add('f7-tab-active');
+    $('f7-panel-taquilla').classList.add('f7-panel-active');
+  }
+  log('Boleto switch: '+tipo,'DEBUG');
+};
+
+function initF7(){
+  log('initF7() INICIO','TIME');
+  var t0=performance.now();
+
+  var slug=new URLSearchParams(location.search).get('slug');
+  if(!slug){log('Sin slug — modo demo','WARN');renderDemo();return}
+
+  log('Slug: '+slug,'INFO');
+
+  sb.from('eventos').select('*, organizaciones(nombre)').eq('slug',slug).single()
+  .then(function(res){
+    if(res.error){log('Query error: '+res.error.message,'ERROR');renderDemo();return}
+    var ev=res.data;
+    log('Evento cargado: '+ev.nombre,'LINK');
+    renderEvent(ev);
+    log('initF7() completo','TIME');
+    log('Renderizado en '+(performance.now()-t0).toFixed(1)+'ms','TIME');
+  })
+  .catch(function(err){log('Fallo crítico: '+err.message,'ERROR');renderDemo()});
+}
+
+function renderEvent(ev){
+  var content=ev.config_landing&&ev.config_landing.content||{};
+
+  document.title=ev.nombre+' — Hostal Terraza';
+
+  // Hero background
+  if(ev.imagen_url){
+    $('f7-hero-bg').style.backgroundImage='url('+ev.imagen_url+')';
+    log('Hero image: OK','LINK');
+  }else{
+    $('f7-hero-bg').style.backgroundImage='linear-gradient(135deg,var(--purple) 0%,var(--bg-primary) 100%)';
+    log('Hero image: fallback gradient','TRACE');
+  }
+
+  // Meta
+  $('event-badge-text').textContent=ev.nombre.toUpperCase();
+  if(ev.fecha)$('meta-fecha').textContent=ev.fecha.toUpperCase();
+  if(ev.hora)$('meta-hora').textContent=ev.hora.toUpperCase();
+  if(ev.ubicacion)$('meta-lugar').textContent=ev.ubicacion.toUpperCase();
+
+  // Title split
+  var nameParts=ev.nombre.split(' ');
+  if(nameParts.length>1){
+    $('hero-title-line1').textContent=nameParts.slice(0,-1).join(' ').toUpperCase();
+    $('hero-title-line2').textContent=nameParts[nameParts.length-1].toUpperCase();
+  }else{
+    $('hero-title-line1').textContent=ev.nombre.toUpperCase();
+    $('hero-title-line2').textContent='';
+  }
+
+  // Countdown
+  var target=parseSpanishDate(ev.fecha,ev.hora);
+  if(target){startCountdown(target);log('Countdown activo','INFO')}
+
+  // Color accent
+  if(ev.color_primario){
+    document.documentElement.style.setProperty('--master-accent',ev.color_primario);
+    log('Color accent: '+ev.color_primario,'LINK');
+  }
+
+  // Stats
+  if(content.objetivo_meta){
+    var meta=parseInt(content.objetivo_meta)||0;
+    var actual=parseInt(content.objetivo_actual)||0;
+    var donantes=parseInt(content.objetivo_donantes)||0;
+    var pct=meta>0?Math.round((actual/meta)*100):0;
+    $('db-objetivo-recaudado').textContent='$'+actual.toLocaleString('es-CO');
+    $('db-objetivo-meta').textContent='$'+meta.toLocaleString('es-CO');
+    $('db-objetivo-donantes').textContent=donantes;
+    $('db-objetivo-pct').textContent=pct+'%';
+    $('db-objetivo-barra').style.width=pct+'%';
+    log('Stats: recaudado='+actual+' meta='+meta,'TRACE');
+  }
+
+  // Metadata
+  if(content.dresscode)$('db-dress-val').textContent=content.dresscode;
+  if(content.guest_list)$('db-guest-val').textContent=content.guest_list;
+  if(ev.aforo_max)$('db-aforo-val').textContent=ev.aforo_max+' Personas';
+
+  // Lineup
+  renderLineup(content.dj_lineup);
+
+  // Gallery
+  renderGallery(content.gallery,ev.video_url||content.trailer_url);
+
+  // FAQ
+  renderFAQ(content.faq);
+
+  // Map
+  if(ev.ubicacion){
+    var mapsUrl='https://www.google.com/maps?q='+encodeURIComponent(ev.ubicacion);
+    var wazeUrl='https://www.waze.com/ul?q='+encodeURIComponent(ev.ubicacion);
+    $('f7-maps-btn').href=mapsUrl;
+    $('f7-waze-btn').href=wazeUrl;
+    $('db-mapa-container').innerHTML='<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.5!2d-74.05!3d4.67!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDAnMTIuMCJOIDc0wrAwMycwMC4wIlc!5e0!3m2!1ses!2sco!4v1" width="100%" height="100%" style="border:0;filter:grayscale(1) invert(1) brightness(0.8) contrast(1.2);" allowfullscreen loading="lazy"></iframe>';
+    log('Mapa: OK','LINK');
+  }
+
+  // WhatsApp
+  if(content.whatsapp){
+    var phone=content.whatsapp.replace(/[^0-9]/g,'');
+    $('db-whatsapp-btn').href='https://wa.me/'+phone;
+    log('WhatsApp: '+phone,'LINK');
+  }
+
+  // Tickets
+  if(content.boletos){
+    var b=content.boletos;
+    if(b.preventa)$('db-boletos-preventa').innerHTML='<span class="f7-tkt-status-label">ESTADO:</span><span class="f7-tkt-status-value">'+b.preventa+'</span>';
+    if(b.taquilla)$('db-boletos-taquilla').innerHTML='<span class="f7-tkt-status-label">ESTADO:</span><span class="f7-tkt-status-value">'+b.taquilla+'</span>';
+  }
+
+  // Footer social
+  if(content.contacto){
+    var links=document.querySelectorAll('.f7-social-link');
+    if(content.contacto.email)links[0]&&(links[0].href='mailto:'+content.contacto.email);
+  }
+
+  // Activate all modules
+  var mods=document.querySelectorAll('section,header,footer');
+  mods.forEach(function(m){m.style.display=''});
+  $('main-content-flow')&&($('main-content-flow').style.display='');
+
+  // Reveal animations
+  setupReveal();
+
+  // Hide loader
+  $('f7-loader').style.display='none';
+  log('All modules rendered','LINK');
+}
+
+function renderLineup(lineup){
+  var container=$('db-lineup');
+  if(!lineup){container.innerHTML='<p style="color:var(--yellow);text-align:center;padding:40px;">LINEUP POR CONFIRMAR</p>';return}
+
+  var artists=[];
+  if(typeof lineup==='string'){
+    artists=lineup.split(',').map(function(n){return{name:n.trim(),genre:'',time:'',stage:''}});
+  }else if(Array.isArray(lineup)){
+    artists=lineup;
+  }
+
+  var html='';
+  artists.forEach(function(a,i){
+    var name=a.nombre||a.name||a;
+    var genre=a.genero||a.genre||'';
+    var time=a.horario||a.time||'';
+    var stage=a.escenario||a.stage||'all';
+    var photo=a.foto||a.photo||a.foto_url||'';
+    html+='<div class="f7-artist-card" data-stage="'+stage+'">';
+    if(photo){
+      html+='<div class="f7-artist-img"><img src="'+photo+'" alt="'+name+'" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=f7-artist-placeholder>♪</div>\'"></div>';
+    }else{
+      html+='<div class="f7-artist-img"><div class="f7-artist-placeholder">♪</div></div>';
+    }
+    html+='<div class="f7-artist-info">';
+    html+='<h4 class="f7-artist-name">'+name.toUpperCase()+'</h4>';
+    if(genre)html+='<span class="f7-artist-genre">'+genre.toUpperCase()+'</span>';
+    if(time)html+='<span class="f7-artist-time">'+time+'</span>';
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  log('Lineup: '+artists.length+' artistas','LINK');
+
+  // Filters
+  document.querySelectorAll('.f7-filter-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.f7-filter-btn').forEach(function(b){b.classList.remove('f7-filter-active')});
+      btn.classList.add('f7-filter-active');
+      var filter=btn.dataset.filter;
+      document.querySelectorAll('.f7-artist-card').forEach(function(card){
+        if(filter==='all'||card.dataset.stage===filter||card.dataset.stage===''){
+          card.style.display='';
+        }else{
+          card.style.display='none';
+        }
+      });
+    });
+  });
+}
+
+function renderGallery(gallery,videoUrl){
+  var grid=$('db-gallery-grid');
+  var images=(gallery||[]).slice(0,8);
+  var html='';
+  images.forEach(function(url,i){
+    html+='<div class="f7-gallery-item'+(i===0?' f7-gallery-large':'')+'">';
+    html+='<img src="'+url+'" alt="Galería '+(i+1)+'" loading="lazy" onclick="window.__f7Lightbox(this.src)" onerror="this.parentElement.style.display=\'none\'">';
+    html+='</div>';
+  });
+  grid.innerHTML=html||'<p style="color:var(--yellow);text-align:center;grid-column:1/-1;padding:40px;">GALERÍA PRÓXIMAMENTE</p>';
+  log('Gallery: '+images.length+' imágenes','LINK');
+
+  // Video
+  if(videoUrl){
+    var videoContainer=$('db-video-content');
+    if(videoUrl.includes('youtube')||videoUrl.includes('youtu.be')){
+      var vid=videoUrl.match(/(?:v=|youtu\.be\/)([^&?]+)/);
+      if(vid){
+        videoContainer.innerHTML='<div class="f7-video-embed"><iframe src="https://www.youtube.com/embed/'+vid[1]+'" frameborder="0" allowfullscreen loading="lazy"></iframe></div>';
+      }
+    }else if(videoUrl.includes('vimeo')){
+      var vid2=videoUrl.match(/vimeo\.com\/(\d+)/);
+      if(vid2){
+        videoContainer.innerHTML='<div class="f7-video-embed"><iframe src="https://player.vimeo.com/video/'+vid2[1]+'" frameborder="0" allowfullscreen loading="lazy"></iframe></div>';
+      }
+    }else{
+      videoContainer.innerHTML='<div class="f7-video-embed"><iframe src="'+videoUrl+'" frameborder="0" allowfullscreen loading="lazy"></iframe></div>';
+    }
+    log('Video: OK','LINK');
+  }else{
+    $('f7-video-trigger').addEventListener('click',function(){
+      log('No video disponible','TRACE');
+    });
+  }
+}
+
+function renderFAQ(faq){
+  var container=$('db-faq-list');
+  if(!faq){
+    container.innerHTML='<p style="color:var(--yellow);text-align:center;padding:40px;">PRÓXIMAMENTE</p>';
+    return;
+  }
+  var items=[];
+  if(typeof faq==='string'){
+    items=faq.split('|').map(function(q){return{q:q.trim(),a:'Consulta con nosotros para más información.'}});
+  }else if(Array.isArray(faq)){
+    items=faq;
+  }
+  var html='';
+  items.forEach(function(item,i){
+    var question=item.q||item.pregunta||item;
+    var answer=item.a||item.respuesta||'';
+    html+='<div class="f7-faq-item" onclick="this.classList.toggle(\'f7-faq-open\')">';
+    html+='<div class="f7-faq-question">';
+    html+='<span>'+question+'</span>';
+    html+='<span class="f7-faq-toggle">+</span>';
+    html+='</div>';
+    html+='<div class="f7-faq-answer">'+answer+'</div>';
+    html+='</div>';
+  });
+  container.innerHTML=html;
+  log('FAQ: '+items.length+' preguntas','LINK');
+}
+
+function setupReveal(){
+  var observer=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}
+    });
+  },{threshold:0.1});
+  document.querySelectorAll('.f7-section-header,.f7-highlight-block,.f7-stats-terminal,.f7-meta-card,.f7-ticket-card,.f7-gallery-item,.f7-artist-card,.f7-faq-item,.f7-whatsapp-inner,.f7-donation-inner').forEach(function(el){
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+}
+
+// Ticket quantity
+document.addEventListener('click',function(e){
+  var btn=e.target.closest('.f7-qty-btn');
+  if(!btn||btn.disabled)return;
+  var action=btn.dataset.action;
+  var card=btn.closest('.f7-ticket-card');
+  var display=card.querySelector('.f7-qty-value');
+  var val=parseInt(display.textContent)||0;
+  if(action==='plus')val++;
+  else if(action==='minus'&&val>0)val--;
+  display.textContent=val;
+});
+
+// Mobile menu
+var hamburger=$('f7-hamburger');
+var mobileMenu=$('f7-mobile-menu');
+hamburger.addEventListener('click',function(){
+  hamburger.classList.toggle('f7-ham-open');
+  mobileMenu.classList.toggle('f7-mobile-open');
+});
+document.querySelectorAll('.f7-mobile-link,.f7-mobile-cta').forEach(function(link){
+  link.addEventListener('click',function(){
+    hamburger.classList.remove('f7-ham-open');
+    mobileMenu.classList.remove('f7-mobile-open');
+  });
+});
+
+// Header scroll effect
+var header=$('f7-header');
+window.addEventListener('scroll',function(){
+  if(window.scrollY>80){header.classList.add('f7-header-scrolled')}
+  else{header.classList.remove('f7-header-scrolled')}
+});
+
+// Lightbox
+window.__f7Lightbox=function(src){
+  $('f7-modal-content').innerHTML='<img src="'+src+'" alt="Galería">';
+  $('f7-modal').classList.add('f7-modal-open');
+};
+$('f7-modal-close').addEventListener('click',function(){
+  $('f7-modal').classList.remove('f7-modal-open');
+});
+$('f7-modal').addEventListener('click',function(e){
+  if(e.target===this)$('f7-modal').classList.remove('f7-modal-open');
+});
+
+// Demo render when no DB
+function renderDemo(){
+  log('Modo demo activado','WARN');
+  startCountdown(new Date(Date.now()+864e5*23+36e5*8+6e4*34+1e3*57));
+  $('f7-hero-bg').style.backgroundImage='linear-gradient(135deg,var(--purple) 0%,var(--bg-primary) 50%,#1a0a2e 100%)';
+  renderLineup([
+    {nombre:'KABZA DE SMALL',genero:'AMAPIANO',horario:'22:00 — 00:00',stage:'terrazza',foto:''},
+    {nombre:'DJ MAPHORISA',genero:'AFRO-HOUSE',horario:'00:00 — 02:00',stage:'terrazza',foto:''},
+    {nombre:'UNCLE WAFFLES',genero:'AMAPIANO',horario:'20:00 — 22:00',stage:'tropical',foto:''},
+    {nombre:'BLACK COFFEE',genero:'DEEP HOUSE',horario:'23:00 — 01:00',stage:'headliner',foto:''},
+    {nombre:'FUEGO',genero:'DANCEHALL',horario:'21:00 — 23:00',stage:'tropical',foto:''},
+    {nombre:'SILVIA SUAREZ',genero:'AFROBEATS',horario:'19:00 — 21:00',stage:'terrazza',foto:''}
+  ]);
+  renderFAQ([
+    {q:'¿Cuál es la edad mínima de ingreso?',a:'El evento es para mayores de 18 años. Se requiere documento de identidad vigente.'},
+    {q:'¿Cuál es el código de vestimenta?',a:'Tropical y colorido. Se recomienda ropa ligera, colores vibrantes y calzado cómodo.'},
+    {q:'¿Cuál es la política de reembolsos?',a:'No se realizan reembolsos una vez adquirida la entrada. Puedes transferir tu entrada a otra persona con previa notificación.'}
+  ]);
+  var mods=document.querySelectorAll('section,header,footer');
+  mods.forEach(function(m){m.style.display=''});
+  $('f7-loader').style.display='none';
+  setupReveal();
+  log('Demo renderizado','LINK');
+}
+
+// Boot
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initF7);
+}else{
+  initF7();
+}
+
+})();
+</script>
+
+</body>
+</html>

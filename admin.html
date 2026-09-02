@@ -767,6 +767,10 @@ tr:hover td{background:var(--surface)}
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9f1c;box-shadow:0 0 8px #ff9f1c"></div><span style="font-size:12px;font-weight:600;color:#ffb84d">P10 · Afromango Editor</span></div>
               <div style="font-size:10px;color:#a89b85">Editorial Oscura · Vervee x Deep End · Aurora</div>
             </div>
+            <div class="ld-theme-card" data-theme="tropical-brutalism" onclick="seleccionarTheme('tropical-brutalism')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#090909,#171020)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#F4D000;box-shadow:0 0 8px #F4D000"></div><span style="font-size:12px;font-weight:600;color:#F4D000">P11 · Tropical Brutalism</span></div>
+              <div style="font-size:10px;color:#7B2CFF">Festival Afro-Caribeño · Afromango · Poster Brutalista</div>
+            </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
@@ -2446,7 +2450,7 @@ const _THEME_TYPE = {
   'neon-cult-cine':'cinematografia','interactive-cine':'cinematografia',
   'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
   'underground':'fiesta','elegant-cocktail':'fiesta','afromango':'fiesta',
-  'afromango-editor':'fiesta',
+  'afromango-editor':'fiesta','tropical-brutalism':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
 };
@@ -2456,6 +2460,7 @@ const _THEME_TYPE = {
 const _THEME_TPL = {
   'afromango':'f5',
   'afromango-editor':'f6',
+  'tropical-brutalism':'f7',
 };
 
 // Reverse map template_id → theme slug (para cargar la plantilla al editar).
@@ -2463,6 +2468,16 @@ const _TPL_THEME = Object.keys(_THEME_TPL).reduce((acc, theme) => {
   acc[_THEME_TPL[theme]] = theme;
   return acc;
 }, {});
+
+// Enruta el link público según el silo asignado. F7 es un motor independiente
+// (f7.html), el resto usa el orquestador maestro evento.html.
+function landingUrl(ev) {
+  const tpl = (ev.template_id || '').toLowerCase();
+  const cfgTheme = ev.config_landing && ev.config_landing.theme;
+  const via = (cfgTheme && _THEME_TPL[cfgTheme]) || '';
+  const base = (tpl === 'f7' || via === 'f7') ? '/f7.html' : '/evento.html';
+  return window.location.origin + base + '?' + (ev.slug ? 'slug=' + ev.slug : 'id=' + ev.id);
+}
 
 function seleccionarTheme(theme) {
   _ldThemeSeleccionado = theme;
@@ -2498,6 +2513,7 @@ function seleccionarTheme(theme) {
     'underground':'P7 · Underground','elegant-cocktail':'P8 · Elegant Cocktail',
     'afromango':'P9 · Afromango',
   'afromango-editor':'P10 · Afromango Editor',
+    'tropical-brutalism':'P11 · Tropical Brutalism',
     'solidario-moderno':'P9 · Solidario Moderno','urgente-impactante':'P10 · Urgente & Impactante',
     'tech-futurista':'P11 · Tech & Futurista','vintage-organico':'P12 · Vintage & Orgánico',
   };
@@ -3581,7 +3597,7 @@ function renderEventos() {
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
         ${sesiones.map(s => {
-          const link = window.location.origin + '/evento.html?slug=' + (s.slug||s.id);
+          const link = landingUrl(s);
           return `<div style="display:flex;align-items:center;gap:8px;padding:.45rem .75rem;background:var(--surface);border-radius:var(--rsm)">
             <span style="width:22px;height:22px;background:var(--gold-bg);color:var(--gold-d);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0">${s.sesion_num}</span>
             <span style="flex:1;font-size:13px;font-weight:500">${s.fecha||'—'}${s.hora?' · '+s.hora:''}</span>
@@ -3597,9 +3613,7 @@ function renderEventos() {
 
   // Mostrar eventos sueltos
   sueltos.forEach(e => {
-    const pubLink = e.slug
-      ? window.location.origin + '/evento.html?slug=' + e.slug
-      : window.location.origin + '/evento.html?id=' + e.id;
+    const pubLink = landingUrl(e);
     html.push(`<div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.6rem">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
@@ -3937,7 +3951,7 @@ async function guardarEventoWizard() {
     const { error } = await SB.from('eventos').update(payload).eq('id', id);
     if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
 
-    const pubLink = prevSlug ? window.location.origin + '/evento.html?slug=' + prevSlug : '';
+    const pubLink = prevSlug ? landingUrl({ ...(_eventos.find(e => e.id === id) || {}), slug: prevSlug }) : '';
     alrt('ev-alert', `✓ Evento actualizado correctamente.${pubLink ? ` <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>` : ''}`, 'ok');
     cancelarEdicion();
     loadEventos();
@@ -4941,7 +4955,8 @@ async function _crearEventoUnico(n) {
 
   if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
 
-  const pubLink = window.location.origin + '/evento.html?slug=' + slug;
+  const _tplCreado = (_THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || '').toLowerCase();
+  const pubLink = landingUrl({ template_id: _tplCreado, slug: slug });
   alrt('ev-alert',`✓ Evento "${n}" creado. <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>`,'ok');
 
   ['ev-n','ev-f','ev-h','ev-d','ev-ubic','ev-img','ev-aforo','ev-video'].forEach(i=>{const el=document.getElementById(i);if(el)el.value=''});
