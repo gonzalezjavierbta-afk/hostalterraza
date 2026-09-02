@@ -788,133 +788,103 @@
 /* ==========================================================================
    14. BOLETOS — Pestañas preventa/taquilla editoriales + tarjetas precio
    ========================================================================== */
+/* ==========================================================================
+   11. BOLETOS — Diseño compacto vertical (ref: boleteria.jpg, v223)
+   ========================================================================== */
 .tpl-f6 #mod-boletos {
-    padding: 4.5rem 8%;
+    padding: 3.5rem 8%;
 }
 
-.tpl-f6 .boleto-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 0.4rem;
-    margin-bottom: 2.6rem;
-    border-bottom: 1px solid var(--f6-line);
-}
-
-.tpl-f6 .boleto-tab {
-    padding: 0.95rem 2.4rem;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
+.tpl-f6 .boleto-subtitle {
+    font-size: 0.8rem;
     color: var(--f6-text-muted);
-    font-family: var(--f6-font);
-    font-weight: 800;
-    font-size: 0.7rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: -1px;
-}
-
-.tpl-f6 .boleto-tab.active,
-.tpl-f6 .boleto-tab:hover {
-    color: var(--f6-accent-glow);
-    border-bottom-color: var(--f6-accent-ember);
+    letter-spacing: 0.08em;
+    margin-top: -1.8rem;
+    margin-bottom: 2rem;
 }
 
 .tpl-f6 .boleto-cards-wrap {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.4rem;
-    max-width: 720px;
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    max-width: 420px;
     margin: 0 auto;
-}
-
-.tpl-f6 .boleto-card {
-    background: var(--f6-card-bg);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--f6-line);
-    border-top: 2px solid var(--f6-accent-ember);
-    border-radius: 1px;
-    padding: 2.2rem 1.8rem;
-    text-align: center;
-    position: relative;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
 }
 
-.tpl-f6 .boleto-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--f6-accent-ember);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), var(--f6-glow-soft);
+/* Fila de boleto */
+.tpl-f6 .boleto-card-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--f6-line);
+    transition: background 0.2s ease;
 }
 
+.tpl-f6 .boleto-card-row:last-child {
+    border-bottom: none;
+}
+
+.tpl-f6 .boleto-card-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Icono de boleto */
+.tpl-f6 .boleto-icon {
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
+/* Etiqueta de tipo */
 .tpl-f6 .boleto-tipo {
     font-family: var(--f6-font);
     font-weight: 800;
-    font-size: 0.62rem;
-    letter-spacing: 0.34em;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--f6-accent-glow);
-    display: block;
-    margin-bottom: 0.8rem;
 }
 
+/* Precio */
 .tpl-f6 .boleto-precio {
     font-family: var(--f6-font);
     font-weight: 900;
-    font-size: 2.6rem;
-    color: var(--f6-text-cream);
-    text-shadow: 0 0 22px rgba(255, 159, 28, 0.4);
-    display: block;
-    margin: 0.6rem 0 0.4rem;
+    font-size: 1.6rem;
+    color: var(--tpl-white);
 }
 
-.tpl-f6 .boleto-desc {
-    font-size: 0.85rem;
-    color: var(--f6-text-muted);
-    line-height: 1.5;
-    margin-bottom: 1.4rem;
+/* Flecha */
+.tpl-f6 .boleto-arrow {
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.tpl-f6 .boleto-btn {
-    display: inline-flex;
+.tpl-f6 .boleto-card-row:hover .boleto-arrow {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+/* Mensaje de confianza */
+.tpl-f6 .boleto-trust {
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.95rem 2.2rem;
-    background: transparent;
-    color: var(--f6-accent-glow);
-    font-family: var(--f6-font);
-    font-weight: 900;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
     font-size: 0.7rem;
-    letter-spacing: 0.24em;
+    font-weight: 700;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    border: 1px solid var(--f6-accent-ember);
-    border-radius: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    color: var(--tpl-white);
+    opacity: 0.7;
 }
 
-.tpl-f6 .boleto-btn:hover {
-    background: var(--f6-accent-ember);
-    color: #0b0806;
-    box-shadow: var(--f6-glow-strong);
-}
-
-.tpl-f6 #db-boletos-preventa,
-.tpl-f6 #db-boletos-taquilla {
-    display: block !important;
-}
-
-/* v223 (f6): se muestran los DOS valores (preventa y taquilla) en dos líneas
-   apiladas, sin pestañas toggle. Se oculta el selector y se fuerza la pila. */
-.tpl-f6 .boleto-tabs {
-    display: none !important;
-}
-
-.tpl-f6 .boleto-cards-wrap {
-    grid-template-columns: 1fr !important;
-    max-width: 480px;
+.tpl-f6 .boleto-trust svg {
+    color: var(--tpl-orange);
 }
 
 /* ==========================================================================
