@@ -890,7 +890,11 @@ tr:hover td{background:var(--surface)}
             <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
 
             <!-- CAMPOS FIESTA -->
-            <div id="ld-campo-dj-lineup" style="display:none" class="fg"><label style="font-size:12px">DJ Lineup (uno por línea — formato: <code>Nombre|FotoURL|Reseña|Hora|Instagram|YouTube|TikTok</code>)</label><textarea id="ld-dj-lineup-val" rows="4" placeholder="ZARA KLYNE|https://foto.jpg|Silky vocals, warm presence|19:00|https://instagram.com/zara||https://tiktok.com/@zara&#10;MALIK RHO|https://foto2.jpg|Deep, steady grooves|20:00|https://instagram.com/malik||https://tiktok.com/@malik" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-dj-lineup" style="display:none" class="fg">
+              <label style="font-size:12px;font-weight:600;margin-bottom:8px;display:block">🎧 DJ Lineup — Artistas</label>
+              <div id="dj-lineup-entries" style="display:flex;flex-direction:column;gap:12px"></div>
+              <button type="button" id="dj-lineup-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Artista</button>
+            </div>
             <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
             <div id="ld-campo-guest-list" style="display:none" class="fg"><label style="font-size:12px">Instrucciones Guest List</label><input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario"></div>
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
@@ -2773,6 +2777,75 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
+// === DJ LINEUP FORM (v223) — Formulario dinámico con campos individuales ===
+(function() {
+  const container = document.getElementById('dj-lineup-entries');
+  const addBtn = document.getElementById('dj-lineup-add');
+  if (!container || !addBtn) return;
+
+  const socialFields = [
+    { key: 'instagram', label: 'Instagram', placeholder: 'https://instagram.com/...' },
+    { key: 'youtube', label: 'YouTube', placeholder: 'https://youtube.com/...' },
+    { key: 'tiktok', label: 'TikTok', placeholder: 'https://tiktok.com/@...' },
+    { key: 'web', label: 'Página Web', placeholder: 'https://...' },
+    { key: 'spotify', label: 'Spotify', placeholder: 'https://open.spotify.com/...' }
+  ];
+
+  function createEntry(data = {}) {
+    const idx = container.children.length;
+    const entry = document.createElement('div');
+    entry.className = 'dj-entry';
+    entry.style.cssText = 'padding:12px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--surface);position:relative';
+    
+    let socialInputs = socialFields.map(f => 
+      `<div style="flex:1;min-width:140px"><label style="font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em">${f.label}</label><input type="url" class="dj-social" data-key="${f.key}" value="${data[f.key] || ''}" placeholder="${f.placeholder}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rsm);font-size:11px;background:var(--surface);color:var(--ink1);margin-top:2px"></div>`
+    ).join('');
+
+    entry.innerHTML = `
+      <button type="button" class="dj-remove" style="position:absolute;top:8px;right:8px;background:none;border:none;color:var(--ink3);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px" title="Eliminar">✕</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div><label style="font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em">Nombre *</label><input type="text" class="dj-name" value="${data.nombre || ''}" placeholder="DJ Nombre" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rsm);font-size:12px;font-weight:600;background:var(--surface);color:var(--ink1);margin-top:2px"></div>
+        <div><label style="font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em">Hora</label><input type="text" class="dj-hora" value="${data.hora || ''}" placeholder="19:00" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rsm);font-size:12px;background:var(--surface);color:var(--ink1);margin-top:2px"></div>
+      </div>
+      <div style="margin-bottom:8px"><label style="font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em">Foto URL</label><input type="url" class="dj-foto" value="${data.foto || ''}" placeholder="https://..." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rsm);font-size:11px;font-family:monospace;background:var(--surface);color:var(--ink1);margin-top:2px"></div>
+      <div style="margin-bottom:8px"><label style="font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em">Reseña / Bio</label><textarea class="dj-resena" rows="2" placeholder="Breve descripción del artista..." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rsm);font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical;margin-top:2px">${data.resena || ''}</textarea></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">${socialInputs}</div>
+    `;
+
+    entry.querySelector('.dj-remove').addEventListener('click', () => {
+      entry.remove();
+    });
+
+    container.appendChild(entry);
+  }
+
+  addBtn.addEventListener('click', () => createEntry());
+
+  // Expose functions globally for loading/saving
+  window._djLineupGetEntries = () => {
+    return Array.from(container.querySelectorAll('.dj-entry')).map(entry => {
+      const dj = { nombre: entry.querySelector('.dj-name').value.trim() };
+      if (!dj.nombre) return null;
+      const foto = entry.querySelector('.dj-foto').value.trim();
+      const resena = entry.querySelector('.dj-resena').value.trim();
+      const hora = entry.querySelector('.dj-hora').value.trim();
+      if (foto) dj.foto = foto;
+      if (resena) dj.resena = resena;
+      if (hora) dj.hora = hora;
+      entry.querySelectorAll('.dj-social').forEach(input => {
+        const val = input.value.trim();
+        if (val) dj[input.dataset.key] = val;
+      });
+      return dj;
+    }).filter(Boolean);
+  };
+
+  window._djLineupSetEntries = (arr) => {
+    container.innerHTML = '';
+    if (Array.isArray(arr)) arr.forEach(d => createEntry(d));
+  };
+})();
+
 function _buildConfigLanding() {
   const activa = document.getElementById('ev-landing-activa')?.checked;
   if (!activa || !_ldThemeSeleccionado) return null;
@@ -2845,22 +2918,8 @@ function _buildConfigLanding() {
       trailer_url:    val('ld-trailer-url')      || null,
       dresscode:      val('ld-dresscode-val')    || null,
       // Fiesta
-      // v223: DJ Lineup con foto grande, hora y redes sociales. Formato por línea:
-      //   solo nombre  -> "DJ Foo"
-      //   completo      -> "DJ Foo|https://foto.jpg|Breve reseña|19:00|https://instagram.com/foo||https://tiktok.com/@foo"
-      // Retrocompat: sin '|' sigue siendo solo nombre (objeto {nombre, foto?}).
-      dj_lineup:   val('ld-dj-lineup-val') ? val('ld-dj-lineup-val').split('\n').map(l => {
-          const p = l.split('|').map(s => s.trim());
-          if (p.length <= 1) return { nombre: p[0] };
-          const dj = { nombre: p[0] };
-          if (p[1]) dj.foto = p[1];
-          if (p[2]) dj.resena = p[2];
-          if (p[3]) dj.hora = p[3];
-          if (p[4]) dj.instagram = p[4];
-          if (p[5]) dj.youtube = p[5];
-          if (p[6]) dj.tiktok = p[6];
-          return dj;
-        }).filter(d => d.nombre) : undefined,
+      // v223: DJ Lineup con formulario dinámico (campos individuales)
+      dj_lineup:   window._djLineupGetEntries ? window._djLineupGetEntries() : undefined,
       playlist_url:val('ld-playlist-url')   || null,
       guest_list:  val('ld-guest-list-val') || null,
       ubicacion:   val('ld-ubicacion-val')  || null,
@@ -3842,8 +3901,8 @@ function _poblarContenidoWizard(content, suf) {
     set('ld-boletos-taquilla', content.boletos.taquilla);
   }
   if (Array.isArray(content.dj_lineup)) {
-    set('ld-dj-lineup-val', content.dj_lineup.map(d => [d.nombre, d.foto, d.resena, d.hora, d.instagram, d.youtube, d.tiktok].filter(v => v != null && v !== '').join('|')).join('\n'));
-  } else { set('ld-dj-lineup-val', null); }
+    if (window._djLineupSetEntries) window._djLineupSetEntries(content.dj_lineup);
+  }
   // Galería / FAQ / Sponsors — id depende de la categoría activa
   if (Array.isArray(content.gallery) && content.gallery.length) {
     set(fiesta ? 'ld-gallery-fiesta-urls' : 'ld-gallery-urls', content.gallery.join('\n'));
