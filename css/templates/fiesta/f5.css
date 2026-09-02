@@ -1,0 +1,1351 @@
+/* ============================================================================
+   f5.css — SILO FIESTA F5 "AFROMANGO" CONSOLIDADO (v1.0.0, sep-2026)
+   Scoped atomic silo for the Afromango template (P9 · Etiqueta Afromango).
+   Breakpoints (mobile-first scale): BASE (<480) / 480 / 640 / 899 / 1024+ (desktop split 40vw|60vw).
+   Estética: Mango Amber (#ff9d00–#ffb020) on Dark Wood (#2a1810) + black accents.
+   Fonts: Geist 900 (titles/artists/digits/cards) + Afterglow (drop-shadow/glow).
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;700;800;900&display=swap');
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   ========================================================================== */
+.tpl-f5, .tpl-F5 {
+    --tpl-accent: var(--master-accent, #ff9d00);
+    --gold: var(--tpl-accent, #ff9d00);
+    --f5-bg-deep: #0e0a06;
+    --f5-bg-wood: #2a1810;
+    --f5-bg-warm: #1a110a;
+    --f5-text-main: #f5f0e8;
+    --f5-text-muted: #c4a87a;
+    --f5-card-bg: rgba(42, 24, 16, 0.8);
+    --f5-glow-soft: 0 0 15px var(--tpl-accent);
+    --f5-glow-strong: 0 0 25px var(--tpl-accent), 0 0 50px rgba(255, 157, 0, 0.3);
+    --f5-font: 'Geist', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(ellipse at 30% 10%, #2a1810 0%, #0e0a06 55%, #060301 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f5-text-main);
+    font-family: var(--f5-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Box-sizing global dentro del silo (ADR-019) */
+.tpl-f5 *, .tpl-F5 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f5 *::before, .tpl-F5 *::before {
+    box-sizing: border-box;
+}
+
+.tpl-f5 *::after, .tpl-F5 *::after {
+    box-sizing: border-box;
+}
+
+.tpl-f5 section, .tpl-F5 section {
+    padding: 5rem 10%;
+    border-bottom: 1px solid rgba(255, 157, 0, 0.08);
+}
+
+.tpl-f5 h2, .tpl-F5 h2 {
+    color: var(--tpl-accent);
+    font-family: var(--f5-font);
+    font-size: 0.8rem;
+    letter-spacing: 5px;
+    font-weight: 900;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255, 157, 0, 0.4);
+}
+
+/* ==========================================================================
+   2. ACTIVACIÓN ATÓMICA — display:flex en módulos vitales
+   ========================================================================== */
+/* Todas las secciones que Afromango enciende se declaran AQUÍ con display explícito,
+   porque el kernel IoC ("section, header, footer { display:none }") oculta todo por
+   defecto. Un grid-area por sí solo NO vuelve visible a un bloque display:none. */
+.tpl-f5 #mod-hero, .tpl-F5 #mod-hero,
+.tpl-f5 #mod-form, .tpl-F5 #mod-form,
+.tpl-f5 #mod-lineup, .tpl-F5 #mod-lineup,
+.tpl-f5 #mod-playlist, .tpl-F5 #mod-playlist,
+.tpl-f5 #unified-frame, .tpl-F5 #unified-frame {
+    display: flex !important;
+}
+
+.tpl-f5 #mod-hero-meta, .tpl-F5 #mod-hero-meta,
+.tpl-f5 #mod-video, .tpl-F5 #mod-video,
+.tpl-f5 #mod-boletos, .tpl-F5 #mod-boletos,
+.tpl-f5 #mod-info-tecnica, .tpl-F5 #mod-info-tecnica,
+.tpl-f5 #mod-faq, .tpl-F5 #mod-faq,
+.tpl-f5 #mod-ubicacion, .tpl-F5 #mod-ubicacion,
+.tpl-f5 #mod-sponsors, .tpl-F5 #mod-sponsors,
+.tpl-f5 #mod-whatsapp, .tpl-F5 #mod-whatsapp {
+    display: block !important;
+}
+
+.tpl-f5 #mod-footer, .tpl-F5 #mod-footer {
+    display: block !important;
+}
+
+.tpl-f5 #mod-hero-meta, .tpl-F5 #mod-hero-meta {
+    padding: 0 0 1rem;
+}
+
+.tpl-f5 #main-content-flow {
+    display: grid !important;
+}
+
+/* ==========================================================================
+   3. GRID ATÓMICO — Mobile-first (columna única) / Desktop split 40vw|60vw
+   ========================================================================== */
+.tpl-f5 #main-content-flow {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "countdown"
+        "meta"
+        "video"
+        "lineup"
+        "playlist"
+        "boletos"
+        "info"
+        "faq"
+        "ubicacion"
+        "sponsors"
+        "whatsapp"
+        "form"
+        "footer";
+    row-gap: 0;
+    width: 100%;
+}
+
+.tpl-f5 #mod-hero         { grid-area: hero; }
+.tpl-f5 #unified-frame    { grid-area: countdown; }
+.tpl-f5 #mod-hero-meta    { grid-area: meta; }
+.tpl-f5 #mod-video        { grid-area: video; }
+.tpl-f5 #mod-lineup       { grid-area: lineup; }
+.tpl-f5 #mod-playlist     { grid-area: playlist; }
+.tpl-f5 #mod-info-tecnica { grid-area: info; }
+.tpl-f5 #mod-faq          { grid-area: faq; }
+.tpl-f5 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f5 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f5 #mod-form         { grid-area: form; }
+.tpl-f5 #mod-footer       { grid-area: footer; }
+/* Módulos nuevos: Grid area reservado, se activan cuando el JS los inyecte */
+.tpl-f5 #mod-boletos      { grid-area: boletos; }
+.tpl-f5 #mod-whatsapp     { grid-area: whatsapp; }
+
+/* Desktop split 40vw | 60vw */
+@media (min-width: 1024px) {
+    .tpl-f5 #main-content-flow {
+        grid-template-columns: 40vw 60vw;
+        grid-template-areas:
+            "hero countdown"
+            "hero meta"
+            "hero video"
+            "hero lineup"
+            "hero playlist"
+            "hero boletos"
+            "hero info"
+            "hero faq"
+            "hero ubicacion"
+            "hero sponsors"
+            "hero whatsapp"
+            "hero form"
+            "hero footer";
+    }
+}
+
+/* ==========================================================================
+   4. #MOD-HERO — Panel izquierdo fijo desktop / mobile-first
+   ========================================================================== */
+.tpl-f5 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 12vh;
+    background-size: cover !important;
+    background-position: center !important;
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+@media (max-width: 1023px) {
+    .tpl-f5 #mod-hero {
+        padding-top: 8vh !important;
+        min-height: 55vh !important;
+        display: flex !important;
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 899px) {
+    .tpl-f5 #mod-hero {
+        min-height: 70vh !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .tpl-f5 #mod-hero {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        width: 40vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 4rem 2.5rem !important;
+        z-index: 10;
+        text-align: left !important;
+    }
+}
+
+/* ==========================================================================
+   5. #EVENT-TITLE — Geist 900 + Afterglow Mango
+   ========================================================================== */
+@media (min-width: 1024px) {
+    .tpl-f5 #event-title {
+        font-family: var(--f5-font);
+        font-weight: 900 !important;
+        font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
+        line-height: 1.1;
+        margin: 0;
+        max-width: 90%;
+        text-shadow: 0 0 20px var(--tpl-accent), 0 0 40px rgba(255, 157, 0, 0.4);
+    }
+}
+
+@media (max-width: 1023px) {
+    .tpl-f5 #event-title {
+        text-align: center !important;
+        width: 100%;
+        font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
+        font-weight: 900 !important;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        text-shadow: 0 0 22px var(--tpl-accent), 0 0 45px rgba(255, 157, 0, 0.35) !important;
+        margin-bottom: 2rem !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .tpl-f5 #event-title {
+        font-size: clamp(2rem, 8vw, 3.2rem) !important;
+        padding: 0 1rem;
+        word-wrap: break-word;
+    }
+}
+
+/* ==========================================================================
+   6. #MOD-FORM — Panel overlay (desktop) / mobile-first
+   ========================================================================== */
+.tpl-f5 .form-master-box {
+    background: var(--f5-card-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--tpl-accent);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 157, 0, 0.2);
+    max-width: 550px;
+    margin: 2rem auto 0;
+}
+
+@media (min-width: 1024px) {
+    .tpl-f5 #mod-form {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        width: 40vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        padding: 3rem 2.5rem !important;
+        background: transparent !important;
+        z-index: 100;
+        pointer-events: none;
+        justify-content: center;
+        align-items: flex-end;
+        padding-bottom: 3.5rem;
+    }
+    .tpl-f5 #mod-form .form-master-box {
+        pointer-events: auto;
+        max-width: 400px !important;
+        padding: 2rem !important;
+        border-radius: 22px !important;
+        margin: 0 !important;
+        backdrop-filter: blur(20px) !important;
+        background: rgba(42, 24, 16, 0.9) !important;
+        border: 1px solid var(--tpl-accent) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 157, 0, 0.25) !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    .tpl-f5 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f5 .form-master-box {
+        margin-top: -20vh !important;
+        background: rgba(42, 24, 16, 0.92) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid var(--tpl-accent);
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+    }
+}
+
+@media (max-width: 400px) {
+    .tpl-f5 .form-master-box {
+        margin: -5vh 1rem 2rem !important;
+        padding: 2rem 1.5rem !important;
+        width: calc(100% - 2rem) !important;
+    }
+}
+
+/* ==========================================================================
+   7. FORMULARIO — Inputs, Botones, Tabs
+   ========================================================================== */
+.tpl-f5 .form-input, .tpl-f5 #reg-nombre,
+.tpl-f5 #reg-cedula, .tpl-f5 #rec-cedula {
+    width: 100%;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.2rem;
+    background: rgba(14, 10, 6, 0.85);
+    border: 1px solid rgba(255, 157, 0, 0.15);
+    border-radius: 14px;
+    color: #ffffff;
+    font-family: var(--f5-font);
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f5 .form-input:focus, .tpl-f5 #reg-nombre:focus,
+.tpl-f5 #reg-cedula:focus {
+    outline: none;
+    border-color: var(--tpl-accent);
+    box-shadow: 0 0 15px rgba(255, 157, 0, 0.35);
+}
+
+.tpl-f5 .btn-submit,
+.tpl-f5 #master-reg-form button[type="submit"] {
+    width: 100%;
+    padding: 1.4rem;
+    background: var(--tpl-accent);
+    color: #1a0e06;
+    font-family: var(--f5-font);
+    font-weight: 900;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(255, 157, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 .btn-submit:hover,
+.tpl-f5 #master-reg-form button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(255, 157, 0, 0.55);
+    filter: brightness(1.1);
+}
+
+@media (min-width: 1024px) {
+    .tpl-f5 .form-input, .tpl-f5 .btn-submit {
+        padding: 0.9rem 1.2rem !important;
+        font-size: 0.85rem !important;
+        margin-bottom: 0.8rem !important;
+    }
+    .tpl-f5 .form-tabs {
+        margin-bottom: 1.2rem !important;
+        gap: 1rem !important;
+    }
+}
+
+.tpl-f5 .form-tabs {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 157, 0, 0.15);
+}
+
+.tpl-f5 .tab-btn {
+    background: none;
+    border: none;
+    color: var(--f5-text-muted);
+    padding-bottom: 0.8rem;
+    cursor: pointer;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 .tab-btn.active {
+    color: var(--tpl-accent);
+    border-bottom: 2px solid var(--tpl-accent);
+}
+
+.tpl-f5 input[type="text"], .tpl-f5 input[type="tel"], .tpl-f5 select {
+    background: rgba(14, 10, 6, 0.7) !important;
+    border: 1px solid rgba(255, 157, 0, 0.12) !important;
+    color: #fff !important;
+    padding: 1.2rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+/* ==========================================================================
+   8. COUNTDOWN FRAME — Geist 900 + Afterglow Mango
+   ========================================================================== */
+.tpl-f5 .unified-countdown-frame,
+.tpl-f5 #unified-frame {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    justify-self: center;
+    margin-top: 7rem !important;
+    margin-bottom: 3rem;
+    width: fit-content;
+    max-width: 100%;
+    z-index: 5;
+    gap: 1.5rem;
+    padding: 1.5rem 2.5rem;
+    background: rgba(42, 24, 16, 0.7) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 157, 0, 0.25) !important;
+}
+
+.tpl-f5 .cd-block {
+    padding: 0 1.2rem;
+    border-right: 1px solid rgba(255, 157, 0, 0.2);
+    text-align: center;
+}
+
+.tpl-f5 .cd-block:last-child {
+    border-right: none;
+}
+
+/* Dígitos: Geist 900 + Afterglow Mango */
+.tpl-f5 [id^="cd-"] {
+    font-family: var(--f5-font) !important;
+    font-size: 2.2rem !important;
+    font-weight: 900 !important;
+    line-height: 1;
+    color: var(--f5-text-main) !important;
+    text-shadow: 0 0 18px var(--tpl-accent), 0 0 35px rgba(255, 157, 0, 0.4);
+}
+
+/* Labels countdown */
+.tpl-f5 .unified-countdown-frame small {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--f5-text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* Countdown responsive: ≤640px */
+@media (max-width: 640px) {
+    .tpl-f5 #unified-frame {
+        gap: 0.8rem !important;
+        padding: 1rem 1.2rem !important;
+        margin-top: 3rem !important;
+        margin-bottom: 1.5rem !important;
+        border-radius: 18px !important;
+    }
+    .tpl-f5 .cd-block {
+        padding: 0 0.7rem !important;
+    }
+    .tpl-f5 [id^="cd-"] {
+        font-size: 1.7rem !important;
+    }
+}
+
+/* Countdown responsive: ≤400px — flex-wrap 2x2 */
+@media (max-width: 400px) {
+    .tpl-f5 #unified-frame {
+        flex-wrap: wrap !important;
+        gap: 0.6rem !important;
+        padding: 0.8rem 1rem !important;
+        justify-content: center !important;
+    }
+    .tpl-f5 .cd-block {
+        padding: 0.3rem 0.5rem !important;
+        flex: 0 0 calc(50% - 0.6rem) !important;
+    }
+}
+
+/* Desktop countdown override */
+@media (min-width: 1024px) {
+    .tpl-f5 #unified-frame {
+        margin: 0 !important;
+        margin-top: 10vh !important;
+        padding: 2.5rem !important;
+        background: var(--f5-bg-deep, #0e0a06) !important;
+        border-radius: 0 !important;
+        border-bottom: 1px solid var(--tpl-accent);
+        display: flex !important;
+        justify-content: center;
+    }
+}
+
+/* ==========================================================================
+   9. HERO-META — Metadatos del evento
+   ========================================================================== */
+.tpl-f5 .hero-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 2rem 5rem;
+    margin: 4rem auto 2rem !important;
+    width: 100%;
+    max-width: 1100px;
+    justify-self: center;
+}
+
+.tpl-f5 .hero-meta > div,
+.tpl-f5 .meta-item {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--f5-font) !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    color: var(--f5-text-main) !important;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+/* Segunda línea: lugar — salto completo */
+.tpl-f5 .hero-meta > div:nth-child(3) {
+    flex-basis: 100% !important;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* Íconos SVG: 32px + Afterglow Mango */
+.tpl-f5 .meta-svg {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 1.5rem !important;
+    fill: var(--tpl-accent) !important;
+    filter: drop-shadow(0 0 20px rgba(255, 157, 0, 0.6));
+}
+
+/* Hero-meta responsive: ≤640px */
+@media (max-width: 640px) {
+    .tpl-f5 .hero-meta {
+        gap: 1rem 0.8rem !important;
+        padding: 0 0.5rem !important;
+        justify-content: center !important;
+        margin: 2rem auto 1rem !important;
+    }
+    .tpl-f5 .hero-meta > div,
+    .tpl-f5 .meta-item {
+        font-size: 0.9rem !important;
+        letter-spacing: 2px !important;
+    }
+    .tpl-f5 .meta-svg {
+        width: 22px !important;
+        height: 22px !important;
+        margin-right: 0.8rem !important;
+    }
+}
+
+/* Hero-meta responsive: ≤1023px */
+@media (max-width: 1023px) {
+    .tpl-f5 .hero-meta {
+        gap: 1.2rem 0.8rem !important;
+        padding: 0 0.5rem !important;
+        justify-content: center !important;
+    }
+}
+
+/* ==========================================================================
+   10. DATA CARDS — Tarjetas técnicas (Dresscode, Guest List, Aforo, Tickets)
+   ========================================================================== */
+.tpl-f5 .card-item {
+    background: var(--f5-card-bg, rgba(42, 24, 16, 0.8)) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--tpl-accent) !important;
+    border-radius: 25px !important;
+    padding: 2.2rem 1.8rem;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(255, 157, 0, 0.2) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.tpl-f5 .card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 35px rgba(255, 157, 0, 0.35) !important;
+}
+
+/* Geist 900 para valores de tarjetas */
+.tpl-f5 .card-item span[id*="-val"] {
+    font-family: var(--f5-font) !important;
+    font-weight: 900 !important;
+    font-size: 1.6rem;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(255, 157, 0, 0.5);
+    display: block;
+    margin-top: 0.4rem;
+}
+
+/* Labels de tarjetas */
+.tpl-f5 .data-label {
+    color: var(--tpl-accent);
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Contenedor grid de tarjetas */
+.tpl-f5 .data-cards-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+@media (max-width: 899px) {
+    .tpl-f5 .data-cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .tpl-f5 .data-cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+    }
+}
+
+/* ==========================================================================
+   11. LINEUP — Póster + Grid de artistas mejorado (reseña + botón perfil)
+   ========================================================================== */
+
+/* Contenedor maestro del lineup */
+.tpl-f5 #mod-lineup > div {
+    grid-template-columns: 1fr !important;
+    max-width: 800px !important;
+    margin: 0 auto;
+}
+
+/* Activación del contenedor del póster */
+.tpl-f5 #mod-lineup > div > div:first-child {
+    display: flex !important;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 4rem;
+}
+
+/* Póster real: #db-poster-img */
+.tpl-f5 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 400px;
+    border-radius: 28px;
+    border: 4px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 50px rgba(255, 157, 0, 0.35);
+    object-fit: cover;
+}
+
+/* Grid de artistas */
+.tpl-f5 .lineup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* Contenedor de artistas */
+.tpl-f5 #db-lineup {
+    padding-left: 0 !important;
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Fila de artista — estilo mejorado Afromango */
+.tpl-f5 .artist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.8rem;
+    padding: 1.5rem;
+    background: rgba(42, 24, 16, 0.5);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 157, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    flex-wrap: wrap;
+}
+
+.tpl-f5 .artist-item:hover {
+    background: rgba(42, 24, 16, 0.75);
+    border-color: var(--tpl-accent);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 18px rgba(255, 157, 0, 0.15);
+    transform: translateX(4px);
+}
+
+.tpl-f5 .artist-item:hover .artist-name {
+    color: var(--tpl-accent);
+    text-shadow: 0 0 12px rgba(255, 157, 0, 0.5);
+}
+
+/* Nombre del artista: Geist 900 + Afterglow */
+.tpl-f5 .artist-name {
+    font-family: var(--f5-font) !important;
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #ffffff;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Avatar circular con glow mango */
+.tpl-f5 .artist-avatar {
+    width: 70px;
+    height: 70px;
+    flex-shrink: 0;
+    border-radius: 50% !important;
+    border: 3px solid var(--tpl-accent) !important;
+    box-shadow: 0 0 18px rgba(255, 157, 0, 0.5);
+    object-fit: cover;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f5 .artist-item:hover .artist-avatar {
+    box-shadow: 0 0 28px rgba(255, 157, 0, 0.7);
+    transform: scale(1.05);
+}
+
+/* Reseña del artista (inyectada por JS) */
+.tpl-f5 .artist-resena {
+    flex-basis: 100%;
+    font-size: 0.85rem;
+    color: var(--f5-text-muted);
+    line-height: 1.5;
+    margin-top: 0.3rem;
+    padding-left: 0;
+}
+
+/* Botón "VER PERFIL" del artista (inyectado por JS) */
+.tpl-f5 .artist-perfil-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.4rem;
+    margin-top: 0.8rem;
+    background: transparent;
+    border: 1px solid var(--tpl-accent);
+    border-radius: 12px;
+    color: var(--tpl-accent);
+    font-family: var(--f5-font);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 .artist-perfil-btn:hover {
+    background: var(--tpl-accent);
+    color: #1a0e06;
+    box-shadow: 0 6px 20px rgba(255, 157, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Lineup responsive: ≤1023px */
+@media (max-width: 1023px) {
+    .tpl-f5 .lineup-grid {
+        grid-template-columns: 1fr !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        gap: 2rem !important;
+    }
+    .tpl-f5 .lineup-grid > div:first-child {
+        border-right: none !important;
+        padding-right: 0 !important;
+        padding-bottom: 1.5rem !important;
+        border-bottom: 1px solid rgba(255, 157, 0, 0.1);
+    }
+    .tpl-f5 .artist-name {
+        font-size: 1.8rem;
+    }
+}
+
+/* Lineup responsive: ≤640px */
+@media (max-width: 640px) {
+    .tpl-f5 .artist-name {
+        font-size: 1.25rem !important;
+    }
+    .tpl-f5 .artist-item {
+        gap: 0.9rem !important;
+        padding: 1rem !important;
+    }
+    .tpl-f5 .artist-avatar {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    .tpl-f5 #db-lineup {
+        gap: 1rem !important;
+    }
+    .tpl-f5 #db-poster-img {
+        border-radius: 16px !important;
+        border-width: 3px !important;
+    }
+}
+
+/* Desktop lineup override */
+@media (min-width: 1024px) {
+    .tpl-f5 #mod-lineup > div {
+        max-width: 1100px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+}
+
+/* Liberar padding de sección lineup */
+.tpl-f5 section#mod-lineup {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   12. BOLETOS — Pestañas preventa/taquilla + tarjetas de precio (NUEVO)
+   ========================================================================== */
+.tpl-f5 #mod-boletos {
+    padding: 4rem 5%;
+}
+
+/* Contenedor de pestañas */
+.tpl-f5 .boleto-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Pestañas individuales */
+.tpl-f5 .boleto-tab {
+    padding: 0.9rem 2.2rem;
+    background: rgba(42, 24, 16, 0.5);
+    border: 1px solid rgba(255, 157, 0, 0.15);
+    border-radius: 14px;
+    color: var(--f5-text-muted);
+    font-family: var(--f5-font);
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 .boleto-tab.active,
+.tpl-f5 .boleto-tab:hover {
+    background: var(--tpl-accent);
+    color: #1a0e06;
+    border-color: var(--tpl-accent);
+    box-shadow: 0 6px 22px rgba(255, 157, 0, 0.35);
+}
+
+/* Contenedor de tarjetas de precio */
+.tpl-f5 .boleto-cards-wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.8rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Tarjeta individual de boleto */
+.tpl-f5 .boleto-card {
+    background: var(--f5-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 157, 0, 0.2);
+    border-radius: 25px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tpl-f5 .boleto-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--tpl-accent), transparent);
+}
+
+.tpl-f5 .boleto-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--tpl-accent);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 157, 0, 0.25);
+}
+
+/* Precio en la tarjeta: Geist 900 + Afterglow */
+.tpl-f5 .boleto-precio {
+    font-family: var(--f5-font);
+    font-weight: 900;
+    font-size: 2.8rem;
+    color: var(--tpl-accent);
+    text-shadow: 0 0 20px rgba(255, 157, 0, 0.5);
+    display: block;
+    margin: 1rem 0 0.5rem;
+}
+
+/* Tipo de boleto (PREVENTA / TAQUILLA) */
+.tpl-f5 .boleto-tipo {
+    font-family: var(--f5-font);
+    font-weight: 900;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--tpl-accent);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Descripción del boleto */
+.tpl-f5 .boleto-desc {
+    font-size: 0.85rem;
+    color: var(--f5-text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+/* Botón de compra del boleto */
+.tpl-f5 .boleto-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.5rem;
+    background: var(--tpl-accent);
+    color: #1a0e06;
+    font-family: var(--f5-font);
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 157, 0, 0.35);
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 .boleto-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(255, 157, 0, 0.5);
+    filter: brightness(1.1);
+}
+
+/* Contenedores de datos (prevent/taquilla) ocultos por defecto */
+.tpl-f5 #db-boletos-preventa,
+.tpl-f5 #db-boletos-taquilla {
+    display: none;
+}
+
+/* ==========================================================================
+   13. VIDEO & PLAYLIST — Contenedores multimedia
+   ========================================================================== */
+.tpl-f5 #mod-video {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Sección video: edge-to-edge */
+.tpl-f5 section#mod-video,
+.tpl-f5 section#mod-playlist {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Contenedores internos: full-width */
+.tpl-f5 #mod-video > div:not(#db-gallery-grid),
+.tpl-f5 #mod-playlist > div {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.tpl-f5 #db-video-content {
+    background: #0a0603;
+    border-radius: 25px;
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 157, 0, 0.2);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+}
+
+.tpl-f5 #db-spotify-embed {
+    border-radius: 25px;
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    min-height: 400px;
+    height: 100%;
+}
+
+.tpl-f5 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+/* ==========================================================================
+   14. GALERÍA — Grid responsivo de imágenes
+   ========================================================================== */
+.tpl-f5 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 0.8rem;
+    padding: 0 2%;
+    margin-bottom: 3rem;
+}
+
+.tpl-f5 #db-gallery-grid img {
+    width: 100%;
+    border-radius: 14px;
+    object-fit: cover;
+    aspect-ratio: 1;
+    border: 2px solid rgba(255, 157, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.tpl-f5 #db-gallery-grid img:hover {
+    border-color: var(--tpl-accent);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 18px rgba(255, 157, 0, 0.3);
+    transform: scale(1.03);
+}
+
+@media (max-width: 640px) {
+    .tpl-f5 #db-gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 0.5rem !important;
+    }
+}
+
+/* ==========================================================================
+   15. FAQ, MAPA & PATROCINADORES
+   ========================================================================== */
+.tpl-f5 .faq-item {
+    border-bottom: 1px solid rgba(255, 157, 0, 0.08);
+    padding: 1.3rem 0;
+    cursor: pointer;
+}
+
+.tpl-f5 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f5-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.tpl-f5 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1.2rem !important;
+}
+
+.tpl-f5 #db-mapa-container {
+    border-radius: 25px;
+    overflow: hidden;
+    border: 1px solid var(--tpl-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.tpl-f5 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3.5rem;
+    padding: 2rem 0;
+}
+
+.tpl-f5 .sponsor-item {
+    background: rgba(42, 24, 16, 0.35);
+    padding: 1.2rem 2.2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 157, 0, 0.08);
+    transition: all 0.4s ease;
+}
+
+.tpl-f5 .sponsor-item:hover {
+    background: rgba(42, 24, 16, 0.6);
+    border-color: var(--tpl-accent);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 157, 0, 0.15);
+}
+
+.tpl-f5 .sponsor-img {
+    height: 42px;
+    width: auto;
+    opacity: 0.85;
+    transition: all 0.4s ease;
+}
+
+.tpl-f5 .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+/* ==========================================================================
+   16. WHATSAPP — Botón de contacto grande/llamativo (NUEVO)
+   ========================================================================== */
+.tpl-f5 #mod-whatsapp {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 5%;
+}
+
+.tpl-f5 .whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.2rem 3rem;
+    background: #25d366;
+    color: #ffffff;
+    font-family: var(--f5-font);
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.35), 0 0 20px rgba(37, 211, 102, 0.2);
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 .whatsapp-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(37, 211, 102, 0.5), 0 0 35px rgba(37, 211, 102, 0.3);
+    filter: brightness(1.1);
+}
+
+.tpl-f5 .whatsapp-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: #ffffff;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+}
+
+/* ==========================================================================
+   17. CONTRATO DE DATOS — Protección de módulos invisibles
+   ========================================================================== */
+.tpl-f5 #db-poster-img[style*="display:none"],
+.tpl-f5 #db-faq-list[style*="display:none"],
+.tpl-f5 #db-mapa-container[style*="display:none"],
+.tpl-f5 #db-sponsors-list[style*="display:none"],
+.tpl-f5 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   18. FOOTER — Estilo Afromango
+   ========================================================================== */
+.tpl-f5 #mod-footer {
+    background: var(--f5-bg-deep) !important;
+    border-top: 1px solid rgba(255, 157, 0, 0.12);
+}
+
+.tpl-f5 #mod-footer .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+.tpl-f5 #mod-footer .footer-brand {
+    flex: 1 1 250px;
+}
+
+.tpl-f5 #mod-footer .footer-brand span {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--tpl-accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255, 157, 0, 0.3);
+}
+
+.tpl-f5 #mod-footer .footer-brand p {
+    color: var(--f5-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.tpl-f5 #mod-footer .footer-col {
+    flex: 1 1 160px;
+}
+
+.tpl-f5 #mod-footer .footer-col h4 {
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--tpl-accent);
+    margin-bottom: 1rem;
+}
+
+.tpl-f5 #mod-footer .footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tpl-f5 #mod-footer .footer-col ul li {
+    margin-bottom: 0.6rem;
+}
+
+.tpl-f5 #mod-footer .footer-col ul li a {
+    color: var(--f5-text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+}
+
+.tpl-f5 #mod-footer .footer-col ul li a:hover {
+    color: var(--tpl-accent);
+}
+
+.tpl-f5 #mod-footer .footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.tpl-f5 #mod-footer .footer-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 157, 0, 0.2);
+    color: var(--f5-text-muted);
+    transition: all 0.3s ease;
+}
+
+.tpl-f5 #mod-footer .footer-social-icon:hover {
+    border-color: var(--tpl-accent);
+    color: var(--tpl-accent);
+    box-shadow: 0 0 12px rgba(255, 157, 0, 0.3);
+}
+
+.tpl-f5 #mod-footer .footer-contacto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--f5-text-muted);
+}
+
+.tpl-f5 #mod-footer .footer-bottom {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(255, 157, 0, 0.08);
+    font-size: 0.75rem;
+    color: var(--f5-text-muted);
+    opacity: 0.7;
+}
+
+/* ==========================================================================
+   19. RESPONSIVE MOBILE — Reordenamiento de grid y ajustes finos
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .tpl-f5 #main-content-flow {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "countdown"
+            "meta"
+            "video"
+            "lineup"
+            "playlist"
+            "boletos"
+            "info"
+            "faq"
+            "ubicacion"
+            "sponsors"
+            "whatsapp"
+            "form"
+            "footer" !important;
+        row-gap: 0 !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+    .tpl-f5 #mod-form {
+        grid-area: form !important;
+        z-index: 50 !important;
+    }
+    .tpl-f5 #main-content-flow {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}
+
+/* Línea divisoria video-póster anulada */
+@media (max-width: 1023px) {
+    .tpl-f5 #mod-lineup > div > div:first-child {
+        border-right: none !important;
+        padding-right: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* ============================================================================
+   LOG DE VERSIONES — Template f5 "Afromango"
+   ============================================================================
+| Versión  | Fecha      | Cambio                                                             | Estado |
+|----------|------------|--------------------------------------------------------------------|--------|
+| v1.0.0   | 01/09/2026 | Creación completa del silo Afromango desde f1 como base.           | [OK]   |
+|          |            | Estética mango/ámbar sobre madera oscura, Geist 900 + Afterglow.  |        |
+|          |            | Desktop split 40vw|60vw. Ámbito dual .tpl-f5/.tpl-F5.            |        |
+|          |            | Módulos nuevos: boletos (tabs+cards), whatsapp (botón glow),      |        |
+|          |            | artist-resena, artist-perfil-btn. Galería grid. Reset de silo.     |        |
+============================================================================ */

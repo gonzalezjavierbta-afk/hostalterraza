@@ -173,6 +173,39 @@
             <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
         </section>
 
+        <!-- ============================================================
+             EXTENSIÓN ADITIVA III DEL CONTRATO (v221 · Contrato v109)
+             2 átomos nuevos, genéricos, opcionales: Boletería (preventa/
+             taquilla) y WhatsApp de contacto. Ocultos por defecto (kernel
+             IoC); se encienden solo vía el CSS del silo (.tpl-{id}). Ningún
+             átomo previo fue tocado ni removido. ======================== -->
+
+        <!-- MÓDULO EXTENDIDO: BOLETERÍA con selector preventa/taquilla -->
+        <section id="mod-boletos">
+            <div class="boleto-inner" style="max-width:1100px; margin:0 auto; text-align:center;">
+                <h2>BOLETERÍA</h2>
+                <div class="boleto-tabs" style="display:flex; justify-content:center; gap:0.75rem; margin-bottom:2.5rem;">
+                    <button id="boleto-tab-preventa" class="boleto-tab active" onclick="switchBoleto('preventa')" style="cursor:pointer;">PREVENTA</button>
+                    <button id="boleto-tab-taquilla" class="boleto-tab" onclick="switchBoleto('taquilla')" style="cursor:pointer;">TAQUILLA</button>
+                </div>
+                <div class="boleto-cards-wrap" style="max-width:700px; margin:0 auto;">
+                    <div id="db-boletos-preventa"></div>
+                    <div id="db-boletos-taquilla" style="display:none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: WHATSAPP de contacto -->
+        <section id="mod-whatsapp">
+            <div class="whatsapp-inner" style="max-width:1100px; margin:0 auto; text-align:center;">
+                <a id="db-whatsapp-btn" class="whatsapp-btn" href="#" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:1rem; padding:1.1rem 2.2rem; border-radius:60px; background:#25d366; color:#fff; text-decoration:none; font-weight:900; letter-spacing:1px; box-shadow:0 8px 30px rgba(37,211,102,0.45);">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-2.9 4.1c-.2 0-.5.1-.7.4-.3.3-1 .9-1 2.3s1 2.7 1.2 2.9c.1.2 2 3.2 5 4.4 2.4.9 2.9.7 3.4.7.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3l-2-1c-.3-.1-.5-.2-.7.1l-.9 1.1c-.2.2-.4.3-.7.1-.3-.1-1.4-.5-2.6-1.6-1-.9-1.6-2-1.8-2.3-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.3.3-.5.1-.2.1-.4 0-.5l-1-2.2c-.2-.5-.4-.5-.7-.5z"/></svg>
+                    <span id="db-whatsapp-text">CONTÁCTANOS POR WHATSAPP</span>
+                </a>
+            </div>
+        </section>
+        <!-- ==================== FIN EXTENSIÓN ADITIVA III ================ -->
+
         <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
 
         <!-- MÓDULO 7: FORMULARIO DUAL [cite: 735, 874] -->
@@ -268,6 +301,19 @@
             document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
             document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
             logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
+        }
+
+        function switchBoleto(tipo) {
+            const isPrev = tipo === 'preventa';
+            const tabP = document.getElementById('boleto-tab-preventa');
+            const tabT = document.getElementById('boleto-tab-taquilla');
+            if (tabP) tabP.classList.toggle('active', isPrev);
+            if (tabT) tabT.classList.toggle('active', !isPrev);
+            const cP = document.getElementById('db-boletos-preventa');
+            const cT = document.getElementById('db-boletos-taquilla');
+            if (cP) cP.style.display = isPrev ? 'block' : 'none';
+            if (cT) cT.style.display = isPrev ? 'none' : 'block';
+            logStatus(`DEBUG: Boletería cambiada a [${tipo.toUpperCase()}]`, "DEBUG");
         }
 
 
@@ -530,10 +576,16 @@
     }
     // === FIN SEGMENTO IMPACTO ===
 
-  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207) ===
+  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207 / FIX v221) ===
     // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
+    // FIX v221: content.sponsors puede llegar como ARRAY (así lo persiste admin en
+    // _buildConfigLanding) o como string separado por comas. Antes solo se asumía
+    // string y `split` reventaba el try completo ("sponsorsRaw.split is not a function"),
+    // abortando todo lo que seguía (póster, lineup, ubicación, FAQ, tarjetas).
     const sponsorsRaw = content.sponsors || "";
-    let sponsorsList = sponsorsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    let sponsorsList = Array.isArray(sponsorsRaw)
+        ? sponsorsRaw.map(s => (typeof s === 'string' ? s : (s && typeof s === 'object' ? (s.url || s.src || '') : '')).trim()).filter(s => s.length > 0)
+        : String(sponsorsRaw).split(',').map(s => s.trim()).filter(s => s.length > 0);
     let isFallback = false;
 
     if (sponsorsList.length === 0) {
@@ -654,24 +706,60 @@ if (document.getElementById('db-poster-img')) {
     logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
 }
 
-// === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198) ===
+// === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198 / MEJORA v221) ===
     if (content.dj_lineup && Array.isArray(content.dj_lineup)) {
-        document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => {
-            // Soporte Dual: Detecta si 'dj' es un texto simple o un objeto {nombre, foto} [cite: 821]
-            const name = typeof dj === 'object' ? dj.nombre : dj;
-            const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
-            
+        document.getElementById('db-lineup').innerHTML = content.dj_lineup.map((dj, idx) => {
+            // Soporte Triple: string simple → {nombre}, objeto {nombre,foto}, objeto
+            // {nombre,foto,resena,perfil} [cite: 821] + mejora v221
+            const isObj = dj && typeof dj === 'object';
+            const name   = isObj ? (dj.nombre || '') : String(dj || '');
+            const photo  = (isObj && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
+            const resena = (isObj && dj.resena) ? dj.resena : '';
+            const perfil = (isObj && dj.perfil) ? dj.perfil : '';
+            const perfilBtn = perfil
+                ? `<a class="artist-perfil-btn" href="${perfil}" target="_blank" rel="noopener" onclick="event.stopPropagation(); window.open('${perfil}','_blank'); return false;">VER PERFIL →</a>`
+                : '';
+            const resenaEl = resena
+                ? `<span class="artist-resena">${resena}</span>`
+                : '';
+
             return `
-                <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;">
+                <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;" data-idx="${idx}">
                     <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;">
-                    <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
+                    <div class="artist-info" style="flex:1; display:flex; flex-direction:column;">
+                        <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
+                        ${resenaEl}
+                        ${perfilBtn}
+                    </div>
                 </div>`;
         }).join('');
-        
+
         // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
         logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
     }
     // === FIN SEGMENTO: LINEUP ===
+
+    // === INICIO SEGMENTO: GALERÍA REAL (v221) ===
+    // Pobla #db-gallery-grid desde content.gallery (array de URLs). Fallback: 2
+    // imágenes de referencia si el campo llegó vacío, manteniendo el átomo visible.
+    const galleryEl = document.getElementById('db-gallery-grid');
+    if (galleryEl) {
+        let galleryList = Array.isArray(content.gallery) ? content.gallery.filter(Boolean) : [];
+        let isGalleryFallback = false;
+        if (galleryList.length === 0) {
+            galleryList = [
+                "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600",
+                "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600"
+            ];
+            isGalleryFallback = true;
+        }
+        galleryEl.innerHTML = galleryList.slice(0, 8).map((url, i) =>
+            `<figure class="gallery-item" style="margin:0; position:relative; border-radius:14px; overflow:hidden;">
+                <img src="${url}" alt="Galería ${i + 1}" loading="lazy" style="width:100%; aspect-ratio:1/1; object-fit:cover; display:block;">
+            </figure>`).join('');
+        logStatus(`TRACE: Galería ${isGalleryFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada (${galleryList.length} imágenes).`, "TRACE");
+    }
+    // === FIN SEGMENTO GALERÍA ===
 
    // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
     if (content.faq) {
@@ -761,6 +849,35 @@ if (document.getElementById('db-poster-img')) {
     logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
     // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
 
+    // === INICIO SEGMENTO: BOLETERÍA PREVENTA/TAQUILLA (v221) ===
+    // Fuente: content.boletos = { preventa: "...", taquilla: "..." }.
+    // Render con Contrato de Interactividad Física (pestañas onclick inline).
+    const boletosData = content.boletos || {};
+    const preventaVal = boletosData.preventa || content.tickets_info || 'POR DEFINIR';
+    const taquillaVal = boletosData.taquilla || 'POR DEFINIR';
+    const boletoCard = (precio) => `
+        <div class="boleto-card" style="background:rgba(255,255,255,0.04); border:1px solid var(--tpl-accent, #d72dc0); border-radius:20px; padding:2.5rem 2rem; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.4), 0 0 25px var(--tpl-accent, #d72dc0);">
+            <span class="boleto-precio" style="display:block; font-weight:900; font-size:2.4rem; color:#fff; text-shadow:0 0 18px var(--tpl-accent, #d72dc0);">${precio}</span>
+            <span class="boleto-desc" style="display:block; margin-top:0.5rem; opacity:0.75; font-size:0.85rem; letter-spacing:1px;">Precio de entrada</span>
+        </div>`;
+    const bwP = document.getElementById('db-boletos-preventa');
+    const bwT = document.getElementById('db-boletos-taquilla');
+    if (bwP) bwP.innerHTML = boletoCard(preventaVal);
+    if (bwT) bwT.innerHTML = boletoCard(taquillaVal);
+    logStatus(`TRACE: Boletería preventa/taquilla inyectada (${preventaVal} | ${taquillaVal}).`, "TRACE");
+    // === FIN SEGMENTO BOLETERÍA ===
+
+    // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
+    // Fuente: content.whatsapp = número (formato internacional sin +). Mensaje opcional.
+    const waTel = content.whatsapp || '573001234567';
+    const waMsg = (content.whatsapp_msg || 'Hola, quiero información sobre el evento ' + (ev.nombre || '')).replace(/ /g, '%20');
+    const waBtn = document.getElementById('db-whatsapp-btn');
+    if (waBtn) {
+        waBtn.href = `https://wa.me/${waTel}?text=${waMsg}`;
+        logStatus(`LINK: WhatsApp de contacto vinculado (wa.me/${waTel}).`, "LINK");
+    }
+    // === FIN SEGMENTO WHATSAPP ===
+
                 // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
                 // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
                 // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
@@ -771,7 +888,7 @@ if (document.getElementById('db-poster-img')) {
                 // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
                 // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
                 // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer'];
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-boletos', 'mod-whatsapp'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 

@@ -759,6 +759,10 @@ tr:hover td{background:var(--surface)}
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#8b7355"></div><span style="font-size:12px;font-weight:600;color:#3a3530">P8 · Elegant Cocktail</span></div>
               <div style="font-size:10px;color:#7a7570">Aman · Standard Hotels · VIP</div>
             </div>
+            <div class="ld-theme-card" data-theme="afromango" onclick="seleccionarTheme('afromango')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#2a1800,#4a2c06)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9d00;box-shadow:0 0 7px #ff9d00"></div><span style="font-size:12px;font-weight:600;color:#ffb020">P9 · Afromango</span></div>
+              <div style="font-size:10px;color:#c8862a">Mango · Fiesta Tropical · DJ & Playlist</div>
+            </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
@@ -812,6 +816,8 @@ tr:hover td{background:var(--surface)}
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-faq-fiesta" style="width:13px;height:13px;accent-color:var(--gold)"> ❓ FAQ</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-ubicacion" style="width:13px;height:13px;accent-color:var(--gold)"> 📍 Ubicación</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sponsors-fiesta" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Patrocinadores</label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-boletos" style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Boletos preventa/taquilla</label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-whatsapp" style="width:13px;height:13px;accent-color:var(--gold)"> 💬 WhatsApp contacto</label>
               </div>
             </div>
 
@@ -876,13 +882,21 @@ tr:hover td{background:var(--surface)}
             <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
 
             <!-- CAMPOS FIESTA -->
-            <div id="ld-campo-dj-lineup" style="display:none" class="fg"><label style="font-size:12px">DJ Lineup (nombre — hora, uno por línea)</label><textarea id="ld-dj-lineup-val" rows="3" placeholder="DJ Nombre — 10pm&#10;DJ Otro — 12am" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-dj-lineup" style="display:none" class="fg"><label style="font-size:12px">DJ Lineup (uno por línea — o formato <code>Nombre|FotoURL|Reseña|PerfilURL</code>)</label><textarea id="ld-dj-lineup-val" rows="4" placeholder="DJ Nombre&#10;DJ Otro|https://foto.jpg|Breve reseña|https://instagram.com/dj" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
             <div id="ld-campo-guest-list" style="display:none" class="fg"><label style="font-size:12px">Instrucciones Guest List</label><input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario"></div>
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
             <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 8)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg"><label style="font-size:12px">Patrocinadores (separados por coma)</label><input id="ld-sponsors-fiesta-val" placeholder="Ej. Aguila, Spotify, Davivienda" style="font-size:12px"></div>
+            <div id="ld-campo-boletos" style="display:none" class="fg">
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">🎟 Precio de boletería (preventa / taquilla)</div>
+              <div class="grid2">
+                <div class="fg"><label style="font-size:11px">Preventa</label><input id="ld-boletos-preventa" placeholder="Ej. $40.000" style="font-size:12px"></div>
+                <div class="fg"><label style="font-size:11px">Taquilla</label><input id="ld-boletos-taquilla" placeholder="Ej. $60.000" style="font-size:12px"></div>
+              </div>
+            </div>
+            <div id="ld-campo-whatsapp" style="display:none" class="fg"><label style="font-size:12px">WhatsApp de contacto — número internacional sin + (57...)</label><input id="ld-whatsapp-tel" placeholder="Ej. 573001234567" style="font-size:12px"></div>
 
             <!-- CAMPOS CAMPAÑA -->
             <div id="ld-campo-historia" style="display:none">
@@ -2424,9 +2438,15 @@ const _THEME_TYPE = {
   'arthouse':'cinematografia','premiere-gold':'cinematografia',
   'neon-cult-cine':'cinematografia','interactive-cine':'cinematografia',
   'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
-  'underground':'fiesta','elegant-cocktail':'fiesta',
+  'underground':'fiesta','elegant-cocktail':'fiesta','afromango':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
+};
+
+// Map theme slug → template_id (silo CSS). Los silos validados usan su id
+// atómico (f1, f3, f5...). Los themes sin silo mapeado conservan su slug.
+const _THEME_TPL = {
+  'afromango':'f5',
 };
 
 function seleccionarTheme(theme) {
@@ -2461,6 +2481,7 @@ function seleccionarTheme(theme) {
     'neon-cult-cine':'P3 · Neon Cult Cine','interactive-cine':'P4 · Interactive Cine',
     'tropical-hostel':'P5 · Tropical Hostel','rooftop-sunset':'P6 · Rooftop Sunset',
     'underground':'P7 · Underground','elegant-cocktail':'P8 · Elegant Cocktail',
+    'afromango':'P9 · Afromango',
     'solidario-moderno':'P9 · Solidario Moderno','urgente-impactante':'P10 · Urgente & Impactante',
     'tech-futurista':'P11 · Tech & Futurista','vintage-organico':'P12 · Vintage & Orgánico',
   };
@@ -2691,6 +2712,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'ld-mod-gallery-fiesta':  'ld-campo-gallery-fiesta',
     'ld-mod-faq-fiesta':      'ld-campo-faq-fiesta',
     'ld-mod-sponsors-fiesta': 'ld-campo-sponsors-fiesta',
+  'ld-mod-boletos':         'ld-campo-boletos',
+  'ld-mod-whatsapp':        'ld-campo-whatsapp',
     'ld-mod-dresscode-fiesta':'ld-campo-dresscode',
     // Campaña
     'ld-mod-historia':         'ld-campo-historia',
@@ -2764,6 +2787,8 @@ function _buildConfigLanding() {
       playlist:      chk('ld-mod-playlist'),
       guest_list:    chk('ld-mod-guest-list'),
       ubicacion:     chk('ld-mod-ubicacion'),
+      boletos:       chk('ld-mod-boletos'),
+      whatsapp:      chk('ld-mod-whatsapp'),
       // Campaña
       historia:        chk('ld-mod-historia'),
       objetivo:        chk('ld-mod-objetivo'),
@@ -2787,10 +2812,24 @@ function _buildConfigLanding() {
       trailer_url:    val('ld-trailer-url')      || null,
       dresscode:      val('ld-dresscode-val')    || null,
       // Fiesta
-      dj_lineup:   val('ld-dj-lineup-val')  ? val('ld-dj-lineup-val').split('\n').filter(Boolean) : undefined,
+      // v221: DJ Lineup con reseña y perfil. Formato por línea:
+      //   solo nombre  -> "DJ Foo"
+      //   completo      -> "DJ Foo|https://foto.jpg|Breve reseña|https://instagram.com/foo"
+      // Retrocompat: sin '|' sigue siendo solo nombre (objeto {nombre, foto?}).
+      dj_lineup:   val('ld-dj-lineup-val') ? val('ld-dj-lineup-val').split('\n').map(l => {
+          const p = l.split('|').map(s => s.trim());
+          if (p.length <= 1) return { nombre: p[0] };
+          const dj = { nombre: p[0] };
+          if (p[1]) dj.foto = p[1];
+          if (p[2]) dj.resena = p[2];
+          if (p[3]) dj.perfil = p[3];
+          return dj;
+        }).filter(d => d.nombre) : undefined,
       playlist_url:val('ld-playlist-url')   || null,
       guest_list:  val('ld-guest-list-val') || null,
       ubicacion:   val('ld-ubicacion-val')  || null,
+      whatsapp:    val('ld-whatsapp-tel')   || null,
+      boletos:     (val('ld-boletos-preventa') || val('ld-boletos-taquilla')) ? { preventa: val('ld-boletos-preventa') || null, taquilla: val('ld-boletos-taquilla') || null } : null,
       // Fiesta extra fields
       gallery:     (()=>{ const v=val('ld-gallery-fiesta-urls')||val('ld-gallery-urls'); return v ? v.split('\n').filter(Boolean) : undefined; })(),
       faq:         (()=>{ const v=val('ld-faq-fiesta-val')||val('ld-faq-val'); return v ? v.split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{q:p[0]?.trim(),a:p[1]?.trim()};}) : undefined; })(),
@@ -4590,7 +4629,7 @@ async function _crearEventoUnico(n) {
     // ADR-021 — antes solo vivían dentro de config_landing (JSON); BLUEPRINT.md ya los
     // documentaba como columnas de 'eventos' pero el INSERT nunca los escribía
     // (ver ERRORES_HISTORICOS.md §8). Requiere la migración de /migrations/adr021.sql.
-    template_id:    _ldThemeSeleccionado || null,
+    template_id:    (_THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null),
     categoria_slug: _evCategoria || null,
     captura_pura:   _evCapturaPura,
     org_id:    ORG_ID,
@@ -4677,7 +4716,7 @@ async function _crearSerie(n) {
         custom: getCamposCustom(),
       },
       // ADR-021 — mismo fix de persistencia que _crearEventoUnico (ver ERRORES_HISTORICOS.md §8)
-      template_id:    _ldThemeSeleccionado || null,
+      template_id:    (_THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null),
       categoria_slug: _evCategoria || null,
       captura_pura:   _evCapturaPura,
       org_id: ORG_ID,
