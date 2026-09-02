@@ -791,7 +791,8 @@ function renderPlaylist(playlistUrl){
   var cleaned=playlistUrl.trim();
   var embedUrl=cleaned;
   if(cleaned.indexOf('/embed/')===-1){
-    embedUrl=cleaned.replace('/playlist/','/embed/playlist/').replace('/track/','/embed/track/').replace('/album/','/embed/album/');
+    var m=cleaned.match(/open\.spotify\.com\/(?:.*?\/)?(playlist|track|album|artist|show)\/([a-zA-Z0-9]+)/i);
+    if(m){embedUrl='https://open.spotify.com/embed/'+m[1]+'/'+m[2];}
   }
   if(embedUrl.indexOf('open.spotify.com')!==-1 && embedUrl.indexOf('/embed/')===-1){
     log('Playlist: URL sin /embed/ — no se embebe para evitar bloqueo CSP','ERROR');

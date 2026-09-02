@@ -355,8 +355,17 @@
                 const trailerUrl = content.trailer_url || "https://player.vimeo.com/video/259411563";
                 document.getElementById('db-video-content').innerHTML = `<iframe class="video-iframe" src="${trailerUrl}" allowfullscreen></iframe>`;
                 if (content.playlist_url) {
-                    const embed = content.playlist_url.replace('/playlist/', '/embed/playlist/');
-                    document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" frameBorder="0" allow="encrypted-media"></iframe>`;
+                    const playUrl = String(content.playlist_url || '').trim();
+                    let embed = playUrl;
+                    if (embed.indexOf('/embed/') === -1) {
+                        const m = playUrl.match(/open\.spotify\.com\/(?:.*?\/)?(playlist|track|album|artist|show)\/([a-zA-Z0-9]+)/i);
+                        if (m) embed = 'https://open.spotify.com/embed/' + m[1] + '/' + m[2];
+                    }
+                    if (embed.indexOf('open.spotify.com') !== -1 && embed.indexOf('/embed/') === -1) {
+                        console.warn('[F6-WARN] Spotify sin /embed/ — iframe omitido (CSP frame-ancestors).');
+                    } else {
+                        document.getElementById('db-spotify-embed').innerHTML = `<iframe src="${embed}" frameBorder="0" allow="encrypted-media"></iframe>`;
+                    }
                 }
 
 

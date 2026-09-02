@@ -475,14 +475,26 @@
 
 
 
-    // 2. Sincronía Spotify 1:1 [cite: 462, 767]
+    // 2. Sincronía Spotify 1:1 (FIX v215: solo se embebe la variante /embed/,
+    // nunca open.spotify.com directo — bloqueado por CSP frame-ancestors).
     if (content.playlist_url) {
-        const embedUrl = content.playlist_url.replace('/playlist/', '/embed/playlist/');
         const sContainer = document.getElementById('db-spotify-embed');
         if (sContainer) {
-            sContainer.style.borderColor = 'var(--tpl-accent)';
-            sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
-            logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
+            const playUrl = String(content.playlist_url || '').trim();
+            let embedUrl = playUrl;
+            if (embedUrl.indexOf('/embed/') === -1) {
+                const m = playUrl.match(/open\.spotify\.com\/(?:.*?\/)?(playlist|track|album|artist|show)\/([a-zA-Z0-9]+)/i);
+                if (m) {
+                    embedUrl = 'https://open.spotify.com/embed/' + m[1] + '/' + m[2];
+                }
+            }
+            if (embedUrl.indexOf('open.spotify.com') !== -1 && embedUrl.indexOf('/embed/') === -1) {
+                logStatus("ERROR: URL de Spotify sin /embed/ — iframe omitido (CSP frame-ancestors).", "ERROR");
+            } else {
+                sContainer.style.borderColor = 'var(--tpl-accent)';
+                sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+                logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
+            }
         }
     }
     // === FIN SEGMENTO MULTIMEDIA ===
