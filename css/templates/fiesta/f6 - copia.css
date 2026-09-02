@@ -161,10 +161,10 @@
     grid-template-columns: 1fr;
     grid-template-areas:
         "hero"
+        "form"
         "countdown"
         "meta"
         "ctas"
-        "form"
         "cartel"
         "lineup"
         "whatsapp"
@@ -259,9 +259,7 @@
 
 /* Organizador (badge negro, borde naranja, sombra morada) */
 .tpl-f6 #org-name-badge {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
+    position: relative;
     z-index: 1;
     display: inline-flex;
     align-items: center;
@@ -269,7 +267,7 @@
     background: var(--tpl-black);
     color: var(--tpl-warm);
     padding: 8px 18px;
-    margin-bottom: 20px !important;
+    margin-bottom: 20px;
     border: 2px solid var(--tpl-orange);
     box-shadow: 4px 4px 0 var(--tpl-purple-electric);
     font-size: 12px;
@@ -436,7 +434,6 @@
     align-items: stretch;
     gap: 10px;
     padding: 2rem 6% 1.4rem;
-    margin-top: 0 !important;
     background: var(--tpl-yellow);
     border-bottom: 4px solid var(--tpl-black);
 }
@@ -541,8 +538,6 @@
    10B. HERO CTAs — Botón naranja WhatsApp + botón negro lineup (v222)
    ========================================================================== */
 .tpl-f6 #mod-hero-ctas {
-    position: relative;
-    z-index: 1;
     flex-wrap: wrap;
     justify-content: center;
     gap: 14px;
@@ -1126,7 +1121,7 @@
 }
 
 /* ==========================================================================
-   22. RESPONSIVE MOBILE — Ajustes finos (grid ya es 1 columna en todo)
+   22. RESPONSIVE MOBILE — Reordenamiento de grid y ajustes finos
    ========================================================================== */
 @media (max-width: 1023px) {
     .tpl-f6 #main-content-flow {
@@ -1134,10 +1129,9 @@
         grid-template-columns: 1fr !important;
         grid-template-areas:
             "hero"
+            "form"
             "countdown"
             "meta"
-            "ctas"
-            "form"
             "cartel"
             "lineup"
             "whatsapp"
@@ -1160,29 +1154,6 @@
     .tpl-f6 h2 {
         letter-spacing: 0.32em;
     }
-    .tpl-f6 #mod-hero {
-        padding: 3.4rem 6% 1rem;
-    }
-    .tpl-f6 #org-name-badge {
-        padding: 6px 14px;
-        margin-bottom: 16px;
-    }
-    .tpl-f6 #event-title {
-        font-size: clamp(2.6rem, 12vw, 4.4rem) !important;
-    }
-    .tpl-f6 #unified-frame .cd-block {
-        min-width: 0;
-        max-width: none;
-        flex: 1 1 40%;
-        padding: 10px 8px;
-    }
-    .tpl-f6 #unified-frame .cd-block::after {
-        display: none;
-    }
-    .tpl-f6 #mod-hero-ctas .hero-cta-btn {
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 /* ==========================================================================
@@ -1192,8 +1163,7 @@
 @supports (animation-timeline: view()) {
     .tpl-f6 section,
     .tpl-f6 #unified-frame,
-    .tpl-f6 #mod-hero-meta,
-    .tpl-f6 #mod-hero-ctas {
+    .tpl-f6 #mod-hero-meta {
         animation: f6RevealUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
         animation-timeline: view();
         animation-range: entry 0% entry 45%;
@@ -1218,8 +1188,7 @@
     }
     .tpl-f6 section,
     .tpl-f6 #unified-frame,
-    .tpl-f6 #mod-hero-meta,
-    .tpl-f6 #mod-hero-ctas {
+    .tpl-f6 #mod-hero-meta {
         animation: none !important;
     }
 }
@@ -1235,16 +1204,4 @@
 |          |            | Efectos: aurora animada, grano cinematográfico, shimmer título,   |        |
 |          |            | float póster, countdown flotante "00:00:00:00", reveal scroll.    |        |
 |          |            | Betos editoriales 1px, footer solo copyright, video/info ocultos. |        |
-| v1.1.0   | 02/09/2026 | Hero Tropical Brutalism (espejo F7). Se eliminó el split de       | [OK]   |
-|          |            | escritorio (40vw|60vw): el hero es un bloque normal full-width y  |        |
-|          |            | las secciones fluyen debajo en 1 columna (todos los breakpoints). |        |
-|          |            | #mod-hero fondo amarillo + glow nacional, #org-name-badge const  |        |
-|          |            | negro/naranja/morado arriba del título, título en 2 líneas        |        |
-|          |            | (negro / blanco con sombra). Countdown sobre recuadros negros     |        |
-|          |            | (números blancos, labels verdes), meta con separadores morados.   |        |
-|          |            | Nuevo módulo aditivo #mod-hero-ctas (v222): botón naranja WhatsApp                |        |
-|          |            | + botón negro "VER LINE UP COMPLETO" (ancla #mod-lineup).         |        |
-|          |            | #mod-form sin overlay fixed: fluye como sección normal.           |        |
-|          |            | Requiere maestro evento3.html v222 (kernel: #mod-hero-ctas oculto |        |
-|          |            | por defecto; JS: split título 2 líneas solo .tpl-f6 + wa.me hero).|        |
 ============================================================================ */

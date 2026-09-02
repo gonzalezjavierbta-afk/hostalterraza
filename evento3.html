@@ -27,6 +27,9 @@
 
     /* 3. PROTOCOLO DE VISIBILIDAD PASIVA (IoC) */
     section, header, footer { display: none; } /* v220: footer sumado al kernel IoC */
+    /* v222 (aditivo): #mod-hero-ctas nace oculto por defecto. Solo un silo
+       (.tpl-f6) lo enciende vía su CSS con display flex. Cero Borrado. */
+    #mod-hero-ctas { display: none !important; }
 
     /* 4. CARGA Y FEEDBACK */
     .loading-overlay { 
@@ -50,6 +53,11 @@
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
         <div class="hero-content" style="position:relative; z-index:5;">
             <h1 id="event-title">--</h1>
+        </div>
+        <!-- MÓDULO EXTENDIDO: HERO CTAs (v222 aditivo — exclusivo .tpl-f6) -->
+        <div id="mod-hero-ctas" class="hero-ctas">
+            <a id="f6-hero-wa" class="hero-cta-btn hero-cta-btn--wa" href="#" target="_blank" rel="noopener">COMPRA ENTRADAS AHORA</a>
+            <a class="hero-cta-btn hero-cta-btn--lineup" href="#mod-lineup">VER LINE UP COMPLETO</a>
         </div>
     </header>
 
@@ -420,7 +428,25 @@
                 }, 1000);
 
                 // MAPEO DE HERO & METADATA
-                document.getElementById('event-title').innerText = ev.nombre.toUpperCase();
+                const __tituloEl = document.getElementById('event-title');
+                const __tituloRaw = ev.nombre.toUpperCase();
+                // v222 (aditivo, solo silo .tpl-f6): título en 2 líneas físico
+                // (contrato: #event-title sigue intacto, se añaden 2 spans hijos).
+                if (document.body.className.includes('tpl-f6')) {
+                    const __palabras = __tituloRaw.split(' ');
+                    const __mitad = Math.ceil(__palabras.length / 2);
+                    const __l1 = document.createElement('span');
+                    __l1.className = 'hero-title-line1';
+                    __l1.textContent = __palabras.slice(0, __mitad).join(' ');
+                    const __l2 = document.createElement('span');
+                    __l2.className = 'hero-title-line2';
+                    __l2.textContent = __palabras.slice(__mitad).join(' ');
+                    __tituloEl.textContent = '';
+                    __tituloEl.appendChild(__l1);
+                    __tituloEl.appendChild(__l2);
+                } else {
+                    __tituloEl.innerText = __tituloRaw;
+                }
                 document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
                 document.getElementById('meta-fecha').innerText = ev.fecha;
                 document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
@@ -909,6 +935,11 @@ if (document.getElementById('db-poster-img')) {
         }
         logStatus(`LINK: WhatsApp de contacto vinculado (wa.me/${waTel}).`, "LINK");
     }
+    // v222 (aditivo): hero CTA del silo .tpl-f6 comparte el mismo vínculo wa.me.
+    const f6HeroWa = document.getElementById('f6-hero-wa');
+    if (f6HeroWa) {
+        f6HeroWa.href = `https://wa.me/${waTel}?text=${waMsg}`;
+    }
     // === FIN SEGMENTO WHATSAPP ===
 
                 // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
@@ -921,7 +952,7 @@ if (document.getElementById('db-poster-img')) {
                 // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
                 // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
                 // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
-                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-cartel', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-boletos', 'mod-whatsapp'];
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-hero-ctas', 'mod-cartel', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-boletos', 'mod-whatsapp'];
                 let activeModulesCount = 0;
                 let presentInDomCount = 0;
 
