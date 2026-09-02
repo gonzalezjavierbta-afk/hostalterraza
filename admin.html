@@ -1188,7 +1188,10 @@ tr:hover td{background:var(--surface)}
       <!-- Navegación inferior del Wizard (ADR-021) — siempre en el DOM, sin data-wiz-step -->
       <div style="display:flex;justify-content:space-between;margin-top:1rem;gap:8px" id="wiz-bottom-nav">
         <button type="button" class="btn btn-ghost" id="wiz-btn-prev" onclick="wizPrev()" style="visibility:hidden">← Atrás</button>
-        <button type="button" class="btn btn-gold" id="wiz-btn-next" onclick="wizNext()">Siguiente →</button>
+        <div style="display:flex;gap:8px">
+          <button type="button" class="btn btn-ghost" id="wiz-btn-cancel-edit" onclick="cancelarEdicion()" style="display:none">✕ Cancelar edición</button>
+          <button type="button" class="btn btn-gold" id="wiz-btn-next" onclick="wizNext()">Siguiente →</button>
+        </div>
       </div>
     </div>
     </div><!-- /data-adm-tab="crear" -->
@@ -2455,6 +2458,12 @@ const _THEME_TPL = {
   'afromango-editor':'f6',
 };
 
+// Reverse map template_id → theme slug (para cargar la plantilla al editar).
+const _TPL_THEME = Object.keys(_THEME_TPL).reduce((acc, theme) => {
+  acc[_THEME_TPL[theme]] = theme;
+  return acc;
+}, {});
+
 function seleccionarTheme(theme) {
   _ldThemeSeleccionado = theme;
 
@@ -2506,6 +2515,7 @@ function seleccionarTheme(theme) {
 let _wizStep      = 1;
 let _evCategoria  = null;    // 'cinematografia' | 'fiesta' | 'campana' — Orquestador de Intención
 let _evCapturaPura = false;  // true = Evento de Captura Pura (omite generación de QR)
+let _evEditandoId  = null;   // id del evento en edición (reutiliza el wizard completo) — null = modo creación
 
 // Plantillas aún sin silo CSS/HTML propio (ver PROJECT.md §6 "Silos Operativos Validados").
 // Cero Borrado: se mantienen seleccionables, solo se marcan visualmente como "Próximamente".
@@ -3618,41 +3628,326 @@ async function delSerie(id) {
 }
 
 // ════════════════════════════════════════════════════
-// EDITAR EVENTO
+// EDITAR EVENTO — reutiliza el wizard completo de creación (ADR-021)
+// Al pulsar "✏ Editar" se navega al tab Crear con el evento precargado en el
+// mismo espacio (pasos 1-4 + módulos ld-*): edición 100% coherente con la creación.
+// El modal antiguo (#mod-edit-ev) se conserva en el DOM por Cero Borrado pero deja de abrirse.
 // ════════════════════════════════════════════════════
+// Módulos cuyo checkbox tiene sufijo por categoría (-cine/-fiesta/-campana)
+const _MOD_SUF_SETS = ['countdown','gallery','aforo','dresscode','sponsors','faq'];
+// Módulos de id fijo (sin sufijo)
+const _MOD_FIXED = {
+  trailer:'ld-mod-trailer', sinopsis:'ld-mod-sinopsis', meet_director:'ld-mod-director',
+  dj_lineup:'ld-mod-dj-lineup', playlist:'ld-mod-playlist', guest_list:'ld-mod-guest-list',
+  ubicacion:'ld-mod-ubicacion', boletos:'ld-mod-boletos', whatsapp:'ld-mod-whatsapp',
+  historia:'ld-mod-historia', objetivo:'ld-mod-objetivo', impacto:'ld-mod-impacto',
+  equipo:'ld-mod-equipo', testimonios:'ld-mod-testimonios',
+  actualizaciones:'ld-mod-actualizaciones', contacto:'ld-mod-contacto',
+};
+
 function openEditMod(evId) {
   const ev = _eventos.find(e => e.id === evId);
   if (!ev) return;
-  document.getElementById('edit-ev-id').value        = evId;
-  document.getElementById('edit-ev-n').value         = ev.nombre || '';
-  document.getElementById('edit-ev-f').value         = ev.fecha  || '';
-  document.getElementById('edit-ev-h').value         = ev.hora   || '';
-  document.getElementById('edit-ev-d').value         = ev.descripcion || '';
-  document.getElementById('edit-ev-ubic').value      = ev.ubicacion  || '';
-  document.getElementById('edit-ev-color').value     = ev.color_primario || '#c9a84c';
-  document.getElementById('edit-ev-color-hex').value = ev.color_primario || '#c9a84c';
-  document.getElementById('edit-ev-img').value       = ev.imagen_url || '';
-  document.getElementById('edit-ev-alert').innerHTML = '';
-  // Reset upload zone
-  document.getElementById('edit-img-placeholder').style.display = 'block';
-  document.getElementById('edit-img-loading').style.display = 'none';
-  // Show current image if exists
-  const preview = document.getElementById('edit-ev-img-preview');
-  const thumb   = document.getElementById('edit-ev-img-thumb');
-  if (ev.imagen_url) {
-    thumb.src = ev.imagen_url;
-    preview.style.display = 'block';
-  } else {
-    thumb.src = '';
-    preview.style.display = 'none';
+
+  _evEditandoId = evId;
+  _evTipo = 'unico';                            // siempre se edita un evento individual
+  _limpiarWizardCompleto();
+
+  // ── Paso 1 · Cimiento (identidad) ──
+  setEvTipo('unico');
+  setEvSalida(!!ev.captura_pura);
+  const color = ev.color_primario || '#c9a84c';
+  document.getElementById('ev-color').value     = color;
+  document.getElementById('ev-color-hex').value = color;
+  document.getElementById('ev-n').value     = ev.nombre  || '';
+  document.getElementById('ev-f').value     = ev.fecha   || '';
+  document.getElementById('ev-h').value     = ev.hora    || '';
+  document.getElementById('ev-ubic').value  = ev.ubicacion || '';
+  document.getElementById('ev-aforo').value = ev.aforo_max || '';
+  document.getElementById('ev-wa-share').checked = ev.wa_share !== false;
+
+  // ── Paso 3 · Contenido (descripción + media) ──
+  const descInput = document.getElementById('ev-d');
+  if (descInput) descInput.value = ev.descripcion || '';
+  const poster = ev.poster_url || ev.config_landing?.content?.poster_url || '';
+  if (poster) {
+    document.getElementById('ev-poster-url').value = poster;
+    document.getElementById('ev-poster-thumb').src = poster;
+    document.getElementById('ev-poster-preview').style.display = 'flex';
   }
-  const editAforo = document.getElementById('edit-ev-aforo');
-  if (editAforo) editAforo.value = ev.aforo_max || '';
+  if (ev.video_url) {
+    document.getElementById('ev-video').value = ev.video_url;
+    previewVideo(ev.video_url);
+  }
+  if (ev.imagen_url) {
+    document.getElementById('ev-img').value = ev.imagen_url;
+    document.getElementById('ev-img-thumb').src = ev.imagen_url;
+    document.getElementById('ev-img-preview').style.display = 'block';
+    const lbl = document.getElementById('ev-img-source-label');
+    if (lbl) lbl.textContent = 'URL';
+  }
 
-  // Cargar campos personalizados existentes del evento
-  loadCamposCustomEdit(ev.form_campos);
+  // ── Paso 4 · Blindaje ──
+  const fc = ev.form_campos || {};
+  ['email','edad','ciudad','nota'].forEach(k => {
+    const el = document.getElementById('ev-campo-' + k);
+    if (el) el.checked = !!fc[k];
+  });
+  loadCamposCustomFromEvento(fc);
+  if (Array.isArray(ev.puntos_acceso) && ev.puntos_acceso.length) {
+    document.getElementById('ev-multi-acceso').checked = true;
+    const list = document.getElementById('ev-puntos-list');
+    list.innerHTML = '';
+    ev.puntos_acceso.forEach(p => addPuntoRow(p));
+    document.getElementById('ev-puntos-wrap').style.display = 'block';
+  }
 
-  document.getElementById('mod-edit-ev').style.display = 'flex';
+  // ── Landing: categoría + plantilla + módulos + contenido ──
+  const cfg = ev.config_landing || {};
+  const content = cfg.content || {};
+  let theme = cfg.theme || _TPL_THEME[ev.template_id];
+  const tipo = _THEME_TYPE[theme] || ev.categoria_slug || 'cinematografia';
+  // Módulos con sufijo necesitan el sufijo de la categoría activa
+  const suf  = tipo === 'fiesta' ? 'fiesta' : (tipo === 'campana' ? 'campana' : 'cine');
+
+  // Campañas sin fecha fija guardan el centinela 2099-12-31 (columna NOT NULL en Supabase).
+  // Al editar se re-expone como "sin fecha", coherente con el flujo de creación.
+  if (tipo === 'campana' && ev.fecha === '2099-12-31') {
+    document.getElementById('ev-f').value = '';
+  }
+
+  seleccionarCategoria(tipo);
+  if (theme && _THEME_TYPE[theme]) seleccionarTheme(theme);
+
+  const hayLanding = !!cfg.theme || !!cfg.modules || !!content;
+  if (hayLanding) {
+    document.getElementById('ev-landing-activa').checked = true;
+    toggleLandingConfig(true);
+    // Módulos activos → marcar checkbox y mostrar su campo de contenido
+    const mods = cfg.modules || {};
+    const idsChecked = new Set();
+    Object.keys(mods).forEach(key => {
+      const id = _MOD_FIXED[key] || (_MOD_SUF_SETS.includes(key) ? 'ld-mod-' + key + '-' + suf : null);
+      if (!id) return;
+      idsChecked.add(id);
+      const chk = document.getElementById(id);
+      if (chk) chk.checked = !!mods[key];
+    });
+    // Apagar checks de módulos del tipo activo que no vienen en el config (retrocompat)
+    document.querySelectorAll('.mods-tipo:not([style*="display: none"]) [id^="ld-mod-"]').forEach(chk => {
+      if (!idsChecked.has(chk.id)) chk.checked = false;
+    });
+    // Efectos
+    const fx = cfg.effects || {};
+    if (fx.grain     != null) { const el = document.getElementById('ld-fx-grain');     if (el) el.checked = !!fx.grain; }
+    if (fx.glow      != null) { const el = document.getElementById('ld-fx-glow');      if (el) el.checked = !!fx.glow; }
+    if (fx.vhs       != null) { const el = document.getElementById('ld-fx-vhs');       if (el) el.checked = !!fx.vhs; }
+    if (fx.parallax  != null) { const el = document.getElementById('ld-fx-parallax');  if (el) el.checked = !!fx.parallax; }
+    // Contenido → campos ld-*
+    _poblarContenidoWizard(content, suf);
+
+    if (content.titulo_display) { const el = document.getElementById('ev-titulo-display'); if (el) el.value = content.titulo_display; }
+  }
+
+  // Activar show/hide de campos de contenido según checks (replicar modMap listener)
+  document.querySelectorAll('.mods-tipo [id^="ld-mod-"]').forEach(chk => chk.dispatchEvent(new Event('change', { bubbles:true })));
+
+  // ── Estado de guardado: botón del Paso 4 pasa a UPDATE ──
+  const btn = document.getElementById('btn-crear-ev');
+  if (btn) btn.textContent = 'Guardar cambios';
+  const cancelBtn = document.getElementById('wiz-btn-cancel-edit');
+  if (cancelBtn) cancelBtn.style.display = '';
+
+  goPg('admin');
+  admGoTab('crear');
+  _wizStep = 1;
+  document.querySelectorAll('[data-wiz-step]').forEach(el => {
+    const steps = String(el.dataset.wizStep).split(',').map(s => s.trim());
+    el.classList.toggle('wiz-visible', steps.includes('1'));
+  });
+  document.querySelectorAll('.wiz-pill').forEach(p => p.classList.toggle('active', Number(p.dataset.pill) === 1));
+  const prevBtn = document.getElementById('wiz-btn-prev');
+  const nextBtn = document.getElementById('wiz-btn-next');
+  if (prevBtn) prevBtn.style.visibility = 'hidden';
+  if (nextBtn) nextBtn.style.display = '';
+  const card = document.getElementById('pg-admin');
+  if (card && nextBtn) nextBtn.scrollIntoView({ block:'center', behavior:'smooth' });
+}
+
+function _limpiarWizardCompleto() {
+  ['ev-n','ev-f','ev-h','ev-ubic','ev-aforo','ev-img','ev-video','ev-poster-url'].forEach(i => {
+    const el = document.getElementById(i); if (el) el.value = '';
+  });
+  ['ev-d','ld-sinopsis-text','ev-titulo-display','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
+   'ld-playlist-url','ld-guest-list-val','ld-ubicacion-val','ld-whatsapp-tel','ld-boletos-preventa',
+   'ld-boletos-taquilla','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
+   'ld-sponsors-fiesta-val','ld-sponsors-val','ld-dir-nombre','ld-dir-rol','ld-dir-foto','ld-dir-bio',
+   'ld-historia-titulo','ld-historia-val','ld-historia-items-val','ld-objetivo-meta','ld-objetivo-actual',
+   'ld-objetivo-url','ld-objetivo-btn','ld-donate-text','ld-impacto-val','ld-como-ayudar-stats-val',
+   'ld-impacto-historico-val','ld-impacto-historico-frase','ld-equipo-val','ld-testimonios-val',
+   'ld-actualizaciones-val','ld-contacto-email','ld-contacto-tel','ld-contacto-dir'].forEach(i => {
+    const el = document.getElementById(i); if (el) el.value = '';
+  });
+  document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; });
+  document.querySelectorAll('[id^="ld-campo-"]').forEach(c => { c.style.display = 'none'; });
+  const landing = document.getElementById('ev-landing-activa');
+  if (landing) { landing.checked = false; toggleLandingConfig(false); }
+  document.getElementById('ev-img-preview').style.display = 'none';
+  document.getElementById('ev-poster-preview').style.display = 'none';
+  document.getElementById('ev-multi-acceso').checked = false;
+  document.getElementById('ev-puntos-wrap').style.display = 'none';
+  document.getElementById('ev-puntos-list').innerHTML = '';
+  resetCamposCustom();
+  _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
+}
+
+// Escribe en los campos ld-* del wizard los valores del config_landing guardado.
+function _poblarContenidoWizard(content, suf) {
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  const fiesta = suf === 'fiesta';
+  // Cine
+  set('ld-sinopsis-text', content.sinopsis);
+  set('ld-trailer-url',   content.trailer_url);
+  set('ld-dresscode-val', content.dresscode);
+  if (content.director) {
+    set('ld-dir-nombre', content.director.nombre);
+    set('ld-dir-rol',    content.director.rol || 'Director');
+    set('ld-dir-foto',   content.director.foto);
+    set('ld-dir-bio',    content.director.bio);
+  }
+  // Fiesta
+  set('ld-playlist-url', content.playlist_url);
+  set('ld-guest-list-val', content.guest_list);
+  set('ld-ubicacion-val', content.ubicacion);
+  set('ld-whatsapp-tel', content.whatsapp);
+  if (content.boletos) {
+    set('ld-boletos-preventa', content.boletos.preventa);
+    set('ld-boletos-taquilla', content.boletos.taquilla);
+  }
+  if (Array.isArray(content.dj_lineup)) {
+    set('ld-dj-lineup-val', content.dj_lineup.map(d => [d.nombre, d.foto, d.resena, d.perfil].filter(v => v != null && v !== '').join('|')).join('\n'));
+  } else { set('ld-dj-lineup-val', null); }
+  // Galería / FAQ / Sponsors — id depende de la categoría activa
+  if (Array.isArray(content.gallery) && content.gallery.length) {
+    set(fiesta ? 'ld-gallery-fiesta-urls' : 'ld-gallery-urls', content.gallery.join('\n'));
+  }
+  if (Array.isArray(content.faq) && content.faq.length) {
+    set(fiesta ? 'ld-faq-fiesta-val' : 'ld-faq-val', content.faq.map(f => (f.q || '') + '|' + (f.a || '')).join('\n'));
+  }
+  if (Array.isArray(content.sponsors) && content.sponsors.length) {
+    set(fiesta ? 'ld-sponsors-fiesta-val' : 'ld-sponsors-val', content.sponsors.join(', '));
+  }
+  // Campaña
+  set('ld-historia-titulo', content.historia_titulo);
+  set('ld-historia-val', content.historia);
+  if (Array.isArray(content.historia_items)) {
+    set('ld-historia-items-val', content.historia_items.map(h => [h.titulo, h.texto, h.imagen].filter(v => v != null).join('|')).join('\n'));
+  }
+  set('ld-objetivo-meta',   content.objetivo_meta);
+  set('ld-objetivo-actual', content.objetivo_actual);
+  set('ld-objetivo-url',    content.objetivo_url);
+  set('ld-objetivo-btn',    content.objetivo_btn);
+  set('ld-donate-text',     content.donate_text);
+  if (Array.isArray(content.impacto)) {
+    set('ld-impacto-val', content.impacto.map(i => [i.etiqueta, i.valor, i.icono].filter(v => v != null).join('|')).join('\n'));
+  }
+  if (content.como_ayudar?.stats) {
+    set('ld-como-ayudar-stats-val', content.como_ayudar.stats.map(s => [s.etiqueta, s.valor].join('|')).join('\n'));
+  }
+  if (Array.isArray(content.impacto_historico)) {
+    set('ld-impacto-historico-val', content.impacto_historico.map(it => [it.etiqueta, it.valor].join('|')).join('\n'));
+  }
+  set('ld-impacto-historico-frase', content.impacto_historico_frase);
+  if (Array.isArray(content.equipo)) {
+    set('ld-equipo-val', content.equipo.map(e => [e.nombre, e.rol, e.foto].filter(v => v != null).join('|')).join('\n'));
+  }
+  if (Array.isArray(content.testimonios)) {
+    set('ld-testimonios-val', content.testimonios.map(t => [t.texto, t.autor].filter(v => v != null).join('|')).join('\n'));
+  }
+  if (Array.isArray(content.actualizaciones)) {
+    set('ld-actualizaciones-val', content.actualizaciones.map(a => [a.categoria, a.fecha, a.titulo, a.resumen, a.imagen].filter(v => v != null).join('|')).join('\n'));
+  }
+  if (content.contacto) {
+    set('ld-contacto-email', content.contacto.email);
+    set('ld-contacto-tel',   content.contacto.tel);
+    set('ld-contacto-dir',   content.contacto.dir);
+  }
+}
+
+function cancelarEdicion() {
+  _evEditandoId = null;
+  _limpiarWizardCompleto();
+  const btn = document.getElementById('btn-crear-ev');
+  if (btn) btn.textContent = _evTipo === 'serie' ? 'Crear serie y sesiones' : 'Crear evento';
+  const cancelBtn = document.getElementById('wiz-btn-cancel-edit');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  admGoTab('historial');
+}
+
+// Guardado desde el wizard en modo edición (UPDATE). Comparte payload con la creación.
+async function guardarEventoWizard() {
+  const id = _evEditandoId;
+  if (!id) return crearEvento();
+  const n = document.getElementById('ev-n').value.trim();
+  if (!n) { alrt('ev-alert','El nombre es obligatorio.','err'); return; }
+  if (!SB) { alrt('ev-alert','Conecta la base de datos primero.','err'); return; }
+
+  const btn = document.getElementById('btn-crear-ev');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+
+  const _tipoActual = (_THEME_TYPE[_ldThemeSeleccionado]) ? _THEME_TYPE[_ldThemeSeleccionado] : _evCategoria;
+  const f = document.getElementById('ev-f').value;
+  if (!f && _tipoActual !== 'campana') {
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar cambios'; }
+    alrt('ev-alert','La fecha es obligatoria.','err'); return;
+  }
+  const _fechaParaGuardar = f || (_tipoActual === 'campana' ? '2099-12-31' : f);
+
+  try {
+    const payload = {
+      nombre:         n,
+      fecha:          _fechaParaGuardar,
+      hora:           document.getElementById('ev-h').value || null,
+      descripcion:    (document.getElementById('ev-d').value || '').trim() || null,
+      ubicacion:      (document.getElementById('ev-ubic').value || '').trim() || null,
+      color_primario: document.getElementById('ev-color-hex').value.trim() || '#c9a84c',
+      imagen_url:     (document.getElementById('ev-img').value || '').trim() || null,
+      poster_url:     (document.getElementById('ev-poster-url').value || '').trim() || null,
+      video_url:      (document.getElementById('ev-video')?.value || '').trim() || null,
+      wa_share:       document.getElementById('ev-wa-share')?.checked ?? true,
+      aforo_max:      parseInt(document.getElementById('ev-aforo')?.value) || null,
+      puntos_acceso:  getPuntosAcceso(),
+      captura_pura:   _evCapturaPura,
+      template_id:    _THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null,
+      categoria_slug: _evCategoria || null,
+      form_campos: {
+        email:  document.getElementById('ev-campo-email')?.checked ?? false,
+        edad:   document.getElementById('ev-campo-edad')?.checked ?? false,
+        ciudad: document.getElementById('ev-campo-ciudad')?.checked ?? false,
+        nota:   document.getElementById('ev-campo-nota')?.checked ?? false,
+        custom: getCamposCustom(),
+      },
+    };
+    const cfgLanding = _buildConfigLanding();
+    // Edición: si la landing se desactivó, limpiar el JSON previo (Cero Huérfanos).
+    payload.config_landing = cfgLanding || null;
+
+    const prevSlug = _eventos.find(e => e.id === id)?.slug || null;
+
+    const { error } = await SB.from('eventos').update(payload).eq('id', id);
+    if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
+
+    const pubLink = prevSlug ? window.location.origin + '/evento.html?slug=' + prevSlug : '';
+    alrt('ev-alert', `✓ Evento actualizado correctamente.${pubLink ? ` <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>` : ''}`, 'ok');
+    cancelarEdicion();
+    loadEventos();
+    loadEventosSelects();
+  } catch(err) {
+    console.error('[guardarEventoWizard]', err);
+    alrt('ev-alert','Error inesperado: '+err.message,'err');
+  } finally {
+    if (btn && _evEditandoId) { btn.disabled = false; btn.textContent = 'Guardar cambios'; }
+  }
 }
 
 function closeEditMod() {
@@ -4568,6 +4863,8 @@ function toggleInvitadoresForm() { abrirModalNuevoInvitador(); }
 
 
 async function crearEvento() {
+  // Modo edición: el wizard completo reutilizado hace UPDATE en vez de INSERT.
+  if (_evEditandoId) return guardarEventoWizard();
   const n = document.getElementById('ev-n').value.trim();
   if (!n) { alrt('ev-alert','El nombre es obligatorio.','err'); return; }
   if (!SB) { alrt('ev-alert','Conecta la base de datos primero.','err'); return; }
