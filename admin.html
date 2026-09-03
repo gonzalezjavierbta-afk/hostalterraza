@@ -2906,6 +2906,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#sponsors-add').forEach(addBtn => {
     const panel = addBtn.closest('[id^="ld-campo-sponsors"]');
     const container = panel ? panel.querySelector('#sponsors-entries') : null;
+    const panelId = panel ? panel.id : '';
     if (!container) return;
 
     const createEntry = (data) => {
@@ -3003,11 +3004,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     addBtn.addEventListener('click', () => createEntry());
-    pairs.push({ container, createEntry });
+    pairs.push({ container, createEntry, panelId });
   });
 
-  // Resuelve el contenedor ACTIVO (el del panel de categoría visible)
-  const activeContainer = () => {
+  // Resuelve el contenedor ACTIVO (el del panel de categoría visible).
+  // ADR-FIX: se prioriza la categoría activa (fiesta -> ld-campo-sponsors-fiesta,
+  // cine/campaña -> ld-campo-sponsors) por encima de la visibilidad, porque al
+  // poblar en edición el panel correcto aún puede estar oculto y el código
+  // anterior caía siempre al PRIMER panel (cine), perdiendo los logos subidos.
+  const activeContainer = (suf) => {
+    const want = suf === 'fiesta' ? 'ld-campo-sponsors-fiesta' : 'ld-campo-sponsors';
+    for (const p of pairs) { if (p.panelId === want) return p.container; }
     for (const p of pairs) {
       const panel = p.container.closest('[id^="ld-campo-sponsors"]');
       if (panel && panel.style.display !== 'none') return p.container;
@@ -3016,8 +3023,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Expose functions globally for loading/saving (operan sobre el panel activo)
-  window._sponsorsGetEntries = () => {
-    const c = activeContainer();
+  window._sponsorsGetEntries = (suf) => {
+    const c = activeContainer(suf);
     if (!c) return [];
     return Array.from(c.querySelectorAll('.sponsor-entry')).map(entry => {
       const nombre = entry.querySelector('.sponsor-name').value.trim();
@@ -3027,11 +3034,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }).filter(Boolean);
   };
 
-  window._sponsorsSetEntries = (arr) => {
-    const c = activeContainer();
+  window._sponsorsSetEntries = (arr, suf) => {
+    const c = activeContainer(suf);
     if (!c) return;
     c.innerHTML = '';
-    if (Array.isArray(arr)) arr.forEach(s => pairs.forEach(p => { if (p.container === c) p.createEntry(s); }));
+    // Normaliza so soporta array de objetos {nombre, logo_url} O legacy de strings/comas.
+    const items = Array.isArray(arr)
+      ? arr
+      : (typeof arr === 'string' ? arr.split(',').map(s => s.trim()).filter(Boolean).map(u => ({ logo_url: u })) : []);
+    items.forEach(s => {
+      const norm = (typeof s === 'string') ? { logo_url: s.trim() } : s;
+      pairs.forEach(p => { if (p.container === c) p.createEntry(norm); });
+    });
   };
 })();
 
@@ -3054,7 +3068,7 @@ function _buildConfigLanding(slug) {
   const faq      = faqRaw ? faqRaw.split('\n').filter(l => l.includes('|')).map(l => {
     const [q, ...rest] = l.split('|'); return { q: q.trim(), a: rest.join('|').trim() };
   }) : [];
-  const sponsors = window._sponsorsGetEntries ? window._sponsorsGetEntries() : [];
+  const sponsors = window._sponsorsGetEntries ? window._sponsorsGetEntries(suf) : [];
   const gallery  = val('ld-gallery-urls') ? val('ld-gallery-urls').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8) : [];
   const director = (val('ld-dir-nombre') || val('ld-dir-bio')) ? {
     nombre: val('ld-dir-nombre') || null,
@@ -3976,7 +3990,12 @@ function openEditMod(evId) {
   // ── Landing: categoría + plantilla + módulos + contenido ──
   const cfg = ev.config_landing || {};
   const content = cfg.content || {};
-  let theme = cfg.theme || _TPL_THEME[ev.template_id];
+  // ADR-FIX: el template_id es la fuente de verdad del silo que renderiza la página.
+  // Se resuelve el tema por template_id (sin distinguir mayúsc./minúsc.), y solo se
+  // cae a cfg.theme si el template_id no corresponde a ningún silo conocido. Esto
+  // corrige que editar un evento "f6" terminara guardado como un tema sin silo (ej.
+  // tropical-hostel) y rompiera la página.
+  let theme = _TPL_THEME[String(ev.template_id || '').toLowerCase()] || cfg.theme;
   const tipo = _THEME_TYPE[theme] || ev.categoria_slug || 'cinematografia';
   // Módulos con sufijo necesitan el sufijo de la categoría activa
   const suf  = tipo === 'fiesta' ? 'fiesta' : (tipo === 'campana' ? 'campana' : 'cine');
@@ -3988,7 +4007,7 @@ function openEditMod(evId) {
   }
 
   seleccionarCategoria(tipo);
-  if (theme && _THEME_TYPE[theme]) seleccionarTheme(theme);
+  if (theme) seleccionarTheme(theme);
 
   const hayLanding = !!cfg.theme || !!cfg.modules || !!content;
   if (hayLanding) {
@@ -4170,8 +4189,8 @@ function _poblarContenidoWizard(content, suf) {
   if (Array.isArray(content.faq) && content.faq.length) {
     set(fiesta ? 'ld-faq-fiesta-val' : 'ld-faq-val', content.faq.map(f => (f.q || '') + '|' + (f.a || '')).join('\n'));
   }
-  if (Array.isArray(content.sponsors) && content.sponsors.length) {
-    if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors);
+  if (content.sponsors && (Array.isArray(content.sponsors) || typeof content.sponsors === 'string')) {
+    if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors, suf);
   }
   // Campaña
   set('ld-historia-titulo', content.historia_titulo);

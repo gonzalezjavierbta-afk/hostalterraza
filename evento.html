@@ -393,6 +393,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
                 const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
                 if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
+
+                // Título de pestaña/pestaña del navegador con el nombre real del evento.
+                document.title = (ev.nombre || 'Hostal Terraza') + ' · Hostal Terraza';
                 
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
                 const content = ev.config_landing?.content || {};
@@ -772,7 +775,11 @@ if (document.getElementById('db-poster-img')) {
             const photo  = (isObj && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
             const resena = (isObj && dj.resena) ? dj.resena : '';
             const hora   = (isObj && dj.hora) ? dj.hora : '';
-            const instagram = (isObj && dj.instagram) ? dj.instagram : '';
+            const rawIg = (isObj && dj.instagram) ? dj.instagram : '';
+            // ADR-FIX: soporta "@artista" o "artista" y lo convierte a la URL real de
+            // Instagram (https://instagram.com/{handle}) para abrir directo en la app.
+            const igHandle = rawIg.replace(/^@+/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').split(/[/?#&]/)[0].trim();
+            const instagram = igHandle ? 'https://instagram.com/' + encodeURIComponent(igHandle) : '';
             const youtube   = (isObj && dj.youtube) ? dj.youtube : '';
             const tiktok    = (isObj && dj.tiktok) ? dj.tiktok : '';
             const web       = (isObj && dj.web) ? dj.web : '';
