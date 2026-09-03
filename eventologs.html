@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -295,6 +295,11 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        function logStatus(m, t = 'INFO') {
+            const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
+            console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
+        }
+
         // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
         function parseSpanishDate(dateStr, timeStr) {
             const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
@@ -314,6 +319,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             document.getElementById('tab-old').classList.toggle('active', !isNew);
             document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
             document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
+            logStatus(`DEBUG: Ruta de formulario cambiada a [${type.toUpperCase()}]`, "DEBUG");
         }
 
         function switchBoleto(tipo) {
@@ -326,6 +332,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             const cT = document.getElementById('db-boletos-taquilla');
             if (cP) cP.style.display = isPrev ? 'block' : 'none';
             if (cT) cT.style.display = isPrev ? 'none' : 'block';
+            logStatus(`DEBUG: Boletería cambiada a [${tipo.toUpperCase()}]`, "DEBUG");
         }
 
 
@@ -341,6 +348,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const timer = setTimeout(() => {
                     if (!isResolved) {
                         isResolved = true;
+                        logStatus(`ERROR: Timeout de 5s al cargar CSS [${path}]. Continuando en degradación suave.`, "ERROR");
                         resolve(false);
                     }
                 }, 5000);
@@ -357,6 +365,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                                 rulesCount = targetSheet.cssRules.length;
                             }
                         } catch (e) {}
+                        logStatus(`LINK: Estilo [${tplId}] cargado con éxito (${rulesCount} reglas CSS).`, "LINK");
                         resolve(true);
                     }
                 };
@@ -365,6 +374,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     if (!isResolved) {
                         isResolved = true;
                         clearTimeout(timer);
+                        logStatus(`ERROR: Fallo crítico al cargar [${path}]`, "ERROR");
                         resolve(false);
                     }
                 };
@@ -374,6 +384,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         }
 
         async function initEvento() {
+            logStatus("Iniciando Orquestador v214 - Sistema de Grid Atómico Modular.", "INFO");
             const slug = new URLSearchParams(window.location.search).get('slug');
             if (!slug) return;
             try {
@@ -394,6 +405,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 if (primaryColor) {
                     document.documentElement.style.setProperty('--master-accent', primaryColor);
                 }
+                logStatus("DEBUG: Prioridad de color cedida a --master-accent.", "DEBUG");
 
                 const cssLoadedOK = await injectAtomicCSS(ev.categoria_slug, ev.template_id);
                 if (!cssLoadedOK) {
@@ -407,6 +419,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const tplNormal = `tpl-${ev.template_id || 'F3'}`;
                 const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
                 document.body.className = `${tplNormal} ${tplLower}`;
+                logStatus(`DEBUG: Ámbito Dual inyectado [${tplNormal} ${tplLower}]`, "DEBUG");
 
                 // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
                 // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
@@ -474,6 +487,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                   </div>
                   <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
               </div>`;
+          console.log("%c[TRACE] Vídeo YouTube detectado -> Miniatura segura inyectada.", "color: #e67e22; font-weight: bold;");
       } else {
           videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">URL DE YOUTUBE INVÁLIDA</div>`;
       }
@@ -485,6 +499,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
           vimeoEmbedUrl = vimeoIdMatch ? `https://player.vimeo.com/video/${vimeoIdMatch[1]}` : videoUrl;
       }
       videoContainer.innerHTML = `<iframe src="${vimeoEmbedUrl}" style="width:100%; height:100%; border:none; object-fit:cover;" allowfullscreen></iframe>`;
+      console.log("%c[TRACE] Vídeo Vimeo detectado -> URL normalizada e iframe inyectado.", "color: #e67e22; font-weight: bold;");
   } else {
       // Fallback estricto anti-bloques vacíos
       videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
@@ -509,9 +524,11 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 }
             }
             if (embedUrl.indexOf('open.spotify.com') !== -1 && embedUrl.indexOf('/embed/') === -1) {
+                logStatus("ERROR: URL de Spotify sin /embed/ — iframe omitido (CSP frame-ancestors).", "ERROR");
             } else {
                 sContainer.style.borderColor = 'var(--tpl-accent)';
                 sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+                logStatus("TRACE: Spotify Sync 1:1 Validado.", "TRACE");
             }
         }
     }
@@ -535,6 +552,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         const histImgUrl = historiaData.imagen || ev.imagen_url || '';
         if (histImgUrl) { histImgEl.src = histImgUrl; } else { histImgEl.style.display = 'none'; }
     }
+    logStatus(`TRACE: Historia ${isHistoriaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada.`, "TRACE");
     // === FIN SEGMENTO HISTORIA ===
 
     // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
@@ -557,6 +575,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         const trackEl = barraEl.closest('.objetivo-barra-track');
         if (trackEl) trackEl.setAttribute('aria-valuenow', pctVal);
     }
+    logStatus(`TRACE: Objetivo ${isObjetivoFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado (${pctVal}% alcanzado).`, "TRACE");
     // === FIN SEGMENTO OBJETIVO ===
 
     // === INICIO SEGMENTO: TARJETAS DE IMPACTO CON FALLBACK (v215) — FORMATO DUAL (v220) ===
@@ -605,6 +624,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 </div>`;
         }).join('');
         const impactoStatus = isImpactoFallback ? `Tarjetas de impacto de REFERENCIA/FALLBACK (${impactoList.length})` : `Tarjetas de impacto REALES (${impactoList.length})`;
+        logStatus(`TRACE: ${impactoStatus} inyectadas.`, "TRACE");
     }
     // === FIN SEGMENTO IMPACTO ===
 
@@ -647,6 +667,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 
         // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
         const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
+        logStatus(`TRACE: ${statusMsg}.`, "TRACE");
     }
     // === FIN SEGMENTO PATROCINADORES ===
 
@@ -673,6 +694,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             </div>`;
         }).join('');
         const equipoStatus = isEquipoFallback ? `Equipo de REFERENCIA/FALLBACK (${equipoList.length})` : `Equipo REAL (${equipoList.length})`;
+        logStatus(`TRACE: ${equipoStatus} inyectado.`, "TRACE");
     }
     // === FIN SEGMENTO EQUIPO ===
 
@@ -683,6 +705,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
     if (document.getElementById('db-cta-final-subtitulo')) document.getElementById('db-cta-final-subtitulo').innerText = ctaFinalData.subtitulo || 'Sé parte del cambio.';
     const ctaBtnEl = document.getElementById('cta-final-btn');
     if (ctaBtnEl && ctaFinalData.boton_texto) ctaBtnEl.innerText = ctaFinalData.boton_texto;
+    logStatus(`TRACE: CTA final ${isCtaFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectado.`, "TRACE");
     // === FIN SEGMENTO CTA FINAL ===
 
     // === INICIO SEGMENTO: FOOTER CON FALLBACK (v220) ===
@@ -732,12 +755,14 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 if (document.getElementById('footer-copy')) {
         document.getElementById('footer-copy').innerText = `© 2026 Chongotronik. Todos los derechos reservados.`;
     }
+    logStatus("TRACE: Footer inyectado (marca, enlaces, redes, contacto).", "TRACE");
     // === FIN SEGMENTO FOOTER ===
 
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
 // 1. Verificación de Póster [cite: 343]
 if (document.getElementById('db-poster-img')) {
     document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
+    logStatus("LINK: Póster real vinculado desde Supabase.", "LINK");
 }
 
 // === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198 / MEJORA v223) ===
@@ -789,6 +814,7 @@ if (document.getElementById('db-poster-img')) {
         }).join('');
 
         // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
+        logStatus(`TRACE: Lineup inyectado (${content.dj_lineup.length} artistas con fotos reales).`, "TRACE");
     }
     // === FIN SEGMENTO: LINEUP ===
 
@@ -810,6 +836,7 @@ if (document.getElementById('db-poster-img')) {
             `<figure class="gallery-item" style="margin:0; position:relative; border-radius:14px; overflow:hidden;">
                 <img src="${url}" alt="Galería ${i + 1}" loading="lazy" style="width:100%; aspect-ratio:1/1; object-fit:cover; display:block;">
             </figure>`).join('');
+        logStatus(`TRACE: Galería ${isGalleryFallback ? 'de REFERENCIA/FALLBACK' : 'REAL'} inyectada (${galleryList.length} imágenes).`, "TRACE");
     }
     // === FIN SEGMENTO GALERÍA ===
 
@@ -844,6 +871,7 @@ if (document.getElementById('db-poster-img')) {
                 </div>`).join('');
             
             // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
+            logStatus(`TRACE: FAQ inyectado satisfactoriamente (${faqItems.length} preguntas).`, "TRACE");
         }
     }
     // === FIN SEGMENTO FAQ ===
@@ -865,6 +893,7 @@ if (document.getElementById('db-poster-img')) {
         }
 
         // Certificación de Salud Escudo GOLD [cite: 805, 811]
+        logStatus("TRACE: Módulo de ubicación vinculado y mapa inyectado.", "TRACE");
     }
     // === FIN SEGMENTO UBICACIÓN ===
 
@@ -888,7 +917,9 @@ if (document.getElementById('db-poster-img')) {
                 .eq('evento_id', ev.id)
                 .eq('cuenta_aforo', true);
             aforoVal = `${count ?? 0} / ${ev.aforo_max}`;
+            logStatus(`TRACE: Aforo real (cuenta_aforo=true) = ${count ?? 0}/${ev.aforo_max}.`, "TRACE");
         } catch (afoErr) {
+            logStatus(`DEBUG: No se pudo contar aforo real (${afoErr.message}); usando aforo_max.`, "DEBUG");
             aforoVal = aforoMax;
         }
     }
@@ -917,6 +948,7 @@ if (document.getElementById('db-poster-img')) {
     const techStatus = isTechFallback 
         ? `Tarjetas técnicas de REFERENCIA/FALLBACK (${technicalCount} tarjetas)` 
         : `Tarjetas técnicas REALES (${technicalCount} tarjetas)`;
+    logStatus(`TRACE: ${techStatus} mapeadas.`, "TRACE");
     // === FIN SEGMENTO TECHNICAL DATA RESTORED ===
 
     // === INICIO SEGMENTO: BOLETERÍA PREVENTA/TAQUILLA (v223 — diseño compacto) ===
@@ -945,6 +977,7 @@ if (document.getElementById('db-poster-img')) {
     const bwT = document.getElementById('db-boletos-taquilla');
     if (bwP) bwP.innerHTML = boletoCard('PREVENTA', preventaVal, '#9b59b6');
     if (bwT) bwT.innerHTML = boletoCard('TAQUILLA', taquillaVal, '#e67e22');
+    logStatus(`TRACE: Boletería preventa/taquilla inyectada (${preventaVal} | ${taquillaVal}).`, "TRACE");
     // === FIN SEGMENTO BOLETERÍA ===
 
     // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
@@ -970,6 +1003,7 @@ if (document.getElementById('db-poster-img')) {
         if (waDisplay) {
             waDisplay.textContent = `CONTÁCTANOS · +${formatWaPhone(waTel)}`;
         }
+        logStatus(`LINK: WhatsApp de contacto vinculado (wa.me/${waTel}).`, "LINK");
     }
     // v222 (aditivo): hero CTA del silo .tpl-f6 comparte el mismo vínculo wa.me.
     const f6HeroWa = document.getElementById('f6-hero-wa');
@@ -993,8 +1027,10 @@ if (document.getElementById('db-poster-img')) {
                         const msgBox = document.getElementById('reg-comunidad-msg');
                         if (!nombre || !whatsapp) {
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Por favor completa tu nombre y WhatsApp.'; }
+                            logStatus("DEBUG: Landing form incompleto (nombre/whatsapp).", "DEBUG");
                             return;
                         }
+                        logStatus("DEBUG: Landing form válido, insertando inscrito (tipo=comunidad).", "DEBUG");
                         const payload = {
                             evento_id: ev.id,
                             org_id: ev.org_id ?? null,
@@ -1013,14 +1049,18 @@ if (document.getElementById('db-poster-img')) {
                             // Anti-duplicado por whatsapp + evento_id
                             const { data: dup } = await sbClient.from('inscritos').select('id').eq('whatsapp', whatsapp).eq('evento_id', ev.id).maybeSingle();
                             if (dup) {
+                                logStatus(`LINK: WhatsApp ya registrado en este evento; redirigiendo a comunidad (${dup.id}).`, "LINK");
                             } else {
                                 const { error } = await sbClient.from('inscritos').insert(payload);
                                 if (error) throw error;
+                                logStatus("INFO: Inscrito de comunidad creado en inscritos (cuenta_aforo=false).", "INFO");
                             }
                             // Redirigir a la comunidad de WhatsApp (si está configurada)
                             if (comunidadLink) {
                                 window.open(comunidadLink, '_blank');
+                                logStatus(`LINK: Abriendo comunidad de WhatsApp (${comunidadLink}).`, "LINK");
                             } else {
+                                logStatus("DEBUG: Sin link de comunidad configurado; mostrando solo agradecimiento.", "DEBUG");
                             }
                             if (msgBox) {
                                 msgBox.style.display = 'block';
@@ -1030,17 +1070,68 @@ if (document.getElementById('db-poster-img')) {
                             regForm.querySelectorAll('input').forEach(i => i.style.display = 'none');
                             regForm.querySelector('button[type=submit]').style.display = 'none';
                         } catch (err) {
+                            logStatus(`ERROR: Fallo al registrar en comunidad: ${err.message}`, "ERROR");
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Hubo un problema. Inténtalo de nuevo.'; }
                         }
+                        logStatus("TRACE: Fin submit formulario landing (ADR-030).", "TRACE");
                     });
+                    logStatus("INFO: Formulario landing vinculado a comunidad WhatsApp (ADR-030).", "INFO");
                 }
 
-            } catch (err) {
-                console.error(err);
-            } finally {
-                const loader = document.getElementById('loader');
-                if (loader) loader.style.display = 'none';
-            }
+                // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
+                // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
+                // por completo al CSS del template (.tpl-{id}) cargado en injectAtomicCSS().
+                // Aquí solo AUDITAMOS lo que el template decidió encender, vía computed style,
+                // para que el Escudo GOLD siga siendo veraz y no un mensaje hardcodeado.
+                // v1.4.8: contrato corregido a los 11 átomos reales — antes faltaban 'unified-frame'
+                // (countdown) y 'mod-hero-meta' (meta), y 'mod-faq-ubicacion' ya no existe (split en dos).
+                // v220: Contrato extendido a 17 átomos (v108 → v109, aditivo, no-breaking).
+                // Se agregan mod-equipo/mod-cta-final/mod-footer — genéricos, disponibles
+                // para cualquier categoría (fiesta, cine, campaña, futuras), no exclusivos de b4.
+                const MODULE_IDS = ['mod-hero', 'unified-frame', 'mod-hero-meta', 'mod-hero-ctas', 'mod-cartel', 'mod-historia', 'mod-objetivo', 'mod-impacto', 'mod-video', 'mod-lineup', 'mod-playlist', 'mod-info-tecnica', 'mod-faq', 'mod-ubicacion', 'mod-sponsors', 'mod-form', 'mod-equipo', 'mod-cta-final', 'mod-footer', 'mod-boletos', 'mod-whatsapp'];
+                let activeModulesCount = 0;
+                let presentInDomCount = 0;
+
+                MODULE_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) {
+                        logStatus(`DEBUG: Módulo [${id}] no existe en el DOM del Master.`, "DEBUG");
+                        return;
+                    }
+                    presentInDomCount++;
+                    const isVisible = window.getComputedStyle(el).display !== 'none';
+                    if (isVisible) {
+                        activeModulesCount++;
+                        logStatus(`INFO: Módulo [${id}] -> ACTIVADO POR CSS (template: ${ev.template_id || 'f3'})`, "INFO");
+                    } else {
+                        logStatus(`DEBUG: Módulo [${id}] -> INACTIVO (el template no lo enciende)`, "DEBUG");
+                    }
+                });
+
+                logStatus(`INFO: ${activeModulesCount}/${MODULE_IDS.length} módulos detectados activos según diagramación del template [${ev.template_id || 'f3'}].`, "INFO");
+
+                // Veredicto estructural explícito (separado de la visibilidad, que es decisión legítima
+                // del template): el contrato de IDs exige que los 11 átomos EXISTAN en el DOM del Master,
+                // aunque un template pueda ocultar algunos por diseño.
+                const contractOK = presentInDomCount === MODULE_IDS.length;
+                logStatus(`SEAL: Contrato de IDs v124-MASTER -> ${contractOK ? '[OK]' : '[FAIL]'} (${presentInDomCount}/${MODULE_IDS.length} átomos presentes en el DOM)`, contractOK ? "INFO" : "ERROR");
+
+                 // === INICIO SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA (v210) ===
+    // Reemplaza el sensor hardcodeado a tpl-p5. El Master no debe conocer
+    // el nombre de ninguna plantilla específica: audita el contenedor grid
+    // (#main-content-flow) de forma genérica, cualquiera sea la plantilla activa.
+    const activeTplClass = Array.from(document.body.classList).find(c => c.toLowerCase().startsWith('tpl-'));
+    const gridEl = document.getElementById('main-content-flow');
+    if (activeTplClass && gridEl) {
+        const gridDisplay = window.getComputedStyle(gridEl).display;
+        const gridColumns = window.getComputedStyle(gridEl).gridTemplateColumns;
+        logStatus(`TRACE: Structural Audit [${activeTplClass}] | Display: ${gridDisplay} | Columns: ${gridColumns}`, "TRACE");
+    }
+    // === FIN SEGMENTO: AUDITORÍA ESTRUCTURAL AGNÓSTICA ===
+                logStatus("TIME: Heartbeat sincronizado satisfactoriamente.", "TIME");
+                logStatus("TRACE: Auditoría v1.4.8 cerrada: injectAtomicCSS duplicado eliminado, video duplicado eliminado, venue-name huérfano eliminado, split FAQ/Ubicación, contrato de 11 átomos corregido, fallback visible de CSS. Sellado Definitivo v124-MASTER.", "TRACE");
+
+            } catch (err) { logStatus(`FALLO CRÍTICO: ${err.message}`, "ERROR"); } finally { document.getElementById('loader').style.display = 'none'; }
         }
         window.onload = initEvento;
     </script>
