@@ -158,23 +158,22 @@
       normal de ancho completo y el resto de secciones fluye debajo.
    ========================================================================== */
 .tpl-f6 #main-content-flow {
-    grid-template-columns: 1fr;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
     grid-template-areas:
-        "hero"
-        "countdown"
-        "meta"
-        "ctas"
-        "form"
-        "cartel"
-        "lineup"
-        "whatsapp"
-        "boletos"
-        "playlist"
-        "video"
-        "faq"
-        "ubicacion"
-        "sponsors"
-        "footer";
+        "hero hero"
+        "countdown countdown"
+        "meta meta"
+        "ctas ctas"
+        "lineup lineup"
+        "cartel playlist"
+        "boletos form"
+        "whatsapp whatsapp"
+        "video video"
+        "ubicacion ubicacion"
+        "faq faq"
+        "sponsors sponsors"
+        "footer footer";
     width: 100%;
 }
 
@@ -1104,28 +1103,27 @@
 }
 
 /* ==========================================================================
-   22. RESPONSIVE MOBILE — Ajustes finos (grid ya es 1 columna en todo)
-   ========================================================================== */
+   22. RESPONSIVE — Móvil/tablet. El grid ya es 1 columna por defecto; aquí se
+       apila en una sola columna por debajo de 768px. Los pares lado a lado
+       ([cartel|playlist] y [boletos|form]) aplican desde 768px (tablet+).
+    ========================================================================== */
 @media (max-width: 1023px) {
     .tpl-f6 #main-content-flow {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr 1fr !important;
         grid-template-areas:
-            "hero"
-            "countdown"
-            "meta"
-            "ctas"
-            "form"
-            "cartel"
-            "lineup"
-            "whatsapp"
-            "boletos"
-            "playlist"
-            "video"
-            "faq"
-            "ubicacion"
-            "sponsors"
-            "footer" !important;
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
         row-gap: 0 !important;
         width: 100% !important;
     }
@@ -1133,7 +1131,63 @@
         z-index: 50 !important;
     }
     .tpl-f6 section {
+        padding: 3.4rem 5%;
+    }
+    .tpl-f6 .form-master-box {
+        max-width: 480px;
+    }
+    .tpl-f6 .boleto-cards-wrap {
+        max-width: 100%;
+    }
+    .tpl-f6 #db-spotify-embed {
+        min-height: 360px;
+    }
+    .tpl-f6 h2 {
+        letter-spacing: 0.32em;
+    }
+    .tpl-f6 #mod-hero {
+        padding: 3.4rem 6% 1rem;
+    }
+    .tpl-f6 #org-name-badge {
+        padding: 0;
+        margin-bottom: 12px;
+    }
+    .tpl-f6 #event-title {
+        font-size: clamp(2.6rem, 12vw, 4.4rem) !important;
+    }
+    .tpl-f6 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .tpl-f6 #main-content-flow {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "countdown"
+            "meta"
+            "ctas"
+            "lineup"
+            "cartel"
+            "playlist"
+            "boletos"
+            "form"
+            "whatsapp"
+            "video"
+            "ubicacion"
+            "faq"
+            "sponsors"
+            "footer" !important;
+    }
+    .tpl-f6 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f6 section {
         padding: 3.4rem 6%;
+    }
+    .tpl-f6 .form-master-box {
+        max-width: 94vw;
     }
     .tpl-f6 h2 {
         letter-spacing: 0.32em;
@@ -1250,4 +1304,11 @@
 |          |            | UP COMPLETO" oculto (display:none, Cero Borrado). #mod-lineup y   |        |
 |          |            | #mod-footer pasan a fondo amarillo (roma el diseño y se retoma).  |        |
 |          |            | Footer: copyright negro sobre amarillo con borde superior negro.  |        |
+| v1.2.0   | 03/09/2026 | Reorden de escritorio/tablet (≥768px): hero → lineup → pares      | [OK]   |
+|          |            | [cartel|playlist] y [boletos|form] lado a lado → video (galería)  |        |
+|          |            | → ubicación → faq → sponsors → footer. Se agrega display:grid     |        |
+|          |            | al base (#main-content-flow) que faltaba para aplicar grid-areas   |        |
+|          |            | en desktop. <768px vuelve a 1 columna apilada. Módulos extra       |        |
+|          |            | (info-técnica, historia/objetivo/impacto, equipo, cta-final)      |        |
+|          |            | permanecen ocultos (IoC) y el flujo no los fuerza.                |        |
 ============================================================================ */
