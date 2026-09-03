@@ -2868,22 +2868,27 @@ document.addEventListener('DOMContentLoaded', () => {
 // PATROCINADORES v223 — Gestión dinámica de logos (nombre + logo)
 // Cada entrada: URL o subida a Supabase Storage.
 // Los logos se renderizan en BLANCO en la landing (filtro CSS).
+// FIX v223.1: soporta DOS paneles (cine/campaña -> ld-campo-sponsors y
+// fiesta -> ld-campo-sponsors-fiesta). Antes solo se enlazaba el PRIMER
+// contenedor con getElementById (IDs duplicados), por lo que el botón
+// "+ Agregar Patrocinador" del panel activo hacía nada.
 // ════════════════════════════════════════════════════════════════
 (function() {
-  const container = document.getElementById('sponsors-entries');
-  if (!container) return;
-  const addBtn = document.getElementById('sponsors-add');
-  if (!addBtn) return;
+  const pairs = [];
+  document.querySelectorAll('#sponsors-add').forEach(addBtn => {
+    const panel = addBtn.closest('[id^="ld-campo-sponsors"]');
+    const container = panel ? panel.querySelector('#sponsors-entries') : null;
+    if (!container) return;
 
-  const createEntry = (data) => {
-    const entry = document.createElement('div');
-    entry.className = 'sponsor-entry';
-    entry.style.cssText = 'display:flex;flex-direction:column;gap:8px;border:1px solid var(--border);border-radius:var(--rsm);padding:12px;background:var(--surface);position:relative';
+    const createEntry = (data) => {
+      const entry = document.createElement('div');
+      entry.className = 'sponsor-entry';
+      entry.style.cssText = 'display:flex;flex-direction:column;gap:8px;border:1px solid var(--border);border-radius:var(--rsm);padding:12px;background:var(--surface);position:relative';
 
-    const url = (data && (data.logo_url || data.logo || data.url || data.src)) || '';
-    const name = (data && data.nombre) || '';
+      const url = (data && (data.logo_url || data.logo || data.url || data.src)) || '';
+      const name = (data && data.nombre) || '';
 
-    entry.innerHTML = `
+      entry.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <span style="font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:0.03em">PATROCINADOR</span>
         <button type="button" class="sponsor-remove" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;line-height:1;padding:2px 6px">✕</button>
@@ -2900,82 +2905,93 @@ document.addEventListener('DOMContentLoaded', () => {
       ${url ? `<div style="display:flex;align-items:center;gap:8px;margin-top:2px"><img src="${url}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span></div>` : ''}
     `;
 
-    const nameInput = entry.querySelector('.sponsor-name');
-    const urlInput = entry.querySelector('.sponsor-url');
-    const fileInput = entry.querySelector('.sponsor-file');
-    const previewWrap = entry.querySelector('.sponsor-upload-status');
+      const urlInput = entry.querySelector('.sponsor-url');
+      const fileInput = entry.querySelector('.sponsor-file');
+      const previewWrap = entry.querySelector('.sponsor-upload-status');
 
-    entry.querySelector('.sponsor-remove').addEventListener('click', () => entry.remove());
+      entry.querySelector('.sponsor-remove').addEventListener('click', () => entry.remove());
 
-    // Refresh preview when URL changes
-    urlInput.addEventListener('input', () => {
-      const oldPrev = entry.querySelector('.sponsor-preview');
-      if (oldPrev) oldPrev.remove();
-      if (urlInput.value.trim()) {
-        const p = document.createElement('div');
-        p.className = 'sponsor-preview';
-        p.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px';
-        p.innerHTML = `<img src="${urlInput.value.trim().replace(/"/g,'&quot;')}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span>`;
-        urlInput.parentElement.parentElement.after(p);
-      }
-    });
-
-    // File upload to Supabase Storage
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) {
-        previewWrap.textContent = '⚠ Solo se permiten imágenes (PNG, SVG, WEBP, JPG).';
-        previewWrap.style.display = 'block';
-        previewWrap.style.color = 'var(--red)';
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        previewWrap.textContent = '⚠ El logo no puede pesar más de 5 MB.';
-        previewWrap.style.display = 'block';
-        previewWrap.style.color = 'var(--red)';
-        return;
-      }
-      if (typeof SB === 'undefined' || !SB) {
-        previewWrap.textContent = '⚠ Conecta la base de datos para subir logos.';
-        previewWrap.style.display = 'block';
-        previewWrap.style.color = 'var(--red)';
-        return;
-      }
-      previewWrap.style.display = 'block';
-      previewWrap.style.color = 'var(--ink3)';
-      previewWrap.textContent = 'Subiendo logo...';
-      try {
-        const ext = file.name.split('.').pop().toLowerCase();
-        const filename = `sponsor_${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
-        const { error } = await SB.storage.from('eventos-imagenes').upload(filename, file, { contentType: file.type, upsert: false });
-        if (error) throw error;
-        const { data: urlData } = SB.storage.from('eventos-imagenes').getPublicUrl(filename);
-        urlInput.value = urlData.publicUrl;
-        previewWrap.textContent = '✓ Logo subido correctamente.';
-        previewWrap.style.color = 'var(--green)';
-        // refresh preview
+      // Refresh preview when URL changes
+      urlInput.addEventListener('input', () => {
         const oldPrev = entry.querySelector('.sponsor-preview');
         if (oldPrev) oldPrev.remove();
-        const p = document.createElement('div');
-        p.className = 'sponsor-preview';
-        p.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px';
-        p.innerHTML = `<img src="${urlData.publicUrl}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span>`;
-        urlInput.parentElement.parentElement.after(p);
-      } catch(err) {
-        previewWrap.textContent = '⚠ Error subiendo logo: ' + (err.message || 'Revisa el bucket "eventos-imagenes".');
-        previewWrap.style.color = 'var(--red)';
-      }
-    });
+        if (urlInput.value.trim()) {
+          const p = document.createElement('div');
+          p.className = 'sponsor-preview';
+          p.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px';
+          p.innerHTML = `<img src="${urlInput.value.trim().replace(/"/g,'&quot;')}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span>`;
+          urlInput.parentElement.parentElement.after(p);
+        }
+      });
 
-    container.appendChild(entry);
+      // File upload to Supabase Storage
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          previewWrap.textContent = '⚠ Solo se permiten imágenes (PNG, SVG, WEBP, JPG).';
+          previewWrap.style.display = 'block';
+          previewWrap.style.color = 'var(--red)';
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          previewWrap.textContent = '⚠ El logo no puede pesar más de 5 MB.';
+          previewWrap.style.display = 'block';
+          previewWrap.style.color = 'var(--red)';
+          return;
+        }
+        if (typeof SB === 'undefined' || !SB) {
+          previewWrap.textContent = '⚠ Conecta la base de datos para subir logos.';
+          previewWrap.style.display = 'block';
+          previewWrap.style.color = 'var(--red)';
+          return;
+        }
+        previewWrap.style.display = 'block';
+        previewWrap.style.color = 'var(--ink3)';
+        previewWrap.textContent = 'Subiendo logo...';
+        try {
+          const ext = file.name.split('.').pop().toLowerCase();
+          const filename = `sponsor_${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+          const { error } = await SB.storage.from('eventos-imagenes').upload(filename, file, { contentType: file.type, upsert: false });
+          if (error) throw error;
+          const { data: urlData } = SB.storage.from('eventos-imagenes').getPublicUrl(filename);
+          urlInput.value = urlData.publicUrl;
+          previewWrap.textContent = '✓ Logo subido correctamente.';
+          previewWrap.style.color = 'var(--green)';
+          const oldPrev = entry.querySelector('.sponsor-preview');
+          if (oldPrev) oldPrev.remove();
+          const p = document.createElement('div');
+          p.className = 'sponsor-preview';
+          p.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px';
+          p.innerHTML = `<img src="${urlData.publicUrl}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span>`;
+          urlInput.parentElement.parentElement.after(p);
+        } catch(err) {
+          previewWrap.textContent = '⚠ Error subiendo logo: ' + (err.message || 'Revisa el bucket "eventos-imagenes".');
+          previewWrap.style.color = 'var(--red)';
+        }
+      });
+
+      container.appendChild(entry);
+    };
+
+    addBtn.addEventListener('click', () => createEntry());
+    pairs.push({ container, createEntry });
+  });
+
+  // Resuelve el contenedor ACTIVO (el del panel de categoría visible)
+  const activeContainer = () => {
+    for (const p of pairs) {
+      const panel = p.container.closest('[id^="ld-campo-sponsors"]');
+      if (panel && panel.style.display !== 'none') return p.container;
+    }
+    return pairs.length ? pairs[0].container : null;
   };
 
-  addBtn.addEventListener('click', () => createEntry());
-
-  // Expose functions globally for loading/saving
+  // Expose functions globally for loading/saving (operan sobre el panel activo)
   window._sponsorsGetEntries = () => {
-    return Array.from(container.querySelectorAll('.sponsor-entry')).map(entry => {
+    const c = activeContainer();
+    if (!c) return [];
+    return Array.from(c.querySelectorAll('.sponsor-entry')).map(entry => {
       const nombre = entry.querySelector('.sponsor-name').value.trim();
       const logo = entry.querySelector('.sponsor-url').value.trim();
       if (!logo) return null;
@@ -2984,8 +3000,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window._sponsorsSetEntries = (arr) => {
-    container.innerHTML = '';
-    if (Array.isArray(arr)) arr.forEach(s => createEntry(s));
+    const c = activeContainer();
+    if (!c) return;
+    c.innerHTML = '';
+    if (Array.isArray(arr)) arr.forEach(s => pairs.forEach(p => { if (p.container === c) p.createEntry(s); }));
   };
 })();
 
@@ -3971,6 +3989,11 @@ function openEditMod(evId) {
   // Activar show/hide de campos de contenido según checks (replicar modMap listener)
   document.querySelectorAll('.mods-tipo [id^="ld-mod-"]').forEach(chk => chk.dispatchEvent(new Event('change', { bubbles:true })));
 
+  // FIX v223.1 — Aislamiento de campos por categoría.
+  // Evita que módulos/campos de OTRA categoría (ej. campaña dentro de fiesta)
+  // queden visibles o marcados al editar. Solo las cajas del tipo activo se muestran.
+  hideForeignModulesByType(tipo, suf);
+
   // ── Estado de guardado: botón del Paso 4 pasa a UPDATE ──
   const btn = document.getElementById('btn-crear-ev');
   if (btn) btn.textContent = 'Guardar cambios';
@@ -4020,6 +4043,58 @@ function _limpiarWizardCompleto() {
   document.getElementById('ev-puntos-list').innerHTML = '';
   resetCamposCustom();
   _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
+}
+
+// ════════════════════════════════════════════════════════════════
+// FIX v223.1 — Aislamiento de módulos/campos por categoría.
+// Cada módulo (checkbox) pertenece a una categoría. Al editar/crear, solo deben
+// estar activos los módulos de la categoría actual: se desmarcan las cajas de
+// otras categorías y se ocultan sus campos de contenido.
+// ════════════════════════════════════════════════════════════════
+function hideForeignModulesByType(tipo, suf) {
+  // Map checkbox id -> categoría del módulo
+  const map = {
+    // Cinematografía
+    'ld-mod-trailer':'cine','ld-mod-sinopsis':'cine','ld-mod-director':'cine',
+    'ld-mod-gallery-cine':'cine','ld-mod-dresscode-cine':'cine','ld-mod-sponsors-cine':'cine',
+    'ld-mod-faq-cine':'cine','ld-mod-countdown-cine':'cine','ld-mod-aforo-cine':'cine',
+    // Fiesta
+    'ld-mod-dj-lineup':'fiesta','ld-mod-playlist':'fiesta','ld-mod-guest-list':'fiesta',
+    'ld-mod-ubicacion':'fiesta','ld-mod-boletos':'fiesta','ld-mod-whatsapp':'fiesta',
+    'ld-mod-gallery-fiesta':'fiesta','ld-mod-faq-fiesta':'fiesta','ld-mod-sponsors-fiesta':'fiesta',
+    'ld-mod-dresscode-fiesta':'fiesta','ld-mod-countdown-fiesta':'fiesta','ld-mod-aforo-fiesta':'fiesta',
+    // Campaña
+    'ld-mod-historia':'campana','ld-mod-objetivo':'campana','ld-mod-impacto':'campana',
+    'ld-mod-gallery-campana':'campana','ld-mod-sponsors-campana':'campana','ld-mod-faq-campana':'campana',
+    'ld-mod-equipo':'campana','ld-mod-testimonios':'campana','ld-mod-actualizaciones':'campana',
+    'ld-mod-contacto':'campana',
+  };
+  // Campo de contenido asociado a cada caja (misma relación que modMap)
+  const fieldOf = {
+    'ld-mod-trailer':'ld-campo-trailer','ld-mod-sinopsis':'ld-campo-sinopsis','ld-mod-director':'ld-campo-director',
+    'ld-mod-gallery-cine':'ld-campo-gallery','ld-mod-dresscode-cine':'ld-campo-dresscode',
+    'ld-mod-sponsors-cine':'ld-campo-sponsors','ld-mod-faq-cine':'ld-campo-faq',
+    'ld-mod-countdown-cine':'ld-campo-countdown','ld-mod-aforo-cine':'ld-campo-aforo',
+    'ld-mod-dj-lineup':'ld-campo-dj-lineup','ld-mod-playlist':'ld-campo-playlist','ld-mod-guest-list':'ld-campo-guest-list',
+    'ld-mod-ubicacion':'ld-campo-ubicacion','ld-mod-boletos':'ld-campo-boletos','ld-mod-whatsapp':'ld-campo-whatsapp',
+    'ld-mod-gallery-fiesta':'ld-campo-gallery-fiesta','ld-mod-faq-fiesta':'ld-campo-faq-fiesta',
+    'ld-mod-sponsors-fiesta':'ld-campo-sponsors-fiesta','ld-mod-dresscode-fiesta':'ld-campo-dresscode',
+    'ld-mod-countdown-fiesta':'ld-campo-countdown','ld-mod-aforo-fiesta':'ld-campo-aforo',
+    'ld-mod-historia':'ld-campo-historia','ld-mod-objetivo':'ld-campo-objetivo','ld-mod-impacto':'ld-campo-impacto',
+    'ld-mod-gallery-campana':'ld-campo-gallery','ld-mod-sponsors-campana':'ld-campo-sponsors','ld-mod-faq-campana':'ld-campo-faq',
+    'ld-mod-equipo':'ld-campo-equipo','ld-mod-testimonios':'ld-campo-testimonios',
+    'ld-mod-actualizaciones':'ld-campo-actualizaciones','ld-mod-contacto':'ld-campo-contacto',
+  };
+
+  document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => {
+    const cat = map[chk.id];
+    if (!cat) return;                    // cajas auxiliares sin categoría (fx, etc.) se respetan
+    if (cat === tipo) return;            // módulo de la categoría activa → se conserva
+    // Módulo de otra categoría → desmarcar y ocultar su campo de contenido
+    chk.checked = false;
+    const e = document.getElementById(fieldOf[chk.id]);
+    if (e) e.style.display = 'none';
+  });
 }
 
 // Escribe en los campos ld-* del wizard los valores del config_landing guardado.
