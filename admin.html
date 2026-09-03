@@ -4251,7 +4251,14 @@ function cancelarEdicion() {
   _evEditandoId = null;
   _limpiarWizardCompleto();
   const btn = document.getElementById('btn-crear-ev');
-  if (btn) btn.textContent = _evTipo === 'serie' ? 'Crear serie y sesiones' : 'Crear evento';
+  // ADR-FIX: rehabilitar SIEMPRE el botón. Antes quedaba disabled=true tras guardar
+  // (el finally de guardarEventoWizard solo lo rehabilita si _evEditandoId sigue
+  // truthy, pero cancelarEdicion() lo pone a null antes), dejando "Guardar cambios"
+  // bloqueado hasta recargar la página.
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = _evTipo === 'serie' ? 'Crear serie y sesiones' : 'Crear evento';
+  }
   const cancelBtn = document.getElementById('wiz-btn-cancel-edit');
   if (cancelBtn) cancelBtn.style.display = 'none';
   admGoTab('historial');
