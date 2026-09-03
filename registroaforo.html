@@ -3,97 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Aforo · Hostal Terraza</title>
+    <title>Registro · Hostal Terraza</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0c0c0e; color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
-        .afo-wrap { width: 100%; max-width: 560px; }
-        .afo-head { text-align: center; margin-bottom: 1.5rem; }
-        .afo-badge { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #f4d000; font-weight: 800; display: block; margin-bottom: 0.4rem; }
-        .afo-title { font-size: 1.6rem; font-weight: 900; line-height: 1.1; text-transform: uppercase; }
-        .afo-sub { font-size: 0.85rem; color: #a89b85; margin-top: 0.4rem; }
-        .afo-card { background: #141419; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.8rem; }
-        .afo-field { margin-bottom: 1rem; }
-        .afo-field label { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #cbbfae; margin-bottom: 0.4rem; }
-        .afo-field input, .afo-field select { width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.95rem; }
-        .afo-field select { appearance: auto; }
-        .afo-btn { width: 100%; padding: 1rem; margin-top: 0.6rem; background: #f4d000; border: none; color: #000; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 12px; cursor: pointer; font-size: 0.95rem; }
+        :root { --gold: #f4d000; --gold-dim: #a8920a; --ink: #0c0c0e; --card: #141419; --line: rgba(255,255,255,0.1); --muted: #a89b85; }
+
+        body { background: #0c0c0e; color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
+
+        /* ── HERO tipo landing ─────────────────────────── */
+        .afo-hero {
+            position: relative; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; text-align: center; padding: 4.5rem 1rem 2rem;
+            background-size: cover; background-position: center;
+        }
+        .afo-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(12,12,14,0.86) 0%, rgba(12,12,14,0.94) 100%);
+        }
+        .afo-hero > * { position: relative; z-index: 2; }
+        .afo-badge {
+            font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+            color: var(--gold); font-weight: 800; margin-bottom: 1rem;
+            border: 1px solid rgba(244,208,0,0.4); padding: 0.35rem 1rem; border-radius: 999px;
+        }
+        .afo-title {
+            font-size: clamp(1.9rem, 6vw, 3.4rem); font-weight: 900; line-height: 0.98;
+            text-transform: uppercase; letter-spacing: -0.01em; font-stretch: condensed;
+            filter: drop-shadow(0 0 18px rgba(244,208,0,0.18));
+        }
+        .afo-title .line { display: block; }
+        .afo-org { font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-top: 0.9rem; }
+
+        /* metadatos (como landing) */
+        .afo-meta { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1.6rem 0 0.4rem; }
+        .afo-meta-item {
+            display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 700;
+            color: #d8ccc0; background: rgba(255,255,255,0.04); border: 1px solid var(--line);
+            padding: 0.45rem 0.9rem; border-radius: 8px;
+        }
+        .afo-meta-item svg { flex: none; }
+
+        /* countdown (como landing) */
+        .afo-cd { display: flex; justify-content: center; gap: 0.5rem; margin: 1.4rem 0 2.8rem; gap: 0.4rem; }
+        .afo-cd-block { min-width: 76px; }
+        .afo-cd-block span {
+            display: block; font-size: 2.6rem; font-weight: 900; color: #fff;
+            background: #141419; border: 1px solid rgba(244,208,0,0.5);
+            padding: 0.4rem 0; border-radius: 10px; box-shadow: 0 0 22px rgba(244,208,0,0.16);
+        }
+        .afo-cd-block small { display: block; margin-top: 0.35rem; font-size: 0.62rem; letter-spacing: 0.2em; color: var(--gold); font-weight: 800; }
+
+        /* ── Formulario ───────────────────────────────── */
+        .afo-wrap { width: 100%; max-width: 560px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+        .form-tabs { display: flex; gap: 0.6rem; margin-bottom: 1.4rem; }
+        .tab-btn {
+            flex: 1; padding: 0.85rem; font-size: 0.8rem; font-weight: 900; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--muted); background: transparent;
+            border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
+        }
+        .tab-btn.active { color: #000; background: var(--gold); border-color: var(--gold); }
+
+        .afo-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 1.8rem; }
+        .afo-field { margin-bottom: 1.1rem; }
+        .afo-field label {
+            display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em;
+            text-transform: uppercase; color: #cbbfae; margin-bottom: 0.4rem;
+        }
+        .afo-field input {
+            width: 100%; padding: 0.95rem 1rem; background: rgba(255,255,255,0.05); color: #fff;
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.95rem;
+        }
+        .afo-btn {
+            width: 100%; padding: 1.05rem; margin-top: 0.4rem; background: var(--gold); border: none;
+            color: #000; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase;
+            border-radius: 12px; cursor: pointer; font-size: 0.95rem;
+        }
         .afo-btn:hover { background: #ffe500; }
-        .afo-msg { display: none; padding: 1rem; margin: 0 0 1rem; border-radius: 10px; font-weight: 600; font-size: 0.92rem; }
+        .afo-btn--ghost { background: transparent; border: 1px solid var(--gold); color: #fff; }
+
+        .afo-msg { display: none; padding: 1rem; margin: 0 0 1.2rem; border-radius: 10px; font-weight: 600; font-size: 0.92rem; }
         .afo-msg.ok { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.4); }
         .afo-msg.err { background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.4); }
-        .fase2-block { display: none; }
-        .afo-success { display: none; text-align: center; padding: 2rem 0; }
-        .afo-success h2 { color: #f4d000; font-weight: 900; text-transform: uppercase; margin-bottom: 0.6rem; }
-        .afo-loader { text-align: center; color: #a89b85; }
-        #loader { text-align: center; padding: 2rem; color: #f4d000; font-weight: 800; }
+
+        /* ── Invitación QR ────────────────────────────── */
+        .afo-inv { display: none; text-align: center; }
+        .afo-inv-badge { font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); font-weight: 800; font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .afo-inv h2 { font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .afo-inv-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.4rem; }
+        .afo-qr-box {
+            width: 210px; height: 210px; margin: 0 auto; background: #fff; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; padding: 12px;
+            box-shadow: 0 0 30px rgba(244,208,0,0.18);
+        }
+        .afo-qr-box svg, .afo-qr-box canvas { width: 100%; height: 100%; }
+        .afo-qr-code { margin-top: 1rem; font-family: monospace; font-size: 0.82rem; color: var(--gold); word-break: break-all; }
+        .afo-qr-note { margin-top: 0.6rem; font-size: 0.78rem; color: var(--muted); max-width: 420px; margin-left: auto; margin-right: auto; }
+
+        #loader { text-align: center; padding: 4rem; color: var(--gold); font-weight: 800; }
     </style>
 </head>
 <body>
     <div id="loader">Cargando evento…</div>
 
-    <div class="afo-wrap" id="afo-page" style="display:none">
-        <header class="afo-head">
-            <span class="afo-badge">Registro de Asistentes · Aforo</span>
-            <h1 class="afo-title" id="afo-event-name">--</h1>
-            <p class="afo-sub" id="afo-event-meta">--</p>
+    <div id="afo-page" style="display:none">
+        <header class="afo-hero" id="afo-hero">
+            <div>
+                <span class="afo-badge">Invitación · Registro</span>
+                <h1 class="afo-title" id="afo-event-name">--</h1>
+                <p class="afo-org" id="afo-org-name"></p>
+            </div>
+            <div class="afo-meta">
+                <div class="afo-meta-item"><svg viewBox="0 0 24 24" width="16" height="16" fill="var(--gold)"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="afo-fecha">--</span></div>
+                <div class="afo-meta-item"><svg viewBox="0 0 24 24" width="16" height="16" fill="var(--gold)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="afo-hora">--</span></div>
+                <div class="afo-meta-item"><svg viewBox="0 0 24 24" width="16" height="16" fill="var(--gold)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="afo-lugar">--</span></div>
+            </div>
+            <div class="afo-cd">
+                <div class="afo-cd-block"><span id="afo-days">00</span><small>DÍAS</small></div>
+                <div class="afo-cd-block"><span id="afo-hours">00</span><small>HORAS</small></div>
+                <div class="afo-cd-block"><span id="afo-mins">00</span><small>MIN</small></div>
+                <div class="afo-cd-block"><span id="afo-secs">00</span><small>SEG</small></div>
+            </div>
         </header>
-        <p class="afo-msg" id="afo-alert"></p>
 
-        <form id="afo-reg-form" class="afo-card" novalidate>
-            <div class="afo-field">
-                <label for="afo-rol">Tipo de registro</label>
-                <select id="afo-rol" required>
-                    <option value="">Selecciona una opción…</option>
-                    <option value="artista">Artista</option>
-                    <option value="invitado">Invitado</option>
-                    <option value="pago">Pago / Entrada</option>
-                </select>
-            </div>
-            <div class="afo-field">
-                <label for="afo-nombre">Nombre completo</label>
-                <input type="text" id="afo-nombre" required>
+        <div class="afo-wrap">
+            <p class="afo-msg" id="afo-alert"></p>
+
+            <div class="form-tabs">
+                <button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button>
+                <button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button>
             </div>
 
-            <!-- FASE 2 · Artista -->
-            <div class="fase2-block" id="fase2-artista">
-                <div class="afo-field"><label for="afo-artista-whatsapp">WhatsApp</label><input type="tel" id="afo-artista-whatsapp"></div>
-                <div class="afo-field"><label for="afo-artista-especialidad">Especialidad</label><input type="text" id="afo-artista-especialidad"></div>
-                <div class="afo-field"><label for="afo-artista-portafolio">Portafolio / URL</label><input type="text" id="afo-artista-portafolio"></div>
-                <div class="afo-field"><label for="afo-artista-requerimiento">Requerimiento técnico</label><input type="text" id="afo-artista-requerimiento"></div>
+            <div id="form-nuevo">
+                <form id="afo-reg-form" class="afo-card" novalidate>
+                    <div class="afo-field">
+                        <label for="afo-nombre">Nombre completo</label>
+                        <input type="text" id="afo-nombre" required>
+                    </div>
+                    <div class="afo-field">
+                        <label for="afo-cedula">Cédula</label>
+                        <input type="text" id="afo-cedula" required>
+                    </div>
+                    <div class="afo-field">
+                        <label for="afo-telefono">Teléfono / WhatsApp</label>
+                        <input type="tel" id="afo-telefono" required>
+                    </div>
+                    <button type="submit" class="afo-btn">Generar Invitación →</button>
+                </form>
             </div>
 
-            <!-- FASE 2 · Invitado -->
-            <div class="fase2-block" id="fase2-invitado">
-                <div class="afo-field"><label for="afo-inv-cedula">Cédula</label><input type="text" id="afo-inv-cedula"></div>
-                <div class="afo-field"><label for="afo-inv-whatsapp">WhatsApp</label><input type="tel" id="afo-inv-whatsapp"></div>
-                <div class="afo-field"><label for="afo-inv-email">Email</label><input type="email" id="afo-inv-email"></div>
+            <div id="form-ya" style="display:none">
+                <form id="afo-rec-form" class="afo-card" novalidate>
+                    <div class="afo-field">
+                        <label for="rec-cedula">Cédula</label>
+                        <input type="text" id="rec-cedula" required>
+                    </div>
+                    <small style="color:var(--muted); font-size:0.78rem; display:block; margin-bottom:0.6rem;">Ingresa la cédula con la que te registraste para recuperar tu invitación con QR.</small>
+                    <button type="submit" class="afo-btn afo-btn--ghost">Recuperar Invitación →</button>
+                </form>
             </div>
 
-            <!-- FASE 2 · Pago -->
-            <div class="fase2-block" id="fase2-pago">
-                <div class="afo-field"><label for="afo-pago-cedula">Cédula</label><input type="text" id="afo-pago-cedula"></div>
-                <div class="afo-field"><label for="afo-pago-whatsapp">WhatsApp</label><input type="tel" id="afo-pago-whatsapp"></div>
-                <div class="afo-field"><label for="afo-pago-monto">Monto (COP)</label><input type="number" id="afo-pago-monto"></div>
-                <div class="afo-field"><label for="afo-pago-metodo">Método de pago</label>
-                    <select id="afo-pago-metodo">
-                        <option value="">Selecciona…</option>
-                        <option value="nequi">Nequi</option>
-                        <option value="daviplata">Daviplata</option>
-                        <option value="bancolombia">Bancolombia</option>
-                        <option value="efectivo">Efectivo</option>
-                        <option value="wompi">Wompi</option>
-                    </select>
-                </div>
+            <div class="afo-inv afo-card" id="afo-inv">
+                <p class="afo-inv-badge">Invitación Confirmada</p>
+                <h2 id="inv-name">--</h2>
+                <p class="afo-inv-sub" id="inv-event">--</p>
+                <div class="afo-qr-box" id="inv-qr"></div>
+                <p class="afo-qr-code" id="inv-code">--</p>
+                <p class="afo-qr-note">Presenta este código QR en la entrada del evento. Un solo ingreso por invitación.</p>
+                <button class="afo-btn" style="margin-top:1.6rem" onclick="location.reload()">Registrar otra persona →</button>
             </div>
-
-            <button type="submit" class="afo-btn">Registrar →</button>
-        </form>
-
-        <div class="afo-success" id="afo-success">
-            <h2>¡Registro confirmado!</h2>
-            <p id="afo-success-text">Tu registro cuenta para el aforo del evento.</p>
         </div>
     </div>
 
@@ -111,6 +191,28 @@
         function NOW()   { return new Date().toLocaleTimeString('es-CO'); }
         function UID()   { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
+        function parseSpanishDate(dateStr, timeStr) {
+            const months = { "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06", "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12" };
+            const parts = (dateStr || '').toLowerCase().split(' de ');
+            if (parts.length === 3) {
+                const d = parts[0].trim().padStart(2, '0');
+                const m = months[parts[1].trim()];
+                const a = parts[2].trim();
+                return new Date(`${a}-${m}-${d}T${timeStr}`);
+            }
+            return new Date(`${dateStr}T${timeStr}`);
+        }
+
+        function switchForm(type) {
+            const isNew = type === 'nuevo';
+            const tn = document.getElementById('tab-new'), to = document.getElementById('tab-old');
+            tn.classList.toggle('active', isNew);
+            to.classList.toggle('active', !isNew);
+            document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
+            document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
+            log("DEBUG: Ruta de formulario cambiada a [" + type.toUpperCase() + "]", "DEBUG");
+        }
+
         function mostrarAlerta(msg, tipo) {
             const el = document.getElementById('afo-alert');
             el.className = 'afo-msg ' + (tipo === 'ok' ? 'ok' : 'err');
@@ -118,11 +220,30 @@
             el.textContent = msg;
         }
 
+        function mostrarInvitacion(nombre, eventoTxt, qrCode) {
+            document.getElementById('form-nuevo').style.display = 'none';
+            document.getElementById('form-ya').style.display = 'none';
+            document.getElementById('afo-alert').style.display = 'none';
+            document.getElementById('inv-name').textContent = (nombre || '').toUpperCase();
+            document.getElementById('inv-event').textContent = eventoTxt;
+            document.getElementById('inv-code').textContent = qrCode || '--';
+            const qd = document.getElementById('inv-qr');
+            qd.innerHTML = '';
+            try {
+                QrCreator.render({ text: qrCode, radius: 0, ecLevel: "H", fill: "#181815", background: "#ffffff", size: 200 }, qd);
+            } catch (e) {
+                qd.textContent = qrCode;
+            }
+            document.getElementById('afo-inv').style.display = 'block';
+            log("TRACE: Invitación QR renderizada con código " + (qrCode || ''), "TRACE");
+        }
+
         async function init() {
-            log("Iniciando Registro Aforo (ADR-030) — página solo-formulario.", "INFO");
+            log("Iniciando Registro (ADR-030) — página de invitación con QR + aforo.", "INFO");
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
             const id = params.get('id');
+            const rol = (params.get('rol') || 'invitado').trim().toLowerCase();
             if (!slug && !id) { document.getElementById('afo-page').style.display = 'block'; mostrarAlerta('Evento no especificado.', 'err'); return; }
             try {
                 const timeoutPromise = new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout 8s')), 8000));
@@ -134,20 +255,42 @@
                 window.__ctxEventoId = ev.id;
                 window.__ctxOrgId = ev.org_id || null;
                 window.__ctxEv = ev;
+                window.__ctxRol = rol;
+
                 const content = ev.config_landing?.content || {};
-                const formSolo = content.form_solo && content.form_solo.activo === false ? false : true;
+                const formSolo = content.form_solo ? content.form_solo.activo !== false : true;
 
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('afo-page').style.display = 'block';
-                document.getElementById('afo-event-name').textContent = (ev.nombre || '').toUpperCase();
-                const fechaHora = (ev.fecha ? ev.fecha : '') + (ev.hora ? ' · ' + ev.hora + ' HRS' : '');
-                document.getElementById('afo-event-meta').textContent = (fechaHora ? fechaHora + ' · ' : '') + (ev.ubicacion || '');
-                log("LINK: Evento cargado para registro aforo: " + (ev.nombre || '') + " (id=" + ev.id + ").", "LINK");
+
+                const tituloRaw = (ev.nombre || '').toUpperCase();
+                const palabras = tituloRaw.split(' ');
+                const mitad = Math.ceil(palabras.length / 2);
+                const title = document.getElementById('afo-event-name');
+                title.innerHTML = '<span class="line">' + palabras.slice(0, mitad).join(' ') + '</span><span class="line">' + palabras.slice(mitad).join(' ') + '</span>';
+                document.getElementById('afo-org-name').textContent = (ev.organizaciones?.nombre || '--').toUpperCase();
+                document.getElementById('afo-fecha').textContent = ev.fecha || '--';
+                document.getElementById('afo-hora').textContent = (ev.hora ? ev.hora + ' HRS' : '--');
+                document.getElementById('afo-lugar').textContent = (ev.ubicacion || '--').toUpperCase();
+                if (ev.imagen_url) document.getElementById('afo-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
+
+                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
+                setInterval(() => {
+                    const diff = target - Date.now();
+                    if (diff <= 0) return;
+                    document.getElementById('afo-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                    document.getElementById('afo-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById('afo-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById('afo-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                }, 1000);
+
+                log("LINK: Evento cargado para registro QR: " + (ev.nombre || '') + " (id=" + ev.id + ", rol=" + rol + ").", "LINK");
 
                 if (!formSolo) {
-                    mostrarAlerta('El registro aforo no está disponible para este evento.', 'err');
-                    document.getElementById('afo-reg-form').style.display = 'none';
-                    log("INFO: form_solo.activo=false — página aforo desactivada para este evento.", "INFO");
+                    mostrarAlerta('El registro con invitación no está disponible para este evento.', 'err');
+                    document.getElementById('form-nuevo').style.display = 'none';
+                    document.getElementById('form-ya').style.display = 'none';
+                    log("INFO: form_solo.activo=false — registro desactivado para este evento.", "INFO");
                     return;
                 }
             } catch (err) {
@@ -158,77 +301,73 @@
             }
         }
 
-        // Selector de rol → muestra bloque Fase 2 (Cero Borrado: todos en el DOM)
-        document.getElementById('afo-rol').addEventListener('change', function () {
-            const rol = this.value;
-            document.querySelectorAll('.fase2-block').forEach(b => b.style.display = 'none');
-            if (rol) {
-                const blk = document.getElementById('fase2-' + rol);
-                if (blk) blk.style.display = 'block';
-            }
-            log("DEBUG: Rol aforo seleccionado: " + (rol || 'ninguno'), "DEBUG");
-        });
-
         document.getElementById('afo-reg-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const ev = window.__ctxEv;
             if (!ev) { mostrarAlerta('Evento no cargado.', 'err'); return; }
-            const rol = document.getElementById('afo-rol').value;
             const nombre = document.getElementById('afo-nombre').value.trim();
-            if (!rol || !nombre) { mostrarAlerta('Selecciona un tipo de registro y escribe tu nombre.', 'err'); return; }
+            const cedula = document.getElementById('afo-cedula').value.trim();
+            const telefono = document.getElementById('afo-telefono').value.trim();
+            const rol = window.__ctxRol || 'invitado';
+            if (!nombre || !cedula || !telefono) { mostrarAlerta('Completa nombre, cédula y teléfono.', 'err'); return; }
 
-            const get = (id) => (document.getElementById(id)?.value || '').trim();
-            const payload = {
-                evento_id: ev.id,
-                org_id: window.__ctxOrgId,
-                evento_nombre: ev.nombre,
-                evento_fecha: ev.fecha,
-                nombre: nombre,
-                tipo: rol,
-                tipo_ayuda: rol,
-                cuenta_aforo: true,
-                respuestas_custom: { rol },
-                fecha_inscripcion: TODAY(),
-                hora_inscripcion: NOW()
-            };
-            let cedula = null;
-
-            if (rol === 'artista') {
-                payload.whatsapp = get('afo-artista-whatsapp');
-                payload.telefono = payload.whatsapp;
-                payload.artista_especialidad = get('afo-artista-especialidad');
-                payload.artista_portafolio = get('afo-artista-portafolio');
-                payload.artista_requerimiento_tecnico = get('afo-artista-requerimiento');
-            } else if (rol === 'invitado') {
-                cedula = get('afo-inv-cedula');
-                payload.cedula = cedula;
-                payload.whatsapp = get('afo-inv-whatsapp');
-                payload.telefono = payload.whatsapp;
-                payload.email = get('afo-inv-email');
-            } else if (rol === 'pago') {
-                cedula = get('afo-pago-cedula');
-                payload.cedula = cedula;
-                payload.whatsapp = get('afo-pago-whatsapp');
-                payload.telefono = payload.whatsapp;
-                payload.qr_code = 'QR-' + UID();
-                payload.respuestas_custom = { rol, monto: get('afo-pago-monto'), metodo_pago: get('afo-pago-metodo') };
-            }
-
+            const btn = document.querySelector('#afo-reg-form .afo-btn');
+            btn.disabled = true; btn.textContent = 'Generando invitación…';
             try {
-                if (cedula) {
-                    const { data: dup } = await sbClient.from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
-                    if (dup) { mostrarAlerta('Esta cédula ya está registrada para este evento.', 'err'); log("DEBUG: Duplicado por cédula: " + cedula, "DEBUG"); return; }
-                }
+                const { data: dup } = await sbClient.from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
+                if (dup) { mostrarAlerta('Esta cédula ya está registrada para este evento. Usa la pestaña RECUPERAR.', 'err'); btn.disabled = false; btn.textContent = 'Generar Invitación →'; return; }
+
+                const qr = 'QR-' + UID();
+                const payload = {
+                    evento_id: ev.id,
+                    org_id: window.__ctxOrgId,
+                    evento_nombre: ev.nombre,
+                    evento_fecha: ev.fecha,
+                    nombre: nombre,
+                    cedula: cedula,
+                    telefono: telefono,
+                    whatsapp: telefono,
+                    tipo: rol,
+                    tipo_ayuda: rol,
+                    cuenta_aforo: true,
+                    qr_code: qr,
+                    used: false,
+                    fecha_inscripcion: TODAY(),
+                    hora_inscripcion: NOW(),
+                    respuestas_custom: { rol, origen: 'pagina-registro' }
+                };
                 const { error } = await sbClient.from('inscritos').insert(payload);
                 if (error) throw error;
-                log("INFO: Inscrito aforo creado (rol=" + rol + ", cuenta_aforo=true).", "INFO");
-                mostrarAlerta('✓ Registro confirmado. Cuenta para el aforo del evento.', 'ok');
-                document.getElementById('afo-reg-form').style.display = 'none';
-                document.getElementById('afo-success').style.display = 'block';
-                log("TRACE: Formulario aforo cerrado con éxito.", "TRACE");
+                log("INFO: Invitación creada (rol=" + rol + ", cuenta_aforo=true, " + qr + ").", "INFO");
+                mostrarInvitacion(nombre, (ev.nombre || '') + ' · ' + (ev.fecha || ''), qr);
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
-                mostrarAlerta('Hubo un problema al registrar. Inténtalo de nuevo.', 'err');
+                btn.disabled = false; btn.textContent = 'Generar Invitación →';
+                mostrarAlerta('Hubo un problema al generar tu invitación. Inténtalo de nuevo.', 'err');
+            }
+        });
+
+        document.getElementById('afo-rec-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const ev = window.__ctxEv;
+            if (!ev) { mostrarAlerta('Evento no cargado.', 'err'); return; }
+            const cedula = document.getElementById('rec-cedula').value.trim();
+            if (!cedula) { mostrarAlerta('Ingresa tu cédula.', 'err'); return; }
+
+            const btn = document.querySelector('#afo-rec-form .afo-btn');
+            btn.disabled = true; btn.textContent = 'Buscando…';
+            try {
+                const { data: ins, error } = await sbClient.from('inscritos')
+                    .select('*').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
+                if (error) throw error;
+                if (!ins) { mostrarAlerta('No encontramos una invitación con esa cédula.', 'err'); btn.disabled = false; btn.textContent = 'Recuperar Invitación →'; return; }
+                const qr = ins.qr_code || ('QR-' + UID());
+                log("LINK: Invitación recuperada por cédula (" + (ins.id || '') + ").", "LINK");
+                mostrarInvitacion(ins.nombre, (ev.nombre || '') + ' · ' + (ev.fecha || ''), qr);
+            } catch (err) {
+                log("ERROR: " + err.message, "ERROR");
+                btn.disabled = false; btn.textContent = 'Recuperar Invitación →';
+                mostrarAlerta('Hubo un problema al recuperar tu invitación.', 'err');
             }
         });
 
