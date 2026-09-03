@@ -719,6 +719,29 @@ tr:hover td{background:var(--surface)}
           </label>
         </div>
         <div id="ev-landing-config" style="display:none">
+        <!-- ══ SISTEMA DUAL DE CAPTURA (ADR-030): Landing + Página solo-formulario ══ -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.85rem">
+          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">📲 Sistema de captura</div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-bottom:.6rem">
+            <input type="checkbox" id="ev-sist-dual" style="width:14px;height:14px;accent-color:var(--gold)" onchange="toggleSistDual(this.checked)">
+            Landing + página solo-formulario (aforo)
+          </label>
+          <div id="ev-sist-dual-config" style="display:none">
+            <div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">El formulario del landing mete al usuario a una comunidad de WhatsApp; la página solo-formulario registra artistas/invitados/pagos que cuentan para aforo.</div>
+            <div class="fg">
+              <label>Link comunidad de WhatsApp</label>
+              <input id="ev-comunidad-whatsapp" placeholder="https://chat.whatsapp.com/XXXX  o  https://wa.me/57..." style="width:100%">
+            </div>
+            <div class="fg" style="margin-top:.5rem">
+              <label>URL página solo-formulario (aforo)</label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input id="ev-form-solo-url" readonly style="flex:1;background:rgba(0,0,0,.08)">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyLink(document.getElementById('ev-form-solo-url').value,this)">Copiar</button>
+              </div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:3px">Se genera automáticamente al guardar el evento con el slug. Ej: /registroaforo.html?slug=...</div>
+            </div>
+          </div>
+        </div>
         <!-- ══ Sub-paso 2 · ADN Visual (plantilla + módulos + efectos) ══ -->
         <div class="wiz-step" data-wiz-step="2">
           <!-- Selector de themes -->
@@ -2466,6 +2489,11 @@ function toggleLandingConfig(activa) {
   if (activa && !_ldThemeSeleccionado) seleccionarTheme('arthouse');
 }
 
+// ADR-030 — Sistema dual de captura (landing + página solo-formulario)
+function toggleSistDual(activa) {
+  document.getElementById('ev-sist-dual-config').style.display = activa ? 'block' : 'none';
+}
+
 // Map theme → event type for dynamic modules
 const _THEME_TYPE = {
   'arthouse':'cinematografia','premiere-gold':'cinematografia',
@@ -3007,7 +3035,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 })();
 
-function _buildConfigLanding() {
+function _buildConfigLanding(slug) {
   const activa = document.getElementById('ev-landing-activa')?.checked;
   if (!activa || !_ldThemeSeleccionado) return null;
 
@@ -3115,6 +3143,11 @@ function _buildConfigLanding() {
       impacto_historico: val('ld-impacto-historico-val') ? val('ld-impacto-historico-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{etiqueta:p[0]?.trim(),valor:p[1]?.trim()};}) : undefined,
       impacto_historico_frase: val('ld-impacto-historico-frase') || null,
       contacto:    (val('ld-contacto-email')||val('ld-contacto-tel')) ? {email:val('ld-contacto-email'),tel:val('ld-contacto-tel'),dir:val('ld-contacto-dir')} : null,
+      // ADR-030 — Sistema dual de captura (landing + página solo-formulario/aforo)
+      ...((document.getElementById('ev-sist-dual')?.checked) ? {
+        comunidad_whatsapp: val('ev-comunidad-whatsapp') || null,
+        form_solo: { activo: true, url: slug ? '/registroaforo.html?slug=' + encodeURIComponent(slug) : '/registroaforo.html?slug=' },
+      } : {}),
       ...(director           ? {director}           : {}),
       ...(gallery.length     ? {gallery}             : {}),
       ...(sponsors.length    ? {sponsors}            : {}),
@@ -3847,6 +3880,7 @@ function renderEventos() {
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0" class="ev-actions">
           <button class="btn btn-gold btn-sm" onclick="openMod('${e.id}','${(e.nombre||'').replace(/'/g,"\\'")}','${e.fecha||''}','${e.hora||''}')">Invitación QR</button>
           <button class="btn btn-ghost btn-sm" onclick="copyLink('${pubLink}',this)">Página pública</button>
+          ${(e.config_landing && e.config_landing.content && e.config_landing.content.form_solo && e.config_landing.content.form_solo.activo) ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${window.location.origin}/registroaforo.html?slug=${encodeURIComponent(e.slug||'')}',this)">Formulario aforo</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="openEditMod('${e.id}')">✏ Editar</button>
           <button class="btn btn-ghost btn-sm btn-red" onclick="delEvento('${e.id}')">Eliminar</button>
         </div>
@@ -4036,6 +4070,12 @@ function _limpiarWizardCompleto() {
   if (window._djLineupSetEntries) window._djLineupSetEntries([]);
   const landing = document.getElementById('ev-landing-activa');
   if (landing) { landing.checked = false; toggleLandingConfig(false); }
+  const sistDual = document.getElementById('ev-sist-dual');
+  if (sistDual) { sistDual.checked = false; toggleSistDual(false); }
+  const comun = document.getElementById('ev-comunidad-whatsapp');
+  if (comun) comun.value = '';
+  const formUrl = document.getElementById('ev-form-solo-url');
+  if (formUrl) formUrl.value = '';
   document.getElementById('ev-img-preview').style.display = 'none';
   document.getElementById('ev-poster-preview').style.display = 'none';
   document.getElementById('ev-multi-acceso').checked = false;
@@ -4168,6 +4208,17 @@ function _poblarContenidoWizard(content, suf) {
     set('ld-contacto-tel',   content.contacto.tel);
     set('ld-contacto-dir',   content.contacto.dir);
   }
+  // ADR-030 — Sistema dual de captura (landing + página solo-formulario/aforo)
+  const sistDualEl = document.getElementById('ev-sist-dual');
+  const dualCfg = document.getElementById('ev-sist-dual-config');
+  const comunEl = document.getElementById('ev-comunidad-whatsapp');
+  const urlEl   = document.getElementById('ev-form-solo-url');
+  const formSolo = content.form_solo;
+  const dualActivo = !!(sistDualEl && formSolo && formSolo.activo === true);
+  if (sistDualEl) sistDualEl.checked = dualActivo;
+  if (dualCfg) dualCfg.style.display = dualActivo ? 'block' : 'none';
+  if (comunEl) comunEl.value = content.comunidad_whatsapp || '';
+  if (urlEl) urlEl.value = (formSolo && formSolo.url) ? formSolo.url.replace(window.location.origin, '') : '';
 }
 
 function cancelarEdicion() {
@@ -4224,11 +4275,10 @@ async function guardarEventoWizard() {
         custom: getCamposCustom(),
       },
     };
-    const cfgLanding = _buildConfigLanding();
+    const prevSlug = _eventos.find(e => e.id === id)?.slug || null;
+    const cfgLanding = _buildConfigLanding(prevSlug);
     // Edición: si la landing se desactivó, limpiar el JSON previo (Cero Huérfanos).
     payload.config_landing = cfgLanding || null;
-
-    const prevSlug = _eventos.find(e => e.id === id)?.slug || null;
 
     const { error } = await SB.from('eventos').update(payload).eq('id', id);
     if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
@@ -5225,7 +5275,7 @@ async function _crearEventoUnico(n) {
     },
     aforo_max: parseInt(document.getElementById('ev-aforo')?.value) || null,
     ...(document.getElementById('ev-poster-url')?.value.trim() ? {poster_url: document.getElementById('ev-poster-url').value.trim()} : {}),
-    ...(typeof _buildConfigLanding === 'function' && _buildConfigLanding() ? {config_landing: _buildConfigLanding()} : {}),
+    ...(typeof _buildConfigLanding === 'function' && _buildConfigLanding(slug) ? {config_landing: _buildConfigLanding(slug)} : {}),
     // ADR-021 — antes solo vivían dentro de config_landing (JSON); BLUEPRINT.md ya los
     // documentaba como columnas de 'eventos' pero el INSERT nunca los escribía
     // (ver ERRORES_HISTORICOS.md §8). Requiere la migración de /migrations/adr021.sql.

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Aforo · Hostal Terraza</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0c0e; color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+        .afo-wrap { width: 100%; max-width: 560px; }
+        .afo-head { text-align: center; margin-bottom: 1.5rem; }
+        .afo-badge { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #f4d000; font-weight: 800; display: block; margin-bottom: 0.4rem; }
+        .afo-title { font-size: 1.6rem; font-weight: 900; line-height: 1.1; text-transform: uppercase; }
+        .afo-sub { font-size: 0.85rem; color: #a89b85; margin-top: 0.4rem; }
+        .afo-card { background: #141419; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.8rem; }
+        .afo-field { margin-bottom: 1rem; }
+        .afo-field label { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #cbbfae; margin-bottom: 0.4rem; }
+        .afo-field input, .afo-field select { width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.95rem; }
+        .afo-field select { appearance: auto; }
+        .afo-btn { width: 100%; padding: 1rem; margin-top: 0.6rem; background: #f4d000; border: none; color: #000; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 12px; cursor: pointer; font-size: 0.95rem; }
+        .afo-btn:hover { background: #ffe500; }
+        .afo-msg { display: none; padding: 1rem; margin: 0 0 1rem; border-radius: 10px; font-weight: 600; font-size: 0.92rem; }
+        .afo-msg.ok { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.4); }
+        .afo-msg.err { background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.4); }
+        .fase2-block { display: none; }
+        .afo-success { display: none; text-align: center; padding: 2rem 0; }
+        .afo-success h2 { color: #f4d000; font-weight: 900; text-transform: uppercase; margin-bottom: 0.6rem; }
+        .afo-loader { text-align: center; color: #a89b85; }
+        #loader { text-align: center; padding: 2rem; color: #f4d000; font-weight: 800; }
+    </style>
+</head>
+<body>
+    <div id="loader">Cargando evento…</div>
+
+    <div class="afo-wrap" id="afo-page" style="display:none">
+        <header class="afo-head">
+            <span class="afo-badge">Registro de Asistentes · Aforo</span>
+            <h1 class="afo-title" id="afo-event-name">--</h1>
+            <p class="afo-sub" id="afo-event-meta">--</p>
+        </header>
+        <p class="afo-msg" id="afo-alert"></p>
+
+        <form id="afo-reg-form" class="afo-card" novalidate>
+            <div class="afo-field">
+                <label for="afo-rol">Tipo de registro</label>
+                <select id="afo-rol" required>
+                    <option value="">Selecciona una opción…</option>
+                    <option value="artista">Artista</option>
+                    <option value="invitado">Invitado</option>
+                    <option value="pago">Pago / Entrada</option>
+                </select>
+            </div>
+            <div class="afo-field">
+                <label for="afo-nombre">Nombre completo</label>
+                <input type="text" id="afo-nombre" required>
+            </div>
+
+            <!-- FASE 2 · Artista -->
+            <div class="fase2-block" id="fase2-artista">
+                <div class="afo-field"><label for="afo-artista-whatsapp">WhatsApp</label><input type="tel" id="afo-artista-whatsapp"></div>
+                <div class="afo-field"><label for="afo-artista-especialidad">Especialidad</label><input type="text" id="afo-artista-especialidad"></div>
+                <div class="afo-field"><label for="afo-artista-portafolio">Portafolio / URL</label><input type="text" id="afo-artista-portafolio"></div>
+                <div class="afo-field"><label for="afo-artista-requerimiento">Requerimiento técnico</label><input type="text" id="afo-artista-requerimiento"></div>
+            </div>
+
+            <!-- FASE 2 · Invitado -->
+            <div class="fase2-block" id="fase2-invitado">
+                <div class="afo-field"><label for="afo-inv-cedula">Cédula</label><input type="text" id="afo-inv-cedula"></div>
+                <div class="afo-field"><label for="afo-inv-whatsapp">WhatsApp</label><input type="tel" id="afo-inv-whatsapp"></div>
+                <div class="afo-field"><label for="afo-inv-email">Email</label><input type="email" id="afo-inv-email"></div>
+            </div>
+
+            <!-- FASE 2 · Pago -->
+            <div class="fase2-block" id="fase2-pago">
+                <div class="afo-field"><label for="afo-pago-cedula">Cédula</label><input type="text" id="afo-pago-cedula"></div>
+                <div class="afo-field"><label for="afo-pago-whatsapp">WhatsApp</label><input type="tel" id="afo-pago-whatsapp"></div>
+                <div class="afo-field"><label for="afo-pago-monto">Monto (COP)</label><input type="number" id="afo-pago-monto"></div>
+                <div class="afo-field"><label for="afo-pago-metodo">Método de pago</label>
+                    <select id="afo-pago-metodo">
+                        <option value="">Selecciona…</option>
+                        <option value="nequi">Nequi</option>
+                        <option value="daviplata">Daviplata</option>
+                        <option value="bancolombia">Bancolombia</option>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="wompi">Wompi</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="afo-btn">Registrar →</button>
+        </form>
+
+        <div class="afo-success" id="afo-success">
+            <h2>¡Registro confirmado!</h2>
+            <p id="afo-success-text">Tu registro cuenta para el aforo del evento.</p>
+        </div>
+    </div>
+
+    <script>
+        const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
+        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+
+        function log(format, t = 'INFO') {
+            const colors = { 'INFO': '#00ff88', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'TRACE': '#e67e22', 'DEBUG': '#3498db', 'ERROR': '#ff4d4d' };
+            console.log('%c[' + new Date().toLocaleTimeString() + '] [' + t + '] ' + format, 'color: ' + (colors[t] || '#fff') + '; font-weight: bold;');
+        }
+
+        function TODAY() { return new Date().toLocaleDateString('es-CO'); }
+        function NOW()   { return new Date().toLocaleTimeString('es-CO'); }
+        function UID()   { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+        function mostrarAlerta(msg, tipo) {
+            const el = document.getElementById('afo-alert');
+            el.className = 'afo-msg ' + (tipo === 'ok' ? 'ok' : 'err');
+            el.style.display = 'block';
+            el.textContent = msg;
+        }
+
+        async function init() {
+            log("Iniciando Registro Aforo (ADR-030) — página solo-formulario.", "INFO");
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug');
+            const id = params.get('id');
+            if (!slug && !id) { document.getElementById('afo-page').style.display = 'block'; mostrarAlerta('Evento no especificado.', 'err'); return; }
+            try {
+                const timeoutPromise = new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout 8s')), 8000));
+                let query = sbClient.from('eventos').select('*, organizaciones(nombre)');
+                if (slug) query = query.eq('slug', slug).single();
+                else query = query.eq('id', id).single();
+                const { data: ev, error } = await Promise.race([query, timeoutPromise]);
+                if (error || !ev) throw error || new Error('Evento no hallado');
+                window.__ctxEventoId = ev.id;
+                window.__ctxOrgId = ev.org_id || null;
+                window.__ctxEv = ev;
+                const content = ev.config_landing?.content || {};
+                const formSolo = content.form_solo && content.form_solo.activo === false ? false : true;
+
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('afo-page').style.display = 'block';
+                document.getElementById('afo-event-name').textContent = (ev.nombre || '').toUpperCase();
+                const fechaHora = (ev.fecha ? ev.fecha : '') + (ev.hora ? ' · ' + ev.hora + ' HRS' : '');
+                document.getElementById('afo-event-meta').textContent = (fechaHora ? fechaHora + ' · ' : '') + (ev.ubicacion || '');
+                log("LINK: Evento cargado para registro aforo: " + (ev.nombre || '') + " (id=" + ev.id + ").", "LINK");
+
+                if (!formSolo) {
+                    mostrarAlerta('El registro aforo no está disponible para este evento.', 'err');
+                    document.getElementById('afo-reg-form').style.display = 'none';
+                    log("INFO: form_solo.activo=false — página aforo desactivada para este evento.", "INFO");
+                    return;
+                }
+            } catch (err) {
+                log("ERROR: " + err.message, "ERROR");
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('afo-page').style.display = 'block';
+                mostrarAlerta('No pudimos cargar el evento. Inténtalo de nuevo.', 'err');
+            }
+        }
+
+        // Selector de rol → muestra bloque Fase 2 (Cero Borrado: todos en el DOM)
+        document.getElementById('afo-rol').addEventListener('change', function () {
+            const rol = this.value;
+            document.querySelectorAll('.fase2-block').forEach(b => b.style.display = 'none');
+            if (rol) {
+                const blk = document.getElementById('fase2-' + rol);
+                if (blk) blk.style.display = 'block';
+            }
+            log("DEBUG: Rol aforo seleccionado: " + (rol || 'ninguno'), "DEBUG");
+        });
+
+        document.getElementById('afo-reg-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const ev = window.__ctxEv;
+            if (!ev) { mostrarAlerta('Evento no cargado.', 'err'); return; }
+            const rol = document.getElementById('afo-rol').value;
+            const nombre = document.getElementById('afo-nombre').value.trim();
+            if (!rol || !nombre) { mostrarAlerta('Selecciona un tipo de registro y escribe tu nombre.', 'err'); return; }
+
+            const get = (id) => (document.getElementById(id)?.value || '').trim();
+            const payload = {
+                evento_id: ev.id,
+                org_id: window.__ctxOrgId,
+                evento_nombre: ev.nombre,
+                evento_fecha: ev.fecha,
+                nombre: nombre,
+                tipo: rol,
+                tipo_ayuda: rol,
+                cuenta_aforo: true,
+                respuestas_custom: { rol },
+                fecha_inscripcion: TODAY(),
+                hora_inscripcion: NOW()
+            };
+            let cedula = null;
+
+            if (rol === 'artista') {
+                payload.whatsapp = get('afo-artista-whatsapp');
+                payload.telefono = payload.whatsapp;
+                payload.artista_especialidad = get('afo-artista-especialidad');
+                payload.artista_portafolio = get('afo-artista-portafolio');
+                payload.artista_requerimiento_tecnico = get('afo-artista-requerimiento');
+            } else if (rol === 'invitado') {
+                cedula = get('afo-inv-cedula');
+                payload.cedula = cedula;
+                payload.whatsapp = get('afo-inv-whatsapp');
+                payload.telefono = payload.whatsapp;
+                payload.email = get('afo-inv-email');
+            } else if (rol === 'pago') {
+                cedula = get('afo-pago-cedula');
+                payload.cedula = cedula;
+                payload.whatsapp = get('afo-pago-whatsapp');
+                payload.telefono = payload.whatsapp;
+                payload.qr_code = 'QR-' + UID();
+                payload.respuestas_custom = { rol, monto: get('afo-pago-monto'), metodo_pago: get('afo-pago-metodo') };
+            }
+
+            try {
+                if (cedula) {
+                    const { data: dup } = await sbClient.from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
+                    if (dup) { mostrarAlerta('Esta cédula ya está registrada para este evento.', 'err'); log("DEBUG: Duplicado por cédula: " + cedula, "DEBUG"); return; }
+                }
+                const { error } = await sbClient.from('inscritos').insert(payload);
+                if (error) throw error;
+                log("INFO: Inscrito aforo creado (rol=" + rol + ", cuenta_aforo=true).", "INFO");
+                mostrarAlerta('✓ Registro confirmado. Cuenta para el aforo del evento.', 'ok');
+                document.getElementById('afo-reg-form').style.display = 'none';
+                document.getElementById('afo-success').style.display = 'block';
+                log("TRACE: Formulario aforo cerrado con éxito.", "TRACE");
+            } catch (err) {
+                log("ERROR: " + err.message, "ERROR");
+                mostrarAlerta('Hubo un problema al registrar. Inténtalo de nuevo.', 'err');
+            }
+        });
+
+        window.onload = init;
+    </script>
+</body>
+</html>

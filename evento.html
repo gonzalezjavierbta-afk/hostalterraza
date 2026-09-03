@@ -230,6 +230,8 @@
                 <div id="form-nuevo">
                     <form id="master-reg-form">
                         <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
+                        <input type="tel" id="reg-whatsapp" placeholder="WhatsApp *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
+                        <div id="reg-comunidad-msg" style="display:none; margin-bottom:1.5rem; padding:1.2rem; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.4); border-radius:12px; color:#fff; font-weight:600;"></div>
                         <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR →</button>
                     </form>
                 </div>
@@ -893,8 +895,25 @@ if (document.getElementById('db-poster-img')) {
 
     const dressVal = content.dresscode || 'NEON';
     const guestVal = content.guest_list || '+200';
-    const aforoVal = ev.aforo_max ? `${ev.aforo_max}` : '100';
+    const aforoMax = ev.aforo_max ? `${ev.aforo_max}` : '100';
     const ticketVal = content.tickets_info || 'DISPONIBLES';
+
+    // aforoVal se resuelve de forma asíncrona (conteo real de registros de la
+    // página solo-formulario, cuenta_aforo=true) sobre aforo_max (ADR-030).
+    let aforoVal = aforoMax;
+    if (ev.aforo_max) {
+        try {
+            const { count } = await sbClient.from('inscritos')
+                .select('id', { count: 'exact', head: true })
+                .eq('evento_id', ev.id)
+                .eq('cuenta_aforo', true);
+            aforoVal = `${count ?? 0} / ${ev.aforo_max}`;
+            logStatus(`TRACE: Aforo real (cuenta_aforo=true) = ${count ?? 0}/${ev.aforo_max}.`, "TRACE");
+        } catch (afoErr) {
+            logStatus(`DEBUG: No se pudo contar aforo real (${afoErr.message}); usando aforo_max.`, "DEBUG");
+            aforoVal = aforoMax;
+        }
+    }
 
     if (!content.dresscode || !content.guest_list || !ev.aforo_max || !content.tickets_info) {
         isTechFallback = true;
@@ -983,6 +1002,72 @@ if (document.getElementById('db-poster-img')) {
         f6HeroWa.href = `https://wa.me/${waTel}?text=${waMsg}`;
     }
     // === FIN SEGMENTO WHATSAPP ===
+
+                // === INICIO SEGMENTO: FORMULARIO LANDING → COMUNIDAD (ADR-030) ===
+                // Sistema dual de captura (Parte A): el formulario del landing captura datos
+                // del usuario y lo redirige a la comunidad de WhatsApp configurada por evento
+                // en config_landing.content.comunidad_whatsapp. Este registro NUNCA cuenta
+                // para aforo (cuenta_aforo = false).
+                const regForm = document.getElementById('master-reg-form');
+                if (regForm) {
+                    regForm.addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        const nombre = (document.getElementById('reg-nombre')?.value || '').trim();
+                        const whatsapp = (document.getElementById('reg-whatsapp')?.value || '').trim();
+                        const comunidadLink = content.comunidad_whatsapp || '';
+                        const msgBox = document.getElementById('reg-comunidad-msg');
+                        if (!nombre || !whatsapp) {
+                            if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Por favor completa tu nombre y WhatsApp.'; }
+                            logStatus("DEBUG: Landing form incompleto (nombre/whatsapp).", "DEBUG");
+                            return;
+                        }
+                        logStatus("DEBUG: Landing form válido, insertando inscrito (tipo=comunidad).", "DEBUG");
+                        const payload = {
+                            evento_id: ev.id,
+                            org_id: ev.org_id ?? null,
+                            evento_nombre: ev.nombre,
+                            evento_fecha: ev.fecha,
+                            nombre,
+                            whatsapp,
+                            telefono: whatsapp,
+                            tipo: 'comunidad',
+                            cuenta_aforo: false,
+                            fecha_inscripcion: new Date().toLocaleDateString('es-CO'),
+                            hora_inscripcion: new Date().toLocaleTimeString('es-CO'),
+                            respuestas_custom: { origen: 'landing-comunidad' }
+                        };
+                        try {
+                            // Anti-duplicado por whatsapp + evento_id
+                            const { data: dup } = await sbClient.from('inscritos').select('id').eq('whatsapp', whatsapp).eq('evento_id', ev.id).maybeSingle();
+                            if (dup) {
+                                logStatus(`LINK: WhatsApp ya registrado en este evento; redirigiendo a comunidad (${dup.id}).`, "LINK");
+                            } else {
+                                const { error } = await sbClient.from('inscritos').insert(payload);
+                                if (error) throw error;
+                                logStatus("INFO: Inscrito de comunidad creado en inscritos (cuenta_aforo=false).", "INFO");
+                            }
+                            // Redirigir a la comunidad de WhatsApp (si está configurada)
+                            if (comunidadLink) {
+                                window.open(comunidadLink, '_blank');
+                                logStatus(`LINK: Abriendo comunidad de WhatsApp (${comunidadLink}).`, "LINK");
+                            } else {
+                                logStatus("DEBUG: Sin link de comunidad configurado; mostrando solo agradecimiento.", "DEBUG");
+                            }
+                            if (msgBox) {
+                                msgBox.style.display = 'block';
+                                msgBox.textContent = '¡Gracias! Revisa WhatsApp para unirte a la comunidad del evento.';
+                                msgBox.style.borderColor = comunidadLink ? 'rgba(37,211,102,0.4)' : 'rgba(241,196,15,0.5)';
+                            }
+                            regForm.querySelectorAll('input').forEach(i => i.style.display = 'none');
+                            regForm.querySelector('button[type=submit]').style.display = 'none';
+                        } catch (err) {
+                            logStatus(`ERROR: Fallo al registrar en comunidad: ${err.message}`, "ERROR");
+                            if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Hubo un problema. Inténtalo de nuevo.'; }
+                        }
+                        logStatus("TRACE: Fin submit formulario landing (ADR-030).", "TRACE");
+                    });
+                    logStatus("INFO: Formulario landing vinculado a comunidad WhatsApp (ADR-030).", "INFO");
+                }
 
                 // === SENSOR DE SALUD DINÁMICO (Inversión de Control v212) ===
                 // El Master ya no decide qué módulos se muestran. Ese mandato pertenece
