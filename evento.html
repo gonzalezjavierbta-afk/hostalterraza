@@ -433,9 +433,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // MAPEO DE HERO & METADATA
                 const __tituloEl = document.getElementById('event-title');
                 const __tituloRaw = ev.nombre.toUpperCase();
-                // v222 (aditivo, solo silo .tpl-f6): título en 2 líneas físico
+                // v222 (aditivo, solo silo .tpl-f6 / v300 .tpl-f8): título en 2 líneas físico
                 // (contrato: #event-title sigue intacto, se añaden 2 spans hijos).
-                if (document.body.className.includes('tpl-f6')) {
+                if (document.body.className.includes('tpl-f6') || document.body.className.includes('tpl-f8')) {
                     const __palabras = __tituloRaw.split(' ');
                     const __mitad = Math.ceil(__palabras.length / 2);
                     const __l1 = document.createElement('span');
@@ -978,7 +978,9 @@ if (document.getElementById('db-poster-img')) {
             waDisplay.textContent = `CONTÁCTANOS · +${formatWaPhone(waTel)}`;
         }
     }
-    // v222 (aditivo): hero CTA del silo .tpl-f6 comparte el mismo vínculo wa.me.
+    // v222 (aditivo): hero CTA del silo .tpl-f6 / .tpl-f8 comparte el mismo vínculo wa.me.
+    // El botón físico #f6-hero-wa es el único CTA del orquestador (compartido); su href
+    // se asigna aquí sin condicionar por template, así que .tpl-f8 también lo recibe.
     const f6HeroWa = document.getElementById('f6-hero-wa');
     if (f6HeroWa) {
         f6HeroWa.href = `https://wa.me/${waTel}?text=${waMsg}`;

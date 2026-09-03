@@ -1,0 +1,1353 @@
+/* ============================================================================
+   f8.css — SILO FIESTA F8 "TROPILOVE" (sep-2026)
+   v1.0.0 · MAXIMALISTA BRUTALISTA TROPICAL
+   Dirección estética: "MAXIMALISTA BRUTALISTA TROPICAL" — tropical brutalism
+   con oscuridad editorial. Fondo degradado saturado amarillo-verde → púrpura
+   profundo → rosa central, con textura de grano fino y siluetas de palmeras.
+   Tokens: --f8-bg-deep #0B0117, --f8-neon-pink #FF3CAC, --f8-neon-yellow #FFE500,
+   --f8-neon-purple #7B2CFF, --f8-neon-blue #2C7BFF.
+   Tipografía: Geist 900 display, script masivo para logo hero.
+   Efectos: aurora neón animada, grano cinematográfico púrpura, glow pulsante,
+   siluetas de palmeras tropicales, reveal scroll-driven.
+   Respeto prefers-reduced-motion.
+   Breakpoints (mobile-first): BASE (<480) / 480 / 640 / 767 / 1023+.
+   ============================================================================ */
+
+/* Geist se carga de forma asíncrona por el kernel (evento.html preload);
+   se eliminó el @import bloqueante de Google Fonts para acelerar el silo. */
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   ========================================================================== */
+.tpl-f8, .Tpl-F8 {
+    --tpl-accent: var(--master-accent, #FF3CAC);
+    --gold: var(--tpl-accent, #FF3CAC);
+    --f8-bg-deep: #0B0117;
+    --f8-bg-ink: #14032C;
+    --f8-bg-soft: #1E0A3C;
+    --f8-card-bg: rgba(20, 3, 44, 0.78);
+    --f8-neon-pink: #FF3CAC;
+    --f8-neon-yellow: #FFE500;
+    --f8-neon-purple: #7B2CFF;
+    --f8-neon-blue: #2C7BFF;
+    --f8-text-main: #FFFFFF;
+    --f8-text-muted: rgba(255, 255, 255, 0.6);
+    --f8-text-cream: #F0E6FF;
+    --f8-line: rgba(255, 255, 255, 0.1);
+    --f8-line-soft: rgba(255, 255, 255, 0.06);
+    --f8-glow-pink: 0 0 18px rgba(255, 60, 172, 0.35);
+    --f8-glow-pink-strong: 0 0 28px rgba(255, 60, 172, 0.55), 0 0 70px rgba(255, 60, 172, 0.18);
+    --f8-glow-yellow: 0 0 18px rgba(255, 229, 0, 0.35);
+    --f8-glow-purple: 0 0 18px rgba(123, 44, 255, 0.35);
+    --f8-green: #25D366;
+    --f8-font: 'Geist', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(120% 90% at 18% 4%, #1E0A3C 0%, #0B0117 48%, #050010 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f8-text-main);
+    font-family: var(--f8-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Box-sizing global dentro del silo (ADR-019) */
+.tpl-f8 *, .Tpl-F8 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f8 *::before, .Tpl-F8 *::before,
+.tpl-f8 *::after, .Tpl-F8 *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1.1. AURORA ANIMADA — Capa de fondo fija (blobs neón rosa/púrpura en deriva)
+   ========================================================================== */
+.tpl-f8::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(46% 34% at 12% 18%, rgba(255, 60, 172, 0.18) 0%, transparent 70%),
+        radial-gradient(40% 30% at 86% 72%, rgba(123, 44, 255, 0.14) 0%, transparent 70%),
+        radial-gradient(34% 26% at 68% 12%, rgba(44, 123, 255, 0.12) 0%, transparent 70%),
+        radial-gradient(42% 40% at 28% 88%, rgba(255, 229, 0, 0.10) 0%, transparent 72%);
+    animation: f8AuroraDrift 24s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f8AuroraDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.9; }
+    50%  { transform: translate3d(-2.5%, 1.8%, 0) scale(1.06); opacity: 1; }
+    100% { transform: translate3d(2.2%, -1.6%, 0) scale(1.1); opacity: 0.85; }
+}
+
+/* ==========================================================================
+   1.2. GRANO CINEMATOGRÁFICO + SILUETAS DE PALMERAS TROPICALES
+   ========================================================================== */
+.tpl-f8::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.055;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: f8GrainShift 0.9s steps(4) infinite;
+}
+
+@keyframes f8GrainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1%); }
+    50%  { transform: translate(1%, -2%); }
+    75%  { transform: translate(-1%, 2%); }
+    100% { transform: translate(2%, -1%); }
+}
+
+/* ==========================================================================
+   2. ACTIVACIÓN ATÓMICA — display explícito (kernel IoC oculta todo por defecto)
+   ========================================================================== */
+.tpl-f8 #main-content-flow,
+.Tpl-F8 #main-content-flow {
+    position: relative;
+    z-index: 1;
+}
+
+.tpl-f8 #mod-hero, .Tpl-F8 #mod-hero,
+.tpl-f8 #mod-form, .Tpl-F8 #mod-form,
+.tpl-f8 #mod-cartel, .Tpl-F8 #mod-cartel,
+.tpl-f8 #mod-lineup, .Tpl-F8 #mod-lineup,
+.tpl-f8 #mod-playlist, .Tpl-F8 #mod-playlist,
+.tpl-f8 #unified-frame, .Tpl-F8 #unified-frame {
+    display: flex !important;
+}
+
+.tpl-f8 #mod-hero-ctas, .Tpl-F8 #mod-hero-ctas {
+    display: flex !important;
+}
+
+.tpl-f8 #mod-hero-meta, .Tpl-F8 #mod-hero-meta,
+.tpl-f8 #mod-video, .Tpl-F8 #mod-video,
+.tpl-f8 #mod-boletos, .Tpl-F8 #mod-boletos,
+.tpl-f8 #mod-faq, .Tpl-F8 #mod-faq,
+.tpl-f8 #mod-ubicacion, .Tpl-F8 #mod-ubicacion,
+.tpl-f8 #mod-sponsors, .Tpl-F8 #mod-sponsors,
+.tpl-f8 #mod-whatsapp, .Tpl-F8 #mod-whatsapp {
+    display: block !important;
+}
+
+.tpl-f8 #mod-footer, .Tpl-F8 #mod-footer {
+    display: block !important;
+}
+
+/* ==========================================================================
+   3. GRID ATÓMICO — 2 columnas en desktop, 1 columna en mobile
+   ========================================================================== */
+.tpl-f8 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "hero hero"
+        "countdown countdown"
+        "meta meta"
+        "ctas ctas"
+        "lineup lineup"
+        "cartel playlist"
+        "boletos form"
+        "whatsapp whatsapp"
+        "video video"
+        "ubicacion ubicacion"
+        "faq faq"
+        "sponsors sponsors"
+        "footer footer";
+    width: 100%;
+}
+
+.tpl-f8 #mod-hero         { grid-area: hero; }
+.tpl-f8 #unified-frame    { grid-area: countdown; }
+.tpl-f8 #mod-hero-meta    { grid-area: meta; }
+.tpl-f8 #mod-hero-ctas    { grid-area: ctas; }
+.tpl-f8 #mod-cartel       { grid-area: cartel; }
+.tpl-f8 #mod-video        { grid-area: video; }
+.tpl-f8 #mod-lineup       { grid-area: lineup; }
+.tpl-f8 #mod-playlist     { grid-area: playlist; }
+.tpl-f8 #mod-faq          { grid-area: faq; }
+.tpl-f8 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f8 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f8 #mod-form         { grid-area: form; }
+.tpl-f8 #mod-footer       { grid-area: footer; }
+.tpl-f8 #mod-boletos      { grid-area: boletos; }
+.tpl-f8 #mod-whatsapp     { grid-area: whatsapp; }
+
+/* ==========================================================================
+   4. TIPOGRAFÍA EDITORIAL — Eyebrows versales, encabezados de sección
+   ========================================================================== */
+.tpl-f8 h2, .Tpl-F8 h2 {
+    color: var(--f8-text-cream);
+    font-family: var(--f8-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.42em;
+    font-weight: 800;
+    margin-bottom: 2.6rem;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 0;
+}
+
+.tpl-f8 h2::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 1px;
+    background: var(--f8-neon-pink);
+    margin-right: 1rem;
+    vertical-align: middle;
+    box-shadow: var(--f8-glow-pink);
+}
+
+.tpl-f8 section {
+    padding: 4.5rem 8%;
+    border-bottom: 1px solid var(--f8-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO — Hero Tropical Brutalism con imagen de cabezote como fondo
+      Bloque full-width con fondo de imagen del cabezote + overlay gradiente.
+      Logo 3D neon script en #event-title.
+   ========================================================================== */
+.tpl-f8 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5.5rem 8% 1.4rem;
+    min-height: 100vh;
+    color: var(--f8-text-main);
+    background-color: var(--f8-bg-deep);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Overlay gradiente tropical sobre la imagen de fondo */
+.tpl-f8 #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(11, 1, 23, 0.55) 0%,
+        rgba(30, 10, 60, 0.45) 35%,
+        rgba(255, 60, 172, 0.12) 65%,
+        rgba(11, 1, 23, 0.85) 100%
+    );
+    pointer-events: none;
+}
+
+/* Organizador — eyebrow text */
+.tpl-f8 #org-name-badge {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 1;
+    display: block;
+    margin-bottom: 10px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--f8-neon-yellow);
+    opacity: 0.85;
+    text-shadow: 0 0 12px rgba(255, 229, 0, 0.5);
+}
+
+.tpl-f8 #mod-hero .hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==========================================================================
+   6. #EVENT-TITLE — Logo 3D Neon Script masivo
+      Gradiente rosa/púrpura/azul neón con text-shadow múltiples para
+      profundidad. Background-clip: text para efecto cromático.
+   ========================================================================== */
+.tpl-f8 #event-title {
+    margin: 0 0 1.6rem;
+    font-family: var(--f8-font);
+    font-weight: 900 !important;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+    font-size: clamp(3.2rem, 14vw, 8rem) !important;
+    max-width: 100%;
+    background: linear-gradient(
+        135deg,
+        var(--f8-neon-pink) 0%,
+        var(--f8-neon-purple) 40%,
+        var(--f8-neon-blue) 70%,
+        var(--f8-neon-yellow) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(255, 60, 172, 0.4))
+            drop-shadow(0 0 40px rgba(123, 44, 255, 0.25));
+    animation: f8NeonPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes f8NeonPulse {
+    0%   { filter: drop-shadow(0 0 20px rgba(255, 60, 172, 0.4)) drop-shadow(0 0 40px rgba(123, 44, 255, 0.25)); }
+    50%  { filter: drop-shadow(0 0 30px rgba(255, 60, 172, 0.6)) drop-shadow(0 0 60px rgba(123, 44, 255, 0.35)); }
+    100% { filter: drop-shadow(0 0 22px rgba(255, 60, 172, 0.45)) drop-shadow(0 0 45px rgba(123, 44, 255, 0.28)); }
+}
+
+.tpl-f8 #event-title .hero-title-line1 {
+    display: block;
+    line-height: 1;
+}
+
+.tpl-f8 #event-title .hero-title-line2 {
+    display: block;
+    line-height: 1;
+    font-size: 0.65em;
+}
+
+/* ==========================================================================
+   6B. CINTA AMARILLA DE FECHA
+   ========================================================================== */
+.tpl-f8 .hero-date-ribbon {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    background: var(--f8-neon-yellow);
+    color: var(--f8-bg-deep);
+    padding: 0.45rem 1.8rem;
+    font-family: var(--f8-font);
+    font-weight: 900;
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 20px rgba(255, 229, 0, 0.3);
+}
+
+/* ==========================================================================
+   7. META — Custom icons (ubicación, cover, precio) con estilo neón
+   ========================================================================== */
+.tpl-f8 #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem 2.2rem;
+    padding: 1.6rem 6% 2.2rem;
+    background: linear-gradient(135deg, var(--f8-bg-ink) 0%, var(--f8-bg-deep) 100%);
+    border-bottom: 2px solid var(--f8-neon-purple);
+    box-shadow: 0 4px 30px rgba(123, 44, 255, 0.15);
+}
+
+.tpl-f8 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: rgba(255, 60, 172, 0.08);
+    border: 1px solid rgba(255, 60, 172, 0.2);
+    color: var(--f8-text-main);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+    position: relative;
+}
+
+.tpl-f8 #mod-hero-meta .meta-item:not(:last-child)::after {
+    content: none;
+}
+
+.tpl-f8 #mod-hero-meta .meta-item span {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Iconos de meta neón */
+.tpl-f8 #mod-hero-meta .meta-svg {
+    display: block;
+    flex-shrink: 0;
+    fill: var(--f8-neon-pink);
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 0 6px rgba(255, 60, 172, 0.5));
+}
+
+/* ==========================================================================
+   8. HERO CTAs — Botón amarillo neón WhatsApp grande
+   ========================================================================== */
+.tpl-f8 #mod-hero-ctas {
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 6% 2.8rem;
+    background: linear-gradient(135deg, var(--f8-bg-ink) 0%, var(--f8-bg-deep) 100%);
+    border-bottom: 2px solid var(--f8-neon-yellow);
+    box-shadow: 0 4px 30px rgba(255, 229, 0, 0.1);
+}
+
+.tpl-f8 #mod-hero-ctas .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 16px 26px;
+    border: 2px solid transparent;
+    transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.tpl-f8 #mod-hero-ctas .hero-cta-btn:hover { transform: translate(-2px, -2px); }
+
+.tpl-f8 #mod-hero-ctas .hero-cta-btn--wa {
+    background: var(--f8-neon-yellow);
+    color: var(--f8-bg-deep);
+    border-color: var(--f8-bg-deep);
+    box-shadow: 4px 4px 0 var(--f8-neon-purple), var(--f8-glow-yellow);
+}
+
+.tpl-f8 #mod-hero-ctas .hero-cta-btn--wa:hover {
+    background: var(--f8-bg-deep);
+    color: var(--f8-neon-yellow);
+    box-shadow: 6px 6px 0 var(--f8-neon-purple), 0 0 30px rgba(255, 229, 0, 0.4);
+    transform: translate(1px, 1px);
+}
+
+/* Botón lineup oculto (Cero Borrado: display:none, no se elimina) */
+.tpl-f8 #mod-hero-ctas .hero-cta-btn--lineup {
+    display: none !important;
+}
+
+/* ==========================================================================
+   9. COUNTDOWN — Bloques neón brillantes con glow rosa/púrpura
+   ========================================================================== */
+.tpl-f8 #unified-frame {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    padding: 2rem 6% 1.4rem;
+    margin-top: 0 !important;
+    background: linear-gradient(135deg, var(--f8-bg-ink) 0%, var(--f8-bg-deep) 100%);
+    border-bottom: 2px solid var(--f8-neon-pink);
+}
+
+.tpl-f8 #unified-frame .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    padding: 12px 10px;
+    position: relative;
+    background: rgba(255, 60, 172, 0.06);
+    border: 1px solid rgba(255, 60, 172, 0.25);
+    min-width: 96px;
+    flex: 1;
+    max-width: 150px;
+    box-shadow: var(--f8-glow-pink);
+    animation: f8CountdownGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes f8CountdownGlow {
+    0%   { box-shadow: 0 0 12px rgba(255, 60, 172, 0.2); }
+    50%  { box-shadow: 0 0 22px rgba(255, 60, 172, 0.4), 0 0 40px rgba(123, 44, 255, 0.15); }
+    100% { box-shadow: 0 0 14px rgba(255, 60, 172, 0.25); }
+}
+
+.tpl-f8 #unified-frame .cd-block::after {
+    content: none;
+}
+
+.tpl-f8 #unified-frame .cd-block:last-child::after {
+    content: "";
+}
+
+.tpl-f8 #unified-frame .cd-block > span {
+    display: block;
+    font-size: clamp(1.9rem, 6vw, 3rem) !important;
+    font-weight: 900 !important;
+    font-variant-numeric: tabular-nums;
+    color: var(--f8-text-main);
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 18px rgba(255, 60, 172, 0.3);
+    line-height: 1;
+}
+
+.tpl-f8 #unified-frame .cd-block small {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--f8-neon-purple);
+    margin-top: 0.4rem;
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   10. CARTEL — Póster flotante con glow pulsante neón
+   ========================================================================== */
+.tpl-f8 #mod-cartel {
+    padding: 1.6rem 8% 3.4rem;
+}
+
+.tpl-f8 #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+}
+
+.tpl-f8 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 430px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 60, 172, 0.2);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f8-glow-pink);
+    object-fit: cover;
+    animation: f8PosterFloat 7s ease-in-out infinite;
+    transition: box-shadow 0.5s ease;
+}
+
+@keyframes f8PosterFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-10px) scale(1.015); }
+}
+
+.tpl-f8 #mod-cartel:hover #db-poster-img {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f8-glow-pink-strong);
+}
+
+/* ==========================================================================
+   11. LINEUP — Tarjetas compactas foto+nombre+redes SIN bio
+       Ocultar .artist-resena (Cero Borrado). Filtro rosa neón.
+   ========================================================================== */
+.tpl-f8 #mod-lineup {
+    padding: 4.5rem 8%;
+    background: linear-gradient(180deg, var(--f8-bg-deep) 0%, var(--f8-bg-ink) 100%);
+    border-top: 2px solid var(--f8-neon-pink);
+    border-bottom: 2px solid var(--f8-neon-purple);
+}
+
+.tpl-f8 #mod-lineup > div {
+    max-width: 1200px !important;
+    margin: 0 auto;
+}
+
+.tpl-f8 #db-lineup {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem;
+}
+
+/* Tarjeta individual */
+.tpl-f8 .artist-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+}
+
+.tpl-f8 .artist-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 60, 172, 0.2);
+}
+
+/* Foto con filtro rosa neón */
+.tpl-f8 .artist-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) brightness(0.75) hue-rotate(-10deg) saturate(1.2);
+    transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+.tpl-f8 .artist-card:hover .artist-photo {
+    filter: grayscale(0%) brightness(0.85) saturate(1.4);
+    transform: scale(1.05);
+}
+
+/* Overlay inferior */
+.tpl-f8 .artist-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.6rem;
+    background: linear-gradient(0deg, rgba(11, 1, 23, 0.95) 0%, rgba(20, 3, 44, 0.6) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+/* Hora */
+.tpl-f8 .artist-hora {
+    font-family: var(--f8-font);
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--f8-neon-pink);
+    text-shadow: 0 0 10px rgba(255, 60, 172, 0.5);
+}
+
+/* Nombre del DJ */
+.tpl-f8 .artist-name {
+    font-family: var(--f8-font);
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+    color: var(--f8-text-main);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    line-height: 1.1;
+}
+
+/* Reseña — OCULTA (Cero Borrado: display:none, no se elimina) */
+.tpl-f8 .artist-resena {
+    display: none !important;
+}
+
+/* Redes sociales */
+.tpl-f8 .artist-social {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 0.6rem;
+}
+
+.tpl-f8 .artist-social-icon {
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tpl-f8 .artist-social-icon:hover {
+    color: var(--f8-neon-pink);
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px rgba(255, 60, 172, 0.5));
+}
+
+/* ==========================================================================
+   12. PLAYLIST — Spotify oscuro integrado
+   ========================================================================== */
+.tpl-f8 #mod-playlist {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f8 #db-spotify-embed {
+    border-radius: 2px;
+    border: 1px solid var(--f8-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), var(--f8-glow-purple);
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.tpl-f8 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+/* ==========================================================================
+   13. BOLETOS — Filas detalladas con precios neón amarillo
+   ========================================================================== */
+.tpl-f8 #mod-boletos {
+    padding: 3.5rem 8%;
+}
+
+.tpl-f8 .boleto-subtitle {
+    font-size: 0.8rem;
+    color: var(--f8-text-muted);
+    letter-spacing: 0.08em;
+    margin-top: -1.8rem;
+    margin-bottom: 2rem;
+}
+
+.tpl-f8 .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    max-width: 420px;
+    margin: 0 auto;
+    border: 1px solid var(--f8-line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(20, 3, 44, 0.5);
+}
+
+/* Fila de boleto */
+.tpl-f8 .boleto-card-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--f8-line);
+    transition: background 0.2s ease;
+}
+
+.tpl-f8 .boleto-card-row:last-child {
+    border-bottom: none;
+}
+
+.tpl-f8 .boleto-card-row:hover {
+    background: rgba(255, 60, 172, 0.05);
+}
+
+/* Icono de boleto */
+.tpl-f8 .boleto-icon {
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
+/* Etiqueta de tipo */
+.tpl-f8 .boleto-tipo {
+    font-family: var(--f8-font);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+/* Precio — amarillo neón con clamp */
+.tpl-f8 .boleto-precio {
+    font-family: var(--f8-font);
+    font-weight: 900;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    color: var(--f8-neon-yellow);
+    text-shadow: 0 0 12px rgba(255, 229, 0, 0.3);
+}
+
+/* Precio con ID específico */
+.tpl-f8 #price-neon-yellow {
+    color: var(--f8-neon-yellow) !important;
+    text-shadow: 0 0 12px rgba(255, 229, 0, 0.3);
+}
+
+/* Flecha */
+.tpl-f8 .boleto-arrow {
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tpl-f8 .boleto-card-row:hover .boleto-arrow {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+/* Mensaje de confianza */
+.tpl-f8 .boleto-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--f8-text-main);
+    opacity: 0.7;
+}
+
+.tpl-f8 .boleto-trust svg {
+    color: var(--f8-neon-pink);
+}
+
+/* ==========================================================================
+   14. FORMULARIO — Tabs Registro/Recuperar, .formulario-tab.active neón
+   ========================================================================== */
+.tpl-f8 .form-master-box {
+    background: var(--f8-card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--f8-line);
+    border-top: 2px solid var(--f8-neon-purple);
+    border-radius: 2px;
+    padding: 2.6rem 2.4rem;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), var(--f8-glow-purple);
+    max-width: 520px;
+    margin: 2rem auto 0;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tpl-f8 .form-master-box:hover {
+    border-color: rgba(123, 44, 255, 0.45);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), 0 0 30px rgba(123, 44, 255, 0.2);
+}
+
+.tpl-f8 .form-input, .tpl-f8 #reg-nombre,
+.tpl-f8 #reg-cedula, .tpl-f8 #rec-cedula {
+    width: 100%;
+    padding: 1.1rem 1rem;
+    margin-bottom: 1.1rem;
+    background: rgba(11, 1, 23, 0.8);
+    border: 1px solid var(--f8-line);
+    border-radius: 1px;
+    color: var(--f8-text-main);
+    font-family: var(--f8-font);
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f8 .form-input:focus, .tpl-f8 #reg-nombre:focus,
+.tpl-f8 #reg-cedula:focus, .tpl-f8 #rec-cedula:focus {
+    outline: none;
+    border-color: var(--f8-neon-purple);
+    box-shadow: 0 0 0 1px var(--f8-neon-purple), var(--f8-glow-purple);
+}
+
+/* Tabs de formulario */
+.tpl-f8 .form-tabs {
+    display: flex;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--f8-line);
+}
+
+.tpl-f8 .form-tabs .tab-btn,
+.tpl-f8 .tab-btn {
+    flex: 1;
+    padding: 0.9rem 0.4rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--f8-text-muted);
+    font-family: var(--f8-font);
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Tab active = formulario-tab.active */
+.tpl-f8 .formulario-tab.active,
+.tpl-f8 .form-tabs .tab-btn.active,
+.tpl-f8 .tab-btn.active {
+    color: var(--f8-bg-deep);
+    background: var(--f8-neon-yellow);
+    border-bottom-color: var(--f8-neon-yellow);
+}
+
+.tpl-f8 .form-tabs .tab-btn:hover,
+.tpl-f8 .tab-btn:hover {
+    color: var(--f8-neon-pink);
+    border-bottom-color: var(--f8-neon-pink);
+}
+
+/* Botón submit */
+.tpl-f8 .btn-submit {
+    display: block;
+    width: 100%;
+    padding: 1.2rem;
+    margin-top: 1.2rem;
+    background: transparent;
+    border: 1px solid var(--f8-neon-pink);
+    border-radius: 1px;
+    color: var(--f8-neon-pink);
+    font-family: var(--f8-font);
+    font-weight: 900;
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f8 .btn-submit:hover {
+    background: var(--f8-neon-pink);
+    color: var(--f8-bg-deep);
+    box-shadow: var(--f8-glow-pink-strong);
+}
+
+/* ==========================================================================
+   15. WHATSAPP — Botón verde brillante
+   ========================================================================== */
+.tpl-f8 #mod-whatsapp {
+    padding: 2.6rem 8%;
+}
+
+.tpl-f8 .whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.15rem 2.8rem;
+    background: linear-gradient(120deg, #1a8a4a, var(--f8-green));
+    color: #ffffff;
+    font-family: var(--f8-font);
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 14px 40px rgba(37, 211, 102, 0.3);
+    transition: all 0.3s ease;
+}
+
+.tpl-f8 .whatsapp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 50px rgba(37, 211, 102, 0.42), 0 0 30px rgba(37, 211, 102, 0.25);
+    filter: brightness(1.08);
+}
+
+.tpl-f8 .whatsapp-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
+}
+
+/* ==========================================================================
+   16. GALERÍA — Grid fotos con filtro rosa neón
+   ========================================================================== */
+.tpl-f8 #mod-video {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f8 #mod-video > div:not(#db-gallery-grid),
+.Tpl-F8 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
+.tpl-f8 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+    gap: 0.7rem;
+}
+
+.tpl-f8 #db-gallery-grid img {
+    width: 100%;
+    border-radius: 1px;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--f8-line-soft);
+    filter: grayscale(20%) saturate(1.2);
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.tpl-f8 #db-gallery-grid img:hover {
+    border-color: var(--f8-neon-pink);
+    filter: grayscale(0%) saturate(1.4);
+    transform: scale(1.02);
+    box-shadow: var(--f8-glow-pink);
+    z-index: 2;
+}
+
+/* ==========================================================================
+   17. FAQ — Acordeón neón
+   ========================================================================== */
+.tpl-f8 #mod-faq {
+    padding: 4.5rem 8%;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tpl-f8 .faq-item {
+    border-bottom: 1px solid var(--f8-line);
+    padding: 1.4rem 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.tpl-f8 .faq-q {
+    font-family: var(--f8-font);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--f8-text-cream);
+    transition: color 0.3s ease;
+}
+
+.tpl-f8 .faq-item:hover .faq-q {
+    color: var(--f8-neon-pink);
+}
+
+.tpl-f8 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f8-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.tpl-f8 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
+}
+
+/* ==========================================================================
+   18. UBICACIÓN — Mapa integrado
+   ========================================================================== */
+.tpl-f8 #mod-ubicacion {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f8 #db-mapa-container {
+    border-radius: 1px;
+    overflow: hidden;
+    border: 1px solid var(--f8-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), var(--f8-glow-purple);
+}
+
+/* ==========================================================================
+   19. SPONSORS — Grid logos aliados en color original
+   ========================================================================== */
+.tpl-f8 #mod-sponsors {
+    padding: 3.2rem 8%;
+}
+
+.tpl-f8 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem 3rem;
+    padding: 1rem 0;
+}
+
+.tpl-f8 .sponsor-item {
+    padding: 0.1rem 0;
+    opacity: 0.65;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tpl-f8 .sponsor-item:hover {
+    opacity: 1;
+}
+
+/* Logos en color original (sin filtro blanco como F6) */
+.tpl-f8 .sponsor-img {
+    height: 40px;
+    max-width: 160px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.tpl-f8 .sponsor-item:hover .sponsor-img {
+    transform: translateY(-3px);
+    opacity: 0.95;
+}
+
+/* ==========================================================================
+   20. FOOTER — Copyright + logo
+   ========================================================================== */
+.tpl-f8 #mod-footer {
+    background: var(--f8-bg-deep) !important;
+    border-top: 2px solid var(--f8-neon-purple);
+}
+
+.tpl-f8 #mod-footer .footer-inner,
+.Tpl-F8 #mod-footer .footer-inner {
+    display: none !important;
+}
+
+.tpl-f8 #mod-footer .footer-bottom {
+    text-align: center;
+    padding: 1.6rem 2rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    color: var(--f8-text-muted);
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   21. CONTRATO DE DATOS — Protección de módulos invisibles
+   ========================================================================== */
+.tpl-f8 #db-poster-img[style*="display:none"],
+.tpl-f8 #db-faq-list[style*="display:none"],
+.tpl-f8 #db-mapa-container[style*="display:none"],
+.tpl-f8 #db-sponsors-list[style*="display:none"],
+.tpl-f8 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   22. RESPONSIVE — Tablet (992px-1279px), Móvil (<767px), Small (<640px)
+   ========================================================================== */
+@media (max-width: 1279px) {
+    .tpl-f8 #main-content-flow {
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+        row-gap: 0 !important;
+        width: 100% !important;
+    }
+    .tpl-f8 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f8 section {
+        padding: 3.4rem 5%;
+    }
+    .tpl-f8 .form-master-box {
+        max-width: 480px;
+    }
+    .tpl-f8 .boleto-cards-wrap {
+        max-width: 100%;
+    }
+    .tpl-f8 #db-spotify-embed {
+        min-height: 360px;
+    }
+    .tpl-f8 h2 {
+        letter-spacing: 0.32em;
+    }
+    .tpl-f8 #mod-hero {
+        padding: 3.4rem 6% 1rem;
+    }
+    .tpl-f8 #org-name-badge {
+        padding: 0;
+        margin-bottom: 12px;
+    }
+    .tpl-f8 #event-title {
+        font-size: clamp(2.6rem, 12vw, 4.4rem) !important;
+    }
+    .tpl-f8 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .tpl-f8 #mod-hero {
+        min-height: 85vh;
+    }
+    .tpl-f8 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .tpl-f8 #event-title {
+        font-size: clamp(2.4rem, 11vw, 4rem) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .tpl-f8 #main-content-flow {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "countdown"
+            "meta"
+            "ctas"
+            "form"
+            "cartel"
+            "lineup"
+            "whatsapp"
+            "boletos"
+            "playlist"
+            "video"
+            "faq"
+            "ubicacion"
+            "sponsors"
+            "footer" !important;
+    }
+    .tpl-f8 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f8 section {
+        padding: 3.4rem 6%;
+    }
+    .tpl-f8 .form-master-box {
+        max-width: 94vw;
+    }
+    .tpl-f8 h2 {
+        letter-spacing: 0.32em;
+    }
+    .tpl-f8 #mod-hero {
+        padding: 3.4rem 6% 1rem;
+        min-height: 80vh;
+    }
+    .tpl-f8 #org-name-badge {
+        padding: 0;
+        margin-bottom: 12px;
+    }
+    .tpl-f8 #event-title {
+        font-size: clamp(2.2rem, 11vw, 3.6rem) !important;
+    }
+    .tpl-f8 #unified-frame .cd-block {
+        min-width: 0;
+        max-width: none;
+        flex: 1 1 40%;
+        padding: 10px 8px;
+    }
+    .tpl-f8 #unified-frame .cd-block::after {
+        display: none;
+    }
+    .tpl-f8 #mod-hero-ctas .hero-cta-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .tpl-f8 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .tpl-f8 #mod-hero-meta {
+        gap: 0.6rem 1rem;
+        padding: 1.2rem 4% 1.8rem;
+    }
+    .tpl-f8 #mod-hero-meta .meta-item {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.85rem;
+        letter-spacing: 0.06em;
+    }
+    .tpl-f8 #mod-hero-meta .meta-svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    .tpl-f8 #db-lineup {
+        grid-template-columns: 1fr !important;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .tpl-f8 .artist-card {
+        aspect-ratio: 3/4;
+    }
+    .tpl-f8 .artist-name {
+        font-size: 1.1rem;
+    }
+    .tpl-f8 #db-poster-img {
+        max-width: 100%;
+        border-radius: 1px !important;
+    }
+    .tpl-f8 #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+}
+
+/* Breakpoint tablet específico 992px-1279px (blindaje visual) */
+@media (min-width: 992px) and (max-width: 1279px) {
+    .tpl-f8 #mod-hero {
+        min-height: 90vh;
+    }
+    .tpl-f8 #db-lineup {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1rem;
+    }
+    .tpl-f8 .form-master-box {
+        max-width: 500px;
+    }
+    .tpl-f8 #db-spotify-embed {
+        min-height: 380px;
+    }
+}
+
+/* ==========================================================================
+   23. REVEAL AL HACER SCROLL — scroll-driven animation (progressive enhancement)
+   ========================================================================== */
+@supports (animation-timeline: view()) {
+    .tpl-f8 section,
+    .tpl-f8 #unified-frame,
+    .tpl-f8 #mod-hero-meta,
+    .tpl-f8 #mod-hero-ctas {
+        animation: f8RevealUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+    }
+
+    @keyframes f8RevealUp {
+        from { opacity: 0; transform: translateY(22px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ==========================================================================
+   24. ACCESIBILIDAD — prefers-reduced-motion: apaga efectos
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f8::before,
+    .tpl-f8::after,
+    .tpl-f8 #event-title,
+    .tpl-f8 #db-poster-img,
+    .tpl-f8 #unified-frame .cd-block {
+        animation: none !important;
+    }
+    .tpl-f8 section,
+    .tpl-f8 #unified-frame,
+    .tpl-f8 #mod-hero-meta,
+    .tpl-f8 #mod-hero-ctas {
+        animation: none !important;
+    }
+}
+
+/* ============================================================================
+   LOG DE VERSIONES — Template f8 "TropiLove"
+   ============================================================================
+| Versión  | Fecha      | Cambio                                                             | Estado |
+|----------|------------|--------------------------------------------------------------------|--------|
+| v1.0.0   | 03/09/2026 | Silo TropiLove (F8). MAXIMALISTA BRUTALISTA TROPICAL.             | [OK]   |
+|          |            | Tokens: --f8-bg-deep #0B0117, --f8-neon-pink #FF3CAC,             |        |
+|          |            | --f8-neon-yellow #FFE500, --f8-neon-purple #7B2CFF,               |        |
+|          |            | --f8-neon-blue #2C7BFF. Fondo degradado púrpura oscuro.           |        |
+|          |            | Aurora neón rosa/púrpura, grano cinematográfico púrpura.           |        |
+|          |            | Hero: imagen cabezote full-viewport + logo 3D neon script          |        |
+|          |            | (background-clip:text gradiente rosa→púrpura→azul→amarillo).      |        |
+|          |            | Cinta amarilla fecha, meta icons neón, CTA amarillo neón.         |        |
+|          |            | Countdown bloques glow rosa pulsante, póster flotante.             |        |
+|          |            | Lineup: SOLO foto+nombre+redes (.artist-resena display:none).     |        |
+|          |            | Filtro rosa neón en fotos artistas. Boletos precio amarillo neón  |        |
+|          |            | con clamp(). Formulario tabs: active=#FFFF00/#14032C.             |        |
+|          |            | WhatsApp verde #25D366. Galería grid filtro rosa.                 |        |
+|          |            | FAQ acordeón neón, mapa, sponsors color original, footer dark.    |        |
+|          |            | Grid 2col desktop / 1col mobile. Breakpoints tablet 992-1279px.  |        |
+|          |            | Scroll reveal @supports animation-timeline. Reduced-motion.       |        |
+|          |            | Escudo GOLD: keyframes f8AuroraDrift, f8GrainShift,               |        |
+|          |            | f8NeonPulse, f8CountdownGlow, f8PosterFloat, f8RevealUp.         |        |
+|          |            | Cero Borrado: IDs protegidos, artist-resena display:none.         |        |
+|          |            | Aislamiento atómico .tpl-f8/.Tpl-F8. Bloque reseteo silo.        |        |
+============================================================================ */
