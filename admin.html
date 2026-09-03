@@ -886,7 +886,16 @@ tr:hover td{background:var(--surface)}
             </div>
             <div id="ld-campo-gallery" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 8)</label><textarea id="ld-gallery-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-dresscode" style="display:none" class="fg"><label style="font-size:12px">Dress code</label><input id="ld-dresscode-val" placeholder="Ej. Formal · Elegante · All black"></div>
-            <div id="ld-campo-sponsors" style="display:none" class="fg"><label style="font-size:12px">Patrocinadores (separados por coma)</label><input id="ld-sponsors-val" placeholder="Ej. Aguila, Spotify, Davivienda"></div>
+            <div id="ld-campo-sponsors" style="display:none" class="fg">
+              <label style="font-size:12px;font-weight:600;margin-bottom:8px;display:block">🤝 Patrocinadores — Logos</label>
+              <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;background:var(--surface);padding:8px 10px;border-radius:var(--rsm);border:1px solid var(--border)">
+                <strong>Formato recomendado:</strong> PNG con fondo transparente o SVG<br>
+                <strong>Tamaño ideal:</strong> 400×150px (ratio 8:3) o similar en proporción<br>
+                <strong>Los logos se muestran en blanco</strong> sobre fondo oscuro
+              </div>
+              <div id="sponsors-entries" style="display:flex;flex-direction:column;gap:12px"></div>
+              <button type="button" id="sponsors-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Patrocinador</button>
+            </div>
             <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
 
             <!-- CAMPOS FIESTA -->
@@ -900,7 +909,16 @@ tr:hover td{background:var(--surface)}
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
             <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 8)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg"><label style="font-size:12px">Patrocinadores (separados por coma)</label><input id="ld-sponsors-fiesta-val" placeholder="Ej. Aguila, Spotify, Davivienda" style="font-size:12px"></div>
+            <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg">
+              <label style="font-size:12px;font-weight:600;margin-bottom:8px;display:block">🤝 Patrocinadores — Logos</label>
+              <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;background:var(--surface);padding:8px 10px;border-radius:var(--rsm);border:1px solid var(--border)">
+                <strong>Formato recomendado:</strong> PNG con fondo transparente o SVG<br>
+                <strong>Tamaño ideal:</strong> 400×150px (ratio 8:3) o similar en proporción<br>
+                <strong>Los logos se muestran en blanco</strong> sobre fondo oscuro
+              </div>
+              <div id="sponsors-entries" style="display:flex;flex-direction:column;gap:12px"></div>
+              <button type="button" id="sponsors-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Patrocinador</button>
+            </div>
             <div id="ld-campo-boletos" style="display:none" class="fg">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">🎟 Precio de boletería (preventa / taquilla)</div>
               <div class="grid2">
@@ -2846,6 +2864,131 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 })();
 
+// ════════════════════════════════════════════════════════════════
+// PATROCINADORES v223 — Gestión dinámica de logos (nombre + logo)
+// Cada entrada: URL o subida a Supabase Storage.
+// Los logos se renderizan en BLANCO en la landing (filtro CSS).
+// ════════════════════════════════════════════════════════════════
+(function() {
+  const container = document.getElementById('sponsors-entries');
+  if (!container) return;
+  const addBtn = document.getElementById('sponsors-add');
+  if (!addBtn) return;
+
+  const createEntry = (data) => {
+    const entry = document.createElement('div');
+    entry.className = 'sponsor-entry';
+    entry.style.cssText = 'display:flex;flex-direction:column;gap:8px;border:1px solid var(--border);border-radius:var(--rsm);padding:12px;background:var(--surface);position:relative';
+
+    const url = (data && (data.logo_url || data.logo || data.url || data.src)) || '';
+    const name = (data && data.nombre) || '';
+
+    entry.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:0.03em">PATROCINADOR</span>
+        <button type="button" class="sponsor-remove" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;line-height:1;padding:2px 6px">✕</button>
+      </div>
+      <div class="fg"><label style="font-size:11px">Nombre del patrocinador</label><input class="sponsor-name" placeholder="Ej. Águila, Spotify, Davivienda" value="${name.replace(/"/g,'&quot;')}"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div class="fg" style="flex:1"><label style="font-size:11px">URL del logo</label><input class="sponsor-url" type="url" placeholder="https://.../logo.png" value="${url.replace(/"/g,'&quot;')}" style="font-family:monospace;font-size:11px"></div>
+        <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-size:11px;cursor:pointer;background:var(--bg);white-space:nowrap;margin-bottom:0">
+          📁 Subir
+          <input type="file" class="sponsor-file" accept="image/png,image/svg+xml,image/webp,image/jpeg" style="display:none">
+        </label>
+      </div>
+      <div class="sponsor-upload-status" style="font-size:10px;color:var(--ink3);min-height:14px;display:none"></div>
+      ${url ? `<div style="display:flex;align-items:center;gap:8px;margin-top:2px"><img src="${url}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span></div>` : ''}
+    `;
+
+    const nameInput = entry.querySelector('.sponsor-name');
+    const urlInput = entry.querySelector('.sponsor-url');
+    const fileInput = entry.querySelector('.sponsor-file');
+    const previewWrap = entry.querySelector('.sponsor-upload-status');
+
+    entry.querySelector('.sponsor-remove').addEventListener('click', () => entry.remove());
+
+    // Refresh preview when URL changes
+    urlInput.addEventListener('input', () => {
+      const oldPrev = entry.querySelector('.sponsor-preview');
+      if (oldPrev) oldPrev.remove();
+      if (urlInput.value.trim()) {
+        const p = document.createElement('div');
+        p.className = 'sponsor-preview';
+        p.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px';
+        p.innerHTML = `<img src="${urlInput.value.trim().replace(/"/g,'&quot;')}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span>`;
+        urlInput.parentElement.parentElement.after(p);
+      }
+    });
+
+    // File upload to Supabase Storage
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        previewWrap.textContent = '⚠ Solo se permiten imágenes (PNG, SVG, WEBP, JPG).';
+        previewWrap.style.display = 'block';
+        previewWrap.style.color = 'var(--red)';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        previewWrap.textContent = '⚠ El logo no puede pesar más de 5 MB.';
+        previewWrap.style.display = 'block';
+        previewWrap.style.color = 'var(--red)';
+        return;
+      }
+      if (typeof SB === 'undefined' || !SB) {
+        previewWrap.textContent = '⚠ Conecta la base de datos para subir logos.';
+        previewWrap.style.display = 'block';
+        previewWrap.style.color = 'var(--red)';
+        return;
+      }
+      previewWrap.style.display = 'block';
+      previewWrap.style.color = 'var(--ink3)';
+      previewWrap.textContent = 'Subiendo logo...';
+      try {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const filename = `sponsor_${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+        const { error } = await SB.storage.from('eventos-imagenes').upload(filename, file, { contentType: file.type, upsert: false });
+        if (error) throw error;
+        const { data: urlData } = SB.storage.from('eventos-imagenes').getPublicUrl(filename);
+        urlInput.value = urlData.publicUrl;
+        previewWrap.textContent = '✓ Logo subido correctamente.';
+        previewWrap.style.color = 'var(--green)';
+        // refresh preview
+        const oldPrev = entry.querySelector('.sponsor-preview');
+        if (oldPrev) oldPrev.remove();
+        const p = document.createElement('div');
+        p.className = 'sponsor-preview';
+        p.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px';
+        p.innerHTML = `<img src="${urlData.publicUrl}" style="height:26px;width:auto;background:#fff;border-radius:3px;padding:2px" alt="preview"><span style="font-size:10px;color:var(--ink3)">Vista previa (se mostrará en blanco)</span>`;
+        urlInput.parentElement.parentElement.after(p);
+      } catch(err) {
+        previewWrap.textContent = '⚠ Error subiendo logo: ' + (err.message || 'Revisa el bucket "eventos-imagenes".');
+        previewWrap.style.color = 'var(--red)';
+      }
+    });
+
+    container.appendChild(entry);
+  };
+
+  addBtn.addEventListener('click', () => createEntry());
+
+  // Expose functions globally for loading/saving
+  window._sponsorsGetEntries = () => {
+    return Array.from(container.querySelectorAll('.sponsor-entry')).map(entry => {
+      const nombre = entry.querySelector('.sponsor-name').value.trim();
+      const logo = entry.querySelector('.sponsor-url').value.trim();
+      if (!logo) return null;
+      return { nombre: nombre || null, logo_url: logo };
+    }).filter(Boolean);
+  };
+
+  window._sponsorsSetEntries = (arr) => {
+    container.innerHTML = '';
+    if (Array.isArray(arr)) arr.forEach(s => createEntry(s));
+  };
+})();
+
 function _buildConfigLanding() {
   const activa = document.getElementById('ev-landing-activa')?.checked;
   if (!activa || !_ldThemeSeleccionado) return null;
@@ -2865,7 +3008,7 @@ function _buildConfigLanding() {
   const faq      = faqRaw ? faqRaw.split('\n').filter(l => l.includes('|')).map(l => {
     const [q, ...rest] = l.split('|'); return { q: q.trim(), a: rest.join('|').trim() };
   }) : [];
-  const sponsors = val('ld-sponsors-val') ? val('ld-sponsors-val').split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const sponsors = window._sponsorsGetEntries ? window._sponsorsGetEntries() : [];
   const gallery  = val('ld-gallery-urls') ? val('ld-gallery-urls').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8) : [];
   const director = (val('ld-dir-nombre') || val('ld-dir-bio')) ? {
     nombre: val('ld-dir-nombre') || null,
@@ -2928,7 +3071,7 @@ function _buildConfigLanding() {
       // Fiesta extra fields
       gallery:     (()=>{ const v=val('ld-gallery-fiesta-urls')||val('ld-gallery-urls'); return v ? v.split('\n').filter(Boolean) : undefined; })(),
       faq:         (()=>{ const v=val('ld-faq-fiesta-val')||val('ld-faq-val'); return v ? v.split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{q:p[0]?.trim(),a:p[1]?.trim()};}) : undefined; })(),
-      sponsors:    (()=>{ const v=val('ld-sponsors-fiesta-val')||val('ld-sponsors-val'); return v ? v.split(',').map(s=>s.trim()).filter(Boolean) : undefined; })(),
+      sponsors:    window._sponsorsGetEntries ? window._sponsorsGetEntries() : undefined,
       // Campaña
       historia:    val('ld-historia-val')   || null,
       historia_titulo: val('ld-historia-titulo') || null,
@@ -3866,6 +4009,8 @@ function _limpiarWizardCompleto() {
   });
   document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; });
   document.querySelectorAll('[id^="ld-campo-"]').forEach(c => { c.style.display = 'none'; });
+  if (window._sponsorsSetEntries) window._sponsorsSetEntries([]);
+  if (window._djLineupSetEntries) window._djLineupSetEntries([]);
   const landing = document.getElementById('ev-landing-activa');
   if (landing) { landing.checked = false; toggleLandingConfig(false); }
   document.getElementById('ev-img-preview').style.display = 'none';
@@ -3911,7 +4056,7 @@ function _poblarContenidoWizard(content, suf) {
     set(fiesta ? 'ld-faq-fiesta-val' : 'ld-faq-val', content.faq.map(f => (f.q || '') + '|' + (f.a || '')).join('\n'));
   }
   if (Array.isArray(content.sponsors) && content.sponsors.length) {
-    set(fiesta ? 'ld-sponsors-fiesta-val' : 'ld-sponsors-val', content.sponsors.join(', '));
+    if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors);
   }
   // Campaña
   set('ld-historia-titulo', content.historia_titulo);

@@ -1012,7 +1012,8 @@
 }
 
 /* ==========================================================================
-   19. PATROCINADORES — Franja limpia de marcas (sin cajas)
+   19. PATROCINADORES — Logos en BLANCO, franja equilibrada (v223)
+   Los logos se renderizan en blanco puro mediante filtro CSS (invert+brightness).
    ========================================================================== */
 .tpl-f6 #mod-sponsors {
     padding: 3.2rem 8%;
@@ -1023,30 +1024,37 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 2.6rem 3.4rem;
+    gap: 2rem 3rem;
     padding: 1rem 0;
 }
 
 .tpl-f6 .sponsor-item {
-    padding: 0.2rem 0;
-    opacity: 0.55;
-    transition: all 0.4s ease;
+    padding: 0.1rem 0;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+    display: flex;
+    align-items: center;
 }
 
 .tpl-f6 .sponsor-item:hover {
     opacity: 1;
 }
 
+/* Filtro blanco: fuerza logos a blanco puro independiente de su color original.
+   Se aplica invert(1) + sepia + saturate + hue-rotate para lograr el blanco.
+   brightness(0) + invert(1) da blanco puro para cualquier logo monocromo. */
 .tpl-f6 .sponsor-img {
     height: 40px;
+    max-width: 160px;
     width: auto;
-    filter: brightness(0.9) grayscale(20%);
-    transition: all 0.4s ease;
+    object-fit: contain;
+    filter: brightness(0) invert(1) grayscale(1);
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .tpl-f6 .sponsor-item:hover .sponsor-img {
-    filter: brightness(1.1) grayscale(0%);
     transform: translateY(-3px);
+    opacity: 0.95;
 }
 
 /* ==========================================================================

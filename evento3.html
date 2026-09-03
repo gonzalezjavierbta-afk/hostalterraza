@@ -621,24 +621,31 @@
     }
     // === FIN SEGMENTO IMPACTO ===
 
-  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207 / FIX v221) ===
+  // === INICIO SEGMENTO: PATROCINADORES CON FALLBACK (v207 / FIX v221 / v223 logos) ===
     // 1. Detección de Datos vs Fallback v107 [cite: 328, 898]
     // FIX v221: content.sponsors puede llegar como ARRAY (así lo persiste admin en
     // _buildConfigLanding) o como string separado por comas. Antes solo se asumía
     // string y `split` reventaba el try completo ("sponsorsRaw.split is not a function"),
     // abortando todo lo que seguía (póster, lineup, ubicación, FAQ, tarjetas).
+    // v223: soporta objetos {nombre, logo_url} (formato dinámico del admin) y strings legacy.
     const sponsorsRaw = content.sponsors || "";
     let sponsorsList = Array.isArray(sponsorsRaw)
-        ? sponsorsRaw.map(s => (typeof s === 'string' ? s : (s && typeof s === 'object' ? (s.url || s.src || '') : '')).trim()).filter(s => s.length > 0)
-        : String(sponsorsRaw).split(',').map(s => s.trim()).filter(s => s.length > 0);
+        ? sponsorsRaw.map(s => {
+            if (typeof s === 'string') return { logo_url: s.trim() };
+            if (s && typeof s === 'object') {
+              return { nombre: s.nombre || null, logo_url: (s.logo_url || s.logo || s.url || s.src || '').trim() };
+            }
+            return null;
+          }).filter(s => s && s.logo_url)
+        : String(sponsorsRaw).split(',').map(s => s.trim()).filter(s => s.length > 0).map(u => ({ logo_url: u }));
     let isFallback = false;
 
     if (sponsorsList.length === 0) {
         // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
         sponsorsList = [
-            "https://supabase.com/favicon/favicon-196x196.png",
-            "https://github.com/apple-touch-icon.png",
-            "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg"
+            { logo_url: "https://supabase.com/favicon/favicon-196x196.png" },
+            { logo_url: "https://github.com/apple-touch-icon.png" },
+            { logo_url: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" }
         ];
         isFallback = true;
     }
@@ -646,11 +653,11 @@
     // 2. Inyección Física en el Contrato de Datos [cite: 757]
     const sponsorsContainer = document.getElementById('db-sponsors-list');
     if (sponsorsContainer) {
-        sponsorsContainer.innerHTML = sponsorsList.map(url => `
-            <div class="sponsor-item" style="padding: 1.5rem;">
-                <img src="${url}" class="sponsor-img" style="height:40px; width:auto; opacity:0.85;">
+        sponsorsContainer.innerHTML = sponsorsList.map(sp => `
+            <div class="sponsor-item" style="padding: 1rem 1.5rem;">
+                <img src="${sp.logo_url}" alt="${(sp.nombre || 'Patrocinador').replace(/"/g,'&quot;')}" class="sponsor-img">
             </div>`).join('');
-            
+
         // Certificación Cuantitativa Obligatoria (GOLD v1.2) [cite: 760, 763]
         const statusMsg = isFallback ? `Sponsors de REFERENCIA inyectados (${sponsorsList.length} marcas)` : `Sponsors REALES inyectados (${sponsorsList.length} marcas)`;
         logStatus(`TRACE: ${statusMsg}.`, "TRACE");
