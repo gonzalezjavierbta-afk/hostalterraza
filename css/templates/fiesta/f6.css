@@ -492,9 +492,10 @@
 .tpl-f6 #mod-hero-meta {
     display: flex !important;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 0.6rem 0;
-    padding: 1.4rem 6% 2rem;
+    gap: 0.9rem 2.2rem;
+    padding: 1.6rem 6% 2.2rem;
     background: var(--tpl-yellow);
     border-bottom: 4px solid var(--tpl-black);
 }
@@ -502,21 +503,20 @@
 .tpl-f6 #mod-hero-meta .meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    color: var(--tpl-black);
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
+    gap: 0.7rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-weight: 800;
+    font-weight: 900;
+    background: var(--tpl-black);
+    color: var(--tpl-yellow);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
     position: relative;
 }
 
 .tpl-f6 #mod-hero-meta .meta-item:not(:last-child)::after {
-    content: "•";
-    margin-left: 1.2rem;
-    color: var(--tpl-black);
-    font-size: 1rem;
-    font-weight: 900;
+    content: none;
 }
 
 .tpl-f6 #mod-hero-meta .meta-item span {
@@ -524,12 +524,33 @@
     padding-bottom: 0;
 }
 
+/* Iconos antes de cada dato de la meta (v224) — antes ocultos, ahora visibles */
 .tpl-f6 #mod-hero-meta .meta-svg {
-    display: none;
+    display: block;
+    flex-shrink: 0;
+    fill: var(--tpl-orange);
+    width: 22px;
+    height: 22px;
+}
+
+@media (max-width: 480px) {
+    .tpl-f6 #mod-hero-meta {
+        gap: 0.6rem 1rem;
+        padding: 1.2rem 4% 1.8rem;
+    }
+    .tpl-f6 #mod-hero-meta .meta-item {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.85rem;
+        letter-spacing: 0.06em;
+    }
+    .tpl-f6 #mod-hero-meta .meta-svg {
+        width: 18px;
+        height: 18px;
+    }
 }
 
 /* ==========================================================================
-   10B. HERO CTAs — Botón naranja WhatsApp + botón negro lineup (v222)
+   10B. HERO CTAs — Botón naranja WhatsApp (v224: se retira el botón de lineup)
    ========================================================================== */
 .tpl-f6 #mod-hero-ctas {
     position: relative;
@@ -575,18 +596,9 @@
     transform: translate(1px, 1px);
 }
 
+/* v224 — botón "VER LINE UP COMPLETO" oculto (Cero Borrado: display:none, no se elimina) */
 .tpl-f6 #mod-hero-ctas .hero-cta-btn--lineup {
-    background: var(--tpl-black);
-    color: var(--tpl-white);
-    border-color: var(--tpl-white);
-    box-shadow: 4px 4px 0 var(--tpl-orange);
-}
-
-.tpl-f6 #mod-hero-ctas .hero-cta-btn--lineup:hover {
-    background: var(--tpl-white);
-    color: var(--tpl-black);
-    border-color: var(--tpl-black);
-    box-shadow: 6px 6px 0 var(--tpl-purple-electric);
+    display: none !important;
 }
 
 /* ==========================================================================
@@ -630,13 +642,14 @@
 }
 
 /* ==========================================================================
-   12. LINEUP — Filas editoriales tipo agenda (hora + artista)
-   ========================================================================== */
-/* ==========================================================================
    12. LINEUP — Tarjetas con foto grande y overlay (ref: lineup.jpg)
+   v224: sección sobre fondo AMARILLO para romper el diseño (retoma en footer)
    ========================================================================== */
 .tpl-f6 #mod-lineup {
     padding: 4.5rem 8%;
+    background: var(--tpl-yellow);
+    border-top: 4px solid var(--tpl-black);
+    border-bottom: 4px solid var(--tpl-black);
 }
 
 .tpl-f6 #mod-lineup > div {
@@ -1058,11 +1071,11 @@
 }
 
 /* ==========================================================================
-   20. FOOTER — Solo copyright (igual decisión de f5 v222)
+   20. FOOTER — Solo copyright sobre AMARILLO (v224: retoma el acento del lineup)
    ========================================================================== */
 .tpl-f6 #mod-footer {
-    background: var(--f6-bg-ink) !important;
-    border-top: 1px solid var(--f6-line-soft);
+    background: var(--tpl-yellow) !important;
+    border-top: 4px solid var(--tpl-black);
 }
 
 .tpl-f6 #mod-footer .footer-inner,
@@ -1075,7 +1088,8 @@
     padding: 1.6rem 2rem;
     font-size: 0.74rem;
     letter-spacing: 0.16em;
-    color: var(--f6-text-muted);
+    color: var(--tpl-black);
+    font-weight: 800;
 }
 
 /* ==========================================================================
@@ -1231,4 +1245,9 @@
 |          |            | #mod-form sin overlay fixed: fluye como sección normal.           |        |
 |          |            | Requiere maestro evento3.html v222 (kernel: #mod-hero-ctas oculto |        |
 |          |            | por defecto; JS: split título 2 líneas solo .tpl-f6 + wa.me hero).|        |
+| v1.1.1   | 02/09/2026 | v224 — Ajustes hero/lineup/footer: meta más grande con cajas negras| [OK]   |
+|          |            | + iconos visibles (fecha/hora/lugar) en naranja, botón "VER LINE  |        |
+|          |            | UP COMPLETO" oculto (display:none, Cero Borrado). #mod-lineup y   |        |
+|          |            | #mod-footer pasan a fondo amarillo (roma el diseño y se retoma).  |        |
+|          |            | Footer: copyright negro sobre amarillo con borde superior negro.  |        |
 ============================================================================ */
