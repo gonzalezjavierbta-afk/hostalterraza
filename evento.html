@@ -428,11 +428,6 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
                     document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                    // Sincronía del countdown del mockup LINEUP Comparativo (silo f8)
-                    [['cd-days','f8-cd-days'],['cd-hours','f8-cd-hours'],['cd-mins','f8-cd-mins'],['cd-secs','f8-cd-secs']].forEach(pair => {
-                        const f8El = document.getElementById(pair[1]);
-                        if (f8El) f8El.innerText = document.getElementById(pair[0]).innerText;
-                    });
                 }, 1000);
 
                 // MAPEO DE HERO & METADATA
@@ -816,15 +811,14 @@ if (document.getElementById('db-poster-img')) {
     }
     // === FIN SEGMENTO: LINEUP ===
 
-    // === INICIO SEGMENTO: LINEUP COMPARATIVO (v1.1.0 · solo silo .tpl-f8) ===
-    // Galería comparativa: Maqueta B (grid de escritorio 4×2) lado a lado con
-    // Maqueta C (columna única móvil dentro de un mockup de teléfono con la
-    // cabecera TROPILOVE · SÁBADO 12/SEP · countdown y bordes de palmeras
-    // curvadas). Data-First: se alimenta de content.dj_lineup REAL; los
-    // nombres de ejemplo del brief solo actúan como fallback si el campo
-    // llegara vacío.
+    // === INICIO SEGMENTO: LINEUP MAQUETA B (v1.2.0 · solo silo .tpl-f8) ===
+    // Única variante del LINEUP: grid flexible de escritorio 4×N con TODOS los
+    // artistas de content.dj_lineup. Cada tarjeta muestra la foto y el nombre
+    // encima; al hacer hover la foto aplica filtro rosa y se revelan SOLO las
+    // redes sociales ingresadas en el formulario (sin placeholders '#').
+    // Data-First: los nombres de ejemplo del brief actúan como fallback si el
+    // campo dj_lineup llegara vacío. Maqueta C (mockup móvil) retirada.
     if (document.body.className.indexOf('tpl-f8') !== -1) {
-        const f8Avatar = "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
         const f8Ph = (name) => {
             const initial = String(name || '?').trim().charAt(0).toUpperCase();
             return 'data:image/svg+xml;utf8,' + encodeURIComponent(
@@ -855,76 +849,35 @@ if (document.getElementById('db-poster-img')) {
                 Spotify: get('spotify'),
                 "Sitio web": get('web')
             };
-            return Object.keys(red).map(label => {
-                const href = red[label] || '#';
-                const off = href === '#' ? ' aria-disabled="true" tabindex="-1"' : '';
-                const stop = href === '#' ? ' onclick="event.preventDefault(); return false;"' : '';
-                return `<a href="${href}"${off}${stop} class="f8-artist-social-icon" target="${href === '#' ? '_self' : '_blank'}" rel="noopener" title="${label}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="${F8_SOCIAL_PATHS[label]}"/></svg></a>`;
+            return Object.keys(red).filter(label => red[label]).map(label => {
+                return `<a href="${red[label]}" class="f8-artist-social-icon" target="_blank" rel="noopener" title="${label}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="${F8_SOCIAL_PATHS[label]}"/></svg></a>`;
             }).join('');
         };
-        const f8Card = (dj, idx, variant) => {
+        const f8Card = (dj, idx) => {
             const isObj = dj && typeof dj === 'object';
             const name = isObj ? (dj.nombre || '') : String(dj || '');
-            const photo = (isObj && dj.foto) ? dj.foto : (variant === 'mob' ? f8Ph(name) : f8Avatar);
+            const photo = (isObj && dj.foto) ? dj.foto : f8Ph(name);
             return `
-                <article class="f8-artist${variant === 'mob' ? ' f8-artist--mob' : ''}" data-idx="${idx}">
+                <article class="f8-artist" data-idx="${idx}">
                     <img class="f8-artist-photo" src="${photo}" alt="${name}" loading="lazy">
+                    <div class="f8-artist-social">${f8SocialEl(dj)}</div>
                     <div class="f8-artist-overlay">
                         <span class="f8-artist-name">${name}</span>
-                        <div class="f8-artist-social">${f8SocialEl(dj)}</div>
                     </div>
                 </article>`;
         };
-        const f8Days = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
-        const f8Months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-        let f8DateLabel = 'SÁBADO 12 / SEP';
-        try {
-            const d0 = new Date(ev.fecha + 'T00:00:00');
-            if (!isNaN(d0.getTime())) {
-                f8DateLabel = `${f8Days[d0.getDay()]} ${String(d0.getDate()).padStart(2, '0')} / ${f8Months[d0.getMonth()]}`;
-            }
-        } catch (e) {}
         const f8RawLineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : [];
-        const f8Demo = ['JABEKALÁN', 'DIDJBЯAUCA', 'IDEYFLILKYAU', 'LA RIBN YAM', 'LIBAIIDM MANDIOR', 'LNYIEMMI', 'ANANGREURI', 'NENIDE', 'ALFENDALIA', 'VER TOPE DJ LIVE', 'RJ ORQUIDEA'].map(n => ({ nombre: n }));
+        const f8Demo = ['JABEKALÁN', 'DIDJBЯAUCA', 'IDEYFLILKYAU', 'LA RIBN YAM', 'LIBAIIDM MANDIOR', 'LNYIEMMI', 'ANANGREURI', 'NENIDE'].map(n => ({ nombre: n }));
         const f8Artists = f8RawLineup.length ? f8RawLineup : f8Demo;
-        const f8Grid = f8Artists.slice(0, 8);
-        const f8Mob = f8Artists.length >= 11
-            ? f8Artists.slice(8, 11)
-            : f8Artists.slice(0, Math.min(3, f8Artists.length));
-        const f8Cd = (id) => `<span class="f8-phone-cd-v" id="${id}">00</span>`;
         const f8Compare = `
-            <div class="f8-lineup-compare">
-                <div class="f8-lc-panel f8-lc-panel--desktop">
-                    <h3 class="f8-lc-title">LINEUP</h3>
-                    <span class="f8-lc-sub">MAQUETA B · GRID ESCRITORIO 4×2</span>
-                    <div class="f8-lc-grid">
-                        ${f8Grid.map((dj, i) => f8Card(dj, i, 'desk')).join('')}
-                    </div>
-                </div>
-                <div class="f8-lc-panel f8-lc-panel--mobile">
-                    <h3 class="f8-lc-title f8-lc-title--single">LINEUP<br>(SINGLE COLUMN)</h3>
-                    <span class="f8-lc-sub">MAQUETA C · COLUMNA ÚNICA MÓVIL</span>
-                    <div class="f8-phone">
-                        <div class="f8-phone-header">
-                            <span class="f8-phone-logo">TROPILOVE</span>
-                            <span class="f8-phone-date">${f8DateLabel}</span>
-                            <div class="f8-phone-cd">
-                                <div>${f8Cd('f8-cd-days')}<small>DÍAS</small></div>
-                                <div>${f8Cd('f8-cd-hours')}<small>HORAS</small></div>
-                                <div>${f8Cd('f8-cd-mins')}<small>MIN</small></div>
-                                <div>${f8Cd('f8-cd-secs')}<small>SEG</small></div>
-                            </div>
-                        </div>
-                        <div class="f8-phone-list">
-                            ${f8Mob.map((dj, i) => f8Card(dj, i, 'mob')).join('')}
-                        </div>
-                    </div>
-                </div>
+            <h3 class="f8-lc-title">LINEUP</h3>
+            <div class="f8-lc-grid">
+                ${f8Artists.map((dj, i) => f8Card(dj, i)).join('')}
             </div>`;
         const f8LineupEl = document.getElementById('db-lineup');
         if (f8LineupEl) f8LineupEl.innerHTML = f8Compare;
     }
-    // === FIN SEGMENTO: LINEUP COMPARATIVO ===
+    // === FIN SEGMENTO: LINEUP MAQUETA B ===
 
     // === INICIO SEGMENTO: GALERÍA REAL (v221) ===
     // Pobla #db-gallery-grid desde content.gallery (array de URLs). Fallback: 2

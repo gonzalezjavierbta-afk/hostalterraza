@@ -1328,21 +1328,21 @@
     .tpl-f8 #unified-frame,
     .tpl-f8 #mod-hero-meta,
     .tpl-f8 #mod-hero-ctas,
-    .tpl-f8 .f8-artist-name,
-    .tpl-f8 .f8-lc-title,
-    .tpl-f8 .f8-phone-logo {
+.tpl-f8 .f8-artist-name,
+    .tpl-f8 .f8-lc-title {
         animation: none !important;
     }
 }
 
 /* ==========================================================================
-   25. LINEUP COMPARATIVO — Galería de secciones interactiva (f8 v1.1.0)
-       Maqueta B (grid de escritorio 4×2) + Maqueta C (columna única móvil
-       dentro de un mockup de teléfono con cabecera TROPILOVE, fecha y
-       countdown) mostradas lado a lado como visualización comparativa
-       detallada. Paleta: rosa neón primario · cian secundario · amarillo
-       de acento. Cero Borrado: #db-lineup intacto, solo se sobreescribe su
-       contenido desde el JS del orquestador.
+   25. LINEUP MAQUETA B — Grid flexible de escritorio (f8 v1.2.0)
+       Única variante del LINEUP: cuadrícula 4×N con TODOS los artistas de
+       content.dj_lineup. Cada tarjeta muestra la foto y, encima, el nombre;
+       al hacer hover la foto aplica filtro rosa y se revelan SOLO las redes
+       sociales ingresadas en el formulario (sin placeholders '#').
+       Paleta: rosa neón primario · cian secundario · amarillo de acento.
+       Cero Borrado: #db-lineup intacto, solo se sobreescribe su contenido.
+       Maqueta C (mockup de teléfono) retirada.
    ========================================================================== */
 .tpl-f8 #db-lineup {
     display: block !important;
@@ -1350,26 +1350,12 @@
 }
 
 .tpl-f8 #mod-lineup .lineup-grid {
-    max-width: 1500px !important;
+    max-width: 1280px !important;
     width: 100% !important;
     margin: 0 auto;
 }
 
-.tpl-f8 .f8-lineup-compare {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    justify-content: center;
-    gap: 2.4rem;
-    width: 100%;
-}
-
-.tpl-f8 .f8-lc-panel {
-    flex: 1 1 0;
-    min-width: 0;
-}
-
-/* === Títulos neon cursiva (rosa/cian/amarillo) === */
+/* Título LINEUP — cursiva de neón (rosa/cian/amarillo) */
 .tpl-f8 .f8-lc-title {
     font-family: var(--f8-font);
     font-style: italic;
@@ -1379,7 +1365,7 @@
     text-transform: uppercase;
     text-align: center;
     font-size: clamp(2rem, 4.5vw, 3.1rem);
-    margin: 0 0 0.3rem;
+    margin: 0 0 1.8rem;
     background-image: linear-gradient(135deg, #FF3CAC 0%, #2C7BFF 48%, #FFE500 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -1389,22 +1375,7 @@
     animation: f8NeonPulse 3.6s ease-in-out infinite alternate;
 }
 
-.tpl-f8 .f8-lc-title--single {
-    font-size: clamp(1.5rem, 3vw, 2.1rem);
-}
-
-.tpl-f8 .f8-lc-sub {
-    display: block;
-    text-align: center;
-    font-size: 0.6rem;
-    font-weight: 800;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
-    color: var(--f8-text-muted);
-    margin: 0 0 1.7rem;
-}
-
-/* === Maqueta B — grid de escritorio 4 columnas × 2 filas === */
+/* Grid flexible 4×N — caben TODOS los artistas del lineup */
 .tpl-f8 .f8-lc-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1439,9 +1410,10 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.tpl-f8 .f8-artist:hover {
+.tpl-f8 .f8-artist:hover,
+.tpl-f8 .f8-artist:focus-within {
     transform: translateY(-7px);
-    border-color: rgba(44, 123, 255, 0.65);
+    border-color: rgba(255, 60, 172, 0.65);
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.22),
@@ -1449,41 +1421,46 @@
         var(--f8-glow-pink-strong);
 }
 
+/* Foto — por defecto levemente oscura; en hover filtro rosa */
 .tpl-f8 .f8-artist-photo {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(15%) brightness(0.72) saturate(1.15);
-    transition: filter 0.5s ease, transform 0.5s ease;
+    filter: grayscale(12%) brightness(0.78) saturate(1.12);
+    transition: filter 0.45s ease, transform 0.45s ease;
 }
 
-.tpl-f8 .f8-artist:hover .f8-artist-photo {
-    filter: grayscale(0%) brightness(0.82) saturate(1.35);
+.tpl-f8 .f8-artist:hover .f8-artist-photo,
+.tpl-f8 .f8-artist:focus-within .f8-artist-photo {
+    filter: brightness(0.72) saturate(1.55) hue-rotate(315deg) contrast(1.06);
     transform: scale(1.06);
 }
 
+/* Overlay inferior gradiente: soporte del nombre sobre la foto */
 .tpl-f8 .f8-artist-overlay {
     position: absolute;
     inset: auto 0 0 0;
-    padding: 1.6rem 0.9rem 1rem;
-    background: linear-gradient(0deg, rgba(11, 1, 23, 0.96) 0%, rgba(20, 3, 44, 0.72) 55%, transparent 100%);
+    padding: 1.7rem 0.9rem 1.1rem;
+    background: linear-gradient(0deg, rgba(11, 1, 23, 0.97) 0%, rgba(20, 3, 44, 0.82) 52%, rgba(20, 3, 44, 0.18) 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: flex-end;
     text-align: center;
+    min-height: 44%;
+    pointer-events: none;
 }
 
-/* Nombre del artista — cursiva de neón (alternancia rosa→cian / cian→amarillo) */
+/* Nombre del artista — cursiva de neón, siempre visible encima de la foto */
 .tpl-f8 .f8-artist-name {
     font-family: var(--f8-font);
     font-style: italic;
     font-weight: 900;
-    font-size: clamp(1rem, 2.3vw, 1.4rem);
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
     letter-spacing: 0.02em;
-    line-height: 1.05;
+    line-height: 1.1;
     text-transform: uppercase;
     -webkit-background-clip: text;
     background-clip: text;
@@ -1501,231 +1478,57 @@
     filter: drop-shadow(0 0 8px rgba(44, 123, 255, 0.7)) drop-shadow(0 0 16px rgba(255, 60, 172, 0.35));
 }
 
-/* Iconos sociales detallados */
+/* Redes sociales — ocultas por defecto; solo aparecen en hover y SOLO las
+   ingresadas en el formulario (sin placeholders) */
 .tpl-f8 .f8-artist-social {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 42%;
+    z-index: 2;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 0.55rem;
-    margin-top: 0.35rem;
     flex-wrap: wrap;
+    padding: 0.5rem 0.6rem;
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.tpl-f8 .f8-artist:hover .f8-artist-social,
+.tpl-f8 .f8-artist:focus-within .f8-artist-social {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
 }
 
 .tpl-f8 .f8-artist-social a {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(11, 1, 23, 0.6);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(255, 60, 172, 0.5);
+    background: rgba(11, 1, 23, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 12px rgba(255, 60, 172, 0.45);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     text-decoration: none;
 }
 
-.tpl-f8 .f8-artist-social a:hover,
-.tpl-f8 .f8-artist-social a:focus-visible {
-    transform: translateY(-2px);
-    color: var(--f8-neon-pink);
-    border-color: var(--f8-neon-pink);
-    box-shadow: 0 0 14px rgba(255, 60, 172, 0.55);
-    outline: none;
+.tpl-f8 .f8-artist-social a:hover {
+    transform: translateY(-2px) scale(1.08);
+    background: rgba(255, 60, 172, 0.28);
+    box-shadow: 0 0 16px rgba(255, 60, 172, 0.65);
 }
 
-.tpl-f8 .f8-artist-social a[aria-disabled="true"] {
-    opacity: 0.75;
-}
-
-/* === Maqueta C — mockup de teléfono (columna única móvil) === */
-.tpl-f8 .f8-phone {
-    position: relative;
-    max-width: 372px;
-    margin: 0 auto;
-    border-radius: 32px;
-    padding: 1rem;
-    background:
-        linear-gradient(180deg, rgba(255, 60, 172, 0.1) 0%, rgba(30, 10, 60, 0.9) 45%, #0b0117 100%),
-        #14032c;
-    border: 1px solid rgba(255, 60, 172, 0.4);
-    box-shadow:
-        0 32px 80px rgba(0, 0, 0, 0.65),
-        inset 0 0 0 3px #0b0117,
-        inset 0 0 0 4px rgba(255, 60, 172, 0.28),
-        0 0 46px rgba(255, 60, 172, 0.2);
-}
-
-/* Firma de borde — palmeras curvadas en los laterales del teléfono */
-.tpl-f8 .f8-phone::before {
-    content: "";
-    position: absolute;
-    top: 26%;
-    left: 5px;
-    width: 28px;
-    height: 96px;
-    pointer-events: none;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='96' viewBox='0 0 60 96'%3E%3Cpath d='M10 92 C 18 66, 20 40, 34 14' stroke='%232C7BFF' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M16 64 C 30 60, 42 56, 54 48' stroke='%23FF3CAC' stroke-width='2.5' fill='none'/%3E%3Cpath d='M20 46 C 32 44, 44 38, 52 30' stroke='%23FFE500' stroke-width='2.5' fill='none'/%3E%3Cpath d='M26 30 C 36 29, 46 22, 52 16' stroke='%237B2CFF' stroke-width='2.5' fill='none'/%3E%3C/svg%3E");
-    filter: drop-shadow(0 0 6px rgba(44, 123, 255, 0.55));
-}
-
-.tpl-f8 .f8-phone::after {
-    content: "";
-    position: absolute;
-    top: 22%;
-    right: 5px;
-    width: 28px;
-    height: 96px;
-    pointer-events: none;
-    transform: scaleX(-1);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='96' viewBox='0 0 60 96'%3E%3Cpath d='M10 92 C 18 66, 20 40, 34 14' stroke='%23FF3CAC' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M16 64 C 30 60, 42 56, 54 48' stroke='%23FFE500' stroke-width='2.5' fill='none'/%3E%3Cpath d='M20 46 C 32 44, 44 38, 52 30' stroke='%232C7BFF' stroke-width='2.5' fill='none'/%3E%3Cpath d='M26 30 C 36 29, 46 22, 52 16' stroke='%237B2CFF' stroke-width='2.5' fill='none'/%3E%3C/svg%3E");
-    filter: drop-shadow(0 0 6px rgba(255, 60, 172, 0.55));
-}
-
-/* Cabecera del teléfono: logo TROPILOVE + fecha + countdown */
-.tpl-f8 .f8-phone-header {
-    text-align: center;
-    padding: 0.8rem 0.5rem 1rem;
-    border-bottom: 1px solid rgba(255, 60, 172, 0.22);
-}
-
-.tpl-f8 .f8-phone-logo {
-    display: block;
-    font-family: var(--f8-font);
-    font-style: italic;
-    font-weight: 900;
-    font-size: 2rem;
-    line-height: 1;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    background-image: linear-gradient(135deg, #FF3CAC 0%, #2C7BFF 50%, #FFE500 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(255, 60, 172, 0.5));
-}
-
-.tpl-f8 .f8-phone-date {
-    display: inline-block;
-    margin-top: 0.55rem;
-    padding: 0.24rem 0.95rem;
-    border-radius: 40px;
-    background: var(--f8-neon-yellow);
-    color: #0b0117;
-    font-size: 0.64rem;
-    font-weight: 900;
-    letter-spacing: 0.22em;
-    box-shadow: 0 0 16px rgba(255, 229, 0, 0.35);
-}
-
-.tpl-f8 .f8-phone-cd {
-    display: flex;
-    justify-content: center;
-    gap: 0.4rem;
-    margin-top: 0.85rem;
-}
-
-.tpl-f8 .f8-phone-cd > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 50px;
-    padding: 0.4rem 0.2rem;
-    background: rgba(11, 1, 23, 0.7);
-    border: 1px solid rgba(44, 123, 255, 0.35);
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(44, 123, 255, 0.18);
-}
-
-.tpl-f8 .f8-phone-cd > div > span {
-    font-size: 1.12rem;
-    font-weight: 900;
-    color: #ffffff;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    text-shadow: 0 0 12px rgba(255, 60, 172, 0.5);
-}
-
-.tpl-f8 .f8-phone-cd small {
-    margin-top: 0.28rem;
-    font-size: 0.5rem;
-    letter-spacing: 0.18em;
-    font-weight: 800;
-    color: var(--f8-neon-pink);
-}
-
-/* Lista apilada — tarjetas simplificadas del teléfono */
-.tpl-f8 .f8-phone-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    margin-top: 1rem;
-}
-
-.tpl-f8 .f8-artist--mob {
-    aspect-ratio: auto;
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 0.6rem;
-    border-radius: 14px;
-    min-height: 84px;
-    border: 1px solid rgba(255, 60, 172, 0.26);
-    background: #12042b;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--f8-glow-pink);
-}
-
-.tpl-f8 .f8-artist--mob .f8-artist-photo {
-    position: static;
-    width: 62px;
-    height: 62px;
-    min-width: 62px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 229, 0, 0.55);
-    box-shadow: 0 0 12px rgba(255, 229, 0, 0.28);
-    object-fit: cover;
-    filter: saturate(1.15) brightness(0.85);
-}
-
-.tpl-f8 .f8-artist--mob .f8-artist-overlay {
-    position: static;
-    inset: auto;
-    background: none;
-    padding: 0;
-    align-items: flex-start;
-    text-align: left;
-    flex: 1;
-    min-width: 0;
-    gap: 0.4rem;
-}
-
-.tpl-f8 .f8-artist--mob .f8-artist-name {
-    font-size: 1rem;
-    text-align: left;
-}
-
-.tpl-f8 .f8-artist--mob .f8-artist-social {
-    justify-content: flex-start;
-}
-
-.tpl-f8 .f8-artist--mob .f8-artist-social a {
-    width: 29px;
-    height: 29px;
-}
-
-.tpl-f8 .f8-artist--mob:hover {
-    transform: translateX(4px);
-    border-color: rgba(44, 123, 255, 0.6);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--f8-glow-pink-strong);
-}
-
-/* === Responsive del LINEUP Comparativo === */
+/* === Responsive del LINEUP === */
 @media (max-width: 1279px) {
     .tpl-f8 .f8-lc-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -1736,13 +1539,8 @@
 }
 
 @media (max-width: 992px) {
-    .tpl-f8 .f8-lineup-compare {
-        flex-direction: column;
-        align-items: center;
-    }
-    .tpl-f8 .f8-lc-panel {
-        width: 100%;
-        flex: none;
+    .tpl-f8 .f8-lc-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
@@ -1751,11 +1549,12 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 0.8rem;
     }
-    .tpl-f8 .f8-phone {
-        max-width: 100%;
-    }
     .tpl-f8 .f8-lc-title {
         font-size: clamp(1.6rem, 8vw, 2.2rem);
+    }
+    .tpl-f8 .f8-artist-social a {
+        width: 32px;
+        height: 32px;
     }
 }
 
@@ -1796,4 +1595,11 @@
 |          |            | única de 3 tarjetas. Data-First: alimentado por content.dj_lineup |        |
 |          |            | real; nombres del brief solo como fallback. JS orquestador:       |        |
 |          |            | segmento LINEUP COMPARATIVO en evento.html + sync f8-cd-*.        |        |
+| v1.2.0   | 04/09/2026 | LINEUP simplificado a UNA sola variante: Maqueta B (grid flexible| [OK]  |
+|          |            | 4×N con TODOS los artistas de content.dj_lineup). Tarjeta: foto +|       |
+|          |            | nombre (cursiva neón) siempre visible encima. Hover: filtro rosa |       |
+|          |            | en la foto + revela SOLO las redes ingresadas en el formulario.  |       |
+|          |            | Maqueta C (mockup telefónico) RETIRADA: se eliminó su CSS (.f8-  |       |
+|          |            | phone, palmeras, cabecera móvil) y su JS (f8DateLabel, f8Cd,     |       |
+|          |            | sync f8-cd-*, panel móvil). Sin placeholders '#' en redes.       |       |
 ============================================================================ */
