@@ -138,7 +138,8 @@
 .tpl-f8 #mod-faq, .Tpl-F8 #mod-faq,
 .tpl-f8 #mod-ubicacion, .Tpl-F8 #mod-ubicacion,
 .tpl-f8 #mod-sponsors, .Tpl-F8 #mod-sponsors,
-.tpl-f8 #mod-whatsapp, .Tpl-F8 #mod-whatsapp {
+.tpl-f8 #mod-whatsapp, .Tpl-F8 #mod-whatsapp,
+.tpl-f8 #mod-experiencias, .Tpl-F8 #mod-experiencias {
     display: block !important;
 }
 
@@ -159,7 +160,8 @@
         "ctas ctas"
         "lineup lineup"
         "cartel playlist"
-        "boletos form"
+"boletos form"
+        "experiencias experiencias"
         "whatsapp whatsapp"
         "video video"
         "ubicacion ubicacion"
@@ -184,6 +186,7 @@
 .tpl-f8 #mod-footer       { grid-area: footer; }
 .tpl-f8 #mod-boletos      { grid-area: boletos; }
 .tpl-f8 #mod-whatsapp     { grid-area: whatsapp; }
+.tpl-f8 #mod-experiencias { grid-area: experiencias; }
 
 /* ==========================================================================
    4. TIPOGRAFÍA EDITORIAL — Eyebrows versales, encabezados de sección
@@ -1126,7 +1129,8 @@
             "ctas ctas"
             "lineup lineup"
             "cartel playlist"
-            "boletos form"
+"boletos form"
+            "experiencias experiencias"
             "whatsapp whatsapp"
             "video video"
             "ubicacion ubicacion"
@@ -1192,8 +1196,9 @@
             "form"
             "cartel"
             "lineup"
-            "whatsapp"
+"whatsapp"
             "boletos"
+            "experiencias"
             "playlist"
             "video"
             "faq"
@@ -1558,6 +1563,115 @@
     }
 }
 
+/* ==========================================================================
+   26. EXPERIENCIAS — 3 tarjetas tras la boletería (f8 v1.3.0)
+       Trilogía de experiencias que acompaña la compra del cover: grabación
+       del Dj set, pintura en vivo y el remate en el venue oficial. Tarjetas
+       con borde neón, grano y glow; numeración 01/02/03, título versal
+       condensado y tag en cursiva neón con gradiente. Data-First: pobladas
+       por content.experiencias (array {titulo, tag}); el contenido editorial
+       del evento (XLR NATION / TANIA PNK / EL CANDELARIO) actúa como fallback
+       manteniendo el átomo visible. Cero Borrado: átomo nuevo y opcional,
+       activado solo por .tpl-f8; ningún átomo previo fue tocado.
+   ========================================================================== */
+.tpl-f8 #mod-experiencias {
+    padding: 2rem 5% 4.4rem;
+}
+
+.tpl-f8 #db-experiencias-list {
+    max-width: 1100px !important;
+}
+
+.tpl-f8 .exp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    min-height: 230px;
+    padding: 2.2rem 1.4rem;
+    border: 1px solid rgba(123, 44, 255, 0.28);
+    border-radius: 22px;
+    background: radial-gradient(160% 130% at 50% 0%, rgba(255, 60, 172, 0.14) 0%, rgba(11, 1, 23, 0.92) 55%, rgba(11, 1, 23, 1) 100%);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 18px 44px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.tpl-f8 .exp-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 0 1px, transparent 1.5px);
+    background-size: 17px 17px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.tpl-f8 .exp-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 60, 172, 0.6);
+    box-shadow: 0 0 0 1px rgba(255, 60, 172, 0.28), 0 26px 58px rgba(0, 0, 0, 0.55), 0 0 34px rgba(255, 60, 172, 0.25);
+}
+
+.tpl-f8 .exp-num {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.32em;
+    font-weight: 700;
+    color: rgba(255, 229, 0, 0.85);
+}
+
+.tpl-f8 .exp-titulo {
+    font-family: var(--f8-font);
+    font-weight: 900;
+    font-size: clamp(0.82rem, 1.6vw, 1.02rem);
+    letter-spacing: 0.13em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    color: var(--f8-text-cream);
+    margin: 0;
+    position: relative;
+}
+
+.tpl-f8 .exp-tag {
+    font-family: var(--f8-font);
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(1.5rem, 3.4vw, 2rem);
+    line-height: 1;
+    text-transform: uppercase;
+    color: transparent;
+    background-image: linear-gradient(100deg, #FF3CAC 0%, #ff6ad5 34%, #7B2CFF 70%, #FFE500 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    position: relative;
+    filter: drop-shadow(0 0 12px rgba(255, 60, 172, 0.45));
+    letter-spacing: 0.02em;
+}
+
+.tpl-f8 .exp-card:nth-child(2) .exp-tag {
+    background-image: linear-gradient(100deg, #FFE500 0%, #FF3CAC 55%, #7B2CFF 100%);
+}
+
+.tpl-f8 .exp-card:nth-child(3) .exp-tag {
+    background-image: linear-gradient(100deg, #7B2CFF 0%, #FF3CAC 40%, #FFE500 100%);
+}
+
+@media (max-width: 767px) {
+    .tpl-f8 #db-experiencias-list {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tpl-f8 .exp-card {
+        min-height: 190px;
+    }
+}
+
 /* ============================================================================
    LOG DE VERSIONES — Template f8 "TropiLove"
    ============================================================================
@@ -1602,4 +1716,11 @@
 |          |            | Maqueta C (mockup telefónico) RETIRADA: se eliminó su CSS (.f8-  |       |
 |          |            | phone, palmeras, cabecera móvil) y su JS (f8DateLabel, f8Cd,     |       |
 |          |            | sync f8-cd-*, panel móvil). Sin placeholders '#' en redes.       |       |
+| v1.3.0   | 04/09/2026 | EXPERIENCIAS: 3 tarjetas tras la boletería (grabación del Dj set, | [OK] |
+|          |            | pintura en vivo y remate en el venue). Átomo nuevo y opcional    |      |
+|          |            | (#mod-experiencias → EXTENSIÓN ADITIVA IV), agregado al grid en |      |
+|          |            | los 3 breakpoints (fila "experiencias" tras "boletos form").    |      |
+|          |            | Tarjetas con numeración 01/02/03, título versal y tag en cursiva|      |
+|          |            | neón con gradiente; Data-First vía content.experiencias con      |      |
+|          |            | fallback editorial XLR NATION / TANIA PNK / EL CANDELARIO.      |      |
 ============================================================================ */

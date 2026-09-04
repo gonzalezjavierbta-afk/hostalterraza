@@ -217,6 +217,21 @@
             </div>
         </section>
 
+        <!-- ============================================================
+             EXTENSIÓN ADITIVA IV DEL CONTRATO (v1.3.x · f8 v1.3.0)
+             Átomo nuevo, genérico, opcional: Experiencias (3 tarjetas que
+             acompañan la boletería). Oculto por defecto (kernel IoC); se
+             enciende solo vía el CSS del silo (.tpl-{id}). Ningún átomo
+             previo fue tocado ni removido. Cero Borrado respetado. ===== -->
+
+        <!-- MÓDULO EXTENDIDO: EXPERIENCIAS (f8 v1.3.0) -->
+        <section id="mod-experiencias">
+            <div class="exp-inner" style="max-width:1100px; margin:0 auto; text-align:center;">
+                <h2>EXPERIENCIAS</h2>
+                <div id="db-experiencias-list" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem;"></div>
+            </div>
+        </section>
+
         <!-- MÓDULO EXTENDIDO: WHATSAPP de contacto -->
         <section id="mod-whatsapp">
             <div class="whatsapp-inner" style="max-width:1100px; margin:0 auto; text-align:center;">
@@ -878,6 +893,37 @@ if (document.getElementById('db-poster-img')) {
         if (f8LineupEl) f8LineupEl.innerHTML = f8Compare;
     }
     // === FIN SEGMENTO: LINEUP MAQUETA B ===
+
+    // === INICIO SEGMENTO: EXPERIENCIAS (v1.3.0 · solo silo .tpl-f8) ===
+    // Puebla #db-experiencias-list tras la boletería con 3 tarjetas: grabación
+    // de Dj set, pintura en vivo y acceso al remate. Data-First: lee el campo
+    // content.experiencias (array de {titulo, tag}); si llega vacío usa el
+    // contenido editorial del evento (XLR NATION / TANIA PNK / EL CANDELARIO)
+    // como fallback, manteniendo el átomo visible.
+    if (document.body.className.indexOf('tpl-f8') !== -1) {
+        const EXP_FALLBACK = [
+            { titulo: 'Grabación de Dj set', tag: 'XLR NATION' },
+            { titulo: 'Pintura en vivo', tag: 'TANIA PNK' },
+            { titulo: 'Con tu cover tienes acceso al remate en', tag: 'EL CANDELARIO' }
+        ];
+        let expList = Array.isArray(content.experiencias) && content.experiencias.length
+            ? content.experiencias
+            : EXP_FALLBACK;
+        const expEl = document.getElementById('db-experiencias-list');
+        if (expEl) {
+            expEl.innerHTML = expList.map((exp, i) => {
+                const titulo = String(exp.titulo || exp.title || '');
+                const tag = String(exp.tag || exp.extra || '');
+                return `
+                <article class="exp-card" data-idx="${i}">
+                    <span class="exp-num">${String(i + 1).padStart(2, '0')}</span>
+                    <h3 class="exp-titulo">${titulo}</h3>
+                    <span class="exp-tag">${tag}</span>
+                </article>`;
+            }).join('');
+        }
+    }
+    // === FIN SEGMENTO: EXPERIENCIAS ===
 
     // === INICIO SEGMENTO: GALERÍA REAL (v221) ===
     // Pobla #db-gallery-grid desde content.gallery (array de URLs). Fallback: 2
