@@ -456,6 +456,13 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
+                // v302 (aditivo, solo silo .tpl-f8 TropiLove): tab del formulario
+                // "REGISTRO" → "Únete para más información". Cero impacto en otros silos.
+                if (document.body.className.includes('tpl-f8')) {
+                    const __f8TabNew = document.getElementById('tab-new');
+                    if (__f8TabNew) __f8TabNew.textContent = 'Únete para más información';
+                }
+
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
   // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
   const videoContainer = document.getElementById('db-video-content');
@@ -737,7 +744,12 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
     }
 
 if (document.getElementById('footer-copy')) {
-        document.getElementById('footer-copy').innerText = `© 2026 Chongotronik. Todos los derechos reservados.`;
+        // v302 (aditivo, solo silo .tpl-f8 TropiLove): footer muestra "Chokoflow" en
+        // lugar de "Chongotronik". Los demás silos conservan el copyright original.
+        const __esF8Footer = document.body.className && document.body.className.includes('tpl-f8');
+        document.getElementById('footer-copy').innerText = __esF8Footer
+            ? `© 2026 Chokoflow. Todos los derechos reservados.`
+            : `© 2026 Chongotronik. Todos los derechos reservados.`;
     }
     // === FIN SEGMENTO FOOTER ===
 
@@ -950,8 +962,13 @@ if (document.getElementById('db-poster-img')) {
 
     const bwP = document.getElementById('db-boletos-preventa');
     const bwT = document.getElementById('db-boletos-taquilla');
-    if (bwP) bwP.innerHTML = boletoCard('PREVENTA', preventaVal, '#9b59b6');
-    if (bwT) bwT.innerHTML = boletoCard('TAQUILLA', taquillaVal, '#e67e22');
+    // v302 (aditivo, solo silo .tpl-f8 TropiLove): preventa→"INDIVIDUAL" y taquilla→"PAREJA".
+    // Los demás silos conservan "PREVENTA"/"TAQUILLA".
+    const __esF8Boletos = document.body.className && document.body.className.includes('tpl-f8');
+    const __labelPreventa = __esF8Boletos ? 'INDIVIDUAL' : 'PREVENTA';
+    const __labelTaquilla = __esF8Boletos ? 'PAREJA' : 'TAQUILLA';
+    if (bwP) bwP.innerHTML = boletoCard(__labelPreventa, preventaVal, '#9b59b6');
+    if (bwT) bwT.innerHTML = boletoCard(__labelTaquilla, taquillaVal, '#e67e22');
     // === FIN SEGMENTO BOLETERÍA ===
 
     // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
