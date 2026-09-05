@@ -280,9 +280,9 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
       <span class="htz-logo-name">Hostal<b> Terraza</b></span>
     </a>
     <nav class="htz-nav-links" id="navLinks" aria-label="Navegación principal">
+      <a href="#eventos">Cartelera</a>
       <a href="#sistema">Sistema QR</a>
       <a href="#landings">Landings</a>
-      <a href="#eventos">Cartelera</a>
       <a href="#contacto">Contacto</a>
     </nav>
     <div class="htz-nav-user" id="userZone"></div>
@@ -329,6 +329,43 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
 <div class="htz-ticker" aria-hidden="true">
   <div class="htz-ticker-track" id="tickerTrack"></div>
 </div>
+
+<!-- ═════════ CARTELERA ═════════ -->
+<section class="htz-sec htz-eventos" id="eventos">
+  <div class="htz-wrap">
+    <div class="htz-sec-head htz-rv">
+      <div>
+        <span class="hz-kicker">Lo que viene y lo que fue</span>
+        <h2 class="htz-sec-title">Cartelera</h2>
+      </div>
+      <p class="htz-sec-sub">Busca, filtra por categoría o estado y abre la página de cada noche. Los eventos pasados quedan publicados con su historia.</p>
+    </div>
+
+    <div class="htz-toolbar htz-rv">
+      <div class="htz-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" type="search" placeholder="Busca por evento, ciudad o marca…" aria-label="Buscar eventos" autocomplete="off">
+      </div>
+      <div class="htz-filtros">
+        <div class="htz-tabs" role="tablist" aria-label="Estado del evento">
+          <button class="htz-tab on" data-estado="proximos" role="tab" aria-selected="true">Próximos <span class="n" id="count-prox"></span></button>
+          <button class="htz-tab" data-estado="pasados" role="tab" aria-selected="false">Pasados <span class="n" id="count-pas"></span></button>
+          <button class="htz-tab" data-estado="todos" role="tab" aria-selected="false">Todos <span class="n" id="count-tot"></span></button>
+        </div>
+        <div class="htz-chips" aria-label="Filtrar por categoría">
+          <button class="htz-chip-cat on" data-cat="todas">Todas</button>
+          <button class="htz-chip-cat" data-cat="fiesta">Fiesta</button>
+          <button class="htz-chip-cat" data-cat="cine">Cine</button>
+          <button class="htz-chip-cat" data-cat="campana">Campaña</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="htz-grid" id="eventsGrid" aria-live="polite">
+      <div class="htz-vacio"><div class="big">Cargando cartelera…</div><p>Consultando los eventos publicados.</p></div>
+    </div>
+  </div>
+</section>
 
 <!-- ═════════ SISTEMA QR ═════════ -->
 <section class="htz-sec" id="sistema">
@@ -438,43 +475,6 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Historia e impacto</li>
         </ul>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═════════ CARTELERA ═════════ -->
-<section class="htz-sec htz-eventos" id="eventos">
-  <div class="htz-wrap">
-    <div class="htz-sec-head htz-rv">
-      <div>
-        <span class="hz-kicker">Lo que viene y lo que fue</span>
-        <h2 class="htz-sec-title">Cartelera</h2>
-      </div>
-      <p class="htz-sec-sub">Busca, filtra por categoría o estado y abre la página de cada noche. Los eventos pasados quedan publicados con su historia.</p>
-    </div>
-
-    <div class="htz-toolbar htz-rv">
-      <div class="htz-search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="searchInput" type="search" placeholder="Busca por evento, ciudad o marca…" aria-label="Buscar eventos" autocomplete="off">
-      </div>
-      <div class="htz-filtros">
-        <div class="htz-tabs" role="tablist" aria-label="Estado del evento">
-          <button class="htz-tab on" data-estado="proximos" role="tab" aria-selected="true">Próximos <span class="n" id="count-prox"></span></button>
-          <button class="htz-tab" data-estado="pasados" role="tab" aria-selected="false">Pasados <span class="n" id="count-pas"></span></button>
-          <button class="htz-tab" data-estado="todos" role="tab" aria-selected="false">Todos <span class="n" id="count-tot"></span></button>
-        </div>
-        <div class="htz-chips" aria-label="Filtrar por categoría">
-          <button class="htz-chip-cat on" data-cat="todas">Todas</button>
-          <button class="htz-chip-cat" data-cat="fiesta">Fiesta</button>
-          <button class="htz-chip-cat" data-cat="cine">Cine</button>
-          <button class="htz-chip-cat" data-cat="campana">Campaña</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="htz-grid" id="eventsGrid" aria-live="polite">
-      <div class="htz-vacio"><div class="big">Cargando cartelera…</div><p>Consultando los eventos publicados.</p></div>
     </div>
   </div>
 </section>
