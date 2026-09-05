@@ -394,6 +394,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             const CLICK_RULES = [
                 { sel: '#db-whatsapp-btn', act: 'whatsapp_contact' },
                 { sel: '#f6-hero-wa', act: 'hero_cta' },
+                { sel: '#db-poster-img', act: 'poster_zoom' },
                 { sel: '.f8-artist-social-icon', act: (t) => 'artist_social_' + String((t.getAttribute('title') || 'link').toLowerCase()) },
                 { sel: 'a.boleto-card-row', act: (t) => { const tp = (t.querySelector('.boleto-tipo') || {}).textContent || ''; return 'buy_' + tp.trim().toLowerCase(); }, lbl: (t) => { const pr = (t.querySelector('.boleto-precio') || {}).textContent || ''; return pr.trim().slice(0, 80); } },
                 { sel: '#db-footer-social a', act: 'footer_social' },
@@ -463,6 +464,83 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         })();
         if (window) { window.__track = (action, label, value, extra) => { __ANALYTICS.track(action, label, value, extra); }; }
         // === FIN SEGMENTO: ESCUDO ANALYTICS ===
+
+        // === INICIO SEGMENTO: LIGHTBOX GLOBAL (v1.0.0 · cartel + galería) ===
+        // Zoom ampliado al hacer clic: cualquier elemento con .lightbox-trigger
+        // (el cartel #db-poster-img y las fotos de la galería) abre un visor a
+        // pantalla completa (#global-lightbox). Se cierra con la X, clic fuera
+        // o tecla ESC. Genérico del kernel: sin tocar átomos previos y sin
+        // colisionar con los silos (IDs propios, z-index superior).
+        (() => {
+            const cssId = 'global-lightbox-style';
+            if (!document.getElementById(cssId)) {
+                const st = document.createElement('style');
+                st.id = cssId;
+                st.textContent = `
+#global-lightbox{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(6,1,12,.92);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;padding:2.5rem 1.5rem;}
+#global-lightbox.glb-open{opacity:1;visibility:visible;}
+#global-lightbox figure{margin:0;max-width:94vw;max-height:92vh;position:relative;}
+#global-lightbox img{display:block;max-width:94vw;max-height:88vh;width:auto;height:auto;border-radius:8px;box-shadow:0 30px 90px rgba(0,0,0,.7);}
+#global-lightbox .glb-close{position:absolute;top:-10px;right:-10px;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:rgba(20,3,44,.9);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.55);}
+#global-lightbox .glb-hint{position:absolute;bottom:-34px;left:0;right:0;text-align:center;font-size:.68rem;letter-spacing:.22em;color:rgba(255,255,255,.45);}
+.lightbox-trigger{cursor:zoom-in;}
+@media (prefers-reduced-motion: reduce){#global-lightbox{transition:none;}}
+`;
+                document.head.appendChild(st);
+                console.debug('[Lightbox] CSS inyectado');
+            }
+            let lb = document.getElementById('global-lightbox');
+            if (!lb) {
+                lb = document.createElement('div');
+                lb.id = 'global-lightbox';
+                lb.setAttribute('role', 'dialog');
+                lb.setAttribute('aria-modal', 'true');
+                lb.setAttribute('aria-label', 'Vista ampliada');
+                lb.innerHTML = `<figure><img src="" alt=""><button class="glb-close" aria-label="Cerrar">×</button><div class="glb-hint">PRESIONA ESC PARA CERRAR</div></figure>`;
+                document.body.appendChild(lb);
+            }
+            const lbImg = lb.querySelector('img');
+            const lbClose = lb.querySelector('.glb-close');
+            let lastFocused = null;
+
+            const closeLb = () => {
+                lb.classList.remove('glb-open');
+                lbImg.src = '';
+                if (lastFocused) { try { lastFocused.focus(); } catch (e) {} }
+                console.debug('[Lightbox] cerrado');
+            };
+
+            const openLb = (el) => {
+                const src = (el instanceof HTMLImageElement)
+                    ? (el.currentSrc || el.src)
+                    : (el.getAttribute('data-lightbox') || '');
+                if (!src) return;
+                lastFocused = document.activeElement;
+                lbImg.src = src;
+                lbImg.alt = el.getAttribute('alt') || 'Vista ampliada';
+                lb.classList.add('glb-open');
+                lbClose.focus();
+                console.debug('[Lightbox] abierto:', src.slice(0, 80));
+            };
+
+            document.addEventListener('click', (e) => {
+                const trig = e.target.closest ? e.target.closest('.lightbox-trigger') : null;
+                if (trig) {
+                    e.preventDefault();
+                    openLb(trig);
+                    return;
+                }
+                if (lb.classList.contains('glb-open') &&
+                    (e.target === lb || (e.target.closest && e.target.closest('.glb-close')))) {
+                    closeLb();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && lb.classList.contains('glb-open')) closeLb();
+            });
+        })();
+        // === FIN SEGMENTO: LIGHTBOX GLOBAL ===
 
         // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
         function parseSpanishDate(dateStr, timeStr) {
@@ -924,6 +1002,8 @@ if (document.getElementById('footer-copy')) {
 // 1. Verificación de Póster [cite: 343]
 if (document.getElementById('db-poster-img')) {
     document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
+    // LIGHTBOX GLOBAL: el cartel se abre ampliado al hacer clic (como la galería).
+    document.getElementById('db-poster-img').classList.add('lightbox-trigger');
 }
 
 // === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198 / MEJORA v223) ===
@@ -1092,7 +1172,7 @@ if (document.getElementById('db-poster-img')) {
         }
         galleryEl.innerHTML = galleryList.slice(0, 8).map((url, i) =>
             `<figure class="gallery-item" style="margin:0; position:relative; border-radius:14px; overflow:hidden;">
-                <img src="${url}" alt="Galería ${i + 1}" loading="lazy" style="width:100%; aspect-ratio:1/1; object-fit:cover; display:block;">
+                <img src="${url}" alt="Galería ${i + 1}" loading="lazy" class="lightbox-trigger" style="width:100%; aspect-ratio:1/1; object-fit:cover; display:block; cursor:zoom-in;">
             </figure>`).join('');
     }
     // === FIN SEGMENTO GALERÍA ===
