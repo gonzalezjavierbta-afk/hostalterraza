@@ -3,536 +3,935 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Invitación · Terraza</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>Hostal Terraza · Sistema QR &amp; Landing Pages para Eventos</title>
+<meta name="description" content="Registra invitados por WhatsApp, reparte entradas con QR personal y controla la puerta desde el celular. Cada evento con su propia landing page.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0A09'/%3E%3Cpath d='M20 12v40M20 12l30 22M20 36l30 16' stroke='%23E3B457' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ink:#181815;--ink2:#52524d;--ink3:#9a9a94;
-  --paper:#f9f9f6;--surface:#f2f2ee;--border:#e2e2da;
-  --gold:#c8a96e;--gold-d:#a8893e;--gold-bg:#fdf6e8;--gold-border:#e8d5a0;
-  --green:#2d6a4f;--green-bg:#d8f3dc;--green-border:#74c69d;
-  --red:#9b2226;--red-bg:#fde8e8;--red-border:#fca5a5;
-  --r:14px;--rsm:8px;
+/* ═══════════════ HOSTAL TERRAZA · PORTAL v1.0.0 ═══════════════ */
+.htz{--hbg:#0B0A09;--hbg2:#14110C;--hpanel:#17130D;--hline:rgba(227,180,87,.18);
+--gold:#E3B457;--gold2:#C8903F;--cream:#F5EFE2;--mut:rgba(245,239,226,.58);
+--mut2:rgba(245,239,226,.32);--mut3:rgba(245,239,226,.14);
+--cin:#7FA6E0;--camp:#E0816B;--r:20px;--rsm:10px;
+margin:0;color:var(--cream);background:var(--hbg);
+font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+.htz *,.htz *::before,.htz *::after{box-sizing:border-box}
+.htz a{color:inherit;text-decoration:none}
+.htz img{display:block;max-width:100%}
+.htz button{font-family:inherit}
+.htz h1,.htz h2,.htz h3,.htz .hz-display{font-family:'Anton',Impact,sans-serif;font-weight:400;letter-spacing:.02em;text-transform:uppercase;margin:0}
+.htz :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+.htz ::selection{background:var(--gold);color:#000}
+.htz .hz-wrap{width:min(1180px,100% - 48px);margin-inline:auto}
+.htz .hz-kicker{display:inline-flex;align-items:center;gap:.5rem;font-size:11px;font-weight:600;
+letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.htz .hz-kicker::before{content:'';width:22px;height:2px;background:var(--gold)}
+
+/* ── NAV ── */
+.htz-nav{position:sticky;top:0;z-index:60;background:rgba(11,10,9,.72);
+backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+border-bottom:1px solid var(--hline)}
+.htz-nav-in{display:flex;align-items:center;gap:1.25rem;height:64px}
+.htz-logo{display:flex;align-items:center;gap:.6rem;margin-right:auto}
+.htz-logo-mark{width:34px;height:34px;color:var(--gold);flex-shrink:0}
+.htz-logo-name{font-family:'Anton';font-size:17px;letter-spacing:.06em;line-height:1;text-transform:uppercase;color:var(--cream)}
+.htz-logo-name b{color:var(--gold)}
+.htz-nav-links{display:flex;gap:1.4rem}
+.htz-nav-links a{font-size:13px;font-weight:500;color:var(--mut);transition:color .15s}
+.htz-nav-links a:hover{color:var(--cream)}
+.htz-nav-user{display:flex;align-items:center;gap:.6rem}
+.htz-chip{display:inline-flex;align-items:center;gap:.5rem;font-size:12px;color:var(--cream);
+background:var(--hpanel);border:1px solid var(--hline);padding:.45rem .8rem;border-radius:999px}
+.htz-chip b{color:var(--gold);font-weight:600}
+.htz-btn{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
+background:var(--gold);color:#191307;font-weight:700;font-size:13.5px;letter-spacing:.03em;
+border:0;border-radius:999px;padding:.6rem 1.15rem;cursor:pointer;transition:background .15s,transform .15s}
+.htz-btn:hover{background:#f0c46d;transform:translateY(-1px)}
+.htz-btn-ghost{background:transparent;color:var(--cream);border:1px solid var(--hline)}
+.htz-btn-ghost:hover{background:rgba(227,180,87,.08);border-color:var(--gold)}
+.htz-btn-mini{padding:.35rem .7rem;font-size:12px}
+.htz-nav-burger{display:none;background:none;border:1px solid var(--hline);color:var(--cream);
+border-radius:8px;width:40px;height:40px;font-size:20px;cursor:pointer}
+
+/* ── HERO ── */
+.htz-hero{position:relative;overflow:hidden;padding:calc(72px + 3vw) 0 0;border-bottom:1px solid var(--hline)}
+.htz-hero-bg{position:absolute;inset:0;pointer-events:none}
+.htz-hero-bg::before{content:'';position:absolute;width:720px;height:720px;right:-160px;top:-200px;
+border-radius:50%;background:radial-gradient(circle,rgba(227,180,87,.16),transparent 62%)}
+.htz-hero-bg::after{content:'';position:absolute;width:520px;height:520px;left:-180px;bottom:-240px;
+border-radius:50%;background:radial-gradient(circle,rgba(227,180,87,.08),transparent 60%)}
+.htz-hero-grid{position:absolute;inset:0;
+background-image:linear-gradient(rgba(245,239,226,.035) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(245,239,226,.035) 1px,transparent 1px);
+background-size:56px 56px;mask-image:radial-gradient(circle at 65% 0,#000 0%,transparent 55%)}
+.htz-hero-in{position:relative;display:grid;grid-template-columns:1.35fr .85fr;gap:3rem;
+align-items:center;padding-bottom:64px}
+.htz-hero-title{font-size:clamp(52px,9vw,108px);line-height:.94;margin:.9rem 0 1.1rem;color:var(--cream)}
+.htz-hero-title .gl{color:var(--gold)}
+.htz-hero-title em{font-style:normal;color:var(--mut3);-webkit-text-stroke:1px rgba(227,180,87,.5)}
+.htz-hero-sub{max-width:520px;font-size:16px;color:var(--mut);margin:0 0 1.8rem}
+.htz-hero-cta{display:flex;gap:.9rem;flex-wrap:wrap}
+.htz-hero-stats{display:flex;gap:0;margin-top:2.6rem;border-top:1px solid var(--hline)}
+.htz-stat{padding:.9rem 1.4rem .6rem 0;margin-right:1.6rem;min-width:120px}
+.htz-stat + .htz-stat{border-left:1px solid var(--hline);padding-left:1.6rem}
+.htz-stat-num{font-family:'Anton';font-size:30px;color:var(--gold);line-height:1.1}
+.htz-stat-lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut2)}
+
+/* Ticket-QR mock (hero) */
+.htz-ticket{position:relative;width:100%;max-width:380px;margin-left:auto;border-radius:var(--r);
+background:linear-gradient(180deg,#1C1810,#121009);border:1px solid var(--hline);
+box-shadow:0 30px 70px rgba(0,0,0,.55);padding:0;overflow:hidden;transform:rotate(1.2deg)}
+.htz-ticket::before{content:'';position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--gold),transparent 70%)}
+.htz-ticket-top{padding:22px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start}
+.htz-ticket-org{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);line-height:1.2}
+.htz-ticket-org small{display:block;color:var(--mut2);letter-spacing:.3em;font-size:9px;margin-top:2px}
+.htz-ticket-stamp{font-size:10px;font-weight:700;letter-spacing:.12em;background:var(--gold);color:#191307;border-radius:6px;padding:5px 12px}
+.htz-ticket-name{font-family:'Anton';font-size:34px;color:var(--cream);line-height:.96;padding:6px 24px 2px;text-transform:uppercase}
+.htz-ticket-name span{color:var(--gold)}
+.htz-ticket-row{display:flex;justify-content:space-between;padding:14px 24px 0;font-size:12px}
+.htz-ticket-row div span{display:block;font-size:9px;letter-spacing:.16em;color:var(--mut2);text-transform:uppercase;margin-bottom:3px}
+.htz-ticket-row div b{font-weight:600;color:var(--cream)}
+.htz-ticket-qr{background:#fff;border-radius:12px;width:120px;height:120px;padding:9px;margin:20px auto 18px;
+display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.htz-ticket-qr i{display:block;background:#111;border-radius:1px}
+.htz-ticket-qr i.b{background:transparent}
+.htz-ticket-foot{padding:0 24px 18px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--mut2);letter-spacing:.18em}
+
+/* ── TICKER ── */
+.htz-ticker{position:relative;overflow:hidden;background:var(--gold);color:#191307;padding:10px 0;margin-top:0}
+.htz-ticker-track{display:flex;gap:2.4rem;width:max-content;animation:tick 38s linear infinite;white-space:nowrap}
+.htz-ticker:hover .htz-ticker-track{animation-play-state:paused}
+.htz-ticker span{font-family:'Anton';font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.htz-ticker span::after{content:'◆';margin-left:2.4rem;font-size:9px;vertical-align:middle}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.htz-ticker-track{animation:none}}
+
+/* ── SECTIONS base ── */
+.htz-sec{padding:76px 0}
+.htz-sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2.4rem}
+.htz-sec-title{font-size:clamp(30px,5vw,46px);line-height:1;margin:.7rem 0 0}
+.htz-sec-sub{max-width:440px;color:var(--mut);font-size:14.5px;margin:0}
+
+/* ── SISTEMA QR · PASOS ── */
+.htz-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;counter-reset:step}
+.htz-step{position:relative;background:var(--hpanel);border:1px solid var(--hline);border-radius:var(--r);padding:1.7rem 1.5rem 1.5rem;overflow:hidden}
+.htz-step::before{counter-increment:step;content:counter(step,decimal-leading-zero);position:absolute;top:1.1rem;right:1.4rem;
+font-family:'Anton';font-size:44px;color:var(--mut3);line-height:1}
+.htz-step-ic{width:52px;height:52px;border-radius:14px;background:rgba(227,180,87,.12);border:1px solid var(--hline);
+display:flex;align-items:center;justify-content:center;color:var(--gold);margin-bottom:1.1rem}
+.htz-step h3{font-size:21px;margin-bottom:.45rem}
+.htz-step p{margin:0;font-size:14px;color:var(--mut)}
+.htz-feats{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.6rem}
+.htz-feat-chip{display:inline-flex;align-items:center;gap:.45rem;font-size:12.5px;color:var(--cream);
+background:rgba(245,239,226,.05);border:1px solid var(--mut3);border-radius:999px;padding:.4rem .85rem}
+.htz-feat-chip svg{color:var(--gold);flex-shrink:0}
+
+/* ── LANDINGS ── */
+.htz-land-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.htz-land{background:var(--hpanel);border:1px solid var(--hline);border-radius:var(--r);padding:1.6rem;display:flex;flex-direction:column;gap:1.1rem}
+.htz-land-ac{height:150px;border-radius:14px;overflow:hidden;position:relative;border:1px solid var(--mut3)}
+.htz-land-ac .top{position:absolute;inset:0;padding:12px;display:flex;flex-direction:column;gap:6px}
+.htz-land-ac .bar{height:34px;border-radius:8px;display:flex;align-items:center;gap:6px;padding:0 8px;font-size:8px;letter-spacing:.12em;font-weight:600}
+.htz-land-ac .bar i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.35)}
+.htz-land-ac .copy{flex:1;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px}
+.htz-land-ac .copy b{font-size:13px;letter-spacing:.02em;text-transform:uppercase}
+.htz-land-ac .copy u{height:5px;border-radius:3px;background:rgba(0,0,0,.28);width:70%}
+.htz-land-ac .copy i{display:block;width:44px;height:8px;border-radius:4px;margin-top:8px}
+.htz-land-tag{font-family:'Anton';font-size:13px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
+.htz-land h3{margin:.1rem 0 .3rem;font-size:22px}
+.htz-land p{margin:0;font-size:14px;color:var(--mut)}
+.htz-land ul{list-style:none;margin:.2rem 0 0;padding:0;display:grid;gap:.45rem}
+.htz-land ul li{display:flex;gap:.55rem;font-size:13px;color:var(--cream)}
+.htz-land ul svg{color:var(--gold);flex-shrink:0;margin-top:1px}
+
+/* ── CARTELERA ── */
+.htz-eventos{background:linear-gradient(180deg,transparent,rgba(227,180,87,.045))
 }
-body{font-family:'DM Sans',sans-serif;background:#0e0e0c;min-height:100vh;color:var(--ink)}
-h1,h2,h3,.serif{font-family:'Playfair Display',serif;font-weight:400}
+.htz-toolbar{background:var(--hpanel);border:1px solid var(--hline);border-radius:var(--r);padding:1.1rem;margin-bottom:1.6rem;display:grid;gap:.9rem}
+.htz-search{position:relative;display:flex;align-items:center}
+.htz-search svg{position:absolute;left:14px;color:var(--mut2);pointer-events:none}
+.htz-search input{width:100%;background:rgba(245,239,226,.05);border:1px solid var(--mut3);border-radius:999px;
+color:var(--cream);font-family:inherit;font-size:14.5px;padding:.78rem 1rem .78rem 42px;outline:none;transition:border-color .15s}
+.htz-search input:focus{border-color:var(--gold)}
+.htz-search input::placeholder{color:var(--mut2)}
+.htz-filtros{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.htz-tabs{display:inline-flex;background:rgba(245,239,226,.05);border:1px solid var(--mut3);border-radius:999px;padding:3px}
+.htz-tab{background:none;border:0;color:var(--mut);font-size:13px;font-weight:600;padding:.42rem .95rem;border-radius:999px;cursor:pointer;transition:.15s}
+.htz-tab .n{color:var(--gold);font-size:11px}
+.htz-tab.on{background:var(--gold);color:#191307}
+.htz-tab.on .n{color:#191307}
+.htz-chips{display:inline-flex;gap:.45rem;flex-wrap:wrap}
+.htz-chip-cat{background:none;border:1px solid var(--mut3);color:var(--mut);font-size:12.5px;font-weight:600;
+padding:.4rem .9rem;border-radius:999px;cursor:pointer;transition:.15s}
+.htz-chip-cat:hover{color:var(--cream)}
+.htz-chip-cat.on{background:rgba(227,180,87,.14);border-color:var(--gold);color:var(--gold)}
 
-/* ── LOADING ── */
-#screen-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0e0e0c}
-.spin{width:40px;height:40px;border:3px solid rgba(200,169,110,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.htz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:1.15rem}
+.htz-card{position:relative;display:flex;flex-direction:column;background:var(--hpanel);border:1px solid var(--hline);
+border-radius:var(--r);overflow:hidden;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.htz-card:hover{transform:translateY(-5px);border-color:var(--acd);box-shadow:0 20px 46px rgba(0,0,0,.55),0 0 0 1px var(--acd)}
+.htz-card-media{position:relative;aspect-ratio:4/5;background:var(--med-bg,#1B1710) center/cover no-repeat;display:flex}
+.htz-media-fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+background:radial-gradient(120% 90% at 85% 0%,color-mix(in srgb,var(--acd) 34%,transparent),transparent 60%), var(--med-bg,#1B1710)}
+.htz-media-fb::before{content:attr(data-init);font-family:'Anton';font-size:120px;line-height:1;color:rgba(245,239,226,.1);letter-spacing:.04em}
+.htz-card-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,10,9,0) 45%,rgba(11,10,9,.82))}
+.htz-card-stamp{position:absolute;top:12px;left:12px;font-family:'Anton';font-size:12px;letter-spacing:.1em;
+color:#191307;background:var(--gold);padding:4px 10px;border-radius:6px;z-index:2}
+.htz-card-cat{position:absolute;top:12px;right:12px;font-size:10px;font-weight:600;letter-spacing:.14em;
+color:#0B0A09;padding:4px 9px;border-radius:6px;z-index:2;text-transform:uppercase}
+.htz-next-pill{position:absolute;bottom:12px;left:12px;z-index:2;display:inline-flex;align-items:center;gap:.4rem;
+font-size:11px;font-weight:700;letter-spacing:.08em;color:#0B0A09;background:rgba(245,239,226,.9);border-radius:999px;padding:4px 10px}
+.htz-campa-pill{background:var(--camp);color:#fff}
+.htz-card-body{padding:1.05rem 1.15rem 1.1rem;display:flex;flex-direction:column;gap:.3rem;flex:1}
+.htz-card-org{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.htz-card-name{font-family:'Anton';font-size:24px;line-height:1.02;text-transform:uppercase;color:var(--cream)}
+.htz-card-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:13px;color:var(--mut);margin-top:.15rem}
+.htz-card-meta svg{color:var(--gold)}
+.htz-card-go{margin-top:.5rem;font-size:12.5px;font-weight:600;color:var(--gold);border-top:1px dashed var(--mut3);
+padding-top:.7rem;display:inline-flex;align-items:center;gap:.4rem}
+.htz-card:hover .htz-card-go{letter-spacing:.04em}
+.htz-vacio{grid-column:1/-1;text-align:center;padding:3.2rem 1rem;color:var(--mut)}
+.htz-vacio .big{font-family:'Anton';font-size:30px;color:var(--mut2);text-transform:uppercase;margin-bottom:.5rem}
+.htz-vacio p{margin:0 0 1.1rem;font-size:14.5px}
 
-/* ── ERROR ── */
-#screen-error{display:none;min-height:100vh;background:#0e0e0c;align-items:center;justify-content:center;padding:2rem}
-.error-card{background:#1a1a17;border:1px solid #333;border-radius:20px;padding:2.5rem;text-align:center;max-width:380px;width:100%}
-.error-card h3{color:#fff;font-size:20px;margin:.75rem 0 .5rem}
-.error-card p{color:rgba(255,255,255,.5);font-size:13px;line-height:1.6}
+/* ── CTA ── */
+.htz-cta{background:linear-gradient(140deg,var(--hpanel),#0D0B07);border:1px solid var(--hline);border-radius:26px;
+padding:3rem;display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:center;position:relative;overflow:hidden}
+.htz-cta::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;right:-90px;top:-120px;
+background:radial-gradient(circle,rgba(227,180,87,.18),transparent 65%)}
+.htz-cta h2{font-size:clamp(28px,4vw,40px);line-height:1;margin-bottom:.8rem}
+.htz-cta p{margin:0 0 1.4rem;color:var(--mut);max-width:430px;font-size:15px}
+.htz-cta-actions{display:flex;gap:.8rem;flex-wrap:wrap;position:relative}
 
-/* ── INVITATION SCREEN ── */
-#screen-invite{display:none;min-height:100vh;background:#0e0e0c;position:relative;overflow:hidden}
+/* ── FOOTER ── */
+.htz-footer{border-top:1px solid var(--hline);padding:2.4rem 0 3rem;margin-top:60px}
+.htz-footer-in{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.htz-footer-brand p{color:var(--mut2);font-size:13px;max-width:300px;margin:.6rem 0 0}
+.htz-footer-cols{display:flex;gap:3rem;flex-wrap:wrap}
+.htz-footer h4{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .7rem;font-weight:600}
+.htz-footer a{display:block;color:var(--mut);font-size:13.5px;margin-bottom:.45rem}
+.htz-footer a:hover{color:var(--cream)}
+.htz-footer-bottom{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--mut3);display:flex;justify-content:space-between;
+gap:1rem;flex-wrap:wrap;color:var(--mut2);font-size:12.5px}
 
-/* Background image overlay */
-.invite-bg{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat}
-.invite-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,rgba(0,0,0,.72) 50%,rgba(0,0,0,.92) 100%)}
+/* ── LOGIN MODAL ── */
+.htz-overlay{position:fixed;inset:0;background:rgba(5,4,3,.66);backdrop-filter:blur(6px);z-index:80;display:none;
+align-items:center;justify-content:center;padding:1.2rem}
+.htz-overlay.open{display:flex}
+.htz-modal{width:min(400px,100%);background:linear-gradient(180deg,#1C1810,#121009);border:1px solid var(--gold);
+border-radius:var(--r);padding:1.9rem;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.htz-modal-close{position:absolute;top:14px;right:16px;background:none;border:0;color:var(--mut2);font-size:22px;cursor:pointer;line-height:1}
+.htz-modal-close:hover{color:var(--cream)}
+.htz-modal h2{font-size:26px;margin:.6rem 0 .4rem}
+.htz-modal p{color:var(--mut);font-size:13.5px;margin:0 0 1.3rem}
+.htz-field{margin-bottom:.95rem}
+.htz-field label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut2);margin-bottom:.35rem;font-weight:600}
+.htz-field input{width:100%;background:rgba(245,239,226,.05);border:1px solid var(--mut3);border-radius:10px;color:var(--cream);
+font-family:inherit;font-size:14.5px;padding:.72rem .9rem;outline:none}
+.htz-field input:focus{border-color:var(--gold)}
+.htz-aviso{display:none;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4);color:#ffb3b3;
+border-radius:10px;padding:.6rem .85rem;font-size:13px;margin-bottom:.9rem}
+.htz-aviso.show{display:block}
+.htz-modal .htz-btn{width:100%;padding:.85rem}
 
-/* Content */
-.invite-content{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:3rem 1.5rem 2rem}
+/* ── TOAST ── */
+.htz-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,140%);z-index:90;
+background:#1C1810;border:1px solid var(--gold);color:var(--cream);border-radius:12px;padding:.75rem 1.1rem;
+font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-align:center}
+.htz-toast.on{transform:translate(-50%,0)}
 
-/* Logo */
-.invite-logo{width:120px;margin-bottom:2rem;opacity:.95}
+/* ── SCROLL REVEAL ── */
+.htz-rv{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.htz-rv.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.htz-rv{opacity:1;transform:none}}
 
-/* Event info */
-.invite-eyebrow{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
-.invite-title{font-family:'Playfair Display',serif;font-size:clamp(32px,8vw,52px);color:#fff;text-align:center;line-height:1.15;margin-bottom:1.25rem;text-shadow:0 2px 20px rgba(0,0,0,.4)}
-.invite-title em{font-style:italic;color:var(--gold)}
-.invite-divider{width:40px;height:1px;background:var(--gold);margin:.75rem auto 1rem;opacity:.6}
-.invite-meta{display:flex;flex-direction:column;align-items:center;gap:.35rem;margin-bottom:.5rem}
-.invite-meta-row{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:14px}
-.invite-meta-icon{width:16px;height:16px;opacity:.6;flex-shrink:0}
-.invite-desc{color:rgba(255,255,255,.55);font-size:13px;text-align:center;max-width:320px;margin:1rem auto 0;line-height:1.6;font-style:italic}
-
-/* Form card */
-.invite-form-wrap{width:100%;max-width:400px;margin-top:2.5rem}
-.form-card{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:1.75rem}
-.form-card-title{font-size:13px;font-weight:500;color:rgba(255,255,255,.5);text-align:center;margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.1em}
-.field{margin-bottom:.9rem}
-.field label{display:block;font-size:11px;font-weight:500;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.field input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:.15s}
-.field input::placeholder{color:rgba(255,255,255,.25)}
-.field input:focus{border-color:var(--gold);background:rgba(255,255,255,.1)}
-.submit-btn{width:100%;padding:14px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-family:'Playfair Display',serif;letter-spacing:.04em;cursor:pointer;transition:.15s;margin-top:.5rem}
-.submit-btn:hover{background:var(--gold-d)}
-.submit-btn:disabled{opacity:.4;cursor:not-allowed}
-.alert-err{background:rgba(155,34,38,.2);border:1px solid rgba(252,165,165,.3);border-radius:var(--rsm);padding:9px 13px;font-size:13px;color:#fca5a5;margin-bottom:.9rem}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
-
-/* ── HOME SCREEN ── */
-#screen-home{display:none;min-height:100vh;background:#0e0e0c;padding:3rem 1.5rem 2rem}
-.home-content{max-width:480px;margin:0 auto}
-.home-logo{width:100px;margin-bottom:2rem;opacity:.9}
-.home-title{font-family:'Playfair Display',serif;font-size:36px;color:#fff;line-height:1.2;margin-bottom:.5rem}
-.home-sub{color:rgba(255,255,255,.45);font-size:14px;margin-bottom:2.5rem;line-height:1.6}
-.home-section-label{font-size:11px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:1rem}
-.event-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;margin-bottom:.75rem;cursor:pointer;transition:.2s;text-decoration:none;display:block}
-.event-card:hover{border-color:rgba(200,169,110,.4);background:rgba(255,255,255,.08);transform:translateY(-1px)}
-.event-card-img{height:120px;background-size:cover;background-position:center;background-color:#1a1a17;position:relative}
-.event-card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.7))}
-.event-card-body{padding:1rem 1.25rem}
-.event-card-name{font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:.3rem}
-.event-card-meta{font-size:12px;color:rgba(255,255,255,.45);display:flex;gap:12px;flex-wrap:wrap}
-.event-card-badge{display:inline-flex;font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;background:rgba(200,169,110,.15);color:var(--gold);border:1px solid rgba(200,169,110,.2);margin-bottom:.5rem}
-.no-events{text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:14px}
-.home-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.06);text-align:center;font-size:12px;color:rgba(255,255,255,.2)}
-
-/* ── SUCCESS / TICKET SCREEN ── */
-#screen-success{display:none;min-height:100vh;background:#0e0e0c;padding:2rem 1.5rem;align-items:center;justify-content:center;flex-direction:column}
-
-.success-header{text-align:center;margin-bottom:2rem}
-.success-header p{color:rgba(255,255,255,.5);font-size:13px;margin-top:.5rem}
-.success-title{font-family:'Playfair Display',serif;font-size:28px;color:#fff}
-
-/* THE TICKET */
-#ticket-visual{width:100%;max-width:380px;border-radius:20px;overflow:hidden;position:relative;background:#1a1a17;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-
-.ticket-top{padding:2rem;text-align:center;position:relative;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;background-size:cover;background-position:center}
-.ticket-top::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3) 0%,rgba(0,0,0,.75) 100%)}
-.ticket-top-content{position:relative;z-index:1;width:100%}
-.ticket-logo{width:70px;margin-bottom:1rem;opacity:.9}
-.ticket-event-name{font-family:'Playfair Display',serif;font-size:22px;color:#fff;line-height:1.2;margin-bottom:.35rem}
-.ticket-event-name em{font-style:italic;color:var(--gold)}
-.ticket-date{font-size:12px;color:rgba(255,255,255,.65);letter-spacing:.06em;text-transform:uppercase}
-
-/* Ticket tear line */
-.ticket-tear{display:flex;align-items:center;margin:0;position:relative;height:2px;background:rgba(255,255,255,.08)}
-.ticket-tear::before,.ticket-tear::after{content:'';width:24px;height:24px;background:#0e0e0c;border-radius:50%;position:absolute;top:50%;transform:translateY(-50%);flex-shrink:0}
-.ticket-tear::before{left:-12px}
-.ticket-tear::after{right:-12px}
-.ticket-tear-line{flex:1;border-top:1px dashed rgba(255,255,255,.15)}
-
-/* Ticket bottom */
-.ticket-bottom{padding:1.5rem;background:#1a1a17}
-.ticket-guest-label{font-size:10px;font-weight:500;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
-.ticket-guest-name{font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:1.25rem}
-.ticket-qr-row{display:flex;align-items:flex-start;gap:1rem}
-.ticket-qr-box{background:#fff;padding:8px;border-radius:8px;flex-shrink:0}
-.ticket-info{flex:1}
-.ticket-info-row{margin-bottom:.5rem}
-.ticket-info-label{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em}
-.ticket-info-value{font-size:13px;color:rgba(255,255,255,.8);margin-top:1px}
-.ticket-code{font-family:monospace;font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.08em;margin-top:.75rem;text-align:center}
-.ticket-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;background:rgba(200,169,110,.15);color:var(--gold);border:1px solid rgba(200,169,110,.25);margin-bottom:.75rem}
-
-/* Download button */
-.download-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:380px;padding:13px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-family:'Playfair Display',serif;letter-spacing:.04em;cursor:pointer;transition:.15s;margin-top:1.25rem}
-.download-btn:hover{background:var(--gold-d)}
-.download-btn:disabled{opacity:.5;cursor:not-allowed}
-.share-note{font-size:12px;color:rgba(255,255,255,.35);text-align:center;margin-top:.75rem;line-height:1.5}
-
-/* ── DUPLICATE SCREEN ── */
-#screen-duplicate{display:none;min-height:100vh;background:#0e0e0c;align-items:center;justify-content:center;padding:2rem}
+/* ── RESPONSIVE ── */
+@media (max-width:920px){
+ .htz-hero-in{grid-template-columns:1fr;gap:2.4rem}
+ .htz-ticket{margin:0}
+ .htz-steps,.htz-land-grid{grid-template-columns:1fr}
+ .htz-cta{grid-template-columns:1fr;padding:2rem}
+ .htz-nav-links{display:none}
+ .htz-nav-links.open{display:flex;position:fixed;inset:64px 0 auto 0;flex-direction:column;background:rgba(11,10,9,.97);
+  padding:1.2rem 1.4rem;gap:1rem;border-bottom:1px solid var(--hline);z-index:59}
+ .htz-nav-burger{display:block}
+ .htz-hero-stats{flex-wrap:wrap}
+ .htz-stat{min-width:110px}
+}
+@media (max-width:560px){
+ .htz-hero{padding-top:52px}
+ .htz-toolbar{display:grid}
+ .htz-filtros{flex-direction:column;align-items:stretch}
+}
+@media (prefers-reduced-motion:reduce){
+ .htz-hero-bg,.htz-hero-grid{animation:none}
+ .htz-card:hover{transform:none}
+}
 </style>
 </head>
-<body>
+<body class="htz" id="top">
 
-<!-- LOADING -->
-<div id="screen-loading" style="display:flex">
-  <div class="spin"></div>
-</div>
-
-<!-- ERROR -->
-<div id="screen-error" style="display:none;flex">
-  <div class="error-card">
-    <div style="font-size:32px;margin-bottom:.5rem">⚠️</div>
-    <h3>Evento no encontrado</h3>
-    <p>El link no corresponde a ningún evento activo. Pide al hostal el link correcto.</p>
+<!-- ═════════ NAV ═════════ -->
+<header class="htz-nav">
+  <div class="htz-wrap htz-nav-in">
+    <a class="htz-logo" href="#top" aria-label="Hostal Terraza, inicio">
+      <svg class="htz-logo-mark" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M20 12v40M20 12l30 22M20 36l30 16"/></svg>
+      <span class="htz-logo-name">Hostal<b> Terraza</b></span>
+    </a>
+    <nav class="htz-nav-links" id="navLinks" aria-label="Navegación principal">
+      <a href="#sistema">Sistema QR</a>
+      <a href="#landings">Landings</a>
+      <a href="#eventos">Cartelera</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="htz-nav-user" id="userZone"></div>
+    <button class="htz-nav-burger" id="navBurger" aria-label="Abrir menú">☰</button>
   </div>
-</div>
+</header>
 
-<!-- HOME — lista de eventos activos -->
-<div id="screen-home" style="display:none">
-  <div class="home-content">
-    <img class="home-logo" src="" id="home-logo" alt="Logo">
-    <h1 class="home-title">Terraza<br><em style="font-style:italic;color:var(--gold)">Hostal</em></h1>
-    <p class="home-sub">Bienvenido. Selecciona el evento al que fuiste invitado para completar tu registro y recibir tu entrada.</p>
-    <div class="home-section-label">Próximos eventos</div>
-    <div id="home-events-list"><div class="no-events">Cargando eventos…</div></div>
-    <div class="home-footer">Para acceder directamente usa el link que te enviaron.</div>
-  </div>
-</div>
-
-<!-- INVITATION -->
-<div id="screen-invite" style="display:none">
-  <div class="invite-bg" id="invite-bg"></div>
-  <div class="invite-content">
-    <img class="invite-logo" id="invite-logo" src="" alt="Logo">
-    <div class="invite-eyebrow">Te invitamos a</div>
-    <h1 class="invite-title" id="invite-title"></h1>
-    <div class="invite-divider"></div>
-    <div class="invite-meta">
-      <div class="invite-meta-row">
-        <svg class="invite-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        <span id="invite-date"></span>
+<!-- ═════════ HERO ═════════ -->
+<section class="htz-hero">
+  <div class="htz-hero-bg"></div>
+  <div class="htz-hero-grid"></div>
+  <div class="htz-wrap htz-hero-in">
+    <div>
+      <span class="hz-kicker">Sistema QR · Landings · Tickets</span>
+      <h1 class="htz-hero-title">Donde la fiesta<br>se encuentra<br>con el <span class="gl">código</span><em>.</em></h1>
+      <p class="htz-hero-sub">Registra invitados con WhatsApp, reparte entradas con un QR personal y controla la puerta desde el celular. Cada evento vive en su propia landing page, con el diseño que lo representa.</p>
+      <div class="htz-hero-cta">
+        <a class="htz-btn" href="#eventos" data-track="cta_cartelera">Ver cartelera</a>
+        <a class="htz-btn htz-btn-ghost" href="#sistema" data-track="cta_sistema">Cómo funciona</a>
       </div>
-      <div class="invite-meta-row" id="invite-location-row" style="display:none">
-        <svg class="invite-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-        <span id="invite-location"></span>
+      <div class="htz-hero-stats">
+        <div class="htz-stat"><div class="htz-stat-num" id="st-events">…</div><div class="htz-stat-lbl">Eventos publicados</div></div>
+        <div class="htz-stat"><div class="htz-stat-num" id="st-guest">…</div><div class="htz-stat-lbl">Asistentes registrados</div></div>
+        <div class="htz-stat"><div class="htz-stat-num" id="st-tpl">…</div><div class="htz-stat-lbl">Diseños disponibles</div></div>
       </div>
     </div>
-    <p class="invite-desc" id="invite-desc"></p>
-
-    <div class="invite-form-wrap">
-      <div class="form-card">
-        <div class="form-card-title">Registro de asistencia</div>
-        <div id="form-alert"></div>
-        <div class="field"><label>Nombre completo *</label><input id="f-nombre" placeholder="Tu nombre completo" autocomplete="name"></div>
-        <div class="field"><label>Cédula / Documento *</label><input id="f-cedula" placeholder="Número de documento" inputmode="numeric"></div>
-        <div class="field"><label>Teléfono *</label><input id="f-tel" placeholder="Número de celular" type="tel" inputmode="numeric"></div>
-        <button class="submit-btn" id="submit-btn" onclick="registrar()">Confirmar asistencia →</button>
+    <div class="htz-ticket" aria-hidden="true">
+      <div class="htz-ticket-top">
+        <div class="htz-ticket-org">Hostal Terraza<small>VRIP INVITADO</small></div>
+        <div class="htz-ticket-stamp">ENTRADA</div>
       </div>
+      <div class="htz-ticket-name">Tu noche<span> empieza</span></div>
+      <div class="htz-ticket-row">
+        <div><span>Fecha</span><b id="mock-fecha">—</b></div>
+        <div><span>Hora</span><b id="mock-hora">—</b></div>
+      </div>
+      <div class="htz-ticket-qr" id="mockQR"></div>
+      <div class="htz-ticket-foot"><span>USO ÚNICO</span><span>DRAPOR TERRAZA</span></div>
     </div>
   </div>
+</section>
+
+<!-- ═════════ TICKER ═════════ -->
+<div class="htz-ticker" aria-hidden="true">
+  <div class="htz-ticker-track" id="tickerTrack"></div>
 </div>
 
-<!-- SUCCESS + TICKET -->
-<div id="screen-success" style="display:none;min-height:100vh;background:#0e0e0c;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 1rem">
-
-  <div style="text-align:center;margin-bottom:1.25rem">
-    <div style="font-family:'Playfair Display',serif;font-size:24px;color:#fff">¡Te esperamos!</div>
-    <p style="font-size:13px;color:rgba(255,255,255,.4);margin-top:.3rem">Descarga tu entrada y muéstrala en la puerta.</p>
-  </div>
-
-  <!-- ══ TICKET HTML ══════════════════════════════ -->
-  <div id="ticket-card" style="
-    width:100%; max-width:380px;
-    background:#0F0F0F;
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow:0 24px 64px rgba(0,0,0,.8);
-    font-family:'Poppins',sans-serif;
-  ">
-    <!-- Franja dorada top -->
-    <div style="height:8px;background:#C8A96E;width:100%"></div>
-
-    <!-- Header -->
-    <div style="padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between">
+<!-- ═════════ SISTEMA QR ═════════ -->
+<section class="htz-sec" id="sistema">
+  <div class="htz-wrap">
+    <div class="htz-sec-head htz-rv">
       <div>
-        <div style="font-weight:700;font-size:16px;color:#C8A96E;letter-spacing:.04em">HOSTAL</div>
-        <div style="font-weight:300;font-size:12px;color:#A0A09B;letter-spacing:.06em;margin-top:1px">TERRAZA</div>
+        <span class="hz-kicker">Del mensaje al ingreso</span>
+        <h2 class="htz-sec-title">Tres pasos.<br>Una puerta sin filas.</h2>
       </div>
-      <div style="background:#C8A96E;border-radius:6px;padding:5px 14px">
-        <div style="font-weight:700;font-size:12px;color:#0F0F0F;letter-spacing:.08em">ENTRADA</div>
-      </div>
+      <p class="htz-sec-sub">Tu invitado no instala nada: escribe por WhatsApp, recibe su entrada con QR y la muestra en la puerta. Validada en segundos.</p>
     </div>
-
-    <!-- Divider -->
-    <div style="height:1px;background:#2D2D2A;margin:14px 24px 0"></div>
-
-    <!-- Evento -->
-    <div style="padding:14px 24px 0">
-      <div style="font-weight:500;font-size:11px;color:#646460;letter-spacing:.1em;margin-bottom:4px">EVENTO</div>
-      <div id="tk-ev1" style="font-weight:700;font-size:36px;color:#fff;line-height:1.1;letter-spacing:-.01em"></div>
-      <div id="tk-ev2" style="font-weight:700;font-size:36px;color:#C8A96E;line-height:1.1;letter-spacing:-.01em"></div>
-    </div>
-
-    <div style="height:1px;background:#2D2D2A;margin:14px 24px 0"></div>
-
-    <!-- Fecha / Hora -->
-    <div style="padding:12px 24px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div>
-        <div style="font-weight:500;font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:3px">FECHA</div>
-        <div id="tk-fecha" style="font-weight:700;font-size:17px;color:#fff"></div>
+    <div class="htz-steps">
+      <div class="htz-step htz-rv">
+        <div class="htz-step-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <h3>Registra</h3>
+        <p>El invitado envía su nombre y WhatsApp desde el formulario del evento. Tú recibes su información sin líos de papel o planillas.</p>
       </div>
-      <div>
-        <div style="font-weight:500;font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:3px">HORA</div>
-        <div id="tk-hora" style="font-weight:700;font-size:17px;color:#fff"></div>
+      <div class="htz-step htz-rv">
+        <div class="htz-step-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+        <h3>Recibe</h3>
+        <p>Cada asistente obtiene una entrada con un QR personal de uso único. Se descarga, se comparte y se muestra en la puerta.</p>
+      </div>
+      <div class="htz-step htz-rv">
+        <div class="htz-step-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
+        <h3>Escanea</h3>
+        <p>Tu control validará cada QR desde el celular o la tablet: ingreso confirmado, duplicados bloqueados y aforo siempre bajo control.</p>
       </div>
     </div>
-
-    <div style="height:1px;background:#2D2D2A;margin:12px 24px 0"></div>
-
-    <!-- Lugar -->
-    <div style="padding:12px 24px 0">
-      <div style="font-weight:500;font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:3px">LUGAR</div>
-      <div id="tk-lugar" style="font-weight:700;font-size:16px;color:#fff"></div>
-      <div id="tk-dir" style="font-weight:400;font-size:13px;color:#A0A09B;margin-top:2px"></div>
+    <div class="htz-feats">
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Varios puntos de control</span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Aforo en tiempo real</span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Lista de invitados</span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Sin app para el invitado</span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Registro por WhatsApp o cédula</span>
     </div>
-
-    <!-- QR -->
-    <div style="padding:18px 24px 4px;text-align:center">
-      <div style="display:inline-block;background:#fff;border-radius:12px;padding:14px" id="tk-qr-wrap">
-        <div id="tk-qr"></div>
-      </div>
-      <div style="font-weight:300;font-size:10px;color:#646460;letter-spacing:.08em;margin-top:8px">CÓDIGO QR DEL ASISTENTE</div>
-    </div>
-
-    <div style="height:1px;background:#2D2D2A;margin:4px 24px 0"></div>
-
-    <!-- Asistente -->
-    <div style="padding:14px 24px 0">
-      <div style="font-weight:500;font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:4px">ASISTENTE</div>
-      <div id="tk-nombre" style="font-weight:700;font-size:22px;color:#fff;letter-spacing:-.01em"></div>
-      <!-- Badge tipo -->
-      <div id="tk-badge" style="display:inline-flex;align-items:center;margin-top:8px;border:1.5px solid #C8A96E;border-radius:6px;padding:4px 12px">
-        <span id="tk-badge-txt" style="font-weight:500;font-size:11px;color:#C8A96E;letter-spacing:.06em"></span>
-      </div>
-    </div>
-
-    <!-- Código único -->
-    <div style="padding:10px 24px 16px">
-      <div id="tk-code" style="font-weight:300;font-size:11px;color:#646460;letter-spacing:.04em"></div>
-    </div>
-
-    <!-- Franja dorada bottom -->
-    <div style="height:8px;background:#C8A96E;width:100%"></div>
   </div>
-  <!-- ══ FIN TICKET ══════════════════════════════ -->
+</section>
 
-  <button class="download-btn" id="download-btn" onclick="descargarTicket()" style="margin-top:1.25rem;max-width:380px">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Descargar mi entrada
-  </button>
-  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.6rem;line-height:1.6">
-    Muestra el QR en la puerta · Código personal · uso único
-  </p>
+<!-- ═════════ LANDINGS ═════════ -->
+<section class="htz-sec" id="landings" style="background:linear-gradient(180deg,transparent,rgba(227,180,87,.04))">
+  <div class="htz-wrap">
+    <div class="htz-sec-head htz-rv">
+      <div>
+        <span class="hz-kicker">Para cada evento, un mundo</span>
+        <h2 class="htz-sec-title">Landing pages que<br>se sienten propias.</h2>
+      </div>
+      <p class="htz-sec-sub">Plantillas por categoría, con el color de tu marca, línea de artistas, boletería, FAQ dinámico y datos de visitas. Sin instalar nada más que abrir el link.</p>
+    </div>
+    <div class="htz-land-grid">
+      <div class="htz-land htz-rv">
+        <div class="htz-land-ac" style="--acc:#E3B457">
+          <div class="top">
+            <div class="bar" style="background:#16120B;color:rgba(245,239,226,.85)"><i></i><i></i><i></i><span>TROPILOVE</span></div>
+            <div class="copy" style="background:linear-gradient(160deg,#2b2110,#151109);color:#F5EFE2">
+              <b>FIESTA</b><u style="background:rgba(245,239,226,.14)"></u><u style="background:rgba(245,239,226,.1);width:55%"></u>
+              <i style="background:var(--acc)"></i>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="htz-land-tag">Fiesta · tpl f8</div>
+          <h3>Noche con lineup</h3>
+          <p>Artistas con foto y redes, dresscode, aforo y boletería en preventa y taquilla.</p>
+        </div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Comunidad + WhatsApp</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Conteo regresivo y mapa</li>
+        </ul>
+      </div>
+      <div class="htz-land htz-rv">
+        <div class="htz-land-ac" style="--acc:#7FA6E0">
+          <div class="top">
+            <div class="bar" style="background:#0E141F;color:rgba(226,234,255,.85)"><i></i><i></i><i></i><span>NOCHE DE ESTRENO</span></div>
+            <div class="copy" style="background:linear-gradient(160deg,#162036,#0C1118);color:#E2EAFF">
+              <b>CINE</b><u style="background:rgba(226,234,255,.14)"></u><u style="background:rgba(226,234,255,.1);width:60%"></u>
+              <i style="background:var(--acc)"></i>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="htz-land-tag">Cine · tpl c1</div>
+          <h3>Premiere con tráiler</h3>
+          <p>Ficha técnica, tráiler, función, dresscode e invitados especiales en pantalla.</p>
+        </div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Video y director</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Lista de invitados</li>
+        </ul>
+      </div>
+      <div class="htz-land htz-rv">
+        <div class="htz-land-ac" style="--acc:#E0816B">
+          <div class="top">
+            <div class="bar" style="background:#1C0F0D;color:rgba(255,228,220,.85)"><i></i><i></i><i></i><span>SONIDOS POR EL CAMBIO</span></div>
+            <div class="copy" style="background:linear-gradient(160deg,#2C1712,#120A09);color:#FFE4DC">
+              <b>CAMPAÑA</b><u style="background:rgba(255,228,220,.14)"></u><u style="background:rgba(255,228,220,.1);width:52%"></u>
+              <i style="background:var(--acc)"></i>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="htz-land-tag">Campaña · tpl b5</div>
+          <h3>Causa que se mueve</h3>
+          <p>Historia, meta de recaudación, impacto y alcance con actualizaciones.</p>
+        </div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Meta y donaciones</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Historia e impacto</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ CARTELERA ═════════ -->
+<section class="htz-sec htz-eventos" id="eventos">
+  <div class="htz-wrap">
+    <div class="htz-sec-head htz-rv">
+      <div>
+        <span class="hz-kicker">Lo que viene y lo que fue</span>
+        <h2 class="htz-sec-title">Cartelera</h2>
+      </div>
+      <p class="htz-sec-sub">Busca, filtra por categoría o estado y abre la página de cada noche. Los eventos pasados quedan publicados con su historia.</p>
+    </div>
+
+    <div class="htz-toolbar htz-rv">
+      <div class="htz-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" type="search" placeholder="Busca por evento, ciudad o marca…" aria-label="Buscar eventos" autocomplete="off">
+      </div>
+      <div class="htz-filtros">
+        <div class="htz-tabs" role="tablist" aria-label="Estado del evento">
+          <button class="htz-tab on" data-estado="proximos" role="tab" aria-selected="true">Próximos <span class="n" id="count-prox"></span></button>
+          <button class="htz-tab" data-estado="pasados" role="tab" aria-selected="false">Pasados <span class="n" id="count-pas"></span></button>
+          <button class="htz-tab" data-estado="todos" role="tab" aria-selected="false">Todos <span class="n" id="count-tot"></span></button>
+        </div>
+        <div class="htz-chips" aria-label="Filtrar por categoría">
+          <button class="htz-chip-cat on" data-cat="todas">Todas</button>
+          <button class="htz-chip-cat" data-cat="fiesta">Fiesta</button>
+          <button class="htz-chip-cat" data-cat="cine">Cine</button>
+          <button class="htz-chip-cat" data-cat="campana">Campaña</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="htz-grid" id="eventsGrid" aria-live="polite">
+      <div class="htz-vacio"><div class="big">Cargando cartelera…</div><p>Consultando los eventos publicados.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ CTA ═════════ -->
+<section class="htz-wrap htz-sec" id="contacto">
+  <div class="htz-cta htz-rv">
+    <div>
+      <span class="hz-kicker">¿Tienes un hostal, bar o venue?</span>
+      <h2>Lleva el sistema<br>a tu espacio.</h2>
+      <p>Montamos tu landing, conectamos tu WhatsApp y dejamos tu control de puerta listo para el primer evento. Cuéntanos tu noche y la encendemos.</p>
+      <div class="htz-cta-actions">
+        <a class="htz-btn" href="https://wa.me/573001234567?text=Quiero%20llevar%20el%20sistema%20QR%20a%20mi%20espacio" target="_blank" rel="noopener" data-track="cta_whatsapp">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8z"/></svg>
+          Hablar con el equipo
+        </a>
+        <button class="htz-btn htz-btn-ghost" id="btnAccesoMain">Acceso del equipo</button>
+      </div>
+    </div>
+    <div style="position:relative">
+      <div class="htz-ticket" style="max-width:300px;transform:rotate(-1.6deg)">
+        <div class="htz-ticket-top">
+          <div class="htz-ticket-org">Hostal Terraza<small>PRÓXIMA NOCHE</small></div>
+          <div class="htz-ticket-stamp">QR</div>
+        </div>
+        <div class="htz-ticket-name" id="cta-evname" style="font-size:26px">Tu evento</div>
+        <div class="htz-ticket-qr" id="ctaQR" style="width:96px;height:96px;margin:16px auto 14px"></div>
+        <div class="htz-ticket-foot"><span>ESCANEA PARA ENTRAR</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ FOOTER ═════════ -->
+<footer class="htz-footer">
+  <div class="htz-wrap">
+    <div class="htz-footer-in">
+      <div class="htz-footer-brand">
+        <a class="htz-logo" href="#top" aria-label="Hostal Terraza, inicio">
+          <svg class="htz-logo-mark" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M20 12v40M20 12l30 22M20 36l30 16"/></svg>
+          <span class="htz-logo-name">Hostal<b> Terraza</b></span>
+        </a>
+        <p>Sistema de registro, entradas QR y landings para eventos. Construido para hostales, bares y venues que viven de la noche.</p>
+      </div>
+      <div class="htz-footer-cols">
+        <div>
+          <h4>Plataforma</h4>
+          <a href="#sistema">Sistema QR</a>
+          <a href="#landings">Landing pages</a>
+          <a href="#eventos">Cartelera</a>
+        </div>
+        <div>
+          <h4>Equipo</h4>
+          <a href="#" onclick="openLogin();return false">Acceso al panel</a>
+          <a href="https://wa.me/573001234567" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <div class="htz-footer-bottom">
+      <span>© <span id="year"></span> Hostal Terraza · Sistema QR &amp; Landings</span>
+      <span>Hecho para las noches que se recuerdan.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═════════ LOGIN MODAL ═════════ -->
+<div class="htz-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="htz-modal">
+    <button class="htz-modal-close" id="loginClose" aria-label="Cerrar">×</button>
+    <span class="hz-kicker">Acceso del equipo</span>
+    <h2 id="loginTitle">Entrar al panel</h2>
+    <p>Inicia sesión con tu cuenta de la plataforma. Si no tienes una, pídela al administrador.</p>
+    <div class="htz-aviso" id="loginAviso"></div>
+    <div class="htz-field"><label for="loginEmail">Correo</label><input id="loginEmail" type="email" autocomplete="username" placeholder="tu@hostal.com"></div>
+    <div class="htz-field"><label for="loginPass">Contraseña</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="htz-btn" id="loginBtn">Entrar al panel</button>
+  </div>
 </div>
 
-<!-- DUPLICATE -->
-<div id="screen-duplicate" style="display:none;flex;align-items:center;justify-content:center;padding:2rem">
-  <div class="error-card">
-    <div style="font-size:32px;margin-bottom:.5rem">✓</div>
-    <h3 style="color:#fff">Ya estás registrado</h3>
-    <p>Esta cédula ya fue registrada para este evento. Si perdiste tu entrada, contacta al hostal.</p>
-  </div>
-</div>
+<div class="htz-toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════
-//  ⚠️  REEMPLAZA CON TUS CREDENCIALES DE SUPABASE
-// ══════════════════════════════════════════════════
+"use strict";
+/* ═══════════ Credenciales Supabase (anon) ═══════════ */
 const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
-// ══════════════════════════════════════════════════
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
 
-// Logo del hostal embebido (blanco para fondos oscuros)
-const LOGO_WHITE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAB9AAAAQ9CAYAAAABCta4AAAqf0lEQVR4nOzZQQ0AIBDAsIF/z4cMSGgV7L81MxMAAAAAAAAAfG7fDgAAAAAAAACAFxjoAAAAAAAAAJCBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAAACVgQ4AAAAAAAAAlYEOAAAAAAAAAJWBDgAAAAAAcNqzAwEAAAAAQftTL1IaAUAl0AEAAAAAAACgEugAAAAAAAAAUAl0AAAAAAAAAKgEOgAAAAAAAABUAh0AAAAAAAAAKoEOAAAAAAAAAJVABwAAAAAAAIBKoAMAAAAAAABAJdABAAAAAAAAoBLoAAAAAAAAAFAJdAAAAAAAAACoBDoAAAAAAAAAVAIdAAAAAAAAACqBDgAAAAAAAACVQAcAAAAAAACASqADAAAAAAAAQCXQAQAAAAAAAKAS6AAAAAAAAABQCXQAAAAAAAAAqAQ6AAAAAAAAAFQCHQAAAAAAAAAqgQ4AAAAAAAAAlUAHAAAAAAAAgEqgAwAAAAAAAEAl0AEAAAAAAACgEugAAAAAAAAAUAl0AAAAAAAAAKgEOgAAAAAAAABUAh0AAAAAAAAAKoEOAAAAAAAAAJVABwAAAAAAAIBKoAMAAAAAAABAJdABAAAAAAAAoBLoAAAAAAAAAFAJdAAAAAAAAACoBDoAAAAAAAAAVAIdAAAAAAAAACqBDgAAAAAAAACVQAcAAAAAAACASqADAAAAAAAAQCXQAQAAAAAAAKAS6AAAAAAAAABQCXQAAAAAAAAAqAQ6AAAAAAAAAFQCHQAAAAAAAAAqgQ4AAAAAAAAAlUAHAAAAAAAAgEqgAwAAAAAAAEAl0AEAAAAAAACgEugAAAAAAAAAUAl0AAAAAAAAAKgEOgAAAAAAAABUAh0AAAAAAAAAKoEOAAAAAAAAAJVABwAAAAAAAIBKoAMAAAAAAABAJdABAAAAAAAAoBLoAAAAAAAAAFAJdAAAAAAAAACoBDoAAAAAAAAAVAIdAAAAAAAAACqBDgAAAAAAAACVQAcAAAAAAACASqADAAAAAAAAQCXQAQAAAAAAAKAS6AAAAAAAAABQCXQAAAAAAAAAqAQ6AAAAAAAAAFQCHQAAAAAAAAAqgQ4AAAAAAAAAlUAHAAAAAAAAgEqgAwAAAAAAAEAl0AEAAAAAAACgEugAAAAAAAAAUAl0AAAAAAAAAKgEOgAAAAAAAABUAh0AAAAAAAAAKoEOAAAAAAAAAJVABwAAAAAAAIBKoAMAAAAAAABAJdABAAAAAAAAoBLoAAAAAAAAAFAJdAAAAAAAAACoBDoAAAAAAAAAVAIdAAAAAAAAACqBDgAAAAAAAACVQAcAAAAAAACASqADAAAAAAAAQCXQAQAAAAAAAKAS6AAAAAAAAABQCXQAAAAAAAAAqAQ6AAAAAAAAAFQCHQAAAAAAAAAqgQ4AAAAAAAAAlUAHAAAAAAAAgEqgAwAAAAAAAEAl0AEAAAAAAACgqgGTxgx2e9cdXQAAAABJRU5ErkJggg==';
+/* ═══════════ Escudo GOLD v1.0 · Portal ═══════════ */
+const GOLD = {
+  t: {},
+  info(m){ console.log('%c GOLD [INFO] ', 'background:#2271b3;color:#fff;font-weight:700;border-radius:3px', m); },
+  debug(m){ console.log('%c GOLD [DEBUG] ', 'background:#444;color:#fff;font-weight:700;border-radius:3px', m); },
+  link(m){ console.log('%c GOLD [LINK] ', 'background:#2e7d32;color:#fff;font-weight:700;border-radius:3px', m); },
+  trace(m){ console.log('%c GOLD [TRACE] ', 'background:#5b5b0e;color:#fff;font-weight:700;border-radius:3px', m); },
+  time(n){ this.t[n] = performance.now(); console.log('%c GOLD [TIME] ', 'background:#7b4d9e;color:#fff;font-weight:700;border-radius:3px', n + ' >> INICIA'); },
+  timeEnd(n){ const d = ((performance.now() - (this.t[n]||performance.now())) / 1000).toFixed(2) + 's'; console.log('%c GOLD [TIME] ', 'background:#7b4d9e;color:#fff;font-weight:700;border-radius:3px', n + ' >> ' + d); },
+  err(m){ console.error('%c GOLD [ERROR] ', 'background:#c62828;color:#fff;font-weight:700;border-radius:3px', m); }
+};
 
-const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const UID = () => Math.random().toString(36).substr(2,8).toUpperCase();
-let eventoActual = null;
+/* ═══════════ Estado global ═══════════ */
+const CATS = {
+  fiesta:      { label: 'Fiesta',   color: '#E3B457' },
+  cine:        { label: 'Cine',     color: '#7FA6E0' },
+  cinematografia: { label: 'Cine',  color: '#7FA6E0' },
+  campana:     { label: 'Campaña',  color: '#E0816B' }
+};
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MESES_L = { enero:'01', febrero:'02', marzo:'03', abril:'04', mayo:'05', junio:'06', julio:'07', agosto:'08', septiembre:'09', octubre:'10', noviembre:'11', diciembre:'12' };
 
-function show(id) {
-  ['screen-loading','screen-error','screen-home','screen-invite','screen-success','screen-duplicate']
-    .forEach(s => {
-      const el = document.getElementById(s);
-      if (el) el.style.display = 'none';
-    });
-  const target = document.getElementById(id);
-  if (!target) return;
-  if (['screen-success','screen-duplicate','screen-error','screen-loading'].includes(id)) {
-    target.style.display = 'flex';
+const state = { events: [], q: '', estado: 'proximos', cat: 'todas' };
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function parseFecha(str){
+  if (!str) return null;
+  const s = String(str).trim();
+  const m = s.toLowerCase().match(/^(\d{1,2})\s+de\s+([a-záéíóúñ]+)\s+de\s+(\d{4})$/);
+  if (m){ const mm = MESES_L[m[2]]; if (mm) return new Date(`${m[3]}-${mm}-${m[1].padStart(2,'0')}T00:00:00`); }
+  if (s.includes('-')){ const [y,mo,d] = s.split('-').map(Number); if (y&&mo&&d) return new Date(y, mo-1, d); }
+  if (s.includes('/')){ const [d,mo,y] = s.split('/').map(Number); if (y&&mo&&d) return new Date(y, mo-1, d); }
+  return new Date(s);
+}
+
+function esCampanaAbierta(e){
+  const f = parseFecha(e.fecha);
+  return !!f && f.getFullYear() > new Date().getFullYear() + 3;
+}
+function normalizarEvento(e){
+  const cat = CATS[e.categoria_slug] || { label: e.categoria_slug ? String(e.categoria_slug).toUpperCase() : 'Evento', color: e.color_primario || '#E3B457' };
+  const org = e.organizaciones || {};
+  const color = e.color_primario || org.color_primario || '#C8903F';
+  const fechaD = parseFecha(e.fecha);
+  const abierta = esCampanaAbierta(e);
+  return {
+    ...e,
+    _cat: cat,
+    _org: org,
+    _color: color,
+    _fecha: fechaD,
+    _abierta: abierta,
+    _img: e.poster_url || (e.config_landing && e.config_landing.content && e.config_landing.content.poster_url) || e.imagen_url || '',
+    _loc: e.ubicacion || 'Hostal Terraza'
+  };
+}
+
+function initEv(e){
+  const img = e._img;
+  const fechaTxt = e._abierta ? 'Abierta' : (e._fecha ? `${e._fecha.getDate()} ${MESES[e._fecha.getMonth()]} ${e._fecha.getFullYear()}` : (e.fecha||''));
+  const horaTxt = formatHora(e.hora);
+  const media = img
+    ? `<div class="htz-card-media" style="background-image:url('${esc(img)}')">`
+    : `<div class="htz-card-media"><div class="htz-media-fb" data-init="${esc((e.nombre||'?').charAt(0).toUpperCase())}"></div>`;
+  const chipCat = `<span class="htz-card-cat" style="background:${e._cat.color}">${esc(e._cat.label)}</span>`;
+  const stamp = e._abierta
+    ? `<span class="htz-next-pill htz-campa-pill">● En curso</span>`
+    : `<span class="htz-next-pill">● Próxima</span>`;
+  return `<a class="htz-card" href="/evento.html?slug=${esc(e.slug)}" style="--acd:${e._color}" data-track="abrir_evento" data-track-label="${esc(e.slug)}">
+    ${media}
+      <div class="htz-card-shade"></div>
+      ${chipCat}${stamp}
+      <span class="htz-card-stamp">${esc(fechaTxt || 'TBA')}</span>
+    </div>
+    <div class="htz-card-body">
+      <div class="htz-card-org">${esc(e._org.nombre || 'Hostal Terraza')}</div>
+      <h3 class="htz-card-name">${esc(e.nombre || 'Evento')}</h3>
+      <div class="htz-card-meta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <span>${esc(e._loc)}</span>
+        ${e.hora ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${esc(horaTxt)}</span>` : ''}
+      </div>
+      <span class="htz-card-go">Abrir la página del evento →</span>
+    </div>
+  </a>`;
+}
+
+function formatHora(h){
+  if (!h) return '';
+  const m = String(h).match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return String(h);
+  let hh = +m[1]; const ap = hh >= 12 ? 'PM' : 'AM'; hh = hh % 12 || 12;
+  return `${hh}:${m[2]} ${ap}`;
+}
+
+function crearMockQR(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const cells = [];
+  const seed = 7;
+  for (let i = 0; i < 49; i++){
+    const v = ((i * seed + 3) % 10) > 5 ? 's' : 'b';
+    cells.push(v);
+  }
+  cells[0]='s'; cells[6]='s'; cells[42]='s'; cells[48]='s';
+  el.innerHTML = cells.map(c => `<i class="${c}"></i>`).join('');
+}
+
+function renderGrid(){
+  const grid = document.getElementById('eventsGrid');
+  const q = state.q.toLowerCase().trim();
+  let list = state.events.slice();
+  if (state.cat !== 'todas'){
+    list = list.filter(e => e.categoria_slug === state.cat || (state.cat === 'cine' && e.categoria_slug === 'cinematografia'));
+  }
+  if (state.estado === 'proximos'){
+    list = list.filter(e => e._abierta || (e._fecha && e._fecha.getTime() >= todayMid().getTime()));
+    list.sort((a,b) => (a._fecha ? a._fecha.getTime() : 0) - (b._fecha ? b._fecha.getTime() : 0));
+  } else if (state.estado === 'pasados'){
+    list = list.filter(e => !e._abierta && e._fecha && e._fecha.getTime() < todayMid().getTime());
+    list.sort((a,b) => (b._fecha ? b._fecha.getTime() : 0) - (a._fecha ? a._fecha.getTime() : 0));
   } else {
-    target.style.display = 'block';
+    const up = list.filter(e => e._abierta || (e._fecha && e._fecha.getTime() >= todayMid().getTime()));
+    const past = list.filter(e => !e._abierta && e._fecha && e._fecha.getTime() < todayMid().getTime());
+    up.sort((a,b) => (a._fecha ? a._fecha.getTime() : 0) - (b._fecha ? b._fecha.getTime() : 0));
+    past.sort((a,b) => (b._fecha ? b._fecha.getTime() : 0) - (a._fecha ? a._fecha.getTime() : 0));
+    list = [...up, ...past];
   }
-}
-
-async function init() {
-  const params = new URLSearchParams(window.location.search);
-  const evId   = params.get('evento') || params.get('id');
-  const tipo   = params.get('tipo') || '';
-
-  if (!evId) {
-    document.querySelector('#screen-error .error-card h3').textContent = 'Terraza · Hostal';
-    document.querySelector('#screen-error .error-card p').innerHTML =
-      'Esta es la plataforma de registro de eventos.<br><br>' +
-      'Si tienes una invitación, abre el link que te enviaron.<br>' +
-      'Si eres del equipo: <a href="/admin.html" style="color:var(--gold)">acceder al admin →</a>';
-    show('screen-error');
+  if (q){
+    list = list.filter(e =>
+      (e.nombre||'').toLowerCase().includes(q) ||
+      (e.ubicacion||'').toLowerCase().includes(q) ||
+      (e._org.nombre||'').toLowerCase().includes(q) ||
+      e._cat.label.toLowerCase().includes(q)
+    );
+  }
+  if (list.length === 0){
+    grid.innerHTML = `<div class="htz-vacio"><div class="big">Sin resultados</div>
+      <p>No encontramos eventos que coincidan con esa búsqueda o filtro.</p>
+      <button class="htz-btn htz-btn-mini" onclick="limpiarFiltros()">Limpiar filtros</button></div>`;
     return;
   }
-
-  // Si el evento tiene slug, redirigir a evento.html que es la página pública oficial
-  const { data, error } = await SB.from('eventos').select('*').eq('id', evId).maybeSingle();
-  if (error || !data) {
-    show('screen-error');
-    return;
-  }
-
-  // Si tiene slug, redirigir a evento.html con slug + tipo
-  if (data.slug) {
-    const dest = '/evento.html?slug=' + data.slug + (tipo ? '&tipo=' + tipo : '');
-    window.location.replace(dest);
-    return;
-  }
-
-  eventoActual = data;
-  const dateStr = formatFecha(data.fecha) + (data.hora ? ' · ' + data.hora : '');
-
-  document.getElementById('invite-title').innerHTML = data.nombre;
-  document.getElementById('invite-date').textContent = dateStr;
-  if (data.ubicacion) {
-    document.getElementById('invite-location').textContent = data.ubicacion;
-    document.getElementById('invite-location-row').style.display = 'flex';
-  }
-  if (data.descripcion) {
-    document.getElementById('invite-desc').textContent = data.descripcion;
-  }
-  const bg = document.getElementById('invite-bg');
-  if (data.imagen_url) {
-    bg.style.backgroundImage = `url(${data.imagen_url})`;
-  } else {
-    const gradients = [
-      'linear-gradient(135deg,#1a1a2e,#0f3460)',
-      'linear-gradient(135deg,#2d1b69,#11998e)',
-      'linear-gradient(135deg,#1a1a1a,#4a1942)',
-      'linear-gradient(135deg,#0f2027,#2c5364)',
-      'linear-gradient(135deg,#2c1654,#c8a96e)',
-    ];
-    bg.style.background = gradients[data.nombre.charCodeAt(0) % gradients.length];
-  }
-
-  // Si el evento tiene tipo en la URL, guardarlo
-  if (tipo) window._tipoActual = tipo;
-
-  document.title = data.nombre + ' · Terraza';
-  show('screen-invite');
+  grid.innerHTML = list.map(initEv).join('');
+  GOLD.trace('Cartelera renderizada: ' + list.length + ' eventos | estado=' + state.estado + ' | cat=' + state.cat + ' | q=' + (q||'—'));
 }
 
-function formatFecha(f) {
-  if (!f) return '';
-  // f can be YYYY-MM-DD or DD/MM/YYYY
-  const parts = f.includes('-') ? f.split('-') : f.split('/').reverse();
-  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const d = parseInt(parts[2]), m = parseInt(parts[1])-1, y = parts[0];
-  return `${d} ${months[m]} ${y}`;
+function todayMid(){
+  const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate());
 }
 
-async function registrar() {
-  const nombre = document.getElementById('f-nombre').value.trim();
-  const cedula = document.getElementById('f-cedula').value.trim();
-  const tel    = document.getElementById('f-tel').value.trim();
-  if (!nombre || !cedula || !tel) { alrt('Completa todos los campos.'); return; }
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Registrando…';
-
-  const { data: dup } = await SB.from('inscritos').select('id')
-    .eq('cedula', cedula).eq('evento_id', eventoActual.id);
-  if (dup && dup.length > 0) {
-    btn.disabled=false; btn.textContent='Confirmar asistencia →';
-    show('screen-duplicate'); return;
-  }
-
-  const qr = 'QR-' + UID();
-  const { error } = await SB.from('inscritos').insert({
-    tipo:'invitado', nombre, cedula, telefono:tel, cliente_id:null,
-    evento_id:eventoActual.id, evento_nombre:eventoActual.nombre,
-    evento_fecha:eventoActual.fecha, qr_code:qr,
-    used:false, hora_ingreso:null, fecha_ingreso:null
-  });
-
-  btn.disabled=false; btn.textContent='Confirmar asistencia →';
-  if (error) { alrt('Error: ' + error.message); return; }
-
-  // Llenar el ticket HTML con los datos reales
-  llenarTicket(nombre, 'invitado', qr);
-  show('screen-success');
+function renderTicker(){
+  const tr = document.getElementById('tickerTrack');
+  if (!tr) return;
+  const up = state.events.filter(e => e._abierta || (e._fecha && e._fecha.getTime() >= todayMid().getTime()))
+    .sort((a,b) => (a._fecha ? a._fecha - b._fecha : 0) - (b._fecha ? b._fecha - 0 : 0));
+  const names = up.length ? up.map(e => e.nombre) : ['Hostal Terraza', 'Próxima noche', 'Tu evento con QR propio'];
+  const seq = [...names, ...names, ...names, ...names];
+  tr.innerHTML = seq.map(n => `<span>${esc(n)}</span>`).join('');
 }
 
-// ══════════════════════════════════════════════════
-// TICKET HTML — llena los datos y genera la imagen
-// ══════════════════════════════════════════════════
-async function llenarTicket(nombre, tipo, qrCode) {
-  const ev = eventoActual?.nombre || '';
-  const words = ev.split(' ');
-  const mid = Math.ceil(words.length / 2);
-  document.getElementById('tk-ev1').textContent = words.slice(0, mid).join(' ').toUpperCase();
-  document.getElementById('tk-ev2').textContent = words.slice(mid).join(' ').toUpperCase();
+function renderStats(){
+  document.getElementById('st-events').textContent = String(state.events.length).padStart(2,'0');
+  const tpls = new Set(state.events.map(e => e.template_id).filter(Boolean));
+  document.getElementById('st-tpl').textContent = tpls.size ? String(tpls.size).padStart(2,'0') : '—';
+  (async () => {
+    const { count, error } = await SB.from('inscritos').select('*', { count: 'exact', head: true });
+    if (!error && count != null){ document.getElementById('st-guest').textContent = count.toLocaleString('es-CO'); }
+    else { document.getElementById('st-guest').textContent = '—'; }
+  })();
+}
 
-  // Fecha formateada
-  const fv = eventoActual?.fecha || '';
-  let fd = fv;
-  if (fv.includes('-')) { const [y,m,d]=fv.split('-'); fd=`${d} / ${m} / ${y}`; }
-  document.getElementById('tk-fecha').textContent = fd;
-  document.getElementById('tk-hora').textContent  = eventoActual?.hora || '—';
-  document.getElementById('tk-lugar').textContent = 'Hostal R10';
-  document.getElementById('tk-dir').textContent   = eventoActual?.ubicacion || 'Bogotá, Colombia';
-  document.getElementById('tk-nombre').textContent = nombre.toUpperCase();
-  document.getElementById('tk-code').textContent  = `USO ÚNICO  ·  CÓDIGO: ${qrCode}`;
+function contarFiltros(){
+  const up = state.events.filter(e => e._abierta || (e._fecha && e._fecha.getTime() >= todayMid().getTime())).length;
+  const p = state.events.length - up;
+  const t = state.events.length;
+  setN('count-prox', up); setN('count-pas', p); setN('count-tot', t);
+}
+function setN(id, n){ const el = document.getElementById(id); if (el) el.textContent = String(n); }
 
-  // Badge tipo
-  const badge = document.getElementById('tk-badge-txt');
-  const tipoMap = { frecuente:'★  CLIENTE FRECUENTE', invitado:'◎  INVITADO', artista:'🎵  ARTISTA', pago:'💳  POR PAGO' };
-  badge.textContent = tipoMap[tipo] || '◎  INVITADO';
+function limpiarFiltros(){
+  state.q = ''; state.cat = 'todas'; state.estado = 'proximos';
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('.htz-tab').forEach(b => b.classList.toggle('on', b.dataset.estado === 'proximos'));
+  document.querySelectorAll('.htz-chip-cat').forEach(b => b.classList.toggle('on', b.dataset.cat === 'todas'));
+  renderGrid();
+}
 
-  // QR real — esperar renderizado completo antes de mostrar ticket
-  const qrWrap = document.getElementById('tk-qr');
-  qrWrap.innerHTML = '';
-  await new Promise(resolve => {
-    try {
-      new QRCode(qrWrap, {
-        text: qrCode, width: 200, height: 200,
-        colorDark: '#0F0F0F', colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H
-      });
-      setTimeout(resolve, 600);
-    } catch(e) {
-      qrWrap.textContent = qrCode;
-      resolve();
+/* ═══════════ Analytics del portal (page_events) ═══════════ */
+const HTZ_AN = (() => {
+  const vid = (() => { try { let v = localStorage.getItem('htz_visitor'); if (!v){ v = 'v-' + Math.random().toString(36).slice(2,12); localStorage.setItem('htz_visitor', v); } return v; } catch(e){ return 'v-anon'; } })();
+  const sid = (() => { try { let s = sessionStorage.getItem('htz_session'); if (!s){ s = 's-' + Math.random().toString(36).slice(2,12); sessionStorage.setItem('htz_session', s); } return s; } catch(e){ return 's-anon'; } })();
+  return {
+    track(type, action, label){
+      if (!window.supabase) return;
+      SB.from('page_events').insert([{
+        org_id: null, evento_id: null, evento_slug: 'index', evento_nombre: 'Hostal Terraza · Portal',
+        page_url: window.location.href, page_ref: document.referrer, event_type: type,
+        event_action: action || '', event_label: label || '', event_value: null,
+        session_id: sid, visitor_id: vid, user_meta: {}
+      }]).then(() => {}).catch(() => {});
     }
-  });
+  };
+})();
 
-  document.getElementById('ticket-card').style.fontFamily = "'Poppins', sans-serif";
-}
-
-// ── Descargar ticket como imagen via html2canvas ──
-async function descargarTicket() {
-  const btn = document.getElementById('download-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Generando imagen…';
-
-  try {
-    // Esperar 800ms para asegurar que QR e imágenes estén completamente renderizados
-    await new Promise(r => setTimeout(r, 800));
-
-    const ticket = document.getElementById('ticket-card');
-    const canvas = await html2canvas(ticket, {
-      scale: 3,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: '#0F0F0F',
-      logging: false,
-      imageTimeout: 3000,
-      width: ticket.offsetWidth,
-      height: ticket.offsetHeight,
-      onclone: (doc) => {
-        const qrImg = doc.querySelector('#tk-qr img');
-        if (qrImg) qrImg.style.display = 'block';
-      }
-    });
-
-    const link = document.createElement('a');
-    link.download = 'entrada-' + (eventoActual?.nombre||'evento').replace(/\s+/g,'-').toLowerCase() + '.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  } catch(e) {
-    alert('Para guardar: mantén presionado el ticket y elige "Guardar imagen".');
+/* ═══════════ Inicialización ═══════════ */
+async function initFallthrough(){
+  GOLD.info('Portal Hostal Terraza v1.0.0 (index.html)');
+  GOLD.debug('Contrato v107 protegido: URLs públicas preservadas (?slug y ?evento → evento.html)');
+  const params = new URLSearchParams(window.location.search);
+  const directSlug = params.get('slug');
+  const evRef = params.get('evento') || params.get('id');
+  if (directSlug){ GOLD.link('Redirigiendo a /evento.html?slug=' + directSlug); window.location.replace('/evento.html?slug=' + encodeURIComponent(directSlug)); return; }
+  if (evRef){
+    GOLD.debug('Referencia de evento detectada: ' + evRef + ' → resolviendo slug');
+    let slug = null;
+    try { const { data } = await SB.from('eventos').select('id,slug').eq('id', evRef).maybeSingle(); slug = data && data.slug; } catch(e){}
+    if (slug){ GOLD.link('Redirigiendo a /evento.html?slug=' + slug); window.location.replace('/evento.html?slug=' + encodeURIComponent(slug)); return; }
   }
-
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar mi entrada';
+  await arrancarPortal();
 }
 
-function alrt(msg) {
-  const el = document.getElementById('form-alert');
-  el.innerHTML = `<div class="alert-err">${msg}</div>`;
-  setTimeout(() => el.innerHTML = '', 4000);
+async function arrancarPortal(){
+  GOLD.time('portal-load');
+  crearMockQR('mockQR');
+  crearMockQR('ctaQR');
+  document.getElementById('year').textContent = new Date().getFullYear();
+  bindUI();
+  await cargarSesion();
+  await cargarEventos();
+  rellenarMockTicket();
+  GOLD.timeEnd('portal-load');
+  emitirEscudo();
+  HTZ_AN.track('pageview', 'index_load', '');
 }
 
-init();
+function rellenarMockTicket(){
+  const f = document.getElementById('mock-fecha'); const h = document.getElementById('mock-hora');
+  const up = state.events.filter(e => e._fecha).sort((a,b) => a._fecha - b._fecha);
+  if (up.length){
+    const d = up[0]._fecha;
+    if (f) f.textContent = `${d.getDate()} ${MESES[d.getMonth()]}`;
+    if (h && up[0].hora) h.textContent = formatHora(up[0].hora);
+  }
+  const evn = document.getElementById('cta-evname');
+  if (evn && up.length) evn.textContent = (up[0].nombre || 'Tu evento').split(' ').slice(0,3).join(' ') + '…';
+}
+
+async function cargarEventos(){
+  GOLD.time('fetch-eventos');
+  const grid = document.getElementById('eventsGrid');
+  const t0 = performance.now();
+  try {
+    const { data, error } = await SB.from('eventos')
+      .select('*, organizaciones(nombre, color_primario, logo_url, slug)')
+      .order('fecha', { ascending: false });
+    GOLD.timeEnd('fetch-eventos');
+    if (error) throw new Error(error.message);
+    state.events = (data || []).filter(e => e.slug).map(normalizarEvento);
+    GOLD.trace('Eventos con slug: ' + state.events.length + '/total DB: ' + ((data||[]).length) + ' (' + ((performance.now()-t0)/1000).toFixed(2) + 's)');
+    renderTicker(); renderStats(); contarFiltros(); renderGrid();
+  } catch(e){
+    GOLD.err('No se pudieron cargar los eventos: ' + e.message);
+    grid.innerHTML = `<div class="htz-vacio"><div class="big">No pudimos cargar la cartelera</div>
+      <p>Revisa tu conexión e intenta de nuevo.</p>
+      <button class="htz-btn htz-btn-mini" onclick="cargarEventos()">Reintentar</button></div>`;
+  }
+}
+
+/* ═══════════ UI · nav, filtros, reveal ═══════════ */
+function bindUI(){
+  document.getElementById('navBurger').addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+  const sea = document.getElementById('searchInput');
+  sea.addEventListener('input', () => { state.q = sea.value; renderGrid(); });
+  document.querySelectorAll('.htz-tab').forEach(b => b.addEventListener('click', () => {
+    state.estado = b.dataset.estado;
+    document.querySelectorAll('.htz-tab').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    renderGrid();
+  }));
+  document.querySelectorAll('.htz-chip-cat').forEach(b => b.addEventListener('click', () => {
+    state.cat = b.dataset.cat;
+    document.querySelectorAll('.htz-chip-cat').forEach(x => x.classList.toggle('on', x === b));
+    renderGrid();
+  }));
+  document.getElementById('navLinks').addEventListener('click', e => { if (e.target.tagName === 'A') document.getElementById('navLinks').classList.remove('open'); });
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-track]');
+    if (!t) return;
+    HTZ_AN.track('click', t.dataset.track, t.dataset.trackLabel || '');
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLogin(); });
+  const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting){ x.target.classList.add('on'); io.unobserve(x.target); } }), { threshold: 0.12 });
+  document.querySelectorAll('.htz-rv').forEach(el => io.observe(el));
+  let scrollDeep = false;
+  window.addEventListener('scroll', () => {
+    if (scrollDeep) return;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    if (h > 0 && (window.scrollY / h) > 0.5){ scrollDeep = true; HTZ_AN.track('scroll_depth', 'index_50', ''); }
+  }, { passive: true });
+}
+
+/* ═══════════ Login staff ═══════════ */
+function openLogin(){ document.getElementById('loginOverlay').classList.add('open'); setTimeout(() => document.getElementById('loginEmail').focus(), 60); }
+function closeLogin(){ document.getElementById('loginOverlay').classList.remove('open'); }
+function mostrarAviso(msg){ const el = document.getElementById('loginAviso'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 4000); }
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass){ mostrarAviso('Escribe tu correo y contraseña.'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; const txt = btn.innerHTML; btn.innerHTML = 'Entrando…';
+  try {
+    const { data, error } = await SB.auth.signInWithPassword({ email, password: pass });
+    if (error || !data.session) throw new Error(error ? error.message : 'Sin sesión');
+    GOLD.info('Sesión iniciada: ' + email);
+    HTZ_AN.track('click', 'login_ok', email);
+    window.location.href = '/admin.html';
+  } catch(e){
+    GOLD.err('Login fallido: ' + e.message);
+    mostrarAviso('Credenciales incorrectas. Verifica e intenta de nuevo.');
+    HTZ_AN.track('error', 'login_error', '');
+  }
+  btn.disabled = false; btn.innerHTML = txt;
+}
+
+async function cargarSesion(){
+  try {
+    const { data: { session } } = await SB.auth.getSession();
+    if (!session) { pintarUserOff(); return; }
+    let perfil = null;
+    try { const { data } = await SB.from('perfiles').select('nombre,rol').eq('id', session.user.id).single(); perfil = data; } catch(e){}
+    pintarUserOn(session.user.email || 'Cuenta', perfil && perfil.nombre || '');
+  } catch(e){ pintarUserOff(); }
+}
+function pintarUserOff(){
+  document.getElementById('userZone').innerHTML = `<button class="htz-btn htz-btn-mini" id="accessTop" onclick="openLogin()">Acceso</button>`;
+}
+function pintarUserOn(email, nombre){
+  const chip = document.createElement('div');
+  chip.className = 'htz-chip';
+  chip.innerHTML = `<span>●</span><span style="color:var(--gold)">${esc(nombre || email)}</span>
+    <a href="/admin.html" style="font-weight:700;color:var(--gold)">Panel</a>
+    <button onclick="doLogout()" title="Cerrar sesión" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px">×</button>`;
+  document.getElementById('userZone').appendChild(chip);
+}
+function doLogout(){ SB.auth.signOut().then(() => window.location.reload()); }
+
+function emitirEscudo(){
+  GOLD.time('escudo');
+  GOLD.info('Portal operativo · Hero + Sistema QR + Landings + Cartelera cargados');
+  GOLD.debug('Modo asíncrono Supabase con RLS anon — lecturas públicas, telemetría en page_events');
+  GOLD.link('ENLACES GESTIONADOS: ' + state.events.length + ' → /evento.html?slug=… | /admin.html | wa.me contacto');
+  GOLD.trace('TRACE cuantitativo: eventos=' + state.events.length + ' · próximos=' + document.getElementById('count-prox').textContent +
+    ' · pasados=' + document.getElementById('count-pas').textContent + ' · categorías=' + new Set(state.events.map(e => e.categoria_slug)).size);
+  GOLD.timeEnd('escudo');
+  setTimeout(() => GOLD.debug('Sin errores en la carga inicial.'), 500);
+}
+
+/* ── Bind de botones extra ── */
+setTimeout(() => {
+  const b = document.getElementById('btnAccesoMain'); if (b) b.addEventListener('click', openLogin);
+  const lc = document.getElementById('loginClose'); if (lc) lc.addEventListener('click', closeLogin);
+  const lo = document.getElementById('loginOverlay'); if (lo) lo.addEventListener('click', e => { if (e.target === lo) closeLogin(); });
+  const lb = document.getElementById('loginBtn'); if (lb) lb.addEventListener('click', doLogin);
+  const ls = document.getElementById('loginPass'); if (ls) ls.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } });
+}, 0);
+
+initFallthrough().catch(e => { GOLD.err('Fallo de arranque: ' + e.message); });
 </script>
 </body>
 </html>
