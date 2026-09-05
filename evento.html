@@ -317,6 +317,153 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        // === INICIO SEGMENTO: ESCUDO ANALYTICS (v1.0.0 · landing) ===
+        // Analítica de primer partido sobre Supabase (tabla page_events, ADR-032).
+        // Mide: vistas del landing (pageview con visitante/sesión únicos), ingresos
+        // al formulario de comunidad (form_submit), clics en botones y enlaces
+        // (click: WhatsApp, hero CTA, boletería individual/pareja, redes, FAQ,
+        // galería, sponsors, playlist…), profundidad de scroll (scroll_depth) y
+        // tiempo activo en página (active_visit, vía fetch keepalive al cerrar).
+        // Fire-and-forget: nunca bloquea la UI ni depende del resultado de la
+        // escritura. Sin PII: los labels son genéricos; los datos personales ya
+        // viven en la tabla inscritos.
+        const __ANALYTICS = (() => {
+            const SESSION_KEY = 'ht_analytics_session';
+            const VISITOR_KEY = 'ht_analytics_visitor';
+            const STARTS = Date.now();
+            const SENT = {};
+            const CTX = { org_id: null, evento_id: null, evento_slug: '', evento_nombre: '' };
+
+            const uid = () => {
+                try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : ((r & 0x3) | 0x8);
+                    return v.toString(16);
+                });
+            };
+
+            let sessionId = sessionStorage.getItem(SESSION_KEY);
+            if (!sessionId) { sessionId = uid(); try { sessionStorage.setItem(SESSION_KEY, sessionId); } catch (e) {} }
+            let visitorId = localStorage.getItem(VISITOR_KEY);
+            if (!visitorId) { visitorId = uid(); try { localStorage.setItem(VISITOR_KEY, visitorId); } catch (e) {} }
+
+            const slugFromUrl = () => (new URLSearchParams(window.location.search).get('slug') || '');
+
+            const buildEvt = (type, action, label, value, extra) => ({
+                org_id: CTX.org_id,
+                evento_id: CTX.evento_id,
+                evento_slug: CTX.evento_slug || slugFromUrl(),
+                evento_nombre: CTX.evento_nombre,
+                page_url: String(window.location.href).slice(0, 2048),
+                page_ref: String(document.referrer || '').slice(0, 500),
+                event_type: type,
+                event_action: String(action || '').slice(0, 100),
+                event_label: String(label || '').slice(0, 200),
+                event_value: (value === undefined || value === null) ? null : Number(value),
+                session_id: sessionId,
+                visitor_id: visitorId,
+                user_meta: Object.assign({ path: location.pathname }, extra || {})
+            });
+
+            const track = (type, action, label, value, extra) => {
+                try {
+                    sbClient.from('page_events').insert(buildEvt(type, action, label, value, extra))
+                        .then(() => {}).catch((e) => console.debug('[Analytics]', e.message));
+                } catch (e) { console.debug('[Analytics]', e.message); }
+            };
+
+            // keepalive: sobrevive a pagehide (cierre de pestaña o navegación).
+            const trackKeepalive = (type, action, label, value, extra) => {
+                try {
+                    fetch(SB_URL + '/rest/v1/page_events', {
+                        method: 'POST',
+                        keepalive: true,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SB_KEY,
+                            'Authorization': 'Bearer ' + SB_KEY,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(buildEvt(type, action, label, value, extra))
+                    }).catch(() => {});
+                } catch (e) {}
+            };
+
+            // Clics — tabla de reglas delegadas (primera coincidencia gana).
+            const CLICK_RULES = [
+                { sel: '#db-whatsapp-btn', act: 'whatsapp_contact' },
+                { sel: '#f6-hero-wa', act: 'hero_cta' },
+                { sel: '.f8-artist-social-icon', act: (t) => 'artist_social_' + String((t.getAttribute('title') || 'link').toLowerCase()) },
+                { sel: 'a.boleto-card-row', act: (t) => { const tp = (t.querySelector('.boleto-tipo') || {}).textContent || ''; return 'buy_' + tp.trim().toLowerCase(); }, lbl: (t) => { const pr = (t.querySelector('.boleto-precio') || {}).textContent || ''; return pr.trim().slice(0, 80); } },
+                { sel: '#db-footer-social a', act: 'footer_social' },
+                { sel: '#db-sponsors-list a', act: 'sponsor_link' },
+                { sel: '#db-faq-list .faq-item', act: 'faq_toggle' },
+                { sel: '#db-gallery-grid .gallery-item', act: 'gallery_view' },
+                { sel: 'a[href*="wa.me"]', act: 'wa_link' },
+                { sel: '[data-track]', act: (t) => t.getAttribute('data-track') }
+            ];
+            document.addEventListener('click', (e) => {
+                const target = e.target;
+                if (!target || !(target instanceof Element)) return;
+                for (const rule of CLICK_RULES) {
+                    const el = target.closest(rule.sel);
+                    if (el) {
+                        const action = typeof rule.act === 'function' ? rule.act(el) : rule.act;
+                        const label = rule.lbl ? rule.lbl(el) : '';
+                        track('click', action, label, 1);
+                        return;
+                    }
+                }
+            }, true);
+
+            // Scroll depth — umbrales de lectura (1 envío por umbral por sesión).
+            const depthOnScroll = () => {
+                const doc = document.documentElement;
+                const ratio = window.scrollY / Math.max(1, (doc.scrollHeight - window.innerHeight));
+                [0.25, 0.5, 0.75, 0.95].forEach((th) => {
+                    if (!SENT['depth_' + th] && ratio >= th) {
+                        SENT['depth_' + th] = 1;
+                        track('scroll_depth', 'scroll_' + Math.round(th * 100) + 'pct', '', 1);
+                    }
+                });
+            };
+            window.addEventListener('scroll', () => {
+                if (!window.__anaRaf) {
+                    window.__anaRaf = requestAnimationFrame(() => { window.__anaRaf = null; depthOnScroll(); });
+                }
+            }, { passive: true });
+
+            // Tiempo activo al salir + errores JS con keepalive.
+            window.addEventListener('pagehide', () => {
+                const secs = Math.round((Date.now() - STARTS) / 1000);
+                if (secs > 0) trackKeepalive('active_visit', 'session_seconds', CTX.evento_slug || slugFromUrl(), secs, {});
+            });
+            window.addEventListener('error', (e) => {
+                trackKeepalive('error', 'js_error', String(e.message || 'error').slice(0, 200), 1, { line: e.lineno });
+            });
+
+            depthOnScroll();
+
+            return {
+                // Contexto del evento: se llama dentro de initEvento cuando el
+                // landing ya cargó el evento (lanza el pageview).
+                setContext: (ev) => {
+                    CTX.org_id = ev.org_id ?? null;
+                    CTX.evento_id = ev.id ?? null;
+                    CTX.evento_slug = ev.slug || '';
+                    CTX.evento_nombre = ev.nombre || '';
+                    track('pageview', 'landing_view', CTX.evento_nombre || CTX.evento_slug, 1, { tpl: document.body.className || '' });
+                },
+                // Emisión cruda con tipo explícito (pageview/form_submit/click/…).
+                emit: (type, action, label, value, extra) => track(type, action, label, value, extra),
+                // Acceso directo para instrumentar botones con data-track.
+                track: (action, label, value, extra) => track('click', action, label, value, extra)
+            };
+        })();
+        if (window) { window.__track = (action, label, value, extra) => { __ANALYTICS.track(action, label, value, extra); }; }
+        // === FIN SEGMENTO: ESCUDO ANALYTICS ===
+
         // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
         function parseSpanishDate(dateStr, timeStr) {
             const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
@@ -336,6 +483,8 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             document.getElementById('tab-old').classList.toggle('active', !isNew);
             document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
             document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
+            // ESCUDO ANALYTICS: cambio de pestaña del formulario.
+            try { __ANALYTICS.track('form_tab_' + type, '', 1); } catch (e) {}
         }
 
         function switchBoleto(tipo) {
@@ -407,6 +556,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 
                 // Título de pestaña/pestaña del navegador con el nombre real del evento.
                 document.title = (ev.nombre || 'Hostal Terraza') + ' · Hostal Terraza';
+
+                // ESCUDO ANALYTICS: contextualiza y emite el pageview del landing.
+                __ANALYTICS.setContext(ev);
                 
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
                 const content = ev.config_landing?.content || {};
@@ -1160,6 +1312,7 @@ if (document.getElementById('db-poster-img')) {
                         const msgBox = document.getElementById('reg-comunidad-msg');
                         if (!nombre || !whatsapp) {
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Por favor completa tu nombre y WhatsApp.'; }
+                            __ANALYTICS.emit('form_submit', 'form_error', 'validacion', 0);
                             return;
                         }
                         const payload = {
@@ -1181,9 +1334,11 @@ if (document.getElementById('db-poster-img')) {
                             // Anti-duplicado por whatsapp + evento_id
                             const { data: dup } = await sbClient.from('inscritos').select('id').eq('whatsapp', whatsapp).eq('evento_id', ev.id).maybeSingle();
                             if (dup) {
+                                __ANALYTICS.emit('form_submit', 'comunidad_dup', 'ya_inscrito', 0);
                             } else {
                                 const { data: insRow, error } = await sbClient.from('inscritos').insert(payload).select('id').single();
                                 if (error) { console.error('Inscrito landing -> error insert:', error); throw error; }
+                                __ANALYTICS.emit('form_submit', 'comunidad_ok', 'landing', 1);
                             }
                             // Redirigir a la comunidad de WhatsApp (si está configurada)
                             if (comunidadLink) {
@@ -1199,6 +1354,7 @@ if (document.getElementById('db-poster-img')) {
                             regForm.querySelector('button[type=submit]').style.display = 'none';
                         } catch (err) {
                             console.error('Inscrito landing -> error general:', err);
+                            __ANALYTICS.emit('form_submit', 'form_error', 'insercion', 0);
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Hubo un problema. Inténtalo de nuevo.'; }
                         }
                     });
