@@ -191,6 +191,14 @@ font-size:11px;font-weight:700;letter-spacing:.08em;color:#0B0A09;background:rgb
 .htz-card-go{margin-top:.5rem;font-size:12.5px;font-weight:600;color:var(--gold);border-top:1px dashed var(--mut3);
 padding-top:.7rem;display:inline-flex;align-items:center;gap:.4rem}
 .htz-card:hover .htz-card-go{letter-spacing:.04em}
+.htz-cd{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:.7rem}
+.htz-cd-cell{background:rgba(245,239,226,.05);border:1px solid var(--mut3);border-radius:10px;padding:.42rem .25rem;text-align:center}
+.htz-cd-live{display:block;grid-column:1/-1;background:rgba(227,180,87,.12);border:1px solid var(--gold);border-radius:10px;
+color:var(--gold);font-weight:700;font-size:13px;text-align:center;padding:.5rem;animation:cdpulse 1.6s ease-in-out infinite}
+.htz-cd-cell b{display:block;font-family:'Anton';font-size:21px;color:var(--gold);line-height:1.05;letter-spacing:.02em}
+.htz-cd-cell span{display:block;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut2);margin-top:2px}
+@keyframes cdpulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.htz-cd-live{animation:none}}
 .htz-vacio{grid-column:1/-1;text-align:center;padding:3.2rem 1rem;color:var(--mut)}
 .htz-vacio .big{font-family:'Anton';font-size:30px;color:var(--mut2);text-transform:uppercase;margin-bottom:.5rem}
 .htz-vacio p{margin:0 0 1.1rem;font-size:14.5px}
@@ -625,6 +633,15 @@ function initEv(e){
   const img = e._img;
   const fechaTxt = e._abierta ? 'Abierta' : (e._fecha ? `${e._fecha.getDate()} ${MESES[e._fecha.getMonth()]} ${e._fecha.getFullYear()}` : (e.fecha||''));
   const horaTxt = formatHora(e.hora);
+  const cdTarget = (!e._abierta && e._fecha && e._fecha.getTime() >= todayMid().getTime()) ? targetFor(e) : 0;
+  const cdHtml = cdTarget
+    ? `<div class="htz-cd" data-target="${cdTarget}" role="timer" aria-label="Countdown del evento">
+        <div class="htz-cd-cell"><b class="htz-cd-d">--</b><span>Días</span></div>
+        <div class="htz-cd-cell"><b class="htz-cd-h">--</b><span>Horas</span></div>
+        <div class="htz-cd-cell"><b class="htz-cd-m">--</b><span>Min</span></div>
+        <div class="htz-cd-cell"><b class="htz-cd-s">--</b><span>Seg</span></div>
+      </div>`
+    : '';
   const media = img
     ? `<div class="htz-card-media" style="background-image:url('${esc(img)}')">`
     : `<div class="htz-card-media"><div class="htz-media-fb" data-init="${esc((e.nombre||'?').charAt(0).toUpperCase())}"></div>`;
@@ -646,9 +663,37 @@ function initEv(e){
         <span>${esc(e._loc)}</span>
         ${e.hora ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${esc(horaTxt)}</span>` : ''}
       </div>
+      ${cdHtml}
       <span class="htz-card-go">Abrir la página del evento →</span>
     </div>
   </a>`;
+}
+
+function targetFor(e){
+  const d = new Date(e._fecha);
+  const m = e.hora ? String(e.hora).match(/^(\d{1,2}):(\d{2})/) : null;
+  if (m){ d.setHours(+m[1], +m[2], 0, 0); } else { d.setHours(23, 59, 59, 999); }
+  return d.getTime();
+}
+
+function updateCountdowns(){
+  const now = Date.now();
+  document.querySelectorAll('.htz-cd').forEach(cd => {
+    const t = parseInt(cd.dataset.target || '0', 10);
+    if (t <= 0) return;
+    const diff = t - now;
+    if (diff <= 0){
+      cd.dataset.target = '0';
+      cd.innerHTML = `<div class="htz-cd-live">● ¡La noche está en marcha — entra ya!</div>`;
+      return;
+    }
+    const s = Math.floor(diff / 1000);
+    const seg = s % 60, min = Math.floor(s / 60) % 60, hor = Math.floor(s / 3600) % 24, dia = Math.floor(s / 86400);
+    const d = cd.querySelector('.htz-cd-d'); if (d) d.textContent = String(dia).padStart(2, '0');
+    const h = cd.querySelector('.htz-cd-h'); if (h) h.textContent = String(hor).padStart(2, '0');
+    const mi = cd.querySelector('.htz-cd-m'); if (mi) mi.textContent = String(min).padStart(2, '0');
+    const se = cd.querySelector('.htz-cd-s'); if (se) se.textContent = String(seg).padStart(2, '0');
+  });
 }
 
 function formatHora(h){
@@ -707,6 +752,7 @@ function renderGrid(){
     return;
   }
   grid.innerHTML = list.map(initEv).join('');
+  updateCountdowns();
   GOLD.trace('Cartelera renderizada: ' + list.length + ' eventos | estado=' + state.estado + ' | cat=' + state.cat + ' | q=' + (q||'—'));
 }
 
@@ -862,6 +908,7 @@ function bindUI(){
     const h = document.documentElement.scrollHeight - window.innerHeight;
     if (h > 0 && (window.scrollY / h) > 0.5){ scrollDeep = true; HTZ_AN.track('scroll_depth', 'index_50', ''); }
   }, { passive: true });
+  setInterval(updateCountdowns, 1000);
 }
 
 /* ═══════════ Login staff ═══════════ */
