@@ -40,6 +40,7 @@
         }
         body.page-registro #mod-hero::after { display: none !important; }
         body.page-registro #cabezote-img { display: block; width: 100%; height: auto; }
+        body.page-registro #cabezote-picture { display: block; width: 100%; }
         body.page-registro #mod-form { display: block !important; padding: 1.5rem 6% 3rem; border-bottom: none !important; }
         body.page-registro .wa-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1.1rem; }
         body.page-registro .wa-code { flex: 0 0 128px; width: auto; margin-bottom: 0; min-width: 0; }
@@ -164,11 +165,11 @@
             if (srcUrl.indexOf('/storage/v1/object/public/') !== -1) {
                 const base = srcUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
                 img.onerror = () => { img.onerror = null; img.src = srcUrl; };
-                img.src = base + '?width=1600&quality=75';
-                document.getElementById('cabezote-desktop-webp').srcset = base + '?width=1600&quality=75&format=webp';
-                document.getElementById('cabezote-mobile-webp').srcset = base + '?width=640&quality=70&format=webp';
-                document.getElementById('cabezote-desktop-jpg').srcset = base + '?width=1600&quality=75';
-                document.getElementById('cabezote-mobile-jpg').srcset = base + '?width=640&quality=70';
+                img.src = base + '?width=1600&resize=contain&quality=75';
+                document.getElementById('cabezote-desktop-webp').srcset = base + '?width=1600&resize=contain&quality=75&format=webp';
+                document.getElementById('cabezote-mobile-webp').srcset = base + '?width=640&resize=contain&quality=70&format=webp';
+                document.getElementById('cabezote-desktop-jpg').srcset = base + '?width=1600&resize=contain&quality=75';
+                document.getElementById('cabezote-mobile-jpg').srcset = base + '?width=640&resize=contain&quality=70';
                 log("LINK: Cabezote transformado (WebP/JPEG × desktop/mobile) desde Supabase Storage.", "LINK");
             } else {
                 clearSources();
