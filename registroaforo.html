@@ -28,35 +28,29 @@
         .inv-note { margin-top: 0.6rem; font-size: 0.76rem; color: var(--f6-text-muted, #a89b85); }
         .inv-note + button { margin-top: 1.6rem; }
         .field-note { display: block; font-size: 0.78rem; color: var(--f6-text-muted, #a89b85); margin: -0.4rem 0 1.1rem; }
+        /* Página solo-cabezote+formulario: neutraliza el grid/hero del template del landing */
+        body.page-registro #main-content-flow { display: block !important; }
+        body.page-registro #mod-hero {
+            display: block !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: none !important;
+        }
+        body.page-registro #mod-hero::after { display: none !important; }
+        body.page-registro #cabezote-img { display: block; width: 100%; height: auto; }
+        body.page-registro #mod-form { display: block !important; padding: 1.5rem 6% 3rem; border-bottom: none !important; }
     </style>
 </head>
-<body class="tpl-init">
+<body class="tpl-init page-registro">
     <div id="loader" class="loading-overlay">CARGANDO INVITACIÓN…</div>
 
     <main id="main-content-flow">
 
-        <!-- HERO (espejo del landing: mismos IDs/classes para reutilizar el template) -->
+        <!-- CABEZOTE: imagen estática cargada en /imagenes (único encabezado de la página) -->
         <header id="mod-hero" class="hero">
-            <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
-            <div class="hero-content" style="position:relative; z-index:5;">
-                <h1 id="event-title">--</h1>
-            </div>
+            <img id="cabezote-img" src="/imagenes/cabezote%20tropilove%20formulario.jpg.jpeg" alt="Cabezote del evento">
         </header>
-
-        <!-- COUNTDOWN (espejo del landing) -->
-        <div id="unified-frame" class="unified-countdown-frame" style="display:flex; justify-content:center; margin-top:3rem;">
-            <div class="cd-block" style="text-align:center;"><span id="cd-days" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>DÍAS</small></div>
-            <div class="cd-block" style="text-align:center;"><span id="cd-hours" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>HORAS</small></div>
-            <div class="cd-block" style="text-align:center;"><span id="cd-mins" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>MIN</small></div>
-            <div class="cd-block" style="text-align:center;"><span id="cd-secs" style="display:block; font-size:3.2rem; font-weight:900;">00</span><small>SEG</small></div>
-        </div>
-
-        <!-- METADATOS (espejo del landing) -->
-        <div id="mod-hero-meta" class="hero-meta">
-            <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg><span id="meta-fecha">--/--/--</span></div>
-            <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58-8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="meta-hora">--:--</span></div>
-            <div class="meta-item"><svg class="meta-svg" viewBox="0 0 24 24" width="18" height="18" fill="var(--gold)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span id="meta-lugar">--</span></div>
-        </div>
 
         <!-- FORMULARIO DE REGISTRO (espejo del landing: .form-master-box + tabs + .btn-submit) -->
         <section id="mod-form">
@@ -113,18 +107,6 @@
         function TODAY() { return new Date().toLocaleDateString('es-CO'); }
         function NOW()   { return new Date().toLocaleTimeString('es-CO'); }
         function UID()   { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-
-        function parseSpanishDate(dateStr, timeStr) {
-            const months = { "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06", "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12" };
-            const parts = (dateStr || '').toLowerCase().split(' de ');
-            if (parts.length === 3) {
-                const d = parts[0].trim().padStart(2, '0');
-                const m = months[parts[1].trim()];
-                const a = parts[2].trim();
-                return new Date(`${a}-${m}-${d}T${timeStr}`);
-            }
-            return new Date(`${dateStr}T${timeStr}`);
-        }
 
         // Reutiliza el MISMO mecanismo de inyección de CSS del landing (Data-First).
         function injectAtomicCSS(cat, tplId) {
@@ -212,36 +194,10 @@
                 // Activación de Ámbito Dual (misma del landing)
                 const tplNormal = `tpl-${ev.template_id || 'F3'}`;
                 const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
-                document.body.className = `${tplNormal} ${tplLower}`;
+                document.body.className = `${tplNormal} ${tplLower} page-registro`;
 
                 const content = ev.config_landing?.content || {};
                 const formSolo = content.form_solo ? content.form_solo.activo !== false : true;
-
-                // Hero en 2 líneas (misma lógica del landing)
-                const __tituloEl = document.getElementById('event-title');
-                const __tituloRaw = (ev.nombre || '').toUpperCase();
-                const __palabras = __tituloRaw.split(' ');
-                const __mitad = Math.ceil(__palabras.length / 2);
-                const __l1 = document.createElement('span'); __l1.className = 'hero-title-line1'; __l1.textContent = __palabras.slice(0, __mitad).join(' ');
-                const __l2 = document.createElement('span'); __l2.className = 'hero-title-line2'; __l2.textContent = __palabras.slice(__mitad).join(' ');
-                __tituloEl.textContent = ''; __tituloEl.appendChild(__l1); __tituloEl.appendChild(__l2);
-
-                document.getElementById('org-name-badge').innerText = ev.organizaciones?.nombre.toUpperCase() || "--";
-                document.getElementById('meta-fecha').innerText = ev.fecha;
-                document.getElementById('meta-hora').innerText = `${ev.hora} HRS`;
-                document.getElementById('meta-lugar').innerText = (ev.ubicacion || "--").toUpperCase();
-                if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
-
-                // Countdown
-                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
-                setInterval(() => {
-                    const diff = target - Date.now();
-                    if (diff <= 0) return;
-                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                }, 1000);
 
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('mod-form').style.display = 'block';
