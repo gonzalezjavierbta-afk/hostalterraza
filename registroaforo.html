@@ -6,7 +6,6 @@
     <title>Registro · Hostal Terraza</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
     <!-- Kernel SaaS agnóstico (espejo del landing: reset + grano + IoC) -->
     <style>
         html, body { margin: 0; padding: 0; min-height: 100%; background-color: #050505; color: #ffffff; font-family: 'Geist', sans-serif; overflow-x: hidden; }
@@ -17,17 +16,8 @@
         }
         section, header, footer { display: none; }
         .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
-        /* Estilo mínimo para la invitación QR (no forma parte del template del landing) */
-        .inv-panel { text-align: center; }
+        /* Estilo mínimo para el formulario de registro (no forma parte del template del landing) */
         .inv-badge { font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase; font-weight: 900; color: var(--gold, #ff9f1c); margin-bottom: 0.6rem; }
-        .inv-panel h2 { font-size: 1.3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.3rem; }
-        .inv-panel .inv-sub { color: var(--f6-text-muted, #a89b85); font-size: 0.9rem; margin-bottom: 1.4rem; }
-        .inv-qr { width: 200px; height: 200px; margin: 0 auto; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 12px; }
-        .inv-qr svg, .inv-qr canvas { width: 100%; height: 100%; }
-        .inv-code { margin-top: 1.1rem; font-family: monospace; font-size: 0.82rem; color: var(--gold, #ff9f1c); word-break: break-all; }
-        .inv-note { margin-top: 0.6rem; font-size: 0.76rem; color: var(--f6-text-muted, #a89b85); }
-        .inv-note + button { margin-top: 1.6rem; }
-        .field-note { display: block; font-size: 0.78rem; color: var(--f6-text-muted, #a89b85); margin: -0.4rem 0 1.1rem; }
         /* Página solo-cabezote+formulario: neutraliza el grid/hero del template del landing */
         body.page-registro #main-content-flow { display: block !important; }
         body.page-registro #mod-hero {
@@ -43,7 +33,7 @@
     </style>
 </head>
 <body class="tpl-init page-registro">
-    <div id="loader" class="loading-overlay">CARGANDO INVITACIÓN…</div>
+    <div id="loader" class="loading-overlay">CARGANDO REGISTRO…</div>
 
     <main id="main-content-flow">
 
@@ -52,43 +42,17 @@
             <img id="cabezote-img" src="/imagenes/cabezote%20tropilove%20formulario.jpg.jpeg" alt="Cabezote del evento">
         </header>
 
-        <!-- FORMULARIO DE REGISTRO (espejo del landing: .form-master-box + tabs + .btn-submit) -->
+        <!-- FORMULARIO DE REGISTRO (captura simple: nombre, cédula, whatsapp → BD) -->
         <section id="mod-form">
             <div class="form-master-box">
-                <div class="form-tabs">
-                    <button id="tab-new" class="tab-btn active" onclick="switchForm('nuevo')">REGISTRO</button>
-                    <button id="tab-old" class="tab-btn" onclick="switchForm('ya')">RECUPERAR</button>
-                </div>
-
-                <div id="form-nuevo">
-                    <form id="master-reg-form" novalidate>
-                        <p class="inv-badge" id="form-alert-badge" style="display:none"></p>
-                        <input type="text" id="reg-nombre" class="form-input" placeholder="Nombre completo *" required>
-                        <input type="text" id="reg-cedula" class="form-input" placeholder="Cédula *" required>
-                        <input type="tel" id="reg-telefono" class="form-input" placeholder="Teléfono / WhatsApp *" required>
-                        <button type="submit" class="btn-submit">Generar Invitación →</button>
-                    </form>
-                </div>
-
-                <div id="form-ya" style="display:none">
-                    <form id="master-rec-form" novalidate>
-                        <input type="text" id="rec-cedula" class="form-input" placeholder="Cédula *" required>
-                        <span class="field-note">Ingresa la cédula con la que te registraste para recuperar tu invitación con QR.</span>
-                        <button type="submit" class="btn-submit">Recuperar Invitación →</button>
-                    </form>
-                    <p class="inv-badge" style="display:none" id="rec-alert-badge"></p>
-                </div>
-
-                <!-- Invitación QR -->
-                <div class="inv-panel" id="inv-panel" style="display:none">
-                    <p class="inv-badge">Invitación Confirmada</p>
-                    <h2 id="inv-name">--</h2>
-                    <p class="inv-sub" id="inv-event">--</p>
-                    <div class="inv-qr" id="inv-qr"></div>
-                    <p class="inv-code" id="inv-code-text">--</p>
-                    <p class="inv-note">Presenta este código QR en la entrada del evento. Un solo ingreso por invitación.</p>
-                    <button type="button" class="btn-submit" onclick="location.reload()">Registrar otra persona →</button>
-                </div>
+                <p class="inv-badge" id="form-alert-badge" style="display:none"></p>
+                <form id="master-reg-form" novalidate>
+                    <input type="text" id="reg-nombre" class="form-input" placeholder="Nombre completo *" required>
+                    <input type="text" id="reg-cedula" class="form-input" placeholder="Cédula *" required>
+                    <input type="tel" id="reg-whatsapp" class="form-input" placeholder="WhatsApp *" required>
+                    <button type="submit" class="btn-submit">Registrarme →</button>
+                </form>
+                <p class="inv-badge" id="form-success-msg" style="display:none"></p>
             </div>
         </section>
 
@@ -106,7 +70,6 @@
 
         function TODAY() { return new Date().toLocaleDateString('es-CO'); }
         function NOW()   { return new Date().toLocaleTimeString('es-CO'); }
-        function UID()   { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
         // Reutiliza el MISMO mecanismo de inyección de CSS del landing (Data-First).
         function injectAtomicCSS(cat, tplId) {
@@ -124,15 +87,6 @@
             });
         }
 
-        function switchForm(type) {
-            const isNew = type === 'nuevo';
-            document.getElementById('tab-new').classList.toggle('active', isNew);
-            document.getElementById('tab-old').classList.toggle('active', !isNew);
-            document.getElementById('form-nuevo').style.display = isNew ? 'block' : 'none';
-            document.getElementById('form-ya').style.display = isNew ? 'none' : 'block';
-            log("DEBUG: Ruta de formulario cambiada a [" + type.toUpperCase() + "]", "DEBUG");
-        }
-
         function showBadge(id, msg, tipo) {
             const el = document.getElementById(id);
             el.style.display = 'block';
@@ -140,25 +94,8 @@
             el.style.color = tipo === 'err' ? '#ff6b6b' : 'inherit';
         }
 
-        function mostrarInvitacion(nombre, eventoTxt, qrCode) {
-            document.getElementById('form-nuevo').style.display = 'none';
-            document.getElementById('form-ya').style.display = 'none';
-            document.getElementById('inv-name').textContent = (nombre || '').toUpperCase();
-            document.getElementById('inv-event').textContent = eventoTxt;
-            document.getElementById('inv-code-text').textContent = qrCode || '--';
-            const qd = document.getElementById('inv-qr');
-            qd.innerHTML = '';
-            try {
-                QrCreator.render({ text: qrCode, radius: 0, ecLevel: "H", fill: "#181815", background: "#ffffff", size: 200 }, qd);
-            } catch (e) {
-                qd.textContent = qrCode;
-            }
-            document.getElementById('inv-panel').style.display = 'block';
-            log("TRACE: Invitación QR renderizada con código " + (qrCode || ''), "TRACE");
-        }
-
         async function init() {
-            log("Iniciando Registro (ADR-030) — invitación QR con estilos del template del landing.", "INFO");
+            log("Iniciando Registro (ADR-030) — captura simple de datos con estilos del template del landing.", "INFO");
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
             const id = params.get('id');
@@ -204,9 +141,8 @@
                 log("LINK: Evento cargado para registro: " + (ev.nombre || '') + " (id=" + ev.id + ", rol=" + rol + ").", "LINK");
 
                 if (!formSolo) {
-                    document.getElementById('form-nuevo').style.display = 'none';
-                    document.getElementById('form-ya').style.display = 'none';
-                    showBadge('form-alert-badge', 'El registro con invitación no está disponible para este evento.', 'err');
+                    document.getElementById('master-reg-form').style.display = 'none';
+                    showBadge('form-alert-badge', 'El registro no está disponible para este evento.', 'err');
                     log("INFO: form_solo.activo=false — registro desactivado.", "INFO");
                 }
             } catch (err) {
@@ -221,16 +157,15 @@
             if (!ev) { showBadge('form-alert-badge', 'Evento no cargado.', 'err'); return; }
             const nombre = document.getElementById('reg-nombre').value.trim();
             const cedula = document.getElementById('reg-cedula').value.trim();
-            const telefono = document.getElementById('reg-telefono').value.trim();
+            const whatsapp = document.getElementById('reg-whatsapp').value.trim();
             const rol = window.__ctxRol || 'invitado';
-            if (!nombre || !cedula || !telefono) { showBadge('form-alert-badge', 'Completa nombre, cédula y teléfono.', 'err'); return; }
+            if (!nombre || !cedula || !whatsapp) { showBadge('form-alert-badge', 'Completa nombre, cédula y WhatsApp.', 'err'); return; }
 
             const btn = document.querySelector('#master-reg-form .btn-submit');
-            btn.disabled = true; btn.textContent = 'Generando invitación…';
+            btn.disabled = true; btn.textContent = 'Registrando…';
             try {
                 const { data: dup } = await sbClient.from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
-                if (dup) { showBadge('form-alert-badge', 'Esta cédula ya está registrada. Usa la pestaña RECUPERAR.', 'err'); btn.disabled = false; btn.textContent = 'Generar Invitación →'; return; }
-                const qr = 'QR-' + UID();
+                if (dup) { showBadge('form-alert-badge', 'Esta cédula ya está registrada en este evento.', 'err'); btn.disabled = false; btn.textContent = 'Registrarme →'; return; }
                 const payload = {
                     evento_id: ev.id,
                     org_id: window.__ctxOrgId,
@@ -238,12 +173,11 @@
                     evento_fecha: ev.fecha,
                     nombre: nombre,
                     cedula: cedula,
-                    telefono: telefono,
-                    whatsapp: telefono,
+                    whatsapp: whatsapp,
+                    telefono: whatsapp,
                     tipo: rol,
                     tipo_ayuda: rol,
                     cuenta_aforo: true,
-                    qr_code: qr,
                     used: false,
                     fecha_inscripcion: TODAY(),
                     hora_inscripcion: NOW(),
@@ -251,34 +185,16 @@
                 };
                 const { error } = await sbClient.from('inscritos').insert(payload);
                 if (error) throw error;
-                log("INFO: Invitación creada (rol=" + rol + ", cuenta_aforo=true, " + qr + ").", "INFO");
-                mostrarInvitacion(nombre, (ev.nombre || '') + ' · ' + (ev.fecha || ''), qr);
+                log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ").", "INFO");
+                document.getElementById('master-reg-form').style.display = 'none';
+                const ok = document.getElementById('form-success-msg');
+                ok.style.display = 'block';
+                ok.style.color = '#25d366';
+                ok.textContent = '¡Gracias, ' + nombre + '! Tu registro fue guardado.';
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
-                btn.disabled = false; btn.textContent = 'Generar Invitación →';
-                showBadge('form-alert-badge', 'Hubo un problema al generar tu invitación. Inténtalo de nuevo.', 'err');
-            }
-        });
-
-        document.getElementById('master-rec-form').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const ev = window.__ctxEv;
-            if (!ev) { showBadge('rec-alert-badge', 'Evento no cargado.', 'err'); return; }
-            const cedula = document.getElementById('rec-cedula').value.trim();
-            if (!cedula) { showBadge('rec-alert-badge', 'Ingresa tu cédula.', 'err'); return; }
-            const btn = document.querySelector('#master-rec-form .btn-submit');
-            btn.disabled = true; btn.textContent = 'Buscando…';
-            try {
-                const { data: ins, error } = await sbClient.from('inscritos').select('*').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
-                if (error) throw error;
-                if (!ins) { showBadge('rec-alert-badge', 'No encontramos una invitación con esa cédula.', 'err'); btn.disabled = false; btn.textContent = 'Recuperar Invitación →'; return; }
-                const qr = ins.qr_code || ('QR-' + UID());
-                log("LINK: Invitación recuperada por cédula (" + (ins.id || '') + ").", "LINK");
-                mostrarInvitacion(ins.nombre, (ev.nombre || '') + ' · ' + (ev.fecha || ''), qr);
-            } catch (err) {
-                log("ERROR: " + err.message, "ERROR");
-                btn.disabled = false; btn.textContent = 'Recuperar Invitación →';
-                showBadge('rec-alert-badge', 'Hubo un problema al recuperar tu invitación.', 'err');
+                btn.disabled = false; btn.textContent = 'Registrarme →';
+                showBadge('form-alert-badge', 'Hubo un problema al guardar tu registro. Inténtalo de nuevo.', 'err');
             }
         });
 
