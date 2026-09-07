@@ -1186,6 +1186,21 @@ tr:hover td{background:var(--surface)}
           <div style="font-size:11px;color:var(--ink3);margin-top:.4rem">El video se mostrará en la página pública del evento</div>
         </div>
 
+        <!-- Cabezote del formulario de registro/aforo (ADR-034) -->
+        <div class="fg" style="grid-column:1/-1">
+          <label>Cabezote del formulario de registro
+            <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:4px">Imagen superior de registroaforo.html · Deja vacío para usar la del evento</span>
+          </label>
+          <input id="ev-cabezote-form" type="url"
+            placeholder="https://... o /imagenes/... (URL del cabezote del formulario)"
+            oninput="handleCabezoteFormUrl(this.value)"
+            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-size:12px;font-family:monospace;background:var(--surface);color:var(--ink1)">
+          <div id="ev-cabezote-form-preview" style="margin-top:.5rem;display:none">
+            <img id="ev-cabezote-form-thumb" style="max-width:100%;max-height:120px;border-radius:6px;border:1px solid var(--border);object-fit:contain" src="">
+            <button onclick="clearCabezoteForm()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:2px 8px;font-size:11px;cursor:pointer;color:var(--ink3)">✕ Quitar</button>
+          </div>
+        </div>
+
       </div>
 
       </div><!-- /wiz-step 3 -->
@@ -4053,6 +4068,11 @@ function openEditMod(evId) {
     document.getElementById('ev-poster-thumb').src = poster;
     document.getElementById('ev-poster-preview').style.display = 'flex';
   }
+  if (ev.cabezote_formulario_url) {
+    document.getElementById('ev-cabezote-form').value = ev.cabezote_formulario_url;
+    document.getElementById('ev-cabezote-form-thumb').src = ev.cabezote_formulario_url;
+    document.getElementById('ev-cabezote-form-preview').style.display = 'block';
+  }
   if (ev.video_url) {
     document.getElementById('ev-video').value = ev.video_url;
     previewVideo(ev.video_url);
@@ -4166,7 +4186,7 @@ function openEditMod(evId) {
 }
 
 function _limpiarWizardCompleto() {
-  ['ev-n','ev-f','ev-h','ev-ubic','ev-aforo','ev-img','ev-video','ev-poster-url'].forEach(i => {
+  ['ev-n','ev-f','ev-h','ev-ubic','ev-aforo','ev-img','ev-video','ev-poster-url','ev-cabezote-form'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
   });
   ['ev-d','ld-sinopsis-text','ev-titulo-display','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
@@ -4189,6 +4209,7 @@ function _limpiarWizardCompleto() {
   if (formUrl) formUrl.value = '';
   document.getElementById('ev-img-preview').style.display = 'none';
   document.getElementById('ev-poster-preview').style.display = 'none';
+  document.getElementById('ev-cabezote-form-preview').style.display = 'none';
   document.getElementById('ev-multi-acceso').checked = false;
   document.getElementById('ev-puntos-wrap').style.display = 'none';
   document.getElementById('ev-puntos-list').innerHTML = '';
@@ -4379,6 +4400,7 @@ async function guardarEventoWizard() {
       color_primario: document.getElementById('ev-color-hex').value.trim() || '#c9a84c',
       imagen_url:     (document.getElementById('ev-img').value || '').trim() || null,
       poster_url:     (document.getElementById('ev-poster-url').value || '').trim() || null,
+      cabezote_formulario_url: (document.getElementById('ev-cabezote-form').value || '').trim() || null,
       video_url:      (document.getElementById('ev-video')?.value || '').trim() || null,
       wa_share:       document.getElementById('ev-wa-share')?.checked ?? true,
       aforo_max:      parseInt(document.getElementById('ev-aforo')?.value) || null,
@@ -5384,6 +5406,7 @@ async function _crearEventoUnico(n) {
     color_primario: document.getElementById('ev-color-hex').value.trim()||'#c9a84c',
     imagen_url: document.getElementById('ev-img').value.trim()||null,
     video_url:  document.getElementById('ev-video')?.value.trim()||null,
+    cabezote_formulario_url: document.getElementById('ev-cabezote-form')?.value.trim()||null,
     wa_share: document.getElementById('ev-wa-share')?.checked ?? true,
     puntos_acceso: getPuntosAcceso(),
     form_campos: {
@@ -5412,10 +5435,11 @@ async function _crearEventoUnico(n) {
   const pubLink = landingUrl({ template_id: _tplCreado, slug: slug });
   alrt('ev-alert',`✓ Evento "${n}" creado. <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>`,'ok');
 
-  ['ev-n','ev-f','ev-h','ev-d','ev-ubic','ev-img','ev-aforo','ev-video'].forEach(i=>{const el=document.getElementById(i);if(el)el.value=''});
+  ['ev-n','ev-f','ev-h','ev-d','ev-ubic','ev-img','ev-aforo','ev-video','ev-cabezote-form'].forEach(i=>{const el=document.getElementById(i);if(el)el.value=''});
   document.getElementById('ev-color-hex').value='#c9a84c';
   document.getElementById('ev-color').value='#c9a84c';
   document.getElementById('ev-img-preview').style.display='none';
+  document.getElementById('ev-cabezote-form-preview').style.display='none';
   previewVideo('');
   resetCamposCustom();
   // ADR-021 — reiniciar el estado del Wizard para la siguiente creación
@@ -5479,6 +5503,7 @@ async function _crearSerie(n) {
       wa_share: true,
       color_primario: color,
       imagen_url: imagen,
+      cabezote_formulario_url: document.getElementById('ev-cabezote-form')?.value.trim()||null,
       descripcion: 'Sesión ' + i + ' de ' + nSes,
       form_campos: {
         email:  document.getElementById('ev-campo-email')?.checked ?? false,
@@ -5509,6 +5534,7 @@ async function _crearSerie(n) {
   document.getElementById('ev-color-hex').value='#c9a84c';
   document.getElementById('ev-color').value='#c9a84c';
   document.getElementById('ev-img-preview').style.display='none';
+  document.getElementById('ev-cabezote-form-preview').style.display='none';
   loadEventos();
   loadEventosSelects();
   loadSeries();
@@ -8709,6 +8735,30 @@ function clearPoster() {
   document.getElementById('ev-poster-url').value = '';
   document.getElementById('ev-poster-thumb').src = '';
   document.getElementById('ev-poster-preview').style.display = 'none';
+}
+
+// ── Cabezote del formulario de registro (ADR-034) ──
+let _cabezoteFormUrlTimer = null;
+function handleCabezoteFormUrl(url) {
+  clearTimeout(_cabezoteFormUrlTimer);
+  if (!url.trim()) { clearCabezoteForm(); return; }
+  _cabezoteFormUrlTimer = setTimeout(() => {
+    const img = new Image();
+    img.onload = () => {
+      document.getElementById('ev-cabezote-form-thumb').src = url;
+      document.getElementById('ev-cabezote-form-preview').style.display = 'block';
+    };
+    img.onerror = () => {
+      const inp = document.getElementById('ev-cabezote-form');
+      if (inp) { inp.style.borderColor = 'var(--red)'; setTimeout(() => { inp.style.borderColor = ''; }, 2000); }
+    };
+    img.src = url;
+  }, 500);
+}
+function clearCabezoteForm() {
+  document.getElementById('ev-cabezote-form').value = '';
+  document.getElementById('ev-cabezote-form-thumb').src = '';
+  document.getElementById('ev-cabezote-form-preview').style.display = 'none';
 }
 
 

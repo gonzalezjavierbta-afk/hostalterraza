@@ -214,7 +214,8 @@
                 window.__ctxRol = rol;
 
                 // Cabezote responsive + WebP tan pronto se conoce la imagen del evento.
-                setCabezote(ev.imagen_url || ev.poster_url);
+                // ADR-034: cabezote_formulario_url tiene precedencia (imagen propia del formulario).
+                setCabezote(ev.cabezote_formulario_url || ev.imagen_url || ev.poster_url);
                 const cabImg = document.getElementById('cabezote-img');
                 if (cabImg) cabImg.alt = ev.nombre || 'Cabezote del evento';
 
