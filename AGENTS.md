@@ -1,67 +1,21 @@
-# AGENTS.md — Sistema QR Hostal Terraza
+# Directrices de Gobernanza y Enrutamiento Agéntico (GSD-Protocol)
 
-Rol de este documento: reglas universales de colaboración para cualquier agente que trabaje en este proyecto. Se carga automáticamente al inicio de cada sesión junto con `.agents/rules/CLAUDE.md` (ver `opencode.json`).
+Este repositorio utiliza el Desarrollo Dirigido por Subagentes (SDD). Queda prohibida la modificación desordenada de archivos sin un plan de especificación técnica aprobado en la Fase 1.
 
-## Misión técnica
+## 1. Matriz de Enrutamiento de Agentes (Ruteo por Costo)
+Antes de procesar cualquier código, los agentes principales (build/plan) deben delegar las tareas a los subagentes especializados configurados en la carpeta `.opencode/agents/` según el lenguaje o dominio de la tarea:
+* **Frontend y Estética Visual (CSS/React/HTML)**: Delegar al agente `frontend-tpl` utilizando el modelo `minimax/m3` o `qwen/qwen3.7-plus`.
+* **Desarrollo Javascript/Typescript Rutinario**: Delegar al subagente de bajo coste `js-silo-dev` que apunta al modelo gratuito `deepseek-v4-flash-free`.
+* **Tareas de Validación de Calidad y Tests**: Delegar al agente de soporte `exp-pickle` utilizando el modelo gratuito `opencode/big-pickle` (MiMo-v2.5) solo para tareas de bajo riesgo.
+* **Seguridad Crítica, RLS y Persistencia (SQL)**: Queda terminantemente prohibido delegar estas tareas a agentes experimentales gratuitos. Estas tareas deben ser procesadas exclusivamente por `sql-security` o `architect-review` usando `deepseek-v4-pro` o `kimi-k3`.
 
-- Arquitectura: Vanilla JavaScript (ES6+), HTML5 semántico, CSS3 modular. Prohibido Webpack/Vite u otros bundlers.
-- Infraestructura: Supabase (PostgreSQL, Auth, Storage, Edge Functions, RLS) + Vercel (hosting/CDN).
-- Estilos: silos atómicos con CSS scoped bajo `.tpl-{id}`.
-- Fuente de verdad técnica: `.agents/rules/CLAUDE.md` (Reglas de Oro v1.3.39) y `memory.md`.
+## 2. Reglas del Espacio de Trabajo contra la Deuda Técnica
+Para mitigar la crisis de mantenibilidad, duplicación de código y rotación de commits, el runtime de OpenCode aplicará las siguientes restricciones:
+1. **Regla de No-Duplicidad (Tripwire de 5 líneas)**: Queda prohibido copiar y pegar bloques de código existentes de más de 5 líneas para adaptarlos localmente. Si se requiere una funcionalidad similar en otra sección, se debe refactorizar el código base para crear una abstracción o función reutilizable.
+2. **Prohibición de Captura Genérica de Excepciones**: No se permite la creación de bloques `try-catch` vacíos o capturas de excepciones genéricas (`catch (Exception e)`) que silencien fallos de integración continua. Toda excepción debe ser debidamente tipada, registrada y reportada.
+3. **Delegación Sistemática de Exploración**: El agente principal no debe absorber operaciones masivas de exploración en su ventana de contexto. Toda búsqueda de archivos pesada, regex o listado recursivo de directorios debe delegarse al subagente `explore` mediante comandos `@explore` para evitar el desperdicio de tokens.
+4. **Verificación Asíncrona Obligatoria (Gating de PR)**: Todo cambio en la lógica del negocio o middlewares debe ser validado ejecutando la suite de pruebas unitarias locales (`npm run test` o similar) antes de presentar la tarea como completada.
 
-## Protocolo de Delegación Universal (sugerido, no obligatorio)
-
-Al recibir una indicación o prompt, evalúa si conviene delegar la tarea a un sub-agente especializado en lugar de resolverla tú directamente. La delegación optimiza el trabajo porque cada sub-agente usa un modelo y rol calibrado para su dominio.
-
-### Matriz de enrutamiento recomendada
-
-| Dominio de la tarea | Sub-agente recomendado |
-|---|---|
-| JavaScript vanilla, lógica de eventos, registro, scanner, integraciones Supabase/Wompi | `js-silo-dev` |
-| CSS, silos `.tpl-{id}`, diseño visual, Geist 900, PWA (manifest/Service Worker) | `frontend-tpl` |
-| Verificación QA: logs Escudo GOLD, parser HTML5, `node --check`, validación 1px | `qa-gold` |
-| Migraciones SQL idempotentes, `pg_cron`, Edge Functions, integridad de esquemas | `sql-migrations` |
-| Auditoría RLS y políticas Supabase, aislamiento por `org_id` | `sql-security` |
-| Arquitectura, validación de ADRs, reconciliación de archivos, Reglas de Oro | `architect-review` |
-| Exploración rápida del codebase (búsqueda de archivos, keywords, cómo funciona algo) | `explore` |
-| Pruebas experimentales de modelo / comparación de calidad (NUNCA seguridad crítica) | `exp-pickle` |
-
-### Cómo delegar
-
-1. Clasifica la tarea por dominio usando la matriz.
-2. Invoca la tool `task` con el sub-agente elegido y un prompt **autocontenido**:
-   - Objetivo claro y resultado esperado.
-   - Archivos/áreas afectadas.
-   - Reglas de Oro relevantes (Data-First, Cero Borrado, Escudo GOLD, etc.).
-   - Formato de retorno solicitado.
-3. Consolida el resultado y repórtalo al usuario.
-4. Si la tarea toca dominios distintos, delega en paralelo (varios `task` en una misma respuesta).
-
-### Protocolo de Aprobación de Delegación (Mandatorio)
-
-Antes de invocar la tool `task` con cualquier sub-agente, el agente principal DEBE:
-
-1. **Presentar el Plan de Delegación Completo**, detallando:
-   - Sub-agentes a invocar y su modelo asignado (ej. `js-silo-dev` → opencode/deepseek-v4-flash-free).
-   - Tarea y responsabilidad específica de cada sub-agente.
-   - Orden de ejecución (paralelo si son dominios independientes; secuencial si hay dependencias).
-   - Formato de retorno esperado de cada uno.
-2. **Pedir aprobación explícita del Director** usando la tool `question`, ofreciendo:
-   - Aprobar el plan tal cual.
-   - Ajustar agentes/modelos/distribución (con campo libre para correcciones).
-   - No delegar (resolverlo el agente principal directamente).
-3. **Ejecutar SOLO después de la aprobación** recibida.
-
-Excepción: tareas triviales (≤1 edición, preguntas informativas, lecturas directas) quedan exentas del protocolo, según la regla "Cuándo NO delegar".
-
-### Cuándo NO delegar
-
-- Tareas triviales: ≤1 edición, preguntas informativas, lectura directa de un archivo.
-- Cuando el usuario pida expresamente que la resuelvas tú.
-- Nunca delegar recursivamente dentro de un sub-agente.
-
-## Referencias
-
-- `.agents/rules/CLAUDE.md` — Constitución Técnica / Reglas de Oro (Data-First, Cero Borrado, Escudo GOLD, fidelidad 1px).
-- `.agents/rules/memory.md` — Memoria contextual de preferencias del Director.
-- `.opencode/agent/*.md` — Definiciones de los sub-agentes.
+## 3. Estilo y Estándares de Código
+* **UI/UX**: Seguir una paleta de colores limpia y moderna de alta gama. Evitar fuentes genéricas (como Arial o Roboto); utilizar en su lugar tipografías definidas en las hojas de estilo del proyecto con espaciados responsive estrictos.
+* **Backend**: APIs serverless estructuradas, limpias y deterministas. El código debe ser ASCII-safe.
