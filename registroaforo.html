@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Registro · Hostal Terraza</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://ctgyvydzshueemlelkzv.supabase.co" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css"></noscript>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <!-- Kernel SaaS agnóstico (espejo del landing: reset + grano + IoC) -->
     <style>
         html, body { margin: 0; padding: 0; min-height: 100%; background-color: #050505; color: #ffffff; font-family: 'Geist', sans-serif; overflow-x: hidden; }
@@ -15,7 +18,15 @@
             opacity: 0.04;
         }
         section, header, footer { display: none; }
-        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+        .loading-overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; align-items: center; justify-content: center; }
+        .loading-overlay .spinner {
+            width: 44px; height: 44px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: var(--gold, #ff9f1c);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         /* Estilo mínimo para el formulario de registro (no forma parte del template del landing) */
         .inv-badge { font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase; font-weight: 900; color: var(--gold, #ff9f1c); margin-bottom: 0.6rem; }
         /* Página solo-cabezote+formulario: neutraliza el grid/hero del template del landing */
@@ -37,13 +48,20 @@
     </style>
 </head>
 <body class="tpl-init page-registro">
-    <div id="loader" class="loading-overlay">CARGANDO REGISTRO…</div>
+    <div id="loader" class="loading-overlay"><div class="spinner"></div></div>
 
     <main id="main-content-flow">
 
-        <!-- CABEZOTE: imagen estática cargada en /imagenes (único encabezado de la página) -->
+        <!-- CABEZOTE: imagen del evento, responsive + WebP vía Supabase Storage transform.
+             Fallback local solo si el evento no tiene imagen (Cero Borrado). -->
         <header id="mod-hero" class="hero">
-            <img id="cabezote-img" src="/imagenes/cabezote%20tropilove%20formulario.jpg.jpeg" alt="Cabezote del evento">
+            <picture id="cabezote-picture">
+                <source id="cabezote-desktop-webp" type="image/webp" media="(min-width: 768px)">
+                <source id="cabezote-mobile-webp" type="image/webp" media="(max-width: 767px)">
+                <source id="cabezote-desktop-jpg" type="image/jpeg" media="(min-width: 768px)">
+                <source id="cabezote-mobile-jpg" type="image/jpeg" media="(max-width: 767px)">
+                <img id="cabezote-img" alt="Cabezote del evento" fetchpriority="high" decoding="async">
+            </picture>
         </header>
 
         <!-- FORMULARIO DE REGISTRO (captura simple: nombre, cédula, whatsapp → BD) -->
@@ -92,7 +110,13 @@
     <script>
         const SB_URL = "https://ctgyvydzshueemlelkzv.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
-        const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+        // Cliente Supabase perezoso: supabase-js se carga con defer, así que se
+        // instancia en el primer uso (ya con la librería disponible).
+        let sbClient = null;
+        function getClient() {
+            if (!sbClient) sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+            return sbClient;
+        }
 
         function log(format, t = 'INFO') {
             const colors = { 'INFO': '#00ff88', 'LINK': '#f1c40f', 'TIME': '#9b59b6', 'TRACE': '#e67e22', 'DEBUG': '#3498db', 'ERROR': '#ff4d4d' };
@@ -116,6 +140,41 @@
                 link.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(timer); log("ERROR: No se pudo cargar [" + path + "].", "ERROR"); resolve(false); } };
                 link.href = path;
             });
+        }
+
+        // CABEZOTE dinámico: imagen del evento con variantes responsive + WebP
+        // vía transformación de Supabase Storage (render/image). Si el origen no es
+        // Supabase Storage, se sirve la URL tal cual. Fallback: archivo local.
+        const CABEZOTE_FALLBACK = '/imagenes/cabezote%20tropilove%20formulario.jpg.jpeg';
+        const CABEZOTE_SOURCE_IDS = ['cabezote-desktop-webp', 'cabezote-mobile-webp', 'cabezote-desktop-jpg', 'cabezote-mobile-jpg'];
+
+        function setCabezote(srcUrl) {
+            const img = document.getElementById('cabezote-img');
+            if (!img) return;
+            const clearSources = () => CABEZOTE_SOURCE_IDS.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.removeAttribute('srcset');
+            });
+            if (!srcUrl) {
+                clearSources();
+                img.src = CABEZOTE_FALLBACK;
+                log("DEBUG: Cabezote sin imagen de evento — fallback local.", "DEBUG");
+                return;
+            }
+            if (srcUrl.indexOf('/storage/v1/object/public/') !== -1) {
+                const base = srcUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+                img.onerror = () => { img.onerror = null; img.src = srcUrl; };
+                img.src = base + '?width=1600&quality=75';
+                document.getElementById('cabezote-desktop-webp').srcset = base + '?width=1600&quality=75&format=webp';
+                document.getElementById('cabezote-mobile-webp').srcset = base + '?width=640&quality=70&format=webp';
+                document.getElementById('cabezote-desktop-jpg').srcset = base + '?width=1600&quality=75';
+                document.getElementById('cabezote-mobile-jpg').srcset = base + '?width=640&quality=70';
+                log("LINK: Cabezote transformado (WebP/JPEG × desktop/mobile) desde Supabase Storage.", "LINK");
+            } else {
+                clearSources();
+                img.src = srcUrl;
+                log("LINK: Cabezote desde URL externa (sin transformar): " + srcUrl, "LINK");
+            }
         }
 
         function showBadge(id, msg, tipo) {
@@ -143,7 +202,7 @@
             }
             try {
                 const timeoutPromise = new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout 8s')), 8000));
-                let query = sbClient.from('eventos').select('*, organizaciones(nombre)');
+                let query = getClient().from('eventos').select('*, organizaciones(nombre)');
                 if (slug) query = query.eq('slug', slug).single();
                 else query = query.eq('id', id).single();
                 const { data: ev, error } = await Promise.race([query, timeoutPromise]);
@@ -152,6 +211,11 @@
                 window.__ctxOrgId = ev.org_id || null;
                 window.__ctxEv = ev;
                 window.__ctxRol = rol;
+
+                // Cabezote responsive + WebP tan pronto se conoce la imagen del evento.
+                setCabezote(ev.imagen_url || ev.poster_url);
+                const cabImg = document.getElementById('cabezote-img');
+                if (cabImg) cabImg.alt = ev.nombre || 'Cabezote del evento';
 
                 // Inyecta el MISMO silo CSS que usa su landing (mismo template_id/categoria_slug).
                 let cssOK = true;
@@ -211,7 +275,7 @@
             const btn = document.querySelector('#master-reg-form .btn-submit');
             btn.disabled = true; btn.textContent = 'Registrando…';
             try {
-                const { data: dup } = await sbClient.from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
+                const { data: dup } = await getClient().from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
                 if (dup) { showBadge('form-alert-badge', 'Esta cédula ya está registrada en este evento.', 'err'); btn.disabled = false; btn.textContent = 'Registrarme →'; return; }
                 const payload = {
                     evento_id: ev.id,
@@ -230,7 +294,7 @@
                     hora_inscripcion: NOW(),
                     respuestas_custom: { rol, origen: 'pagina-registro' }
                 };
-                const { error } = await sbClient.from('inscritos').insert(payload);
+                const { error } = await getClient().from('inscritos').insert(payload);
                 if (error) throw error;
                 log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ", whatsapp=" + whatsapp + ").", "INFO");
                 btn.disabled = false; btn.textContent = 'Registrarme →';
@@ -252,7 +316,11 @@
             }
         });
 
-        window.onload = init;
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
