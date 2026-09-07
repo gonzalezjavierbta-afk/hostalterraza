@@ -94,6 +94,15 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .wiz-swatch:hover{box-shadow:0 0 0 2px var(--gold)}
 @media(max-width:600px){.wiz-nav{flex-direction:column}.wiz-pill{width:100%}}
 
+/* ═══ ADR-033: Selector de modo de página pública (landing / formulario / ambos) ═══ */
+.modo-card{border:2px solid var(--border);border-radius:var(--r);padding:.9rem .5rem;cursor:pointer;text-align:center;transition:.15s;background:#fff;font-family:'DM Sans',sans-serif}
+.modo-card:hover{border-color:var(--gold-border)}
+.modo-card.active{border-color:var(--gold);background:var(--gold-bg)}
+.modo-emoji{font-size:22px;margin-bottom:.3rem;line-height:1}
+.modo-title{font-size:13px;font-weight:600;color:var(--ink)}
+.modo-sub{font-size:10px;color:var(--ink3);margin-top:2px}
+@media(max-width:600px){#ev-modo-publico{grid-template-columns:1fr!important}}
+
 /* ═══ ADR-022: Navegación interna del módulo Admin (Crear / Invitadores / Historial) ═══ */
 .adm-nav{display:flex;gap:8px;margin-bottom:1.25rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .adm-tab{display:flex;align-items:center;gap:6px;padding:10px 4px;margin-bottom:-1px;border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink3);font-family:'DM Sans',sans-serif;transition:.15s}
@@ -709,39 +718,54 @@ tr:hover td{background:var(--surface)}
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem" data-wiz-step="2,3">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:.75rem">
           <div>
-            <div style="font-size:13px;font-weight:600;color:var(--ink2)">🎬 Plantilla visual de la página pública</div>
-            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Elige el estilo visual — define qué módulos aparecen en la página del evento</div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink2)">🎛 Tipo de página pública</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px">¿Qué tendrá este evento? Elige una opción y configura su contenido</div>
           </div>
-          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;flex-shrink:0">
-            <input type="checkbox" id="ev-landing-activa" style="width:14px;height:14px;accent-color:var(--gold)"
-              onchange="toggleLandingConfig(this.checked)">
-            Activar plantilla
-          </label>
         </div>
+
+        <!-- ══ ADR-033: Selector de modo de página pública (landing / formulario / ambos) ══ -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem" id="ev-modo-publico">
+          <button type="button" data-modo="landing" onclick="setModoPublico('landing')" class="modo-card">
+            <div class="modo-emoji">🖼</div>
+            <div class="modo-title">Landing page</div>
+            <div class="modo-sub">Página visual (hero, lineup, galería…)</div>
+          </button>
+          <button type="button" data-modo="formulario" onclick="setModoPublico('formulario')" class="modo-card">
+            <div class="modo-emoji">📝</div>
+            <div class="modo-title">Formulario</div>
+            <div class="modo-sub">Solo página de registro/aforo</div>
+          </button>
+          <button type="button" data-modo="landing_formulario" onclick="setModoPublico('landing_formulario')" class="modo-card">
+            <div class="modo-emoji">🖼 + 📝</div>
+            <div class="modo-title">Landing + Formulario</div>
+            <div class="modo-sub">Página visual + registro/aforo</div>
+          </button>
+        </div>
+
+        <!-- Checkboxes de estado interno (ADR-030 / ADR-033) — ocultos, controlados por setModoPublico() -->
+        <input type="checkbox" id="ev-landing-activa" style="display:none" onchange="toggleLandingConfig(this.checked)">
+        <input type="checkbox" id="ev-sist-dual" style="display:none" onchange="toggleSistDual(this.checked)">
+
+        <!-- Config Formulario (aforo) — visible si el modo incluye formulario -->
+        <div id="ev-sist-dual-config" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.85rem">
+          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">📝 Formulario de registro (aforo)</div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">Página independiente donde se registran artistas, invitados y pagos — estos registros son los que cuentan para el aforo.</div>
+          <div class="fg">
+            <label>Link comunidad de WhatsApp</label>
+            <input id="ev-comunidad-whatsapp" placeholder="https://chat.whatsapp.com/XXXX  o  https://wa.me/57..." style="width:100%">
+          </div>
+          <div class="fg" style="margin-top:.5rem">
+            <label>URL página de registro (aforo)</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="ev-form-solo-url" readonly style="flex:1;background:rgba(0,0,0,.08)">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="copyLink(document.getElementById('ev-form-solo-url').value,this)">Copiar</button>
+            </div>
+            <div style="font-size:10px;color:var(--ink3);margin-top:3px">Se genera automáticamente al guardar el evento con el slug. Ej: /registroaforo.html?slug=...</div>
+          </div>
+        </div>
+
+        <!-- Config Landing (plantilla visual) — visible si el modo incluye landing -->
         <div id="ev-landing-config" style="display:none">
-        <!-- ══ SISTEMA DUAL DE CAPTURA (ADR-030): Landing + Página solo-formulario ══ -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.85rem">
-          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">📲 Sistema de captura</div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-bottom:.6rem">
-            <input type="checkbox" id="ev-sist-dual" style="width:14px;height:14px;accent-color:var(--gold)" onchange="toggleSistDual(this.checked)">
-            Landing + página solo-formulario (aforo)
-          </label>
-          <div id="ev-sist-dual-config" style="display:none">
-            <div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">El formulario del landing mete al usuario a una comunidad de WhatsApp; la página solo-formulario registra artistas/invitados/pagos que cuentan para aforo.</div>
-            <div class="fg">
-              <label>Link comunidad de WhatsApp</label>
-              <input id="ev-comunidad-whatsapp" placeholder="https://chat.whatsapp.com/XXXX  o  https://wa.me/57..." style="width:100%">
-            </div>
-            <div class="fg" style="margin-top:.5rem">
-              <label>URL página solo-formulario (aforo)</label>
-              <div style="display:flex;gap:6px;align-items:center">
-                <input id="ev-form-solo-url" readonly style="flex:1;background:rgba(0,0,0,.08)">
-                <button type="button" class="btn btn-ghost btn-sm" onclick="copyLink(document.getElementById('ev-form-solo-url').value,this)">Copiar</button>
-              </div>
-              <div style="font-size:10px;color:var(--ink3);margin-top:3px">Se genera automáticamente al guardar el evento con el slug. Ej: /registroaforo.html?slug=...</div>
-            </div>
-          </div>
-        </div>
         <!-- ══ Sub-paso 2 · ADN Visual (plantilla + módulos + efectos) ══ -->
         <div class="wiz-step" data-wiz-step="2">
           <!-- Selector de themes -->
@@ -2499,6 +2523,50 @@ function toggleSistDual(activa) {
   document.getElementById('ev-sist-dual-config').style.display = activa ? 'block' : 'none';
 }
 
+// ADR-033 — Modo de página pública del evento: 'landing' | 'formulario' | 'landing_formulario'.
+// Un único selector de 3 opciones gobierna los checkboxes internos ev-landing-activa y
+// ev-sist-dual (que a su vez alimentan _buildConfigLanding). Mantiene retrocompatibilidad
+// con eventos legacy que no tienen la columna modo_publico.
+let _evModoPublico = 'landing';
+
+function setModoPublico(modo) {
+  _evModoPublico = modo;
+  const inclLanding = modo === 'landing' || modo === 'landing_formulario';
+  const inclForm    = modo === 'formulario' || modo === 'landing_formulario';
+
+  document.querySelectorAll('#ev-modo-publico .modo-card').forEach(b => {
+    b.classList.toggle('active', b.dataset.modo === modo);
+  });
+
+  const la = document.getElementById('ev-landing-activa');
+  if (la) la.checked = inclLanding;
+  toggleLandingConfig(inclLanding);
+
+  // Modo solo-formulario: no hay landing, se descarta la plantilla visual elegida.
+  if (!inclLanding) {
+    _ldThemeSeleccionado = null;
+    document.querySelectorAll('.ld-theme-card').forEach(c => { c.style.outline = ''; c.style.borderColor = ''; });
+  }
+
+  const sd = document.getElementById('ev-sist-dual');
+  if (sd) sd.checked = inclForm;
+  toggleSistDual(inclForm);
+}
+
+// Deriva el modo de página pública de un evento guardado (usa modo_publico si existe;
+// cae a la configuración legacy de config_landing).
+function _deriveModoPublico(ev) {
+  if (ev && ev.modo_publico) return ev.modo_publico;
+  const cfg = (ev && ev.config_landing) || {};
+  const content = cfg.content || {};
+  const hasLanding = !!(cfg.theme || cfg.modules);
+  const hasForm = !!(content.form_solo && content.form_solo.activo === true);
+  if (hasLanding && hasForm) return 'landing_formulario';
+  if (hasForm) return 'formulario';
+  if (hasLanding) return 'landing';
+  return 'landing';
+}
+
 // Map theme → event type for dynamic modules
 const _THEME_TYPE = {
   'arthouse':'cinematografia','premiere-gold':'cinematografia',
@@ -2657,7 +2725,8 @@ function wizValidate(step) {
     }
   }
   if (step === 2) {
-    if (!_ldThemeSeleccionado) { alrt('ev-alert', 'Elige una plantilla visual.', 'err'); return false; }
+    // ADR-033 — en modo "Formulario" (sin landing) no se exige plantilla visual.
+    if (_evModoPublico !== 'formulario' && !_ldThemeSeleccionado) { alrt('ev-alert', 'Elige una plantilla visual.', 'err'); return false; }
   }
   return true;
 }
@@ -2683,12 +2752,8 @@ function wizShow(step) {
 
 function wizNext() {
   if (!wizValidate(_wizStep)) return;
-  if (_wizStep === 1) {
-    // Activa automáticamente la plantilla al avanzar — el checkbox sigue existiendo
-    // y editable (Cero Borrado), solo se preselecciona por coherencia con el Paso 1.
-    const chk = document.getElementById('ev-landing-activa');
-    if (chk && !chk.checked) { chk.checked = true; toggleLandingConfig(true); }
-  }
+  // ADR-033 — el modo de página pública ya viene preseleccionado (landing) por
+  // setModoPublico(); no se fuerza aquí para no pisar una elección de "Formulario".
   if (_wizStep < 4) wizShow(_wizStep + 1);
 }
 function wizPrev() { if (_wizStep > 1) wizShow(_wizStep - 1); }
@@ -2696,10 +2761,6 @@ function wizJump(n) {
   if (n <= _wizStep) { wizShow(n); return; }
   for (let s = _wizStep; s < n; s++) {
     if (!wizValidate(s)) { wizShow(s); return; }
-    if (s === 1) {
-      const chk = document.getElementById('ev-landing-activa');
-      if (chk && !chk.checked) { chk.checked = true; toggleLandingConfig(true); }
-    }
   }
   wizShow(n);
 }
@@ -2765,6 +2826,7 @@ document.addEventListener('DOMContentLoaded', () => {
   wizShow(1);
   admGoTab('historial'); // ADR-022 — vista por defecto de Admin
   pnlGoTab('resumen');   // ADR-023 — vista por defecto de Panel
+  setModoPublico('landing'); // ADR-033 — modo de página pública por defecto
   // Marcar visualmente las plantillas "por definir" (Cero Borrado: siguen siendo seleccionables)
   _TEMAS_POR_DEFINIR.forEach(theme => {
     const card = document.querySelector(`.ld-theme-card[data-theme="${theme}"]`);
@@ -3059,7 +3121,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function _buildConfigLanding(slug) {
   const activa = document.getElementById('ev-landing-activa')?.checked;
-  if (!activa || !_ldThemeSeleccionado) return null;
+  const sistDual = document.getElementById('ev-sist-dual')?.checked;
+  const hayLanding = !!activa && !!_ldThemeSeleccionado;
+  const hayForm = !!sistDual;
+  if (!hayLanding && !hayForm) return null;
+
+  // ADR-033 — Solo formulario (sin landing): config mínimo con la página de registro.
+  // No incluye theme/modules, así evento.html la trata como "sin plantilla" y el link
+  // de landing no se expone; registroaforo.html sí queda activo (form_solo.activo=true).
+  if (!hayLanding && hayForm) {
+    const cfg = { content: {} };
+    cfg.content.form_solo = {
+      activo: true,
+      url: slug ? '/registroaforo.html?slug=' + encodeURIComponent(slug) : '/registroaforo.html?slug=',
+    };
+    const comun = (document.getElementById('ev-comunidad-whatsapp')?.value || '').trim();
+    if (comun) cfg.content.comunidad_whatsapp = comun;
+    return cfg;
+  }
 
   const get = id => document.getElementById(id);
   const chk = id => get(id)?.checked || false;
@@ -3165,11 +3244,14 @@ function _buildConfigLanding(slug) {
       impacto_historico: val('ld-impacto-historico-val') ? val('ld-impacto-historico-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{etiqueta:p[0]?.trim(),valor:p[1]?.trim()};}) : undefined,
       impacto_historico_frase: val('ld-impacto-historico-frase') || null,
       contacto:    (val('ld-contacto-email')||val('ld-contacto-tel')) ? {email:val('ld-contacto-email'),tel:val('ld-contacto-tel'),dir:val('ld-contacto-dir')} : null,
-      // ADR-030 — Sistema dual de captura (landing + página solo-formulario/aforo)
-      ...((document.getElementById('ev-sist-dual')?.checked) ? {
+      // ADR-030/033 — Landing + formulario: form_solo activo; landing solo: se desactiva
+      // explícitamente la página de registro (registroaforo.html queda "no disponible").
+      ...(hayForm ? {
         comunidad_whatsapp: val('ev-comunidad-whatsapp') || null,
         form_solo: { activo: true, url: slug ? '/registroaforo.html?slug=' + encodeURIComponent(slug) : '/registroaforo.html?slug=' },
-      } : {}),
+      } : {
+        form_solo: { activo: false },
+      }),
       ...(director           ? {director}           : {}),
       ...(gallery.length     ? {gallery}             : {}),
       ...(sponsors.length    ? {sponsors}            : {}),
@@ -3892,6 +3974,9 @@ function renderEventos() {
   // Mostrar eventos sueltos
   sueltos.forEach(e => {
     const pubLink = landingUrl(e);
+    const modo = _deriveModoPublico(e);
+    const hayLanding = modo !== 'formulario';
+    const hayForm = modo !== 'landing';
     html.push(`<div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.6rem">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
@@ -3901,8 +3986,8 @@ function renderEventos() {
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0" class="ev-actions">
           <button class="btn btn-gold btn-sm" onclick="openMod('${e.id}','${(e.nombre||'').replace(/'/g,"\\'")}','${e.fecha||''}','${e.hora||''}')">Invitación QR</button>
-          <button class="btn btn-ghost btn-sm" onclick="copyLink('${pubLink}',this)">Página pública</button>
-          ${(e.config_landing && e.config_landing.content && e.config_landing.content.form_solo && e.config_landing.content.form_solo.activo) ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${window.location.origin}/registroaforo.html?slug=${encodeURIComponent(e.slug||'')}',this)">Formulario aforo</button>` : ''}
+          ${hayLanding ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${pubLink}',this)">Página pública</button>` : ''}
+          ${hayForm ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${window.location.origin}/registroaforo.html?slug=${encodeURIComponent(e.slug||'')}',this)">Formulario aforo</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="openEditMod('${e.id}')">✏ Editar</button>
           <button class="btn btn-ghost btn-sm btn-red" onclick="delEvento('${e.id}')">Eliminar</button>
         </div>
@@ -4055,6 +4140,9 @@ function openEditMod(evId) {
   // queden visibles o marcados al editar. Solo las cajas del tipo activo se muestran.
   hideForeignModulesByType(tipo, suf);
 
+  // ADR-033 — restaurar el selector de modo de página pública (y sus paneles).
+  setModoPublico(_deriveModoPublico(ev));
+
   // ── Estado de guardado: botón del Paso 4 pasa a UPDATE ──
   const btn = document.getElementById('btn-crear-ev');
   if (btn) btn.textContent = 'Guardar cambios';
@@ -4095,10 +4183,6 @@ function _limpiarWizardCompleto() {
   document.querySelectorAll('[id^="ld-campo-"]').forEach(c => { c.style.display = 'none'; });
   if (window._sponsorsSetEntries) window._sponsorsSetEntries([]);
   if (window._djLineupSetEntries) window._djLineupSetEntries([]);
-  const landing = document.getElementById('ev-landing-activa');
-  if (landing) { landing.checked = false; toggleLandingConfig(false); }
-  const sistDual = document.getElementById('ev-sist-dual');
-  if (sistDual) { sistDual.checked = false; toggleSistDual(false); }
   const comun = document.getElementById('ev-comunidad-whatsapp');
   if (comun) comun.value = '';
   const formUrl = document.getElementById('ev-form-solo-url');
@@ -4110,6 +4194,7 @@ function _limpiarWizardCompleto() {
   document.getElementById('ev-puntos-list').innerHTML = '';
   resetCamposCustom();
   _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
+  setModoPublico('landing');
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -4299,6 +4384,7 @@ async function guardarEventoWizard() {
       aforo_max:      parseInt(document.getElementById('ev-aforo')?.value) || null,
       puntos_acceso:  getPuntosAcceso(),
       captura_pura:   _evCapturaPura,
+      modo_publico:   _evModoPublico || 'landing',
       template_id:    _THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null,
       categoria_slug: _evCategoria || null,
       form_campos: {
@@ -5274,7 +5360,7 @@ async function _crearEventoUnico(n) {
   const f = document.getElementById('ev-f').value;
   // Fecha es obligatoria SOLO para Cinematografía y Fiesta — Campañas pueden no tener fecha fija
   const _tipoActual = (typeof _THEME_TYPE !== 'undefined' && _ldThemeSeleccionado)
-    ? _THEME_TYPE[_ldThemeSeleccionado] : null;
+    ? _THEME_TYPE[_ldThemeSeleccionado] : (_evCategoria || null);
   if (!f && _tipoActual !== 'campana') {
     alrt('ev-alert','La fecha es obligatoria.','err'); return;
   }
@@ -5316,6 +5402,7 @@ async function _crearEventoUnico(n) {
     template_id:    (_THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null),
     categoria_slug: _evCategoria || null,
     captura_pura:   _evCapturaPura,
+    modo_publico:   _evModoPublico || 'landing',
     org_id:    ORG_ID,
   }).select().single();
 
@@ -5404,6 +5491,7 @@ async function _crearSerie(n) {
       template_id:    (_THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null),
       categoria_slug: _evCategoria || null,
       captura_pura:   _evCapturaPura,
+      modo_publico:   _evModoPublico || 'landing',
       org_id: ORG_ID,
     });
     fecha.setDate(fecha.getDate() + rep);
