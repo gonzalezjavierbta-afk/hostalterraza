@@ -30,6 +30,10 @@
         body.page-registro #mod-hero::after { display: none !important; }
         body.page-registro #cabezote-img { display: block; width: 100%; height: auto; }
         body.page-registro #mod-form { display: block !important; padding: 1.5rem 6% 3rem; border-bottom: none !important; }
+        body.page-registro .wa-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1.1rem; }
+        body.page-registro .wa-code { flex: 0 0 128px; width: auto; margin-bottom: 0; min-width: 0; }
+        body.page-registro .wa-number { flex: 1; min-width: 0; margin-bottom: 0; }
+        body.page-registro .wa-code option { background: #14032C; color: #fff; }
     </style>
 </head>
 <body class="tpl-init page-registro">
@@ -49,7 +53,29 @@
                 <form id="master-reg-form" novalidate>
                     <input type="text" id="reg-nombre" class="form-input" placeholder="Nombre completo *" required>
                     <input type="text" id="reg-cedula" class="form-input" placeholder="Cédula *" required>
-                    <input type="tel" id="reg-whatsapp" class="form-input" placeholder="WhatsApp *" required>
+                    <div class="wa-row">
+                        <select id="reg-whatsapp-code" class="form-input wa-code">
+                            <option value="+57" selected>+57 Colombia</option>
+                            <option value="+58">+58 Venezuela</option>
+                            <option value="+1">+1 EE. UU. / Canadá</option>
+                            <option value="+52">+52 México</option>
+                            <option value="+34">+34 España</option>
+                            <option value="+51">+51 Perú</option>
+                            <option value="+54">+54 Argentina</option>
+                            <option value="+56">+56 Chile</option>
+                            <option value="+593">+593 Ecuador</option>
+                            <option value="+55">+55 Brasil</option>
+                            <option value="+507">+507 Panamá</option>
+                            <option value="+502">+502 Guatemala</option>
+                            <option value="+503">+503 El Salvador</option>
+                            <option value="+504">+504 Honduras</option>
+                            <option value="+505">+505 Nicaragua</option>
+                            <option value="+506">+506 Costa Rica</option>
+                            <option value="otro">Otro…</option>
+                        </select>
+                        <input type="tel" id="reg-whatsapp" class="form-input wa-number" placeholder="Número de WhatsApp *" required>
+                    </div>
+                    <input type="text" id="reg-whatsapp-custom-code" class="form-input" placeholder="Código de país (ej. +7)" maxlength="6" style="display:none">
                     <button type="submit" class="btn-submit">Registrarme →</button>
                 </form>
                 <p class="inv-badge" id="form-success-msg" style="display:none"></p>
@@ -151,15 +177,25 @@
             }
         }
 
+        document.getElementById('reg-whatsapp-code').addEventListener('change', function () {
+            const isOtro = this.value === 'otro';
+            document.getElementById('reg-whatsapp-custom-code').style.display = isOtro ? 'block' : 'none';
+        });
+
         document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const ev = window.__ctxEv;
             if (!ev) { showBadge('form-alert-badge', 'Evento no cargado.', 'err'); return; }
             const nombre = document.getElementById('reg-nombre').value.trim();
             const cedula = document.getElementById('reg-cedula').value.trim();
-            const whatsapp = document.getElementById('reg-whatsapp').value.trim();
+            const phone = document.getElementById('reg-whatsapp').value.trim();
+            const codeSel = document.getElementById('reg-whatsapp-code');
+            let code = codeSel.value === 'otro' ? (document.getElementById('reg-whatsapp-custom-code').value || '').trim() : codeSel.value;
+            if (code && !code.startsWith('+')) code = '+' + code;
             const rol = window.__ctxRol || 'invitado';
-            if (!nombre || !cedula || !whatsapp) { showBadge('form-alert-badge', 'Completa nombre, cédula y WhatsApp.', 'err'); return; }
+            if (!nombre || !cedula || !phone) { showBadge('form-alert-badge', 'Completa nombre, cédula y WhatsApp.', 'err'); return; }
+            if (codeSel.value === 'otro' && !code) { showBadge('form-alert-badge', 'Ingresa el código de país.', 'err'); return; }
+            const whatsapp = (code + phone).trim();
 
             const btn = document.querySelector('#master-reg-form .btn-submit');
             btn.disabled = true; btn.textContent = 'Registrando…';
@@ -185,12 +221,19 @@
                 };
                 const { error } = await sbClient.from('inscritos').insert(payload);
                 if (error) throw error;
-                log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ").", "INFO");
+                log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ", whatsapp=" + whatsapp + ").", "INFO");
+                btn.disabled = false; btn.textContent = 'Registrarme →';
                 document.getElementById('master-reg-form').style.display = 'none';
                 const ok = document.getElementById('form-success-msg');
                 ok.style.display = 'block';
                 ok.style.color = '#25d366';
                 ok.textContent = '¡Gracias, ' + nombre + '! Tu registro fue guardado.';
+                setTimeout(() => {
+                    document.getElementById('master-reg-form').reset();
+                    document.getElementById('reg-whatsapp-custom-code').style.display = 'none';
+                    ok.style.display = 'none';
+                    document.getElementById('master-reg-form').style.display = 'block';
+                }, 2500);
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
                 btn.disabled = false; btn.textContent = 'Registrarme →';
