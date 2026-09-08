@@ -1,7 +1,7 @@
 ---
 description: Revisión arquitectónica — reconciliación de archivos, validación de ADRs y cumplimiento de Reglas de Oro (Data-First, Scoped CSS, Cero Borrado).
 mode: subagent
-model: opencode/deepseek-v4-flash-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 permission:
   edit: deny

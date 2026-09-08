@@ -1,7 +1,7 @@
 ---
 description: Creative Director CSS — silos atómicos, Scoped CSS (.tpl-{id}), Geist 900, Afterglow, grid-template-areas, PWA manifest/Service Worker.
 mode: subagent
-model: opencode/mimo-v2.5-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.3
 permission:
   edit: allow

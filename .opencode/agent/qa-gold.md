@@ -1,7 +1,7 @@
 ---
 description: QA Escudo GOLD — verificación de logs INFO/DEBUG/LINK/TRACE/TIME/ERROR, parser HTML5, node --check, validación de 1px.
 mode: subagent
-model: opencode/longcat-2.0-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 permission:
   edit: deny

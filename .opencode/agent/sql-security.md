@@ -1,7 +1,7 @@
 ---
 description: Auditor de seguridad RLS y políticas Supabase — detecta permisos legacy y riesgos de aislamiento por org_id.
 mode: subagent
-model: opencode/nemotron-3-ultra-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 permission:
   edit: deny

@@ -1,7 +1,7 @@
 ---
 description: Desarrollo JavaScript vanilla para silos del Sistema QR — lógica de eventos, registro, scanner, integraciones Supabase/Wompi.
 mode: subagent
-model: opencode/deepseek-v4-flash-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.3
 permission:
   edit: allow

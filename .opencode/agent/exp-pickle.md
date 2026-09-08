@@ -1,6 +1,6 @@
 ---
 description: Agente experimental de soporte lógico para tareas rutinarias y validaciones de bajo riesgo.
-model: opencode/big-pickle
+model: opencode-go/deepseek-v4-flash
 temperature: 0.3
 ---
 

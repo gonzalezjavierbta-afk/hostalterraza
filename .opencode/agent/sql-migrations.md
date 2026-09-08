@@ -1,7 +1,7 @@
 ---
 description: DBA de migraciones Supabase — migraciones idempotentes, pg_cron, Edge Functions, integridad de esquemas SQL.
 mode: subagent
-model: opencode/laguna-s-2.1-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.2
 permission:
   edit: allow
