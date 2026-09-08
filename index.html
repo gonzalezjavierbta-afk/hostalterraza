@@ -255,11 +255,40 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
 .htz-rv.on{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.htz-rv{opacity:1;transform:none}}
 
+/* ── PLANES Y PAGOS ── */
+.htz-planes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;align-items:stretch}
+.htz-plan{position:relative;display:flex;flex-direction:column;gap:1.05rem;background:var(--hpanel);
+border:1px solid var(--hline);border-radius:var(--r);padding:1.7rem 1.5rem 1.5rem;
+transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.htz-plan:hover{transform:translateY(-5px);border-color:var(--gold2);box-shadow:0 20px 46px rgba(0,0,0,.55)}
+.htz-plan-pop{border-color:var(--gold);background:linear-gradient(180deg,#1C1810,#121009);
+box-shadow:0 0 0 1px var(--gold),0 24px 60px rgba(227,180,87,.14)}
+.htz-plan-pop:hover{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 30px 70px rgba(227,180,87,.22)}
+.htz-plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:'Anton';
+font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#191307;background:var(--gold);
+border-radius:999px;padding:.32rem .9rem;white-space:nowrap;box-shadow:0 8px 24px rgba(227,180,87,.35)}
+.htz-plan-name{font-family:'Anton';font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.htz-plan-price{font-family:'Anton';font-size:clamp(30px,4vw,40px);line-height:1;color:var(--cream);margin-top:.15rem}
+.htz-plan-price small{font-family:'Space Grotesk';font-size:11px;font-weight:600;letter-spacing:.14em;
+text-transform:uppercase;color:var(--mut2);margin-left:.3rem}
+.htz-plan-focus{font-size:13.5px;color:var(--mut);margin:0}
+.htz-plan-feats{list-style:none;margin:0;padding:0;display:grid;gap:.5rem;flex:1}
+.htz-plan-feats li{display:flex;gap:.55rem;font-size:13px;color:var(--cream)}
+.htz-plan-feats svg{color:var(--gold);flex-shrink:0;margin-top:2px}
+.htz-plan .htz-btn{width:100%;margin-top:.35rem}
+.htz-pay-head{margin-top:3rem;margin-bottom:1.2rem}
+.htz-pay-head h3{font-size:clamp(22px,3vw,30px);line-height:1.05;margin:.6rem 0 0}
+.htz-pay{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.htz-pay-block{background:var(--hpanel);border:1px solid var(--hline);border-radius:var(--r);padding:1.6rem 1.5rem}
+.htz-pay-block h3{font-size:19px;line-height:1.15;margin:0 0 .55rem}
+.htz-pay-block p{margin:0;font-size:14px;color:var(--mut)}
+
 /* ── RESPONSIVE ── */
 @media (max-width:920px){
  .htz-hero-in{grid-template-columns:1fr;gap:2.4rem}
  .htz-ticket{margin:0}
- .htz-steps,.htz-land-grid{grid-template-columns:1fr}
+ .htz-steps,.htz-land-grid,.htz-planes-grid{grid-template-columns:1fr}
+ .htz-pay{grid-template-columns:1fr}
  .htz-cta{grid-template-columns:1fr;padding:2rem}
  .htz-nav-links{display:none}
  .htz-nav-links.open{display:flex;position:fixed;inset:64px 0 auto 0;flex-direction:column;background:rgba(11,10,9,.97);
@@ -292,6 +321,7 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
       <a href="#eventos" data-i18n="index.nav.cartelera">Cartelera</a>
       <a href="#sistema" data-i18n="index.nav.sistema">Sistema QR</a>
       <a href="#landings" data-i18n="index.nav.landings">Landings</a>
+      <a href="#planes-pagos" data-i18n="index.nav.planes">Planes y precios</a>
       <a href="#contacto" data-i18n="index.nav.contacto">Contacto</a>
     </nav>
     <div class="htz-nav-user" id="userZone"></div>
@@ -488,6 +518,77 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
   </div>
 </section>
 
+<!-- ═════════ PLANES Y PAGOS ═════════ -->
+<section class="htz-wrap htz-sec" id="planes-pagos">
+  <div class="htz-sec-head htz-rv">
+    <div>
+      <span class="hz-kicker" data-i18n="index.planes.kicker">Precios claros, sin letra pequeña</span>
+      <h2 class="htz-sec-title"><span data-i18n="index.planes.title1">Infraestructura Digital Completa</span><br><span data-i18n="index.planes.title2">para tus Eventos</span></h2>
+    </div>
+    <p class="htz-sec-sub" data-i18n="index.planes.sub">No solo vendemos entradas: te entregamos la Landing Page atómica, el motor de QR, la captura para WhatsApp y el escáner de acceso offline.</p>
+  </div>
+
+  <div class="htz-planes-grid">
+    <div class="htz-plan htz-rv">
+      <div class="htz-plan-name" data-i18n="index.planes.free_title">FREEMIUM</div>
+      <div class="htz-plan-price"><span data-i18n="index.planes.free_name">$0</span><small>COP</small></div>
+      <p class="htz-plan-focus" data-i18n="index.planes.free_focus">Eventos pequeños, culturales o de prueba.</p>
+      <ul class="htz-plan-feats">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f1">Hasta 100 asistentes/evento</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f2">Landing Page atómica</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f3">Captura dual WhatsApp</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f4">Escáner Staff</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f5">Marca de agua discreta</span></li>
+      </ul>
+      <a class="htz-btn htz-btn-ghost" href="registro.html?plan=freemium" data-track="cta_plan_freemium" data-i18n="index.planes.free_cta">Comenzar Gratis</a>
+    </div>
+
+    <div class="htz-plan htz-plan-pop htz-rv">
+      <span class="htz-plan-badge" data-i18n="index.planes.pass_badge">Más Popular</span>
+      <div class="htz-plan-name" data-i18n="index.planes.pass_title">PASS POR EVENTO</div>
+      <div class="htz-plan-price"><span data-i18n="index.planes.pass_name">$40.000</span><small>COP</small></div>
+      <p class="htz-plan-focus" data-i18n="index.planes.pass_focus">Promotores, fiestas temáticas y talleres esporádicos.</p>
+      <ul class="htz-plan-feats">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f1">Asistentes e inscritos ILIMITADOS</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f2">Landing con paleta de colores atómica (v305)</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f3">Sin marcas de agua</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f4">Escáner offline con validación por cédula (últimos 4 dígitos)</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f5">Analítica de clicks y geo en tiempo real</span></li>
+      </ul>
+      <a class="htz-btn" href="registro.html?plan=pass_evento" data-track="cta_plan_pass_evento" data-i18n="index.planes.pass_cta">Crear mi Evento ($40k)</a>
+    </div>
+
+    <div class="htz-plan htz-rv">
+      <div class="htz-plan-name" data-i18n="index.planes.pro_title">SUSCRIPCIÓN B2B</div>
+      <div class="htz-plan-price"><span data-i18n="index.planes.pro_name">$400.000</span><small data-i18n="index.planes.pro_per">/ mes</small></div>
+      <p class="htz-plan-focus" data-i18n="index.planes.pro_focus">Hostales, Discotecas, Clubes y Recintos con eventos recurrentes.</p>
+      <ul class="htz-plan-feats">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f1">Eventos e invitados ILIMITADOS al mes</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f2">Marca Blanca Completa</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f3">Sub-cuentas para Staff y Porteros ilimitadas</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f4">Soporte para Series de Eventos (serie.html)</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f5">Soporte prioritario</span></li>
+      </ul>
+      <a class="htz-btn htz-btn-ghost" href="registro.html?plan=pro_mensual" data-track="cta_plan_pro_mensual" data-i18n="index.planes.pro_cta">Contratar Plan Mensual</a>
+    </div>
+  </div>
+
+  <div class="htz-pay-head htz-rv">
+    <span class="hz-kicker" data-i18n="index.planes.pay_kicker">Cómo funciona el Sistema de Pagos</span>
+    <h3 data-i18n="index.planes.pay_title">Cobras tú. Pagas solo cuando vendes.</h3>
+  </div>
+  <div class="htz-pay">
+    <div class="htz-pay-block htz-rv">
+      <h3 data-i18n="index.planes.bloque_a_t">¿Cómo cobras tus entradas a tus asistentes?</h3>
+      <p data-i18n="index.planes.bloque_a_p">Venta Directa en WhatsApp ($0 comisión) recibiendo Nequi/Daviplata/Efectivo, o conectar pasarela directa (Wompi/MercadoPago).</p>
+    </div>
+    <div class="htz-pay-block htz-rv">
+      <h3 data-i18n="index.planes.bloque_b_t">¿Cómo pagas la plataforma?</h3>
+      <p data-i18n="index.planes.bloque_b_p">Integración transparente con pasarela local (PSE, Nequi, Tarjetas) para activar los pases de $40.000 o la mensualidad de $400.000 de forma instantánea.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ═════════ CTA ═════════ -->
 <section class="htz-wrap htz-sec" id="contacto">
   <div class="htz-cta htz-rv">
@@ -534,6 +635,7 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
           <a href="#sistema" data-i18n="index.nav.sistema">Sistema QR</a>
           <a href="#landings" data-i18n="index.footer.landings">Landing pages</a>
           <a href="#eventos" data-i18n="index.nav.cartelera">Cartelera</a>
+          <a href="#planes-pagos" data-i18n="index.nav.planes">Planes y precios</a>
         </div>
         <div>
           <h4 data-i18n="index.footer.equipo">Equipo</h4>

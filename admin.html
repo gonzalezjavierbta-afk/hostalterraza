@@ -605,9 +605,9 @@ tr:hover td{background:var(--surface)}
       <div class="fg"><label>Contraseña *</label><input id="co-pass" type="password" placeholder="Mínimo 8 caracteres" maxlength="72"></div>
       <div class="fg"><label>Plan</label>
         <select id="co-plan" style="width:100%">
-          <option value="free">Free</option>
-          <option value="mensual" selected>Mensual</option>
-          <option value="evento">Por evento</option>
+          <option value="freemium">Freemium — $0 COP</option>
+          <option value="pass_evento">Pass por Evento — $40.000 COP</option>
+          <option value="pro_mensual" selected>Suscripción Mensual — $400.000 COP/mes</option>
         </select>
       </div>
       <div class="fg"><label>Color principal</label>
@@ -631,10 +631,10 @@ tr:hover td{background:var(--surface)}
       <div class="fg" style="grid-column:1/-1"><label>Nombre *</label><input id="eo-nombre" maxlength="80"></div>
       <div class="fg"><label>Plan</label>
         <select id="eo-plan" style="width:100%">
-          <option value="free">Free</option>
-          <option value="mensual">Mensual</option>
-          <option value="evento">Por evento</option>
-          <option value="combinado">Combinado</option>
+          <option value="freemium">Freemium — $0 COP</option>
+          <option value="pass_evento">Pass por Evento — $40.000 COP</option>
+          <option value="pro_mensual">Suscripción Mensual — $400.000 COP/mes</option>
+          <option value="enterprise">Enterprise</option>
         </select>
       </div>
       <div class="fg"><label>Color principal</label>
@@ -3456,7 +3456,7 @@ async function loadGlobalStats() {
   document.getElementById('ga-active-orgs').textContent    = _gaOrgs.filter(o=>o.activa).length;
   document.getElementById('ga-total-eventos').textContent  = totalEv||0;
   document.getElementById('ga-total-inscritos').textContent= totalIns||0;
-  document.getElementById('ga-mrr').textContent            = _gaOrgs.filter(o=>o.plan!=='free'&&o.activa).length;
+  document.getElementById('ga-mrr').textContent            = _gaOrgs.filter(o=>(o.plan==='pass_evento'||o.plan==='pro_mensual')&&o.activa).length;
   renderGlobalOrgs(_gaOrgs);
   await cargarConteosOrgs(_gaOrgs);
 }
@@ -3465,8 +3465,8 @@ async function loadGlobalStats() {
 function renderGlobalOrgs(orgs) {
   const tb = document.getElementById('ga-orgs-table');
   if (!orgs.length) { tb.innerHTML='<tr><td colspan="9" class="empty">Sin organizaciones</td></tr>'; return; }
-  const planColor={free:'var(--ink3)',mensual:'var(--teal)',evento:'var(--gold-d)',combinado:'var(--green)'};
-  const planLabel={free:'Free',mensual:'Mensual',evento:'Por evento',combinado:'Combinado'};
+  const planColor={freemium:'var(--ink3)',pass_evento:'var(--gold-d)',pro_mensual:'var(--teal)',enterprise:'var(--green)',free:'var(--ink3)',mensual:'var(--teal)',evento:'var(--gold-d)',combinado:'var(--green)'};
+  const planLabel={freemium:'Freemium',pass_evento:'Pass por Evento',pro_mensual:'Suscripción Mensual',enterprise:'Enterprise',free:'Free',mensual:'Mensual',evento:'Por evento',combinado:'Combinado'};
   tb.innerHTML = orgs.map(o => {
     const cnt = _gaConteos[o.id]||{};
     return `<tr>
@@ -3532,7 +3532,7 @@ function renderGlobalCharts() {
     {scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{font:{size:9}}}}});
   const planCount={};
   _gaOrgs.forEach(o=>{planCount[o.plan||'free']=(planCount[o.plan||'free']||0)+1;});
-  const planLbls={free:'Free',mensual:'Mensual',evento:'Por evento',combinado:'Combinado'};
+  const planLbls={freemium:'Freemium',pass_evento:'Pass por Evento',pro_mensual:'Suscripción Mensual',enterprise:'Enterprise',free:'Free',mensual:'Mensual',evento:'Por evento',combinado:'Combinado'};
   mkChart('ga-chart-plan','doughnut',{
     labels:Object.keys(planCount).map(k=>planLbls[k]||k),
     datasets:[{data:Object.values(planCount),backgroundColor:['#888','#1D9E75','#C8A96E','#378ADD']}]
@@ -3570,7 +3570,7 @@ async function verDetalleOrg(orgId) {
     const d=new Date(p[2],p[1]-1,p[0]);const dow=d.getDay()||7;d.setDate(d.getDate()-dow+1);
     const k=d.toISOString().slice(0,10);semMap[k]=(semMap[k]||0)+1;});
   const semanas=Object.entries(semMap).sort((a,b)=>a[0].localeCompare(b[0]));
-  const planLabel={free:'Free',mensual:'Mensual',evento:'Por evento',combinado:'Combinado'};
+  const planLabel={freemium:'Freemium',pass_evento:'Pass por Evento',pro_mensual:'Suscripción Mensual',enterprise:'Enterprise',free:'Free',mensual:'Mensual',evento:'Por evento',combinado:'Combinado'};
   const tipoLbl={invitado:'◎ Inv',frecuente:'★ Frec',artista:'🎵 Art',produccion:'🎬 Prod',pago:'💳 Pago'};
   cont.innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap">
@@ -3700,7 +3700,7 @@ function salirModoOrg() {
 let _coSlugOk=false,_coSlugTimer=null;
 function abrirCrearOrg(){
   ['co-nombre','co-slug','co-email','co-pass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const pl=document.getElementById('co-plan');if(pl)pl.value='mensual';
+  const pl=document.getElementById('co-plan');if(pl)pl.value='pro_mensual';
   const co=document.getElementById('co-color');if(co)co.value='#C8A96E';
   const sh=document.getElementById('co-slug-hint');if(sh)sh.textContent='';
   document.getElementById('co-alert').innerHTML='';
@@ -3899,7 +3899,7 @@ async function cargarOrganizacion() {
   document.getElementById('org-slug-display').textContent = org.slug || '—';
 
   // Plan badge
-  const planLabels = { free:'Plan Free', mensual:'Plan Mensual', evento:'Plan por Evento', combinado:'Plan Combinado' };
+  const planLabels = { freemium:'Plan Freemium', pass_evento:'Plan Pass por Evento', pro_mensual:'Plan Suscripción Mensual', enterprise:'Plan Enterprise', free:'Plan Free', mensual:'Plan Mensual', evento:'Plan por Evento', combinado:'Plan Combinado' };
   document.getElementById('org-plan-badge').textContent = planLabels[org.plan] || org.plan || '—';
   document.getElementById('org-plan-estado').textContent = org.activa ? '✓ Activo' : '⚠ Inactivo';
   document.getElementById('org-plan-estado').style.color = org.activa ? 'var(--green)' : 'var(--red)';
@@ -4682,9 +4682,10 @@ async function agregarSesion(serieId) {
   const sesiones = _eventos.filter(e=>e.serie_id===serieId);
   const nextNum = (Math.max(...sesiones.map(s=>s.sesion_num||0), 0)) + 1;
   const slug = (serie.slug||'serie') + '-s' + nextNum;
+  const estado = await _calcularEstadoEvento();
   const { error } = await SB.from('eventos').insert({
     nombre: serie.nombre + ' · Sesión ' + nextNum,
-    fecha, serie_id: serieId, sesion_num: nextNum, slug,
+    fecha, serie_id: serieId, sesion_num: nextNum, slug, estado,
     color_primario: serie.color||'#c9a84c',
     imagen_url: serie.imagen_url||null,
     wa_share: true,
@@ -5528,6 +5529,24 @@ async function crearEvento() {
   }
 }
 
+// Calcula el estado inicial de un evento nuevo según el plan de la org activa.
+// freemium/pro_mensual → publicado; pass_evento → publicado solo si no hay otro publicado.
+async function _calcularEstadoEvento() {
+  const plan = _orgData?.plan;
+  if (plan === 'pass_evento') {
+    const { count } = await SB.from('eventos')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', ORG_ID)
+      .eq('estado', 'publicado');
+    if ((count || 0) >= 1) {
+      alrt('ev-alert', '⚠ Tu plan PASS incluye 1 evento publicado. Este evento quedará pendiente de pago.', 'warn');
+      return 'pendiente_pago';
+    }
+    return 'publicado';
+  }
+  return 'publicado';
+}
+
 async function _crearEventoUnico(n) {
   const f = document.getElementById('ev-f').value;
   // Fecha es obligatoria SOLO para Cinematografía y Fiesta — Campañas pueden no tener fecha fija
@@ -5548,8 +5567,11 @@ async function _crearEventoUnico(n) {
     .trim().replace(/\s+/g,'-')
     + '-' + Math.random().toString(36).substr(2,4);
 
+  const estado = await _calcularEstadoEvento();
+
   const {data:ev, error} = await SB.from('eventos').insert({
     nombre: n, fecha: _fechaParaGuardar, slug,
+    estado,
     hora: document.getElementById('ev-h').value||null,
     descripcion: document.getElementById('ev-d').value.trim()||null,
     ubicacion: document.getElementById('ev-ubic').value.trim()||null,
@@ -5641,6 +5663,7 @@ async function _crearSerie(n) {
   if (serieErr) { alrt('ev-alert','Error al crear serie: '+serieErr.message,'err'); return; }
 
   // 2. Crear las sesiones como eventos vinculados
+  const estado = await _calcularEstadoEvento();
   const sesiones = [];
   let fecha = new Date(f1+'T12:00:00');
   for (let i=1; i<=nSes; i++) {
@@ -5648,6 +5671,7 @@ async function _crearSerie(n) {
     sesiones.push({
       nombre: n + ' · Sesión ' + i,
       fecha: fStr, hora, ubicacion:ubic,
+      estado,
       serie_id: serie.id, sesion_num: i,
       slug: slug + '-s' + i,
       wa_share: true,

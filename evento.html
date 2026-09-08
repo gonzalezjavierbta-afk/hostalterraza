@@ -632,7 +632,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             if (!slug) return;
             try {
                 // Timeout de 8s para sbQuery (Resiliencia P4)
-                const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();
+                const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre, plan)').eq('slug', slug).single();
                 const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
                 const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
                 if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
@@ -651,6 +651,11 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const effContent = Object.assign({}, content, (__i18nLayer.content || {}));
                 const effNombre = __i18nLayer.nombre || ev.nombre;
                 const effOrgNombre = (__i18nLayer.org_nombre || (ev.organizaciones && ev.organizaciones.nombre)) || '';
+                // v216 · PLAN DE LA ORGANIZACION: gobierna el limite freemium (100
+                // inscritos/evento) y el badge "Powered by Hostal Terraza QR". Si la
+                // org no existe o su plan llega null (ADR-024) se asume 'freemium':
+                // default conservador que nunca regala cupo ni oculta marca a un plan pago.
+                const orgPlan = (ev.organizaciones && ev.organizaciones.plan) || 'freemium';
                 const effUbicacion = __i18nLayer.ubicacion || ev.ubicacion;
 
                 // Título de pestaña del navegador con el nombre real del evento.
@@ -1096,6 +1101,30 @@ if (document.getElementById('footer-copy')) {
             ? T('landing.copy_choko')
             : T('landing.copy_chongo');
     }
+    // v216 · BADGE "Powered by Hostal Terraza QR": marca de agua discreta bajo el
+    // copyright, SOLO para plan 'freemium'. pass_evento / pro_mensual no la crean.
+    // Independiente del silo (el f8 conserva su marca Chokoflow en #footer-copy);
+    // se inyecta en .footer-bottom (padre de #footer-copy) con estilos inline
+    // minimos para no depender de css/templates/ (regla scoped del silo intacta).
+    const __footerBottom = document.getElementById('footer-copy') ? document.getElementById('footer-copy').parentElement : null;
+    if (__footerBottom) {
+        const __prevBadge = __footerBottom.querySelector('.htz-powered');
+        if (orgPlan === 'freemium' && !__prevBadge) {
+            const __htzBadge = document.createElement('span');
+            __htzBadge.className = 'htz-powered';
+            __htzBadge.textContent = 'Powered by Hostal Terraza QR';
+            __htzBadge.style.display = 'block';
+            __htzBadge.style.textAlign = 'center';
+            __htzBadge.style.fontSize = '0.68rem';
+            __htzBadge.style.opacity = '0.55';
+            __htzBadge.style.marginTop = '0.4rem';
+            __htzBadge.style.letterSpacing = '0.4px';
+            __footerBottom.appendChild(__htzBadge);
+        } else if (orgPlan !== 'freemium' && __prevBadge) {
+            // Higiene idempotente: si el plan cambio, se retira la marca propia.
+            __prevBadge.remove();
+        }
+    }
     // === FIN SEGMENTO FOOTER ===
 
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
@@ -1533,6 +1562,20 @@ if (document.getElementById('db-poster-img')) {
                             respuestas_custom: { origen: 'landing-interesado' }
                         };
                         try {
+                            // BLOQUEO FREEMIUM (v216): el plan 'freemium' admite hasta
+                            // 100 inscritos por evento. Aplica a TODOS los registros del
+                            // evento (incluido el 'interesado' de landing con
+                            // cuenta_aforo:false): el cupo se mide por evento, no por tipo.
+                            if (orgPlan === 'freemium') {
+                                const { count, error: countErr } = await sbClient.from('inscritos').select('id', { count: 'exact', head: true }).eq('evento_id', ev.id);
+                                if (countErr) throw countErr;
+                                if (count >= 100) {
+                                    const FREEMIUM_MSG = T('landing.form_freemium_limite') || 'Este evento alcanzó el límite de 100 asistentes del plan gratuito.';
+                                    if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = FREEMIUM_MSG; }
+                                    __ANALYTICS.emit('form_submit', 'freemium_limite', 'bloqueado', 0);
+                                    return;
+                                }
+                            }
                             // Anti-duplicado por whatsapp + evento_id
                             const { data: dup } = await sbClient.from('inscritos').select('id').eq('whatsapp', whatsapp).eq('evento_id', ev.id).maybeSingle();
                             if (dup) {

@@ -257,6 +257,33 @@ let lastScanned = '';
 let lastScannedTime = 0;
 let expCheckInterval = null;
 
+// ── Persistencia de la cola offline (sobrevive a recargas del navegador) ──
+const OFFLINE_QUEUE_PREFIX = 'htz_offline_queue_'; // sufijo por evento: un dispositivo no mezcla colas entre eventos
+let offlineQueueKey = null; // se resuelve en init() cuando eventoId esta disponible
+
+function persistirCola() {
+  if (!offlineQueueKey) return;
+  try {
+    localStorage.setItem(offlineQueueKey, JSON.stringify(offlineQueue));
+  } catch (e) {
+    console.error('persistirCola: no se pudo guardar la cola offline:', e);
+  }
+}
+
+function cargarColaPersistida() {
+  if (!offlineQueueKey) return;
+  try {
+    const raw = localStorage.getItem(offlineQueueKey);
+    if (!raw) return;
+    const cola = JSON.parse(raw);
+    if (!Array.isArray(cola)) throw new TypeError('cola offline persistida no es un array');
+    offlineQueue = cola;
+  } catch (e) {
+    console.error('cargarColaPersistida: cola offline invalida, se descarta:', e);
+    localStorage.removeItem(offlineQueueKey);
+  }
+}
+
 function show(id) {
   ['s-loading','s-error','s-scanner'].forEach(s => {
     document.getElementById(s).style.display = 'none';
@@ -290,6 +317,7 @@ async function init() {
 
   tokenData   = data;
   eventoId    = data.evento_id;
+  offlineQueueKey = OFFLINE_QUEUE_PREFIX + eventoId; // cola aislada por evento en localStorage
   puntoAcceso = data.punto_acceso || null;
 
   // Load event — also check if multi-use (has puntos_acceso)
@@ -343,6 +371,11 @@ async function init() {
   window.addEventListener('online',  () => { isOnline = true;  actualizarBarraOffline(); sincronizarCola(); });
   window.addEventListener('offline', () => { isOnline = false; actualizarBarraOffline(); });
   actualizarBarraOffline();
+
+  // ── Restaurar cola offline persistida antes de habilitar escaneo ──
+  cargarColaPersistida();
+  actualizarBarraOffline();
+  if (offlineQueue.length > 0 && isOnline) sincronizarCola(); // reintentar pendientes al abrir con conexion
 
   show('s-scanner');
   startCamera();
@@ -405,6 +438,7 @@ async function sincronizarCola() {
   if (!isOnline || offlineQueue.length === 0) return;
   const cola = [...offlineQueue];
   offlineQueue = [];
+  persistirCola();
   actualizarBarraOffline();
   for (const op of cola) {
     try {
@@ -415,14 +449,17 @@ async function sincronizarCola() {
       }
     } catch(e) {
       offlineQueue.push(op); // re-queue si falla
+      persistirCola();
     }
   }
   if (offlineQueue.length === 0) {
+    localStorage.removeItem(offlineQueueKey);
     const bar = document.getElementById('offline-bar');
     if (bar) bar.style.display = 'none';
     await cargarCache(); // refrescar cache tras sync
     await updateCounter();
   } else {
+    persistirCola();
     actualizarBarraOffline();
   }
 }
@@ -930,6 +967,7 @@ async function confirmEntry() {
       // Cola offline
       if (!ins.used) offlineQueue.push({ type: 'update', id: ins.id, data: { used: true, hora_ingreso: hora, fecha_ingreso: fecha } });
       offlineQueue.push({ type: 'log', data: logData });
+      persistirCola();
       actualizarBarraOffline();
     }
     document.getElementById('sc-res').innerHTML = `<div class="res-card res-ok">
@@ -972,6 +1010,7 @@ async function confirmEntry() {
       // Cola offline — se sincroniza cuando vuelva la señal
       offlineQueue.push({ type: 'update', id: ins.id, data: updateData });
       offlineQueue.push({ type: 'log', data: logData });
+      persistirCola();
       actualizarBarraOffline();
     }
     document.getElementById('sc-res').innerHTML = `<div class="res-card res-ok">
@@ -1016,6 +1055,7 @@ async function undoCheckinScanner(id, nombre, qrCode) {
   } else {
     // Offline: agregar a la cola
     offlineQueue.push({ type: 'update', id, data: updates });
+    persistirCola();
     actualizarBarraOffline();
   }
 

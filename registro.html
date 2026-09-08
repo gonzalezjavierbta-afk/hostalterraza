@@ -258,7 +258,7 @@ body {
 /* Plan cards */
 .plan-cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
   margin-bottom: 1.25rem;
 }
@@ -276,6 +276,23 @@ body {
 .plan-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
 .plan-price { font-size: 13px; color: var(--gold-d); font-weight: 500; margin-bottom: 4px; }
 .plan-desc { font-size: 11px; color: var(--ink3); line-height: 1.4; }
+.plan-feat {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font-size: 11px;
+  color: var(--ink2);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.plan-feat::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--gold-d);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
 .plan-badge {
   position: absolute;
   top: -8px; right: 8px;
@@ -348,19 +365,41 @@ body {
     <!-- PASO 3: Plan y branding básico -->
     <div id="paso-3" style="display:none">
       <div class="fg" style="margin-bottom:.75rem">
-        <label>Plan</label>        <div class="plan-cards">
-          <label class="plan-card selected" onclick="selectPlan('mensual',this)">
-            <input type="radio" name="plan" value="mensual" checked>
-            <div class="plan-badge">Popular</div>
-            <div class="plan-name">Mensual</div>
-            <div class="plan-price">$200k/mes</div>
-            <div class="plan-desc">Eventos ilimitados, análisis completo, exportaciones.</div>
+        <label>Plan</label>
+        <div class="plan-cards">
+          <label class="plan-card selected" onclick="selectPlan('freemium',this)">
+            <input type="radio" name="plan" value="freemium" checked>
+            <div class="plan-name">Freemium</div>
+            <div class="plan-price">$0 COP</div>
+            <div class="plan-desc">Eventos pequeños, culturales o de prueba.</div>
+            <div class="plan-feat">Hasta 100 asistentes por evento</div>
+            <div class="plan-feat">Landing atómica</div>
+            <div class="plan-feat">Captura dual WhatsApp</div>
+            <div class="plan-feat">Escáner para staff</div>
+            <div class="plan-feat">Marca de agua discreta</div>
           </label>
-          <label class="plan-card" onclick="selectPlan('evento',this)">
-            <input type="radio" name="plan" value="evento">
-            <div class="plan-name">Por evento</div>
-            <div class="plan-price">Desde $30k</div>
-            <div class="plan-desc">Paga solo cuando publicas un evento.</div>
+          <label class="plan-card" onclick="selectPlan('pass_evento',this)">
+            <input type="radio" name="plan" value="pass_evento">
+            <div class="plan-badge">Más Popular</div>
+            <div class="plan-name">Pass por Evento</div>
+            <div class="plan-price">$40.000 COP / evento</div>
+            <div class="plan-desc">Promotores, fiestas temáticas y talleres esporádicos.</div>
+            <div class="plan-feat">Asistentes e inscritos ilimitados</div>
+            <div class="plan-feat">Landing con paleta atómica</div>
+            <div class="plan-feat">Sin marcas de agua</div>
+            <div class="plan-feat">Escáner offline con validación por cédula (últimos 4 dígitos)</div>
+            <div class="plan-feat">Analítica de clicks y geo en tiempo real</div>
+          </label>
+          <label class="plan-card" onclick="selectPlan('pro_mensual',this)">
+            <input type="radio" name="plan" value="pro_mensual">
+            <div class="plan-name">Suscripción B2B</div>
+            <div class="plan-price">$400.000 COP / mes</div>
+            <div class="plan-desc">Hostales, discotecas, clubes y recintos con eventos recurrentes.</div>
+            <div class="plan-feat">Eventos e invitados ilimitados</div>
+            <div class="plan-feat">Marca blanca completa</div>
+            <div class="plan-feat">Sub-cuentas para staff ilimitadas</div>
+            <div class="plan-feat">Soporte para series de eventos</div>
+            <div class="plan-feat">Soporte prioritario</div>
           </label>
         </div>
       </div>
@@ -412,7 +451,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let planSeleccionado = 'mensual';
+let planSeleccionado = 'freemium';
 let slugValidado     = false;
 let _orgCreada       = null;
 
@@ -539,9 +578,26 @@ function irPaso3() {
 
 function selectPlan(plan, el) {
   planSeleccionado = plan;
-  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
+  document.querySelectorAll('.plan-card').forEach(c => {
+    const activa = c === el;
+    c.classList.toggle('selected', activa);
+    const radio = c.querySelector('input[name="plan"]');
+    if (radio) radio.checked = activa;
+  });
 }
+
+// ── Preselección por URL (?plan=freemium|pass_evento|pro_mensual) ──
+function preseleccionarPlan() {
+  const param   = new URLSearchParams(window.location.search).get('plan');
+  const VALIDOS = ['freemium', 'pass_evento', 'pro_mensual'];
+  const elegido = VALIDOS.indexOf(param) !== -1 ? param : 'freemium';
+  const input   = document.querySelector('input[name="plan"][value="' + elegido + '"]');
+  if (input) {
+    const card = input.closest('.plan-card');
+    if (card) selectPlan(elegido, card);
+  }
+}
+preseleccionarPlan();
 
 // ── Crear organización ────────────────────────────────
 async function crearOrganizacion() {
