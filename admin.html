@@ -1014,6 +1014,17 @@ tr:hover td{background:var(--surface)}
             <span style="color:var(--gold)">●</span> Plantilla: <strong id="ld-preview-theme-name">—</strong>
           </div>
         </div><!-- /wiz-step 3 -->
+
+        <!-- ══ Pestaña Idiomas · Overrides FR/EN (ADR-035) ══ -->
+        <div id="ld-i18n-config" style="margin-top:1rem;border:1px solid var(--border);border-radius:var(--r);padding:1rem .9rem .9rem;background:var(--surface)">
+          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem">🌐 Idiomas (traducción FR / EN)</div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:.75rem;line-height:1.55">El español (ES) es el idioma base y se edita en los campos anteriores. Aquí traduces contenido opcional para FR y EN. Deja un campo vacío para usar el texto en español.</div>
+          <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);margin-bottom:.85rem;width:fit-content">
+            <button id="ld-i18n-tab-fr" onclick="ldI18nSetLang('fr')" style="padding:7px 18px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--ink);color:#fff">Français (FR)</button>
+            <button id="ld-i18n-tab-en" onclick="ldI18nSetLang('en')" style="padding:7px 18px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--surface);color:var(--ink3)">English (EN)</button>
+          </div>
+          <div id="ld-i18n-fields"></div>
+        </div>
         </div><!-- /ev-landing-config -->
       </div><!-- /contenedor compartido pasos 2-3 -->
       <!-- ════════════════════════════════════════════════════ -->
@@ -2530,7 +2541,10 @@ let _ldThemeSeleccionado = null;
 
 function toggleLandingConfig(activa) {
   document.getElementById('ev-landing-config').style.display = activa ? 'block' : 'none';
-  if (activa && !_ldThemeSeleccionado) seleccionarTheme('arthouse');
+  if (activa) {
+    if (typeof _ensureI18nPanels === 'function') _ensureI18nPanels();
+    if (!_ldThemeSeleccionado) seleccionarTheme('arthouse');
+  }
 }
 
 // ADR-030 — Sistema dual de captura (landing + página solo-formulario)
@@ -3134,6 +3148,136 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 })();
 
+// ══════════════════════════════════════════════════════════
+// ADR-035 — Pestaña Idiomas: overrides FR/EN de config_landing.i18n
+// Contrato: config_landing.i18n[lang] = { nombre, org_nombre, content:{...} }
+// (es = base en config_landing.content; fr/en = overrides opcionales).
+// ══════════════════════════════════════════════════════════
+let _ldI18nLang = 'fr';
+const LD_I18N_FIELDS = [
+  { id:'nombre',         label:'Nombre del evento',                       path:['nombre'] },
+  { id:'orgnombre',      label:'Nombre de la organización',               path:['org_nombre'] },
+  { id:'ubicacion',      label:'Ubicación',                               path:['ubicacion'] },
+  { id:'titulo',         label:'Título a mostrar',                        path:['content','titulo_display'] },
+  { id:'sinopsis',       label:'Sinopsis',                                path:['content','sinopsis'], textarea:true },
+  { id:'dresscode',      label:'Dress code',                              path:['content','dresscode'] },
+  { id:'guestlist',      label:'Guest list',                              path:['content','guest_list'] },
+  { id:'wamsg',          label:'Mensaje WhatsApp (compra)',               path:['content','whatsapp_msg'] },
+  { id:'historia-titulo',label:'Historia — título',                       path:['content','historia','titulo'] },
+  { id:'historia-texto', label:'Historia — texto',                        path:['content','historia','texto'], textarea:true },
+  { id:'objetivo-btn',   label:'Objetivo — texto botón',                  path:['content','objetivo','btn'] },
+  { id:'objetivo-donatetext', label:'Objetivo — texto motivacional',      path:['content','objetivo','donate_text'] },
+  { id:'cta-titulo',     label:'CTA final — título',                      path:['content','cta_final','titulo'] },
+  { id:'cta-subtitulo',  label:'CTA final — subtítulo',                   path:['content','cta_final','subtitulo'] },
+  { id:'cta-boton',      label:'CTA final — texto botón',                 path:['content','cta_final','boton_texto'] },
+  { id:'footer-tagline', label:'Footer — tagline',                        path:['content','footer','tagline'] },
+  { id:'tickets-info',   label:'Tickets info (fallback boletería)',       path:['content','tickets_info'] },
+  { id:'faq',            label:'FAQ — Pregunta|Respuesta (una por línea)',path:['content','faq'], textarea:true, faq:true },
+];
+const LD_I18N_LANGS = ['fr','en'];
+
+function ldI18nFieldId(f, lang) { return 'ld-i18n-' + f.id + '-' + lang; }
+
+function _ensureI18nPanels() {
+  const wrap = document.getElementById('ld-i18n-fields');
+  if (!wrap || wrap.childElementCount > 0) return;
+  LD_I18N_LANGS.forEach(lang => {
+    const box = document.createElement('div');
+    box.id = 'ld-i18n-panel-' + lang;
+    box.style.display = lang === _ldI18nLang ? 'block' : 'none';
+    box.innerHTML = LD_I18N_FIELDS.map(f => {
+      const ph = f.faq ? '¿Pregunta?|Respuesta' : '';
+      const tag = f.textarea ? 'textarea' : 'input';
+      return `<div class="fg" style="margin-bottom:.6rem"><label style="font-size:11px">${f.label}</label>` +
+        (f.textarea
+          ? `<textarea id="${ldI18nFieldId(f, lang)}" rows="2" placeholder="${ph}" style="width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>`
+          : `<input id="${ldI18nFieldId(f, lang)}" placeholder="${f.label}" style="width:100%;font-size:12px">`) +
+        `</div>`;
+    }).join('');
+    wrap.appendChild(box);
+  });
+}
+
+function ldI18nSetLang(lang) {
+  _ldI18nLang = lang;
+  _ensureI18nPanels();
+  LD_I18N_LANGS.forEach(l => {
+    const panel = document.getElementById('ld-i18n-panel-' + l);
+    if (panel) panel.style.display = l === lang ? 'block' : 'none';
+    const tab = document.getElementById('ld-i18n-tab-' + l);
+    if (tab) { tab.style.background = l === lang ? 'var(--ink)' : 'var(--surface)'; tab.style.color = l === lang ? '#fff' : 'var(--ink3)'; }
+  });
+}
+
+function _setI18nPath(obj, path, val) {
+  let cur = obj;
+  for (let i = 0; i < path.length - 1; i++) {
+    if (typeof cur[path[i]] !== 'object' || cur[path[i]] === null) cur[path[i]] = {};
+    cur = cur[path[i]];
+  }
+  cur[path[path.length - 1]] = val;
+}
+
+function _getI18nPath(obj, path) {
+  let cur = obj;
+  for (let i = 0; i < path.length; i++) {
+    if (cur === null || typeof cur !== 'object') return undefined;
+    cur = cur[path[i]];
+  }
+  return cur;
+}
+
+function _buildI18nFromFields() {
+  _ensureI18nPanels();
+  const out = {};
+  LD_I18N_LANGS.forEach(lang => {
+    const entry = {};
+    let hasAny = false;
+    LD_I18N_FIELDS.forEach(f => {
+      const el = document.getElementById(ldI18nFieldId(f, lang));
+      const v = (el ? el.value || '' : '').trim();
+      if (!v) return;
+      if (f.faq) {
+        const arr = v.split('\n').filter(l => l.includes('|')).map(l => { const p = l.split('|'); return { q: (p[0] || '').trim(), a: (p[1] || '').trim() }; });
+        if (arr.length) { _setI18nPath(entry, f.path, arr); hasAny = true; }
+        return;
+      }
+      _setI18nPath(entry, f.path, v);
+      hasAny = true;
+    });
+    if (hasAny) out[lang] = entry;
+  });
+  return Object.keys(out).length ? out : null;
+}
+
+function _poblarI18nEditor(i18n) {
+  _ensureI18nPanels();
+  if (!i18n) { _limpiarI18nEditor(); return; }
+  LD_I18N_FIELDS.forEach(f => {
+    LD_I18N_LANGS.forEach(lang => {
+      const entry = i18n[lang];
+      if (!entry) return;
+      const el = document.getElementById(ldI18nFieldId(f, lang));
+      if (!el) return;
+      const val = _getI18nPath(entry, f.path);
+      if (val === undefined || val === null) return;
+      if (f.faq && Array.isArray(val)) el.value = val.map(i => ((i && i.q) || '') + '|' + ((i && i.a) || '')).join('\n');
+      else el.value = val;
+    });
+  });
+}
+
+function _limpiarI18nEditor() {
+  _ensureI18nPanels();
+  LD_I18N_FIELDS.forEach(f => {
+    LD_I18N_LANGS.forEach(lang => {
+      const el = document.getElementById(ldI18nFieldId(f, lang));
+      if (el) el.value = '';
+    });
+  });
+  ldI18nSetLang('fr');
+}
+
 function _buildConfigLanding(slug) {
   const activa = document.getElementById('ev-landing-activa')?.checked;
   const sistDual = document.getElementById('ev-sist-dual')?.checked;
@@ -3274,6 +3418,9 @@ function _buildConfigLanding(slug) {
     },
   };
   Object.keys(cfg.content).forEach(k => { if (cfg.content[k] === null) delete cfg.content[k]; });
+  // ADR-035 — overrides de idioma FR/EN (omitidos si no hay contenido traducido).
+  const i18nCfg = _buildI18nFromFields();
+  if (i18nCfg) cfg.i18n = i18nCfg;
   return cfg;
 }
 
@@ -4148,6 +4295,8 @@ function openEditMod(evId) {
     if (fx.parallax  != null) { const el = document.getElementById('ld-fx-parallax');  if (el) el.checked = !!fx.parallax; }
     // Contenido → campos ld-*
     _poblarContenidoWizard(content, suf);
+    // ADR-035 — restaurar overrides de idioma FR/EN del config_landing.i18n
+    if (typeof _poblarI18nEditor === 'function') _poblarI18nEditor(cfg.i18n);
 
     if (content.titulo_display) { const el = document.getElementById('ev-titulo-display'); if (el) el.value = content.titulo_display; }
   }
@@ -4215,6 +4364,7 @@ function _limpiarWizardCompleto() {
   document.getElementById('ev-puntos-list').innerHTML = '';
   resetCamposCustom();
   _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
+  if (typeof _limpiarI18nEditor === 'function') _limpiarI18nEditor();
   setModoPublico('landing');
 }
 

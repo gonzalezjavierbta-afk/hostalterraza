@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hostal Terraza · Sistema QR &amp; Landing Pages para Eventos</title>
-<meta name="description" content="Registra invitados por WhatsApp, reparte entradas con QR personal y controla la puerta desde el celular. Cada evento con su propia landing page.">
+<title data-i18n="index.title">Hostal Terraza · Sistema QR &amp; Landing Pages para Eventos</title>
+<meta name="description" content="Registra invitados por WhatsApp, reparte entradas con QR personal y controla la puerta desde el celular. Cada evento con su propia landing page." data-i18n-meta="index.meta_desc">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0A09'/%3E%3Cpath d='M20 12v40M20 12l30 22M20 36l30 16' stroke='%23E3B457' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/i18n.js"></script>
 <style>
 /* ═══════════════ HOSTAL TERRAZA · PORTAL v1.0.0 ═══════════════ */
 .htz{--hbg:#0B0A09;--hbg2:#14110C;--hpanel:#17130D;--hline:rgba(227,180,87,.18);
@@ -288,13 +289,13 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
       <span class="htz-logo-name">Hostal<b> Terraza</b></span>
     </a>
     <nav class="htz-nav-links" id="navLinks" aria-label="Navegación principal">
-      <a href="#eventos">Cartelera</a>
-      <a href="#sistema">Sistema QR</a>
-      <a href="#landings">Landings</a>
-      <a href="#contacto">Contacto</a>
+      <a href="#eventos" data-i18n="index.nav.cartelera">Cartelera</a>
+      <a href="#sistema" data-i18n="index.nav.sistema">Sistema QR</a>
+      <a href="#landings" data-i18n="index.nav.landings">Landings</a>
+      <a href="#contacto" data-i18n="index.nav.contacto">Contacto</a>
     </nav>
     <div class="htz-nav-user" id="userZone"></div>
-    <button class="htz-nav-burger" id="navBurger" aria-label="Abrir menú">☰</button>
+    <button class="htz-nav-burger" id="navBurger" aria-label="Abrir menú" data-i18n-aria="index.nav.aria_burger">☰</button>
   </div>
 </header>
 
@@ -304,31 +305,31 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
   <div class="htz-hero-grid"></div>
   <div class="htz-wrap htz-hero-in">
     <div>
-      <span class="hz-kicker">Sistema QR · Landings · Tickets</span>
-      <h1 class="htz-hero-title">Donde la fiesta<br>se encuentra<br>con el <span class="gl">código</span><em>.</em></h1>
-      <p class="htz-hero-sub">Registra invitados con WhatsApp, reparte entradas con un QR personal y controla la puerta desde el celular. Cada evento vive en su propia landing page, con el diseño que lo representa.</p>
+      <span class="hz-kicker" data-i18n="index.hero.kicker">Sistema QR · Landings · Tickets</span>
+      <h1 class="htz-hero-title"><span data-i18n="index.hero.t1">Donde la fiesta</span><br><span data-i18n="index.hero.t2">se encuentra</span><br><span data-i18n="index.hero.t3">con el</span> <span class="gl" data-i18n="index.hero.gl">código</span><em data-i18n="index.hero.dot">.</em></h1>
+      <p class="htz-hero-sub" data-i18n="index.hero.sub">Registra invitados con WhatsApp, reparte entradas con un QR personal y controla la puerta desde el celular. Cada evento vive en su propia landing page, con el diseño que lo representa.</p>
       <div class="htz-hero-cta">
-        <a class="htz-btn" href="#eventos" data-track="cta_cartelera">Ver cartelera</a>
-        <a class="htz-btn htz-btn-ghost" href="#sistema" data-track="cta_sistema">Cómo funciona</a>
+        <a class="htz-btn" href="#eventos" data-track="cta_cartelera" data-i18n="index.hero.cta_cartelera">Ver cartelera</a>
+        <a class="htz-btn htz-btn-ghost" href="#sistema" data-track="cta_sistema" data-i18n="index.hero.cta_sistema">Cómo funciona</a>
       </div>
       <div class="htz-hero-stats">
-        <div class="htz-stat"><div class="htz-stat-num" id="st-events">…</div><div class="htz-stat-lbl">Eventos publicados</div></div>
-        <div class="htz-stat"><div class="htz-stat-num" id="st-guest">…</div><div class="htz-stat-lbl">Asistentes registrados</div></div>
-        <div class="htz-stat"><div class="htz-stat-num" id="st-tpl">…</div><div class="htz-stat-lbl">Diseños disponibles</div></div>
+        <div class="htz-stat"><div class="htz-stat-num" id="st-events">…</div><div class="htz-stat-lbl" data-i18n="index.stat.events">Eventos publicados</div></div>
+        <div class="htz-stat"><div class="htz-stat-num" id="st-guest">…</div><div class="htz-stat-lbl" data-i18n="index.stat.guests">Asistentes registrados</div></div>
+        <div class="htz-stat"><div class="htz-stat-num" id="st-tpl">…</div><div class="htz-stat-lbl" data-i18n="index.stat.tpl">Diseños disponibles</div></div>
       </div>
     </div>
     <div class="htz-ticket" aria-hidden="true">
       <div class="htz-ticket-top">
-        <div class="htz-ticket-org">Hostal Terraza<small>VRIP INVITADO</small></div>
-        <div class="htz-ticket-stamp">ENTRADA</div>
+        <div class="htz-ticket-org">Hostal Terraza<small data-i18n="index.ticket.guest">VRIP INVITADO</small></div>
+        <div class="htz-ticket-stamp" data-i18n="index.ticket.entry">ENTRADA</div>
       </div>
-      <div class="htz-ticket-name">Tu noche<span> empieza</span></div>
+      <div class="htz-ticket-name"><span style="color:inherit" data-i18n="index.ticket.name1">Tu noche</span><span data-i18n="index.ticket.name2"> empieza</span></div>
       <div class="htz-ticket-row">
-        <div><span>Fecha</span><b id="mock-fecha">—</b></div>
-        <div><span>Hora</span><b id="mock-hora">—</b></div>
+        <div><span data-i18n="index.ticket.fecha">Fecha</span><b id="mock-fecha">—</b></div>
+        <div><span data-i18n="index.ticket.hora">Hora</span><b id="mock-hora">—</b></div>
       </div>
       <div class="htz-ticket-qr" id="mockQR"></div>
-      <div class="htz-ticket-foot"><span>USO ÚNICO</span><span>DRAPOR TERRAZA</span></div>
+      <div class="htz-ticket-foot"><span data-i18n="index.ticket.single">USO ÚNICO</span><span>DRAPOR TERRAZA</span></div>
     </div>
   </div>
 </section>
@@ -343,34 +344,34 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
   <div class="htz-wrap">
     <div class="htz-sec-head htz-rv">
       <div>
-        <span class="hz-kicker">Lo que viene y lo que fue</span>
-        <h2 class="htz-sec-title">Cartelera</h2>
+        <span class="hz-kicker" data-i18n="index.cartelera.kicker">Lo que viene y lo que fue</span>
+        <h2 class="htz-sec-title" data-i18n="index.cartelera.title">Cartelera</h2>
       </div>
-      <p class="htz-sec-sub">Busca, filtra por categoría o estado y abre la página de cada noche. Los eventos pasados quedan publicados con su historia.</p>
+      <p class="htz-sec-sub" data-i18n="index.cartelera.sub">Busca, filtra por categoría o estado y abre la página de cada noche. Los eventos pasados quedan publicados con su historia.</p>
     </div>
 
     <div class="htz-toolbar htz-rv">
       <div class="htz-search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="searchInput" type="search" placeholder="Busca por evento, ciudad o marca…" aria-label="Buscar eventos" autocomplete="off">
+        <input id="searchInput" type="search" placeholder="Busca por evento, ciudad o marca…" aria-label="Buscar eventos" autocomplete="off" data-i18n-ph="index.cartelera.search_ph" data-i18n-aria="index.cartelera.search_aria">
       </div>
       <div class="htz-filtros">
-        <div class="htz-tabs" role="tablist" aria-label="Estado del evento">
-          <button class="htz-tab on" data-estado="proximos" role="tab" aria-selected="true">Próximos <span class="n" id="count-prox"></span></button>
-          <button class="htz-tab" data-estado="pasados" role="tab" aria-selected="false">Pasados <span class="n" id="count-pas"></span></button>
-          <button class="htz-tab" data-estado="todos" role="tab" aria-selected="false">Todos <span class="n" id="count-tot"></span></button>
+        <div class="htz-tabs" role="tablist" aria-label="Estado del evento" data-i18n-aria="index.cartelera.tabs_aria">
+          <button class="htz-tab on" data-estado="proximos" role="tab" aria-selected="true"><span data-i18n="index.cartelera.tab_prox">Próximos</span> <span class="n" id="count-prox"></span></button>
+          <button class="htz-tab" data-estado="pasados" role="tab" aria-selected="false"><span data-i18n="index.cartelera.tab_pas">Pasados</span> <span class="n" id="count-pas"></span></button>
+          <button class="htz-tab" data-estado="todos" role="tab" aria-selected="false"><span data-i18n="index.cartelera.tab_all">Todos</span> <span class="n" id="count-tot"></span></button>
         </div>
-        <div class="htz-chips" aria-label="Filtrar por categoría">
-          <button class="htz-chip-cat on" data-cat="todas">Todas</button>
-          <button class="htz-chip-cat" data-cat="fiesta">Fiesta</button>
-          <button class="htz-chip-cat" data-cat="cine">Cine</button>
-          <button class="htz-chip-cat" data-cat="campana">Campaña</button>
+        <div class="htz-chips" aria-label="Filtrar por categoría" data-i18n-aria="index.cartelera.chips_aria">
+          <button class="htz-chip-cat on" data-cat="todas" data-i18n="index.cat.todas">Todas</button>
+          <button class="htz-chip-cat" data-cat="fiesta" data-i18n="index.cat.fiesta">Fiesta</button>
+          <button class="htz-chip-cat" data-cat="cine" data-i18n="index.cat.cine">Cine</button>
+          <button class="htz-chip-cat" data-cat="campana" data-i18n="index.cat.campana">Campaña</button>
         </div>
       </div>
     </div>
 
     <div class="htz-grid" id="eventsGrid" aria-live="polite">
-      <div class="htz-vacio"><div class="big">Cargando cartelera…</div><p>Consultando los eventos publicados.</p></div>
+      <div class="htz-vacio"><div class="big" data-i18n="index.cartelera.loading">Cargando cartelera…</div><p data-i18n="index.cartelera.loading_sub">Consultando los eventos publicados.</p></div>
     </div>
   </div>
 </section>
@@ -380,34 +381,34 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
   <div class="htz-wrap">
     <div class="htz-sec-head htz-rv">
       <div>
-        <span class="hz-kicker">Del mensaje al ingreso</span>
-        <h2 class="htz-sec-title">Tres pasos.<br>Una puerta sin filas.</h2>
+        <span class="hz-kicker" data-i18n="index.sistema.kicker">Del mensaje al ingreso</span>
+        <h2 class="htz-sec-title"><span data-i18n="index.sistema.title1">Tres pasos.</span><br><span data-i18n="index.sistema.title2">Una puerta sin filas.</span></h2>
       </div>
-      <p class="htz-sec-sub">Tu invitado no instala nada: escribe por WhatsApp, recibe su entrada con QR y la muestra en la puerta. Validada en segundos.</p>
+      <p class="htz-sec-sub" data-i18n="index.sistema.sub">Tu invitado no instala nada: escribe por WhatsApp, recibe su entrada con QR y la muestra en la puerta. Validada en segundos.</p>
     </div>
     <div class="htz-steps">
       <div class="htz-step htz-rv">
         <div class="htz-step-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <h3>Registra</h3>
-        <p>El invitado envía su nombre y WhatsApp desde el formulario del evento. Tú recibes su información sin líos de papel o planillas.</p>
+        <h3 data-i18n="index.sistema.paso1_t">Registra</h3>
+        <p data-i18n="index.sistema.paso1_p">El invitado envía su nombre y WhatsApp desde el formulario del evento. Tú recibes su información sin líos de papel o planillas.</p>
       </div>
       <div class="htz-step htz-rv">
         <div class="htz-step-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
-        <h3>Recibe</h3>
-        <p>Cada asistente obtiene una entrada con un QR personal de uso único. Se descarga, se comparte y se muestra en la puerta.</p>
+        <h3 data-i18n="index.sistema.paso2_t">Recibe</h3>
+        <p data-i18n="index.sistema.paso2_p">Cada asistente obtiene una entrada con un QR personal de uso único. Se descarga, se comparte y se muestra en la puerta.</p>
       </div>
       <div class="htz-step htz-rv">
         <div class="htz-step-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
-        <h3>Escanea</h3>
-        <p>Tu control validará cada QR desde el celular o la tablet: ingreso confirmado, duplicados bloqueados y aforo siempre bajo control.</p>
+        <h3 data-i18n="index.sistema.paso3_t">Escanea</h3>
+        <p data-i18n="index.sistema.paso3_p">Tu control validará cada QR desde el celular o la tablet: ingreso confirmado, duplicados bloqueados y aforo siempre bajo control.</p>
       </div>
     </div>
     <div class="htz-feats">
-      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Varios puntos de control</span>
-      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Aforo en tiempo real</span>
-      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Lista de invitados</span>
-      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Sin app para el invitado</span>
-      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Registro por WhatsApp o cédula</span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> <span data-i18n="index.sistema.feat1">Varios puntos de control</span></span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> <span data-i18n="index.sistema.feat2">Aforo en tiempo real</span></span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> <span data-i18n="index.sistema.feat3">Lista de invitados</span></span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> <span data-i18n="index.sistema.feat4">Sin app para el invitado</span></span>
+      <span class="htz-feat-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> <span data-i18n="index.sistema.feat5">Registro por WhatsApp o cédula</span></span>
     </div>
   </div>
 </section>
@@ -417,10 +418,10 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
   <div class="htz-wrap">
     <div class="htz-sec-head htz-rv">
       <div>
-        <span class="hz-kicker">Para cada evento, un mundo</span>
-        <h2 class="htz-sec-title">Landing pages que<br>se sienten propias.</h2>
+        <span class="hz-kicker" data-i18n="index.landings.kicker">Para cada evento, un mundo</span>
+        <h2 class="htz-sec-title"><span data-i18n="index.landings.title1">Landing pages que</span><br><span data-i18n="index.landings.title2">se sienten propias.</span></h2>
       </div>
-      <p class="htz-sec-sub">Plantillas por categoría, con el color de tu marca, línea de artistas, boletería, FAQ dinámico y datos de visitas. Sin instalar nada más que abrir el link.</p>
+      <p class="htz-sec-sub" data-i18n="index.landings.sub">Plantillas por categoría, con el color de tu marca, línea de artistas, boletería, FAQ dinámico y datos de visitas. Sin instalar nada más que abrir el link.</p>
     </div>
     <div class="htz-land-grid">
       <div class="htz-land htz-rv">
@@ -434,13 +435,13 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
           </div>
         </div>
         <div>
-          <div class="htz-land-tag">Fiesta · tpl f8</div>
-          <h3>Noche con lineup</h3>
-          <p>Artistas con foto y redes, dresscode, aforo y boletería en preventa y taquilla.</p>
+          <div class="htz-land-tag" data-i18n="index.landings.f8_tag">Fiesta · tpl f8</div>
+          <h3 data-i18n="index.landings.f8_title">Noche con lineup</h3>
+          <p data-i18n="index.landings.f8_p">Artistas con foto y redes, dresscode, aforo y boletería en preventa y taquilla.</p>
         </div>
         <ul>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Comunidad + WhatsApp</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Conteo regresivo y mapa</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.landings.f8_li1">Comunidad + WhatsApp</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.landings.f8_li2">Conteo regresivo y mapa</span></li>
         </ul>
       </div>
       <div class="htz-land htz-rv">
@@ -454,13 +455,13 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
           </div>
         </div>
         <div>
-          <div class="htz-land-tag">Cine · tpl c1</div>
-          <h3>Premiere con tráiler</h3>
-          <p>Ficha técnica, tráiler, función, dresscode e invitados especiales en pantalla.</p>
+          <div class="htz-land-tag" data-i18n="index.landings.c1_tag">Cine · tpl c1</div>
+          <h3 data-i18n="index.landings.c1_title">Premiere con tráiler</h3>
+          <p data-i18n="index.landings.c1_p">Ficha técnica, tráiler, función, dresscode e invitados especiales en pantalla.</p>
         </div>
         <ul>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Video y director</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Lista de invitados</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.landings.c1_li1">Video y director</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.landings.c1_li2">Lista de invitados</span></li>
         </ul>
       </div>
       <div class="htz-land htz-rv">
@@ -474,13 +475,13 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
           </div>
         </div>
         <div>
-          <div class="htz-land-tag">Campaña · tpl b5</div>
-          <h3>Causa que se mueve</h3>
-          <p>Historia, meta de recaudación, impacto y alcance con actualizaciones.</p>
+          <div class="htz-land-tag" data-i18n="index.landings.b5_tag">Campaña · tpl b5</div>
+          <h3 data-i18n="index.landings.b5_title">Causa que se mueve</h3>
+          <p data-i18n="index.landings.b5_p">Historia, meta de recaudación, impacto y alcance con actualizaciones.</p>
         </div>
         <ul>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Meta y donaciones</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Historia e impacto</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.landings.b5_li1">Meta y donaciones</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.landings.b5_li2">Historia e impacto</span></li>
         </ul>
       </div>
     </div>
@@ -491,26 +492,26 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
 <section class="htz-wrap htz-sec" id="contacto">
   <div class="htz-cta htz-rv">
     <div>
-      <span class="hz-kicker">¿Tienes un hostal, bar o venue?</span>
-      <h2>Lleva el sistema<br>a tu espacio.</h2>
-      <p>Montamos tu landing, conectamos tu WhatsApp y dejamos tu control de puerta listo para el primer evento. Cuéntanos tu noche y la encendemos.</p>
+      <span class="hz-kicker" data-i18n="index.cta.kicker">¿Tienes un hostal, bar o venue?</span>
+      <h2><span data-i18n="index.cta.title1">Lleva el sistema</span><br><span data-i18n="index.cta.title2">a tu espacio.</span></h2>
+      <p data-i18n="index.cta.p">Montamos tu landing, conectamos tu WhatsApp y dejamos tu control de puerta listo para el primer evento. Cuéntanos tu noche y la encendemos.</p>
       <div class="htz-cta-actions">
         <a class="htz-btn" href="https://wa.me/573001234567?text=Quiero%20llevar%20el%20sistema%20QR%20a%20mi%20espacio" target="_blank" rel="noopener" data-track="cta_whatsapp">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8z"/></svg>
-          Hablar con el equipo
+          <span data-i18n="index.cta.wa">Hablar con el equipo</span>
         </a>
-        <button class="htz-btn htz-btn-ghost" id="btnAccesoMain">Acceso del equipo</button>
+        <button class="htz-btn htz-btn-ghost" id="btnAccesoMain" data-i18n="index.cta.access">Acceso del equipo</button>
       </div>
     </div>
     <div style="position:relative">
       <div class="htz-ticket" style="max-width:300px;transform:rotate(-1.6deg)">
         <div class="htz-ticket-top">
-          <div class="htz-ticket-org">Hostal Terraza<small>PRÓXIMA NOCHE</small></div>
+          <div class="htz-ticket-org">Hostal Terraza<small data-i18n="index.cta.noche">PRÓXIMA NOCHE</small></div>
           <div class="htz-ticket-stamp">QR</div>
         </div>
-        <div class="htz-ticket-name" id="cta-evname" style="font-size:26px">Tu evento</div>
+        <div class="htz-ticket-name" id="cta-evname" style="font-size:26px" data-i18n="index.cta.evento">Tu evento</div>
         <div class="htz-ticket-qr" id="ctaQR" style="width:96px;height:96px;margin:16px auto 14px"></div>
-        <div class="htz-ticket-foot"><span>ESCANEA PARA ENTRAR</span></div>
+        <div class="htz-ticket-foot"><span data-i18n="index.cta.scan">ESCANEA PARA ENTRAR</span></div>
       </div>
     </div>
   </div>
@@ -525,25 +526,25 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
           <svg class="htz-logo-mark" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M20 12v40M20 12l30 22M20 36l30 16"/></svg>
           <span class="htz-logo-name">Hostal<b> Terraza</b></span>
         </a>
-        <p>Sistema de registro, entradas QR y landings para eventos. Construido para hostales, bares y venues que viven de la noche.</p>
+        <p data-i18n="index.footer.p">Sistema de registro, entradas QR y landings para eventos. Construido para hostales, bares y venues que viven de la noche.</p>
       </div>
       <div class="htz-footer-cols">
         <div>
-          <h4>Plataforma</h4>
-          <a href="#sistema">Sistema QR</a>
-          <a href="#landings">Landing pages</a>
-          <a href="#eventos">Cartelera</a>
+          <h4 data-i18n="index.footer.plataforma">Plataforma</h4>
+          <a href="#sistema" data-i18n="index.nav.sistema">Sistema QR</a>
+          <a href="#landings" data-i18n="index.footer.landings">Landing pages</a>
+          <a href="#eventos" data-i18n="index.nav.cartelera">Cartelera</a>
         </div>
         <div>
-          <h4>Equipo</h4>
-          <a href="#" onclick="openLogin();return false">Acceso al panel</a>
+          <h4 data-i18n="index.footer.equipo">Equipo</h4>
+          <a href="#" onclick="openLogin();return false" data-i18n="index.footer.acceso">Acceso al panel</a>
           <a href="https://wa.me/573001234567" target="_blank" rel="noopener">WhatsApp</a>
         </div>
       </div>
     </div>
     <div class="htz-footer-bottom">
-      <span>© <span id="year"></span> Hostal Terraza · Sistema QR &amp; Landings</span>
-      <span>Hecho para las noches que se recuerdan.</span>
+      <span>© <span id="year"></span> <span data-i18n="index.footer.bottom2">Hostal Terraza · Sistema QR &amp; Landings</span></span>
+      <span data-i18n="index.footer.hecho">Hecho para las noches que se recuerdan.</span>
     </div>
   </div>
 </footer>
@@ -551,14 +552,14 @@ font-size:13.5px;transition:transform .3s ease;max-width:min(420px,90vw);text-al
 <!-- ═════════ LOGIN MODAL ═════════ -->
 <div class="htz-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="htz-modal">
-    <button class="htz-modal-close" id="loginClose" aria-label="Cerrar">×</button>
-    <span class="hz-kicker">Acceso del equipo</span>
-    <h2 id="loginTitle">Entrar al panel</h2>
-    <p>Inicia sesión con tu cuenta de la plataforma. Si no tienes una, pídela al administrador.</p>
+    <button class="htz-modal-close" id="loginClose" aria-label="Cerrar" data-i18n-aria="index.login.aria_cerrar">×</button>
+    <span class="hz-kicker" data-i18n="index.login.kicker">Acceso del equipo</span>
+    <h2 id="loginTitle" data-i18n="index.login.title">Entrar al panel</h2>
+    <p data-i18n="index.login.p">Inicia sesión con tu cuenta de la plataforma. Si no tienes una, pídela al administrador.</p>
     <div class="htz-aviso" id="loginAviso"></div>
-    <div class="htz-field"><label for="loginEmail">Correo</label><input id="loginEmail" type="email" autocomplete="username" placeholder="tu@hostal.com"></div>
-    <div class="htz-field"><label for="loginPass">Contraseña</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
-    <button class="htz-btn" id="loginBtn">Entrar al panel</button>
+    <div class="htz-field"><label for="loginEmail" data-i18n="index.login.correo">Correo</label><input id="loginEmail" type="email" autocomplete="username" placeholder="tu@hostal.com"></div>
+    <div class="htz-field"><label for="loginPass" data-i18n="index.login.pass">Contraseña</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="htz-btn" id="loginBtn" data-i18n="index.login.btn">Entrar al panel</button>
   </div>
 </div>
 
@@ -585,13 +586,14 @@ const GOLD = {
 
 /* ═══════════ Estado global ═══════════ */
 const CATS = {
-  fiesta:      { label: 'Fiesta',   color: '#E3B457' },
-  cine:        { label: 'Cine',     color: '#7FA6E0' },
-  cinematografia: { label: 'Cine',  color: '#7FA6E0' },
-  campana:     { label: 'Campaña',  color: '#E0816B' }
+  fiesta:      { label: 'index.cat.fiesta',   color: '#E3B457' },
+  cine:        { label: 'index.cat.cine',     color: '#7FA6E0' },
+  cinematografia: { label: 'index.cat.cine',  color: '#7FA6E0' },
+  campana:     { label: 'index.cat.campana',  color: '#E0816B' }
 };
-const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const MESES_L = { enero:'01', febrero:'02', marzo:'03', abril:'04', mayo:'05', junio:'06', julio:'07', agosto:'08', septiembre:'09', octubre:'10', noviembre:'11', diciembre:'12' };
+
+function catLbl(cat){ return (window.I18N && I18N.t) ? I18N.t(cat.label) : (cat._es || String(cat.label)); }
 
 const state = { events: [], q: '', estado: 'proximos', cat: 'todas' };
 
@@ -612,14 +614,14 @@ function esCampanaAbierta(e){
   return !!f && f.getFullYear() > new Date().getFullYear() + 3;
 }
 function normalizarEvento(e){
-  const cat = CATS[e.categoria_slug] || { label: e.categoria_slug ? String(e.categoria_slug).toUpperCase() : 'Evento', color: e.color_primario || '#E3B457' };
+  const cat = CATS[e.categoria_slug] || { label: 'index.cat.evento', color: e.color_primario || '#E3B457' };
   const org = e.organizaciones || {};
   const color = e.color_primario || org.color_primario || '#C8903F';
   const fechaD = parseFecha(e.fecha);
   const abierta = esCampanaAbierta(e);
   return {
     ...e,
-    _cat: cat,
+    _cat: { color: cat.color, label: catLbl(cat) },
     _org: org,
     _color: color,
     _fecha: fechaD,
@@ -631,15 +633,15 @@ function normalizarEvento(e){
 
 function initEv(e){
   const img = e._img;
-  const fechaTxt = e._abierta ? 'Abierta' : (e._fecha ? `${e._fecha.getDate()} ${MESES[e._fecha.getMonth()]} ${e._fecha.getFullYear()}` : (e.fecha||''));
+  const fechaTxt = e._abierta ? I18N.t('index.card.abierta') : (e._fecha ? I18N.fmtDate(e._fecha) : (e.fecha||''));
   const horaTxt = formatHora(e.hora);
   const cdTarget = (!e._abierta && e._fecha && e._fecha.getTime() >= todayMid().getTime()) ? targetFor(e) : 0;
   const cdHtml = cdTarget
-    ? `<div class="htz-cd" data-target="${cdTarget}" role="timer" aria-label="Countdown del evento">
-        <div class="htz-cd-cell"><b class="htz-cd-d">--</b><span>Días</span></div>
-        <div class="htz-cd-cell"><b class="htz-cd-h">--</b><span>Horas</span></div>
-        <div class="htz-cd-cell"><b class="htz-cd-m">--</b><span>Min</span></div>
-        <div class="htz-cd-cell"><b class="htz-cd-s">--</b><span>Seg</span></div>
+    ? `<div class="htz-cd" data-target="${cdTarget}" role="timer" aria-label="${I18N.t('index.card.countdown_aria')}">
+        <div class="htz-cd-cell"><b class="htz-cd-d">--</b><span>${I18N.t('index.card.dias')}</span></div>
+        <div class="htz-cd-cell"><b class="htz-cd-h">--</b><span>${I18N.t('index.card.horas')}</span></div>
+        <div class="htz-cd-cell"><b class="htz-cd-m">--</b><span>${I18N.t('index.card.min')}</span></div>
+        <div class="htz-cd-cell"><b class="htz-cd-s">--</b><span>${I18N.t('index.card.seg')}</span></div>
       </div>`
     : '';
   const media = img
@@ -647,24 +649,24 @@ function initEv(e){
     : `<div class="htz-card-media"><div class="htz-media-fb" data-init="${esc((e.nombre||'?').charAt(0).toUpperCase())}"></div>`;
   const chipCat = `<span class="htz-card-cat" style="background:${e._cat.color}">${esc(e._cat.label)}</span>`;
   const stamp = e._abierta
-    ? `<span class="htz-next-pill htz-campa-pill">● En curso</span>`
-    : `<span class="htz-next-pill">● Próxima</span>`;
+    ? `<span class="htz-next-pill htz-campa-pill">${I18N.t('index.card.en_curso')}</span>`
+    : `<span class="htz-next-pill">${I18N.t('index.card.proxima')}</span>`;
   return `<a class="htz-card" href="/evento.html?slug=${esc(e.slug)}" style="--acd:${e._color}" data-track="abrir_evento" data-track-label="${esc(e.slug)}">
     ${media}
       <div class="htz-card-shade"></div>
       ${chipCat}${stamp}
-      <span class="htz-card-stamp">${esc(fechaTxt || 'TBA')}</span>
+      <span class="htz-card-stamp">${esc(fechaTxt || I18N.t('index.card.tba'))}</span>
     </div>
     <div class="htz-card-body">
-      <div class="htz-card-org">${esc(e._org.nombre || 'Hostal Terraza')}</div>
-      <h3 class="htz-card-name">${esc(e.nombre || 'Evento')}</h3>
+      <div class="htz-card-org">${esc(e._org.nombre || I18N.t('common.hostal'))}</div>
+      <h3 class="htz-card-name">${esc(e.nombre || I18N.t('index.cat.evento'))}</h3>
       <div class="htz-card-meta">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
         <span>${esc(e._loc)}</span>
         ${e.hora ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${esc(horaTxt)}</span>` : ''}
       </div>
       ${cdHtml}
-      <span class="htz-card-go">Abrir la página del evento →</span>
+      <span class="htz-card-go">${I18N.t('index.card.abrir')}</span>
     </div>
   </a>`;
 }
@@ -684,7 +686,7 @@ function updateCountdowns(){
     const diff = t - now;
     if (diff <= 0){
       cd.dataset.target = '0';
-      cd.innerHTML = `<div class="htz-cd-live">● ¡La noche está en marcha — entra ya!</div>`;
+      cd.innerHTML = `<div class="htz-cd-live">${I18N.t('index.card.live')}</div>`;
       return;
     }
     const s = Math.floor(diff / 1000);
@@ -746,9 +748,9 @@ function renderGrid(){
     );
   }
   if (list.length === 0){
-    grid.innerHTML = `<div class="htz-vacio"><div class="big">Sin resultados</div>
-      <p>No encontramos eventos que coincidan con esa búsqueda o filtro.</p>
-      <button class="htz-btn htz-btn-mini" onclick="limpiarFiltros()">Limpiar filtros</button></div>`;
+    grid.innerHTML = `<div class="htz-vacio"><div class="big">${I18N.t('index.vacio.titulo')}</div>
+      <p>${I18N.t('index.vacio.p')}</p>
+      <button class="htz-btn htz-btn-mini" onclick="limpiarFiltros()">${I18N.t('index.vacio.limpiar')}</button></div>`;
     return;
   }
   grid.innerHTML = list.map(initEv).join('');
@@ -765,7 +767,7 @@ function renderTicker(){
   if (!tr) return;
   const up = state.events.filter(e => e._abierta || (e._fecha && e._fecha.getTime() >= todayMid().getTime()))
     .sort((a,b) => (a._fecha ? a._fecha - b._fecha : 0) - (b._fecha ? b._fecha - 0 : 0));
-  const names = up.length ? up.map(e => e.nombre) : ['Hostal Terraza', 'Próxima noche', 'Tu evento con QR propio'];
+  const names = up.length ? up.map(e => e.nombre) : ['Hostal Terraza', I18N.t('index.ticker.noche'), I18N.t('index.ticker.evento')];
   const seq = [...names, ...names, ...names, ...names];
   tr.innerHTML = seq.map(n => `<span>${esc(n)}</span>`).join('');
 }
@@ -776,7 +778,7 @@ function renderStats(){
   document.getElementById('st-tpl').textContent = tpls.size ? String(tpls.size).padStart(2,'0') : '—';
   (async () => {
     const { count, error } = await SB.from('inscritos').select('*', { count: 'exact', head: true });
-    if (!error && count != null){ document.getElementById('st-guest').textContent = count.toLocaleString('es-CO'); }
+    if (!error && count != null){ document.getElementById('st-guest').textContent = I18N.fmtNum(count); }
     else { document.getElementById('st-guest').textContent = '—'; }
   })();
 }
@@ -850,11 +852,11 @@ function rellenarMockTicket(){
   const up = state.events.filter(e => e._fecha).sort((a,b) => a._fecha - b._fecha);
   if (up.length){
     const d = up[0]._fecha;
-    if (f) f.textContent = `${d.getDate()} ${MESES[d.getMonth()]}`;
+    if (f) f.textContent = I18N.mesDia(d);
     if (h && up[0].hora) h.textContent = formatHora(up[0].hora);
   }
   const evn = document.getElementById('cta-evname');
-  if (evn && up.length) evn.textContent = (up[0].nombre || 'Tu evento').split(' ').slice(0,3).join(' ') + '…';
+  if (evn && up.length) evn.textContent = (up[0].nombre || I18N.t('index.cta.evento')).split(' ').slice(0,3).join(' ') + '…';
 }
 
 async function cargarEventos(){
@@ -872,9 +874,9 @@ async function cargarEventos(){
     renderTicker(); renderStats(); contarFiltros(); renderGrid();
   } catch(e){
     GOLD.err('No se pudieron cargar los eventos: ' + e.message);
-    grid.innerHTML = `<div class="htz-vacio"><div class="big">No pudimos cargar la cartelera</div>
-      <p>Revisa tu conexión e intenta de nuevo.</p>
-      <button class="htz-btn htz-btn-mini" onclick="cargarEventos()">Reintentar</button></div>`;
+    grid.innerHTML = `<div class="htz-vacio"><div class="big">${I18N.t('index.error.titulo')}</div>
+      <p>${I18N.t('index.error.p')}</p>
+      <button class="htz-btn htz-btn-mini" onclick="cargarEventos()">${I18N.t('index.error.reintentar')}</button></div>`;
   }
 }
 
@@ -909,6 +911,10 @@ function bindUI(){
     if (h > 0 && (window.scrollY / h) > 0.5){ scrollDeep = true; HTZ_AN.track('scroll_depth', 'index_50', ''); }
   }, { passive: true });
   setInterval(updateCountdowns, 1000);
+  window.addEventListener('langchange', () => {
+    if (state.events.length) state.events = state.events.map(normalizarEvento);
+    rellenarMockTicket(); renderTicker(); renderStats(); contarFiltros(); renderGrid();
+  });
 }
 
 /* ═══════════ Login staff ═══════════ */
@@ -919,9 +925,9 @@ function mostrarAviso(msg){ const el = document.getElementById('loginAviso'); el
 async function doLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
-  if (!email || !pass){ mostrarAviso('Escribe tu correo y contraseña.'); return; }
+  if (!email || !pass){ mostrarAviso(I18N.t('index.login.aviso_vacio')); return; }
   const btn = document.getElementById('loginBtn');
-  btn.disabled = true; const txt = btn.innerHTML; btn.innerHTML = 'Entrando…';
+  btn.disabled = true; const txt = btn.innerHTML; btn.innerHTML = I18N.t('index.login.entrando');
   try {
     const { data, error } = await SB.auth.signInWithPassword({ email, password: pass });
     if (error || !data.session) throw new Error(error ? error.message : 'Sin sesión');
@@ -930,7 +936,7 @@ async function doLogin(){
     window.location.href = '/admin.html';
   } catch(e){
     GOLD.err('Login fallido: ' + e.message);
-    mostrarAviso('Credenciales incorrectas. Verifica e intenta de nuevo.');
+    mostrarAviso(I18N.t('index.login.aviso_bad'));
     HTZ_AN.track('error', 'login_error', '');
   }
   btn.disabled = false; btn.innerHTML = txt;
@@ -946,14 +952,14 @@ async function cargarSesion(){
   } catch(e){ pintarUserOff(); }
 }
 function pintarUserOff(){
-  document.getElementById('userZone').innerHTML = `<button class="htz-btn htz-btn-mini" id="accessTop" onclick="openLogin()">Acceso</button>`;
+  document.getElementById('userZone').innerHTML = `<button class="htz-btn htz-btn-mini" id="accessTop" onclick="openLogin()">${I18N.t('index.login.acceso')}</button>`;
 }
 function pintarUserOn(email, nombre){
   const chip = document.createElement('div');
   chip.className = 'htz-chip';
   chip.innerHTML = `<span>●</span><span style="color:var(--gold)">${esc(nombre || email)}</span>
-    <a href="/admin.html" style="font-weight:700;color:var(--gold)">Panel</a>
-    <button onclick="doLogout()" title="Cerrar sesión" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px">×</button>`;
+    <a href="/admin.html" style="font-weight:700;color:var(--gold)">${I18N.t('index.login.panel')}</a>
+    <button onclick="doLogout()" title="${I18N.t('index.login.cerrar_sesion')}" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px">×</button>`;
   document.getElementById('userZone').appendChild(chip);
 }
 function doLogout(){ SB.auth.signOut().then(() => window.location.reload()); }

@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Serie · Terraza Hostal</title>
+<title data-i18n="serie.title">Serie · Terraza Hostal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="js/i18n.js"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -112,14 +113,14 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 
 <div id="s-loading">
   <div class="spin"></div>
-  <p style="font-size:13px;color:rgba(255,255,255,.35)">Cargando…</p>
+  <p style="font-size:13px;color:rgba(255,255,255,.35)" data-i18n="serie.cargando">Cargando…</p>
 </div>
 
 <div id="s-error" style="display:none;flex">
   <div class="err-card">
     <div style="font-size:28px;margin-bottom:.5rem">⚠</div>
-    <h3 style="font-size:18px;margin-bottom:.4rem">Serie no encontrada</h3>
-    <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.6">El link no corresponde a ninguna serie activa.</p>
+    <h3 style="font-size:18px;margin-bottom:.4rem" data-i18n="serie.err_titulo">Serie no encontrada</h3>
+    <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.6" data-i18n="serie.err_p">El link no corresponde a ninguna serie activa.</p>
   </div>
 </div>
 
@@ -129,7 +130,7 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
   <div class="hero">
     <div class="hero-content">
       <div class="hero-brand">Terraza · Hostal</div>
-      <div class="hero-eyebrow">Serie de eventos</div>
+      <div class="hero-eyebrow" data-i18n="serie.hero_eyebrow">Serie de eventos</div>
       <h1 class="hero-title" id="s-titulo"></h1>
       <div class="hero-divider"></div>
       <p class="hero-desc" id="s-desc"></p>
@@ -137,7 +138,7 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
   </div>
 
   <div class="sessions-wrap">
-    <div class="sec-label">Selecciona una sesión para registrarte</div>
+    <div class="sec-label" data-i18n="serie.sel_sesion">Selecciona una sesión para registrarte</div>
     <div id="sessions-list"></div>
   </div>
 
@@ -145,23 +146,23 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
     <!-- Banner de invitador -->
     <div id="inv-banner" style="display:none;background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.25);border-radius:var(--rsm);padding:.6rem 1rem;margin-bottom:.75rem;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.75)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-      <span>Invitado por <strong id="inv-banner-nombre" style="color:#c8a96e"></strong></span>
+      <span id="inv-banner-text"></span>
     </div>
     <div class="form-card">
-      <div class="selected-session-badge" id="selected-badge">Sesión seleccionada</div>
-      <div class="form-title">Datos de registro</div>
+      <div class="selected-session-badge" id="selected-badge" data-i18n="serie.sesion_seleccionada">Sesión seleccionada</div>
+      <div class="form-title" data-i18n="serie.datos_registro">Datos de registro</div>
       <div id="form-alert"></div>
       <!-- Tabs nuevo / ya registrado -->
       <div style="display:flex;gap:0;margin-bottom:1.25rem;border-radius:var(--rsm);overflow:hidden;border:1px solid rgba(255,255,255,.15)">
-        <button id="tab-nuevo" onclick="setModo('nuevo')" style="flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--gold);color:#fff">Registro nuevo</button>
-        <button id="tab-existe" onclick="setModo('existe')" style="flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)">Ya estoy registrado</button>
+        <button id="tab-nuevo" onclick="setModo('nuevo')" style="flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--gold);color:#fff" data-i18n="serie.tab_nuevo">Registro nuevo</button>
+        <button id="tab-existe" onclick="setModo('existe')" style="flex:1;padding:9px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)" data-i18n="serie.tab_existe">Ya estoy registrado</button>
       </div>
 
       <!-- Modo nuevo -->
       <div id="modo-nuevo">
-        <div class="fg"><label>Nombre completo *</label><input id="f-nombre" placeholder="Tu nombre completo" autocomplete="name"></div>
-        <div class="fg"><label>Cédula / Documento *</label><input id="f-cedula" placeholder="Número de documento" inputmode="numeric"></div>
-        <div class="fg"><label>Teléfono *</label>
+        <div class="fg"><label data-i18n="serie.f_nombre">Nombre completo *</label><input id="f-nombre" placeholder="Tu nombre completo" autocomplete="name" data-i18n-ph="serie.f_nombre_ph"></div>
+        <div class="fg"><label data-i18n="serie.f_cedula">Cédula / Documento *</label><input id="f-cedula" placeholder="Número de documento" inputmode="numeric" data-i18n-ph="serie.f_cedula_ph"></div>
+        <div class="fg"><label data-i18n="serie.f_tel">Teléfono *</label>
           <div style="display:flex;gap:8px;align-items:stretch">
             <div style="position:relative;flex-shrink:0">
               <select id="f-pais-codigo" onchange="onPaisChangeSerie()"
@@ -194,41 +195,41 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
               </select>
               <span style="position:absolute;right:7px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:10px;color:rgba(255,255,255,.4)">▼</span>
             </div>
-            <input id="f-tel" placeholder="Número sin código de país" type="tel" inputmode="numeric"
+            <input id="f-tel" placeholder="Número sin código de país" type="tel" inputmode="numeric" data-i18n-ph="serie.f_tel_ph"
               style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none">
           </div>
           <input type="hidden" id="f-pais-nombre" value="Colombia">
         </div>
-        <div class="fg" id="campo-email-serie" style="display:none"><label>Correo electrónico</label><input id="f-email" type="email" placeholder="tu@email.com" autocomplete="email"
+        <div class="fg" id="campo-email-serie" style="display:none"><label data-i18n="serie.f_email">Correo electrónico</label><input id="f-email" type="email" placeholder="tu@email.com" autocomplete="email"
           style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none"></div>
-        <div class="fg" id="campo-edad-serie" style="display:none"><label>Edad</label><input id="f-edad" type="number" placeholder="Tu edad" inputmode="numeric" min="1" max="120"
+        <div class="fg" id="campo-edad-serie" style="display:none"><label data-i18n="serie.f_edad">Edad</label><input id="f-edad" type="number" placeholder="Tu edad" inputmode="numeric" min="1" max="120" data-i18n-ph="serie.f_edad_ph"
           style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none"></div>
-        <div class="fg" id="campo-nota-serie" style="display:none"><label>Nota (opcional)</label><input id="f-nota" placeholder="Algo que quieras decirnos"
+        <div class="fg" id="campo-nota-serie" style="display:none"><label data-i18n="serie.f_nota">Nota (opcional)</label><input id="f-nota" placeholder="Algo que quieras decirnos" data-i18n-ph="serie.f_nota_ph"
           style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--rsm);padding:11px 13px;font-size:16px;font-family:'DM Sans',sans-serif;color:#fff;outline:none"></div>
-        <button class="submit-btn" id="submit-btn" onclick="registrar()">Confirmar asistencia →</button>
+        <button class="submit-btn" id="submit-btn" onclick="registrar()" data-i18n="serie.confirmar_btn">Confirmar asistencia →</button>
       </div>
 
       <!-- Modo existente -->
       <div id="modo-existe" style="display:none">
         <div id="paso-verificar">
-          <div class="fg"><label>Cédula *</label><input id="ex-cedula" placeholder="Número de documento" inputmode="numeric"></div>
-          <div class="fg"><label>Teléfono *</label><input id="ex-tel" placeholder="Número de celular" type="tel" inputmode="numeric"></div>
-          <button class="submit-btn" id="verify-btn" onclick="verificarExistente()">Verificar mis datos →</button>
+          <div class="fg"><label data-i18n="serie.ex_cedula">Cédula *</label><input id="ex-cedula" placeholder="Número de documento" inputmode="numeric" data-i18n-ph="serie.ex_cedula_ph"></div>
+          <div class="fg"><label data-i18n="serie.ex_tel">Teléfono *</label><input id="ex-tel" placeholder="Número de celular" type="tel" inputmode="numeric" data-i18n-ph="serie.ex_tel_ph"></div>
+          <button class="submit-btn" id="verify-btn" onclick="verificarExistente()" data-i18n="serie.verificar_btn">Verificar mis datos →</button>
         </div>
         <div id="paso-confirmar" style="display:none">
           <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--rsm);padding:1rem;margin-bottom:1rem">
-            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em">Encontramos tu registro</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em" data-i18n="serie.encontramos">Encontramos tu registro</div>
             <div id="conf-nombre" style="font-size:18px;font-weight:500"></div>
             <div id="conf-meta" style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px"></div>
           </div>
-          <button class="submit-btn" id="confirm-btn" onclick="inscribirExistente()">✓ Inscribirme a esta sesión →</button>
-          <button onclick="resetVerif()" style="width:100%;margin-top:.5rem;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:rgba(255,255,255,.5);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer">No soy yo · Intentar de nuevo</button>
+          <button class="submit-btn" id="confirm-btn" onclick="inscribirExistente()" data-i18n="serie.inscribir_btn">✓ Inscribirme a esta sesión →</button>
+          <button onclick="resetVerif()" style="width:100%;margin-top:.5rem;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:rgba(255,255,255,.5);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer" data-i18n="serie.no_soy_yo">No soy yo · Intentar de nuevo</button>
         </div>
         <div id="paso-noencontrado" style="display:none;text-align:center;padding:1rem 0">
           <div style="font-size:24px;margin-bottom:.4rem">🔍</div>
-          <div style="font-size:14px;font-weight:500;margin-bottom:.4rem">No encontramos tu registro</div>
-          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:1rem">Usa el formulario de registro nuevo.</p>
-          <button onclick="setModo('nuevo')" style="padding:9px 20px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:13px;cursor:pointer">Registrarme →</button>
+          <div style="font-size:14px;font-weight:500;margin-bottom:.4rem" data-i18n="serie.no_encontrado_titulo">No encontramos tu registro</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:1rem" data-i18n="serie.no_encontrado_p">Usa el formulario de registro nuevo.</p>
+          <button onclick="setModo('nuevo')" style="padding:9px 20px;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);font-size:13px;cursor:pointer" data-i18n="serie.registrarme_btn">Registrarme →</button>
         </div>
       </div>
     </div>
@@ -238,35 +239,35 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 <!-- SUCCESS -->
 <div id="s-success">
   <div class="success-head">
-    <h2>¡Te esperamos!</h2>
-    <p>Tu entrada personal está lista.</p>
+    <h2 data-i18n="serie.te_esperamos">¡Te esperamos!</h2>
+    <p data-i18n="serie.entrada_lista">Tu entrada personal está lista.</p>
   </div>
   <div id="ticket-card">
     <div class="tk-strip"></div>
     <div class="tk-header">
       <div><div class="tk-hostal">HOSTAL</div><div class="tk-terraza">TERRAZA</div></div>
-      <div class="tk-badge">ENTRADA</div>
+      <div class="tk-badge" data-i18n="serie.badge_entrada">ENTRADA</div>
     </div>
     <div class="tk-divider"></div>
     <div class="tk-event">
-      <div class="tk-ev-lbl">SERIE</div>
+      <div class="tk-ev-lbl" data-i18n="serie.lbl_serie">SERIE</div>
       <div class="tk-ev1" id="tk-ev1"></div>
       <div class="tk-ev2" id="tk-ev2"></div>
     </div>
     <div class="tk-session" id="tk-session"></div>
     <div class="tk-inforow">
-      <div class="tk-info-block"><label>FECHA</label><span id="tk-fecha"></span></div>
-      <div class="tk-info-block"><label>HORA</label><span id="tk-hora"></span></div>
-      <div class="tk-info-block"><label>SESIÓN</label><span id="tk-num"></span></div>
+      <div class="tk-info-block"><label data-i18n="serie.lbl_fecha">FECHA</label><span id="tk-fecha"></span></div>
+      <div class="tk-info-block"><label data-i18n="serie.lbl_hora">HORA</label><span id="tk-hora"></span></div>
+      <div class="tk-info-block"><label data-i18n="serie.lbl_sesion">SESIÓN</label><span id="tk-num"></span></div>
     </div>
     <div class="tk-divider" style="margin-top:10px"></div>
     <div class="tk-qr-area">
       <div class="tk-qr-wrap"><div id="tk-qr"></div></div>
-      <div class="tk-qr-label">CÓDIGO QR DE ENTRADA · USO ÚNICO</div>
+      <div class="tk-qr-label" data-i18n="serie.qr_label">CÓDIGO QR DE ENTRADA · USO ÚNICO</div>
     </div>
     <div class="tk-divider"></div>
     <div class="tk-guest">
-      <div class="tk-guest-lbl">ASISTENTE</div>
+      <div class="tk-guest-lbl" data-i18n="serie.lbl_asistente">ASISTENTE</div>
       <div class="tk-guest-name" id="tk-nombre"></div>
       <div class="tk-ref" id="tk-ref"></div>
       <div class="tk-tipo" id="tk-tipo">◎ INVITADO</div>
@@ -276,25 +277,25 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
   </div>
   <button class="dl-btn" onclick="descargar()" style="margin-top:1.5rem">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Descargar mi entrada
+    <span data-i18n="serie.descargar">Descargar mi entrada</span>
   </button>
   <button id="btn-wa-ticket" onclick="enviarTicketWASerie()"
     style="display:none;align-items:center;justify-content:center;gap:7px;width:100%;max-width:370px;padding:10px;background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:.6rem">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    Enviar por WhatsApp
+    <span data-i18n="serie.enviar_wa">Enviar por WhatsApp</span>
   </button>
   <div id="email-status" style="display:none;margin-top:.75rem;padding:.6rem 1rem;border-radius:8px;font-size:13px;text-align:center;max-width:370px;width:100%"></div>
-  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.75rem">
+  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.75rem" data-i18n="serie.nota_usounico">
     Muestra el QR en la puerta · Uso único y personal
   </p>
-  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.6rem">Muestra este QR en la puerta · Uso único por sesión</p>
+  <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.6rem" data-i18n="serie.nota_usounico2">Muestra este QR en la puerta · Uso único por sesión</p>
 </div>
 
 <div id="s-duplicate" style="display:none;flex">
   <div style="text-align:center;padding:2rem 1.5rem;width:100%;max-width:420px">
     <div style="font-size:28px;margin-bottom:.5rem">✓</div>
-    <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:.4rem;color:#fff">Ya estás registrado</h3>
-    <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:1.25rem;line-height:1.6">
+    <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:.4rem;color:#fff" data-i18n="serie.ya_registrado">Ya estás registrado</h3>
+    <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:1.25rem;line-height:1.6" data-i18n="serie.recuperar_p">
       Tu entrada ya fue generada. Puedes recuperarla aquí.
     </p>
     <div id="dup-loading" style="margin:1rem auto"><div style="width:32px;height:32px;border:3px solid rgba(200,169,110,.2);border-top-color:#c8a96e;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto"></div></div>
@@ -307,20 +308,20 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
             <div style="background:#c8a96e;border-radius:5px;padding:3px 10px;font-weight:700;font-size:10px;color:#0F0F0F">ENTRADA</div>
           </div>
           <div style="height:1px;background:#2D2D2A;margin-bottom:10px"></div>
-          <div style="font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:4px">EVENTO</div>
+          <div style="font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:4px" data-i18n="serie.lbl_evento">EVENTO</div>
           <div id="dup-ev-nombre" style="font-weight:700;font-size:20px;color:#fff;line-height:1.2;margin-bottom:4px"></div>
           <div id="dup-sesion-nombre" style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:10px"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-            <div><div style="font-size:10px;color:#646460;margin-bottom:2px">FECHA</div><div style="font-weight:700;font-size:14px;color:#fff" id="dup-fecha"></div></div>
-            <div><div style="font-size:10px;color:#646460;margin-bottom:2px">HORA</div><div style="font-weight:700;font-size:14px;color:#fff" id="dup-hora"></div></div>
+            <div><div style="font-size:10px;color:#646460;margin-bottom:2px" data-i18n="serie.lbl_fecha">FECHA</div><div style="font-weight:700;font-size:14px;color:#fff" id="dup-fecha"></div></div>
+            <div><div style="font-size:10px;color:#646460;margin-bottom:2px" data-i18n="serie.lbl_hora">HORA</div><div style="font-weight:700;font-size:14px;color:#fff" id="dup-hora"></div></div>
           </div>
           <div style="height:1px;background:#2D2D2A;margin-bottom:12px"></div>
           <div style="text-align:center">
             <div id="dup-qr-box" style="display:inline-block;background:#fff;border-radius:8px;padding:10px;margin-bottom:6px"></div>
-            <div style="font-size:9px;color:#646460;letter-spacing:.08em">CÓDIGO QR DEL ASISTENTE</div>
+            <div style="font-size:9px;color:#646460;letter-spacing:.08em" data-i18n="serie.qr_label_asistente">CÓDIGO QR DEL ASISTENTE</div>
           </div>
           <div style="height:1px;background:#2D2D2A;margin:10px 0"></div>
-          <div style="font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:3px">ASISTENTE</div>
+          <div style="font-size:10px;color:#646460;letter-spacing:.1em;margin-bottom:3px" data-i18n="serie.lbl_asistente">ASISTENTE</div>
           <div id="dup-nombre" style="font-weight:700;font-size:17px;color:#fff"></div>
         </div>
         <div style="height:7px;background:#c8a96e"></div>
@@ -328,13 +329,13 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
       <button onclick="descargarDupSerie()"
         style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:370px;padding:13px;background:#c8a96e;color:#fff;border:none;border-radius:var(--rsm);font-size:14px;font-family:'Playfair Display',serif;cursor:pointer;margin-top:.5rem">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar mi entrada
+        <span data-i18n="serie.descargar">Descargar mi entrada</span>
       </button>
     </div>
     <div id="dup-no-encontrado" style="display:none">
-      <p style="font-size:13px;color:rgba(255,255,255,.45)">No encontramos tu registro. Contacta al hostal.</p>
+      <p style="font-size:13px;color:rgba(255,255,255,.45)" data-i18n="serie.no_encontrado_dup">No encontramos tu registro. Contacta al hostal.</p>
     </div>
-    <button onclick="show('s-main')" style="margin-top:1rem;padding:9px 18px;background:transparent;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">← Ver otras sesiones</button>
+    <button onclick="show('s-main')" style="margin-top:1rem;padding:9px 18px;background:transparent;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.15);border-radius:var(--rsm);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif" data-i18n="serie.ver_otras_sesiones">← Ver otras sesiones</button>
   </div>
 </div>
 
@@ -342,6 +343,9 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
 const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const T = window.I18N && typeof I18N.t === 'function' ? I18N.t.bind(I18N) : (k => k);
+const I18N_LOCALE = () => (window.I18N && typeof I18N.locale === 'function') ? I18N.locale() : 'es-CO';
+const I18N_FMTNUM = (n) => (window.I18N && typeof I18N.fmtNum === 'function') ? I18N.fmtNum(n) : n;
 const TODAY = () => new Date().toLocaleDateString('es-CO');
 const NOW   = () => new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
 const UID   = () => (crypto.randomUUID ? crypto.randomUUID().replace(/-/g,'').toUpperCase() : Math.random().toString(36).substr(2,9).toUpperCase()+Math.random().toString(36).substr(2,9).toUpperCase());
@@ -429,21 +433,21 @@ async function cargarQRRecuperadoSerie() {
 
 async function descargarDupSerie() {
   const btn = document.querySelector('#s-duplicate button');
-  if (btn) { btn.disabled = true; btn.textContent = 'Generando…'; }
+  if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
   try {
     const cv = await _generarTicketCanvasSerie(_serieTicketData.qr);
     const dataUrl = cv.toDataURL('image/png');
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOS) {
       const w = window.open();
-      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">Mantén presionado → Guardar en Fotos</p></body></html>`);
+      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">${T('serie.presionar_guardar')}</p></body></html>`);
       w.document.close();
     } else {
       const a = document.createElement('a'); a.href = dataUrl;
       a.download = 'entrada-recuperada.png'; a.click();
     }
-  } catch(e) { alert('Para guardar: mantén presionado el ticket y elige "Guardar imagen".'); }
-  if (btn) { btn.disabled = false; btn.textContent = 'Descargar mi entrada'; }
+  } catch(e) { alert(T('serie.guardar_imagen')); }
+  if (btn) { btn.disabled = false; btn.textContent = T('serie.descargar'); }
 }
 
 async function init() {
@@ -477,9 +481,11 @@ async function init() {
       .select('nombre,codigo').eq('codigo', refCodigo).maybeSingle();
     if (inv) {
       refNombre = inv.nombre; refCodigo = inv.codigo;
-      const banner = document.getElementById('inv-banner');
-      const bannerNom = document.getElementById('inv-banner-nombre');
-      if (banner && bannerNom) { bannerNom.textContent = refNombre; banner.style.display = 'flex'; }
+      const bannerText = document.getElementById('inv-banner-text');
+      if (banner && bannerText && refNombre) {
+        bannerText.innerHTML = T('serie.invitado_por').replace('{nombre}', '<strong style="color:#c8a96e">' + refNombre + '</strong>');
+        banner.style.display = 'flex';
+      }
     }
     else { refCodigo = ''; }
   }
@@ -513,14 +519,14 @@ async function init() {
     const fecha = new Date(s.fecha + 'T12:00:00');
     const past = fecha < now;
     const n = countMap[s.id] || 0;
-    const fechaStr = fecha.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+    const fechaStr = fecha.toLocaleDateString(I18N_LOCALE(),{weekday:'long',day:'numeric',month:'long'});
     return `<div class="session-card${past?' past':''}" onclick="${past?'':''} selectSesion('${s.id}')" id="card-${s.id}">
       <div class="session-num" id="num-${s.id}">${s.sesion_num||'?'}</div>
       <div class="session-info">
         <div class="session-date">${fechaStr.charAt(0).toUpperCase()+fechaStr.slice(1)}</div>
-        <div class="session-meta">${s.hora||''} ${s.ubicacion?'· '+s.ubicacion:''} ${past?'· Pasada':''}</div>
+        <div class="session-meta">${s.hora||''} ${s.ubicacion?'· '+s.ubicacion:''} ${past?`· ${T('serie.pasada')}`:''}</div>
       </div>
-      <div class="session-count ${n>0?'active':''}" id="cnt-${s.id}">${n} inscritos</div>
+      <div class="session-count ${n>0?'active':''}" id="cnt-${s.id}">${n} ${T('serie.inscritos')}</div>
     </div>`;
   }).join('');
 
@@ -541,10 +547,10 @@ function selectSesion(id) {
 
   // Mostrar form
   const fecha = new Date(sesionSeleccionada.fecha+'T12:00:00');
-  const fechaStr = fecha.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const fechaStr = fecha.toLocaleDateString(I18N_LOCALE(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('selected-badge').innerHTML =
-    `📅 <strong>Sesión ${sesionSeleccionada.sesion_num}</strong> — ${fechaStr.charAt(0).toUpperCase()+fechaStr.slice(1)}` +
-    (refNombre ? ` · <span style="color:var(--gold)">Invitado por ${refNombre}</span>` : '');
+    `📅 <strong>${T('serie.sesion_x', { n: sesionSeleccionada.sesion_num })}</strong> — ${fechaStr.charAt(0).toUpperCase()+fechaStr.slice(1)}` +
+    (refNombre ? ` · <span style="color:var(--gold)">${T('serie.invitado_por_lbl', { nombre: refNombre })}</span>` : '');
   document.getElementById('form-section').style.display = 'block';
   document.getElementById('form-alert').innerHTML = '';
 
@@ -595,7 +601,7 @@ function _setRateLimit() {
 function _startCooldownTimer(btn, originalText) {
   let secs = Math.ceil(_COOLDOWN_MS / 1000);
   btn.disabled = true;
-  btn.textContent = `Espera ${secs}s…`;
+  btn.textContent = T('serie.espera_seg', { n: secs });
   const interval = setInterval(() => {
     secs--;
     if (secs <= 0) {
@@ -603,7 +609,7 @@ function _startCooldownTimer(btn, originalText) {
       btn.disabled = false;
       btn.textContent = originalText;
     } else {
-      btn.textContent = `Espera ${secs}s…`;
+      btn.textContent = T('serie.espera_seg', { n: secs });
     }
   }, 1000);
 }
@@ -611,10 +617,10 @@ async function registrar() {
   // Rate limit: evitar spam de registros
   const _wait = _checkRateLimit();
   if (_wait > 0) {
-    alrt(`Espera ${_wait} segundos antes de intentar de nuevo.`);
+    alrt(T('serie.espera_seg', { n: _wait }));
     return;
   }
-  if (!sesionSeleccionada) { alrt('Selecciona una sesión primero.'); return; }
+  if (!sesionSeleccionada) { alrt(T('serie.sel_sesion_err')); return; }
   const nombre   = document.getElementById('f-nombre').value.trim();
   const cedula   = document.getElementById('f-cedula').value.trim();
   const telRaw   = document.getElementById('f-tel').value.trim();
@@ -622,23 +628,24 @@ async function registrar() {
   const emailVal = (document.getElementById('f-email')?.value || '').trim() || null;
   const pais     = getPaisNombreSerie();
 
-  if (!nombre || !cedula || !telRaw) { alrt('Completa todos los campos.'); return; }
+  if (!nombre || !cedula || !telRaw) { alrt(T('serie.completa_campos')); return; }
 
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Registrando…';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>' + T('serie.registrando');
 
   // Verificar duplicado
   const { data:dup } = await SB.from('inscritos').select('id')
     .eq('cedula', cedula).eq('evento_id', sesionSeleccionada.id);
-  if (dup&&dup.length>0) { btn.disabled=false; btn.textContent='Confirmar asistencia →'; show('s-duplicate'); return; }
+  const btnsTexto = T('serie.confirmar_btn');
+  if (dup&&dup.length>0) { btn.disabled=false; btn.textContent=btnsTexto; show('s-duplicate'); return; }
 
   // Verificar aforo máximo si está configurado
   if (sesionSeleccionada.aforo_max) {
     const { count:totalIns } = await SB.from('inscritos')
       .select('*',{count:'exact',head:true}).eq('evento_id', sesionSeleccionada.id);
     if (totalIns !== null && totalIns >= sesionSeleccionada.aforo_max) {
-      btn.disabled=false; btn.textContent='Confirmar asistencia →';
-      alrt(`Esta sesión ha alcanzado su capacidad máxima de ${sesionSeleccionada.aforo_max} personas.`);
+      btn.disabled=false; btn.textContent=T('serie.confirmar_btn');
+      alrt(T('serie.aforo_max', { n: sesionSeleccionada.aforo_max }));
       return;
     }
   }
@@ -662,8 +669,8 @@ async function registrar() {
     org_id:     serieActual?.org_id || null,
   });
 
-  btn.disabled=false; btn.textContent='Confirmar asistencia →';
-  if (error) { alrt('Error: '+error.message); return; }
+  btn.disabled=false; btn.textContent=T('serie.confirmar_btn');
+  if (error) { alrt(`${T('serie.error')}: ${error.message}`); return; }
 
   _setRateLimit(); // cooldown anti-spam
 
@@ -671,7 +678,7 @@ async function registrar() {
   const cntEl = document.getElementById('cnt-'+sesionSeleccionada.id);
   if (cntEl) {
     const cur = parseInt(cntEl.textContent)||0;
-    cntEl.textContent = (cur+1)+' inscritos';
+    cntEl.textContent = (cur+1) + ' ' + T('serie.inscritos');
     cntEl.classList.add('active');
   }
 
@@ -691,10 +698,10 @@ async function verificarExistente() {
   const cedula = document.getElementById('ex-cedula').value.trim();
   const telRaw = document.getElementById('ex-tel').value.trim();
   const tel    = ((document.getElementById('f-pais-codigo')?.value || '+57').replace('-CA','')) + telRaw.replace(/\D/g,'');
-  if (!cedula||!telRaw) { alrt('Ingresa cédula y teléfono.'); return; }
+  if (!cedula||!telRaw) { alrt(T('serie.ingresa_cedula_tel')); return; }
 
   const btn = document.getElementById('verify-btn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Verificando…';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>' + T('serie.verificando');
 
   // Buscar en clientes o inscritos anteriores
   const { data:cli } = await SB.from('clientes').select('*').eq('cedula',cedula).eq('telefono',tel).limit(1);
@@ -707,7 +714,7 @@ async function verificarExistente() {
     if (ins&&ins.length>0) persona={nombre:ins[0].nombre,cedula,telefono:tel,cliente_id:ins[0].cliente_id||null,tipo:ins[0].tipo||'invitado'};
   }
 
-  btn.disabled=false; btn.textContent='Verificar mis datos →';
+  btn.disabled=false; btn.textContent=T('serie.verificar_btn');
 
   if (!persona) {
     document.getElementById('paso-verificar').style.display='none';
@@ -722,7 +729,7 @@ async function verificarExistente() {
 
   _existente = persona;
   document.getElementById('conf-nombre').textContent = persona.nombre;
-  document.getElementById('conf-meta').textContent   = `Cédula: ${cedula} · Tel: ${telRaw}`;
+  document.getElementById('conf-meta').textContent   = `${T('serie.cedula_key')}: ${cedula} · ${T('serie.tel_key')}: ${telRaw}`;
   document.getElementById('paso-verificar').style.display='none';
   document.getElementById('paso-confirmar').style.display='block';
 }
@@ -730,7 +737,7 @@ async function verificarExistente() {
 async function inscribirExistente() {
   if (!_existente||!sesionSeleccionada) return;
   const btn = document.getElementById('confirm-btn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Inscribiendo…';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>' + T('serie.inscribiendo');
 
   const qr = 'QR-'+UID();
   const { error } = await SB.from('inscritos').insert({
@@ -749,8 +756,8 @@ async function inscribirExistente() {
     ref_nombre:refNombre||null,
   });
 
-  btn.disabled=false; btn.textContent='✓ Inscribirme a esta sesión →';
-  if (error) { alrt('Error: '+error.message); return; }
+  btn.disabled=false; btn.textContent=T('serie.inscribir_btn');
+  if (error) { alrt(`${T('serie.error')}: ${error.message}`); return; }
 
   _serieTicketData = { qr, nombre: _existente.nombre, telefono: _existente.telefono,
     serieNombre: serieActual?.nombre, sesionNombre: sesionSeleccionada?.nombre,
@@ -781,11 +788,11 @@ async function llenarTicket(nombre, qr, tipo) {
   document.getElementById('tk-hora').textContent  = sesionSeleccionada?.hora || '—';
   document.getElementById('tk-num').textContent   = 'N°'+( sesionSeleccionada?.sesion_num||'?');
   document.getElementById('tk-nombre').textContent = nombre.toUpperCase();
-  document.getElementById('tk-ref').textContent   = refNombre ? 'Invitado por '+refNombre : '';
-  document.getElementById('tk-code').textContent  = `USO ÚNICO · ${qr}`;
+  document.getElementById('tk-ref').textContent   = refNombre ? T('serie.invitado_por', { nombre: refNombre }) : '';
+  document.getElementById('tk-code').textContent  = T('serie.usounico_lbl', { qr: qr });
 
-  const tipoMap={invitado:'◎ INVITADO',frecuente:'★ FRECUENTE',artista:'🎵 ARTISTA',produccion:'🎬 PRODUCCIÓN',pago:'💳 POR PAGO'};
-  document.getElementById('tk-tipo').textContent = tipoMap[tipo]||'◎ INVITADO';
+  const tipoMap={invitado:T('serie.tipo_invitado'),frecuente:T('serie.tipo_frecuente'),artista:T('serie.tipo_artista'),produccion:T('serie.tipo_produccion'),pago:T('serie.tipo_pago')};
+  document.getElementById('tk-tipo').textContent = tipoMap[tipo]||T('serie.tipo_invitado');
 
   // Generar QR UNA SOLA VEZ en div oculto y almacenar dataUrl
   _qrDataUrl = null;
@@ -857,18 +864,18 @@ async function _generarTicketCanvasSerie(qr) {
   ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='300 13px sans-serif'; ctx.fillText('TERRAZA',PAD,70);
   ctx.fillStyle=DARK; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
   _roundRectS(ctx,W-PAD-90,36,90,26,5); ctx.fillStyle=GOLD; ctx.fill();
-  ctx.fillStyle=DARK; ctx.fillText('ENTRADA',W-PAD-45,54); ctx.textAlign='left';
+  ctx.fillStyle=DARK; ctx.fillText(T('serie.canvas_entrada'),W-PAD-45,54); ctx.textAlign='left';
 
   ctx.strokeStyle=LINE; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(PAD,84); ctx.lineTo(W-PAD,84); ctx.stroke();
 
-  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif'; ctx.fillText('SERIE',PAD,108);
+  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif'; ctx.fillText(T('serie.canvas_serie'),PAD,108);
   ctx.fillStyle=WHITE; ctx.font='bold 28px sans-serif'; ctx.fillText(ev1,PAD,144);
   ctx.fillStyle=GOLD;  ctx.font='bold 28px sans-serif'; ctx.fillText(ev2,PAD,178);
   if (sesNom) { ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='400 14px sans-serif'; ctx.fillText(sesNom,PAD,200); }
 
   ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif';
-  ctx.fillText('FECHA',PAD,225); ctx.fillText('HORA',W/2+10,225); ctx.fillText('SESIÓN',W*3/4+10,225);
+  ctx.fillText(T('serie.canvas_fecha'),PAD,225); ctx.fillText(T('serie.canvas_hora'),W/2+10,225); ctx.fillText(T('serie.canvas_sesion'),W*3/4+10,225);
   ctx.fillStyle=WHITE; ctx.font='bold 16px sans-serif';
   ctx.fillText(fecha,PAD,245); ctx.fillText(hora,W/2+10,245); ctx.fillText(numS,W*3/4+10,245);
 
@@ -882,11 +889,11 @@ async function _generarTicketCanvasSerie(qr) {
     });
   }
   ctx.fillStyle=MUTED; ctx.font='300 11px sans-serif'; ctx.textAlign='center';
-  ctx.fillText('CÓDIGO QR DEL ASISTENTE',W/2,QY+QS+28); ctx.textAlign='left';
+  ctx.fillText(T('serie.canvas_qr_label'),W/2,QY+QS+28); ctx.textAlign='left';
 
   const dY=QY+QS+44;
   ctx.strokeStyle=LINE; ctx.beginPath(); ctx.moveTo(PAD,dY); ctx.lineTo(W-PAD,dY); ctx.stroke();
-  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif'; ctx.fillText('ASISTENTE',PAD,dY+22);
+  ctx.fillStyle=MUTED; ctx.font='500 11px sans-serif'; ctx.fillText(T('serie.canvas_asistente'),PAD,dY+22);
   ctx.fillStyle=WHITE; ctx.font='bold 22px sans-serif'; ctx.fillText(nom,PAD,dY+50);
   ctx.strokeStyle=GOLD; ctx.lineWidth=1.5;
   const tW=ctx.measureText(tipo).width+22;
@@ -899,14 +906,14 @@ async function _generarTicketCanvasSerie(qr) {
 
 async function descargar() {
   const btn = document.querySelector('.dl-btn');
-  if (btn) { btn.disabled=true; btn.textContent='Generando…'; }
+  if (btn) { btn.disabled=true; btn.textContent=T('serie.generando'); }
   try {
-    const cv = await _generarTicketCanvasSerie(_serieTicketData?.qr || document.getElementById('tk-code')?.textContent?.replace('USO ÚNICO · ',''));
+    const cv = await _generarTicketCanvasSerie(_serieTicketData?.qr || String(document.getElementById('tk-code')?.textContent || '').split('· ').pop());
     const dataUrl = cv.toDataURL('image/png');
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOS) {
       const w = window.open();
-      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">Mantén presionado → Guardar en Fotos</p></body></html>`);
+      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">${T('serie.presionar_guardar')}</p></body></html>`);
       w.document.close();
     } else {
       const a = document.createElement('a');
@@ -914,22 +921,22 @@ async function descargar() {
       a.download = 'entrada-'+(serieActual?.nombre||'serie').replace(/\s+/g,'-').toLowerCase()+'-s'+(sesionSeleccionada?.sesion_num||'')+'.png';
       a.click();
     }
-  } catch(e) { alert('Para guardar: mantén presionado el ticket y elige "Guardar imagen".'); }
-  if (btn) { btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar mi entrada'; }
+  } catch(e) { alert(T('serie.guardar_imagen')); }
+  if (btn) { btn.disabled=false; btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ${T('serie.descargar')}`; }
 }
 
 async function enviarTicketWASerie() {
   const { qr, nombre, telefono } = _serieTicketData;
   if (!qr) return;
   const btn = document.getElementById('btn-wa-ticket');
-  if (btn) { btn.disabled=true; btn.textContent='Preparando…'; }
+  if (btn) { btn.disabled=true; btn.textContent=T('serie.preparando'); }
 
   const texto = [
-    `🎟️ *Tu entrada — ${serieActual?.nombre}*`,
-    `Sesión: ${sesionSeleccionada?.nombre||''}`,
+    T('serie.wa_titulo', { serie: serieActual?.nombre || '' }),
+    T('serie.wa_sesion', { nombre: sesionSeleccionada?.nombre || '' }),
     `📅 ${formatFechaCorta(sesionSeleccionada?.fecha)}${sesionSeleccionada?.hora?' · '+sesionSeleccionada.hora:''}`,
-    `🔑 Código QR: *${qr}*`,
-    `Muestra este código en la entrada. Personal e intransferible.`,
+    T('serie.wa_qr', { qr }),
+    T('serie.wa_muestra'),
     `_Terraza Hostal_`,
   ].filter(Boolean).join('\n');
 
@@ -941,12 +948,12 @@ async function enviarTicketWASerie() {
     cv.toBlob(async (blob) => {
       const file = new File([blob], `entrada-${serieActual?.nombre||'serie'}.png`, { type:'image/png' });
       if (navigator.canShare && navigator.canShare({ files:[file] })) {
-        try { await navigator.share({ files:[file], text:texto, title:`Tu entrada — ${serieActual?.nombre}` }); if(btn){btn.disabled=false;btn.textContent='Enviar por WhatsApp';} return; }
+        try { await navigator.share({ files:[file], text:texto, title:T('serie.wa_titulo', { serie: serieActual?.nombre || '' }) }); if(btn){btn.disabled=false;btn.textContent=T('serie.enviar_wa');} return; }
         catch(e) {}
       }
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='mi-entrada.png'; a.click();
       setTimeout(()=>window.open(waUrl,'_blank'),800);
-      if(btn){btn.disabled=false;btn.textContent='Enviar por WhatsApp';}
+      if(btn){btn.disabled=false;btn.textContent=T('serie.enviar_wa');}
     }, 'image/png');
   } catch(e) { window.open(waUrl,'_blank'); if(btn){btn.disabled=false;} }
 }
@@ -981,7 +988,7 @@ async function enviarNotificacionesSerie(nombre, qr, emailAddr) {
   if (!statusEl) return;
   statusEl.style.display = 'block';
   statusEl.style.cssText = 'display:block;margin-top:.75rem;padding:.6rem 1rem;border-radius:8px;font-size:13px;text-align:center;max-width:370px;width:100%;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)';
-  statusEl.textContent = '📧 Enviando confirmación…';
+  statusEl.textContent = T('serie.enviando_confirm');
   try {
     const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
     const res = await fetch(fnUrl, {
@@ -1000,7 +1007,7 @@ async function enviarNotificacionesSerie(nombre, qr, emailAddr) {
     if (res.ok) {
       statusEl.style.background = 'rgba(45,106,79,.25)';
       statusEl.style.color = '#74c69d';
-      statusEl.textContent = `✓ Confirmación enviada a ${emailAddr}`;
+      statusEl.textContent = T('serie.conf_enviada', { email: emailAddr });
     } else {
       statusEl.style.display = 'none';
     }
@@ -1013,6 +1020,10 @@ function alrt(msg) {
   const el = document.getElementById('form-alert');
   el.innerHTML = `<div class="alert-err">${msg}</div>`;
   setTimeout(()=>el.innerHTML='',4000);
+}
+
+if (window.I18N) {
+  window.addEventListener('langchange', () => { window.location.reload(); });
 }
 
 init();
