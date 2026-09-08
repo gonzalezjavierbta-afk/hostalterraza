@@ -729,7 +729,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const __hideEmptyModule = function (id, hasContent) {
                     const el = document.getElementById(id);
                     if (el && !hasContent) {
-                        el.style.display = 'none';
+                        el.style.setProperty('display', 'none', 'important');
                     }
                     return !!hasContent;
                 };
@@ -785,7 +785,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 // === INICIO SEGMENTO: VÍDEO SEGURO v1.5.10-STABLE (ADR-005 Compliance) ===
   // 1. Fuente única de verdad: ev.video_url (columna plana) con fallback seguro.
   const videoContainer = document.getElementById('db-video-content');
-  const videoUrl = ev.video_url || content.trailer_url || ""; 
+  const videoUrl = ev.video_url || content.trailer_url || "";
+  // v307 (aditivo): sin video pero con galería, #mod-video debe conservarse (en f8
+  // la silo lo reutiliza como contenedor de la galería; ocultarlo la rompería).
+  const galeriaList = Array.isArray(content.gallery) ? content.gallery.filter(Boolean) : []; 
 
   if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
       // Extracción limpia de ID de YouTube neutralizando ?si=, &list= y anchors
@@ -809,7 +812,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
               </div>`;
       } else {
           // Regla general módulos vacíos (v306): URL de YouTube inválida → ocultar módulo.
-          __hideEmptyModule('mod-video', false);
+          if (galeriaList.length === 0) __hideEmptyModule('mod-video', false);
       }
   } else if (videoUrl.includes('vimeo.com')) {
       // Normalización robusta para Vimeo a formato player
@@ -822,7 +825,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
   } else {
       // Regla general módulos vacíos (v306): sin video configurado → ocultar módulo
       // en lugar de mostrar "VIDEO NO DISPONIBLE".
-      __hideEmptyModule('mod-video', false);
+      if (galeriaList.length === 0) __hideEmptyModule('mod-video', false);
   }
   // === FIN SEGMENTO: VÍDEO SEGURO ===
 
@@ -1428,6 +1431,9 @@ if (document.getElementById('db-poster-img')) {
     const __labelTaquilla = __esF8Boletos ? 'PAREJA' : 'TAQUILLA';
     if (bwP) bwP.innerHTML = boletoCard(__labelPreventa, preventaVal, '#9b59b6', true);
     if (bwT) bwT.innerHTML = boletoCard(__labelTaquilla, taquillaVal, '#e67e22', true);
+    // v307 (aditivo): sin tarifas configuradas (ni preventa/taquilla ni tickets_info)
+    // la boletería se oculta en lugar de pintar tarjetas "POR DEFINIR".
+    __hideEmptyModule('mod-boletos', !!((boletosData.preventa && boletosData.preventa !== 'POR DEFINIR') || (boletosData.taquilla && boletosData.taquilla !== 'POR DEFINIR') || content.tickets_info));
     // === FIN SEGMENTO BOLETERÍA ===
 
     // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
