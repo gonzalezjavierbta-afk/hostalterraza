@@ -4949,12 +4949,54 @@ async function crearQRLink() {
 }
 
 function descargarQR() {
-  const img = document.querySelector('#qrt-qr-box img');
-  if (!img) return;
-  const a = document.createElement('a');
-  a.href = img.src;
-  a.download = 'qr-' + (document.getElementById('qrt-res-link').value.split('=').pop() || 'link') + '.png';
-  a.click();
+  const trackLink = document.getElementById('qrt-res-link').value;
+  descargarQRLink((trackLink.split('=').pop() || '').trim());
+}
+
+function descargarQRLink(codigo) {
+  if (!codigo) return;
+  const trackLink = window.location.origin + '/qr.html?c=' + codigo;
+  _descargarQrAltaRes(trackLink, 'qr-' + codigo + '.png');
+}
+
+// Genera y descarga el QR en ALTA RESOLUCION (2000px + zona blanca de 10%)
+// para impresion profesional. QrCreator.render() crea un <canvas>, no un <img>;
+// se redibuja sobre un canvas mayor con margen de quiet-zone y se exporta PNG.
+function _descargarQrAltaRes(texto, nombreArchivo) {
+  const SIZE  = 2000;
+  const QUIET = Math.round(SIZE * 0.1);
+  const tmp = document.createElement('div');
+  tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:0;height:0;overflow:hidden';
+  document.body.appendChild(tmp);
+  try {
+    QrCreator.render({ text: texto, radius: 0, ecLevel: "H", fill: "#181815", background: "#ffffff", size: SIZE }, tmp);
+    const canvas = tmp.querySelector('canvas');
+    if (!canvas) throw new Error('No se genero el canvas QR');
+
+    const out = document.createElement('canvas');
+    out.width  = SIZE + 2 * QUIET;
+    out.height = SIZE + 2 * QUIET;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.drawImage(canvas, QUIET, QUIET, SIZE, SIZE);
+
+    const url = out.toDataURL('image/png');
+    if (!url || url.length < 100) throw new Error('Canvas vacio');
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombreArchivo;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch(e) {
+    console.error('[descargarQR]', e.message);
+    alrt('qrt-alert', 'No se pudo generar la imagen QR. Intenta de nuevo.', 'err');
+  } finally {
+    tmp.remove();
+  }
 }
 
 async function loadQRLinks() {
@@ -4999,6 +5041,7 @@ async function renderQRLinks() {
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0" class="ev-actions">
           <button class="btn btn-gold btn-sm" onclick="verStatsQR('${link.id}')">Ver stats</button>
           <button class="btn btn-ghost btn-sm" onclick="copyLink('${tUrl}',this)">Copiar link</button>
+          <button class="btn btn-ghost btn-sm" onclick="descargarQRLink('${link.codigo}')">⬇ Descargar QR</button>
           <button class="btn btn-ghost btn-sm btn-red" onclick="eliminarQRLink('${link.id}')">Eliminar</button>
         </div>
       </div>
