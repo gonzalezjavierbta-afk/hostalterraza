@@ -176,6 +176,31 @@ input,select,textarea{font-size:16px!important}
   /* Mode toggle scanner */
   .mode-toggle{gap:4px}
 }
+
+/* ── SIDEBAR · Reestructuración en 5 bloques ── */
+:root{--sb-w:250px}
+.sidebar{position:fixed;top:52px;left:0;bottom:0;width:var(--sb-w);background:#fff;border-right:1px solid var(--border);overflow-y:auto;padding:1rem .6rem 3rem;z-index:95;transform:translateX(-100%);transition:transform .22s ease;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.sidebar.open{transform:translateX(0)}
+.sb-grp{margin-bottom:1.15rem}
+.sb-grp-t{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:0 .5rem;margin-bottom:.3rem}
+.sb-item{display:flex;align-items:center;gap:9px;width:100%;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--ink2);cursor:pointer;text-decoration:none;transition:.12s;border:none;background:none;text-align:left;font-family:'DM Sans',sans-serif}
+.sb-item:hover{background:var(--surface);color:var(--ink)}
+.sb-item.on{background:var(--gold-bg);color:var(--gold-d);font-weight:500}
+.sb-item .sb-ic{width:18px;text-align:center;flex-shrink:0}
+.sb-link-ext{display:block;margin:2px .5rem 0 0;padding:6px 10px;border-radius:8px;font-size:12px;color:var(--teal);text-decoration:none}
+.sb-link-ext:hover{background:var(--teal-bg)}
+.hamb{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;color:#fff;background:rgba(255,255,255,.08);border:none;cursor:pointer;font-size:17px;margin-right:6px;flex-shrink:0}
+.sb-overlay{position:fixed;inset:52px 0 0 0;background:rgba(10,10,8,.45);z-index:90;display:none}
+.sb-overlay.open{display:block}
+@media(min-width:641px){
+  .sidebar{transform:translateX(0)}
+  .pg{margin-left:var(--sb-w);min-height:calc(100vh - 52px)}
+  .sb-overlay{display:none!important}
+  .hamb{display:none}
+}
+@media(max-width:640px){
+  .sidebar{width:262px;box-shadow:4px 0 30px rgba(0,0,0,.18)}
+}
 .stat{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;text-align:center}
 .stat-n{font-family:'DM Serif Display',serif;font-size:28px}
 .stat-l{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
@@ -345,17 +370,8 @@ tr:hover td{background:var(--surface)}
 </div>
 
 <nav class="nav" id="main-nav" style="display:none">
+  <button class="hamb" id="nav-burger" onclick="toggleSidebar(true)" aria-label="Abrir menú">☰</button>
   <span class="brand">Terraza · Hostal</span>
-  <button class="ntab on"  id="nav-admin"    onclick="goPg('admin')">Admin</button>
-  <button class="ntab"     id="nav-clientes" onclick="goPg('clientes')">Clientes</button>
-  <button class="ntab"     id="nav-qrtrack"  onclick="goPg('qrtrack')">QR Links</button>
-  <button class="ntab"     id="nav-scanner"  onclick="goPg('scanner')">Puerta</button>
-  <button class="ntab"     id="nav-panel"    onclick="goPg('panel')">Panel</button>
-
-  <button class="ntab"     id="nav-usuarios" onclick="goPg('usuarios')" style="display:none">Usuarios</button>
-  <button class="ntab"     id="nav-config" onclick="goPg('config')" style="color:rgba(200,169,110,.7)">Config</button>
-  <button class="ntab"     id="nav-org"         onclick="goPg('org')"    style="color:rgba(200,169,110,.7)">Mi org</button>
-  <button class="ntab"     id="nav-globaladmin" onclick="goPg('globaladmin')" style="display:none;color:#E24B4A">⚙ Sistema</button>
 
   <!-- Buscador global -->
   <div id="global-search-wrap" style="position:relative;margin-left:auto;flex-shrink:0">
@@ -376,295 +392,50 @@ tr:hover td{background:var(--surface)}
   </div>
 </nav>
 
-<!-- ══ CONFIGURACIÓN ════════════════════════════════════ -->
-<div class="pg" id="pg-config">
-  <div class="wrap" style="max-width:660px">
-    <h1 style="font-size:24px;margin-bottom:.2rem">Configuración de Supabase</h1>
-    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Conecta la base de datos para que el sistema funcione en todos tus dispositivos en tiempo real.</p>
-
-    <!-- Pasos -->
-    <div class="config-section">
-      <div class="ch">Pasos para obtener tus credenciales</div>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Crea una cuenta gratuita en Supabase</div>
-          <div class="step-desc">Ve a <strong>supabase.com</strong> → Sign Up → crea un nuevo proyecto. Dale cualquier nombre (ej. "hostal-terraza").</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Crea las tablas con el script SQL</div>
-          <div class="step-desc">En tu proyecto Supabase: <strong>SQL Editor → New Query</strong> → pega el contenido del archivo <code>supabase_setup.sql</code> → Run.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Copia tu URL y API Key</div>
-          <div class="step-desc">En Supabase: <strong>Project Settings → API</strong>. Copia la <strong>Project URL</strong> y la <strong>anon / public key</strong>.</div>
-          <div class="code-block">Project URL: https://xxxxxxxxxxxx.supabase.co<br>anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">Habilita Realtime</div>
-          <div class="step-desc">En Supabase: <strong>Database → Replication</strong> → activa las tablas <strong>inscritos</strong> y <strong>logs</strong>.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">5</div>
-        <div class="step-body">
-          <div class="step-title">Pega tus credenciales abajo y guarda</div>
-          <div class="step-desc">El sistema se conectará automáticamente y el indicador "BD" en el menú se pondrá verde.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="config-section">
-      <div class="ch">Credenciales</div>
-      <div id="cfg-alert"></div>
-      <div class="config-field">
-        <label>Supabase Project URL</label>
-        <input id="cfg-url" placeholder="https://xxxxxxxxxxxx.supabase.co" type="url">
-      </div>
-      <div class="config-field">
-        <label>Supabase anon / public key</label>
-        <input id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-gold" onclick="saveConfig()">Guardar y conectar</button>
-        <button class="btn btn-ghost" onclick="testConnection()">Probar conexión</button>
-        <button class="btn btn-ghost btn-sm btn-red" onclick="clearConfig()">Borrar config</button>
-      </div>
-    </div>
+<!-- ══ SIDEBAR · 5 bloques de navegación ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-grp">
+    <div class="sb-grp-t">Eventos</div>
+    <a class="sb-item" data-go="admin" data-sub="historial" data-vis="all" onclick="navigate('#/eventos/historial')"><span class="sb-ic">📅</span> Historial</a>
+    <a class="sb-item" data-go="admin" data-sub="crear" data-vis="super" onclick="navigate('#/eventos/crear')"><span class="sb-ic">＋</span> Crear evento</a>
+    <a class="sb-item" data-go="admin" data-sub="invitadores" data-vis="all" onclick="navigate('#/eventos/invitadores')"><span class="sb-ic">🔗</span> Invitadores</a>
   </div>
-</div>
-
-<!-- ══ MI ORGANIZACIÓN ══════════════════════════════════ -->
-<div class="pg" id="pg-org">
-  <div class="wrap" style="max-width:640px">
-    <h1 style="font-size:24px;margin-bottom:.2rem">Mi organización</h1>
-    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Personaliza cómo aparece tu organización en tickets, páginas de eventos y correos.</p>
-
-    <!-- Plan activo -->
-    <div class="card" style="margin-bottom:1rem">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div>
-          <div class="ch" style="margin-bottom:.2rem">Plan activo</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:.3rem">
-            <span id="org-plan-badge" style="font-size:12px;padding:3px 10px;border-radius:20px;background:var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border);font-weight:500">—</span>
-            <span id="org-plan-estado" style="font-size:12px;color:var(--ink3)"></span>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:11px;color:var(--ink3)">Slug de la organización</div>
-          <code id="org-slug-display" style="font-size:13px;background:var(--surface);padding:2px 8px;border-radius:4px;color:var(--ink2)">—</code>
-        </div>
-      </div>
-    </div>
-
-    <!-- Formulario de edición -->
-    <div class="card">
-      <div class="ch" style="margin-bottom:1rem">Datos de la organización</div>
-      <div id="org-alert"></div>
-      <div class="grid2">
-        <div class="fg" style="grid-column:1/-1">
-          <label>Nombre del local *</label>
-          <input id="org-nombre" placeholder="Ej. Bar La Terraza" maxlength="80">
-          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Aparece en tickets, emails y la página pública.</div>
-        </div>
-        <div class="fg" style="grid-column:1/-1">
-          <label>Logo (URL de imagen)</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input id="org-logo-url" placeholder="https://tudominio.com/logo.png" type="url" style="flex:1">
-            <div id="org-logo-preview" style="width:44px;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:18px">🏠</div>
-          </div>
-          <div style="font-size:11px;color:var(--ink3);margin-top:4px">URL pública de tu logo. Recomendado: imagen cuadrada PNG/SVG, mínimo 200×200px.</div>
-        </div>
-        <div class="fg">
-          <label>Color principal</label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="color" id="org-color" value="#C8A96E"
-              style="width:44px;height:44px;border:none;border-radius:var(--rsm);cursor:pointer;padding:2px"
-              oninput="previsualizarColor(this.value)">
-            <div>
-              <div id="org-color-hex" style="font-size:13px;font-family:monospace;color:var(--ink2)">#C8A96E</div>
-              <div style="font-size:11px;color:var(--ink3)">Tickets, botones y acentos</div>
-            </div>
-            <!-- Mini preview del color -->
-            <div style="flex:1;background:var(--surface);border-radius:var(--rsm);padding:8px 12px;font-size:12px;color:var(--ink2)">
-              Preview: <strong id="org-color-preview-text" style="color:#C8A96E">Hostal Terraza</strong>
-            </div>
-          </div>
-        </div>
-        <div class="fg">
-          <label>Nombre en la app</label>
-          <input id="org-nombre-app" placeholder="Ej. Terraza · Hostal" maxlength="40">
-          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Aparece en la barra de navegación del admin.</div>
-        </div>
-      </div>
-
-      <!-- Preview del ticket -->
-      <div style="margin-top:.75rem;padding:.9rem;background:var(--surface);border-radius:var(--rsm)">
-        <div style="font-size:11px;font-weight:500;color:var(--ink3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em">Vista previa del header del ticket</div>
-        <div id="ticket-preview" style="background:#0F0F0F;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div id="tp-logo" style="width:32px;height:32px;border-radius:6px;background:#2D2D2A;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0">🏠</div>
-            <div>
-              <div id="tp-nombre" style="font-size:13px;font-weight:700;color:#C8A96E">Hostal Terraza</div>
-              <div style="font-size:10px;color:rgba(255,255,255,.3)">ENTRADA</div>
-            </div>
-          </div>
-          <div id="tp-badge" style="background:#C8A96E;border-radius:5px;padding:3px 10px;font-size:10px;font-weight:700;color:#0F0F0F">TICKET</div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
-        <button class="btn btn-gold" onclick="guardarOrganizacion()" style="flex:1;min-width:140px;justify-content:center">Guardar cambios</button>
-        <button class="btn btn-ghost" onclick="cargarOrganizacion()">↺ Recargar</button>
-      </div>
-    </div>
+  <div class="sb-grp">
+    <div class="sb-grp-t">Personas y Datos</div>
+    <a class="sb-item" data-go="clientes" data-sub="cli-list" data-vis="super" onclick="navigate('#/personas/directorio')"><span class="sb-ic">👥</span> Directorio</a>
+    <a class="sb-item" data-go="clientes" data-sub="cli-new" data-vis="super" onclick="navigate('#/personas/nuevo')"><span class="sb-ic">＋</span> Nuevo registro</a>
+    <a class="sb-item" data-go="clientes" data-sub="cli-assign" data-vis="super" onclick="navigate('#/personas/asignar')"><span class="sb-ic">🎫</span> Asignar a evento</a>
+    <div class="sb-grp-t" style="margin-top:.55rem">Analítica</div>
+    <a class="sb-item" data-go="panel" data-sub="resumen" data-vis="all" onclick="navigate('#/datos/resumen')"><span class="sb-ic">📊</span> Resumen</a>
+    <a class="sb-item" data-go="panel" data-sub="tendencias" data-vis="all" onclick="navigate('#/datos/tendencias')"><span class="sb-ic">📈</span> Tendencias</a>
+    <a class="sb-item" data-go="panel" data-sub="rankings" data-vis="all" onclick="navigate('#/datos/rankings')"><span class="sb-ic">🏆</span> Rankings</a>
+    <a class="sb-item" data-go="panel" data-sub="asistentes" data-vis="all" onclick="navigate('#/datos/asistentes')"><span class="sb-ic">🧾</span> Asistentes</a>
   </div>
-</div>
-<!-- ══ PANEL GLOBAL — SISTEMA ════════════════════════════ -->
-<div class="pg" id="pg-globaladmin">
-  <div class="wrap" style="max-width:1100px">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:.75rem">
-      <h1 style="font-size:24px">Panel de Sistema</h1>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="loadGlobalStats()">&#8635; Actualizar</button>
-        <button class="btn btn-teal btn-sm" onclick="abrirCrearOrg()">+ Nueva organización</button>
-      </div>
-    </div>
-    <p style="font-size:13px;color:var(--ink3);margin-bottom:1rem">Vista global de todas las organizaciones del sistema.</p>
-    <div class="stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:1rem">
-      <div class="stat"><div class="stat-n" id="ga-total-orgs">—</div><div class="stat-l">Organizaciones</div></div>
-      <div class="stat"><div class="stat-n" id="ga-active-orgs" style="color:var(--green)">—</div><div class="stat-l">Activas</div></div>
-      <div class="stat"><div class="stat-n" id="ga-total-eventos">—</div><div class="stat-l">Eventos totales</div></div>
-      <div class="stat"><div class="stat-n" id="ga-total-inscritos">—</div><div class="stat-l">Inscritos totales</div></div>
-      <div class="stat"><div class="stat-n" id="ga-mrr" style="color:var(--gold-d)">—</div><div class="stat-l">Orgs de pago</div></div>
-    </div>
-    <div class="subtabs" style="margin-bottom:1rem">
-      <button class="stab on" id="ga-tab-orgs"    onclick="gaTab('orgs')">Organizaciones</button>
-      <button class="stab"    id="ga-tab-compare" onclick="gaTab('compare')">Comparativa</button>
-      <button class="stab"    id="ga-tab-detalle" onclick="gaTab('detalle')" style="display:none">&#128202; <span id="ga-detalle-nombre">—</span></button>
-    </div>
-    <!-- TAB orgs -->
-    <div id="ga-panel-orgs">
-      <input id="ga-search" placeholder="Buscar por nombre, slug o plan…" oninput="filtrarGlobalOrgs(this.value)"
-        style="margin-bottom:.75rem;padding:7px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;width:280px;display:block">
-      <div class="card" style="padding:0"><div class="tw"><table>
-        <thead><tr>
-          <th>Organización</th><th>Slug</th><th>Plan</th><th>Estado</th>
-          <th style="text-align:center">Eventos</th><th style="text-align:center">Inscritos</th>
-          <th style="text-align:center">Usuarios</th><th>Creada</th><th>Acciones</th>
-        </tr></thead>
-        <tbody id="ga-orgs-table"><tr><td colspan="9" class="empty">Cargando…</td></tr></tbody>
-      </table></div></div>
-    </div>
-    <!-- TAB comparativa -->
-    <div id="ga-panel-compare" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-        <div class="card"><div class="ch" style="margin-bottom:.75rem">Inscritos por organización</div>
-          <div style="position:relative;height:220px"><canvas id="ga-chart-ins"></canvas></div></div>
-        <div class="card"><div class="ch" style="margin-bottom:.75rem">Eventos por organización</div>
-          <div style="position:relative;height:220px"><canvas id="ga-chart-ev"></canvas></div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div class="card"><div class="ch" style="margin-bottom:.75rem">Distribución por plan</div>
-          <div style="position:relative;height:200px"><canvas id="ga-chart-plan"></canvas></div></div>
-        <div class="card"><div class="ch" style="margin-bottom:.75rem">Crecimiento de organizaciones</div>
-          <div style="position:relative;height:200px"><canvas id="ga-chart-crec"></canvas></div></div>
-      </div>
-    </div>
-    <!-- TAB detalle org -->
-    <div id="ga-panel-detalle" style="display:none">
-      <div id="ga-detalle-content"></div>
-    </div>
+  <div class="sb-grp">
+    <div class="sb-grp-t">QR</div>
+    <a class="sb-item" data-go="qrtrack" data-sub="qrt-new" data-vis="super" onclick="navigate('#/qr/crear')"><span class="sb-ic">🔗</span> Crear QR</a>
+    <a class="sb-item" data-go="qrtrack" data-sub="qrt-list" data-vis="super" onclick="navigate('#/qr/lista')"><span class="sb-ic">📋</span> QR links</a>
   </div>
-</div>
+  <div class="sb-grp">
+    <div class="sb-grp-t">Subcuentas</div>
+    <a class="sb-item" data-go="usuarios" data-sub="usr-admins" data-vis="super" onclick="navigate('#/staff/admins')"><span class="sb-ic">🛡</span> Administradores</a>
+    <a class="sb-item" data-go="usuarios" data-sub="usr-porteros" data-vis="staff" onclick="navigate('#/staff/porteros')"><span class="sb-ic">🚪</span> Porteros</a>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-grp-t">Aplicativo de Puerta</div>
+    <a class="sb-item" data-go="scanner" data-vis="staff" onclick="navigate('#/puerta/control')"><span class="sb-ic">🎥</span> Control de entrada</a>
+    <a class="sb-link-ext" href="scanner.html" target="_blank" rel="noopener">↗ Abrir aplicativo portero (scanner.html)</a>
+  </div>
+  <div class="sb-grp" id="sb-sistema">
+    <div class="sb-grp-t">Sistema</div>
+    <a class="sb-item" data-go="org" data-vis="all" onclick="navigate('#/org')"><span class="sb-ic">⚙</span> Mi organización</a>
+    <a class="sb-item" data-go="config" data-vis="system" onclick="navigate('#/config')"><span class="sb-ic">🔐</span> Configuración</a>
+    <a class="sb-item" data-go="globaladmin" data-vis="system" onclick="navigate('#/sistema')"><span class="sb-ic">🛠</span> Panel de Sistema</a>
+  </div>
+</aside>
+<div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar(false)"></div>
 
-<!-- MODAL CREAR ORG (global admin) -->
-<div id="mod-crear-org" class="modal-bg" style="display:none" onclick="if(event.target===this)cerrarCrearOrg()">
-  <div class="modal" style="max-width:480px">
-    <button class="modal-x" onclick="cerrarCrearOrg()">×</button>
-    <h3 style="font-size:17px;margin-bottom:.25rem">Nueva organización</h3>
-    <p style="font-size:12px;color:var(--ink3);margin-bottom:1rem">Crea la organización directamente desde el panel de sistema.</p>
-    <div id="co-alert"></div>
-    <div class="grid2">
-      <div class="fg" style="grid-column:1/-1"><label>Nombre del local *</label><input id="co-nombre" placeholder="Ej. Bar La Terraza" maxlength="80" oninput="coAutoSlug(this.value)"></div>
-      <div class="fg" style="grid-column:1/-1"><label>Slug único *</label>
-        <input id="co-slug" placeholder="bar-la-terraza" maxlength="40" oninput="coCheckSlug(this.value)"
-          style="font-family:monospace">
-        <div id="co-slug-hint" style="font-size:11px;margin-top:4px;color:var(--ink3)"></div>
-      </div>
-      <div class="fg"><label>Email admin *</label><input id="co-email" type="email" placeholder="admin@local.com" maxlength="120"></div>
-      <div class="fg"><label>Contraseña *</label><input id="co-pass" type="password" placeholder="Mínimo 8 caracteres" maxlength="72"></div>
-      <div class="fg"><label>Plan</label>
-        <select id="co-plan" style="width:100%">
-          <option value="freemium">Freemium — $0 COP</option>
-          <option value="pass_evento">Pass por Evento — $40.000 COP</option>
-          <option value="pro_mensual" selected>Suscripción Mensual — $400.000 COP/mes</option>
-        </select>
-      </div>
-      <div class="fg"><label>Color principal</label>
-        <input type="color" id="co-color" value="#C8A96E" style="width:100%;height:40px;border:1px solid var(--border);border-radius:var(--rsm);cursor:pointer;padding:2px">
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:.75rem">
-      <button class="btn btn-teal" id="co-btn" onclick="crearOrgGlobal()" style="flex:1;justify-content:center">Crear organización</button>
-      <button class="btn btn-ghost" onclick="cerrarCrearOrg()">Cancelar</button>
-    </div>
-  </div>
-</div>
-<div id="mod-edit-org" class="modal-bg" style="display:none" onclick="if(event.target===this)cerrarEditOrg()">
-  <div class="modal" style="max-width:520px">
-    <button class="modal-x" onclick="cerrarEditOrg()">×</button>
-    <h3 style="font-size:17px;margin-bottom:.25rem">Editar organización</h3>
-    <p style="font-size:12px;color:var(--ink3);margin-bottom:1rem">Cambios aplicados inmediatamente.</p>
-    <input type="hidden" id="eo-id">
-    <div id="eo-alert"></div>
-    <div class="grid2">
-      <div class="fg" style="grid-column:1/-1"><label>Nombre *</label><input id="eo-nombre" maxlength="80"></div>
-      <div class="fg"><label>Plan</label>
-        <select id="eo-plan" style="width:100%">
-          <option value="freemium">Freemium — $0 COP</option>
-          <option value="pass_evento">Pass por Evento — $40.000 COP</option>
-          <option value="pro_mensual">Suscripción Mensual — $400.000 COP/mes</option>
-          <option value="enterprise">Enterprise</option>
-        </select>
-      </div>
-      <div class="fg"><label>Color principal</label>
-        <input type="color" id="eo-color" style="width:100%;height:40px;border:1px solid var(--border);border-radius:var(--rsm);cursor:pointer;padding:2px">
-      </div>
-      <div class="fg" style="grid-column:1/-1"><label>Logo URL</label><input id="eo-logo" type="url" placeholder="https://…"></div>
-      <div class="fg"><label>Nombre app</label><input id="eo-nombre-app" maxlength="40"></div>
-      <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="eo-activa" style="width:16px;height:16px;accent-color:var(--green)">
-        <span>Organización activa</span></label>
-      </div>
-    </div>
-    <div id="eo-stats" style="background:var(--surface);border-radius:var(--rsm);padding:.75rem 1rem;margin-top:.5rem;font-size:12px;color:var(--ink2)">
-      <div style="font-weight:500;margin-bottom:.4rem">Estadísticas</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-        <div>Eventos: <strong id="eo-stat-ev">—</strong></div>
-        <div>Inscritos: <strong id="eo-stat-ins">—</strong></div>
-        <div>Usuarios: <strong id="eo-stat-usr">—</strong></div>
-      </div>
-      <div style="margin-top:.35rem">Slug: <code id="eo-slug" style="background:#fff;padding:1px 6px;border-radius:4px;font-size:11px"></code></div>
-      <div style="margin-top:.2rem;color:var(--ink3)">Creada: <span id="eo-created"></span></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:.9rem;flex-wrap:wrap">
-      <button class="btn btn-gold" onclick="guardarEditOrg()" style="flex:1;justify-content:center">Guardar cambios</button>
-      <button class="btn btn-ghost btn-sm btn-red" onclick="toggleActivarOrg()">Activar / Desactivar</button>
-      <button class="btn btn-ghost" onclick="cerrarEditOrg()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
+<!-- ══ BLOQUE 1 · EVENTOS ══════════════════════════════════════════ -->
 <div class="pg on" id="pg-admin">
   <div class="wrap">
     <h1 style="font-size:24px;margin-bottom:.2rem">Eventos</h1>
@@ -1458,6 +1229,7 @@ tr:hover td{background:var(--surface)}
 </div>
 
 
+<!-- ══ BLOQUE 2 · PERSONAS Y DATOS ══════════════════════════════════ -->
 <!-- ══ CLIENTES ════════════════════════════════════════ -->
 
 <div class="pg" id="pg-clientes">
@@ -1580,129 +1352,7 @@ tr:hover td{background:var(--surface)}
 </div>
 
 
-<!-- ══ QR TRACKER ══════════════════════════════════════ -->
-<div class="pg" id="pg-qrtrack">
-  <div class="wrap">
-    <h1 style="font-size:24px;margin-bottom:.2rem">QR Links</h1>
-    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Genera códigos QR para cualquier link y mide cada escaneo — dispositivo, país, hora y más.</p>
-
-    <div class="subtabs">
-      <button class="stab on" onclick="goSTab('qrt-new')">Nuevo QR</button>
-      <button class="stab"    onclick="goSTab('qrt-list');loadQRLinks()">Mis QR links</button>
-    </div>
-
-    <!-- NUEVO QR -->
-    <div class="stpanel on" id="qrt-new">
-      <div class="card">
-        <div class="ch">Crear QR de tracking</div>
-        <div id="qrt-alert"></div>
-        <div class="grid2">
-          <div class="fg" style="grid-column:1/-1">
-            <label>URL de destino *</label>
-            <input id="qrt-url" placeholder="https://..." type="url" style="font-family:monospace;font-size:13px">
-          </div>
-          <div class="fg">
-            <label>Nombre descriptivo *</label>
-            <input id="qrt-nombre" placeholder="Ej. Flyer Instagram Abril">
-          </div>
-          <div class="fg">
-            <label>Código corto *</label>
-            <div style="display:flex;gap:6px">
-              <input id="qrt-codigo" placeholder="Ej. JZ24" style="flex:1;text-transform:uppercase;font-family:monospace" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')">
-              <button class="btn btn-ghost btn-sm" onclick="qrtGenCodigo()">Auto</button>
-            </div>
-            <div style="font-size:11px;color:var(--ink3);margin-top:4px">El link quedará: <span id="qrt-preview-url" style="font-family:monospace;color:var(--teal)"></span></div>
-          </div>
-        </div>
-        <div style="margin-top:.75rem">
-          <button class="btn btn-gold" onclick="crearQRLink()">Crear QR</button>
-        </div>
-      </div>
-
-      <!-- Preview del QR generado -->
-      <div id="qrt-result" style="display:none">
-        <div class="card" style="border-color:var(--green-border);background:var(--green-bg);margin-top:.75rem">
-          <div class="ch" style="color:var(--green);margin-bottom:.75rem">✓ QR creado</div>
-          <div style="display:grid;grid-template-columns:auto 1fr;gap:1.25rem;align-items:start">
-            <div style="background:#fff;padding:10px;border-radius:8px;border:1px solid var(--border)">
-              <div id="qrt-qr-box"></div>
-            </div>
-            <div>
-              <div style="font-size:13px;font-weight:500;margin-bottom:.3rem" id="qrt-res-nombre"></div>
-              <div style="font-size:12px;color:var(--ink3);margin-bottom:.75rem" id="qrt-res-destino" style="word-break:break-all"></div>
-              <div style="font-size:12px;color:var(--ink2);margin-bottom:.4rem">Link de tracking:</div>
-              <div class="link-row" style="margin-bottom:.75rem">
-                <input id="qrt-res-link" type="text" readonly style="font-size:12px;font-family:monospace;background:#fff">
-                <button class="btn btn-dark btn-sm" onclick="copyLink(document.getElementById('qrt-res-link').value,this)">Copiar</button>
-              </div>
-              <button class="btn btn-ghost btn-sm" onclick="descargarQR()">⬇ Descargar QR imagen</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- LISTA DE QR LINKS -->
-    <div class="stpanel" id="qrt-list">
-      <div id="qrt-links-list"><div class="empty">Cargando…</div></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══ SCANNER ════════════════════════════════════════ -->
-<div class="pg" id="pg-scanner">
-  <div class="scan-wrap">
-    <h1 style="font-size:24px;margin-bottom:.2rem">Control de entrada</h1>
-    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.25rem">Valida QR y verifica documento de identidad.</p>
-    <div class="fg" style="margin-bottom:1rem">
-      <label>Evento activo</label>
-      <select id="sc-ev" onchange="updateContador()" style="width:100%"><option value="">Selecciona el evento</option></select>
-    </div>
-    <div id="sc-contador" style="display:none">
-      <div class="aforo-counter">
-        <div class="aforo-number" id="sc-count">0</div>
-        <div class="aforo-detail">
-          <div style="font-size:13px;font-weight:500">Personas ingresadas hoy</div>
-          <div style="font-size:12px;color:var(--ink3);margin-top:3px" id="sc-count-sub">Sin ingresos aún</div>
-          <div class="aforo-breakdown" id="sc-count-breakdown"></div>
-        </div>
-      </div>
-    </div>
-    <div id="sc-res"></div>
-
-    <!-- Toggle cámara / manual -->
-    <div class="cam-toggle">
-      <button id="btn-cam" class="active" onclick="setMode('cam')">📷 Cámara</button>
-      <button id="btn-manual" onclick="setMode('manual')">⌨️ Manual</button>
-    </div>
-
-    <!-- Error de cámara -->
-    <div id="cam-error"></div>
-
-    <!-- Vista de cámara -->
-    <div id="camera-container" class="active">
-      <video id="camera-video" autoplay playsinline muted></video>
-      <div class="cam-overlay">
-        <div class="cam-frame"></div>
-        <div class="cam-line"></div>
-      </div>
-      <div class="cam-status" id="cam-status">Apunta al código QR del asistente</div>
-    </div>
-
-    <!-- Input manual -->
-    <div class="scan-display" id="manual-display" style="display:none">
-      <div class="scan-lbl">Código QR del asistente</div>
-      <input class="scan-in" id="sc-in" placeholder="Escribe o pega el código" onkeydown="if(event.key==='Enter')scanQR()">
-      <button class="scan-btn" id="scan-btn" onclick="scanQR()">Validar QR</button>
-    </div>
-    <div class="card" style="margin-top:1.25rem">
-      <div class="ch">Registro de entradas — hoy</div>
-      <div id="sc-log"><div class="empty">Sin movimientos aún</div></div>
-    </div>
-  </div>
-</div>
-
+<!-- ── Analítica y Mediciones ── -->
 <!-- ══ PANEL ════════════════════════════════════════════ -->
 <div class="pg" id="pg-panel">
   <div class="wrap" style="max-width:1100px">
@@ -1960,43 +1610,78 @@ tr:hover td{background:var(--surface)}
   </div>
 </div>
 
-<!-- ══ VISTA PÚBLICO ════════════════════════════════════ -->
-<div class="pg" id="pg-public">
-  <div class="pub-wrap">
-    <div class="pub-card">
-      <div class="pub-head">
-        <h2>Registro de invitados</h2>
-        <div id="pb-evnm" class="ev-name"></div>
-        <div id="pb-evds" class="ev-desc"></div>
-      </div>
-      <div id="pb-form" class="pub-body">
-        <div id="pb-alert"></div>
-        <div class="pub-field">
-          <label>Evento</label>
-          <select id="pb-evsel" onchange="pubSelEv()" style="width:100%"><option value="">Selecciona el evento</option></select>
+<!-- ══ BLOQUE 3 · QR ════════════════════════════════════════════════ -->
+<!-- ══ QR TRACKER ══════════════════════════════════════ -->
+<div class="pg" id="pg-qrtrack">
+  <div class="wrap">
+    <h1 style="font-size:24px;margin-bottom:.2rem">QR Links</h1>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Genera códigos QR para cualquier link y mide cada escaneo — dispositivo, país, hora y más.</p>
+
+    <div class="subtabs">
+      <button class="stab on" onclick="goSTab('qrt-new')">Nuevo QR</button>
+      <button class="stab"    onclick="goSTab('qrt-list');loadQRLinks()">Mis QR links</button>
+    </div>
+
+    <!-- NUEVO QR -->
+    <div class="stpanel on" id="qrt-new">
+      <div class="card">
+        <div class="ch">Crear QR de tracking</div>
+        <div id="qrt-alert"></div>
+        <div class="grid2">
+          <div class="fg" style="grid-column:1/-1">
+            <label>URL de destino *</label>
+            <input id="qrt-url" placeholder="https://..." type="url" style="font-family:monospace;font-size:13px">
+          </div>
+          <div class="fg">
+            <label>Nombre descriptivo *</label>
+            <input id="qrt-nombre" placeholder="Ej. Flyer Instagram Abril">
+          </div>
+          <div class="fg">
+            <label>Código corto *</label>
+            <div style="display:flex;gap:6px">
+              <input id="qrt-codigo" placeholder="Ej. JZ24" style="flex:1;text-transform:uppercase;font-family:monospace" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')">
+              <button class="btn btn-ghost btn-sm" onclick="qrtGenCodigo()">Auto</button>
+            </div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:4px">El link quedará: <span id="qrt-preview-url" style="font-family:monospace;color:var(--teal)"></span></div>
+          </div>
         </div>
-        <div class="pub-field"><label>Nombre completo *</label><input id="pb-n" placeholder="Tu nombre completo"></div>
-        <div class="pub-field"><label>Cédula / Documento *</label><input id="pb-c" placeholder="Número de documento"></div>
-        <div class="pub-field"><label>Teléfono *</label><input id="pb-t" placeholder="Número de celular"></div>
-        <button class="pub-submit" id="pub-submit-btn" onclick="regPublico()">Confirmar inscripción →</button>
-      </div>
-      <div id="pb-suc" class="success-wrap" style="display:none">
-        <div class="suc-icon">✓</div>
-        <h2 style="font-size:22px">¡Listo!</h2>
-        <p style="font-size:13px;color:var(--ink3);margin-top:.3rem">Guarda este QR — es tu entrada al evento.</p>
-        <div class="ticket">
-          <span class="badge badge-teal" style="margin-bottom:.5rem">Invitado</span>
-          <div id="pb-sn" style="font-family:'DM Serif Display',serif;font-size:19px;margin:.3rem 0"></div>
-          <div id="pb-se" style="font-size:12px;color:var(--ink2)"></div>
-          <div class="qr-ticket" id="pb-sqr"></div>
-          <div id="pb-sc" style="font-family:monospace;font-size:12px;color:var(--ink3);letter-spacing:.08em"></div>
+        <div style="margin-top:.75rem">
+          <button class="btn btn-gold" onclick="crearQRLink()">Crear QR</button>
         </div>
-        <p style="font-size:12px;color:var(--ink3)">Muestra este código en la puerta de la terraza.</p>
+      </div>
+
+      <!-- Preview del QR generado -->
+      <div id="qrt-result" style="display:none">
+        <div class="card" style="border-color:var(--green-border);background:var(--green-bg);margin-top:.75rem">
+          <div class="ch" style="color:var(--green);margin-bottom:.75rem">✓ QR creado</div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:1.25rem;align-items:start">
+            <div style="background:#fff;padding:10px;border-radius:8px;border:1px solid var(--border)">
+              <div id="qrt-qr-box"></div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:.3rem" id="qrt-res-nombre"></div>
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:.75rem" id="qrt-res-destino" style="word-break:break-all"></div>
+              <div style="font-size:12px;color:var(--ink2);margin-bottom:.4rem">Link de tracking:</div>
+              <div class="link-row" style="margin-bottom:.75rem">
+                <input id="qrt-res-link" type="text" readonly style="font-size:12px;font-family:monospace;background:#fff">
+                <button class="btn btn-dark btn-sm" onclick="copyLink(document.getElementById('qrt-res-link').value,this)">Copiar</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="descargarQR()">⬇ Descargar QR imagen</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- LISTA DE QR LINKS -->
+    <div class="stpanel" id="qrt-list">
+      <div id="qrt-links-list"><div class="empty">Cargando…</div></div>
+    </div>
+
   </div>
 </div>
 
+<!-- ══ BLOQUE 4 · SUBCUENTAS ════════════════════════════════════════ -->
 <!-- ══ USUARIOS ══════════════════════════════════════════ -->
 <div class="pg" id="pg-usuarios">
   <div class="wrap">
@@ -2101,6 +1786,388 @@ tr:hover td{background:var(--surface)}
       <div class="card" style="margin-top:.5rem">
         <div class="ch">Links activos esta noche</div>
         <div id="tok-list"><div class="empty">Sin links generados aún</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BLOQUE 5 · APLICATIVO DE PUERTA ══════════════════════════════ -->
+<!-- ══ SCANNER ════════════════════════════════════════ -->
+<div class="pg" id="pg-scanner">
+  <div class="scan-wrap">
+    <h1 style="font-size:24px;margin-bottom:.2rem">Control de entrada</h1>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.25rem">Valida QR y verifica documento de identidad.</p>
+    <div class="fg" style="margin-bottom:1rem">
+      <label>Evento activo</label>
+      <select id="sc-ev" onchange="updateContador()" style="width:100%"><option value="">Selecciona el evento</option></select>
+    </div>
+    <div id="sc-contador" style="display:none">
+      <div class="aforo-counter">
+        <div class="aforo-number" id="sc-count">0</div>
+        <div class="aforo-detail">
+          <div style="font-size:13px;font-weight:500">Personas ingresadas hoy</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:3px" id="sc-count-sub">Sin ingresos aún</div>
+          <div class="aforo-breakdown" id="sc-count-breakdown"></div>
+        </div>
+      </div>
+    </div>
+    <div id="sc-res"></div>
+
+    <!-- Toggle cámara / manual -->
+    <div class="cam-toggle">
+      <button id="btn-cam" class="active" onclick="setMode('cam')">📷 Cámara</button>
+      <button id="btn-manual" onclick="setMode('manual')">⌨️ Manual</button>
+    </div>
+
+    <!-- Error de cámara -->
+    <div id="cam-error"></div>
+
+    <!-- Vista de cámara -->
+    <div id="camera-container" class="active">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="cam-overlay">
+        <div class="cam-frame"></div>
+        <div class="cam-line"></div>
+      </div>
+      <div class="cam-status" id="cam-status">Apunta al código QR del asistente</div>
+    </div>
+
+    <!-- Input manual -->
+    <div class="scan-display" id="manual-display" style="display:none">
+      <div class="scan-lbl">Código QR del asistente</div>
+      <input class="scan-in" id="sc-in" placeholder="Escribe o pega el código" onkeydown="if(event.key==='Enter')scanQR()">
+      <button class="scan-btn" id="scan-btn" onclick="scanQR()">Validar QR</button>
+    </div>
+    <div class="card" style="margin-top:1.25rem">
+      <div class="ch">Registro de entradas — hoy</div>
+      <div id="sc-log"><div class="empty">Sin movimientos aún</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SISTEMA · organización y panel ═══════════════════════════════ -->
+<!-- ══ MI ORGANIZACIÓN ══════════════════════════════════ -->
+<div class="pg" id="pg-org">
+  <div class="wrap" style="max-width:640px">
+    <h1 style="font-size:24px;margin-bottom:.2rem">Mi organización</h1>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Personaliza cómo aparece tu organización en tickets, páginas de eventos y correos.</p>
+
+    <!-- Plan activo -->
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="ch" style="margin-bottom:.2rem">Plan activo</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:.3rem">
+            <span id="org-plan-badge" style="font-size:12px;padding:3px 10px;border-radius:20px;background:var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border);font-weight:500">—</span>
+            <span id="org-plan-estado" style="font-size:12px;color:var(--ink3)"></span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--ink3)">Slug de la organización</div>
+          <code id="org-slug-display" style="font-size:13px;background:var(--surface);padding:2px 8px;border-radius:4px;color:var(--ink2)">—</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de edición -->
+    <div class="card">
+      <div class="ch" style="margin-bottom:1rem">Datos de la organización</div>
+      <div id="org-alert"></div>
+      <div class="grid2">
+        <div class="fg" style="grid-column:1/-1">
+          <label>Nombre del local *</label>
+          <input id="org-nombre" placeholder="Ej. Bar La Terraza" maxlength="80">
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Aparece en tickets, emails y la página pública.</div>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Logo (URL de imagen)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="org-logo-url" placeholder="https://tudominio.com/logo.png" type="url" style="flex:1">
+            <div id="org-logo-preview" style="width:44px;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:18px">🏠</div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">URL pública de tu logo. Recomendado: imagen cuadrada PNG/SVG, mínimo 200×200px.</div>
+        </div>
+        <div class="fg">
+          <label>Color principal</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="color" id="org-color" value="#C8A96E"
+              style="width:44px;height:44px;border:none;border-radius:var(--rsm);cursor:pointer;padding:2px"
+              oninput="previsualizarColor(this.value)">
+            <div>
+              <div id="org-color-hex" style="font-size:13px;font-family:monospace;color:var(--ink2)">#C8A96E</div>
+              <div style="font-size:11px;color:var(--ink3)">Tickets, botones y acentos</div>
+            </div>
+            <!-- Mini preview del color -->
+            <div style="flex:1;background:var(--surface);border-radius:var(--rsm);padding:8px 12px;font-size:12px;color:var(--ink2)">
+              Preview: <strong id="org-color-preview-text" style="color:#C8A96E">Hostal Terraza</strong>
+            </div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Nombre en la app</label>
+          <input id="org-nombre-app" placeholder="Ej. Terraza · Hostal" maxlength="40">
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Aparece en la barra de navegación del admin.</div>
+        </div>
+      </div>
+
+      <!-- Preview del ticket -->
+      <div style="margin-top:.75rem;padding:.9rem;background:var(--surface);border-radius:var(--rsm)">
+        <div style="font-size:11px;font-weight:500;color:var(--ink3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em">Vista previa del header del ticket</div>
+        <div id="ticket-preview" style="background:#0F0F0F;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="tp-logo" style="width:32px;height:32px;border-radius:6px;background:#2D2D2A;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0">🏠</div>
+            <div>
+              <div id="tp-nombre" style="font-size:13px;font-weight:700;color:#C8A96E">Hostal Terraza</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.3)">ENTRADA</div>
+            </div>
+          </div>
+          <div id="tp-badge" style="background:#C8A96E;border-radius:5px;padding:3px 10px;font-size:10px;font-weight:700;color:#0F0F0F">TICKET</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="guardarOrganizacion()" style="flex:1;min-width:140px;justify-content:center">Guardar cambios</button>
+        <button class="btn btn-ghost" onclick="cargarOrganizacion()">↺ Recargar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ══ CONFIGURACIÓN ════════════════════════════════════ -->
+<div class="pg" id="pg-config">
+  <div class="wrap" style="max-width:660px">
+    <h1 style="font-size:24px;margin-bottom:.2rem">Configuración de Supabase</h1>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:1.5rem">Conecta la base de datos para que el sistema funcione en todos tus dispositivos en tiempo real.</p>
+
+    <!-- Pasos -->
+    <div class="config-section">
+      <div class="ch">Pasos para obtener tus credenciales</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Crea una cuenta gratuita en Supabase</div>
+          <div class="step-desc">Ve a <strong>supabase.com</strong> → Sign Up → crea un nuevo proyecto. Dale cualquier nombre (ej. "hostal-terraza").</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Crea las tablas con el script SQL</div>
+          <div class="step-desc">En tu proyecto Supabase: <strong>SQL Editor → New Query</strong> → pega el contenido del archivo <code>supabase_setup.sql</code> → Run.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Copia tu URL y API Key</div>
+          <div class="step-desc">En Supabase: <strong>Project Settings → API</strong>. Copia la <strong>Project URL</strong> y la <strong>anon / public key</strong>.</div>
+          <div class="code-block">Project URL: https://xxxxxxxxxxxx.supabase.co<br>anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Habilita Realtime</div>
+          <div class="step-desc">En Supabase: <strong>Database → Replication</strong> → activa las tablas <strong>inscritos</strong> y <strong>logs</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Pega tus credenciales abajo y guarda</div>
+          <div class="step-desc">El sistema se conectará automáticamente y el indicador "BD" en el menú se pondrá verde.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="ch">Credenciales</div>
+      <div id="cfg-alert"></div>
+      <div class="config-field">
+        <label>Supabase Project URL</label>
+        <input id="cfg-url" placeholder="https://xxxxxxxxxxxx.supabase.co" type="url">
+      </div>
+      <div class="config-field">
+        <label>Supabase anon / public key</label>
+        <input id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="saveConfig()">Guardar y conectar</button>
+        <button class="btn btn-ghost" onclick="testConnection()">Probar conexión</button>
+        <button class="btn btn-ghost btn-sm btn-red" onclick="clearConfig()">Borrar config</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL GLOBAL — SISTEMA ════════════════════════════ -->
+<div class="pg" id="pg-globaladmin">
+  <div class="wrap" style="max-width:1100px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:.75rem">
+      <h1 style="font-size:24px">Panel de Sistema</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="loadGlobalStats()">&#8635; Actualizar</button>
+        <button class="btn btn-teal btn-sm" onclick="abrirCrearOrg()">+ Nueva organización</button>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:1rem">Vista global de todas las organizaciones del sistema.</p>
+    <div class="stats" style="grid-template-columns:repeat(5,1fr);margin-bottom:1rem">
+      <div class="stat"><div class="stat-n" id="ga-total-orgs">—</div><div class="stat-l">Organizaciones</div></div>
+      <div class="stat"><div class="stat-n" id="ga-active-orgs" style="color:var(--green)">—</div><div class="stat-l">Activas</div></div>
+      <div class="stat"><div class="stat-n" id="ga-total-eventos">—</div><div class="stat-l">Eventos totales</div></div>
+      <div class="stat"><div class="stat-n" id="ga-total-inscritos">—</div><div class="stat-l">Inscritos totales</div></div>
+      <div class="stat"><div class="stat-n" id="ga-mrr" style="color:var(--gold-d)">—</div><div class="stat-l">Orgs de pago</div></div>
+    </div>
+    <div class="subtabs" style="margin-bottom:1rem">
+      <button class="stab on" id="ga-tab-orgs"    onclick="gaTab('orgs')">Organizaciones</button>
+      <button class="stab"    id="ga-tab-compare" onclick="gaTab('compare')">Comparativa</button>
+      <button class="stab"    id="ga-tab-detalle" onclick="gaTab('detalle')" style="display:none">&#128202; <span id="ga-detalle-nombre">—</span></button>
+    </div>
+    <!-- TAB orgs -->
+    <div id="ga-panel-orgs">
+      <input id="ga-search" placeholder="Buscar por nombre, slug o plan…" oninput="filtrarGlobalOrgs(this.value)"
+        style="margin-bottom:.75rem;padding:7px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;width:280px;display:block">
+      <div class="card" style="padding:0"><div class="tw"><table>
+        <thead><tr>
+          <th>Organización</th><th>Slug</th><th>Plan</th><th>Estado</th>
+          <th style="text-align:center">Eventos</th><th style="text-align:center">Inscritos</th>
+          <th style="text-align:center">Usuarios</th><th>Creada</th><th>Acciones</th>
+        </tr></thead>
+        <tbody id="ga-orgs-table"><tr><td colspan="9" class="empty">Cargando…</td></tr></tbody>
+      </table></div></div>
+    </div>
+    <!-- TAB comparativa -->
+    <div id="ga-panel-compare" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="card"><div class="ch" style="margin-bottom:.75rem">Inscritos por organización</div>
+          <div style="position:relative;height:220px"><canvas id="ga-chart-ins"></canvas></div></div>
+        <div class="card"><div class="ch" style="margin-bottom:.75rem">Eventos por organización</div>
+          <div style="position:relative;height:220px"><canvas id="ga-chart-ev"></canvas></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="card"><div class="ch" style="margin-bottom:.75rem">Distribución por plan</div>
+          <div style="position:relative;height:200px"><canvas id="ga-chart-plan"></canvas></div></div>
+        <div class="card"><div class="ch" style="margin-bottom:.75rem">Crecimiento de organizaciones</div>
+          <div style="position:relative;height:200px"><canvas id="ga-chart-crec"></canvas></div></div>
+      </div>
+    </div>
+    <!-- TAB detalle org -->
+    <div id="ga-panel-detalle" style="display:none">
+      <div id="ga-detalle-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CREAR ORG (global admin) -->
+<div id="mod-crear-org" class="modal-bg" style="display:none" onclick="if(event.target===this)cerrarCrearOrg()">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-x" onclick="cerrarCrearOrg()">×</button>
+    <h3 style="font-size:17px;margin-bottom:.25rem">Nueva organización</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:1rem">Crea la organización directamente desde el panel de sistema.</p>
+    <div id="co-alert"></div>
+    <div class="grid2">
+      <div class="fg" style="grid-column:1/-1"><label>Nombre del local *</label><input id="co-nombre" placeholder="Ej. Bar La Terraza" maxlength="80" oninput="coAutoSlug(this.value)"></div>
+      <div class="fg" style="grid-column:1/-1"><label>Slug único *</label>
+        <input id="co-slug" placeholder="bar-la-terraza" maxlength="40" oninput="coCheckSlug(this.value)"
+          style="font-family:monospace">
+        <div id="co-slug-hint" style="font-size:11px;margin-top:4px;color:var(--ink3)"></div>
+      </div>
+      <div class="fg"><label>Email admin *</label><input id="co-email" type="email" placeholder="admin@local.com" maxlength="120"></div>
+      <div class="fg"><label>Contraseña *</label><input id="co-pass" type="password" placeholder="Mínimo 8 caracteres" maxlength="72"></div>
+      <div class="fg"><label>Plan</label>
+        <select id="co-plan" style="width:100%">
+          <option value="freemium">Freemium — $0 COP</option>
+          <option value="pass_evento">Pass por Evento — $40.000 COP</option>
+          <option value="pro_mensual" selected>Suscripción Mensual — $400.000 COP/mes</option>
+        </select>
+      </div>
+      <div class="fg"><label>Color principal</label>
+        <input type="color" id="co-color" value="#C8A96E" style="width:100%;height:40px;border:1px solid var(--border);border-radius:var(--rsm);cursor:pointer;padding:2px">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:.75rem">
+      <button class="btn btn-teal" id="co-btn" onclick="crearOrgGlobal()" style="flex:1;justify-content:center">Crear organización</button>
+      <button class="btn btn-ghost" onclick="cerrarCrearOrg()">Cancelar</button>
+    </div>
+  </div>
+</div>
+<div id="mod-edit-org" class="modal-bg" style="display:none" onclick="if(event.target===this)cerrarEditOrg()">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-x" onclick="cerrarEditOrg()">×</button>
+    <h3 style="font-size:17px;margin-bottom:.25rem">Editar organización</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:1rem">Cambios aplicados inmediatamente.</p>
+    <input type="hidden" id="eo-id">
+    <div id="eo-alert"></div>
+    <div class="grid2">
+      <div class="fg" style="grid-column:1/-1"><label>Nombre *</label><input id="eo-nombre" maxlength="80"></div>
+      <div class="fg"><label>Plan</label>
+        <select id="eo-plan" style="width:100%">
+          <option value="freemium">Freemium — $0 COP</option>
+          <option value="pass_evento">Pass por Evento — $40.000 COP</option>
+          <option value="pro_mensual">Suscripción Mensual — $400.000 COP/mes</option>
+          <option value="enterprise">Enterprise</option>
+        </select>
+      </div>
+      <div class="fg"><label>Color principal</label>
+        <input type="color" id="eo-color" style="width:100%;height:40px;border:1px solid var(--border);border-radius:var(--rsm);cursor:pointer;padding:2px">
+      </div>
+      <div class="fg" style="grid-column:1/-1"><label>Logo URL</label><input id="eo-logo" type="url" placeholder="https://…"></div>
+      <div class="fg"><label>Nombre app</label><input id="eo-nombre-app" maxlength="40"></div>
+      <div class="fg"><label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="eo-activa" style="width:16px;height:16px;accent-color:var(--green)">
+        <span>Organización activa</span></label>
+      </div>
+    </div>
+    <div id="eo-stats" style="background:var(--surface);border-radius:var(--rsm);padding:.75rem 1rem;margin-top:.5rem;font-size:12px;color:var(--ink2)">
+      <div style="font-weight:500;margin-bottom:.4rem">Estadísticas</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <div>Eventos: <strong id="eo-stat-ev">—</strong></div>
+        <div>Inscritos: <strong id="eo-stat-ins">—</strong></div>
+        <div>Usuarios: <strong id="eo-stat-usr">—</strong></div>
+      </div>
+      <div style="margin-top:.35rem">Slug: <code id="eo-slug" style="background:#fff;padding:1px 6px;border-radius:4px;font-size:11px"></code></div>
+      <div style="margin-top:.2rem;color:var(--ink3)">Creada: <span id="eo-created"></span></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:.9rem;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="guardarEditOrg()" style="flex:1;justify-content:center">Guardar cambios</button>
+      <button class="btn btn-ghost btn-sm btn-red" onclick="toggleActivarOrg()">Activar / Desactivar</button>
+      <button class="btn btn-ghost" onclick="cerrarEditOrg()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ARCHIVADO · pg-public (Cero Borrado: inaccesible, se conserva) ══ -->
+<!-- ══ VISTA PÚBLICO ════════════════════════════════════ -->
+<div class="pg" id="pg-public">
+  <div class="pub-wrap">
+    <div class="pub-card">
+      <div class="pub-head">
+        <h2>Registro de invitados</h2>
+        <div id="pb-evnm" class="ev-name"></div>
+        <div id="pb-evds" class="ev-desc"></div>
+      </div>
+      <div id="pb-form" class="pub-body">
+        <div id="pb-alert"></div>
+        <div class="pub-field">
+          <label>Evento</label>
+          <select id="pb-evsel" onchange="pubSelEv()" style="width:100%"><option value="">Selecciona el evento</option></select>
+        </div>
+        <div class="pub-field"><label>Nombre completo *</label><input id="pb-n" placeholder="Tu nombre completo"></div>
+        <div class="pub-field"><label>Cédula / Documento *</label><input id="pb-c" placeholder="Número de documento"></div>
+        <div class="pub-field"><label>Teléfono *</label><input id="pb-t" placeholder="Número de celular"></div>
+        <button class="pub-submit" id="pub-submit-btn" onclick="regPublico()">Confirmar inscripción →</button>
+      </div>
+      <div id="pb-suc" class="success-wrap" style="display:none">
+        <div class="suc-icon">✓</div>
+        <h2 style="font-size:22px">¡Listo!</h2>
+        <p style="font-size:13px;color:var(--ink3);margin-top:.3rem">Guarda este QR — es tu entrada al evento.</p>
+        <div class="ticket">
+          <span class="badge badge-teal" style="margin-bottom:.5rem">Invitado</span>
+          <div id="pb-sn" style="font-family:'DM Serif Display',serif;font-size:19px;margin:.3rem 0"></div>
+          <div id="pb-se" style="font-size:12px;color:var(--ink2)"></div>
+          <div class="qr-ticket" id="pb-sqr"></div>
+          <div id="pb-sc" style="font-family:monospace;font-size:12px;color:var(--ink3);letter-spacing:.08em"></div>
+        </div>
+        <p style="font-size:12px;color:var(--ink3)">Muestra este código en la puerta de la terraza.</p>
       </div>
     </div>
   </div>
@@ -2500,17 +2567,55 @@ function alrt(id, msg, t, dur=4000) {
   if (msg && dur > 0) setTimeout(() => { if(el) el.innerHTML=''; }, dur);
 }
 
-// ── NAV ───────────────────────────────────────────────
+// ── NAV · Router central (5 bloques) ────────────────────
 const PAGES = ['admin','clientes','qrtrack','scanner','panel','usuarios','config','org','globaladmin'];
 
-function goPg(p) {
+// Mapa ruta → [página .pg, sub-panel]
+const ROUTES = {
+  '#/eventos/historial':   ['admin','historial'],
+  '#/eventos/crear':       ['admin','crear'],
+  '#/eventos/invitadores': ['admin','invitadores'],
+  '#/personas/directorio': ['clientes','cli-list'],
+  '#/personas/nuevo':      ['clientes','cli-new'],
+  '#/personas/asignar':    ['clientes','cli-assign'],
+  '#/datos/resumen':       ['panel','resumen'],
+  '#/datos/tendencias':    ['panel','tendencias'],
+  '#/datos/rankings':      ['panel','rankings'],
+  '#/datos/asistentes':    ['panel','asistentes'],
+  '#/qr/crear':            ['qrtrack','qrt-new'],
+  '#/qr/lista':            ['qrtrack','qrt-list'],
+  '#/staff/admins':        ['usuarios','usr-admins'],
+  '#/staff/porteros':      ['usuarios','usr-porteros'],
+  '#/puerta/control':      ['scanner',null],
+  '#/org':                 ['org',null],
+  '#/config':              ['config',null],
+  '#/sistema':             ['globaladmin',null]
+};
+const ROUTE_DEFAULT = '#/eventos/historial';
+const ROUTE_KEY = 'htz_admin_route';
+
+function toggleSidebar(open) {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sb-overlay');
+  if (!sb) return;
+  sb.classList.toggle('open', open);
+  if (ov) ov.classList.toggle('open', open);
+}
+
+function goPg(p, sub) {
   document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));
-  document.querySelectorAll('.ntab').forEach(e=>e.classList.remove('on'));
   const pg = document.getElementById('pg-'+p);
   if (pg) pg.classList.add('on');
-  const idx = PAGES.indexOf(p);
-  const tabs = document.querySelectorAll('.ntab');
-  if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('on');
+
+  // Sidebar: resaltar item activo (por página o por sub-panel)
+  document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('on'));
+  let sel = document.querySelector('.sb-item[data-go="'+p+'"]');
+  if (sub) {
+    const s2 = document.querySelector('.sb-item[data-go="'+p+'"][data-sub="'+sub+'"]');
+    if (s2) sel = s2;
+  }
+  if (sel) sel.classList.add('on');
+
   if (p==='admin')    { loadEventos(); }
   if (p==='qrtrack')  { loadQRLinks(); }
   if (p==='clientes') { loadDirectorio(); loadClientes(); loadEventosSelects(); }
@@ -2533,7 +2638,29 @@ function goPg(p) {
   }
   if (p !== 'scanner' && typeof stopCamera === 'function') stopCamera();
   closeGlobalSearch();
+  toggleSidebar(false);
 }
+
+function navigate(route) {
+  let target = ROUTES[route] ? route : ROUTE_DEFAULT;
+  if (!_canAccess(ROUTES[target][0])) target = ROUTE_DEFAULT;
+  const r = ROUTES[target];
+  const p = r[0], sub = r[1];
+  goPg(p, sub);
+  if (p==='admin' && sub) admGoTab(sub);
+  if (p==='panel' && sub) pnlGoTab(sub);
+  if (p==='clientes' && sub) goSTab(sub);
+  if (p==='qrtrack' && sub) goSTab(sub);
+  if (p==='usuarios' && sub) goSTab(sub);
+  if (location.hash !== target) {
+    try { history.replaceState(null, '', target); } catch(e) { console.error('[navigate] hash:', e.message); }
+  }
+  try { localStorage.setItem(ROUTE_KEY, target); } catch(e) { console.error('[navigate] persist:', e.message); }
+}
+
+window.addEventListener('hashchange', () => {
+  if (ROUTES[location.hash]) navigate(location.hash);
+});
 
 
 // ══ LANDING PAGE CINEMATOGRÁFICA — CONFIGURADOR ═══════════
@@ -3648,12 +3775,8 @@ function entrarComoOrg(orgId) {
   // Mostrar banner
   _mostrarBannerOrg(org);
 
-  // Mostrar todos los tabs como superadmin normal
-  document.getElementById('nav-clientes').style.display  = '';
-  document.getElementById('nav-scanner').style.display   = '';
-  document.getElementById('nav-usuarios').style.display  = '';
-  document.getElementById('nav-qrtrack').style.display   = '';
-  document.getElementById('nav-globaladmin').style.display = 'none';
+  // Mostrar permisos como superadmin normal (sidebar vía data-vis)
+  applyRoleNav('superadmin');
 
   // Recargar datos con el nuevo ORG_ID
   loadAll();
@@ -3690,9 +3813,8 @@ function salirModoOrg() {
   const banner = document.getElementById('banner-modo-org');
   if (banner) banner.remove();
 
-  // Restaurar nav de system admin
-  document.getElementById('nav-globaladmin').style.display = '';
-  document.getElementById('nav-scanner').style.display = '';
+  // Restaurar permisos de system admin (sidebar vía data-vis)
+  applyRoleNav('superadmin');
 
   loadAll();
   goPg('globaladmin');
@@ -8420,7 +8542,10 @@ function showLoginScreen() {
   currentUser = null; currentPerfil = null;
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('main-nav').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('sb-overlay').style.display = 'none';
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  toggleSidebar(false);
 }
 
 async function onLogin(user) {
@@ -8472,6 +8597,8 @@ async function onLogin(user) {
   // 3. Mostrar nav
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('main-nav').style.display = 'flex';
+  document.getElementById('sidebar').style.display = '';
+  document.getElementById('sb-overlay').style.display = '';
   document.getElementById('nav-user-name').textContent = perfil?.nombre || user.email;
 
   // 4. Aplicar roles (UNA SOLA VEZ, _orgData ya cargado)
@@ -8480,9 +8607,25 @@ async function onLogin(user) {
   // 5. Conectar BD y cargar datos
   const ok = await checkConnection();
   if (ok) { setupRealtime(); startHeartbeat(); await loadAll(); }
-  goPg('admin');
+  // Aterrizar en la última ruta guardada (o la por defecto según rol)
+  let saved = ROUTE_DEFAULT;
+  try { saved = localStorage.getItem(ROUTE_KEY) || ROUTE_DEFAULT; } catch(e) { saved = ROUTE_DEFAULT; }
+  if (!ROUTES[saved]) saved = ROUTE_DEFAULT;
+  navigate(saved);
 
   if (perfil?.rol === 'admin_evento') aplicarRestriccionesAdminEvento();
+}
+
+// Permisos por rol para el router (mismas reglas que la barra anterior)
+function _canAccess(p) {
+  const rol = currentPerfil?.rol;
+  const isSuper  = rol === 'superadmin';
+  const isAdminEv = rol === 'admin_evento';
+  const isSys = isSuper && _orgData?.is_master_org === true; // ADR-025
+  if (p === 'clientes' || p === 'qrtrack') return isSuper;
+  if (p === 'scanner' || p === 'usuarios') return isSuper || isAdminEv;
+  if (p === 'config' || p === 'globaladmin') return isSys;
+  return true; // admin, panel, org
 }
 
 function applyRoleNav(rol) {
@@ -8490,26 +8633,20 @@ function applyRoleNav(rol) {
   const isAdminEvento = rol === 'admin_evento';
   const isSystemAdmin = isSuperAdmin && _orgData?.is_master_org === true; // ADR-025: reemplaza match de slug hardcodeado
 
-  // Nav tabs — Puerta y Usuarios visibles para CUALQUIER superadmin o admin_evento
-  document.getElementById('nav-clientes').style.display  = isSuperAdmin ? '' : 'none';
-  document.getElementById('nav-scanner').style.display   = (isSuperAdmin || isAdminEvento) ? '' : 'none';
-  document.getElementById('nav-usuarios').style.display  = (isSuperAdmin || isAdminEvento) ? '' : 'none';
-  document.getElementById('nav-qrtrack')?.style && (document.getElementById('nav-qrtrack').style.display = isSuperAdmin ? '' : 'none');
-
-  // Tab "⚙ Sistema" solo para el superadmin de la org maestra (is_master_org=true, ADR-025)
-  const navGA = document.getElementById('nav-globaladmin');
-  if (navGA) navGA.style.display = isSystemAdmin ? '' : 'none';
-
-  // Tab "Config" solo para system admin (las otras cuentas no tocan la config de Supabase)
-  const navCfg = document.getElementById('nav-config');
-  if (navCfg) navCfg.style.display = isSystemAdmin ? '' : 'none';
+  // Sidebar: visibilidad por regla data-vis (super | staff | system | all)
+  document.querySelectorAll('.sb-item[data-vis]').forEach(el => {
+    const vis = el.dataset.vis;
+    if (vis === 'super')      el.style.display = isSuperAdmin ? '' : 'none';
+    else if (vis === 'staff') el.style.display = (isSuperAdmin || isAdminEvento) ? '' : 'none';
+    else if (vis === 'system') el.style.display = isSystemAdmin ? '' : 'none';
+    else el.style.display = '';
+  });
 
   if (isAdminEvento) {
     const evId = currentPerfil?.evento_id;
     _eventoAsignado = evId;
     const crearCard = document.querySelector('#pg-admin .card');
     if (crearCard) crearCard.style.display = 'none';
-    goPg('admin');
   }
 }
 
