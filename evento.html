@@ -651,7 +651,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const effContent = Object.assign({}, content, (__i18nLayer.content || {}));
                 const effNombre = __i18nLayer.nombre || ev.nombre;
                 const effOrgNombre = (__i18nLayer.org_nombre || (ev.organizaciones && ev.organizaciones.nombre)) || '';
-                // v216 · PLAN DE LA ORGANIZACION: gobierna el limite freemium (100
+                // v216 · PLAN DE LA ORGANIZACION: gobierna el limite freemium (60
                 // inscritos/evento) y el badge "Powered by Hostal Terraza QR". Si la
                 // org no existe o su plan llega null (ADR-024) se asume 'freemium':
                 // default conservador que nunca regala cupo ni oculta marca a un plan pago.
@@ -1563,14 +1563,14 @@ if (document.getElementById('db-poster-img')) {
                         };
                         try {
                             // BLOQUEO FREEMIUM (v216): el plan 'freemium' admite hasta
-                            // 100 inscritos por evento. Aplica a TODOS los registros del
+                            // 60 inscritos por evento. Aplica a TODOS los registros del
                             // evento (incluido el 'interesado' de landing con
                             // cuenta_aforo:false): el cupo se mide por evento, no por tipo.
                             if (orgPlan === 'freemium') {
                                 const { count, error: countErr } = await sbClient.from('inscritos').select('id', { count: 'exact', head: true }).eq('evento_id', ev.id);
                                 if (countErr) throw countErr;
-                                if (count >= 100) {
-                                    const FREEMIUM_MSG = T('landing.form_freemium_limite') || 'Este evento alcanzó el límite de 100 asistentes del plan gratuito.';
+                                if (count >= 60) {
+                                    const FREEMIUM_MSG = T('landing.form_freemium_limite') || 'Este evento alcanzó el límite de 60 asistentes del plan gratuito.';
                                     if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = FREEMIUM_MSG; }
                                     __ANALYTICS.emit('form_submit', 'freemium_limite', 'bloqueado', 0);
                                     return;

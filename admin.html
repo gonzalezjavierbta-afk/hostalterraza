@@ -5695,16 +5695,19 @@ async function crearEvento() {
 }
 
 // Calcula el estado inicial de un evento nuevo según el plan de la org activa.
-// freemium/pro_mensual → publicado; pass_evento → publicado solo si no hay otro publicado.
+// pro_mensual → publicado; pass_evento/freemium → publicado solo si no hay otro publicado.
 async function _calcularEstadoEvento() {
   const plan = _orgData?.plan;
-  if (plan === 'pass_evento') {
+  if (plan === 'pass_evento' || plan === 'freemium') {
     const { count } = await SB.from('eventos')
       .select('id', { count: 'exact', head: true })
       .eq('org_id', ORG_ID)
       .eq('estado', 'publicado');
     if ((count || 0) >= 1) {
-      alrt('ev-alert', '⚠ Tu plan PASS incluye 1 evento publicado. Este evento quedará pendiente de pago.', 'warn');
+      const msg = plan === 'pass_evento'
+        ? '⚠ Tu plan PASS incluye 1 evento publicado. Este evento quedará pendiente de pago.'
+        : '⚠ Tu plan Freemium incluye 1 evento activo. Este evento quedará pendiente de pago.';
+      alrt('ev-alert', msg, 'warn');
       return 'pendiente_pago';
     }
     return 'publicado';

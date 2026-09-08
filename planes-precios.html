@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n="index.nav.planes">Planes y precios · Hostal Terraza</title>
+<meta name="description" content="Planes y precios del sistema QR de Hostal Terraza: Freemium gratis hasta 60 asistentes, PASS por evento desde $40.000 COP y suscripción B2B para eventos recurrentes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0A09'/%3E%3Cpath d='M20 12v40M20 12l30 22M20 36l30 16' stroke='%23E3B457' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/i18n.js"></script>
+<style>
+/* ═══════════ HOSTAL TERRAZA · PLANES Y PRECIOS v1.0.0 ═══════════ */
+.ppz{--hbg:#0B0A09;--hbg2:#14110C;--hpanel:#17130D;--hline:rgba(227,180,87,.18);
+--gold:#E3B457;--gold2:#C8903F;--cream:#F5EFE2;--mut:rgba(245,239,226,.58);
+--mut2:rgba(245,239,226,.32);--r:20px;--rsm:10px;
+margin:0;color:var(--cream);background:var(--hbg);
+font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+.ppz *,.ppz *::before,.ppz *::after{box-sizing:border-box}
+.ppz a{color:inherit;text-decoration:none}
+.ppz img{display:block;max-width:100%}
+.ppz button{font-family:inherit}
+.ppz h1,.ppz h2,.ppz h3,.ppz .hz-display{font-family:'Anton',Impact,sans-serif;font-weight:400;letter-spacing:.02em;text-transform:uppercase;margin:0}
+.ppz :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+.ppz ::selection{background:var(--gold);color:#000}
+.ppz .hz-wrap{width:min(1180px,100% - 48px);margin-inline:auto}
+.ppz .hz-kicker{display:inline-flex;align-items:center;gap:.5rem;font-size:11px;font-weight:600;
+letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.ppz .hz-kicker::before{content:'';width:22px;height:2px;background:var(--gold)}
+
+/* ── NAV ── */
+.ppz-nav{position:sticky;top:0;z-index:60;background:rgba(11,10,9,.72);
+backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+border-bottom:1px solid var(--hline)}
+.ppz-nav-in{display:flex;align-items:center;gap:1.25rem;height:64px}
+.ppz-logo{display:flex;align-items:center;gap:.6rem;margin-right:auto}
+.ppz-logo-mark{width:34px;height:34px;color:var(--gold);flex-shrink:0}
+.ppz-logo-name{font-family:'Anton';font-size:17px;letter-spacing:.06em;line-height:1;text-transform:uppercase;color:var(--cream)}
+.ppz-logo-name b{color:var(--gold)}
+.ppz-nav-links{display:flex;align-items:center;gap:1.3rem}
+.ppz-nav-links a{font-size:13px;font-weight:500;letter-spacing:.03em;color:var(--mut);transition:color .15s}
+.ppz-nav-links a:hover{color:var(--gold)}
+.ppz-nav-links a.is-on{color:var(--gold)}
+.ppz-nav-burger{display:none;background:none;border:1px solid var(--hline);color:var(--cream);
+border-radius:8px;width:40px;height:40px;font-size:20px;cursor:pointer}
+
+/* ── BOTONES ── */
+.ppz-btn{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
+background:var(--gold);color:#191307;font-weight:700;font-size:13.5px;letter-spacing:.03em;
+border:0;border-radius:999px;padding:.6rem 1.15rem;cursor:pointer;transition:background .15s,transform .15s}
+.ppz-btn:hover{background:#f0c46d;transform:translateY(-1px)}
+.ppz-btn-ghost{background:transparent;color:var(--cream);border:1px solid var(--hline)}
+.ppz-btn-ghost:hover{background:rgba(227,180,87,.08);border-color:var(--gold)}
+
+/* ── HERO ── */
+.ppz-hero{padding:4.2rem 0 2.6rem;position:relative;overflow:hidden}
+.ppz-hero::before{content:'';position:absolute;inset:0;z-index:0;
+background:radial-gradient(560px 300px at 70% -10%,rgba(227,180,87,.12),transparent 70%)}
+.ppz-hero-in{position:relative;z-index:1;max-width:760px}
+.ppz-hero h1{font-size:clamp(34px,6vw,58px);line-height:.98;margin:.8rem 0 1rem}
+.ppz-hero p{max-width:620px;color:var(--mut);font-size:15.5px;margin:0}
+
+/* ── SECCIÓN ── */
+.ppz-sec{padding:3.4rem 0}
+.ppz-sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2.4rem}
+.ppz-sec-title{font-size:clamp(28px,4.5vw,40px);line-height:1;margin:.7rem 0 0}
+.ppz-sec-sub{max-width:460px;color:var(--mut);font-size:14.5px;margin:0}
+
+/* ── TARJETAS DE PLANES ── */
+.ppz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;align-items:stretch}
+.ppz-plan{position:relative;display:flex;flex-direction:column;gap:1.05rem;background:var(--hpanel);
+border:1px solid var(--hline);border-radius:var(--r);padding:1.7rem 1.5rem 1.5rem;
+transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.ppz-plan:hover{transform:translateY(-5px);border-color:var(--gold2);box-shadow:0 20px 46px rgba(0,0,0,.55)}
+.ppz-plan-pop{border-color:var(--gold);background:linear-gradient(180deg,#1C1810,#121009);
+box-shadow:0 0 0 1px var(--gold),0 24px 60px rgba(227,180,87,.14)}
+.ppz-plan-pop:hover{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 30px 70px rgba(227,180,87,.22)}
+.ppz-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:'Anton';
+font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#191307;background:var(--gold);
+border-radius:999px;padding:.32rem .9rem;white-space:nowrap;box-shadow:0 8px 24px rgba(227,180,87,.35)}
+.ppz-plan-name{font-family:'Anton';font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.ppz-plan-price{font-family:'Anton';font-size:clamp(30px,4vw,40px);line-height:1;color:var(--cream);margin-top:.15rem}
+.ppz-plan-price small{font-family:'Space Grotesk';font-size:11px;font-weight:600;letter-spacing:.14em;
+text-transform:uppercase;color:var(--mut2);margin-left:.3rem}
+.ppz-plan-focus{font-size:13.5px;color:var(--mut);margin:0}
+.ppz-plan-feats{list-style:none;margin:0;padding:0;display:grid;gap:.5rem;flex:1}
+.ppz-plan-feats li{display:flex;gap:.55rem;font-size:13px;color:var(--cream)}
+.ppz-plan-feats svg{color:var(--gold);flex-shrink:0;margin-top:2px}
+.ppz-plan .ppz-btn{width:100%;margin-top:.35rem}
+.ppz-note{font-size:12px;color:var(--mut2);text-align:center;margin-top:1rem}
+
+/* ── QUÉ DESBLOQUEAS (comparativa) ── */
+.ppz-unlock{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:stretch;
+background:var(--hpanel);border:1px solid var(--hline);border-radius:var(--r);padding:2rem}
+.ppz-unlock-card{display:flex;flex-direction:column;gap:.7rem}
+.ppz-unlock-card h3{font-size:20px;line-height:1.15;margin:0}
+.ppz-unlock-card p{margin:0;font-size:14px;color:var(--mut)}
+.ppz-unlock-list{list-style:none;margin:0;padding:0;display:grid;gap:.55rem}
+.ppz-unlock-list li{display:flex;gap:.55rem;font-size:13.5px;color:var(--cream)}
+.ppz-unlock-list svg{color:var(--gold);flex-shrink:0;margin-top:2px}
+.ppz-unlock-free li{color:var(--mut2);text-decoration:line-through;text-decoration-color:rgba(227,180,87,.35)}
+.ppz-unlock-free svg{color:var(--mut2)}
+
+/* ── PAGOS ── */
+.ppz-pay-head{margin-top:3rem;margin-bottom:1.2rem}
+.ppz-pay-head h3{font-size:clamp(22px,3vw,30px);line-height:1.05;margin:.6rem 0 0}
+.ppz-pay{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.ppz-pay-block{background:var(--hpanel);border:1px solid var(--hline);border-radius:var(--r);padding:1.6rem 1.5rem}
+.ppz-pay-block h3{font-size:19px;line-height:1.15;margin:0 0 .55rem}
+.ppz-pay-block p{margin:0;font-size:14px;color:var(--mut)}
+
+/* ── FOOTER ── */
+.ppz-footer{border-top:1px solid var(--hline);padding:2rem 0;margin-top:2rem}
+.ppz-footer-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.ppz-footer a{color:var(--gold)}
+.ppz-footer small{color:var(--mut2)}
+
+/* ── REVEAL ── */
+.ppz-rv{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.ppz-rv.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.ppz-rv{opacity:1;transform:none}}
+
+/* ── RESPONSIVE ── */
+@media (max-width:920px){
+ .ppz-grid{grid-template-columns:1fr}
+ .ppz-pay{grid-template-columns:1fr}
+ .ppz-unlock{grid-template-columns:1fr}
+ .ppz-nav-links{display:none}
+ .ppz-nav-links.open{display:flex;position:fixed;inset:64px 0 auto 0;flex-direction:column;background:rgba(11,10,9,.97);
+  padding:1.2rem 1.4rem;gap:1rem;border-bottom:1px solid var(--hline);z-index:59}
+ .ppz-nav-burger{display:block}
+ .ppz-sec-head{flex-direction:column;align-items:flex-start;gap:1rem}
+}
+</style>
+</head>
+<body class="ppz" id="top">
+
+<!-- ═════════ NAV ═════════ -->
+<header class="ppz-nav">
+  <div class="hz-wrap ppz-nav-in">
+    <a class="ppz-logo" href="index.html" aria-label="Hostal Terraza, inicio">
+      <svg class="ppz-logo-mark" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M20 12v40M20 12l30 22M20 36l30 16"/></svg>
+      <span class="ppz-logo-name">Hostal<b> Terraza</b></span>
+    </a>
+    <nav class="ppz-nav-links" id="navLinks" aria-label="Navegación principal">
+      <a href="index.html#eventos" data-i18n="index.nav.cartelera">Cartelera</a>
+      <a href="index.html#sistema" data-i18n="index.nav.sistema">Sistema QR</a>
+      <a href="index.html#landings" data-i18n="index.nav.landings">Landings</a>
+      <a href="#" class="is-on" data-i18n="index.nav.planes">Planes y precios</a>
+      <a href="index.html#contacto" data-i18n="index.nav.contacto">Contacto</a>
+    </nav>
+    <button class="ppz-nav-burger" id="navBurger" aria-label="Abrir menú" data-i18n-aria="index.nav.aria_burger">☰</button>
+  </div>
+</header>
+
+<!-- ═════════ HERO ═════════ -->
+<section class="ppz-hero">
+  <div class="hz-wrap ppz-hero-in">
+    <span class="hz-kicker" data-i18n="index.planes.kicker">Precios claros, sin letra pequeña</span>
+    <h1><span data-i18n="index.planes.title1">Planes y precios</span> <span data-i18n="index.planes.title2">que crecen contigo</span></h1>
+    <p data-i18n="index.planes.sub">Empieza gratis con hasta 60 asistentes. Pasa a pago cuando tu evento crezca.</p>
+  </div>
+</section>
+
+<!-- ═════════ PLANES ═════════ -->
+<section class="ppz-sec">
+  <div class="hz-wrap">
+    <div class="ppz-grid">
+      <div class="ppz-plan ppz-rv">
+        <div class="ppz-plan-name" data-i18n="index.planes.free_title">FREEMIUM</div>
+        <div class="ppz-plan-price"><span data-i18n="index.planes.free_name">$0</span><small>COP</small></div>
+        <p class="ppz-plan-focus" data-i18n="index.planes.free_focus">Prueba el sistema con eventos pequeños.</p>
+        <ul class="ppz-plan-feats">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f1">Hasta 60 asistentes/evento</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f2">1 evento activo</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f3">1 plantilla básica</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f4">Landing con marca de agua</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f5">Captura WhatsApp (Nequi/Daviplata/Efectivo)</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.free_f6">Escáner básico en línea</span></li>
+        </ul>
+        <a class="ppz-btn ppz-btn-ghost" href="registro.html?plan=freemium" data-track="cta_plan_freemium" data-i18n="index.planes.free_cta">Comenzar Gratis</a>
+      </div>
+
+      <div class="ppz-plan ppz-plan-pop ppz-rv">
+        <span class="ppz-badge" data-i18n="index.planes.pass_badge">Más Popular</span>
+        <div class="ppz-plan-name" data-i18n="index.planes.pass_title">PASS POR EVENTO</div>
+        <div class="ppz-plan-price"><span data-i18n="index.planes.pass_name">$40.000</span><small>COP</small></div>
+        <p class="ppz-plan-focus" data-i18n="index.planes.pass_focus">Promotores, fiestas temáticas y talleres esporádicos.</p>
+        <ul class="ppz-plan-feats">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f1">Asistentes e inscritos ILIMITADOS</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f2">Landing con paleta de colores atómica (v305)</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f3">Sin marcas de agua</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f4">Escáner offline con validación por cédula (últimos 4 dígitos)</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pass_f5">Analítica de clicks y geo en tiempo real</span></li>
+        </ul>
+        <a class="ppz-btn" href="registro.html?plan=pass_evento" data-track="cta_plan_pass_evento" data-i18n="index.planes.pass_cta">Crear mi Evento ($40k)</a>
+      </div>
+
+      <div class="ppz-plan ppz-rv">
+        <div class="ppz-plan-name" data-i18n="index.planes.pro_title">SUSCRIPCIÓN B2B</div>
+        <div class="ppz-plan-price"><span data-i18n="index.planes.pro_name">$400.000</span><small data-i18n="index.planes.pro_per">/ mes</small></div>
+        <p class="ppz-plan-focus" data-i18n="index.planes.pro_focus">Hostales, Discotecas, Clubes y Recintos con eventos recurrentes.</p>
+        <ul class="ppz-plan-feats">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f1">Eventos e invitados ILIMITADOS al mes</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f2">Marca Blanca Completa</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f3">Sub-cuentas para Staff y Porteros ilimitadas</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f4">Soporte para Series de Eventos (serie.html)</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.pro_f5">Soporte prioritario</span></li>
+        </ul>
+        <a class="ppz-btn ppz-btn-ghost" href="registro.html?plan=pro_mensual" data-track="cta_plan_pro_mensual" data-i18n="index.planes.pro_cta">Contratar Plan Mensual</a>
+      </div>
+    </div>
+
+    <!-- ═════════ QUÉ DESBLOQUEAS AL PASAR A PAGO ═════════ -->
+    <div class="ppz-unlock ppz-rv" style="margin-top:2rem">
+      <div class="ppz-unlock-card">
+        <span class="hz-kicker" data-i18n="index.planes.noinc_title">Qué desbloqueas al pasar a pago</span>
+        <p data-i18n="index.planes.noinc_sub">El plan Freemium es para probar el sistema. Cuando tu evento crezca, el PASS te quita los límites.</p>
+      </div>
+      <div class="ppz-unlock-card">
+        <h3 data-i18n="index.planes.pass_title">PASS POR EVENTO</h3>
+        <ul class="ppz-unlock-list">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.unlock1">Asistentes e inscritos ilimitados</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.unlock2">Sin marca de agua en tu landing</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.unlock3">Escáner offline con validación por cédula</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.unlock4">Analítica de clicks y geo en tiempo real</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="index.planes.unlock5">Paleta de colores completa y pasarela directa</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═════════ CÓMO FUNCIONA EL SISTEMA DE PAGOS ═════════ -->
+    <div class="ppz-pay-head ppz-rv">
+      <span class="hz-kicker" data-i18n="index.planes.pay_kicker">Cómo funciona el Sistema de Pagos</span>
+      <h3 data-i18n="index.planes.pay_title">Cobras tú. Pagas solo cuando vendes.</h3>
+    </div>
+    <div class="ppz-pay">
+      <div class="ppz-pay-block ppz-rv">
+        <h3 data-i18n="index.planes.bloque_a_t">¿Cómo cobras tus entradas a tus asistentes?</h3>
+        <p data-i18n="index.planes.bloque_a_p">Venta Directa en WhatsApp ($0 comisión) recibiendo Nequi/Daviplata/Efectivo, o conectar pasarela directa (Wompi/MercadoPago).</p>
+      </div>
+      <div class="ppz-pay-block ppz-rv">
+        <h3 data-i18n="index.planes.bloque_b_t">¿Cómo pagas la plataforma?</h3>
+        <p data-i18n="index.planes.bloque_b_p">Integración transparente con pasarela local (PSE, Nequi, Tarjetas) para activar los pases de $40.000 o la mensualidad de $400.000 de forma instantánea.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ FOOTER ═════════ -->
+<footer class="ppz-footer">
+  <div class="hz-wrap ppz-footer-in">
+    <a class="ppz-logo" href="index.html" aria-label="Hostal Terraza, inicio">
+      <svg class="ppz-logo-mark" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M20 12v40M20 12l30 22M20 36l30 16"/></svg>
+      <span class="ppz-logo-name">Hostal<b> Terraza</b></span>
+    </a>
+    <small>© <span id="year"></span> <span data-i18n="index.footer.bottom2">Hostal Terraza · Sistema QR &amp; Landings</span></small>
+    <a href="index.html#sistema" data-i18n="index.nav.sistema">Sistema QR</a>
+  </div>
+</footer>
+
+<script>
+/* ── NAV MOBILE ── */
+(function () {
+  var burger = document.getElementById('navBurger');
+  var links = document.getElementById('navLinks');
+  if (burger && links) {
+    burger.addEventListener('click', function () { links.classList.toggle('open'); });
+  }
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+
+/* ── I18N ── */
+if (window.I18N && typeof I18N.apply === 'function') { I18N.apply(); }
+
+/* ── SCROLL REVEAL ── */
+(function () {
+  var els = document.querySelectorAll('.ppz-rv');
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    els.forEach(function (el) { el.classList.add('on'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>
