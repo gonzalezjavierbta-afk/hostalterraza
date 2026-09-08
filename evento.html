@@ -255,6 +255,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     <form id="master-reg-form">
                         <input type="text" id="reg-nombre" placeholder="Nombre completo *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
                         <input type="tel" id="reg-whatsapp" placeholder="WhatsApp *" required style="width:100%; padding:1.2rem; margin-bottom:1.5rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;">
+                        <label id="reg-unir-comunidad-wrap" style="display:none; align-items:flex-start; gap:10px; margin-bottom:1.5rem; padding:1rem 1.1rem; background:rgba(37,211,102,0.08); border:1px solid rgba(37,211,102,0.25); border-radius:12px; cursor:pointer; font-size:0.9rem; color:rgba(255,255,255,0.85);">
+                            <input type="checkbox" id="reg-unir-comunidad" checked style="width:17px; height:17px; accent-color:#25d366; margin-top:2px; flex-shrink:0;">
+                            <span>Quiero unirme a la comunidad de WhatsApp del evento</span>
+                        </label>
                         <div id="reg-comunidad-msg" style="display:none; margin-bottom:1.5rem; padding:1.2rem; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.4); border-radius:12px; color:#fff; font-weight:600;"></div>
                         <button type="submit" style="width:100%; padding:1.5rem; background:var(--gold); border:none; color:white; font-weight:900; border-radius:15px; cursor:pointer;">CONFIRMAR →</button>
                     </form>
@@ -660,6 +664,76 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
                 document.body.className = `${tplNormal} ${tplLower}`;
 
+                // v305 · PUENTE DE GAMAS CROMÁTICAS (regla general, aplica a silos que
+                // exponen tokens de paleta derivada, ej. .tpl-f8 TropiLove). A partir del
+                // --master-accent del evento se calculan complementario/análogos/tríada
+                // (paridad con renderColorHarmony del admin) y se inyectan como CSS vars
+                // para que el silo respete el color elegido con sus gamas de combinación.
+                function __hexToHsl(hex) {
+                    let h = String(hex || '').trim().replace('#', '');
+                    if (h.length === 3) h = h.split('').map(c => c + c).join('');
+                    if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+                    const r = parseInt(h.slice(0, 2), 16) / 255;
+                    const g = parseInt(h.slice(2, 4), 16) / 255;
+                    const b = parseInt(h.slice(4, 6), 16) / 255;
+                    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                    let l = (max + min) / 2, s = 0, hue = 0;
+                    if (max !== min) {
+                        const d = max - min;
+                        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                        if (max === r) hue = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+                        else if (max === g) hue = ((b - r) / d + 2) * 60;
+                        else hue = ((r - g) / d + 4) * 60;
+                    }
+                    return { h: Math.round(hue), s: Math.round(s * 100), l: Math.round(l * 100) };
+                }
+                function __hslToHex(h, s, l) {
+                    h = ((h % 360) + 360) % 360;
+                    s = Math.max(0, Math.min(100, s)); l = Math.max(0, Math.min(100, l));
+                    const sn = s / 100, ln = l / 100;
+                    const k = n => (n + h / 30) % 12;
+                    const a = sn * Math.min(ln, 1 - ln);
+                    const f = n => {
+                        const c = ln - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+                        return Math.round(255 * c).toString(16).padStart(2, '0');
+                    };
+                    return `#${f(0)}${f(8)}${f(4)}`;
+                }
+                const __esF8 = document.body.className && document.body.className.toLowerCase().includes('tpl-f8');
+                if (__esF8 && primaryColor) {
+                    const hsl = __hexToHsl(primaryColor);
+                    if (hsl) {
+                        // Se inyecta en document.body (el elemento que porta la clase
+                        // .tpl-f8): el estilo inline vence la definición de tokens del
+                        // silo en CSS y los descendientes heredan la paleta derivada.
+                        const root = document.body;
+                        const set = (n, v) => root.style.setProperty(n, v);
+                        const clampL = (l) => Math.max(18, Math.min(62, l));
+                        const neon = hsl.l > 60 ? 66 : Math.max(48, hsl.l);
+                        // base (acento) + gamas: análogo ±24°, complementario +180°, tríada ±120°
+                        set('--f8-neon-pink',   __hslToHex(hsl.h, Math.max(80, hsl.s), neon));
+                        set('--f8-neon-yellow', __hslToHex(hsl.h + 24, Math.max(80, hsl.s), clampL(neon - 6)));
+                        set('--f8-neon-purple', __hslToHex(hsl.h - 24, Math.max(70, hsl.s), clampL(neon - 10)));
+                        set('--f8-neon-blue',   __hslToHex(hsl.h + 180, Math.max(65, hsl.s), clampL(neon - 4)));
+                        set('--f8-glow-pink',   `0 0 18px ${__hslToHex(hsl.h, Math.max(80, hsl.s), neon)}55`);
+                        set('--f8-glow-pink-strong', `0 0 28px ${__hslToHex(hsl.h, Math.max(80, hsl.s), neon)}8c, 0 0 70px ${__hslToHex(hsl.h, Math.max(80, hsl.s), neon)}2e`);
+                        set('--f8-glow-yellow', `0 0 18px ${__hslToHex(hsl.h + 24, Math.max(80, hsl.s), clampL(neon - 6))}59`);
+                        set('--f8-glow-purple', `0 0 18px ${__hslToHex(hsl.h - 24, Math.max(70, hsl.s), clampL(neon - 10))}59`);
+                    }
+                }
+
+                // v306 · REGLA GENERAL "MÓDULOS VACÍOS" (data-first): oculta la sección de
+                // un módulo en el landing cuando su contenido está vacío, en lugar de
+                // inyectar contenido de relleno/fallback. Es el mecanismo general; cada
+                // módulo decide si tiene contenido (hasContent) al poblar sus átomos.
+                const __hideEmptyModule = function (id, hasContent) {
+                    const el = document.getElementById(id);
+                    if (el && !hasContent) {
+                        el.style.display = 'none';
+                    }
+                    return !!hasContent;
+                };
+
                 // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
                 // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
                 // "MULTIMEDIA FINAL (v205)" más abajo sobreescribe por completo con lógica superior
@@ -734,7 +808,8 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                   <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">VER EN YOUTUBE</div>
               </div>`;
       } else {
-          videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">URL DE YOUTUBE INVÁLIDA</div>`;
+          // Regla general módulos vacíos (v306): URL de YouTube inválida → ocultar módulo.
+          __hideEmptyModule('mod-video', false);
       }
   } else if (videoUrl.includes('vimeo.com')) {
       // Normalización robusta para Vimeo a formato player
@@ -745,8 +820,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
       }
       videoContainer.innerHTML = `<iframe src="${vimeoEmbedUrl}" style="width:100%; height:100%; border:none; object-fit:cover;" allowfullscreen></iframe>`;
   } else {
-      // Fallback estricto anti-bloques vacíos
-      videoContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; opacity:0.3; font-weight:900; color:var(--p5-text-muted);">VIDEO NO DISPONIBLE</div>`;
+      // Regla general módulos vacíos (v306): sin video configurado → ocultar módulo
+      // en lugar de mostrar "VIDEO NO DISPONIBLE".
+      __hideEmptyModule('mod-video', false);
   }
   // === FIN SEGMENTO: VÍDEO SEGURO ===
 
@@ -773,6 +849,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
             }
         }
+    } else {
+        // Regla general módulos vacíos (v306): sin playlist configurada se oculta el módulo.
+        __hideEmptyModule('mod-playlist', false);
     }
     // === FIN SEGMENTO MULTIMEDIA ===
 
@@ -887,12 +966,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
     let isFallback = false;
 
     if (sponsorsList.length === 0) {
-        // Activación de Activos de Respaldo (Regla de Oro v123: No-Vacío) [cite: 766]
-        sponsorsList = [
-            { logo_url: "https://supabase.com/favicon/favicon-196x196.png" },
-            { logo_url: "https://github.com/apple-touch-icon.png" },
-            { logo_url: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" }
-        ];
+        // Regla general módulos vacíos (v306): sin patrocinadores se oculta el módulo
+        // en lugar de inyectar logos de referencia.
+        __hideEmptyModule('mod-sponsors', false);
         isFallback = true;
     }
 
@@ -1001,9 +1077,15 @@ if (document.getElementById('footer-copy')) {
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
 // 1. Verificación de Póster [cite: 343]
 if (document.getElementById('db-poster-img')) {
-    document.getElementById('db-poster-img').src = ev.poster_url || ev.imagen_url;
-    // LIGHTBOX GLOBAL: el cartel se abre ampliado al hacer clic (como la galería).
-    document.getElementById('db-poster-img').classList.add('lightbox-trigger');
+    const posterUrl = ev.poster_url || ev.imagen_url || '';
+    if (!posterUrl) {
+        // Regla general módulos vacíos (v306): sin cartel configurado se oculta el módulo.
+        __hideEmptyModule('mod-cartel', false);
+    } else {
+        document.getElementById('db-poster-img').src = posterUrl;
+        // LIGHTBOX GLOBAL: el cartel se abre ampliado al hacer clic (como la galería).
+        document.getElementById('db-poster-img').classList.add('lightbox-trigger');
+    }
 }
 
 // === INICIO SEGMENTO: LINEUP CON FOTOS REALES (v198 / MEJORA v223) ===
@@ -1055,6 +1137,10 @@ if (document.getElementById('db-poster-img')) {
         }).join('');
 
         // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
+    } else if (!document.body.className || document.body.className.indexOf('tpl-f8') === -1) {
+        // Regla general módulos vacíos (v306): sin lineup (y sin silo f8 que lo
+        // rellene en la Maqueta B) se oculta el módulo.
+        __hideEmptyModule('mod-lineup', false);
     }
     // === FIN SEGMENTO: LINEUP ===
 
@@ -1114,62 +1200,56 @@ if (document.getElementById('db-poster-img')) {
                 </article>`;
         };
         const f8RawLineup = Array.isArray(content.dj_lineup) ? content.dj_lineup : [];
-        const f8Demo = ['JABEKALÁN', 'DIDJBЯAUCA', 'IDEYFLILKYAU', 'LA RIBN YAM', 'LIBAIIDM MANDIOR', 'LNYIEMMI', 'ANANGREURI', 'NENIDE'].map(n => ({ nombre: n }));
-        const f8Artists = f8RawLineup.length ? f8RawLineup : f8Demo;
-        const f8Compare = `
+        // Regla general módulos vacíos (v306): sin lineup configurado se oculta el
+        // módulo en lugar de inyectar el demo de referencia.
+        if (f8RawLineup.length === 0) {
+            __hideEmptyModule('mod-lineup', false);
+        } else {
+            const f8Artists = f8RawLineup;
+            const f8Compare = `
             <h3 class="f8-lc-title">LINEUP</h3>
             <div class="f8-lc-grid">
                 ${f8Artists.map((dj, i) => f8Card(dj, i)).join('')}
             </div>`;
-        const f8LineupEl = document.getElementById('db-lineup');
-        if (f8LineupEl) f8LineupEl.innerHTML = f8Compare;
+            const f8LineupEl = document.getElementById('db-lineup');
+            if (f8LineupEl) f8LineupEl.innerHTML = f8Compare;
+        }
     }
     // === FIN SEGMENTO: LINEUP MAQUETA B ===
 
     // === INICIO SEGMENTO: EXPERIENCIAS (v1.3.0 · solo silo .tpl-f8) ===
     // Puebla #db-experiencias-list tras la boletería con 3 tarjetas: grabación
     // de Dj set, pintura en vivo y acceso al remate. Data-First: lee el campo
-    // content.experiencias (array de {titulo, tag}); si llega vacío usa el
-    // contenido editorial del evento (XLR NATION / TANIA PNK / EL CANDELARIO)
-    // como fallback, manteniendo el átomo visible.
+    // content.experiencias (array de {titulo, tag}); si llega vacío se oculta el
+    // módulo (regla general módulos vacíos v306) en lugar de usar contenido
+    // editorial de referencia.
     if (document.body.className.indexOf('tpl-f8') !== -1) {
-        const EXP_FALLBACK = [
-            { titulo: 'Grabación de Dj set', tag: 'XLR NATION' },
-            { titulo: 'Pintura en vivo', tag: 'TANIA PNK' },
-            { titulo: 'Con tu cover tienes acceso al remate en', tag: 'EL CANDELARIO' }
-        ];
-        let expList = Array.isArray(content.experiencias) && content.experiencias.length
-            ? content.experiencias
-            : EXP_FALLBACK;
-        const expEl = document.getElementById('db-experiencias-list');
-        if (expEl) {
-            expEl.innerHTML = expList.map((exp, i) => {
-                const titulo = String(exp.titulo || exp.title || '');
-                const tag = String(exp.tag || exp.extra || '');
-                return `
+        const expRaw = Array.isArray(content.experiencias) ? content.experiencias : [];
+        if (expRaw.length === 0) {
+            __hideEmptyModule('mod-experiencias', false);
+        } else {
+            const expEl = document.getElementById('db-experiencias-list');
+            if (expEl) {
+                expEl.innerHTML = expRaw.map((exp, i) => {
+                    const titulo = String(exp.titulo || exp.title || '');
+                    const tag = String(exp.tag || exp.extra || '');
+                    return `
                 <article class="exp-card" data-idx="${i}">
                     <h3 class="exp-titulo">${titulo}</h3>
                     <span class="exp-tag">${tag}</span>
                 </article>`;
-            }).join('');
+                }).join('');
+            }
         }
     }
     // === FIN SEGMENTO: EXPERIENCIAS ===
 
     // === INICIO SEGMENTO: GALERÍA REAL (v221) ===
-    // Pobla #db-gallery-grid desde content.gallery (array de URLs). Fallback: 2
-    // imágenes de referencia si el campo llegó vacío, manteniendo el átomo visible.
+    // Pobla #db-gallery-grid desde content.gallery (array de URLs). Regla general
+    // módulos vacíos (v306): sin imágenes no se inyecta contenido de referencia.
     const galleryEl = document.getElementById('db-gallery-grid');
     if (galleryEl) {
         let galleryList = Array.isArray(content.gallery) ? content.gallery.filter(Boolean) : [];
-        let isGalleryFallback = false;
-        if (galleryList.length === 0) {
-            galleryList = [
-                "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600",
-                "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600"
-            ];
-            isGalleryFallback = true;
-        }
         galleryEl.innerHTML = galleryList.slice(0, 8).map((url, i) =>
             `<figure class="gallery-item" style="margin:0; position:relative; border-radius:14px; overflow:hidden;">
                 <img src="${url}" alt="Galería ${i + 1}" loading="lazy" class="lightbox-trigger" style="width:100%; aspect-ratio:1/1; object-fit:cover; display:block; cursor:zoom-in;">
@@ -1208,7 +1288,13 @@ if (document.getElementById('db-poster-img')) {
                 </div>`).join('');
             
             // Certificación Cuantitativa (Obligatorio Escudo GOLD) [cite: 707, 713]
+        } else {
+            // Regla general módulos vacíos (v306): FAQ sin preguntas → ocultar módulo.
+            __hideEmptyModule('mod-faq', false);
         }
+    } else {
+        // Regla general módulos vacíos (v306): sin FAQ configurado → ocultar módulo.
+        __hideEmptyModule('mod-faq', false);
     }
     // === FIN SEGMENTO FAQ ===
 
@@ -1384,11 +1470,19 @@ if (document.getElementById('db-poster-img')) {
                 // para aforo (cuenta_aforo = false).
                 const regForm = document.getElementById('master-reg-form');
                 if (regForm) {
+                    // v304 (regla general): si el evento tiene comunidad de WhatsApp,
+                    // se ofrece al asistente la opción de unirse (checkbox marcado por
+                    // defecto) o solo guardar su registro en la base de datos.
+                    const comunidadLink = content.comunidad_whatsapp || '';
+                    const unirComWrap = document.getElementById('reg-unir-comunidad-wrap');
+                    if (comunidadLink && unirComWrap) {
+                        unirComWrap.style.display = 'flex';
+                    }
                     regForm.addEventListener('submit', async function (e) {
                         e.preventDefault();
                         const nombre = (document.getElementById('reg-nombre')?.value || '').trim();
                         const whatsapp = (document.getElementById('reg-whatsapp')?.value || '').trim();
-                        const comunidadLink = content.comunidad_whatsapp || '';
+                        const unirComunidad = document.getElementById('reg-unir-comunidad')?.checked !== false;
                         const msgBox = document.getElementById('reg-comunidad-msg');
                         if (!nombre || !whatsapp) {
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Por favor completa tu nombre y WhatsApp.'; }
@@ -1420,18 +1514,21 @@ if (document.getElementById('db-poster-img')) {
                                 if (error) { console.error('Inscrito landing -> error insert:', error); throw error; }
                                 __ANALYTICS.emit('form_submit', 'comunidad_ok', 'landing', 1);
                             }
-                            // Redirigir a la comunidad de WhatsApp (si está configurada)
-                            if (comunidadLink) {
+                            // Redirigir a la comunidad de WhatsApp solo si el asistente
+                            // eligió unirse (v304: opción de solo guardar en BD).
+                            if (comunidadLink && unirComunidad) {
                                 window.open(comunidadLink, '_blank');
-                            } else {
                             }
                             if (msgBox) {
                                 msgBox.style.display = 'block';
-                                msgBox.textContent = '¡Gracias! Revisa WhatsApp para unirte a la comunidad del evento.';
-                                msgBox.style.borderColor = comunidadLink ? 'rgba(37,211,102,0.4)' : 'rgba(241,196,15,0.5)';
+                                msgBox.textContent = (comunidadLink && unirComunidad)
+                                    ? '¡Gracias! Revisa WhatsApp para unirte a la comunidad del evento.'
+                                    : '¡Gracias! Tu registro se guardó correctamente.';
+                                msgBox.style.borderColor = (comunidadLink && unirComunidad) ? 'rgba(37,211,102,0.4)' : 'rgba(241,196,15,0.5)';
                             }
                             regForm.querySelectorAll('input').forEach(i => i.style.display = 'none');
                             regForm.querySelector('button[type=submit]').style.display = 'none';
+                            if (unirComWrap) unirComWrap.style.display = 'none';
                         } catch (err) {
                             console.error('Inscrito landing -> error general:', err);
                             __ANALYTICS.emit('form_submit', 'form_error', 'insercion', 0);

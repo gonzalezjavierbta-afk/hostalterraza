@@ -35,10 +35,10 @@
     --f8-text-cream: #F0E6FF;
     --f8-line: rgba(255, 255, 255, 0.1);
     --f8-line-soft: rgba(255, 255, 255, 0.06);
-    --f8-glow-pink: 0 0 18px rgba(255, 60, 172, 0.35);
-    --f8-glow-pink-strong: 0 0 28px rgba(255, 60, 172, 0.55), 0 0 70px rgba(255, 60, 172, 0.18);
-    --f8-glow-yellow: 0 0 18px rgba(255, 229, 0, 0.35);
-    --f8-glow-purple: 0 0 18px rgba(123, 44, 255, 0.35);
+    --f8-glow-pink: 0 0 18px color-mix(in srgb, var(--f8-neon-pink) 35%, transparent);
+    --f8-glow-pink-strong: 0 0 28px color-mix(in srgb, var(--f8-neon-pink) 55%, transparent), 0 0 70px color-mix(in srgb, var(--f8-neon-pink) 18%, transparent);
+    --f8-glow-yellow: 0 0 18px color-mix(in srgb, var(--f8-neon-yellow) 35%, transparent);
+    --f8-glow-purple: 0 0 18px color-mix(in srgb, var(--f8-neon-purple) 35%, transparent);
     --f8-green: #25D366;
     --f8-font: 'Geist', system-ui, -apple-system, sans-serif;
     margin: 0;
@@ -71,12 +71,12 @@
     position: fixed;
     inset: 0;
     z-index: 0;
-    pointer-events: none;
+pointer-events: none;
     background:
-        radial-gradient(46% 34% at 12% 18%, rgba(255, 60, 172, 0.18) 0%, transparent 70%),
-        radial-gradient(40% 30% at 86% 72%, rgba(123, 44, 255, 0.14) 0%, transparent 70%),
-        radial-gradient(34% 26% at 68% 12%, rgba(44, 123, 255, 0.12) 0%, transparent 70%),
-        radial-gradient(42% 40% at 28% 88%, rgba(255, 229, 0, 0.10) 0%, transparent 72%);
+        radial-gradient(46% 34% at 12% 18%, color-mix(in srgb, var(--f8-neon-pink) 18%, transparent) 0%, transparent 70%),
+        radial-gradient(40% 30% at 86% 72%, color-mix(in srgb, var(--f8-neon-purple) 14%, transparent) 0%, transparent 70%),
+        radial-gradient(34% 26% at 68% 12%, color-mix(in srgb, var(--f8-neon-blue) 12%, transparent) 0%, transparent 70%),
+        radial-gradient(42% 40% at 28% 88%, color-mix(in srgb, var(--f8-neon-yellow) 10%, transparent) 0%, transparent 72%);
     animation: f8AuroraDrift 24s ease-in-out infinite alternate;
     will-change: transform, opacity;
 }
@@ -249,7 +249,7 @@
         180deg,
         rgba(11, 1, 23, 0.55) 0%,
         rgba(30, 10, 60, 0.45) 35%,
-        rgba(255, 60, 172, 0.12) 65%,
+        color-mix(in srgb, var(--f8-neon-pink) 12%, transparent) 65%,
         rgba(11, 1, 23, 0.85) 100%
     );
     pointer-events: none;
@@ -274,7 +274,7 @@
     text-transform: uppercase;
     color: var(--f8-neon-yellow);
     opacity: 0.95;
-    text-shadow: 0 0 12px rgba(255, 229, 0, 0.5);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--f8-neon-yellow) 50%, transparent);
 }
 
 .tpl-f8 #mod-hero .hero-content {
@@ -310,15 +310,15 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 20px rgba(255, 60, 172, 0.4))
-            drop-shadow(0 0 40px rgba(123, 44, 255, 0.25));
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--f8-neon-pink) 40%, transparent))
+            drop-shadow(0 0 40px color-mix(in srgb, var(--f8-neon-purple) 25%, transparent));
     animation: f8NeonPulse 3s ease-in-out infinite alternate;
 }
 
 @keyframes f8NeonPulse {
-    0%   { filter: drop-shadow(0 0 20px rgba(255, 60, 172, 0.4)) drop-shadow(0 0 40px rgba(123, 44, 255, 0.25)); }
-    50%  { filter: drop-shadow(0 0 30px rgba(255, 60, 172, 0.6)) drop-shadow(0 0 60px rgba(123, 44, 255, 0.35)); }
-    100% { filter: drop-shadow(0 0 22px rgba(255, 60, 172, 0.45)) drop-shadow(0 0 45px rgba(123, 44, 255, 0.28)); }
+    0%   { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--f8-neon-pink) 40%, transparent)) drop-shadow(0 0 40px color-mix(in srgb, var(--f8-neon-purple) 25%, transparent)); }
+    50%  { filter: drop-shadow(0 0 30px color-mix(in srgb, var(--f8-neon-pink) 60%, transparent)) drop-shadow(0 0 60px color-mix(in srgb, var(--f8-neon-purple) 35%, transparent)); }
+    100% { filter: drop-shadow(0 0 22px color-mix(in srgb, var(--f8-neon-pink) 45%, transparent)) drop-shadow(0 0 45px color-mix(in srgb, var(--f8-neon-purple) 28%, transparent)); }
 }
 
 .tpl-f8 #event-title .hero-title-line1 {
@@ -354,7 +354,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     margin-bottom: 1.2rem;
-    box-shadow: 0 4px 20px rgba(255, 229, 0, 0.3);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--f8-neon-yellow) 30%, transparent);
 }
 
 /* ==========================================================================
@@ -369,7 +369,7 @@
     padding: 1.6rem 6% 2.2rem;
     background: linear-gradient(135deg, var(--f8-bg-ink) 0%, var(--f8-bg-deep) 100%);
     border-bottom: 2px solid var(--f8-neon-purple);
-    box-shadow: 0 4px 30px rgba(123, 44, 255, 0.15);
+    box-shadow: 0 4px 30px color-mix(in srgb, var(--f8-neon-purple) 15%, transparent);
 }
 
 .tpl-f8 #mod-hero-meta .meta-item {
@@ -380,8 +380,8 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-weight: 900;
-    background: rgba(255, 60, 172, 0.08);
-    border: 1px solid rgba(255, 60, 172, 0.2);
+    background: color-mix(in srgb, var(--f8-neon-pink) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--f8-neon-pink) 20%, transparent);
     color: var(--f8-text-main);
     padding: 0.55rem 1.1rem;
     border-radius: 2px;
@@ -404,7 +404,7 @@
     fill: var(--f8-neon-pink);
     width: 22px;
     height: 22px;
-    filter: drop-shadow(0 0 6px rgba(255, 60, 172, 0.5));
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--f8-neon-pink) 50%, transparent));
 }
 
 /* ==========================================================================
@@ -419,7 +419,7 @@
     padding: 0 6% 2.8rem;
     background: linear-gradient(135deg, var(--f8-bg-ink) 0%, var(--f8-bg-deep) 100%);
     border-bottom: 2px solid var(--f8-neon-yellow);
-    box-shadow: 0 4px 30px rgba(255, 229, 0, 0.1);
+    box-shadow: 0 4px 30px color-mix(in srgb, var(--f8-neon-yellow) 10%, transparent);
 }
 
 .tpl-f8 #mod-hero-ctas .hero-cta-btn {
@@ -451,7 +451,7 @@
 .tpl-f8 #mod-hero-ctas .hero-cta-btn--wa:hover {
     background: var(--f8-bg-deep);
     color: var(--f8-neon-yellow);
-    box-shadow: 6px 6px 0 var(--f8-neon-purple), 0 0 30px rgba(255, 229, 0, 0.4);
+    box-shadow: 6px 6px 0 var(--f8-neon-purple), 0 0 30px color-mix(in srgb, var(--f8-neon-yellow) 40%, transparent);
     transform: translate(1px, 1px);
 }
 
@@ -482,8 +482,8 @@
     gap: 0.1rem;
     padding: 12px 10px;
     position: relative;
-    background: rgba(255, 60, 172, 0.06);
-    border: 1px solid rgba(255, 60, 172, 0.25);
+    background: color-mix(in srgb, var(--f8-neon-pink) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--f8-neon-pink) 25%, transparent);
     min-width: 96px;
     flex: 1;
     max-width: 150px;
@@ -492,9 +492,9 @@
 }
 
 @keyframes f8CountdownGlow {
-    0%   { box-shadow: 0 0 12px rgba(255, 60, 172, 0.2); }
-    50%  { box-shadow: 0 0 22px rgba(255, 60, 172, 0.4), 0 0 40px rgba(123, 44, 255, 0.15); }
-    100% { box-shadow: 0 0 14px rgba(255, 60, 172, 0.25); }
+    0%   { box-shadow: 0 0 12px color-mix(in srgb, var(--f8-neon-pink) 20%, transparent); }
+    50%  { box-shadow: 0 0 22px color-mix(in srgb, var(--f8-neon-pink) 40%, transparent), 0 0 40px color-mix(in srgb, var(--f8-neon-purple) 15%, transparent); }
+    100% { box-shadow: 0 0 14px color-mix(in srgb, var(--f8-neon-pink) 25%, transparent); }
 }
 
 .tpl-f8 #unified-frame .cd-block::after {
@@ -512,7 +512,7 @@
     font-variant-numeric: tabular-nums;
     color: var(--f8-text-main);
     letter-spacing: 0.02em;
-    text-shadow: 0 0 18px rgba(255, 60, 172, 0.3);
+    text-shadow: 0 0 18px color-mix(in srgb, var(--f8-neon-pink) 30%, transparent);
     line-height: 1;
 }
 
@@ -542,7 +542,7 @@
     width: 100% !important;
     max-width: 430px;
     border-radius: 2px;
-    border: 1px solid rgba(255, 60, 172, 0.2);
+    border: 1px solid color-mix(in srgb, var(--f8-neon-pink) 20%, transparent);
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f8-glow-pink);
     object-fit: cover;
     animation: f8PosterFloat 7s ease-in-out infinite;
@@ -593,7 +593,7 @@
 
 .tpl-f8 .artist-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 60, 172, 0.2);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px color-mix(in srgb, var(--f8-neon-pink) 20%, transparent);
 }
 
 /* Foto con filtro rosa neón */
@@ -630,7 +630,7 @@
     font-size: 0.75rem;
     letter-spacing: 0.1em;
     color: var(--f8-neon-pink);
-    text-shadow: 0 0 10px rgba(255, 60, 172, 0.5);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--f8-neon-pink) 50%, transparent);
 }
 
 /* Nombre del DJ */
@@ -666,7 +666,7 @@
 .tpl-f8 .artist-social-icon:hover {
     color: var(--f8-neon-pink);
     transform: scale(1.15);
-    filter: drop-shadow(0 0 6px rgba(255, 60, 172, 0.5));
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--f8-neon-pink) 50%, transparent));
 }
 
 /* ==========================================================================
@@ -731,7 +731,7 @@
 }
 
 .tpl-f8 .boleto-card-row:hover {
-    background: rgba(255, 60, 172, 0.05);
+    background: color-mix(in srgb, var(--f8-neon-pink) 5%, transparent);
 }
 
 /* Icono de boleto */
@@ -755,13 +755,13 @@
     font-weight: 900;
     font-size: clamp(1.2rem, 3vw, 1.6rem);
     color: var(--f8-neon-yellow);
-    text-shadow: 0 0 12px rgba(255, 229, 0, 0.3);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--f8-neon-yellow) 30%, transparent);
 }
 
 /* Precio con ID específico */
 .tpl-f8 #price-neon-yellow {
     color: var(--f8-neon-yellow) !important;
-    text-shadow: 0 0 12px rgba(255, 229, 0, 0.3);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--f8-neon-yellow) 30%, transparent);
 }
 
 /* Flecha */
@@ -813,8 +813,8 @@
 }
 
 .tpl-f8 .form-master-box:hover {
-    border-color: rgba(123, 44, 255, 0.45);
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), 0 0 30px rgba(123, 44, 255, 0.2);
+    border-color: color-mix(in srgb, var(--f8-neon-purple) 45%, transparent);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), 0 0 30px color-mix(in srgb, var(--f8-neon-purple) 20%, transparent);
 }
 
 .tpl-f8 .form-input, .tpl-f8 #reg-nombre,
@@ -1369,12 +1369,12 @@
     text-align: center;
     font-size: clamp(2rem, 4.5vw, 3.1rem);
     margin: 0 0 1.8rem;
-    background-image: linear-gradient(135deg, #FF3CAC 0%, #2C7BFF 48%, #FFE500 100%);
+    background-image: linear-gradient(135deg, var(--f8-neon-pink) 0%, var(--f8-neon-blue) 48%, var(--f8-neon-yellow) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(255, 60, 172, 0.45))
-            drop-shadow(0 0 26px rgba(44, 123, 255, 0.28));
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--f8-neon-pink) 45%, transparent))
+            drop-shadow(0 0 26px color-mix(in srgb, var(--f8-neon-blue) 28%, transparent));
     animation: f8NeonPulse 3.6s ease-in-out infinite alternate;
 }
 
@@ -1392,11 +1392,11 @@
     overflow: hidden;
     aspect-ratio: 3 / 4;
     background: #12042b;
-    border: 1px solid rgba(255, 60, 172, 0.3);
+    border: 1px solid color-mix(in srgb, var(--f8-neon-pink) 30%, transparent);
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.16),
-        inset 0 -18px 34px rgba(255, 60, 172, 0.18),
+        inset 0 -18px 34px color-mix(in srgb, var(--f8-neon-pink) 18%, transparent),
         0 10px 30px rgba(0, 0, 0, 0.45);
     transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1),
                 box-shadow 0.35s ease,
@@ -1409,7 +1409,7 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: rgba(255, 60, 172, 0.48);
+    background: color-mix(in srgb, var(--f8-neon-pink) 48%, transparent);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
@@ -1433,11 +1433,11 @@
 .tpl-f8 .f8-artist:hover,
 .tpl-f8 .f8-artist:focus-within {
     transform: translateY(-7px);
-    border-color: rgba(255, 60, 172, 0.65);
+    border-color: color-mix(in srgb, var(--f8-neon-pink) 65%, transparent);
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        inset 0 -18px 40px rgba(255, 60, 172, 0.24),
+        inset 0 -18px 40px color-mix(in srgb, var(--f8-neon-pink) 24%, transparent),
         var(--f8-glow-pink-strong);
 }
 
@@ -1489,13 +1489,13 @@
 }
 
 .tpl-f8 .f8-artist:nth-child(odd) .f8-artist-name {
-    background-image: linear-gradient(135deg, #FF3CAC 0%, #2C7BFF 60%, #FFE500 100%);
-    filter: drop-shadow(0 0 8px rgba(255, 60, 172, 0.7)) drop-shadow(0 0 16px rgba(44, 123, 255, 0.4));
+    background-image: linear-gradient(135deg, var(--f8-neon-pink) 0%, var(--f8-neon-blue) 60%, var(--f8-neon-yellow) 100%);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--f8-neon-pink) 70%, transparent)) drop-shadow(0 0 16px color-mix(in srgb, var(--f8-neon-blue) 40%, transparent));
 }
 
 .tpl-f8 .f8-artist:nth-child(even) .f8-artist-name {
-    background-image: linear-gradient(135deg, #2C7BFF 0%, #FFE500 55%, #FF3CAC 100%);
-    filter: drop-shadow(0 0 8px rgba(44, 123, 255, 0.7)) drop-shadow(0 0 16px rgba(255, 60, 172, 0.35));
+    background-image: linear-gradient(135deg, var(--f8-neon-blue) 0%, var(--f8-neon-yellow) 55%, var(--f8-neon-pink) 100%);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--f8-neon-blue) 70%, transparent)) drop-shadow(0 0 16px color-mix(in srgb, var(--f8-neon-pink) 35%, transparent));
 }
 
 /* Redes sociales — ocultas por defecto; solo aparecen en hover y SOLO las
@@ -1533,19 +1533,19 @@
     height: 36px;
     border-radius: 50%;
     color: #ffffff;
-    border: 1px solid rgba(255, 60, 172, 0.5);
+    border: 1px solid color-mix(in srgb, var(--f8-neon-pink) 50%, transparent);
     background: rgba(11, 1, 23, 0.72);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
-    box-shadow: 0 0 12px rgba(255, 60, 172, 0.45);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--f8-neon-pink) 45%, transparent);
     transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     text-decoration: none;
 }
 
 .tpl-f8 .f8-artist-social a:hover {
     transform: translateY(-2px) scale(1.08);
-    background: rgba(255, 60, 172, 0.28);
-    box-shadow: 0 0 16px rgba(255, 60, 172, 0.65);
+    background: color-mix(in srgb, var(--f8-neon-pink) 28%, transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--f8-neon-pink) 65%, transparent);
 }
 
 /* === Responsive del LINEUP === */
@@ -1606,9 +1606,9 @@
     gap: 0.85rem;
     min-height: 230px;
     padding: 2.2rem 1.4rem;
-    border: 1px solid rgba(123, 44, 255, 0.28);
+    border: 1px solid color-mix(in srgb, var(--f8-neon-purple) 28%, transparent);
     border-radius: 22px;
-    background: radial-gradient(160% 130% at 50% 0%, rgba(255, 60, 172, 0.14) 0%, rgba(11, 1, 23, 0.92) 55%, rgba(11, 1, 23, 1) 100%);
+    background: radial-gradient(160% 130% at 50% 0%, color-mix(in srgb, var(--f8-neon-pink) 14%, transparent) 0%, rgba(11, 1, 23, 0.92) 55%, rgba(11, 1, 23, 1) 100%);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 18px 44px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     text-align: center;
     overflow: hidden;
@@ -1627,8 +1627,8 @@
 
 .tpl-f8 .exp-card:hover {
     transform: translateY(-6px);
-    border-color: rgba(255, 60, 172, 0.6);
-    box-shadow: 0 0 0 1px rgba(255, 60, 172, 0.28), 0 26px 58px rgba(0, 0, 0, 0.55), 0 0 34px rgba(255, 60, 172, 0.25);
+    border-color: color-mix(in srgb, var(--f8-neon-pink) 60%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--f8-neon-pink) 28%, transparent), 0 26px 58px rgba(0, 0, 0, 0.55), 0 0 34px color-mix(in srgb, var(--f8-neon-pink) 25%, transparent);
 }
 
 .tpl-f8 .exp-titulo {
@@ -1651,20 +1651,20 @@
     line-height: 1;
     text-transform: uppercase;
     color: transparent;
-    background-image: linear-gradient(100deg, #FF3CAC 0%, #ff6ad5 34%, #7B2CFF 70%, #FFE500 100%);
+    background-image: linear-gradient(100deg, var(--f8-neon-pink) 0%, color-mix(in srgb, var(--f8-neon-pink) 55%, white) 34%, var(--f8-neon-purple) 70%, var(--f8-neon-yellow) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     position: relative;
-    filter: drop-shadow(0 0 12px rgba(255, 60, 172, 0.45));
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--f8-neon-pink) 45%, transparent));
     letter-spacing: 0.02em;
 }
 
 .tpl-f8 .exp-card:nth-child(2) .exp-tag {
-    background-image: linear-gradient(100deg, #FFE500 0%, #FF3CAC 55%, #7B2CFF 100%);
+    background-image: linear-gradient(100deg, var(--f8-neon-yellow) 0%, var(--f8-neon-pink) 55%, var(--f8-neon-purple) 100%);
 }
 
 .tpl-f8 .exp-card:nth-child(3) .exp-tag {
-    background-image: linear-gradient(100deg, #7B2CFF 0%, #FF3CAC 40%, #FFE500 100%);
+    background-image: linear-gradient(100deg, var(--f8-neon-purple) 0%, var(--f8-neon-pink) 40%, var(--f8-neon-yellow) 100%);
 }
 
 @media (max-width: 767px) {
@@ -1742,4 +1742,12 @@
 | v1.3.4   | 04/09/2026 | LIGHTBOX GLOBAL (kernel): el cartel (#db-poster-img) y las      | [OK] |
 |          |            | fotos de la galería se abren ampliados al hacer clic; cierre    |      |
 |          |            | con X, clic fuera o ESC. Clics del cartel medidos (poster_zoom).|      |
+| v1.4.0   | 07/09/2026 | GAMAS CROMÁTICAS DEL EVENTO (regla general): la paleta neón     | [OK] |
+|          |            | del silo (pink/purple/yellow, glows, aurora y gradientes) se    |      |
+|          |            | deriva en JS (kernel v305) del --master-accent del evento       |      |
+|          |            | (complementario/análogos/tríada). Los rgba neón hardcodeados    |      |
+|          |            | se sustituyen por color-mix() sobre las variables derivadas.    |      |
+|          |            | Fallback sin color del evento: conserva la paleta original.     |      |
+| v1.4.1   | 07/09/2026 | REGLA GENERAL módulos vacíos: las secciones sin contenido se    | [OK] |
+|          |            | ocultan (display:none) en vez de inyectar contenido de relleno. |      |
 ============================================================================ */
