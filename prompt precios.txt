@@ -1,0 +1,75 @@
+# PROMPT PARA OPENCODE: Implementación de Modelo Comercial (Freemium / $40k / $400k), Módulo de Tarifas en index.html y Cierre de Deuda Técnica RLS
+
+## CONTEXTO Y ROLES
+Actúas como Lead Developer y Software Architect del sistema SaaS "Sistema QR Hostal Terraza" (HTML5/Vanilla JS, Supabase PostgreSQL/RLS, Vercel).
+Debes revisar y actualizar la codebase actual para implementar la lógica de monetización, corregir fugas críticas de seguridad multi-tenant y agregar un módulo explicativo del sistema de pagos en la homepage (`index.html`).
+
+---
+
+## OBJETIVOS PRINCIPALES
+
+### 1. ACTUALIZACIÓN TÉCNICA Y SEGURIDAD (FASE 0 - OBLIGATORIA)
+1. **Resolver TSK-026 (Seguridad RLS Multi-tenant)**:
+   - Auditar las migraciones y la base de datos Supabase.
+   - Eliminar o reemplazar cualquier política RLS legacy permisiva (`USING (true)` o `WITH CHECK (true)`) en las tablas `eventos`, `clientes`, `inscritos`, `perfiles` y `organizaciones`.
+   - Asegurar que TODAS las operaciones filtren estrictamente por `org_id = get_org_id()` o mediante el rol verificado (`is_master_org`), evitando fugas de datos cross-tenant entre clientes del SaaS.
+2. **Corrección de Persistencia del Escáner (`scanner.html`)**:
+   - Modificar la cola de escaneos offline (`offlineQueue`). Actualmente solo reside en memoria JS; migrarla para que persista en `localStorage`.
+   - Implementar listener del evento `window.addEventListener('online', ...)` para auto-sincronizar los registros acumulados en `localStorage` con Supabase apenas se recupere la conexión.
+
+---
+
+### 2. LÓGICA DE MONETIZACIÓN Y RESTRICCIONES DE PLANES (EN BASE DE DATOS Y LÓGICA FRONTEND)
+Implementar el modelo de planes en la tabla `organizaciones` o `eventos`:
+- **PLAN FREEMIUM ($0 COP)**:
+  - Límite duro de 100 inscritos por evento.
+  - Generar marca de agua/badge visible en el ticket descargable (html2canvas) y en el footer de `evento.html` ("Powered by Hostal Terraza QR").
+- **PLAN PASS POR EVENTO ($40.000 COP)**:
+  - Permite activar 1 evento con aforo e inscritos ILIMITADOS.
+  - Remueve la marca de agua.
+  - Requiere validación de estado del evento (`estado = 'publicado'` previo a pago).
+- **PLAN MENSUAL B2B ($400.000 COP/mes)**:
+  - Eventos e inscritos ILIMITADOS durante el mes de vigencia.
+  - Habilita Marca Blanca (soporte para ocultar branding y usar dominios/subdominios).
+
+**Acciones de código**:
+- En `evento.html`: Antes de procesar un nuevo registro de asistente, consultar si la organización es `freemium` y si `count(inscritos) >= 100`. Si se cumple, bloquear el formulario y mostrar un mensaje amigable indicando que el evento alcanzó el límite del plan gratuito.
+- En `admin.html` (Wizard de creación de eventos): Integrar validación para asociar el evento al plan activo o marcarlo como `pendiente_pago` si sobrepasa los límites del Freemium.
+
+---
+
+### 3. MÓDULO EXPLICATIVO DE PLANES Y PAGOS EN `index.html`
+
+Agregar una nueva sección HTML/CSS scoped e interactiva en `index.html` con id `#planes-pagos` (y enlace en la barra de navegación pública):
+
+#### Requerimientos UI/UX del Módulo de Precios:
+- **Título**: "Infraestructura Digital Completa para tus Eventos"
+- **Subtítulo**: "No solo vendemos entradas: te entregamos la Landing Page atómica, el motor de QR, la captura para WhatsApp y el escáner de acceso offline."
+- **Tarjetas Comparativas (3 Columnas Responsive)**:
+  1. **Tarjeta FREEMIUM ($0 COP)**:
+     - Enfoque: Eventos pequeños, culturales o de prueba.
+     - Features: Hasta 100 asistentes/evento, Landing Page atómica, Captura dual WhatsApp, Escáner Staff, Marca de agua discreta.
+     - CTA: "Comenzar Gratis" -> Redirige a `registro.html`.
+  2. **Tarjeta PASS POR EVENTO ($40.000 COP / evento)** *(Destacada con Badge 'Más Popular')*:
+     - Enfoque: Promotores, fiestas temáticas y talleres esporádicos.
+     - Features: Asistentes e inscritos ILIMITADOS, Landing Page con paleta de colores atómica (v305), Sin marcas de agua, Escáner offline con validación por cédula (últimos 4 dígitos), Analítica de clicks y geo en tiempo real.
+     - CTA: "Crear mi Evento ($40k)" -> Redirige a `registro.html?plan=pass_evento`.
+  3. **Tarjeta SUSCRIPCIÓN B2B ($400.000 COP / mes)**:
+     - Enfoque: Hostales, Discotecas, Clubes y Recintos con eventos recurrentes.
+     - Features: Eventos e invitados ILIMITADOS al mes, Marca Blanca Completa, Sub-cuentas para Staff y Porteros ilimitadas, Soporte para Series de Eventos (`serie.html`), Soporte prioritario.
+     - CTA: "Contratar Plan Mensual" -> Redirige a `registro.html?plan=pro_mensual` o canal de ventas WhatsApp.
+
+#### Módulo Explicativo "Cómo Funciona el Sistema de Pagos":
+Debajo de las 3 tarjetas, incluir un desglose visual informativo en 2 bloques:
+- **Bloque A: ¿Cómo cobras tus entradas a tus asistentes?**
+  - Explicar que el organizador puede vender por **Venta Directa en WhatsApp ($0 comisión)** recibiendo Nequi/Daviplata/Efectivo, o conectar su pasarela directa (Wompi/MercadoPago).
+- **Bloque B: ¿Cómo pagas la plataforma?**
+  - Explicar la integración transparente con pasarela local (PSE, Nequi, Tarjetas) para activar los pases de $40.000 o la mensualidad de $400.000 de forma instantánea.
+
+---
+
+## REGLAS DE EJECUCIÓN CÓDIGO Y ESTILO
+1. Conservar la arquitectura Vanilla JS (sin frameworks como React/Vue ni herramientas de build tipo Vite/Webpack).
+2. Mantener la compatibilidad CSS utilizando los tokens y variables CSS declaradas en el proyecto (sistemas de color neón/oscuro acordes a la identidad visual del sitio).
+3. Asegurar que las consultas a la base de datos en JS no expongan datos sensibles e interpolen variables de forma segura (evitar vulnerabilidades XSS sanitizando outputs).
+4. Proveer un resumen detallado de los archivos modificados y las instrucciones SQL necesarias para aplicar las políticas RLS y nuevos campos en Supabase.
