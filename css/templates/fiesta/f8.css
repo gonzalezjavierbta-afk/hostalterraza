@@ -1750,4 +1750,122 @@ pointer-events: none;
 |          |            | Fallback sin color del evento: conserva la paleta original.     |      |
 | v1.4.1   | 07/09/2026 | REGLA GENERAL módulos vacíos: las secciones sin contenido se    | [OK] |
 |          |            | ocultan (display:none) en vez de inyectar contenido de relleno. |      |
+| v1.4.2   | 07/09/2026 | REFLOW (v307): cuando un módulo oculto comparte fila con otro   | [OK] |
+|          |            | en escritorio/tablet, el compañero se expande para ocupar la    |      |
+|          |            | fila completa (:has(#mod-x[data-hidden]) redefiniendo grid-     |      |
+|          |            | template-areas). Filas de 2: cartel/playlist, boletos/form,     |      |
+|          |            | faq/ubicacion. Móvil intacto (columna única ya reflujea).       |      |
 ============================================================================ */
+
+/* ==========================================================================
+   23. REFLOW (v307) — Módulos ocultos reordenan el grid de 2 columnas
+       Cuando un módulo de una fila apareada (cartel|playlist, boletos|form,
+       faq|ubicacion) queda oculto ([data-hidden]), su compañero se expande a
+       la fila completa. El :has() tiene especificidad de 2 IDs y !important,
+       por lo que vence los templates tablet (que también usan !important).
+       Móvil (≤767px) intacto: columna única ya apila sin huecos.
+   ========================================================================== */
+@media (min-width: 768px) {
+    .tpl-f8 #main-content-flow:has(#mod-cartel[data-hidden]),
+    .Tpl-F8 #main-content-flow:has(#mod-cartel[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "playlist playlist"
+            "boletos form"
+            "experiencias experiencias"
+            "whatsapp whatsapp"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f8 #main-content-flow:has(#mod-playlist[data-hidden]),
+    .Tpl-F8 #main-content-flow:has(#mod-playlist[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel cartel"
+            "boletos form"
+            "experiencias experiencias"
+            "whatsapp whatsapp"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f8 #main-content-flow:has(#mod-boletos[data-hidden]),
+    .Tpl-F8 #main-content-flow:has(#mod-boletos[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "form form"
+            "experiencias experiencias"
+            "whatsapp whatsapp"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f8 #main-content-flow:has(#mod-form[data-hidden]),
+    .Tpl-F8 #main-content-flow:has(#mod-form[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos boletos"
+            "experiencias experiencias"
+            "whatsapp whatsapp"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f8 #main-content-flow:has(#mod-faq[data-hidden]),
+    .Tpl-F8 #main-content-flow:has(#mod-faq[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos form"
+            "experiencias experiencias"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f8 #main-content-flow:has(#mod-ubicacion[data-hidden]),
+    .Tpl-F8 #main-content-flow:has(#mod-ubicacion[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos form"
+            "experiencias experiencias"
+            "whatsapp whatsapp"
+            "video video"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+}

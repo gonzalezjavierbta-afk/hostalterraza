@@ -581,3 +581,40 @@
     .tpl-b4 [id^="cd-"] { font-size: 1.7rem !important; }
     .tpl-b4 .hero-btn-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
 }
+
+/* -------------------------------------------------------------------
+   16. REFLOW (v307) — Módulos ocultos reordenan el grid de 2 columnas
+       Pares [video|form] y [faq|ubicacion]: si uno queda oculto
+       ([data-hidden]), el compañero se expande a la fila completa.
+       Los pares [historia|objetivo] y [equipo] aún no se ocultan por
+       el kernel (sin reglas hasta que exista el hito). Mobile
+       (≤900px) intacto: columna única ya apila sin huecos.
+   ------------------------------------------------------------------- */
+@media (min-width: 901px) {
+    .tpl-b4 #main-content-flow:has(#mod-video[data-hidden]) {
+        grid-template-areas:
+            "hero      hero"
+            "countdown countdown"
+            "historia  objetivo"
+            "impacto   impacto"
+            "form      form"
+            "faq       ubicacion"
+            "sponsors  sponsors"
+            "equipo    equipo"
+            "ctafinal  ctafinal"
+            "footer    footer" !important;
+    }
+    .tpl-b4 #main-content-flow:has(#mod-faq[data-hidden]) {
+        grid-template-areas:
+            "hero      hero"
+            "countdown countdown"
+            "historia  objetivo"
+            "impacto   impacto"
+            "video     form"
+            "ubicacion ubicacion"
+            "sponsors  sponsors"
+            "equipo    equipo"
+            "ctafinal  ctafinal"
+            "footer    footer" !important;
+    }
+}

@@ -1314,3 +1314,77 @@
 |          |            | faq→ubicacion→sponsors→footer). Módulos extra (info-técnica,      |        |
 |          |            | historia/objetivo/impacto, equipo, cta-final) permanecen ocultos.  |        |
 ============================================================================ */
+
+/* ==========================================================================
+   23. REFLOW (v307) — Módulos ocultos reordenan el grid de 2 columnas
+       Pares [cartel|playlist] y [boletos|form]: si uno queda oculto
+       ([data-hidden]), el compañero se expande a la fila completa.
+       El :has() (especificidad 2 IDs + !important) vence los templates
+       que usan !important. Móvil (≤767px) intacto: columna única.
+   ========================================================================== */
+@media (min-width: 768px) {
+    .tpl-f6 #main-content-flow:has(#mod-cartel[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "playlist playlist"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f6 #main-content-flow:has(#mod-playlist[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel cartel"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f6 #main-content-flow:has(#mod-boletos[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "form form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f6 #main-content-flow:has(#mod-form[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos boletos"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+}

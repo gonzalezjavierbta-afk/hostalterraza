@@ -486,3 +486,60 @@
     .tpl-f3 [id^="cd-"] { font-size: 2.4rem !important; }
     .tpl-f3 .hero-meta { flex-direction: column; gap: 0.8rem; padding: 1.2rem 1.8rem; }
 }
+
+/* -------------------------------------------------------------------
+   15. REFLOW (v307) — Módulos ocultos reordenan el grid de 2 columnas
+       Pares [video|playlist] y [faq|ubicacion]: si uno queda oculto
+       ([data-hidden]), el compañero se expande a la fila completa.
+       Mobile (≤900px) intacto: columna única ya apila sin huecos.
+   ------------------------------------------------------------------- */
+@media (min-width: 901px) {
+    .tpl-f3 #main-content-flow:has(#mod-video[data-hidden]) {
+        grid-template-areas:
+            "hero      hero"
+            "countdown countdown"
+            "meta      meta"
+            "lineup    lineup"
+            "playlist  playlist"
+            "info      info"
+            "faq       ubicacion"
+            "sponsors  sponsors"
+            "form      form" !important;
+    }
+    .tpl-f3 #main-content-flow:has(#mod-playlist[data-hidden]) {
+        grid-template-areas:
+            "hero      hero"
+            "countdown countdown"
+            "meta      meta"
+            "lineup    lineup"
+            "video     video"
+            "info      info"
+            "faq       ubicacion"
+            "sponsors  sponsors"
+            "form      form" !important;
+    }
+    .tpl-f3 #main-content-flow:has(#mod-faq[data-hidden]) {
+        grid-template-areas:
+            "hero      hero"
+            "countdown countdown"
+            "meta      meta"
+            "lineup    lineup"
+            "video     playlist"
+            "info      info"
+            "ubicacion ubicacion"
+            "sponsors  sponsors"
+            "form      form" !important;
+    }
+    .tpl-f3 #main-content-flow:has(#mod-ubicacion[data-hidden]) {
+        grid-template-areas:
+            "hero      hero"
+            "countdown countdown"
+            "meta      meta"
+            "lineup    lineup"
+            "video     playlist"
+            "info      info"
+            "faq       faq"
+            "sponsors  sponsors"
+            "form      form" !important;
+    }
+}

@@ -728,8 +728,15 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // módulo decide si tiene contenido (hasContent) al poblar sus átomos.
                 const __hideEmptyModule = function (id, hasContent) {
                     const el = document.getElementById(id);
-                    if (el && !hasContent) {
-                        el.style.setProperty('display', 'none', 'important');
+                    if (el) {
+                        if (hasContent) {
+                            el.removeAttribute('data-hidden');
+                        } else {
+                            el.style.setProperty('display', 'none', 'important');
+                            // v307: gancho estable para que cada silo refluya su grid
+                            // (:has(#id[data-hidden])) sin depender del serializado de display.
+                            el.setAttribute('data-hidden', 'true');
+                        }
                     }
                     return !!hasContent;
                 };
