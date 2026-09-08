@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title data-i18n="qr.title">Redirigiendo…</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/i18n.js"></script>
+<link rel="preconnect" href="https://ctgyvydzshueemlelkzv.supabase.co">
+<link rel="dns-prefetch" href="https://ctgyvydzshueemlelkzv.supabase.co">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Helvetica Neue',Arial,sans-serif;background:#0a0a08;min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fff}
@@ -24,94 +24,138 @@ p{font-size:13px;color:rgba(255,255,255,.35);line-height:1.6}
   <p id="msg" data-i18n="qr.momento">Un momento</p>
 </div>
 <script>
+// ═══════════════════════════════════════════════════════════════
+// qr.html v2 — redirección optimizada
+// Sin SDK de Supabase: REST directo (fetch) → carga mínima.
+// Tracking (scan + geo) en segundo plano con keepalive: NO bloquea
+// la redirección. i18n mínimo inline (es/fr/en).
+// ═══════════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://ctgyvydzshueemlelkzv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
-const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const REST = SUPABASE_URL + '/rest/v1';
 
-async function run() {
-  const T = window.I18N && typeof I18N.t === 'function' ? I18N.t.bind(I18N) : (k => k);
-  // 1. Leer el código del QR desde la URL
-  const params = new URLSearchParams(window.location.search);
-  const codigo = params.get('c') || location.pathname.split('/q/')[1];
+const I18N_MIN = {
+  es: { title: 'Redirigiendo…', momento: 'Un momento', link_invalido: 'Link inválido', no_existe: 'Este código no existe o fue desactivado.' },
+  fr: { title: 'Redirection…', momento: 'Un instant', link_invalido: 'Lien invalide', no_existe: "Ce code n'existe pas ou a été désactivé." },
+  en: { title: 'Redirecting…', momento: 'One moment', link_invalido: 'Invalid link', no_existe: 'This code does not exist or was disabled.' }
+};
+function T(k) {
+  const l = (navigator.language || 'es').slice(0, 2);
+  return (I18N_MIN[l] || I18N_MIN.es)[k] || k;
+}
 
-  if (!codigo) {
-    document.getElementById('msg').textContent = T('qr.link_invalido');
-    return;
-  }
+function apiHeaders() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
+}
 
-  // 2. Buscar el link en la BD
-  const { data: link } = await SB.from('qr_links')
-    .select('*').eq('codigo', codigo).eq('activo', true).maybeSingle();
+function detectarDispositivo(ua) {
+  if (/iPad|tablet/i.test(ua)) return 'tablet';
+  if (/Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return 'móvil';
+  return 'desktop';
+}
 
-  if (!link) {
-    document.getElementById('msg').textContent = T('qr.no_existe');
-    return;
-  }
+function detectarSO(ua) {
+  if (/iPhone|iPad|iPod/.test(ua)) return 'iOS';
+  if (/Android/.test(ua)) return 'Android';
+  if (/Windows/.test(ua)) return 'Windows';
+  if (/Mac OS X/.test(ua)) return 'macOS';
+  if (/Linux/.test(ua)) return 'Linux';
+  return 'Desconocido';
+}
 
-  // 3. Capturar datos del dispositivo desde el navegador
-  const ua = navigator.userAgent;
+function detectarNavegador(ua) {
+  if (/CriOS/.test(ua))  return 'Chrome iOS';
+  if (/FxiOS/.test(ua))  return 'Firefox iOS';
+  if (/EdgA|EdgW|Edg\//.test(ua)) return 'Edge';
+  if (/OPR|Opera/.test(ua)) return 'Opera';
+  if (/SamsungBrowser/.test(ua)) return 'Samsung Browser';
+  if (/Chrome/.test(ua) && !/Chromium/.test(ua)) return 'Chrome';
+  if (/Firefox/.test(ua)) return 'Firefox';
+  if (/Safari/.test(ua) && !/Chrome/.test(ua)) return 'Safari';
+  return 'Otro';
+}
 
-  function detectarDispositivo(ua) {
-    if (/iPad|tablet/i.test(ua)) return 'tablet';
-    if (/Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return 'móvil';
-    return 'desktop';
-  }
-
-  function detectarSO(ua) {
-    if (/iPhone|iPad|iPod/.test(ua)) return 'iOS';
-    if (/Android/.test(ua)) return 'Android';
-    if (/Windows/.test(ua)) return 'Windows';
-    if (/Mac OS X/.test(ua)) return 'macOS';
-    if (/Linux/.test(ua)) return 'Linux';
-    return 'Desconocido';
-  }
-
-  function detectarNavegador(ua) {
-    if (/CriOS/.test(ua))  return 'Chrome iOS';
-    if (/FxiOS/.test(ua))  return 'Firefox iOS';
-    if (/EdgA|EdgW|Edg\//.test(ua)) return 'Edge';
-    if (/OPR|Opera/.test(ua)) return 'Opera';
-    if (/SamsungBrowser/.test(ua)) return 'Samsung Browser';
-    if (/Chrome/.test(ua) && !/Chromium/.test(ua)) return 'Chrome';
-    if (/Firefox/.test(ua)) return 'Firefox';
-    if (/Safari/.test(ua) && !/Chrome/.test(ua)) return 'Safari';
-    return 'Otro';
-  }
-
-  const now      = new Date();
-  const fecha    = now.toLocaleDateString('es-CO');
-  const hora     = now.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
-  const referrer = document.referrer || null;
-
-  // 4. Obtener IP y geo via servicio público (no requiere API key)
-  let ip = null, pais = null, ciudad_geo = null;
+async function buscarLink(codigo) {
   try {
-    const geo = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
-    if (geo.ok) {
-      const gd = await geo.json();
-      ip        = gd.ip || null;
-      pais      = gd.country_name || null;
-      ciudad_geo = gd.city || null;
-    }
-  } catch(e) { /* geo opcional — no bloquear la redirección */ }
+    const url = REST + '/qr_links?select=id,url_destino&codigo=eq.' + encodeURIComponent(codigo) + '&activo=eq.true';
+    const r = await fetch(url, { headers: apiHeaders(), signal: AbortSignal.timeout(6000) });
+    if (!r.ok) return null;
+    const rows = await r.json();
+    return Array.isArray(rows) && rows.length ? rows[0] : null;
+  } catch(e) {
+    console.error('[qr] buscarLink:', e.message);
+    return null;
+  }
+}
 
-  // 5. Registrar el escaneo en BD (no esperar — redirigir ya)
-  SB.from('qr_scans').insert({
-    qr_link_id:  link.id,
+function registrarScan(link, codigo, ua, fecha, hora, referrer) {
+  const scan = {
+    qr_link_id: link.id,
     codigo,
     fecha, hora,
-    user_agent:  ua,
+    user_agent: ua,
     dispositivo: detectarDispositivo(ua),
-    so:          detectarSO(ua),
-    navegador:   detectarNavegador(ua),
-    ip, pais, ciudad_geo,
-    referrer,
-  }).then(() => {}).catch(() => {});
+    so: detectarSO(ua),
+    navegador: detectarNavegador(ua),
+    referrer
+  };
+  // Insert con keepalive (sobrevive la navegación). Geo en segundo plano:
+  // se enriquece la fila insertada sin bloquear la redirección.
+  fetch(REST + '/qr_scans', {
+    method: 'POST',
+    headers: { ...apiHeaders(), Prefer: 'return=representation' },
+    body: JSON.stringify(scan),
+    keepalive: true
+  }).then(r => r.json()).then(rows => {
+    const id = Array.isArray(rows) && rows[0] ? rows[0].id : null;
+    if (!id) return;
+    fetch('https://ipapi.co/json/', { keepalive: true, signal: AbortSignal.timeout(2500) })
+      .then(r => r.json())
+      .then(gd => {
+        const patch = {};
+        if (gd && gd.ip) patch.ip = gd.ip;
+        if (gd && gd.country_name) patch.pais = gd.country_name;
+        if (gd && gd.city) patch.ciudad_geo = gd.city;
+        if (Object.keys(patch).length) {
+          fetch(REST + '/qr_scans?id=eq.' + encodeURIComponent(id), {
+            method: 'PATCH',
+            headers: apiHeaders(),
+            body: JSON.stringify(patch),
+            keepalive: true
+          }).catch(() => {});
+        }
+      }).catch(() => {});
+  }).catch(() => {});
+}
 
-  // 6. Redirigir
+async function run() {
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get('c') || location.pathname.split('/q/')[1];
+  if (!codigo) {
+    document.getElementById('msg').textContent = T('link_invalido');
+    return;
+  }
+
+  const link = await buscarLink(codigo);
+  if (!link) {
+    document.getElementById('msg').textContent = T('no_existe');
+    return;
+  }
+
+  const now = new Date();
+  registrarScan(link, codigo, navigator.userAgent,
+    now.toLocaleDateString('es-CO'),
+    now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+    document.referrer || null);
+
   window.location.replace(link.url_destino);
 }
 
+document.title = T('title');
 run();
 </script>
 </body>
