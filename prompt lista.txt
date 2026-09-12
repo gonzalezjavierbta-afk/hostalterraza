@@ -1,0 +1,108 @@
+# 🎯 REQUERIMIENTO TÉCNICO: Módulo de Exportación de Lista de Invitados / Asistentes (Excel & PDF)
+
+## 📌 Objetivo General
+Implementar o refactorizar el módulo de exportación de listas de asistentes en el panel de administración (`admin.html`) del **Sistema QR Hostal Terraza**. El módulo debe permitir exportar tanto la **lista completa de inscritos** como la **lista filtrada de asistentes con check-in en puerta (`used = true`)**, generando reportes limpios, profesionales y estructurados en formato **Excel (`.xlsx`)** y **PDF (`.pdf`)**.
+
+---
+
+## 📐 Mapa de Contexto del Proyecto
+
+1. **Arquitectura Frontend:** 
+   - `admin.html` funciona sobre JavaScript vanilla (Vanilla JS / HTML5) sin frameworks ni herramientas de compilación (`node_modules`, Vite, Webpack).
+   - El estado de la sesión, configuración de la organización (`ORG_ID`) y cliente de Supabase (`SB`) ya se encuentran inicializados en el ámbito global del script.
+2. **Modelo de Datos en Supabase (PostgreSQL / Multi-Tenant):**
+   - Tabla `eventos`: Información general del evento (`id`, `nombre`, `fecha`, `org_id`, `slug`, etc.).
+   - Tabla `inscritos`: Registros asociados (`id`, `evento_id`, `org_id`, `nombre`, `cedula`, `email`, `whatsapp`, `tipo_asistente`, `used` [boolean para check-in], `hora_ingreso`, `invitador_codigo`, `created_at`).
+3. **Librerías Disponibles:**
+   - Para Excel: `SheetJS` / `xlsx.full.min.js` (a través del helper `_ensureXLSX()` o directamente disponible en `window.XLSX`).
+   - Para PDF: Estilos `@media print` / ventanas auxiliares (`window.open()`) con plantilla HTML/CSS dedicada invocando `window.print()`.
+
+---
+
+## 🛠️ Requerimientos Funcionales y Estructura del Reporte
+
+### 1. Experiencia de Usuario (UI/UX)
+- Proporcionar o enriquecer una interfaz (modal, selector desplegable o barra de acciones en la sección de asistentes/detalle de evento) que permita al usuario elegir:
+  - **Filtro de Asistencia:** `Todos los Inscritos` vs. `Solo Asistentes Confirmados (Check-in)`.
+  - **Formato de Exportación:** `Excel (.xlsx)` vs. `PDF (.pdf)`.
+
+### 2. Contenido del Reporte (Columnas Mínimas Obligatorias)
+Cada fila del reporte exportado debe consolidar los siguientes datos:
+1. `#` (Índice consecutivo)
+2. **Nombre Completo** (`nombre`)
+3. **Cédula / Documento de Identidad** (`cedula`)
+4. **Tipo de Asistente** (`tipo_asistente`)
+5. **Estado de Check-in** (`used` ? 'Asistió' : 'Pendiente')
+6. **Hora de Ingreso** (`hora_ingreso`)
+7. **Teléfono / WhatsApp** (`whatsapp`)
+8. **Email** (`email`)
+9. **Código de Invitador** (`invitador_codigo`)
+
+---
+
+## 🧠 Lineamientos Arquitectónicos para el Replanteamiento de la Solución
+
+> **Nota para la IA/OpenCode:** Si al analizar `admin.html` encuentras patrones existentes, componentes modales reutilizables o helpers de exportación previos, **eres libre de replantear, adaptar o reestructurar la lógica planteada a continuación**, siempre y cuando respetes las siguientes reglas de calidad inviolables.
+
+### Reglas Inviolables de Calidad:
+1. **Protección Null Pointer / Silent Fallback (ADR-008 & ADR-029):**
+   - **NUNCA** invoques métodos de string (`.replace()`, `.toLowerCase()`, `.split()`) sobre valores de la base de datos que puedan venir en `NULL` o `undefined`.
+   - Utiliza siempre fallbacks seguros: `(i.nombre || '—')` o `(evento?.nombre || 'Evento').replace(...)`.
+2. **Aislamiento Multi-Tenant (RLS Security):**
+   - Todas las consultas a Supabase deben incluir explícitamente los filtros `.eq('evento_id', eventoId)` y `.eq('org_id', ORG_ID)`.
+3. **Integridad del DOM y Cero Destrucción:**
+   - No elimines ni modifiques elementos HTML ni IDs existentes que puedan romper otras funciones de `admin.html`. Agrega la UI y funciones de manera in-situ e incremental.
+
+---
+
+## 💻 Propuesta de Referencia Técnica (Adaptable según inspección)
+
+### A. Función de Consulta y Orquestación
+```javascript
+async function exportarListaInvitados(eventoId, estadoFiltro = 'todos', formato = 'xlsx') {
+  try {
+    if (!SB || !ORG_ID) {
+      alert('Error: Sin conexión a la base de datos o sesión no válida.');
+      return;
+    }
+
+    // 1. Obtener datos del evento
+    const { data: evento, error: evErr } = await SB.from('eventos')
+      .select('nombre, fecha, ubicacion')
+      .eq('id', eventoId)
+      .eq('org_id', ORG_ID)
+      .single();
+
+    if (evErr) throw evErr;
+
+    // 2. Consulta de inscritos según el filtro
+    let query = SB.from('inscritos')
+      .select('nombre, cedula, email, whatsapp, tipo_asistente, used, hora_ingreso, invitador_codigo, created_at')
+      .eq('evento_id', eventoId)
+      .eq('org_id', ORG_ID);
+
+    if (estadoFiltro === 'asistentes') {
+      query = query.eq('used', true);
+    }
+
+    const { data: lista, error: insErr } = await query.order('nombre', { ascending: true });
+    if (insErr) throw insErr;
+
+    if (!lista || lista.length === 0) {
+      alert(`No se encontraron registros para el filtro seleccionado (${estadoFiltro === 'asistentes' ? 'Solo asistentes' : 'Todos los inscritos'}).`);
+      return;
+    }
+
+    const nombreEventoSafe = (evento?.nombre || 'Evento').replace(/[/\\?%*:|"<>]/g, '-');
+
+    // 3. Delegación al generador correspondiente
+    if (formato === 'xlsx') {
+      await _generarXLSXInvitados(evento, lista, estadoFiltro, nombreEventoSafe);
+    } else if (formato === 'pdf') {
+      _generarPDFInvitados(evento, lista, estadoFiltro, nombreEventoSafe);
+    }
+  } catch (err) {
+    console.error('[Error exportarListaInvitados]', err);
+    alert('Ocurrió un error al generar la exportación: ' + (err.message || err));
+  }
+}

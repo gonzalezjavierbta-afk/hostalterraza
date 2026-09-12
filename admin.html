@@ -1387,6 +1387,11 @@ tr:hover td{background:var(--surface)}
             <button onclick="exportXLSX('completo')"    style="display:block;width:100%;text-align:left;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;border-top:1px solid var(--surface)">📦 Todo en un archivo (.xlsx)</button>
             <div style="font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;padding:8px 14px 4px;border-top:1px solid var(--surface)">Informe</div>
             <button onclick="generarInforme()"          style="display:block;width:100%;text-align:left;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif">🖨 Informe gráfico (PDF)</button>
+            <div style="font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;padding:8px 14px 4px;border-top:1px solid var(--surface)">Lista de invitados</div>
+            <button onclick="exportarListaInvitados('todos','xlsx')" style="display:block;width:100%;text-align:left;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif">📋 Lista de invitados (.xlsx)</button>
+            <button onclick="exportarListaInvitados('todos','pdf')" style="display:block;width:100%;text-align:left;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif">🖨 Lista de invitados (PDF)</button>
+            <button onclick="exportarListaInvitados('asistentes','xlsx')" style="display:block;width:100%;text-align:left;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif">📋 Solo asistencia (.xlsx)</button>
+            <button onclick="exportarListaInvitados('asistentes','pdf')" style="display:block;width:100%;text-align:left;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif">🖨 Solo asistencia (PDF)</button>
           </div>
         </div>
       </div>
@@ -1564,6 +1569,16 @@ tr:hover td{background:var(--surface)}
             <option value="voluntario">🤝 Voluntario</option>
             <option value="donacion">💝 Donación</option>
           </select>
+          <span style="width:1px;height:20px;background:var(--border);align-self:center"></span>
+          <select id="pn-export-estado" title="Alcance de la exportacion"
+            style="font-size:12px;padding:5px 8px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper)">
+            <option value="todos">Todos los inscritos</option>
+            <option value="asistentes">Solo asistencia</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" title="Exportar lista a Excel"
+            onclick="exportarListaInvitados(document.getElementById('pn-export-estado').value,'xlsx')">Excel</button>
+          <button class="btn btn-ghost btn-sm" title="Exportar lista a PDF"
+            onclick="exportarListaInvitados(document.getElementById('pn-export-estado').value,'pdf')">PDF</button>
         </div>
       </div>
       <!-- Barra de acciones masivas (aparece al seleccionar) -->
@@ -7401,6 +7416,38 @@ function renderTabla(list) {
   _renderTablaPagina();
 }
 
+// Lee los filtros visibles del tab Asistentes. Helper compartido por el render
+// de la tabla y por las exportaciones (Excel/PDF) para no duplicar la logica.
+function _leerFiltrosPanel() {
+  return {
+    q:      (document.getElementById('pn-search')?.value||'').toLowerCase().trim(),
+    tipo:   (document.getElementById('pn-tipo-filter')?.value||''),
+    estado: (document.getElementById('pn-estado-filter')?.value||''),
+    cat:    (document.getElementById('pn-cat-filter')?.value||'')
+  };
+}
+
+// Aplica los mismos filtros cliente-side que la tabla de Asistentes sobre la
+// cache _pnAllList. Devuelve el array filtrado (no muta la cache).
+// ADR-024/ADR-029: norm() y los campos se blindan con (campo||'') para no
+// romper con registros incompletos (nombre/cedula/ref_* en NULL).
+function _filtrarInscritosPanel() {
+  const { q, tipo, estado, cat } = _leerFiltrosPanel();
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const qn   = norm(q);
+  return (_pnAllList || []).filter(i => {
+    if (tipo   && i.tipo !== tipo) return false;
+    if (cat    && (i.tipo_ayuda||i.tipo) !== cat) return false;
+    if (estado === 'ingreso'   && !i.used) return false;
+    if (estado === 'pendiente' && i.used)  return false;
+    if (q) {
+      const hay = norm(i.nombre)+' '+(i.cedula||'')+' '+norm(i.ref_nombre||'')+' '+norm(i.ref_codigo||'')+' '+norm(i.evento_nombre||'');
+      if (!hay.includes(qn)) return false;
+    }
+    return true;
+  });
+}
+
 function _renderTablaPagina() {
   const tb    = document.getElementById('pn-table');
   const count = document.getElementById('pn-table-count');
@@ -7414,24 +7461,9 @@ function _renderTablaPagina() {
   const badgeAsist = document.getElementById('pnl-badge-asistentes');
   if (badgeAsist) badgeAsist.textContent = _pnAllList?.length || 0;
 
-  const q      = (document.getElementById('pn-search')?.value||'').toLowerCase().trim();
-  const tipo   = document.getElementById('pn-tipo-filter')?.value||'';
-  const estado = document.getElementById('pn-estado-filter')?.value||'';
-  const cat    = document.getElementById('pn-cat-filter')?.value||'';
-  const norm   = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const qn     = norm(q);
+  const { q, tipo, estado, cat } = _leerFiltrosPanel();
 
-  const filtered = _pnAllList.filter(i => {
-    if (tipo   && i.tipo !== tipo) return false;
-    if (cat    && (i.tipo_ayuda||i.tipo) !== cat) return false;
-    if (estado === 'ingreso'   && !i.used) return false;
-    if (estado === 'pendiente' && i.used)  return false;
-    if (q) {
-      const hay = norm(i.nombre)+' '+(i.cedula||'')+' '+norm(i.ref_nombre||'')+' '+norm(i.ref_codigo||'')+' '+norm(i.evento_nombre||'');
-      if (!hay.includes(qn)) return false;
-    }
-    return true;
-  });
+  const filtered = _filtrarInscritosPanel();
 
   const total = filtered.length;
   const pages = Math.ceil(total / _pnPageSize) || 1;
@@ -7570,6 +7602,7 @@ async function _xlsxInscritos() {
     i.puntos_acceso||''
   ]));
   const ws=XLSX.utils.aoa_to_sheet(rows);
+  _applyXlsxRowStyle(ws, 0, 15, xlsxHeader());
   _setColWidths(ws,[4,30,14,15,14,25,16,20,16,14,30,14,12,12,14]);
   XLSX.utils.book_append_sheet(wb,ws,'Inscritos');
 
@@ -7584,6 +7617,7 @@ async function _xlsxInscritos() {
   resRows.push(['TOTAL',list.length,list.filter(i=>i.used).length,
     list.length>0?Math.round(list.filter(i=>i.used).length/list.length*100)+'%':'—']);
   const ws2=XLSX.utils.aoa_to_sheet(resRows);
+  _applyXlsxRowStyle(ws2, 0, 4, xlsxSubHeader());
   _setColWidths(ws2,[16,10,12,14]);
   XLSX.utils.book_append_sheet(wb,ws2,'Por tipo');
 
@@ -7727,6 +7761,137 @@ async function _xlsxCompleto() {
 
 function _setColWidths(ws, widths) {
   ws['!cols'] = widths.map(w=>({wch:w}));
+}
+
+// Aplica un estilo a una fila completa de una hoja SheetJS (reutiliza los
+// estilos xlsxHeader/xlsxSubHeader del proyecto). Evita repetir el bucle de
+// asignacion de estilo en cada exportacion.
+function _applyXlsxRowStyle(ws, rowIdx, nCols, style) {
+  if (!ws || !style) return;
+  for (let c = 0; c < nCols; c++) {
+    const ref = XLSX.utils.encode_cell({ r: rowIdx, c });
+    if (ws[ref]) ws[ref].s = style;
+  }
+}
+
+// Devuelve la etiqueta de contexto de la vista activa del panel
+// (ev:<id> -> nombre + fecha del evento; serie:<id> -> nombre de la serie).
+function _etiquetaContextoPanel() {
+  const vista = (document.getElementById('pn-vista')?.value || '');
+  if (vista.startsWith('ev:')) {
+    const ev = (_eventos || []).find(e => e.id === vista.slice(3));
+    if (ev) return ((ev.nombre || 'Evento') + ' ' + (ev.fecha || '')).trim();
+    return 'Evento';
+  }
+  if (vista.startsWith('serie:')) {
+    const s = (_series || []).find(x => x.id === vista.slice(6));
+    if (s) return (s.nombre || 'Serie');
+    return 'Serie';
+  }
+  // admin_evento: su #pn-vista se oculta y queda vacia; usar el evento asignado.
+  if (!vista && _eventoAsignado) {
+    const ev = (_eventos || []).find(e => e.id === _eventoAsignado);
+    if (ev) return ((ev.nombre || 'Evento') + ' ' + (ev.fecha || '')).trim();
+  }
+  return 'Vista general';
+}
+
+// Construye las filas del reporte de invitados: SOLO #, Nombre y Cedula
+// (decision de Direccion). Reutilizable por Excel y PDF.
+function _buildInvitadosRows(list) {
+  return (Array.isArray(list) ? list : []).filter(Boolean).map((i, idx) => [
+    idx + 1,
+    (i.nombre || '—'),
+    (i.cedula || '—')
+  ]);
+}
+
+// Genera el .xlsx de la lista de invitados reutilizando SheetJS (_ensureXLSX).
+async function _generarXLSXInvitados(list, contexto, nombreArchivoSafe) {
+  await _ensureXLSX();
+  if (typeof XLSX === 'undefined') {
+    alert('No se pudo cargar la libreria de Excel. Intenta de nuevo.');
+    return;
+  }
+  const dataRows = _buildInvitadosRows(list);
+  const rows = [['#','Nombre','Cédula']].concat(dataRows);
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  _setColWidths(ws, [6,36,18]);
+  _applyXlsxRowStyle(ws, 0, 3, xlsxHeader());
+  dataRows.forEach((_, idx) => _applyXlsxRowStyle(ws, idx + 1, 3, xlsxAlt(idx)));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Lista de invitados');
+  XLSX.writeFile(wb, nombreArchivoSafe + '.xlsx');
+  console.log('[TRACE] Lista de invitados XLSX: ' + dataRows.length + ' registros (' + contexto + ')');
+}
+
+// Genera el PDF de la lista de invitados con el patron existente de
+// generarInforme(): ventana auxiliar + HTML imprimible + window.print().
+function _generarPDFInvitados(list, contexto, nombreArchivoSafe) {
+  const arr = (Array.isArray(list) ? list : []).filter(Boolean);
+  const total = arr.length;
+  const ingresaron = arr.filter(i => i.used).length;
+  const filas = _buildInvitadosRows(arr).map(r => {
+    return '<tr><td style="text-align:center">' + r[0] + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>';
+  }).join('');
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<title>${esc(nombreArchivoSafe)}</title>
+<style>
+  *{box-sizing:border-box} body{font-family:'DM Sans',Arial,sans-serif;color:#181815;margin:0;padding:32px}
+  h1{font-size:22px;margin:0 0 2px} .gold{color:#C8A96E}
+  .sub{font-size:12px;color:#777;margin-bottom:14px}
+  .sum{font-size:13px;margin-bottom:16px} .sum strong{font-size:15px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:#181815;color:#fff;text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  td{padding:7px 10px;border-bottom:1px solid #e6e6df} tr:nth-child(even) td{background:#f7f7f2}
+  .ftr{margin-top:18px;padding-top:8px;border-top:1px solid #e0e0d8;font-size:10px;color:#aaa;display:flex;justify-content:space-between}
+  .print-btn{position:fixed;bottom:18px;right:18px;background:#C8A96E;color:#fff;border:none;padding:10px 18px;border-radius:7px;font-size:13px;cursor:pointer;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:999}
+  @media print{.print-btn{display:none}}
+</style></head><body>
+<button class="print-btn" onclick="window.print()">Guardar como PDF</button>
+<h1><span class="gold">Hostal Terraza</span> · Lista de invitados</h1>
+<div class="sub">${esc(contexto)} · Generado el ${TODAY()} a las ${NOW()}</div>
+<div class="sum">Total: <strong>${total}</strong> &middot; Ingresaron: <strong>${ingresaron}</strong></div>
+<table><thead><tr><th style="width:48px">#</th><th>Nombre</th><th style="width:170px">Cédula</th></tr></thead>
+<tbody>${filas}</tbody></table>
+<div class="ftr"><span>Hostal Terraza · Sistema QR de Registro de Eventos</span><span>${esc(nombreArchivoSafe)}</span></div>
+</body></html>`;
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if (!w) { alert('Permite las ventanas emergentes para generar el PDF.'); return; }
+  w.document.write(html);
+  w.document.close();
+  console.log('[TRACE] Lista de invitados PDF: ' + total + ' registros (' + contexto + ')');
+}
+
+// Exporta la lista de invitados (SOLO #, Nombre y Cedula) reutilizando la cache
+// _pnAllList y los filtros visibles del panel. No consulta Supabase.
+async function exportarListaInvitados(estadoFiltro='todos', formato='xlsx') {
+  try {
+    if (!SB || !ORG_ID) {
+      alert('Error: sin conexion a la base de datos o sesion no valida.');
+      return;
+    }
+    closeExportMenu();
+    if (!_pnAllList || !_pnAllList.length) {
+      await renderPanel();
+    }
+    let list = _filtrarInscritosPanel();
+    if (estadoFiltro === 'asistentes') list = list.filter(i => i.used);
+    if (!list || !list.length) {
+      alert('No se encontraron registros para el filtro seleccionado.');
+      return;
+    }
+    const etiqueta = _etiquetaContextoPanel();
+    const nombreArchivoSafe = ('Lista invitados ' + etiqueta).replace(/[/\\?%*:|"<>]/g,'-');
+    if (formato === 'pdf') {
+      _generarPDFInvitados(list, etiqueta, nombreArchivoSafe);
+    } else {
+      await _generarXLSXInvitados(list, etiqueta, nombreArchivoSafe);
+    }
+  } catch (err) {
+    console.error('[Error exportarListaInvitados]', err);
+    alert('Ocurrio un error al generar la exportacion: ' + (err && err.message ? err.message : err));
+  }
 }
 
 // ════════════════════════════════════════════════════
