@@ -1,0 +1,1714 @@
+/* ============================================================================
+   f10.css — SILO FIESTA F10 "CYBERPUNK FOSFORESCENTE" (sep-2026)
+   v1.0.0 · NEÓN TRÍADA: FUCSIA + AMARILLO + TURQUESA
+   Dirección estética: "Cyberpunk Fosforescente" — underground electrónico
+   con atmósfera de club nocturno de alta gama. Fondo púrpura profundo
+   (#0f021e) con niebla de neón y destellos tríadicos. Galerías de fotos
+   distribuidas en 3 bloques a lo largo del scroll. Título amarillo/fucsia
+   animado con resplandor continuo. Descripción como tarjeta VIP translúcida.
+   Tokens: --f10-bg #0f021e, --f10-pink #ff2a85, --f10-yellow #ffe500,
+   --f10-blue #00f0ff, --f10-purple #7a00ff.
+   Tipografía: Geist 900 display.
+   Efectos: aurora tríada neón, grano cinematográfico, glow pulsante fucsia,
+   galerías ntercaladas, reveal scroll-driven, backdrop-filter glass.
+   Respeto prefers-reduced-motion.
+   Breakpoints (mobile-first): BASE (<480) / 480 / 640 / 767 / 1023+.
+   Líneas: ~750. ADR-Regla9 WCAG-AA compliant (contraste ≥ 4.5:1).
+============================================================================ */
+
+/* Geist se carga de forma asíncrona por el kernel (evento.html preload);
+   se eliminó el @import bloqueante de Google Fonts para acelerar el silo. */
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   ========================================================================== */
+.tpl-f10, .Tpl-F10 {
+    --tpl-accent: var(--master-accent, #ff2a85);
+    --gold: var(--tpl-accent, #ff2a85);
+
+    /* Paleta principal */
+    --f10-bg:        #0f021e;
+    --f10-bg-ink:    #190830;
+    --f10-bg-soft:   #220c40;
+    --f10-card-bg:   rgba(25, 8, 48, 0.75);
+    --f10-pink:      #ff2a85;
+    --f10-yellow:    #ffe500;
+    --f10-blue:      #00f0ff;
+    --f10-purple:    #7a00ff;
+    --f10-text:      #ffffff;
+    --f10-text-muted: rgba(255, 255, 255, 0.58);
+    --f10-text-cream: #f2e6ff;
+    --f10-line:      rgba(255, 255, 255, 0.10);
+    --f10-line-soft: rgba(255, 255, 255, 0.05);
+    --f10-green:     #25d366;
+
+    /* Glows */
+    --f10-glow-pink:        0 0 20px rgba(255, 42, 133, 0.6), 0 0 40px rgba(255, 42, 133, 0.3);
+    --f10-glow-pink-strong: 0 0 28px rgba(255, 42, 133, 0.75), 0 0 60px rgba(255, 42, 133, 0.35), 0 0 100px rgba(255, 42, 133, 0.12);
+    --f10-glow-yellow:      0 0 20px rgba(255, 229, 0, 0.6), 0 0 40px rgba(255, 229, 0, 0.3);
+    --f10-glow-blue:        0 0 20px rgba(0, 240, 255, 0.6), 0 0 40px rgba(0, 240, 255, 0.25);
+    --f10-glow-purple:      0 0 18px rgba(122, 0, 255, 0.45), 0 0 40px rgba(122, 0, 255, 0.2);
+    --f10-border-glow:      1px solid rgba(255, 42, 133, 0.4);
+
+    /* Tipografía */
+    --f10-font: 'Geist', system-ui, -apple-system, sans-serif;
+
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(130% 90% at 20% 5%, #220c40 0%, #0f021e 50%, #07001a 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f10-text);
+    font-family: var(--f10-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Box-sizing global dentro del silo (ADR-019) */
+.tpl-f10 *, .Tpl-F10 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f10 *::before, .Tpl-F10 *::before,
+.tpl-f10 *::after,  .Tpl-F10 *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1.1. AURORA TRÍADA — blobs neón fucsia / azul / amarillo en deriva lenta
+   ========================================================================== */
+.tpl-f10::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(50% 38% at 10% 15%,  rgba(255, 42, 133, 0.18) 0%, transparent 70%),
+        radial-gradient(42% 32% at 88% 70%,  rgba(0, 240, 255, 0.14)  0%, transparent 70%),
+        radial-gradient(36% 28% at 72% 10%,  rgba(255, 229, 0,  0.12) 0%, transparent 70%),
+        radial-gradient(44% 40% at 26% 90%,  rgba(122, 0, 255,  0.14) 0%, transparent 72%);
+    animation: f10AuroraDrift 26s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f10AuroraDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1);       opacity: 0.88; }
+    33%  { transform: translate3d(-2%, 1.5%, 0) scale(1.05); opacity: 1; }
+    66%  { transform: translate3d(1.8%, -1.2%, 0) scale(1.08); opacity: 0.92; }
+    100% { transform: translate3d(2.5%, 1%, 0) scale(1.12); opacity: 0.82; }
+}
+
+/* ==========================================================================
+   1.2. GRANO CINEMATOGRÁFICO — textura de película fine grain
+   ========================================================================== */
+.tpl-f10::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.048;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: f10GrainShift 0.85s steps(4) infinite;
+}
+
+@keyframes f10GrainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1%); }
+    50%  { transform: translate(1.5%, -2%); }
+    75%  { transform: translate(-1%, 2.5%); }
+    100% { transform: translate(2%, -1.5%); }
+}
+
+/* ==========================================================================
+   2. ACTIVACIÓN ATÓMICA — display explícito (kernel IoC oculta todo por defecto)
+   ========================================================================== */
+.tpl-f10 #main-content-flow,
+.Tpl-F10 #main-content-flow {
+    position: relative;
+    z-index: 1;
+}
+
+/* Módulos flex */
+.tpl-f10 #mod-hero,          .Tpl-F10 #mod-hero,
+.tpl-f10 #mod-hero-ctas,     .Tpl-F10 #mod-hero-ctas,
+.tpl-f10 #mod-cartel,        .Tpl-F10 #mod-cartel,
+.tpl-f10 #mod-lineup,        .Tpl-F10 #mod-lineup,
+.tpl-f10 #mod-playlist,      .Tpl-F10 #mod-playlist,
+.tpl-f10 #unified-frame,     .Tpl-F10 #unified-frame {
+    display: flex !important;
+}
+
+/* Módulos block */
+.tpl-f10 #mod-hero-meta,     .Tpl-F10 #mod-hero-meta,
+.tpl-f10 #mod-descripcion,   .Tpl-F10 #mod-descripcion,
+.tpl-f10 #mod-video,         .Tpl-F10 #mod-video,
+.tpl-f10 #mod-boletos,       .Tpl-F10 #mod-boletos,
+.tpl-f10 #mod-experiencias,  .Tpl-F10 #mod-experiencias,
+.tpl-f10 #mod-info-tecnica,  .Tpl-F10 #mod-info-tecnica,
+.tpl-f10 #mod-ubicacion,     .Tpl-F10 #mod-ubicacion,
+.tpl-f10 #mod-sponsors,      .Tpl-F10 #mod-sponsors,
+.tpl-f10 #mod-form,          .Tpl-F10 #mod-form,
+.tpl-f10 #mod-footer,        .Tpl-F10 #mod-footer {
+    display: block !important;
+}
+
+/* Módulos de CAMPAÑA — Cero Borrado: protegidos pero apagados en fiesta */
+.tpl-f10 #mod-historia,
+.tpl-f10 #mod-objetivo,
+.tpl-f10 #mod-impacto-historico,
+.tpl-f10 #mod-mapa-crisis,
+.tpl-f10 #mod-como-ayudar,
+.tpl-f10 #mod-whatsapp {
+    display: none !important;
+}
+
+/* ==========================================================================
+   3. GRID ATÓMICO — 2 columnas en desktop, 1 columna en mobile
+   ========================================================================== */
+.tpl-f10 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "hero       hero"
+        "countdown  countdown"
+        "meta       meta"
+        "ctas       ctas"
+        "descripcion descripcion"
+        "lineup     lineup"
+        "cartel     playlist"
+        "boletos    form"
+        "experiencias experiencias"
+        "video      video"
+        "info       info"
+        "ubicacion  ubicacion"
+        "sponsors   sponsors"
+        "footer     footer";
+    width: 100%;
+}
+
+/* Grid-areas */
+.tpl-f10 #mod-hero         { grid-area: hero; }
+.tpl-f10 #unified-frame    { grid-area: countdown; }
+.tpl-f10 #mod-hero-meta    { grid-area: meta; }
+.tpl-f10 #mod-hero-ctas    { grid-area: ctas; }
+.tpl-f10 #mod-descripcion  { grid-area: descripcion; }
+.tpl-f10 #mod-cartel       { grid-area: cartel; }
+.tpl-f10 #mod-video        { grid-area: video; }
+.tpl-f10 #mod-lineup       { grid-area: lineup; }
+.tpl-f10 #mod-playlist     { grid-area: playlist; }
+.tpl-f10 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f10 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f10 #mod-form         { grid-area: form; }
+.tpl-f10 #mod-footer       { grid-area: footer; }
+.tpl-f10 #mod-boletos      { grid-area: boletos; }
+.tpl-f10 #mod-experiencias { grid-area: experiencias; }
+.tpl-f10 #mod-info-tecnica { grid-area: info; }
+
+/* ==========================================================================
+   4. TIPOGRAFÍA EDITORIAL — Eyebrows versales, encabezados de sección
+   ========================================================================== */
+.tpl-f10 h2, .Tpl-F10 h2 {
+    color: var(--f10-text-cream);
+    font-family: var(--f10-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.44em;
+    font-weight: 800;
+    margin-bottom: 2.6rem;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 0;
+}
+
+.tpl-f10 h2::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 1px;
+    background: var(--f10-pink);
+    margin-right: 1rem;
+    vertical-align: middle;
+    box-shadow: var(--f10-glow-pink);
+}
+
+.tpl-f10 section {
+    padding: 4.5rem 8%;
+    border-bottom: 1px solid var(--f10-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO — Hero full-viewport con overlay de niebla tríada
+   ========================================================================== */
+.tpl-f10 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5.5rem 8% 1.4rem;
+    min-height: 100vh;
+    color: var(--f10-text);
+    background-color: var(--f10-bg);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Overlay degradado neón tríada sobre imagen de fondo */
+.tpl-f10 #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(15, 2, 30, 0.50) 0%,
+        rgba(34, 12, 64, 0.42) 30%,
+        rgba(255, 42, 133, 0.10) 60%,
+        rgba(15, 2, 30, 0.88) 100%
+    );
+    pointer-events: none;
+}
+
+/* Badge de organización — esquina superior izquierda */
+.tpl-f10 #org-name-badge {
+    position: absolute !important;
+    top: 1.6rem !important;
+    left: 1.6rem !important;
+    right: auto !important;
+    z-index: 3;
+    display: block;
+    margin-bottom: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    font-size: 0.70rem;
+    font-weight: 800;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--f10-blue);
+    opacity: 0.95;
+    text-shadow: 0 0 14px rgba(0, 240, 255, 0.55);
+}
+
+.tpl-f10 #mod-hero .hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==========================================================================
+   6. #EVENT-TITLE — Logo neón tríada con animación de resplandor
+      Amarillo/fucsia en gradiente con text-shadow multicapa.
+   ========================================================================== */
+.tpl-f10 #event-title {
+    margin: 0 0 1.6rem;
+    font-family: var(--f10-font);
+    font-weight: 900 !important;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+    font-size: clamp(3.2rem, 14vw, 8rem) !important;
+    max-width: 100%;
+    display: block !important; /* Activado en f10: el título siempre visible */
+    background: linear-gradient(
+        135deg,
+        var(--f10-yellow)  0%,
+        var(--f10-pink)   40%,
+        var(--f10-blue)   70%,
+        var(--f10-yellow) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 22px rgba(255, 229, 0, 0.45))
+            drop-shadow(0 0 44px rgba(255, 42, 133, 0.28));
+    animation: f10NeonPulse 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes f10NeonPulse {
+    0%   {
+        filter: drop-shadow(0 0 20px rgba(255, 229, 0, 0.40))
+                drop-shadow(0 0 40px rgba(255, 42, 133, 0.22));
+    }
+    50%  {
+        filter: drop-shadow(0 0 32px rgba(255, 229, 0, 0.65))
+                drop-shadow(0 0 65px rgba(255, 42, 133, 0.38))
+                drop-shadow(0 0 90px rgba(0, 240, 255, 0.18));
+    }
+    100% {
+        filter: drop-shadow(0 0 24px rgba(255, 229, 0, 0.46))
+                drop-shadow(0 0 48px rgba(255, 42, 133, 0.26));
+    }
+}
+
+.tpl-f10 #event-title .hero-title-line1 {
+    display: block;
+    line-height: 1;
+}
+
+.tpl-f10 #event-title .hero-title-line2 {
+    display: block;
+    line-height: 1;
+    font-size: 0.62em;
+}
+
+/* ==========================================================================
+   6B. CINTA FUCSIA DE FECHA
+   ========================================================================== */
+.tpl-f10 .hero-date-ribbon {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    background: var(--f10-pink);
+    color: #ffffff;
+    padding: 0.45rem 1.8rem;
+    font-family: var(--f10-font);
+    font-weight: 900;
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 22px rgba(255, 42, 133, 0.40);
+}
+
+/* ==========================================================================
+   7. META — Iconos y datos del evento con estilo neón tríada
+   ========================================================================== */
+.tpl-f10 #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem 2.2rem;
+    padding: 1.6rem 6% 2.2rem;
+    background: linear-gradient(135deg, var(--f10-bg-ink) 0%, var(--f10-bg) 100%);
+    border-bottom: 2px solid var(--f10-purple);
+    box-shadow: 0 4px 32px rgba(122, 0, 255, 0.14);
+}
+
+.tpl-f10 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: rgba(255, 42, 133, 0.07);
+    border: 1px solid rgba(255, 42, 133, 0.22);
+    color: var(--f10-text);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+    position: relative;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.tpl-f10 #mod-hero-meta .meta-item:hover {
+    background: rgba(255, 42, 133, 0.13);
+    border-color: rgba(255, 42, 133, 0.45);
+}
+
+.tpl-f10 #mod-hero-meta .meta-svg {
+    display: block;
+    flex-shrink: 0;
+    fill: var(--f10-pink);
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 0 6px rgba(255, 42, 133, 0.55));
+}
+
+/* ==========================================================================
+   8. HERO CTAs — Botones de acción con tactile sizing (min 48px)
+   ========================================================================== */
+.tpl-f10 #mod-hero-ctas {
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 6% 2.8rem;
+}
+
+.tpl-f10 #mod-hero-ctas .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.9rem 2.2rem;
+    min-height: 52px;
+    min-width: 180px;
+    font-family: var(--f10-font);
+    font-weight: 900;
+    font-size: 0.80rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+/* CTA principal — amarillo sólido (máximo contraste) */
+.tpl-f10 #mod-hero-ctas .hero-cta-btn--primary,
+.tpl-f10 #mod-hero-ctas .hero-cta-btn--wa {
+    background: var(--f10-yellow);
+    color: #0f021e;
+    border-color: var(--f10-yellow);
+    box-shadow: 4px 4px 0 var(--f10-purple), var(--f10-glow-yellow);
+    font-weight: 900;
+}
+
+.tpl-f10 #mod-hero-ctas .hero-cta-btn--primary:hover,
+.tpl-f10 #mod-hero-ctas .hero-cta-btn--wa:hover {
+    background: #0f021e;
+    color: var(--f10-yellow);
+    border-color: var(--f10-yellow);
+    box-shadow: 6px 6px 0 var(--f10-purple), 0 0 32px rgba(255, 229, 0, 0.42);
+    transform: translate(1px, 1px);
+}
+
+/* CTA secundario — fucsia outline */
+.tpl-f10 #mod-hero-ctas .hero-cta-btn--secondary {
+    background: transparent;
+    color: var(--f10-pink);
+    border-color: var(--f10-pink);
+    box-shadow: var(--f10-glow-pink);
+}
+
+.tpl-f10 #mod-hero-ctas .hero-cta-btn--secondary:hover {
+    background: var(--f10-pink);
+    color: #ffffff;
+    box-shadow: var(--f10-glow-pink-strong);
+    transform: translateY(-2px);
+}
+
+/* Active pulse en mobile */
+.tpl-f10 #mod-hero-ctas .hero-cta-btn:active {
+    transform: scale(0.97);
+    filter: brightness(0.9);
+}
+
+/* ==========================================================================
+   9. COUNTDOWN — Bloques neón con glow tríada pulsante
+   ========================================================================== */
+.tpl-f10 #unified-frame {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    padding: 2rem 6% 1.4rem;
+    margin-top: 0 !important;
+    padding-top: 0 !important; /* ADR-010: integración de proximidad multimedia */
+    background: linear-gradient(135deg, var(--f10-bg-ink) 0%, var(--f10-bg) 100%);
+    border-bottom: 2px solid var(--f10-pink);
+}
+
+.tpl-f10 #unified-frame .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    padding: 12px 10px;
+    position: relative;
+    background: rgba(255, 42, 133, 0.06);
+    border: 1px solid rgba(255, 42, 133, 0.28);
+    min-width: 96px;
+    flex: 1;
+    max-width: 150px;
+    box-shadow: var(--f10-glow-pink);
+    animation: f10CountdownGlow 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes f10CountdownGlow {
+    0%   { box-shadow: 0 0 12px rgba(255, 42, 133, 0.22); border-color: rgba(255, 42, 133, 0.28); }
+    50%  { box-shadow: 0 0 24px rgba(255, 42, 133, 0.44), 0 0 44px rgba(0, 240, 255, 0.14); border-color: rgba(255, 42, 133, 0.55); }
+    100% { box-shadow: 0 0 14px rgba(255, 229, 0, 0.30), 0 0 28px rgba(255, 42, 133, 0.20); border-color: rgba(255, 229, 0, 0.35); }
+}
+
+.tpl-f10 #unified-frame .cd-block::after {
+    content: none;
+}
+
+.tpl-f10 #unified-frame .cd-block > span {
+    display: block;
+    font-size: clamp(1.9rem, 6vw, 3rem) !important;
+    font-weight: 900 !important;
+    font-variant-numeric: tabular-nums;
+    color: var(--f10-text);
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 18px rgba(255, 42, 133, 0.35);
+    line-height: 1;
+}
+
+.tpl-f10 #unified-frame .cd-block small {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--f10-blue);
+    margin-top: 0.4rem;
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   10. #MOD-DESCRIPCION — Tarjeta VIP translúcida (glass morphism)
+   ========================================================================== */
+.tpl-f10 #mod-descripcion {
+    padding: 3.5rem 8%;
+    background: linear-gradient(135deg, var(--f10-bg-ink) 0%, var(--f10-bg) 100%);
+}
+
+.tpl-f10 #db-descripcion-text,
+.tpl-f10 .descripcion-inner,
+.tpl-f10 #mod-descripcion > div {
+    background: var(--f10-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--f10-border-glow);
+    border-radius: 4px;
+    padding: 2.6rem 2.4rem;
+    max-width: 860px;
+    margin: 0 auto;
+    color: var(--f10-text-cream);
+    font-size: 1.02rem;
+    line-height: 1.75;
+    font-weight: 400;
+    box-shadow:
+        0 22px 55px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        var(--f10-glow-pink);
+    position: relative;
+    overflow: hidden;
+}
+
+.tpl-f10 #db-descripcion-text::before,
+.tpl-f10 .descripcion-inner::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--f10-pink) 0%, var(--f10-blue) 50%, var(--f10-yellow) 100%);
+    opacity: 0.9;
+}
+
+/* ==========================================================================
+   11. CARTEL — Póster flotante con glow pulsante fucsia
+   ========================================================================== */
+.tpl-f10 #mod-cartel {
+    padding: 1.6rem 8% 3.4rem;
+}
+
+.tpl-f10 #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+}
+
+.tpl-f10 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 430px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 42, 133, 0.22);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), var(--f10-glow-pink);
+    object-fit: cover;
+    animation: f10PosterFloat 8s ease-in-out infinite;
+    transition: box-shadow 0.5s ease;
+}
+
+@keyframes f10PosterFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-10px) scale(1.016); }
+}
+
+.tpl-f10 #mod-cartel:hover #db-poster-img {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), var(--f10-glow-pink-strong);
+}
+
+/* ==========================================================================
+   12. LINEUP — Grid 4×N con tarjetas foto+nombre en cursiva neón
+   ========================================================================== */
+.tpl-f10 #mod-lineup {
+    padding: 4.5rem 8%;
+    background: linear-gradient(180deg, var(--f10-bg) 0%, var(--f10-bg-ink) 100%);
+    border-top: 2px solid var(--f10-pink);
+    border-bottom: 2px solid var(--f10-purple);
+}
+
+.tpl-f10 #mod-lineup > div {
+    max-width: 1200px !important;
+    margin: 0 auto;
+}
+
+/* Título LINEUP — cursiva tríada */
+.tpl-f10 .f10-lc-title {
+    font-family: var(--f10-font);
+    font-style: italic;
+    font-weight: 900 !important;
+    letter-spacing: 0.03em;
+    line-height: 0.98;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: clamp(2rem, 4.5vw, 3.1rem);
+    margin: 0 0 1.8rem;
+    background-image: linear-gradient(135deg, var(--f10-yellow) 0%, var(--f10-pink) 45%, var(--f10-blue) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(255, 229, 0, 0.48))
+            drop-shadow(0 0 26px rgba(255, 42, 133, 0.30));
+    animation: f10NeonPulse 3.6s ease-in-out infinite alternate;
+}
+
+/* Contenedor grid */
+.tpl-f10 #db-lineup {
+    display: block !important;
+    width: 100% !important;
+}
+
+.tpl-f10 .f10-lc-grid,
+.tpl-f10 #db-lineup {
+    max-width: 1280px !important;
+    width: 100% !important;
+    margin: 0 auto;
+}
+
+.tpl-f10 .f10-lc-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.1rem;
+}
+
+/* Tarjeta de artista */
+.tpl-f10 .f10-artist {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background: #170535;
+    border: 1px solid rgba(255, 42, 133, 0.30);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -18px 34px rgba(255, 42, 133, 0.16),
+        0 10px 30px rgba(0, 0, 0, 0.48);
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1),
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+}
+
+/* Capa turquesa-fucsia en hover */
+.tpl-f10 .f10-artist::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.35) 0%, rgba(255, 42, 133, 0.40) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.tpl-f10 .f10-artist:hover::before,
+.tpl-f10 .f10-artist:focus-within::before {
+    opacity: 1;
+}
+
+/* Grano interno */
+.tpl-f10 .f10-artist::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.40;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.tpl-f10 .f10-artist:hover,
+.tpl-f10 .f10-artist:focus-within {
+    transform: translateY(-7px);
+    border-color: rgba(0, 240, 255, 0.65);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -18px 40px rgba(0, 240, 255, 0.22),
+        var(--f10-glow-blue);
+}
+
+/* Foto */
+.tpl-f10 .f10-artist-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(15%) brightness(0.78) saturate(1.15);
+    transition: transform 0.45s ease;
+}
+
+.tpl-f10 .f10-artist:hover .f10-artist-photo,
+.tpl-f10 .f10-artist:focus-within .f10-artist-photo {
+    transform: scale(1.06);
+}
+
+/* Overlay inferior */
+.tpl-f10 .f10-artist-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 3;
+    padding: 1.7rem 0.9rem 1.1rem;
+    background: linear-gradient(0deg, rgba(15, 2, 30, 0.97) 0%, rgba(25, 8, 48, 0.82) 52%, rgba(25, 8, 48, 0.14) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: center;
+    min-height: 44%;
+    pointer-events: none;
+}
+
+/* Nombre del artista — cursiva neón tríada */
+.tpl-f10 .f10-artist-name {
+    font-family: var(--f10-font);
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: f10NeonPulse 4s ease-in-out infinite alternate;
+}
+
+/* Impares: amarillo → fucsia */
+.tpl-f10 .f10-artist:nth-child(odd) .f10-artist-name {
+    background-image: linear-gradient(135deg, var(--f10-yellow) 0%, var(--f10-pink) 60%, var(--f10-blue) 100%);
+    filter: drop-shadow(0 0 8px rgba(255, 229, 0, 0.65)) drop-shadow(0 0 16px rgba(255, 42, 133, 0.40));
+}
+
+/* Pares: azul → amarillo */
+.tpl-f10 .f10-artist:nth-child(even) .f10-artist-name {
+    background-image: linear-gradient(135deg, var(--f10-blue) 0%, var(--f10-yellow) 55%, var(--f10-pink) 100%);
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.70)) drop-shadow(0 0 16px rgba(255, 229, 0, 0.38));
+}
+
+/* Redes sociales — aparecen en hover */
+.tpl-f10 .f10-artist-social {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 42%;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0.6rem;
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.tpl-f10 .f10-artist:hover .f10-artist-social,
+.tpl-f10 .f10-artist:focus-within .f10-artist-social {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.tpl-f10 .f10-artist-social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #ffffff;
+    border: 1px solid rgba(0, 240, 255, 0.55);
+    background: rgba(15, 2, 30, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.45);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+}
+
+.tpl-f10 .f10-artist-social a:hover {
+    transform: translateY(-2px) scale(1.08);
+    background: rgba(0, 240, 255, 0.28);
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.65);
+}
+
+/* Reseña — OCULTA (Cero Borrado) */
+.tpl-f10 .artist-resena {
+    display: none !important;
+}
+
+/* ==========================================================================
+   13. PLAYLIST — Spotify oscuro integrado con borde azul neón
+   ========================================================================== */
+.tpl-f10 #mod-playlist {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f10 #db-spotify-embed {
+    border-radius: 2px;
+    border: 1px solid rgba(0, 240, 255, 0.18);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), var(--f10-glow-blue);
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.tpl-f10 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+/* ==========================================================================
+   14. BOLETOS — Filas con precio en amarillo neón
+   ========================================================================== */
+.tpl-f10 #mod-boletos {
+    padding: 3.5rem 8%;
+}
+
+.tpl-f10 .boleto-subtitle {
+    font-size: 0.8rem;
+    color: var(--f10-text-muted);
+    letter-spacing: 0.08em;
+    margin-top: -1.8rem;
+    margin-bottom: 2rem;
+}
+
+.tpl-f10 .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    max-width: 420px;
+    margin: 0 auto;
+    border: 1px solid var(--f10-line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(25, 8, 48, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.tpl-f10 .boleto-card-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--f10-line);
+    transition: background 0.2s ease;
+    cursor: pointer;
+    min-height: 52px; /* tactile mobile */
+}
+
+.tpl-f10 .boleto-card-row:last-child {
+    border-bottom: none;
+}
+
+.tpl-f10 .boleto-card-row:hover {
+    background: rgba(255, 42, 133, 0.06);
+}
+
+.tpl-f10 .boleto-icon {
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
+.tpl-f10 .boleto-tipo {
+    font-family: var(--f10-font);
+    font-weight: 800;
+    font-size: 0.70rem;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: var(--f10-text-cream);
+}
+
+/* Precio — amarillo neón (WCAG AA ✓ sobre fondo oscuro) */
+.tpl-f10 .boleto-precio,
+.tpl-f10 #price-neon-yellow {
+    font-family: var(--f10-font);
+    font-weight: 900;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    color: var(--f10-yellow) !important;
+    text-shadow: 0 0 14px rgba(255, 229, 0, 0.35);
+}
+
+.tpl-f10 .boleto-arrow {
+    flex-shrink: 0;
+    opacity: 0.58;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: var(--f10-blue);
+}
+
+.tpl-f10 .boleto-card-row:hover .boleto-arrow {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+.tpl-f10 .boleto-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.70rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--f10-text);
+    opacity: 0.68;
+}
+
+.tpl-f10 .boleto-trust svg {
+    color: var(--f10-pink);
+}
+
+/* ==========================================================================
+   15. FORMULARIO — Glassmorphism con borde gradiente tríada
+   ========================================================================== */
+.tpl-f10 .form-master-box {
+    background: var(--f10-card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--f10-line);
+    border-top: 2px solid var(--f10-blue);
+    border-radius: 2px;
+    padding: 2.6rem 2.4rem;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), var(--f10-glow-blue);
+    max-width: 520px;
+    margin: 2rem auto 0;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tpl-f10 .form-master-box:hover {
+    border-color: rgba(0, 240, 255, 0.45);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), 0 0 32px rgba(0, 240, 255, 0.22);
+}
+
+.tpl-f10 .form-input,
+.tpl-f10 #reg-nombre,
+.tpl-f10 #reg-cedula,
+.tpl-f10 #rec-cedula {
+    width: 100%;
+    padding: 1.1rem 1rem;
+    margin-bottom: 1.1rem;
+    background: rgba(15, 2, 30, 0.80);
+    border: 1px solid var(--f10-line);
+    border-radius: 1px;
+    color: var(--f10-text);
+    font-family: var(--f10-font);
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    min-height: 48px; /* tactile */
+}
+
+.tpl-f10 .form-input:focus,
+.tpl-f10 #reg-nombre:focus,
+.tpl-f10 #reg-cedula:focus,
+.tpl-f10 #rec-cedula:focus {
+    outline: none;
+    border-color: var(--f10-blue);
+    box-shadow: 0 0 0 1px var(--f10-blue), var(--f10-glow-blue);
+}
+
+/* Tabs de formulario */
+.tpl-f10 .form-tabs {
+    display: flex;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--f10-line);
+}
+
+.tpl-f10 .form-tabs .tab-btn,
+.tpl-f10 .tab-btn {
+    flex: 1;
+    padding: 0.9rem 0.4rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--f10-text-muted);
+    font-family: var(--f10-font);
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 48px;
+}
+
+.tpl-f10 .formulario-tab.active,
+.tpl-f10 .form-tabs .tab-btn.active,
+.tpl-f10 .tab-btn.active {
+    color: var(--f10-bg);
+    background: var(--f10-yellow);
+    border-bottom-color: var(--f10-yellow);
+    font-weight: 900;
+}
+
+.tpl-f10 .form-tabs .tab-btn:hover,
+.tpl-f10 .tab-btn:hover {
+    color: var(--f10-pink);
+    border-bottom-color: var(--f10-pink);
+}
+
+/* Botón submit */
+.tpl-f10 .btn-submit {
+    display: block;
+    width: 100%;
+    padding: 1.2rem;
+    margin-top: 1.2rem;
+    min-height: 52px;
+    background: transparent;
+    border: 1px solid var(--f10-pink);
+    border-radius: 1px;
+    color: var(--f10-pink);
+    font-family: var(--f10-font);
+    font-weight: 900;
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f10 .btn-submit:hover {
+    background: var(--f10-pink);
+    color: #ffffff;
+    box-shadow: var(--f10-glow-pink-strong);
+}
+
+/* ==========================================================================
+   16. GALERÍA (#mod-video) — 3 BLOQUES DE FOTOS a lo largo del scroll
+       La galería #db-gallery-grid se divide en 3 secciones intercaladas
+       mediante nth-child: items 1–4, 5–8, 9+ separados por ::before
+       pseudo-separadores cromáticos. Grid mobile-first 2-3 col.
+   ========================================================================== */
+.tpl-f10 #mod-video {
+    padding: 4.5rem 8%;
+    padding-top: 0 !important; /* ADR-010 */
+    background: var(--f10-bg);
+}
+
+/* Ocultar iframes de YouTube (ADR-005 — miniatura externa en su lugar) */
+.tpl-f10 #mod-video > div:not(#db-gallery-grid),
+.Tpl-F10 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
+/* Grid principal de galería */
+.tpl-f10 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.65rem;
+    position: relative;
+}
+
+/* --- Separador visual entre bloque 1 (items 1–4) y bloque 2 (items 5–8) --- */
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(4)::after,
+.tpl-f10 #db-gallery-grid img:nth-child(4)::after {
+    content: "";
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, var(--f10-pink) 0%, var(--f10-blue) 50%, var(--f10-yellow) 100%);
+    margin: 0.65rem 0;
+    grid-column: 1 / -1;
+    box-shadow: 0 0 12px rgba(255, 42, 133, 0.40);
+}
+
+/* Bandera cromática antes del bloque 3 (nth-child 9+) */
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(8n+1):not(:first-child),
+.tpl-f10 #db-gallery-grid img:nth-child(9) {
+    margin-top: 1.4rem;
+}
+
+/* Imagen de galería */
+.tpl-f10 #db-gallery-grid img,
+.tpl-f10 #db-gallery-grid .gallery-item img {
+    width: 100%;
+    border-radius: 2px;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--f10-line-soft);
+    filter: grayscale(12%) saturate(1.18) brightness(0.90);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.tpl-f10 #db-gallery-grid img:hover,
+.tpl-f10 #db-gallery-grid .gallery-item img:hover {
+    border-color: var(--f10-pink);
+    filter: grayscale(0%) saturate(1.45) brightness(1.05);
+    transform: scale(1.03);
+    box-shadow: var(--f10-glow-pink);
+    z-index: 2;
+    position: relative;
+}
+
+/* Efecto de tinte cíclico por nth-child (3 grupos cromáticos) */
+.tpl-f10 #db-gallery-grid img:nth-child(3n+1):hover { box-shadow: var(--f10-glow-pink); border-color: var(--f10-pink); }
+.tpl-f10 #db-gallery-grid img:nth-child(3n+2):hover { box-shadow: var(--f10-glow-blue); border-color: var(--f10-blue); }
+.tpl-f10 #db-gallery-grid img:nth-child(3n):hover   { box-shadow: var(--f10-glow-yellow); border-color: var(--f10-yellow); }
+
+/* Silent fallback (ADR-008) */
+.tpl-f10 #db-gallery-grid img[src=""],
+.tpl-f10 #db-gallery-grid img:not([src]) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   17. EXPERIENCIAS — Tarjetas con borde gradiente fosforescente
+   ========================================================================== */
+.tpl-f10 #mod-experiencias {
+    padding: 2rem 5% 4.4rem;
+}
+
+.tpl-f10 #db-experiencias-list {
+    max-width: 1100px !important;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+}
+
+.tpl-f10 .exp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    min-height: 230px;
+    padding: 2.2rem 1.4rem;
+    border: 1px solid rgba(122, 0, 255, 0.28);
+    border-radius: 22px;
+    background: radial-gradient(160% 130% at 50% 0%, rgba(255, 42, 133, 0.12) 0%, rgba(15, 2, 30, 0.92) 55%, rgba(15, 2, 30, 1) 100%);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 18px 44px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.tpl-f10 .exp-card::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--f10-pink) 0%, var(--f10-blue) 50%, var(--f10-yellow) 100%);
+    opacity: 0.85;
+    border-radius: 22px 22px 0 0;
+}
+
+.tpl-f10 .exp-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.04) 0 1px, transparent 1.5px);
+    background-size: 17px 17px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.tpl-f10 .exp-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(0, 240, 255, 0.60);
+    box-shadow:
+        0 0 0 1px rgba(0, 240, 255, 0.28),
+        0 26px 58px rgba(0, 0, 0, 0.55),
+        0 0 36px rgba(0, 240, 255, 0.22);
+}
+
+.tpl-f10 .exp-titulo {
+    font-family: var(--f10-font);
+    font-weight: 900;
+    font-size: clamp(0.82rem, 1.6vw, 1.02rem);
+    letter-spacing: 0.14em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    color: var(--f10-text-cream);
+    margin: 0;
+    position: relative;
+}
+
+.tpl-f10 .exp-tag {
+    font-family: var(--f10-font);
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(1.5rem, 3.4vw, 2rem);
+    line-height: 1;
+    text-transform: uppercase;
+    color: transparent;
+    background-image: linear-gradient(100deg, var(--f10-pink) 0%, var(--f10-blue) 50%, var(--f10-yellow) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    position: relative;
+    filter: drop-shadow(0 0 12px rgba(255, 42, 133, 0.48));
+    letter-spacing: 0.02em;
+}
+
+.tpl-f10 .exp-card:nth-child(2) .exp-tag {
+    background-image: linear-gradient(100deg, var(--f10-blue) 0%, var(--f10-yellow) 55%, var(--f10-pink) 100%);
+    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.45));
+}
+
+.tpl-f10 .exp-card:nth-child(3) .exp-tag {
+    background-image: linear-gradient(100deg, var(--f10-yellow) 0%, var(--f10-pink) 40%, var(--f10-blue) 100%);
+    filter: drop-shadow(0 0 12px rgba(255, 229, 0, 0.45));
+}
+
+/* ==========================================================================
+   18. #MOD-INFO-TECNICA — Tarjetas técnicas con Geist 900 y drop-shadow
+   ========================================================================== */
+.tpl-f10 #mod-info-tecnica {
+    padding: 4.5rem 8%;
+    background: linear-gradient(180deg, var(--f10-bg-ink) 0%, var(--f10-bg) 100%);
+}
+
+.tpl-f10 #mod-info-tecnica .info-grid,
+.tpl-f10 .info-tecnica-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.tpl-f10 .info-card {
+    background: var(--f10-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--f10-border-glow);
+    border-radius: 4px;
+    padding: 1.6rem 1.4rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f10 .info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--f10-glow-pink);
+}
+
+.tpl-f10 .info-card-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--f10-blue);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.tpl-f10 .info-card-value {
+    font-family: var(--f10-font);
+    font-weight: 900;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--f10-yellow);
+    text-shadow: 0 0 14px rgba(255, 229, 0, 0.32);
+    filter: drop-shadow(0 0 8px rgba(255, 229, 0, 0.28));
+}
+
+/* ==========================================================================
+   19. UBICACIÓN — Mapa integrado con borde neón azul
+   ========================================================================== */
+.tpl-f10 #mod-ubicacion {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f10 #db-mapa-container {
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 240, 255, 0.20);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), var(--f10-glow-blue);
+}
+
+/* ==========================================================================
+   20. SPONSORS — Logos en opacidad con hover reveal
+   ========================================================================== */
+.tpl-f10 #mod-sponsors {
+    padding: 3.2rem 8%;
+}
+
+.tpl-f10 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem 3rem;
+    padding: 1rem 0;
+}
+
+.tpl-f10 .sponsor-item {
+    padding: 0.1rem 0;
+    opacity: 0.62;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tpl-f10 .sponsor-item:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+
+.tpl-f10 .sponsor-img {
+    height: 40px;
+    max-width: 160px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+    filter: brightness(0.85) saturate(0.7);
+}
+
+.tpl-f10 .sponsor-item:hover .sponsor-img {
+    filter: brightness(1) saturate(1);
+    opacity: 0.95;
+}
+
+/* ==========================================================================
+   21. FOOTER — Fondo profundo con separador fucsia
+   ========================================================================== */
+.tpl-f10 #mod-footer {
+    background: var(--f10-bg) !important;
+    border-top: 2px solid var(--f10-pink);
+}
+
+.tpl-f10 #mod-footer .footer-inner,
+.Tpl-F10 #mod-footer .footer-inner {
+    display: none !important;
+}
+
+.tpl-f10 #mod-footer .footer-bottom {
+    text-align: center;
+    padding: 1.6rem 2rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    color: var(--f10-text-muted);
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   22. CONTRATO DE DATOS — Protección de módulos invisibles (Cero Borrado)
+   ========================================================================== */
+.tpl-f10 #db-poster-img[style*="display:none"],
+.tpl-f10 #db-faq-list[style*="display:none"],
+.tpl-f10 #db-mapa-container[style*="display:none"],
+.tpl-f10 #db-sponsors-list[style*="display:none"],
+.tpl-f10 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   23. REFLOW (v307) — Módulos ocultos reordenan el grid (≥768px)
+   ========================================================================== */
+@media (min-width: 768px) {
+    .tpl-f10 #main-content-flow:has(#mod-cartel[data-hidden]),
+    .Tpl-F10 #main-content-flow:has(#mod-cartel[data-hidden]) {
+        grid-template-areas:
+            "hero       hero"
+            "countdown  countdown"
+            "meta       meta"
+            "ctas       ctas"
+            "descripcion descripcion"
+            "lineup     lineup"
+            "playlist   playlist"
+            "boletos    form"
+            "experiencias experiencias"
+            "video      video"
+            "info       info"
+            "ubicacion  ubicacion"
+            "sponsors   sponsors"
+            "footer     footer" !important;
+    }
+    .tpl-f10 #main-content-flow:has(#mod-playlist[data-hidden]),
+    .Tpl-F10 #main-content-flow:has(#mod-playlist[data-hidden]) {
+        grid-template-areas:
+            "hero       hero"
+            "countdown  countdown"
+            "meta       meta"
+            "ctas       ctas"
+            "descripcion descripcion"
+            "lineup     lineup"
+            "cartel     cartel"
+            "boletos    form"
+            "experiencias experiencias"
+            "video      video"
+            "info       info"
+            "ubicacion  ubicacion"
+            "sponsors   sponsors"
+            "footer     footer" !important;
+    }
+    .tpl-f10 #main-content-flow:has(#mod-boletos[data-hidden]),
+    .Tpl-F10 #main-content-flow:has(#mod-boletos[data-hidden]) {
+        grid-template-areas:
+            "hero       hero"
+            "countdown  countdown"
+            "meta       meta"
+            "ctas       ctas"
+            "descripcion descripcion"
+            "lineup     lineup"
+            "cartel     playlist"
+            "form       form"
+            "experiencias experiencias"
+            "video      video"
+            "info       info"
+            "ubicacion  ubicacion"
+            "sponsors   sponsors"
+            "footer     footer" !important;
+    }
+    .tpl-f10 #main-content-flow:has(#mod-form[data-hidden]),
+    .Tpl-F10 #main-content-flow:has(#mod-form[data-hidden]) {
+        grid-template-areas:
+            "hero       hero"
+            "countdown  countdown"
+            "meta       meta"
+            "ctas       ctas"
+            "descripcion descripcion"
+            "lineup     lineup"
+            "cartel     playlist"
+            "boletos    boletos"
+            "experiencias experiencias"
+            "video      video"
+            "info       info"
+            "ubicacion  ubicacion"
+            "sponsors   sponsors"
+            "footer     footer" !important;
+    }
+    .tpl-f10 #main-content-flow:has(#mod-ubicacion[data-hidden]),
+    .Tpl-F10 #main-content-flow:has(#mod-ubicacion[data-hidden]) {
+        grid-template-areas:
+            "hero       hero"
+            "countdown  countdown"
+            "meta       meta"
+            "ctas       ctas"
+            "descripcion descripcion"
+            "lineup     lineup"
+            "cartel     playlist"
+            "boletos    form"
+            "experiencias experiencias"
+            "video      video"
+            "info       info"
+            "sponsors   sponsors"
+            "footer     footer" !important;
+    }
+}
+
+/* ==========================================================================
+   24. RESPONSIVE — Tablet (1280px) → Tablet (992px) → Mobile (767px) → Small (640px)
+   ========================================================================== */
+@media (max-width: 1279px) {
+    .tpl-f10 #main-content-flow {
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-areas:
+            "hero        hero"
+            "countdown   countdown"
+            "meta        meta"
+            "ctas        ctas"
+            "descripcion descripcion"
+            "lineup      lineup"
+            "cartel      playlist"
+            "boletos     form"
+            "experiencias experiencias"
+            "video       video"
+            "info        info"
+            "ubicacion   ubicacion"
+            "sponsors    sponsors"
+            "footer      footer" !important;
+        row-gap: 0 !important;
+        width: 100% !important;
+    }
+    .tpl-f10 #mod-form { z-index: 50 !important; }
+    .tpl-f10 section  { padding: 3.4rem 5%; }
+    .tpl-f10 .form-master-box { max-width: 480px; }
+    .tpl-f10 .boleto-cards-wrap { max-width: 100%; }
+    .tpl-f10 #db-spotify-embed { min-height: 360px; }
+    .tpl-f10 h2 { letter-spacing: 0.32em; }
+    .tpl-f10 #mod-hero { padding: 3.4rem 6% 1rem; }
+    .tpl-f10 #org-name-badge { padding: 0; margin-bottom: 12px; }
+    .tpl-f10 #event-title { font-size: clamp(2.6rem, 12vw, 4.4rem) !important; }
+    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 992px) {
+    .tpl-f10 #mod-hero { min-height: 85vh; }
+    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(3, 1fr); }
+    .tpl-f10 #event-title { font-size: clamp(2.4rem, 11vw, 4rem) !important; }
+    .tpl-f10 #db-experiencias-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 767px) {
+    .tpl-f10 #main-content-flow {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "countdown"
+            "meta"
+            "ctas"
+            "descripcion"
+            "form"
+            "lineup"
+            "boletos"
+            "experiencias"
+            "cartel"
+            "playlist"
+            "video"
+            "info"
+            "ubicacion"
+            "sponsors"
+            "footer" !important;
+    }
+    .tpl-f10 #mod-form  { z-index: 50 !important; }
+    .tpl-f10 section    { padding: 3.4rem 6%; }
+    .tpl-f10 .form-master-box { max-width: 94vw; }
+    .tpl-f10 h2         { letter-spacing: 0.30em; }
+    .tpl-f10 #mod-hero  { padding: 3.4rem 6% 1rem; min-height: 80vh; }
+    .tpl-f10 #org-name-badge { padding: 0; margin-bottom: 12px; }
+    .tpl-f10 #event-title { font-size: clamp(2.2rem, 11vw, 3.6rem) !important; }
+    .tpl-f10 #unified-frame .cd-block {
+        min-width: 0;
+        max-width: none;
+        flex: 1 1 40%;
+        padding: 10px 8px;
+    }
+    .tpl-f10 #unified-frame .cd-block::after { display: none; }
+    .tpl-f10 #mod-hero-ctas .hero-cta-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+    .tpl-f10 .f10-lc-title { font-size: clamp(1.6rem, 8vw, 2.2rem); }
+    .tpl-f10 .f10-artist-social a { width: 32px; height: 32px; }
+    .tpl-f10 #mod-hero-meta { gap: 0.6rem 1rem; padding: 1.2rem 4% 1.8rem; }
+    .tpl-f10 #mod-hero-meta .meta-item { font-size: 0.85rem; padding: 0.45rem 0.85rem; }
+    .tpl-f10 #mod-hero-meta .meta-svg { width: 18px; height: 18px; }
+    .tpl-f10 #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+    .tpl-f10 #db-experiencias-list { grid-template-columns: 1fr !important; }
+    .tpl-f10 .exp-card { min-height: 190px; }
+}
+
+@media (max-width: 640px) {
+    .tpl-f10 .f10-lc-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .tpl-f10 .f10-artist-name { font-size: clamp(0.88rem, 4vw, 1.15rem); }
+    .tpl-f10 #db-poster-img { max-width: 100%; border-radius: 1px !important; }
+    .tpl-f10 #db-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .tpl-f10 #db-experiencias-list { grid-template-columns: 1fr !important; }
+}
+
+/* Breakpoint tablet 992px-1279px (blindaje visual) */
+@media (min-width: 992px) and (max-width: 1279px) {
+    .tpl-f10 #mod-hero { min-height: 90vh; }
+    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 1rem; }
+    .tpl-f10 .form-master-box { max-width: 500px; }
+    .tpl-f10 #db-spotify-embed { min-height: 380px; }
+    .tpl-f10 #db-gallery-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ==========================================================================
+   25. REVEAL AL HACER SCROLL — scroll-driven (progressive enhancement)
+   ========================================================================== */
+@supports (animation-timeline: view()) {
+    .tpl-f10 section,
+    .tpl-f10 #unified-frame,
+    .tpl-f10 #mod-hero-meta,
+    .tpl-f10 #mod-hero-ctas,
+    .tpl-f10 #mod-descripcion {
+        animation: f10RevealUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+    }
+
+    @keyframes f10RevealUp {
+        from { opacity: 0; transform: translateY(22px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ==========================================================================
+   26. ACCESIBILIDAD — prefers-reduced-motion: apaga efectos
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f10::before,
+    .tpl-f10::after,
+    .tpl-f10 #event-title,
+    .tpl-f10 #db-poster-img,
+    .tpl-f10 #unified-frame .cd-block,
+    .tpl-f10 .f10-lc-title,
+    .tpl-f10 .f10-artist-name {
+        animation: none !important;
+    }
+    .tpl-f10 section,
+    .tpl-f10 #unified-frame,
+    .tpl-f10 #mod-hero-meta,
+    .tpl-f10 #mod-hero-ctas,
+    .tpl-f10 #mod-descripcion {
+        animation: none !important;
+    }
+    .tpl-f10 .f10-artist,
+    .tpl-f10 .exp-card,
+    .tpl-f10 .sponsor-item {
+        transition: none !important;
+    }
+}
+
+/* ============================================================================
+   LOG DE VERSIONES — Template f10 "Cyberpunk Fosforescente"
+   ============================================================================
+| Versión  | Fecha      | Cambio                                                             | Estado |
+|----------|------------|--------------------------------------------------------------------|--------|
+| v1.0.0   | 15/09/2026 | Silo Fiesta F10 "Cyberpunk Fosforescente". Tríada HSL: fucsia      | [OK]   |
+|          |            | #ff2a85, amarillo #ffe500, azul/turquesa #00f0ff sobre fondo      |        |
+|          |            | púrpura profundo #0f021e. Ley 60-30-10 ADR-Regla9 aplicada.      |        |
+|          |            | Aurora tríada animada (f10AuroraDrift), grano cinematográfico      |        |
+|          |            | (f10GrainShift). Hero full-viewport: #event-title activado         |        |
+|          |            | (display:block) con gradiente amarillo→fucsia→azul animado.       |        |
+|          |            | #mod-descripcion: tarjeta VIP glassmorphism (backdrop-blur 12px,  |        |
+|          |            | border-glow fucsia, línea gradiente tríada superior).              |        |
+|          |            | #mod-video: galería split 3 bloques (nth-child cíclico,           |        |
+|          |            | tinte hover por posición). Grid 3 col desktop / 2 col mobile.    |        |
+|          |            | Lineup f10-lc-grid 4×N: nombre cursiva tríada (pares/impares),   |        |
+|          |            | hover capa turquesa-fucsia + social reveal. Countdown glow        |        |
+|          |            | tríada pulsante (f10CountdownGlow). CTA min-height 52px           |        |
+|          |            | Thumb-first. Boletos precio amarillo neón WCAG-AA ✓.             |        |
+|          |            | Formulario borde azul neón, tab active amarillo. Experiencias     |        |
+|          |            | 3 tarjetas gradiente tríada rotativo. #mod-info-tecnica activado: |        |
+|          |            | tarjetas Geist 900 drop-shadow amarillo. Sponsors filter dim/full. |        |
+|          |            | Grid 2col desktop (descripcion fila propia). Reflow v307 completo |        |
+|          |            | (cartel, playlist, boletos, form, ubicacion). Mobile: columna     |        |
+|          |            | única, form antes del lineup. Breakpoints 640/767/992/1279.       |        |
+|          |            | scroll-driven reveal @supports. prefers-reduced-motion.            |        |
+|          |            | Módulos campaña apagados (Cero Borrado). ADR-005, ADR-008,        |        |
+|          |            | ADR-010 respetados. Aislamiento atómico .tpl-f10/.Tpl-F10.        |        |
+============================================================================ */

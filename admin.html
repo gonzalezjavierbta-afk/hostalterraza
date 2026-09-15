@@ -3905,12 +3905,23 @@ function coCheckSlug(raw){
     else    {if(hint){hint.textContent=`✓ "${raw}" disponible`;hint.style.color='var(--green)';}     _coSlugOk=true;}
   },500);
 }
+// -- Plan de organizacion: normalizador defensivo (modelo comercial ADR-037) --
+const PLANES_VALIDOS = ['freemium', 'pass_evento', 'pro_mensual', 'enterprise'];
+function normalizarPlan(v){
+  const raw = String(v == null ? '' : v).trim().toLowerCase();
+  const legacy = { free:'freemium', gratis:'freemium', evento:'pass_evento', pass:'pass_evento',
+                   mensual:'pro_mensual', pro:'pro_mensual', pago:'pro_mensual',
+                   combinado:'pro_mensual', business:'enterprise', maestro:'enterprise' };
+  const mapped = legacy[raw] || raw;
+  return PLANES_VALIDOS.indexOf(mapped) !== -1 ? mapped : 'freemium';
+}
+
 async function crearOrgGlobal(){
   const nombre=document.getElementById('co-nombre').value.trim();
   const slug=document.getElementById('co-slug').value.trim();
   const email=document.getElementById('co-email').value.trim();
   const pass=document.getElementById('co-pass').value;
-  const plan=document.getElementById('co-plan').value;
+  const plan=normalizarPlan((document.getElementById('co-plan')||{}).value);
   const color=document.getElementById('co-color').value;
   if(!nombre){alrt('co-alert','Nombre obligatorio.','err');return;}
   if(!slug||slug.length<3){alrt('co-alert','Slug obligatorio (mín. 3 chars).','err');return;}
