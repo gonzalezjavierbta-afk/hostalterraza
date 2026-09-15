@@ -1,0 +1,224 @@
+/* ==========================================================================
+   TEMPLATE ATÓMICO: f9.css (Fiesta / Místico - Rastro MC)
+   Categoría: Fiesta (css/templates/fiesta/f9.css)
+   Estándar: $10,000 | Scoped CSS: .tpl-f9
+   Basado en: f5.css
+   ========================================================================== */
+
+/* 1. Reset de Caja y Variables Scoped */
+.tpl-f9, .tpl-f9 *, .tpl-f9 *::before, .tpl-f9 *::after {
+  box-sizing: border-box !important;
+}
+
+.tpl-f9 {
+  --f9-bg: #0c0a08;
+  --f9-card-bg: #14110e;
+  --f9-gold: #d4af37;
+  --f9-gold-muted: #8c7323;
+  --f9-text: #f3f3f1;
+  --f9-muted: #a89f91;
+  --f9-border: rgba(212, 175, 55, 0.25);
+  
+  background-color: var(--f9-bg) !important;
+  color: var(--f9-text) !important;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Sin Efecto Glow Global */
+.tpl-f9 *, .tpl-f9 *::before, .tpl-f9 *::after {
+  text-shadow: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* 2. Animaciones y Efectos de Entrada */
+@keyframes f9FadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tpl-f9 section, 
+.tpl-f9 .card-atomic, 
+.tpl-f9 #mod-hero,
+.tpl-f9 #mod-lineup,
+.tpl-f9 #mod-form {
+  animation: f9FadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3. Hero Section */
+.tpl-f9 #mod-hero {
+  text-align: center;
+  padding: 3rem 1.5rem 2rem 1.5rem;
+  border-bottom: 1px solid var(--f9-border);
+}
+
+.tpl-f9 #event-title {
+  font-size: clamp(2.5rem, 8vw, 4.5rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.15em !important;
+  color: var(--f9-text) !important;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem !important;
+}
+
+.tpl-f9 #event-description {
+  color: var(--f9-muted) !important;
+  max-width: 650px;
+  margin: 0 auto 1.5rem auto !important;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Metadata Bar */
+.tpl-f9 .meta-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.tpl-f9 .meta-item {
+  border: 1px solid var(--f9-border);
+  padding: 0.6rem 1.2rem;
+  background: var(--f9-card-bg);
+  border-radius: 4px;
+  color: var(--f9-gold) !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* 4. LINE UP (Resaltado Especial RASTRO MC) */
+.tpl-f9 #mod-lineup {
+  padding: 3rem 1.5rem !important;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: block !important; /* Regla de Bloque sobre Flex (ADR-007) */
+}
+
+.tpl-f9 #db-lineup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Estilo Base de Artistas */
+.tpl-f9 .lineup-card {
+  background: var(--f9-card-bg);
+  border: 1px solid var(--f9-border);
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.tpl-f9 .lineup-card .artist-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--f9-text);
+  text-transform: uppercase;
+}
+
+/* REALSADO RASTRO MC (Headliner) */
+.tpl-f9 .lineup-card[data-artist*="RASTRO MC"],
+.tpl-f9 .lineup-card.headliner {
+  grid-column: 1 / -1;
+  background: #1c1813 !important;
+  border: 2px solid var(--f9-gold) !important;
+  padding: 2.5rem 1.5rem !important;
+  position: relative;
+}
+
+.tpl-f9 .lineup-card[data-artist*="RASTRO MC"] .artist-name,
+.tpl-f9 .lineup-card.headliner .artist-name {
+  font-size: clamp(2.2rem, 6vw, 3.5rem) !important;
+  font-weight: 900 !important;
+  color: var(--f9-gold) !important;
+  letter-spacing: 0.1em;
+}
+
+.tpl-f9 .lineup-card[data-artist*="RASTRO MC"]::before {
+  content: "PRESENTA / HEADLINER";
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: var(--f9-muted);
+  margin-bottom: 0.5rem;
+}
+
+/* 5. Multimedia (Video & Spotify) Grid Atómico */
+.tpl-f9 #mod-video {
+  display: block !important;
+  padding-top: 0 !important; /* ADR-010 */
+  max-width: 1100px;
+  margin: 0 auto 3rem auto;
+}
+
+.tpl-f9 #db-video-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .tpl-f9 #db-video-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 6. Formulario y Entradas */
+.tpl-f9 #mod-form {
+  max-width: 600px;
+  margin: 0 auto 4rem auto;
+  background: var(--f9-card-bg);
+  border: 1px solid var(--f9-border);
+  padding: 2rem;
+  border-radius: 4px;
+}
+
+.tpl-f9 #mod-form input, 
+.tpl-f9 #mod-form select, 
+.tpl-f9 #mod-form button {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--f9-bg);
+  border: 1px solid var(--f9-border);
+  color: var(--f9-text);
+  border-radius: 2px;
+}
+
+.tpl-f9 #mod-form button {
+  background: var(--f9-gold) !important;
+  color: #000 !important;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none !important;
+}
+
+/* 7. Footer Brand Stamped */
+.tpl-f9 #mod-footer-brand,
+.tpl-f9 footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  border-top: 1px solid var(--f9-border);
+  background: var(--f9-bg);
+  color: var(--f9-gold) !important;
+  font-weight: 900;
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.tpl-f9 #mod-footer-brand::after {
+  content: " • rastro mc";
+  display: inline;
+}
