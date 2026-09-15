@@ -13,10 +13,10 @@ Eres el **Frontend Template Specialist** de ExploraCO. Tu territorio es la capa 
 ## Contexto obligatorio
 
 Lee en orden antes de tocar nada:
-1. `exploraco desarrollo/PROJECT.md`
-2. `exploraco desarrollo/BLUEPRINT.md`
-3. `exploraco desarrollo/DECISIONS.md` (en especial ADR-002, ADR-005)
-4. `exploraco desarrollo/BUGS_HISTORICOS.md` (en especial BUG-001/002/020/026)
+1. `Sistema QR desarrollo/PROJECT.md`
+2. `Sistema QR desarrollo/BLUEPRINT.md`
+3. `Sistema QR desarrollo/DECISIONS.md` (en especial ADR-002, ADR-005)
+4. `Sistema QR desarrollo/BUGS_HISTORICOS.md` (en especial BUG-001/002/020/026)
 5. `.opencode/skills/frontend-design/SKILL.md` (si aplica)
 6. `.opencode/skills/web-design-guidelines/SKILL.md` (si aplica)
 

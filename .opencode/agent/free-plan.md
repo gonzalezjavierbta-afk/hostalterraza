@@ -34,7 +34,7 @@ Escribelos en el plan por nombre junto a la tarea correspondiente, pero jamas lo
 | Panel admin (`admin.html`) | `@admin-dev-free` |
 | UI/estetica visual | `@frontend-tpl-free` |
 | Paginas dinamicas (seed+loader+smoke) | `@content-loader-free` |
-| JS/TS rutinario | `@js-silo-dev-free` / `@exp-pickle` |
+| JS/TS rutinario | `@js-silo-dev-free` |
 | SQL/RLS/persistencia | `@sql-security-free` |
 | Migraciones/seeds masivos | `@data-migration-free` |
 | SEO | `@seo-dev-free` |

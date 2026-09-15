@@ -32,12 +32,12 @@ valida y lo entrega al pipeline estandar.
    los datos).
 3. Regla de formato: `ficha_template.md`. Gemini devuelve UNA ficha .md con
    ficha humana + **un unico** bloque ```json ``` final.
-4. El usuario guarda el resultado en `exploraco desarrollo/ficha-<slug>.md`.
+4. El usuario guarda el resultado en `Sistema QR desarrollo/ficha-<slug>.md`.
 
 ### FASE B — Ingesta y validacion (en opencode, `/gemini-research <slug>`)
 
 1. **Validar contrato**: ejecutar
-   `node .opencode/skills/gemini-research/scripts/validate_ficha.js "exploraco desarrollo/ficha-<slug>.md"`.
+   `node .opencode/skills/gemini-research/scripts/validate_ficha.js "Sistema QR desarrollo/ficha-<slug>.md"`.
    Debe salir `PASS`. Si `FAIL`, devolver cada error a correction sobre la
    ficha (no inventar datos).
 2. **Slug unico**: verificar que `GET /api/destinos?slug=<slug>` no exista

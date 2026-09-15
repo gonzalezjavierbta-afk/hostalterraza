@@ -2,6 +2,7 @@
 description: Subagente GRATUITO de bajo costo para desarrollo Javascript/Typescript rutinario de ExploraCO. Versión open-source (big-pickle) de js-silo-dev. Tareas mecánicas, refactor menor, correcciones de lógica simple y ajustes en scripts. NO usar para SQL/RLS/seguridad crítica (ver sql-security) ni para decisiones de arquitectura.
 mode: subagent
 model: opencode/big-pickle
+temperature: 0.3
 permission:
   edit: allow
   bash: allow

@@ -1,7 +1,7 @@
 ---
 description: Planificador y orquestador de ExploraCO. En modo plan actua como coordinador de subagentes: delega exploracion masiva a @explore, investigacion web a @research-agent (o skill gemini-research), y deriva toda implementacion al subagente especializado por dominio. No absorbe trabajo operativo ni exploracion en su contexto.
 mode: primary
-model: opencode-go/deepseek-v4-flash
+model: opencode-go/qwen3.8-flash
 permission:
   edit: deny
   bash: deny
@@ -22,7 +22,7 @@ Eres el **orquestador de subagentes** de ExploraCO. Tu valor es ECONOMIZAR recur
    - Panel admin (admin.html) → `@admin-dev`
    - UI/estetica visual → `@frontend-tpl`
    - Paginas dinamicas (seed+loader+smoke) → `@content-loader` (o skill `create-dynamic-page`)
-   - JS/TS rutinario → `@js-silo-dev` / `@exp-pickle`
+   - JS/TS rutinario → `@js-silo-dev`
    - SQL/RLS/persistencia → `@sql-security` (prohibido a agentes economicos)
    - Migraciones/seeds masivos → `@data-migration`
    - SEO → `@seo-dev`

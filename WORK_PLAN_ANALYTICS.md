@@ -10,8 +10,8 @@ Estado: **FASE 1 EN EJECUCIÓN**
 
 | ID | Tarea | Archivo/Área | Criterio Done | Responsable |
 |----|-------|--------------|---------------|-------------|
-| 1.1 | Índices compuestos `inscritos(org_id, evento_id, used, created_at)` + `qr_scans(qr_link_id, created_at)` | `migrations/001_analytics_indexes.sql` | `EXPLAIN ANALYZE` muestra Index Scan, no Seq Scan | sql-migrations |
-| 1.2 | Vista materializada `analytics_daily(org_id, evento_id, fecha, inscritos, asistieron, por_tipo_json, por_hora_json, por_pais_json, por_ref_json)` + `REFRESH MATERIALIZED VIEW CONCURRENTLY` nocturno | `migrations/002_analytics_daily.sql` + `migrations/003_pg_cron_refresh.sql` | Dashboard KPIs cargan <200ms (vs 2-5s actual) | sql-migrations |
+| 1.1 | Índices compuestos `inscritos(org_id, evento_id, used, created_at)` + `qr_scans(qr_link_id, created_at)` | `migrations/001_analytics_indexes.sql` | `EXPLAIN ANALYZE` muestra Index Scan, no Seq Scan | sql-security-free |
+| 1.2 | Vista materializada `analytics_daily(org_id, evento_id, fecha, inscritos, asistieron, por_tipo_json, por_hora_json, por_pais_json, por_ref_json)` + `REFRESH MATERIALIZED VIEW CONCURRENTLY` nocturno | `migrations/002_analytics_daily.sql` + `migrations/003_pg_cron_refresh.sql` | Dashboard KPIs cargan <200ms (vs 2-5s actual) | sql-security-free |
 | 1.3 | Caché 5 min en `renderPanel()` (clave `panel:${ORG_ID}:${vistaVal}:${_pnPeriod}`) + invalidación por `created_at` max | `admin.html` (`renderPanel`, `sbQuery`) | Recarga inmediata al cambiar tabs/filtros; datos frescos ≤5 min | js-silo-dev |
 | 1.4 | Memoización Chart.js: reusar instancias, `chart.update()` en vez de `destroy()/new` | `admin.html` (`_pnChartEv`, `_pnChartTipo`, `_pnChartSemana`, `_pnChartRetencion`, `_pnChartInsDia`) | 0 parpadeo al cambiar período/vista; CPU <5% | js-silo-dev |
 | 1.5 | Agregación Global Analytics en SQL: `cargarConteosOrgs()` con `GROUP BY org_id` en 1 query | `admin.html` (`cargarConteosOrgs`) | 3 queries → 1 query; tabla orgs render <300ms | js-silo-dev |
@@ -85,3 +85,9 @@ psql -c "SELECT * FROM cron.job WHERE jobname LIKE 'analytics%';"
 # Frontend
 # Abrir Panel → Network → filtrar "inscritos" → ver tiempo y tamaño response
 ```
+
+---
+
+## NOTA DE SANEAMIENTO
+
+Nota de saneamiento (2026-09-14): nombres de agentes actualizados al roster vigente de .opencode/agent/; dirección estratégica: esquema gratuito (*-free).

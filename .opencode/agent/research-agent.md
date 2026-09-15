@@ -17,9 +17,9 @@ Eres el **Research Agent** de ExploraCO. Tu trabajo es investigar destinos turí
 ## Contexto obligatorio
 
 Lee en orden antes de investigar:
-1. `exploraco desarrollo/PROJECT.md`
-2. `exploraco desarrollo/BLUEPRINT.md` (sección 4: estructura de tags por categoría)
-3. `exploraco desarrollo/BUGS_HISTORICOS.md` (BUG-022: fotos verificadas)
+1. `Sistema QR desarrollo/PROJECT.md`
+2. `Sistema QR desarrollo/BLUEPRINT.md` (sección 4: estructura de tags por categoría)
+3. `Sistema QR desarrollo/BUGS_HISTORICOS.md` (BUG-022: fotos verificadas)
 
 ## Tu flujo de trabajo
 
@@ -72,7 +72,7 @@ Cuando recibas un destino para investigar:
 - prohibido[] (qué no permitir)
 
 ### 4. Generar ficha .md
-Crear archivo en `exploraco desarrollo/ficha-<slug>.md` con:
+Crear archivo en `Sistema QR desarrollo/ficha-<slug>.md` con:
 - Datos verificados (citar fuentes)
 - 5 fotos (URLs Wikimedia verificadas HEAD 200)
 - 5 FAQs (preguntas frecuentes reales)

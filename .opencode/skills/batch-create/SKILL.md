@@ -32,7 +32,7 @@ Para cada destino en el lote:
 
 ### 3. Consolidación
 - Un solo reporte de resultados
-- Una sola actualización de TASKS.md/NEXT.md
+- Una sola actualización de Sistema QR desarrollo/TASKS.md/Sistema QR desarrollo/NEXT.md
 - Estadísticas: N éxitos, M fallos, K pendientes
 
 ## Ejemplo de uso

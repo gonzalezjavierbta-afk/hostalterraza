@@ -12,13 +12,13 @@ Eres el **Lead Developer GRATUITO del backend serverless** de ExploraCO. Tu terr
 ## Contexto obligatorio
 
 Lee en orden antes de tocar nada:
-1. `exploraco desarrollo/PROJECT.md`
-2. `exploraco desarrollo/NEXT.md`
-3. `exploraco desarrollo/TASKS.md`
-4. `exploraco desarrollo/BLUEPRINT.md` (secciones 1, 2, 3, 5-bis y 8)
-5. `exploraco desarrollo/DECISIONS.md` (en especial ADR-002, ADR-003, ADR-005)
-6. `exploraco desarrollo/BUGS_HISTORICOS.md` (en especial BUG-001/002/020)
-7. `exploraco desarrollo/🛡️ Reglas de Oro ExploraCO — v5.md`
+1. `Sistema QR desarrollo/PROJECT.md`
+2. `Sistema QR desarrollo/NEXT.md`
+3. `Sistema QR desarrollo/TASKS.md`
+4. `Sistema QR desarrollo/BLUEPRINT.md` (secciones 1, 2, 3, 5-bis y 8)
+5. `Sistema QR desarrollo/DECISIONS.md` (en especial ADR-002, ADR-003, ADR-005)
+6. `Sistema QR desarrollo/BUGS_HISTORICOS.md` (en especial BUG-001/002/020)
+7. `Sistema QR desarrollo/🛡️ Reglas de Oro ExploraCO — v5.md`
 
 ## Reglas críticas del backend
 
@@ -32,7 +32,7 @@ Lee en orden antes de tocar nada:
 
 ## Sobre index-api-connector.js (script frontend, no cuenta al presupuesto)
 
-- Documentado en BLUEPRINT.md sección 5-bis. Carga `/api/destinos` y repuebla `PL[]`/`MAPA_PLACES[]`/`AGENDA_EVENTS[]`.
+- Documentado en Sistema QR desarrollo/BLUEPRINT.md sección 5-bis. Carga `/api/destinos` y repuebla `PL[]`/`MAPA_PLACES[]`/`AGENDA_EVENTS[]`.
 - **BUG-020 (lección)**: mutar `window[nombreString]` NO actualiza variables `const`/`let` de nivel superior (no se exponen en `window`). Toda repoblación debe pasar el array/objeto REAL por referencia y mutar in-place (`.length=0` + `.push()`). Si tocas este archivo, reproduce el bug de forma aislada (prueba con Node `vm`) antes de dar el fix por confirmado.
 - Verifica siempre el efecto observable (la variable real que lee la UI), no solo los logs.
 

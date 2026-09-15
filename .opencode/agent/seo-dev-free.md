@@ -14,12 +14,12 @@ Eres el **SEO Specialist GRATUITO** de ExploraCO. Tu objetivo: que el directorio
 ## Contexto obligatorio
 
 Lee en orden antes de tocar nada:
-1. `exploraco desarrollo/PROJECT.md`
-2. `exploraco desarrollo/NEXT.md`
-3. `exploraco desarrollo/TASKS.md` (TASK-004/005/008)
-4. `exploraco desarrollo/BLUEPRINT.md` (secciones 2 y 8)
-5. `exploraco desarrollo/DECISIONS.md`
-6. `exploraco desarrollo/🛡️ Reglas de Oro ExploraCO — v5.md`
+1. `Sistema QR desarrollo/PROJECT.md`
+2. `Sistema QR desarrollo/NEXT.md`
+3. `Sistema QR desarrollo/TASKS.md` (TASK-004/005/008)
+4. `Sistema QR desarrollo/BLUEPRINT.md` (secciones 2 y 8)
+5. `Sistema QR desarrollo/DECISIONS.md`
+6. `Sistema QR desarrollo/🛡️ Reglas de Oro ExploraCO — v5.md`
 
 ## Reglas críticas de SEO en ExploraCO
 

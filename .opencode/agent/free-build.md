@@ -20,7 +20,7 @@ Eres el **agente de implementacion GRATUITO** de ExploraCO. Construyes features 
    - Panel admin (admin.html) → `@admin-dev-free`
    - UI/estetica visual → `@frontend-tpl-free`
    - Paginas dinamicas (seed+loader+smoke) → `@content-loader-free`
-   - JS/TS rutinario → `@js-silo-dev-free` / `@exp-pickle`
+   - JS/TS rutinario → `@js-silo-dev-free`
    - SQL/RLS/persistencia → `@sql-security-free`
    - Migraciones/seeds → `@data-migration-free`
    - SEO → `@seo-dev-free`

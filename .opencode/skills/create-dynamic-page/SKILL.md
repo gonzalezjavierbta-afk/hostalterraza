@@ -16,7 +16,7 @@ Skill que orquesta el flujo completo de creación de páginas dinámicas de Expl
 ### 1. Validar
 - Verificar que el slug no exista en `/api/destinos` (GET)
 - Confirmar categoría válida: sitio, hostal, comida, evento, blog
-- Validar datos mínimos según BLUEPRINT.md sección 4
+- Validar datos mínimos según Sistema QR desarrollo/BLUEPRINT.md sección 4
 
 ### 2. Ficha
 - Priorizar ficha de `gemini-research` si existe (`ficha-<slug>.md` con bloque
@@ -28,7 +28,7 @@ Skill que orquesta el flujo completo de creación de páginas dinámicas de Expl
 - Generar `scripts/seed-<slug>.js`
 - Upsert SQL idempotente (`ON CONFLICT slug DO UPDATE`)
 - Modo `--dry` por defecto
-- TAGS según categoría (ver BLUEPRINT.md sección 4)
+- TAGS según categoría (ver Sistema QR desarrollo/BLUEPRINT.md sección 4)
 - ASCII-safe: 0 bytes > 127
 
 ### 4. Loader
@@ -55,8 +55,8 @@ Invocar skill `gold-shield` con los 3 archivos:
 - Verificar en sitemap.xml
 
 ### 8. Docs
-- Crear entrada en TASKS.md con ID único
-- Actualizar NEXT.md con "Que sigue"
+- Crear entrada en Sistema QR desarrollo/TASKS.md con ID único
+- Actualizar Sistema QR desarrollo/NEXT.md con "Que sigue"
 - Registrar evidencia física de éxito
 
 ## Categorías y sus tags

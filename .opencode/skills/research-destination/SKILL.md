@@ -72,7 +72,7 @@ prohibido[]        → que no permitir
 ```
 
 ### 4. Generar ficha .md
-Crear archivo en `exploraco desarrollo/ficha-<slug>.md` con:
+Crear archivo en `Sistema QR desarrollo/ficha-<slug>.md` con:
 - Datos verificados (citar fuentes)
 - 5 fotos (URLs Wikimedia verificadas HEAD 200)
 - 5 FAQs (preguntas frecuentes reales)

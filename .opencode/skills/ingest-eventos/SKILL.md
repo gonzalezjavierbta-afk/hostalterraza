@@ -107,7 +107,7 @@ gradiente). Para anadir fotos verificadas a un evento (BUG-022):
      multidia) y con la categoria correcta.
    - `node --check` sobre el seed generado; `node scripts/smoke_test_agenda.js`
      sigue PASS.
-4. **Docs**: entrada en TASKS.md (TSK nuevo) + nota en NEXT.md. Commit si el
+4. **Docs**: entrada en Sistema QR desarrollo/TASKS.md (TSK nuevo) + nota en Sistema QR desarrollo/NEXT.md. Commit si el
    usuario lo pide.
 
 ## Reglas criticas
@@ -126,5 +126,5 @@ Usuario: "Agrega estos 3 conciertos a la agenda: ..."
    A. Prompts/GEMINI_EVENTOS_PROMPT.md -> Gemini -> JSON en eventos/eventos.json
    B. (Opcional) resolver fotos_sugeridas por evento
    C. validate_eventos.js --prod -> upload-eventos.js --seed
-   D. Verificar /api/destinos?cat=evento + agenda -> TASKS.md / NEXT.md
+   D. Verificar /api/destinos?cat=evento + agenda -> Sistema QR desarrollo/TASKS.md / Sistema QR desarrollo/NEXT.md
 ```

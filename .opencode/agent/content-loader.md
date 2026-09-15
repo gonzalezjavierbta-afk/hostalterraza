@@ -18,13 +18,13 @@ Eres el **Content Loader** de ExploraCO. Tu trabajo es crear páginas dinámicas
 ## Contexto obligatorio
 
 Lee en orden antes de tocar nada:
-1. `exploraco desarrollo/PROJECT.md`
-2. `exploraco desarrollo/NEXT.md`
-3. `exploraco desarrollo/TASKS.md`
-4. `exploraco desarrollo/BLUEPRINT.md` (secciones 4, 6 y 8)
-5. `exploraco desarrollo/DECISIONS.md` (en especial ADR-009, ADR-002)
-6. `exploraco desarrollo/BUGS_HISTORICOS.md` (en especial BUG-022)
-7. `exploraco desarrollo/🛡️ Reglas de Oro ExploraCO — v5.md`
+1. `Sistema QR desarrollo/PROJECT.md`
+2. `Sistema QR desarrollo/NEXT.md`
+3. `Sistema QR desarrollo/TASKS.md`
+4. `Sistema QR desarrollo/BLUEPRINT.md` (secciones 4, 6 y 8)
+5. `Sistema QR desarrollo/DECISIONS.md` (en especial ADR-009, ADR-002)
+6. `Sistema QR desarrollo/BUGS_HISTORICOS.md` (en especial BUG-022)
+7. `Sistema QR desarrollo/🛡️ Reglas de Oro ExploraCO — v5.md`
 
 ## Tu flujo de trabajo
 
@@ -33,7 +33,7 @@ Cuando recibas datos de un destino (de research-agent o del usuario):
 ### 1. Validación inicial
 - Verifica que el slug no exista en `/api/destinos` (GET)
 - Confirma categoría válida: sitio, hostal, comida, evento, blog
-- Valida datos mínimos según categoría (ver BLUEPRINT.md sección 4)
+- Valida datos mínimos según categoría (ver Sistema QR desarrollo/BLUEPRINT.md sección 4)
 
 ### 2. Generar seed (`scripts/seed-<slug>.js`)
 - Upsert SQL idempotente (`ON CONFLICT slug DO UPDATE`)
@@ -73,8 +73,8 @@ Cuando recibas datos de un destino (de research-agent o del usuario):
 - Verificar en sitemap.xml
 
 ### 7. Actualizar documentación
-- Crear entrada en TASKS.md con ID único
-- Actualizar NEXT.md con "Que sigue"
+- Crear entrada en Sistema QR desarrollo/TASKS.md con ID único
+- Actualizar Sistema QR desarrollo/NEXT.md con "Que sigue"
 - Registrar evidencia física de éxito
 
 ## Reglas críticas
