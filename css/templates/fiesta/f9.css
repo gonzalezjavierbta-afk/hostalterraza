@@ -1,224 +1,2050 @@
-/* ==========================================================================
-   TEMPLATE ATÓMICO: f9.css (Fiesta / Místico - Rastro MC)
-   Categoría: Fiesta (css/templates/fiesta/f9.css)
-   Estándar: $10,000 | Scoped CSS: .tpl-f9
-   Basado en: f5.css
-   ========================================================================== */
+/* ============================================================================
+   f9.css - SILO FIESTA F9 "MISTICO / RASTRO MC" (sep-2026)
+   Categoria: Fiesta (css/templates/fiesta/f9.css)
+   Estandar: $10,000 | Scoped CSS: .tpl-f9 | Basado en: f5.css
+   ----------------------------------------------------------------------------
+   Direccion estetica: "MISTICO EDITORIAL" - dorado antiguo sobre tinta calida.
+   Paleta fija (NO depende de --master-accent):
+     --f9-bg         #0c0a08   tinta calida de fondo
+     --f9-card-bg    #14110e   superficie de tarjeta
+     --f9-gold       #d4af37   oro principal
+     --f9-gold-muted #8c7323   oro apagado
+     --f9-text       #f3f3f1   texto principal
+     --f9-muted      #a89f91   texto secundario
+     --f9-border     rgba(212, 175, 55, 0.25) borde dorado sutil
+   Tipografia: serif (Georgia) para display/titulos + system-ui/Geist cuerpo.
+   Efectos: PLANO y ELEGANTE. Cero glow (text-shadow/box-shadow/filter: none).
+   Lineup: FOTOGRAFIA PREDOMINANTE. Headliner = .artist-card.headliner (RASTRO MC, por NOMBRE).
+   Kernel IoC: section/header/footer nacen display:none; cada modulo se enciende
+   AQUI con display:flex/block !important (patron f5.css lineas 66-93).
+   Breakpoints: BASE columna unica / 1025+ desktop 2 columnas / 1024 / 768 / 480.
+   ============================================================================ */
 
-/* 1. Reset de Caja y Variables Scoped */
-.tpl-f9, .tpl-f9 *, .tpl-f9 *::before, .tpl-f9 *::after {
-  box-sizing: border-box !important;
+/* ==========================================================================
+   1. RESET DE SILO + VARIABLES SCOPED
+   ========================================================================== */
+.tpl-f9,
+.tpl-f9 *,
+.tpl-f9 *::before,
+.tpl-f9 *::after {
+    box-sizing: border-box !important;
 }
 
 .tpl-f9 {
-  --f9-bg: #0c0a08;
-  --f9-card-bg: #14110e;
-  --f9-gold: #d4af37;
-  --f9-gold-muted: #8c7323;
-  --f9-text: #f3f3f1;
-  --f9-muted: #a89f91;
-  --f9-border: rgba(212, 175, 55, 0.25);
-  
-  background-color: var(--f9-bg) !important;
-  color: var(--f9-text) !important;
-  font-family: system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
+    --f9-bg: #0c0a08;
+    --f9-card-bg: #14110e;
+    --f9-gold: #d4af37;
+    --f9-gold-muted: #8c7323;
+    --f9-text: #f3f3f1;
+    --f9-muted: #a89f91;
+    --f9-border: rgba(212, 175, 55, 0.25);
+    --f9-border-soft: rgba(212, 175, 55, 0.12);
+    /* Puente cromatico para los estilos inline del kernel (FAQ, mapa, video,
+       playlist). Es fijo y dorado: el diseno no depende de --master-accent. */
+    --tpl-accent: var(--f9-gold);
+    --f9-serif: Georgia, "Times New Roman", "Palatino Linotype", serif;
+    --f9-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f9-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    margin: 0;
+    padding: 0;
+    background-color: var(--f9-bg) !important;
+    color: var(--f9-text);
+    font-family: var(--f9-sans);
+    font-size: 16px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-/* Sin Efecto Glow Global */
-.tpl-f9 *, .tpl-f9 *::before, .tpl-f9 *::after {
-  text-shadow: none !important;
-  box-shadow: none !important;
-  filter: none !important;
+/* Reset de efecto glow: ESTE SILO ES PLANO. Nada de sombras ni filtros. */
+.tpl-f9 *,
+.tpl-f9 *::before,
+.tpl-f9 *::after {
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
-/* 2. Animaciones y Efectos de Entrada */
-@keyframes f9FadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.tpl-f9 img {
+    max-width: 100%;
+    display: block;
 }
 
-.tpl-f9 section, 
-.tpl-f9 .card-atomic, 
+.tpl-f9 a {
+    color: var(--f9-gold);
+    text-decoration: none;
+}
+
+.tpl-f9 button {
+    font-family: inherit;
+}
+
+/* Tipografia editorial: encabezados de seccion en serif dorado versal. */
+.tpl-f9 h2 {
+    color: var(--f9-gold);
+    font-family: var(--f9-serif);
+    font-weight: 500;
+    font-size: clamp(1.35rem, 3vw, 1.95rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 2rem 0;
+    line-height: 1.2;
+}
+
+.tpl-f9 h3 {
+    font-family: var(--f9-serif);
+    font-weight: 500;
+    margin: 0;
+}
+
+.tpl-f9 p {
+    color: var(--f9-muted);
+    margin: 0 0 1rem 0;
+}
+
+.tpl-f9 ::selection {
+    background: var(--f9-gold);
+    color: var(--f9-bg);
+}
+
+/* ==========================================================================
+   2. KERNEL IoC - ACTIVACION ATOMICA (display explicito por modulo)
+   El kernel declara "section, header, footer { display: none; }". Un grid-area
+   NO vuelve visible un display:none: cada modulo se enciende AQUI.
+   ========================================================================== */
 .tpl-f9 #mod-hero,
+.tpl-f9 #unified-frame,
+.tpl-f9 #mod-hero-ctas,
 .tpl-f9 #mod-lineup,
-.tpl-f9 #mod-form {
-  animation: f9FadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.tpl-f9 #mod-playlist,
+.tpl-f9 #mod-form,
+.tpl-f9 #mod-whatsapp {
+    display: flex !important;
 }
 
-/* 3. Hero Section */
+.tpl-f9 #mod-historia,
+.tpl-f9 #mod-objetivo,
+.tpl-f9 #mod-impacto,
+.tpl-f9 #mod-video,
+.tpl-f9 #mod-cartel,
+.tpl-f9 #mod-info-tecnica,
+.tpl-f9 #mod-faq,
+.tpl-f9 #mod-ubicacion,
+.tpl-f9 #mod-boletos,
+.tpl-f9 #mod-experiencias,
+.tpl-f9 #mod-sponsors {
+    display: block !important;
+}
+
+.tpl-f9 #mod-footer {
+    display: block !important;
+}
+
+/* Modulos sin contenido: el JS les pone display:none !important inline y
+   data-hidden="true". Las reglas siguientes evitan cajas vacias cuando el
+   motor no los oculta (experiencias solo se puebla en el silo f8; el mapa
+   queda vacio si el evento no tiene ubicacion; video/playlist vacios). */
+.tpl-f9 #mod-experiencias:has(#db-experiencias-list:empty) {
+    display: none !important;
+}
+
+.tpl-f9 #mod-ubicacion:has(#db-mapa-container:empty) {
+    display: none !important;
+}
+
+.tpl-f9 #db-video-content:empty {
+    display: none !important;
+}
+
+.tpl-f9 #db-gallery-grid:empty {
+    display: none !important;
+}
+
+.tpl-f9 #db-spotify-embed:empty {
+    display: none !important;
+}
+
+/* ==========================================================================
+   3. LAYOUT GRID - #main-content-flow (columna unica por defecto)
+   ========================================================================== */
+.tpl-f9 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "countdown"
+        "meta"
+        "ctas"
+        "historia"
+        "objetivo"
+        "impacto"
+        "lineup"
+        "cartel"
+        "video"
+        "playlist"
+        "info"
+        "boletos"
+        "experiencias"
+        "faq"
+        "ubicacion"
+        "whatsapp"
+        "sponsors"
+        "form"
+        "footer";
+    row-gap: 0;
+    column-gap: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background-color: var(--f9-bg);
+}
+
+.tpl-f9 #mod-hero         { grid-area: hero; }
+.tpl-f9 #unified-frame    { grid-area: countdown; }
+.tpl-f9 #mod-hero-meta    { grid-area: meta; }
+.tpl-f9 #mod-hero-ctas    { grid-area: ctas; }
+.tpl-f9 #mod-historia     { grid-area: historia; }
+.tpl-f9 #mod-objetivo     { grid-area: objetivo; }
+.tpl-f9 #mod-impacto      { grid-area: impacto; }
+.tpl-f9 #mod-lineup       { grid-area: lineup; }
+.tpl-f9 #mod-cartel       { grid-area: cartel; }
+.tpl-f9 #mod-video        { grid-area: video; }
+.tpl-f9 #mod-playlist     { grid-area: playlist; }
+.tpl-f9 #mod-info-tecnica { grid-area: info; }
+.tpl-f9 #mod-boletos      { grid-area: boletos; }
+.tpl-f9 #mod-experiencias { grid-area: experiencias; }
+.tpl-f9 #mod-faq          { grid-area: faq; }
+.tpl-f9 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f9 #mod-whatsapp     { grid-area: whatsapp; }
+.tpl-f9 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f9 #mod-form         { grid-area: form; }
+.tpl-f9 #mod-footer       { grid-area: footer; }
+
+/* Desktop: dos columnas con filas pareadas (cartel|video, faq|ubicacion,
+   whatsapp|sponsors). Las filas de ancho completo vacias colapsan porque
+   row-gap es 0. El REFLOW (seccion 25) expande al companero cuando falta. */
+@media (min-width: 1025px) {
+    .tpl-f9 #main-content-flow {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "historia historia"
+            "objetivo objetivo"
+            "impacto impacto"
+            "lineup lineup"
+            "cartel video"
+            "playlist playlist"
+            "info info"
+            "boletos boletos"
+            "experiencias experiencias"
+            "faq ubicacion"
+            "whatsapp sponsors"
+            "form form"
+            "footer footer";
+    }
+}
+
+/* ==========================================================================
+   4. ANIMACION DE ENTRADA f9FadeUp
+   ========================================================================== */
+@keyframes f9FadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tpl-f9 .hero-content,
+.tpl-f9 #db-lineup .artist-card,
+.tpl-f9 .impacto-card,
+.tpl-f9 .exp-card,
+.tpl-f9 .card-item {
+    animation: f9FadeUp 0.8s var(--f9-ease) both;
+}
+
+.tpl-f9 #db-lineup .artist-card:nth-child(2),
+.tpl-f9 .impacto-card:nth-child(2),
+.tpl-f9 .card-item:nth-child(2) { animation-delay: 0.08s; }
+
+.tpl-f9 #db-lineup .artist-card:nth-child(3),
+.tpl-f9 .impacto-card:nth-child(3),
+.tpl-f9 .card-item:nth-child(3) { animation-delay: 0.16s; }
+
+.tpl-f9 #db-lineup .artist-card:nth-child(4),
+.tpl-f9 .impacto-card:nth-child(4),
+.tpl-f9 .card-item:nth-child(4) { animation-delay: 0.24s; }
+
+.tpl-f9 #db-lineup .artist-card:nth-child(n+5) { animation-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f9 *,
+    .tpl-f9 *::before,
+    .tpl-f9 *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ==========================================================================
+   5. HERO - #mod-hero (background-image inline del motor)
+   ========================================================================== */
 .tpl-f9 #mod-hero {
-  text-align: center;
-  padding: 3rem 1.5rem 2rem 1.5rem;
-  border-bottom: 1px solid var(--f9-border);
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 80vh;
+    padding: 7rem 1.5rem 4.5rem 1.5rem;
+    background-color: #050403;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    border-bottom: 1px solid var(--f9-border);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Overlay: gradiente oscuro de abajo hacia arriba + halo dorado muy sutil. */
+.tpl-f9 #mod-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(12, 10, 8, 0.55) 0%, rgba(12, 10, 8, 0.78) 55%, #0c0a08 100%),
+        radial-gradient(70% 55% at 50% 18%, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0) 70%);
+}
+
+.tpl-f9 #mod-hero .hero-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Badge de organizacion: kicker centrado arriba del titulo. */
+.tpl-f9 #org-name-badge {
+    position: static !important;
+    z-index: 10 !important;
+    display: inline-block !important;
+    margin: 0 auto 1.6rem auto !important;
+    padding: 0.5rem 1.2rem !important;
+    border: 1px solid var(--f9-border) !important;
+    color: var(--f9-gold) !important;
+    font-family: var(--f9-sans) !important;
+    font-size: 0.66rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4em !important;
+    text-transform: uppercase !important;
+    background: rgba(12, 10, 8, 0.5);
 }
 
 .tpl-f9 #event-title {
-  font-size: clamp(2.5rem, 8vw, 4.5rem) !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.15em !important;
-  color: var(--f9-text) !important;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem !important;
+    display: block;
+    font-family: var(--f9-serif);
+    font-weight: 500 !important;
+    font-size: clamp(2.4rem, 8vw, 5rem) !important;
+    line-height: 1.02;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase;
+    color: var(--f9-text) !important;
+    margin: 0 !important;
+    max-width: 100%;
+    word-wrap: break-word;
 }
 
-.tpl-f9 #event-description {
-  color: var(--f9-muted) !important;
-  max-width: 650px;
-  margin: 0 auto 1.5rem auto !important;
-  font-size: 1rem;
-  line-height: 1.6;
+/* Lineas partidas del titulo (mismo contrato que f6/f8) - soporte defensivo. */
+.tpl-f9 .hero-title-line1,
+.tpl-f9 .hero-title-line2 {
+    display: block;
 }
 
-/* Metadata Bar */
-.tpl-f9 .meta-bar {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
+.tpl-f9 .hero-title-line2 {
+    color: var(--f9-gold);
 }
 
-.tpl-f9 .meta-item {
-  border: 1px solid var(--f9-border);
-  padding: 0.6rem 1.2rem;
-  background: var(--f9-card-bg);
-  border-radius: 4px;
-  color: var(--f9-gold) !important;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+/* ==========================================================================
+   6. COUNTDOWN - #unified-frame.unified-countdown-frame
+   ========================================================================== */
+.tpl-f9 #unified-frame {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 0 !important;
+    padding: 2.6rem 1.5rem;
+    background-color: var(--f9-card-bg);
+    border-bottom: 1px solid var(--f9-border);
 }
 
-/* 4. LINE UP (Resaltado Especial RASTRO MC) */
-.tpl-f9 #mod-lineup {
-  padding: 3rem 1.5rem !important;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: block !important; /* Regla de Bloque sobre Flex (ADR-007) */
+.tpl-f9 .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    padding: 0 1.8rem;
+    border-right: 1px solid var(--f9-border-soft);
+    text-align: center;
 }
 
-.tpl-f9 #db-lineup {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+.tpl-f9 .cd-block:last-child {
+    border-right: none;
 }
 
-/* Estilo Base de Artistas */
-.tpl-f9 .lineup-card {
-  background: var(--f9-card-bg);
-  border: 1px solid var(--f9-border);
-  padding: 1.5rem;
-  text-align: center;
-  border-radius: 4px;
+.tpl-f9 [id^="cd-"] {
+    display: block !important;
+    font-family: var(--f9-serif) !important;
+    font-size: clamp(2.1rem, 5vw, 3.1rem) !important;
+    font-weight: 500 !important;
+    line-height: 1;
+    color: var(--f9-gold) !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
 }
 
-.tpl-f9 .lineup-card .artist-name {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--f9-text);
-  text-transform: uppercase;
+.tpl-f9 .cd-block small {
+    display: block;
+    margin-top: 0.7rem;
+    font-family: var(--f9-sans);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--f9-muted);
 }
 
-/* REALSADO RASTRO MC (Headliner) */
-.tpl-f9 .lineup-card[data-artist*="RASTRO MC"],
-.tpl-f9 .lineup-card.headliner {
-  grid-column: 1 / -1;
-  background: #1c1813 !important;
-  border: 2px solid var(--f9-gold) !important;
-  padding: 2.5rem 1.5rem !important;
-  position: relative;
+/* ==========================================================================
+   7. METADATA - #mod-hero-meta.hero-meta > .meta-item
+   ========================================================================== */
+.tpl-f9 #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem 1.2rem;
+    padding: 2.6rem 1.5rem;
 }
 
-.tpl-f9 .lineup-card[data-artist*="RASTRO MC"] .artist-name,
-.tpl-f9 .lineup-card.headliner .artist-name {
-  font-size: clamp(2.2rem, 6vw, 3.5rem) !important;
-  font-weight: 900 !important;
-  color: var(--f9-gold) !important;
-  letter-spacing: 0.1em;
+.tpl-f9 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.4rem;
+    background-color: var(--f9-card-bg);
+    border: 1px solid var(--f9-border);
+    color: var(--f9-gold);
+    font-family: var(--f9-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: border-color 0.3s ease, color 0.3s ease;
 }
 
-.tpl-f9 .lineup-card[data-artist*="RASTRO MC"]::before {
-  content: "PRESENTA / HEADLINER";
-  display: block;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  color: var(--f9-muted);
-  margin-bottom: 0.5rem;
+.tpl-f9 #mod-hero-meta .meta-item:hover {
+    border-color: var(--f9-gold);
 }
 
-/* 5. Multimedia (Video & Spotify) Grid Atómico */
+.tpl-f9 #mod-hero-meta .meta-svg {
+    flex-shrink: 0;
+    width: 18px !important;
+    height: 18px !important;
+    fill: var(--f9-gold);
+}
+
+/* ==========================================================================
+   8. HERO CTAs - #mod-hero-ctas.hero-ctas
+   Nace con display:none !important desde el kernel; se enciende aqui.
+   ========================================================================== */
+.tpl-f9 #mod-hero-ctas {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 2.4rem 1.5rem;
+    background-color: var(--f9-bg);
+    border-bottom: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-hero-ctas .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.2rem;
+    font-family: var(--f9-sans);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    border: 1px solid var(--f9-gold);
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 #mod-hero-ctas .hero-cta-btn--wa {
+    background-color: var(--f9-gold);
+    color: var(--f9-bg);
+}
+
+.tpl-f9 #mod-hero-ctas .hero-cta-btn--wa:hover {
+    background-color: transparent;
+    color: var(--f9-gold);
+    transform: translateY(-2px);
+}
+
+.tpl-f9 #mod-hero-ctas .hero-cta-btn--lineup {
+    background-color: transparent;
+    color: var(--f9-gold);
+}
+
+.tpl-f9 #mod-hero-ctas .hero-cta-btn--lineup:hover {
+    background-color: var(--f9-gold);
+    color: var(--f9-bg);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   9. HISTORIA - #mod-historia > .historia-inner
+   ========================================================================== */
+.tpl-f9 #mod-historia {
+    padding: 5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-historia .historia-inner {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    text-align: center;
+}
+
+.tpl-f9 #db-historia-titulo {
+    color: var(--f9-gold) !important;
+    font-family: var(--f9-serif);
+    font-weight: 500 !important;
+    font-size: clamp(1.5rem, 4vw, 2.3rem) !important;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0 0 1.8rem 0 !important;
+    line-height: 1.25;
+}
+
+.tpl-f9 #db-historia-img {
+    display: block;
+    width: 100% !important;
+    max-width: 700px !important;
+    margin: 0 auto 2rem auto !important;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    object-fit: cover;
+}
+
+.tpl-f9 #db-historia-texto {
+    max-width: 640px;
+    margin: 0 auto !important;
+    color: var(--f9-muted) !important;
+    font-size: 1.02rem;
+    line-height: 1.9;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   10. OBJETIVO - #mod-objetivo > .objetivo-inner (meta + barra de progreso)
+   ========================================================================== */
+.tpl-f9 #mod-objetivo {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-objetivo .objetivo-inner {
+    max-width: 840px;
+    margin: 0 auto;
+}
+
+.tpl-f9 .objetivo-stats {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem !important;
+}
+
+.tpl-f9 .objetivo-stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 130px;
+    text-align: center;
+}
+
+.tpl-f9 .objetivo-label {
+    color: var(--f9-muted);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 .objetivo-value {
+    color: var(--f9-gold);
+    font-family: var(--f9-serif);
+    font-size: clamp(1.25rem, 3vw, 1.8rem);
+    line-height: 1.1;
+}
+
+.tpl-f9 .objetivo-barra-track {
+    height: 6px;
+    width: 100%;
+    background-color: rgba(243, 243, 241, 0.06);
+    border: 1px solid var(--f9-border-soft);
+    overflow: hidden;
+}
+
+.tpl-f9 #db-objetivo-barra.objetivo-barra-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--f9-gold-muted) 0%, var(--f9-gold) 100%);
+    transition: width 0.7s var(--f9-ease);
+}
+
+.tpl-f9 #db-objetivo-pct.objetivo-pct {
+    display: block;
+    margin-top: 0.7rem;
+    text-align: right;
+    color: var(--f9-gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+}
+
+/* ==========================================================================
+   11. IMPACTO - #mod-impacto > #db-impacto-grid.impacto-grid
+   ========================================================================== */
+.tpl-f9 #mod-impacto {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #db-impacto-grid.impacto-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f9 .impacto-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2.4rem 1.6rem;
+    background-color: var(--f9-card-bg);
+    border: 1px solid var(--f9-border);
+    text-align: center;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 .impacto-card:hover {
+    border-color: var(--f9-gold);
+    transform: translateY(-4px);
+}
+
+.tpl-f9 .impacto-card--donacion {
+    cursor: pointer;
+}
+
+.tpl-f9 .impacto-icono {
+    color: var(--f9-gold);
+    line-height: 0;
+}
+
+.tpl-f9 .impacto-valor {
+    color: var(--f9-gold);
+    font-family: var(--f9-serif);
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.tpl-f9 .impacto-etiqueta {
+    color: var(--f9-muted);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 .impacto-monto {
+    color: var(--f9-gold);
+    font-family: var(--f9-serif);
+    font-size: 1.65rem;
+    line-height: 1.1;
+}
+
+.tpl-f9 .impacto-titulo {
+    color: var(--f9-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 .impacto-desc {
+    color: var(--f9-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ==========================================================================
+   12. VIDEO Y GALERIA - #mod-video > #db-gallery-grid + #db-video-content
+   ========================================================================== */
 .tpl-f9 #mod-video {
-  display: block !important;
-  padding-top: 0 !important; /* ADR-010 */
-  max-width: 1100px;
-  margin: 0 auto 3rem auto;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    max-width: 1100px;
+    margin: 0 auto 3rem auto !important;
+}
+
+.tpl-f9 #db-gallery-grid .gallery-item {
+    border: 1px solid var(--f9-border-soft);
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.tpl-f9 #db-gallery-grid .gallery-item:hover {
+    border-color: var(--f9-gold);
+}
+
+.tpl-f9 #db-gallery-grid img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    cursor: zoom-in;
+    transition: transform 0.5s var(--f9-ease);
+}
+
+.tpl-f9 #db-gallery-grid .gallery-item:hover img {
+    transform: scale(1.04);
 }
 
 .tpl-f9 #db-video-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    background-color: #000;
+    border: 1px solid var(--f9-border);
+    border-radius: 0 !important;
+    overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .tpl-f9 #db-video-content {
-    grid-template-columns: 1fr;
-  }
+.tpl-f9 #db-video-content iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 
-/* 6. Formulario y Entradas */
+.tpl-f9 #db-video-content .video-placeholder {
+    width: 100%;
+    height: 100%;
+}
+
+.tpl-f9 #db-video-content .play-button {
+    border: 1px solid var(--f9-gold) !important;
+    background: rgba(12, 10, 8, 0.6) !important;
+}
+
+.tpl-f9 #db-video-content .play-button span {
+    color: var(--f9-gold) !important;
+}
+
+/* ==========================================================================
+   13. CARTEL - #mod-cartel > .cartel-inner > #db-poster-img
+   ========================================================================== */
+.tpl-f9 #mod-cartel {
+    padding: 4.5rem 1.5rem;
+}
+
+.tpl-f9 #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto !important;
+}
+
+.tpl-f9 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 420px;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   14. LINEUP - #mod-lineup (FOTOGRAFIA PREDOMINANTE)
+   Headliner = .artist-card.headliner (marcado por NOMBRE: RASTRO MC en el JS).
+   No por posicion: foto 60vh, nombre dorado gigante encima.
+   Demas artistas: grid 2-3 columnas, foto 3/4, sin avatares circulares.
+   ========================================================================== */
+.tpl-f9 #mod-lineup {
+    display: flex !important;
+    flex-direction: column;
+    padding: 5rem 1.5rem;
+    background-color: var(--f9-bg);
+    border-top: 1px solid var(--f9-border);
+    border-bottom: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-lineup .lineup-grid {
+    display: block;
+    max-width: 1200px !important;
+    width: 100%;
+    margin: 0 auto !important;
+}
+
+.tpl-f9 #db-lineup {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.4rem !important;
+    width: 100% !important;
+}
+
+/* --- Tarjeta base (artistas no headliner) --- */
+.tpl-f9 #db-lineup .artist-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background-color: #000;
+    border: 1px solid var(--f9-border);
+    border-radius: 0;
+    cursor: pointer;
+    transition: border-color 0.4s ease, transform 0.4s ease;
+}
+
+.tpl-f9 #db-lineup .artist-card:hover {
+    border-color: var(--f9-gold);
+    transform: translateY(-4px);
+}
+
+.tpl-f9 #db-lineup .artist-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition: transform 0.7s var(--f9-ease);
+}
+
+.tpl-f9 #db-lineup .artist-card:hover .artist-photo {
+    transform: scale(1.05);
+}
+
+/* Overlay superpuesto sobre la foto: gradiente oscuro de abajo hacia arriba. */
+.tpl-f9 #db-lineup .artist-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    background: linear-gradient(
+        0deg,
+        rgba(12, 10, 8, 0.96) 0%,
+        rgba(12, 10, 8, 0.72) 45%,
+        rgba(12, 10, 8, 0) 100%
+    );
+}
+
+.tpl-f9 #db-lineup .artist-hora {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.28rem 0.7rem;
+    border: 1px solid var(--f9-border);
+    background-color: rgba(12, 10, 8, 0.55);
+    color: var(--f9-gold);
+    font-family: var(--f9-sans);
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 #db-lineup .artist-name {
+    display: block;
+    color: #ffffff;
+    font-family: var(--f9-serif);
+    font-weight: 500;
+    font-size: clamp(1.45rem, 3vw, 2.15rem);
+    line-height: 1.05;
+    letter-spacing: 0.03em;
+}
+
+.tpl-f9 #db-lineup .artist-resena {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--f9-muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.tpl-f9 #db-lineup .artist-social {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-top: 0.4rem;
+}
+
+.tpl-f9 #db-lineup .artist-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--f9-gold);
+    opacity: 0.85;
+    line-height: 0;
+    transition: color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 #db-lineup .artist-social-icon:hover {
+    color: #ffffff;
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+/* --- HEADLINER: artist-card.headliner (marcado por nombre en JS) --- */
+.tpl-f9 #db-lineup .artist-card.headliner {
+    grid-column: 1 / -1;
+    aspect-ratio: auto !important;
+    min-height: 60vh;
+    border-color: var(--f9-border);
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-position: center 25%;
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-overlay {
+    inset: auto 0 0 0;
+    padding: 5rem 3rem 3rem 3rem;
+    background: linear-gradient(
+        0deg,
+        rgba(12, 10, 8, 0.97) 0%,
+        rgba(12, 10, 8, 0.8) 40%,
+        rgba(12, 10, 8, 0) 100%
+    );
+    gap: 0.75rem;
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-name {
+    color: var(--f9-gold);
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.98;
+    letter-spacing: 0.02em;
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-hora {
+    background-color: rgba(212, 175, 55, 0.12);
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-resena {
+    max-width: 640px;
+    font-size: 0.95rem;
+    -webkit-line-clamp: 3;
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-social {
+    margin-top: 0.8rem;
+    gap: 1.1rem;
+}
+
+.tpl-f9 #db-lineup .artist-card.headliner .artist-social-icon {
+    opacity: 1;
+}
+
+/* Etiqueta "HEADLINER" sobre la foto del artista marcado por NOMBRE (RASTRO MC). */
+.tpl-f9 #db-lineup .artist-card.headliner::before {
+    content: "HEADLINER";
+    position: absolute;
+    top: 2.2rem;
+    left: 3rem;
+    z-index: 4;
+    color: var(--f9-gold);
+    font-family: var(--f9-sans);
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   15. PLAYLIST - #mod-playlist > #db-spotify-embed
+   ========================================================================== */
+.tpl-f9 #mod-playlist {
+    display: flex !important;
+    flex-direction: column;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-playlist > div {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto !important;
+}
+
+.tpl-f9 #db-spotify-embed {
+    background-color: var(--f9-card-bg);
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.tpl-f9 #db-spotify-embed iframe {
+    display: block;
+    width: 100% !important;
+    min-height: 500px !important;
+    border: none;
+    border-radius: 0 !important;
+}
+
+/* ==========================================================================
+   16. INFO TECNICA - #mod-info-tecnica > .data-cards-container > .card-item
+   ========================================================================== */
+.tpl-f9 #mod-info-tecnica {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 .data-cards-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f9 .card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 2rem 1.4rem !important;
+    background-color: var(--f9-card-bg) !important;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    text-align: center;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 .card-item:hover {
+    border-color: var(--f9-gold) !important;
+    transform: translateY(-3px);
+}
+
+.tpl-f9 .card-item > span:first-child {
+    color: var(--f9-gold) !important;
+    font-size: 0.6rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3em !important;
+    text-transform: uppercase !important;
+}
+
+.tpl-f9 .card-item span[id*="-val"] {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--f9-text) !important;
+    font-family: var(--f9-serif);
+    font-size: 1.5rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   17. FAQ - #mod-faq > h2 + #db-faq-list > .faq-item
+   ========================================================================== */
+.tpl-f9 #mod-faq {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #db-faq-list {
+    max-width: 840px;
+    margin: 0 auto;
+}
+
+.tpl-f9 .faq-item {
+    padding: 1.4rem 0 !important;
+    border-bottom: 1px solid var(--f9-border-soft) !important;
+    cursor: pointer;
+}
+
+.tpl-f9 .faq-item > div:first-child span {
+    color: var(--f9-text);
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+}
+
+.tpl-f9 .faq-icon-circle {
+    border-color: var(--f9-gold) !important;
+    color: var(--f9-gold) !important;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.tpl-f9 .faq-item.active .faq-icon-circle {
+    transform: rotate(45deg);
+}
+
+.tpl-f9 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s var(--f9-ease), opacity 0.4s ease, padding 0.4s ease;
+    color: var(--f9-muted);
+    font-size: 0.92rem;
+    line-height: 1.75;
+    padding-top: 0;
+}
+
+.tpl-f9 .faq-item.active .faq-answer {
+    max-height: 560px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
+}
+
+/* ==========================================================================
+   18. UBICACION - #mod-ubicacion > #db-mapa-container
+   ========================================================================== */
+.tpl-f9 #mod-ubicacion {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #db-mapa-container {
+    max-width: 1000px;
+    height: 380px;
+    margin: 0 auto;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    background-color: var(--f9-card-bg);
+}
+
+.tpl-f9 #db-mapa-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ==========================================================================
+   19. BOLETOS - #mod-boletos (filas compactas inyectadas por el motor)
+   ========================================================================== */
+.tpl-f9 #mod-boletos {
+    display: block !important;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-boletos .boleto-inner {
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    text-align: center;
+}
+
+.tpl-f9 .boleto-subtitle {
+    color: var(--f9-muted) !important;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+}
+
+.tpl-f9 .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column;
+    margin-top: 1.8rem !important;
+    background-color: var(--f9-card-bg);
+    border: 1px solid var(--f9-border);
+    gap: 0 !important;
+}
+
+.tpl-f9 .boleto-card-row {
+    border-bottom: 1px solid var(--f9-border-soft) !important;
+    transition: background-color 0.3s ease;
+}
+
+.tpl-f9 .boleto-card-row:last-child {
+    border-bottom: none !important;
+}
+
+.tpl-f9 a.boleto-card-row:hover {
+    background-color: rgba(212, 175, 55, 0.06);
+}
+
+.tpl-f9 .boleto-icon {
+    color: var(--f9-gold) !important;
+}
+
+.tpl-f9 .boleto-tipo {
+    color: var(--f9-gold) !important;
+    letter-spacing: 0.24em !important;
+}
+
+.tpl-f9 .boleto-precio {
+    color: var(--f9-text) !important;
+    font-family: var(--f9-serif);
+    font-weight: 500 !important;
+}
+
+.tpl-f9 .boleto-arrow {
+    color: var(--f9-gold) !important;
+    opacity: 0.85 !important;
+}
+
+.tpl-f9 .boleto-desc {
+    color: var(--f9-muted) !important;
+}
+
+.tpl-f9 .boleto-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.8rem;
+    color: var(--f9-muted);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 .boleto-trust svg {
+    fill: var(--f9-gold);
+}
+
+/* ==========================================================================
+   20. EXPERIENCIAS - #mod-experiencias (opcional; oculto si llega vacio)
+   ========================================================================== */
+.tpl-f9 #mod-experiencias {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-experiencias .exp-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tpl-f9 #db-experiencias-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.tpl-f9 .exp-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 2.2rem 1.6rem;
+    background-color: var(--f9-card-bg);
+    border: 1px solid var(--f9-border);
+    text-align: left;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 .exp-card:hover {
+    border-color: var(--f9-gold);
+    transform: translateY(-4px);
+}
+
+.tpl-f9 .exp-titulo {
+    color: var(--f9-gold);
+    font-family: var(--f9-serif);
+    font-size: 1.3rem;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.tpl-f9 .exp-tag {
+    color: var(--f9-muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+}
+
+/* ==========================================================================
+   21. WHATSAPP - #mod-whatsapp > .whatsapp-inner > #db-whatsapp-btn
+   ========================================================================== */
+.tpl-f9 #mod-whatsapp {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    padding: 3.2rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #mod-whatsapp .whatsapp-inner {
+    max-width: 1100px;
+    margin: 0 auto !important;
+    text-align: center;
+}
+
+.tpl-f9 #db-whatsapp-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 1.1rem 2.4rem !important;
+    background-color: transparent !important;
+    color: var(--f9-gold) !important;
+    border: 1px solid var(--f9-gold) !important;
+    border-radius: 0 !important;
+    font-family: var(--f9-sans);
+    font-weight: 800 !important;
+    font-size: 0.74rem !important;
+    letter-spacing: 0.22em !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 #db-whatsapp-btn:hover {
+    background-color: var(--f9-gold) !important;
+    color: var(--f9-bg) !important;
+    transform: translateY(-2px);
+}
+
+.tpl-f9 #db-whatsapp-btn svg {
+    fill: currentColor !important;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   22. SPONSORS - #mod-sponsors > #db-sponsors-list > .sponsor-item
+   ========================================================================== */
+.tpl-f9 #mod-sponsors {
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    border-top: 1px solid var(--f9-border-soft);
+}
+
+.tpl-f9 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f9 .sponsor-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 1.6rem !important;
+    background-color: transparent;
+    border: 1px solid var(--f9-border-soft);
+    transition: border-color 0.3s ease;
+}
+
+.tpl-f9 .sponsor-item:hover {
+    border-color: var(--f9-gold);
+}
+
+.tpl-f9 .sponsor-img {
+    height: 42px;
+    width: auto;
+    opacity: 0.72;
+    transition: opacity 0.3s ease;
+}
+
+.tpl-f9 .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   23. FORMULARIO - #mod-form > .form-master-box (tabs + inputs + submit)
+   ========================================================================== */
 .tpl-f9 #mod-form {
-  max-width: 600px;
-  margin: 0 auto 4rem auto;
-  background: var(--f9-card-bg);
-  border: 1px solid var(--f9-border);
-  padding: 2rem;
-  border-radius: 4px;
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9-border-soft);
 }
 
-.tpl-f9 #mod-form input, 
-.tpl-f9 #mod-form select, 
-.tpl-f9 #mod-form button {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  margin-bottom: 1rem;
-  background: var(--f9-bg);
-  border: 1px solid var(--f9-border);
-  color: var(--f9-text);
-  border-radius: 2px;
+.tpl-f9 .form-master-box {
+    width: 100%;
+    max-width: 560px !important;
+    margin: 0 auto !important;
+    padding: 2.6rem !important;
+    background-color: var(--f9-card-bg) !important;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
 }
 
-.tpl-f9 #mod-form button {
-  background: var(--f9-gold) !important;
-  color: #000 !important;
-  font-weight: 900;
-  text-transform: uppercase;
-  cursor: pointer;
-  border: none !important;
+.tpl-f9 .form-tabs {
+    display: flex;
+    gap: 1.6rem;
+    margin-bottom: 1.8rem !important;
+    border-bottom: 1px solid var(--f9-border-soft);
 }
 
-/* 7. Footer Brand Stamped */
-.tpl-f9 #mod-footer-brand,
-.tpl-f9 footer {
-  text-align: center;
-  padding: 3rem 1rem;
-  border-top: 1px solid var(--f9-border);
-  background: var(--f9-bg);
-  color: var(--f9-gold) !important;
-  font-weight: 900;
-  font-size: 1.4rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+.tpl-f9 .tab-btn {
+    background: none;
+    border: none;
+    padding: 0 0 0.8rem 0;
+    color: var(--f9-muted);
+    font-family: var(--f9-sans);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
-.tpl-f9 #mod-footer-brand::after {
-  content: " • rastro mc";
-  display: inline;
+.tpl-f9 .tab-btn.active {
+    color: var(--f9-gold);
+    border-bottom: 2px solid var(--f9-gold);
 }
+
+.tpl-f9 #master-reg-form input[type="text"],
+.tpl-f9 #master-reg-form input[type="tel"],
+.tpl-f9 #form-ya input[type="text"] {
+    width: 100% !important;
+    padding: 1.1rem 1.2rem !important;
+    margin-bottom: 1.2rem !important;
+    background-color: rgba(243, 243, 241, 0.03) !important;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    color: var(--f9-text) !important;
+    font-family: var(--f9-sans);
+    font-size: 0.92rem;
+}
+
+.tpl-f9 #master-reg-form input[type="text"]:focus,
+.tpl-f9 #master-reg-form input[type="tel"]:focus,
+.tpl-f9 #form-ya input[type="text"]:focus {
+    outline: none;
+    border-color: var(--f9-gold) !important;
+}
+
+.tpl-f9 #master-reg-form input::placeholder,
+.tpl-f9 #form-ya input::placeholder {
+    color: rgba(168, 159, 145, 0.7);
+}
+
+.tpl-f9 #reg-unir-comunidad-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin-bottom: 1.4rem !important;
+    padding: 1rem 1.1rem !important;
+    background-color: rgba(212, 175, 55, 0.05) !important;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+    color: var(--f9-muted) !important;
+    font-size: 0.86rem !important;
+    cursor: pointer;
+}
+
+.tpl-f9 #reg-unir-comunidad {
+    accent-color: var(--f9-gold) !important;
+}
+
+.tpl-f9 #reg-comunidad-msg {
+    color: var(--f9-text) !important;
+    background-color: rgba(212, 175, 55, 0.08) !important;
+    border: 1px solid var(--f9-border) !important;
+    border-radius: 0 !important;
+}
+
+.tpl-f9 #master-reg-form button[type="submit"] {
+    width: 100% !important;
+    padding: 1.2rem !important;
+    background-color: var(--f9-gold) !important;
+    color: var(--f9-bg) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: var(--f9-sans);
+    font-weight: 800 !important;
+    font-size: 0.82rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9 #master-reg-form button[type="submit"]:hover {
+    background-color: #e8cf74 !important;
+}
+
+.tpl-f9 #form-ya .btn-submit {
+    background-color: transparent !important;
+    color: var(--f9-gold) !important;
+    border: 1px solid var(--f9-gold) !important;
+    border-radius: 0 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.tpl-f9 #form-ya .btn-submit:hover {
+    background-color: var(--f9-gold) !important;
+    color: var(--f9-bg) !important;
+}
+
+/* ==========================================================================
+   24. FOOTER - #mod-footer > .footer-inner + .footer-bottom > #footer-copy
+   ========================================================================== */
+.tpl-f9 #mod-footer {
+    display: block !important;
+    padding: 3.8rem 1.5rem 2rem 1.5rem;
+    background-color: var(--f9-bg);
+    border-top: 1px solid var(--f9-border);
+}
+
+.tpl-f9 #mod-footer .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto 2.6rem auto;
+    text-align: left;
+}
+
+.tpl-f9 #mod-footer .footer-brand {
+    flex: 1 1 260px;
+}
+
+.tpl-f9 #footer-org-name {
+    display: block;
+    color: var(--f9-gold);
+    font-family: var(--f9-serif);
+    font-size: 1.35rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 #footer-tagline {
+    margin-top: 0.7rem;
+    color: var(--f9-muted);
+    font-size: 0.86rem;
+    line-height: 1.6;
+}
+
+.tpl-f9 #mod-footer .footer-col {
+    flex: 1 1 170px;
+}
+
+.tpl-f9 #mod-footer .footer-col h4 {
+    margin: 0 0 1rem 0;
+    color: var(--f9-gold);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 #mod-footer .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tpl-f9 #mod-footer .footer-col ul li {
+    margin-bottom: 0.6rem;
+}
+
+.tpl-f9 #mod-footer .footer-col ul li a {
+    color: var(--f9-muted);
+    font-size: 0.86rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.tpl-f9 #mod-footer .footer-col ul li a:hover {
+    color: var(--f9-gold);
+}
+
+.tpl-f9 .footer-social {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.tpl-f9 .footer-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--f9-border);
+    color: var(--f9-muted);
+    line-height: 0;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.tpl-f9 .footer-social-icon:hover {
+    color: var(--f9-gold);
+    border-color: var(--f9-gold);
+}
+
+.tpl-f9 .footer-contacto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: var(--f9-muted);
+    font-size: 0.86rem;
+}
+
+.tpl-f9 #mod-footer .footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--f9-border-soft);
+    text-align: center;
+}
+
+.tpl-f9 #footer-copy {
+    color: var(--f9-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+}
+
+/* Marca de silo: "-- rastro mc" al final del copyright. */
+.tpl-f9 #footer-copy::after {
+    content: " - rastro mc";
+    color: var(--f9-gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.tpl-f9 .htz-powered {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--f9-muted);
+    font-size: 0.68rem;
+    opacity: 0.55;
+}
+
+/* ==========================================================================
+   25. BREAKPOINTS RESPONSIVE
+   ========================================================================== */
+
+/* --- Tablet: hasta 1024px. Una columna y aire reducido. --- */
+@media (max-width: 1024px) {
+    .tpl-f9 #mod-hero {
+        min-height: 66vh;
+        padding: 6rem 1.5rem 3.5rem 1.5rem;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner {
+        min-height: 50vh;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner .artist-overlay {
+        padding: 3.5rem 2rem 2rem 2rem;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner::before {
+        top: 1.6rem;
+        left: 2rem;
+    }
+
+    .tpl-f9 .data-cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .tpl-f9 #db-lineup {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+}
+
+/* --- Movil grande: hasta 768px. --- */
+@media (max-width: 768px) {
+    .tpl-f9 #mod-hero {
+        min-height: 60vh;
+        padding: 5rem 1.2rem 3rem 1.2rem;
+    }
+
+    .tpl-f9 #event-title {
+        font-size: clamp(2rem, 10vw, 3.2rem) !important;
+        letter-spacing: 0.05em !important;
+    }
+
+    .tpl-f9 #org-name-badge {
+        font-size: 0.6rem !important;
+        letter-spacing: 0.3em !important;
+    }
+
+    .tpl-f9 #unified-frame {
+        padding: 1.8rem 1rem;
+        gap: 0.4rem;
+    }
+
+    .tpl-f9 .cd-block {
+        min-width: 74px;
+        padding: 0 0.7rem;
+    }
+
+    .tpl-f9 #mod-hero-meta {
+        padding: 2rem 1rem;
+        gap: 0.8rem;
+    }
+
+    .tpl-f9 #mod-hero-meta .meta-item {
+        font-size: 0.7rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .tpl-f9 #mod-historia,
+    .tpl-f9 #mod-objetivo,
+    .tpl-f9 #mod-impacto,
+    .tpl-f9 #mod-video,
+    .tpl-f9 #mod-playlist,
+    .tpl-f9 #mod-info-tecnica,
+    .tpl-f9 #mod-boletos,
+    .tpl-f9 #mod-experiencias,
+    .tpl-f9 #mod-faq,
+    .tpl-f9 #mod-ubicacion {
+        padding-left: 1.1rem;
+        padding-right: 1.1rem;
+    }
+
+    .tpl-f9 #mod-lineup {
+        padding: 3.5rem 1.1rem;
+    }
+
+    .tpl-f9 #db-lineup {
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1.1rem !important;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner {
+        min-height: 46vh;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner .artist-overlay {
+        padding: 2.8rem 1.4rem 1.4rem 1.4rem;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner::before {
+        top: 1.2rem;
+        left: 1.4rem;
+        font-size: 0.56rem;
+    }
+
+    .tpl-f9 .objetivo-stats {
+        gap: 1rem;
+    }
+
+    .tpl-f9 .form-master-box {
+        padding: 1.8rem !important;
+    }
+
+    .tpl-f9 #mod-footer {
+        padding: 3rem 1.1rem 1.6rem 1.1rem;
+    }
+
+    .tpl-f9 #mod-footer .footer-inner {
+        gap: 1.8rem;
+    }
+}
+
+/* --- Movil chico: hasta 480px. --- */
+@media (max-width: 480px) {
+    .tpl-f9 #mod-hero {
+        min-height: 54vh;
+        padding: 4.2rem 1rem 2.4rem 1rem;
+    }
+
+    .tpl-f9 #org-name-badge {
+        letter-spacing: 0.24em !important;
+        padding: 0.4rem 0.9rem !important;
+    }
+
+    .tpl-f9 #unified-frame {
+        padding: 1.4rem 0.6rem;
+    }
+
+    .tpl-f9 .cd-block {
+        min-width: 60px;
+        padding: 0 0.45rem;
+    }
+
+    .tpl-f9 [id^="cd-"] {
+        font-size: 1.7rem !important;
+    }
+
+    .tpl-f9 .cd-block small {
+        letter-spacing: 0.18em;
+        font-size: 0.52rem;
+    }
+
+    .tpl-f9 #mod-hero-meta .meta-item {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tpl-f9 #mod-hero-ctas {
+        padding: 1.8rem 1rem;
+    }
+
+    .tpl-f9 #mod-hero-ctas .hero-cta-btn {
+        width: 100%;
+        padding: 0.95rem 1.2rem;
+    }
+
+    .tpl-f9 .data-cards-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tpl-f9 #db-lineup {
+        grid-template-columns: 1fr;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner {
+        min-height: 42vh;
+    }
+
+    .tpl-f9 #db-lineup .artist-card.headliner .artist-name {
+        font-size: clamp(2rem, 11vw, 2.8rem);
+    }
+
+    .tpl-f9 #db-gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+        gap: 0.5rem;
+    }
+
+    .tpl-f9 .objetivo-stat-block {
+        flex: 1 1 100%;
+    }
+
+    .tpl-f9 #db-sponsors-list {
+        gap: 1.6rem;
+    }
+
+    .tpl-f9 .sponsor-img {
+        height: 34px;
+    }
+
+    .tpl-f9 #db-whatsapp-btn {
+        width: 100%;
+        padding: 1rem 1.2rem !important;
+        font-size: 0.66rem !important;
+    }
+
+    .tpl-f9 .form-master-box {
+        padding: 1.4rem !important;
+    }
+
+    .tpl-f9 #mod-footer .footer-inner {
+        flex-direction: column;
+        gap: 1.6rem;
+    }
+}
+
+/* ==========================================================================
+   26. REFLOW - Modulos ocultos reordenan el grid de 2 columnas (desktop)
+   Cuando un modulo de una fila pareada (cartel|video, faq|ubicacion,
+   whatsapp|sponsors) queda oculto ([data-hidden] o vacio), su companero se
+   expande a la fila completa. Solo aplica en desktop (>=1025px); en columna
+   unica las filas ya se apilan y una fila vacia colapsa por row-gap: 0.
+   Nota: si dos modulos de la MISMA pareja se ocultan a la vez, gana la ultima
+   regla que coincida; la fila queda vacia y colapsa sin dejar hueco visible.
+   ========================================================================== */
+@media (min-width: 1025px) {
+    /* --- Falta el cartel: el video ocupa toda la fila. --- */
+    .tpl-f9 #main-content-flow:has(#mod-cartel[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "historia historia"
+            "objetivo objetivo"
+            "impacto impacto"
+            "lineup lineup"
+            "video video"
+            "playlist playlist"
+            "info info"
+            "boletos boletos"
+            "experiencias experiencias"
+            "faq ubicacion"
+            "whatsapp sponsors"
+            "form form"
+            "footer footer";
+    }
+
+    /* --- Falta el video: el cartel ocupa toda la fila. --- */
+    .tpl-f9 #main-content-flow:has(#mod-video[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "historia historia"
+            "objetivo objetivo"
+            "impacto impacto"
+            "lineup lineup"
+            "cartel cartel"
+            "playlist playlist"
+            "info info"
+            "boletos boletos"
+            "experiencias experiencias"
+            "faq ubicacion"
+            "whatsapp sponsors"
+            "form form"
+            "footer footer";
+    }
+
+    /* --- Falta el FAQ: la ubicacion ocupa toda la fila. --- */
+    .tpl-f9 #main-content-flow:has(#mod-faq[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "historia historia"
+            "objetivo objetivo"
+            "impacto impacto"
+            "lineup lineup"
+            "cartel video"
+            "playlist playlist"
+            "info info"
+            "boletos boletos"
+            "experiencias experiencias"
+            "ubicacion ubicacion"
+            "whatsapp sponsors"
+            "form form"
+            "footer footer";
+    }
+
+    /* --- Ubicacion vacia (sin mapa): el FAQ ocupa toda la fila. --- */
+    .tpl-f9 #main-content-flow:has(#db-mapa-container:empty) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "historia historia"
+            "objetivo objetivo"
+            "impacto impacto"
+            "lineup lineup"
+            "cartel video"
+            "playlist playlist"
+            "info info"
+            "boletos boletos"
+            "experiencias experiencias"
+            "faq faq"
+            "whatsapp sponsors"
+            "form form"
+            "footer footer";
+    }
+
+    /* --- Faltan los sponsors: el WhatsApp ocupa toda la fila. --- */
+    .tpl-f9 #main-content-flow:has(#mod-sponsors[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "historia historia"
+            "objetivo objetivo"
+            "impacto impacto"
+            "lineup lineup"
+            "cartel video"
+            "playlist playlist"
+            "info info"
+            "boletos boletos"
+            "experiencias experiencias"
+            "faq ubicacion"
+            "whatsapp whatsapp"
+            "form form"
+            "footer footer";
+    }
+}
+
+/* ============================================================================
+   LOG DE VERSIONES - Template f9 "Mistico / Rastro MC"
+   ============================================================================
+   | Version | Fecha      | Cambio                                                     | Estado |
+   |---------|------------|------------------------------------------------------------|--------|
+   | v1.0.0  | 15/09/2026 | Reescritura completa del silo Mistico (F9). Antes 224      | [OK]   |
+   |         |            | lineas con selectores rotos (#event-description, .meta-bar, |        |
+   |         |            | .lineup-card, [data-artist], #mod-footer-brand) que nunca   |        |
+   |         |            | existieron en el DOM real de evento.html.                   |        |
+   |         |            | Paleta fija dorado oscuro: #0c0a08 / #14110e / #d4af37 /   |        |
+   |         |            | #8c7323 / #f3f3f1 / #a89f91. No depende de --master-accent. |        |
+   |         |            | Estetica PLANO ELEGANTE: cero glow (text-shadow, box-shadow,|        |
+   |         |            | filter: none !important en el reset).                       |        |
+   |         |            | Tipografia serif (Georgia) para display + system-ui cuerpo. |        |
+   |         |            | Kernel IoC: display:flex/block !important por modulo.       |        |
+   |         |            | Grid columna unica base + desktop 2 columnas (>=1025px).    |        |
+   |         |            | LINEUP FOTOGRAFIA PREDOMINANTE: headliner = .artist-card    |        |
+   |         |            | .headliner (marcado por NOMBRE: RASTRO MC, en el JS; no     |        |
+   |         |            | por posicion); grid-column 1/-1, min-height 60vh, titulo    |        |
+   |         |            | dorado clamp 3-6rem, ::before "HEADLINER"); demas artistas  |        |
+   |         |            | foto 3/4 en grid auto-fit, overlay con gradiente, redes     |        |
+   |         |            | doradas visibles, resena de 3 lineas. Sin avatares.         |        |
+   |         |            | Selectores reales: #mod-hero-meta, .meta-item, .meta-svg,   |        |
+   |         |            | #mod-hero-ctas, .hero-cta-btn--wa/--lineup, .cd-block,      |        |
+   |         |            | .historia-inner, .objetivo-*, .impacto-*, .artist-card,     |        |
+   |         |            | .artist-photo, .artist-overlay, .artist-hora, .artist-name, |        |
+   |         |            | .artist-resena, .artist-social-icon, .card-item, .faq-item, |        |
+   |         |            | .boleto-card-row, .exp-card, .whatsapp-btn, .sponsor-item,  |        |
+   |         |            | .form-master-box, #footer-copy, .footer-col, .htz-powered.  |        |
+   |         |            | Modulos vacios: :has(:empty) oculta experiencias, ubicacion,|        |
+   |         |            | video-content, galeria y spotify sin contenido.             |        |
+   |         |            | REFLOW (:has con data-hidden / mapa vacio) para filas       |        |
+   |         |            | pareadas cartel|video, faq|ubicacion, whatsapp|sponsors.     |        |
+   |         |            | Breakpoints: base / 1024px / 768px / 480px + reduced-motion.|        |
+   |         |            | Escudo GOLD: ASCII puro (cero bytes >127). Aislamiento      |        |
+   |         |            | atomico estricto bajo .tpl-f9. Cero Borrado respetado.      |        |
+   ============================================================================ */

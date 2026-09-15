@@ -1177,8 +1177,13 @@ if (document.getElementById('db-poster-img')) {
                 ? `<div class="artist-social">${socialIcons}</div>`
                 : '';
 
+            // v1.4.0 (aditivo, solo silo .tpl-f9 Mistico): el headliner se marca por
+            // NOMBRE (RASTRO MC), no por posicion: en los datos el artista puede venir en cualquier orden.
+            const __isHeadliner = document.body.className.indexOf('tpl-f9') !== -1
+                && String(name || '').trim().toUpperCase().indexOf('RASTRO MC') !== -1;
+
             return `
-                <div class="artist-card" data-idx="${idx}">
+                <div class="artist-card${__isHeadliner ? ' headliner' : ''}" data-idx="${idx}">
                     <img src="${photo}" class="artist-photo" alt="${name}">
                     <div class="artist-overlay">
                         ${hora ? `<span class="artist-hora">${hora}</span>` : ''}
@@ -1276,7 +1281,8 @@ if (document.getElementById('db-poster-img')) {
     // content.experiencias (array de {titulo, tag}); si llega vacío se oculta el
     // módulo (regla general módulos vacíos v306) en lugar de usar contenido
     // editorial de referencia.
-    if (document.body.className.indexOf('tpl-f8') !== -1) {
+    // v1.4.0 (aditivo): f9 Mistico reutiliza el mismo motor de experiencias.
+    if (document.body.className.indexOf('tpl-f8') !== -1 || document.body.className.indexOf('tpl-f9') !== -1) {
         const expRaw = Array.isArray(effContent.experiencias) ? effContent.experiencias : [];
         if (expRaw.length === 0) {
             __hideEmptyModule('mod-experiencias', false);
