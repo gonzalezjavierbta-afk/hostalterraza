@@ -593,6 +593,10 @@ tr:hover td{background:var(--surface)}
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#FF3CAC;box-shadow:0 0 8px #FF3CAC"></div><span style="font-size:12px;font-weight:600;color:#FF3CAC">P12 · TropiLove</span></div>
               <div style="font-size:10px;color:#FFE500">Tropical Neón · Brutalismo Maximalista · Palm Grain</div>
             </div>
+            <div class="ld-theme-card" data-theme="mistico" onclick="seleccionarTheme('mistico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#14110e)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">P13 &middot; Mistico</span></div>
+              <div style="font-size:10px;color:#a89f91">Dorado Antiguo &middot; Editorial Oscuro &middot; Rastro MC</div>
+            </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
@@ -648,6 +652,18 @@ tr:hover td{background:var(--surface)}
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-sponsors-fiesta" style="width:13px;height:13px;accent-color:var(--gold)"> 🤝 Patrocinadores</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-boletos" style="width:13px;height:13px;accent-color:var(--gold)"> 🎟 Boletos preventa/taquilla</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-whatsapp" style="width:13px;height:13px;accent-color:var(--gold)"> 💬 WhatsApp contacto</label>
+              </div>
+              <div id="ld-meta-hero-wrap" style="margin-top:.6rem;border-top:1px solid var(--border);padding-top:.6rem">
+                <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Hero Meta - 2 lineas (opcional)</div>
+                <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Linea 1 / Linea 2 por cada dato. Se persiste en config_landing.content.meta.</div>
+                <div class="grid2">
+                  <div class="fg"><label style="font-size:11px">Fecha L1</label><input id="ld-meta-fecha-l1" placeholder="Ej. Sabado 15" style="font-size:12px"></div>
+                  <div class="fg"><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
+                  <div class="fg"><label style="font-size:11px">Hora L1</label><input id="ld-meta-hora-l1" placeholder="Ej. Puertas 8:00 PM" style="font-size:12px"></div>
+                  <div class="fg"><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
+                  <div class="fg"><label style="font-size:11px">Lugar L1</label><input id="ld-meta-lugar-l1" placeholder="Ej. Terraza Central" style="font-size:12px"></div>
+                  <div class="fg"><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
+                </div>
               </div>
             </div>
 
@@ -2766,7 +2782,7 @@ const _THEME_TYPE = {
   'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
   'underground':'fiesta','elegant-cocktail':'fiesta','afromango':'fiesta',
   'afromango-editor':'fiesta','tropical-brutalism':'fiesta',
-  'tropilove':'fiesta',
+  'tropilove':'fiesta','mistico':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
 };
@@ -2778,6 +2794,7 @@ const _THEME_TPL = {
   'afromango-editor':'f6',
   'tropical-brutalism':'f7',
   'tropilove':'f8',
+  'mistico':'f9',
 };
 
 // Reverse map template_id → theme slug (para cargar la plantilla al editar).
@@ -2832,6 +2849,7 @@ function seleccionarTheme(theme) {
   'afromango-editor':'P10 · Afromango Editor',
     'tropical-brutalism':'P11 · Tropical Brutalism',
     'tropilove':'P12 · TropiLove',
+    'mistico':'P13 \u00B7 Mistico',
     'solidario-moderno':'P9 · Solidario Moderno','urgente-impactante':'P10 · Urgente & Impactante',
     'tech-futurista':'P11 · Tech & Futurista','vintage-organico':'P12 · Vintage & Orgánico',
   };
@@ -3537,6 +3555,12 @@ function _buildConfigLanding(slug) {
       ubicacion:   val('ld-ubicacion-val')  || null,
       whatsapp:    val('ld-whatsapp-tel')   || null,
       boletos:     (val('ld-boletos-preventa') || val('ld-boletos-taquilla')) ? { preventa: val('ld-boletos-preventa') || null, taquilla: val('ld-boletos-taquilla') || null } : null,
+      // F9 Mistico - hero meta a 2 lineas (contrato: {fecha:{l1,l2},hora:{l1,l2},lugar:{l1,l2}})
+      meta: (val('ld-meta-fecha-l1') || val('ld-meta-fecha-l2') || val('ld-meta-hora-l1') || val('ld-meta-hora-l2') || val('ld-meta-lugar-l1') || val('ld-meta-lugar-l2')) ? {
+        fecha: { l1: val('ld-meta-fecha-l1') || null, l2: val('ld-meta-fecha-l2') || null },
+        hora:  { l1: val('ld-meta-hora-l1')  || null, l2: val('ld-meta-hora-l2')  || null },
+        lugar: { l1: val('ld-meta-lugar-l1') || null, l2: val('ld-meta-lugar-l2') || null },
+      } : null,
       // Fiesta extra fields
       gallery:     (()=>{ const v=val('ld-gallery-fiesta-urls')||val('ld-gallery-urls'); return v ? v.split('\n').filter(Boolean) : undefined; })(),
       faq:         (()=>{ const v=val('ld-faq-fiesta-val')||val('ld-faq-val'); return v ? v.split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{q:p[0]?.trim(),a:p[1]?.trim()};}) : undefined; })(),
@@ -4498,7 +4522,8 @@ function _limpiarWizardCompleto() {
   });
   ['ev-d','ld-sinopsis-text','ev-titulo-display','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
    'ld-playlist-url','ld-guest-list-val','ld-ubicacion-val','ld-whatsapp-tel','ld-boletos-preventa',
-   'ld-boletos-taquilla','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
+   'ld-boletos-taquilla','ld-meta-fecha-l1','ld-meta-fecha-l2','ld-meta-hora-l1','ld-meta-hora-l2',
+   'ld-meta-lugar-l1','ld-meta-lugar-l2','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
    'ld-sponsors-fiesta-val','ld-sponsors-val','ld-dir-nombre','ld-dir-rol','ld-dir-foto','ld-dir-bio',
    'ld-historia-titulo','ld-historia-val','ld-historia-items-val','ld-objetivo-meta','ld-objetivo-actual',
    'ld-objetivo-url','ld-objetivo-btn','ld-donate-text','ld-impacto-val','ld-como-ayudar-stats-val',
@@ -4600,6 +4625,14 @@ function _poblarContenidoWizard(content, suf) {
   if (content.boletos) {
     set('ld-boletos-preventa', content.boletos.preventa);
     set('ld-boletos-taquilla', content.boletos.taquilla);
+  }
+  if (content.meta) {
+    set('ld-meta-fecha-l1', content.meta.fecha && content.meta.fecha.l1);
+    set('ld-meta-fecha-l2', content.meta.fecha && content.meta.fecha.l2);
+    set('ld-meta-hora-l1',  content.meta.hora  && content.meta.hora.l1);
+    set('ld-meta-hora-l2',  content.meta.hora  && content.meta.hora.l2);
+    set('ld-meta-lugar-l1', content.meta.lugar && content.meta.lugar.l1);
+    set('ld-meta-lugar-l2', content.meta.lugar && content.meta.lugar.l2);
   }
   if (Array.isArray(content.dj_lineup)) {
     if (window._djLineupSetEntries) window._djLineupSetEntries(content.dj_lineup);

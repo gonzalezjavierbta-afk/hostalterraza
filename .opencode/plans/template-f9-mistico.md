@@ -2,9 +2,40 @@
 
 **Fecha:** 2026-09-15
 **Solicitante:** Usuario (evento prelanzamiento-mistico-9t39)
-**Estado:** COMPLETADO — certificado APTO (Gold Shield)
+**Estado:** COMPLETADO — iteración v1 (reescritura del silo) + iteración v2 (átomo `#mod-descripcion`, meta 2 líneas, boletería, theme `mistico`). Ambas certificadas con Gold Shield. Ver `Sistema QR desarrollo/DECISIONS.md` ADR-041.
 
-## Resultado (2026-09-15)
+---
+
+## Iteración v2 (2026-09-15) — COMPLETADO
+
+> Segunda pasada de arreglo y organización sobre F9. Documentada como ADR-041 en `Sistema QR desarrollo/DECISIONS.md`. Working tree modificado, **sin commit** al momento del cierre documental.
+
+**Archivos tocados:** `css/templates/fiesta/f9.css` (log de versiones v1.1.0), `evento.html`, `admin.html`.
+
+**Cambios:**
+- **`f9.css` (v1.1.0):** se apagan los módulos de campaña que no aplican a un prelanzamiento (`#mod-historia`, `#mod-objetivo`, `#mod-impacto`, `#mod-info-tecnica` — IDs intactos en el HTML, Cero Borrado) y se enciende en su lugar el átomo nuevo `#mod-descripcion`. Hero meta a 2 líneas (`.meta-line` / `.meta-line--2`). Lineup de escritorio (≥992px): headliner en columna izquierda + 6 artistas en 2 filas de 3; 1 columna por debajo. Grid desktop con `cartel|playlist` pareados. Footer minimal (base f8) en dorado con sello `- rastro mc`. `.form-tabs` centrado. Breakpoints portados de f8: 1279/991/767/640.
+- **`evento.html`:** átomo nuevo `#mod-descripcion` (HTML + render) con fuente `effContent.descripcion || ev.descripcion` y fallback editorial del prelanzamiento del disco Místico de octubre (**fix H-1**). Hero meta 2 líneas vía `__metaSet`, solo `tpl-f9` (con fallback de 1 línea en los demás silos — **fix H-2**). FAQ fallback de 5 ejemplos solo para `tpl-f9`. Boletería f9: solo taquilla con precio real; preventa solo con precio real (oculta si vacía); módulo oculto si ninguna. WhatsApp sin número en el texto (**cambio GLOBAL** aprobado por el usuario; el `href` `wa.me` no cambia). Headliner del lineup marcado por NOMBRE (`RASTRO MC`).
+- **`admin.html`:** card seleccionable `data-theme="mistico"` (P13) en el grupo Fiesta; `_THEME_TYPE['mistico']='fiesta'`; `_THEME_TPL['mistico']='f9'`; label en `names` (`P13 · Mistico`); inputs de `content.meta` (fecha/hora/lugar con `l1`/`l2`) + persistencia en `_buildConfigLanding()`, precarga en `_poblarContenidoWizard()` y limpieza en `_limpiarWizardCompleto()`.
+
+**Contrato de datos nuevo (opcional y aditivo):** `config_landing.content.meta = { fecha:{l1,l2}, hora:{l1,l2}, lugar:{l1,l2} }`.
+
+**Decisiones del usuario (v2):**
+| Decisión | Elección |
+|---|---|
+| Cambio de WhatsApp | Sin número en el texto visible (aplica a TODOS los silos) |
+| Módulos de campaña en F9 | Apagados (`historia`/`objetivo`/`impacto`/`info-tecnica`); reemplazados por `#mod-descripcion` |
+| Boletería F9 | Solo tarifas reales; nunca tarjetas "POR DEFINIR" |
+| FAQ F9 sin configurar | Fallback editorial de 5 preguntas (solo `tpl-f9`) |
+| Meta del hero | 2 líneas configurables, con fallback a 1 línea |
+| ADR-040 (cuenta master) | Solo diseño, NO implementado (queda pendiente en TSK-030) |
+
+**QA (Escudo GOLD):** PASS en sintaxis JS (`node --check`), ASCII-safety de código, balance de divs/llaves/comentarios, Cero Borrado y grid. H-1/H-2 corregidos. **H-3** (FAQ de ejemplo hardcodeado para cualquier evento f9) y **H-4** (`formatWaPhone()` sin uso) quedan como observaciones aceptadas = deuda técnica TSK-031.
+
+**Pendiente:** commit por Dirección; implementar ADR-040 (TSK-030); cargar fotos de artistas en `config_landing.content.dj_lineup`.
+
+---
+
+## Resultado (2026-09-15) — iteración v1
 
 - `css/templates/fiesta/f9.css`: reescrito de 224 a ~2048 lineas. Paleta dorada "Mistico", activacion IoC de 20 modulos, grid desktop/mobile, lineup de fotografia predominante, REFLOW, responsive. ASCII 0 bytes >127, llaves balanceadas, 0 `:has()` anidados, 0 selectores muertos.
 - `evento.html`: (1) segmento EXPERIENCIAS ampliado a `tpl-f9`; (2) headliner del lineup marcado por NOMBRE (`RASTRO MC`) con clase `.headliner` + `indexOf` robusto.

@@ -106,6 +106,16 @@
             </div>
         </section>
 
+        <!-- MODULO EXTENDIDO: DESCRIPCION (v1.4.0 - atomo nuevo, aditivo. Nace
+             oculto por el kernel IoC: solo lo enciende el CSS del silo que lo
+             referencia. Ningun atomo previo fue tocado. Cero Borrado intacto). -->
+        <section id="mod-descripcion">
+            <div class="descripcion-inner">
+                <h2 id="db-descripcion-titulo">--</h2>
+                <p id="db-descripcion-texto">--</p>
+            </div>
+        </section>
+
         <!-- MÓDULO EXTENDIDO: OBJETIVO (meta económica + barra de progreso) -->
         <section id="mod-objetivo">
             <div class="objetivo-inner" style="max-width:900px; margin:0 auto;">
@@ -796,9 +806,36 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     __tituloEl.innerText = __tituloRaw;
                 }
                 document.getElementById('org-name-badge').innerText = effOrgNombre ? effOrgNombre.toUpperCase() : "--";
-                document.getElementById('meta-fecha').innerText = ev.fecha;
-                document.getElementById('meta-hora').innerText = `${ev.hora} ${T('landing.hrs')}`;
-                document.getElementById('meta-lugar').innerText = (effUbicacion || "--").toUpperCase();
+                // v1.4.0 (aditivo): soporte de metadata en 2 lineas por tarjeta via
+                // config_landing.content.meta = { fecha:{l1,l2}, hora:{l1,l2}, lugar:{l1,l2} }.
+                // Si el campo no viene (o no trae l1), se conserva el comportamiento
+                // historico de una sola linea. Se construye con textContent (sin innerHTML).
+                const __metaData = (effContent.meta && typeof effContent.meta === 'object') ? effContent.meta : {};
+                // v309 (fix H-2): las 2 lineas (.meta-line) solo tienen soporte CSS en el
+                // silo .tpl-f9. En cualquier otro silo se ignora `two` y se conserva la
+                // linea unica historica; asi content.meta no degrada el hero de f5/f6/f8.
+                const __esF9Meta = document.body.className && document.body.className.includes('tpl-f9');
+                const __metaSet = (id, one, two) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const l1 = (__esF9Meta && two && typeof two === 'object' && two.l1) ? String(two.l1) : '';
+                    if (!l1) { el.innerText = one; return; }
+                    el.textContent = '';
+                    const __l1 = document.createElement('span');
+                    __l1.className = 'meta-line';
+                    __l1.textContent = l1;
+                    el.appendChild(__l1);
+                    const l2 = two.l2 ? String(two.l2) : '';
+                    if (l2) {
+                        const __l2 = document.createElement('span');
+                        __l2.className = 'meta-line meta-line--2';
+                        __l2.textContent = l2;
+                        el.appendChild(__l2);
+                    }
+                };
+                __metaSet('meta-fecha', ev.fecha, __metaData.fecha);
+                __metaSet('meta-hora', `${ev.hora} ${T('landing.hrs')}`, __metaData.hora);
+                __metaSet('meta-lugar', (effUbicacion || "--").toUpperCase(), __metaData.lugar);
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
                 // v302 (aditivo, solo silo .tpl-f8 TropiLove): tab del formulario
@@ -903,6 +940,22 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         if (histImgUrl) { histImgEl.src = histImgUrl; } else { histImgEl.style.display = 'none'; }
     }
     // === FIN SEGMENTO HISTORIA ===
+
+    // === INICIO SEGMENTO: DESCRIPCION DEL EVENTO (v1.4.0 - atomo aditivo) ===
+    // Fuente prioritaria: content.descripcion (override i18n) || ev.descripcion
+    // (string u objeto {titulo, texto}). Sin dato se usa un texto editorial de
+    // ejemplo del prelanzamiento (no escribe nada, solo pinta).
+    // El atomo nace oculto por el kernel: solo el CSS del silo que lo enciende
+    // (#mod-descripcion en .tpl-f9) lo muestra.
+    const __f9DescTituloDef = 'MISTICO - PRELANZAMIENTO';
+    const __f9DescTextoDef = 'Rastro MC estrena en tarima los temas de Mistico antes de su lanzamiento oficial en octubre. Una sola noche para escuchar en vivo el disco completo, con banda completa, invitados sorpresa y una puesta en escena creada para el recinto. Las boletas de taquilla se entregan en puerta y el merch oficial estara disponible el mismo dia, mientras dure el inventario.';
+    const __descRaw = effContent.descripcion || ev.descripcion;
+    const __descObj = (__descRaw && typeof __descRaw === 'object') ? __descRaw : {};
+    const __descTitulo = __descObj.titulo || __f9DescTituloDef;
+    const __descTexto = __descObj.texto || (typeof __descRaw === 'string' ? __descRaw.trim() : '') || __f9DescTextoDef;
+    if (document.getElementById('db-descripcion-titulo')) document.getElementById('db-descripcion-titulo').innerText = String(__descTitulo).toUpperCase();
+    if (document.getElementById('db-descripcion-texto')) document.getElementById('db-descripcion-texto').innerText = String(__descTexto);
+    // === FIN SEGMENTO DESCRIPCION ===
 
     // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
     const objetivoData = effContent.objetivo || {};
@@ -1317,6 +1370,19 @@ if (document.getElementById('db-poster-img')) {
     // === FIN SEGMENTO GALERÍA ===
 
    // === INICIO SEGMENTO: FAQ PROTEGIDO (v208) ===
+    // v1.4.0 (aditivo, solo silo .tpl-f9 Mistico): si el evento no tiene FAQ
+    // configurado se pinta un set editorial de 5 preguntas del prelanzamiento
+    // en lugar de ocultar el modulo. Otros silos conservan el comportamiento
+    // vigente (sin FAQ -> modulo oculto). Cero Borrado: no altera el contrato.
+    if (!effContent.faq && document.body.className.indexOf('tpl-f9') !== -1) {
+        effContent.faq = [
+            { pregunta: 'Como compro las boletas', respuesta: 'Escribenos por WhatsApp desde el boton de esta pagina. Te confirmamos disponibilidad y te enviamos el enlace de pago el mismo dia.' },
+            { pregunta: 'A que hora abren puertas', respuesta: 'Las puertas abren a las 7:00 p.m. y Rastro MC sube a tarima a las 10:00 p.m. Te recomendamos llegar temprano: el aforo es limitado.' },
+            { pregunta: 'Hay edad minima', respuesta: 'El evento es para mayores de 18 anos. Presenta tu documento de identidad en la entrada; sin el no hay acceso.' },
+            { pregunta: 'Hay parqueadero', respuesta: 'Si. El recinto cuenta con parqueadero vigilado y cupo limitado. Tambien puedes llegar en taxi o en transporte de aplicacion.' },
+            { pregunta: 'Habra merch oficial', respuesta: 'Si. El dia del evento habra merch oficial del disco Mistico en la mesa de entrada, mientras dure el inventario.' }
+        ];
+    }
     if (effContent.faq) {
         let faqItems = [];
         // Detección de Formato (SaaS Array vs Legacy String) [cite: 304, 841]
@@ -1486,11 +1552,25 @@ if (document.getElementById('db-poster-img')) {
     const __esF8Boletos = document.body.className && document.body.className.includes('tpl-f8');
     const __labelPreventa = __esF8Boletos ? T('landing.boletos_individual') : T('landing.boletos_preventa');
     const __labelTaquilla = __esF8Boletos ? T('landing.boletos_pareja') : T('landing.boletos_taquilla');
-    if (bwP) bwP.innerHTML = boletoCard(__labelPreventa, preventaVal, '#9b59b6', true);
-    if (bwT) bwT.innerHTML = boletoCard(__labelTaquilla, taquillaVal, '#e67e22', true);
-    // v307 (aditivo): sin tarifas configuradas (ni preventa/taquilla ni tickets_info)
-    // la boletería se oculta en lugar de pintar tarjetas "POR DEFINIR".
-    __hideEmptyModule('mod-boletos', !!((boletosData.preventa && boletosData.preventa !== T('landing.pendiente_def')) || (boletosData.taquilla && boletosData.taquilla !== T('landing.pendiente_def')) || effContent.tickets_info));
+    // v1.4.0 (aditivo, solo silo .tpl-f9 Mistico): f9 pinta SOLO la tarjeta de
+    // TAQUILLA. La preventa se genera unicamente si trae un precio real (nunca
+    // con el relleno "POR DEFINIR") y el modulo se oculta si no hay tarifa real
+    // alguna. Los demas silos conservan su comportamiento vigente (v307).
+    const __esF9Boletos = document.body.className && document.body.className.includes('tpl-f9');
+    const __pendienteVal = T('landing.pendiente_def');
+    const __hasPreventaReal = !!(boletosData.preventa && boletosData.preventa !== __pendienteVal);
+    const __hasTaquillaReal = !!(boletosData.taquilla && boletosData.taquilla !== __pendienteVal);
+    if (__esF9Boletos) {
+        if (bwP) bwP.innerHTML = __hasPreventaReal ? boletoCard(__labelPreventa, boletosData.preventa, '#9b59b6', true) : '';
+        if (bwT) bwT.innerHTML = __hasTaquillaReal ? boletoCard(__labelTaquilla, boletosData.taquilla, '#e67e22', true) : '';
+        __hideEmptyModule('mod-boletos', __hasPreventaReal || __hasTaquillaReal);
+    } else {
+        if (bwP) bwP.innerHTML = boletoCard(__labelPreventa, preventaVal, '#9b59b6', true);
+        if (bwT) bwT.innerHTML = boletoCard(__labelTaquilla, taquillaVal, '#e67e22', true);
+        // v307 (aditivo): sin tarifas configuradas (ni preventa/taquilla ni tickets_info)
+        // la boleteria se oculta en lugar de pintar tarjetas "POR DEFINIR".
+        __hideEmptyModule('mod-boletos', !!(boletosData.preventa && boletosData.preventa !== T('landing.pendiente_def')) || (boletosData.taquilla && boletosData.taquilla !== T('landing.pendiente_def')) || effContent.tickets_info);
+    }
     // === FIN SEGMENTO BOLETERÍA ===
 
     // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
@@ -1514,7 +1594,9 @@ if (document.getElementById('db-poster-img')) {
         waBtn.href = `https://wa.me/${waTel}?text=${waMsg}`;
         const waDisplay = document.getElementById('db-whatsapp-text');
         if (waDisplay) {
-            waDisplay.textContent = `${T('landing.wa_btn')} · +${formatWaPhone(waTel)}`;
+            // v1.4.0: el boton de WhatsApp deja de exponer el numero en el texto
+            // (el href wa.me se conserva intacto, solo cambia la etiqueta visible).
+            waDisplay.textContent = T('landing.wa_btn');
         }
     }
     // v222 (aditivo): hero CTA del silo .tpl-f6 / .tpl-f8 comparte el mismo vínculo wa.me.
