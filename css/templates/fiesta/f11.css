@@ -143,6 +143,7 @@
 .tpl-f11 #mod-ubicacion,
 .tpl-f11 #mod-sponsors,
 .tpl-f11 #mod-form,
+.tpl-f11 #mod-faq,
 .tpl-f11 #mod-footer,
 .Tpl-F11 #mod-descripcion,
 .Tpl-F11 #mod-video,
@@ -152,6 +153,7 @@
 .Tpl-F11 #mod-ubicacion,
 .Tpl-F11 #mod-sponsors,
 .Tpl-F11 #mod-form,
+.Tpl-F11 #mod-faq,
 .Tpl-F11 #mod-footer {
     display: block !important;
 }
@@ -181,7 +183,7 @@
         "experiencias experiencias"
         "video        video"
         "info         info"
-        "ubicacion    ubicacion"
+        "faq          ubicacion"
         "sponsors     sponsors"
         "footer       footer";
     width: 100%;
@@ -196,6 +198,7 @@
 .tpl-f11 #mod-lineup       { grid-area: lineup; }
 .tpl-f11 #mod-playlist     { grid-area: playlist; }
 .tpl-f11 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f11 #mod-faq          { grid-area: faq; }
 .tpl-f11 #mod-sponsors     { grid-area: sponsors; }
 .tpl-f11 #mod-form         { grid-area: form; }
 .tpl-f11 #mod-footer       { grid-area: footer; }
@@ -211,18 +214,18 @@
      - frame   → encima de meta (mayor margin-bottom)
    Los valores se definen como variables para ajuste rápido en un solo lugar. */
 
-/* Alturas estimadas de cada franja:
-     ctas  ≈ 50px  + 1.5rem padding  → reservar ~80px
-     meta  ≈ 36px  + 1rem gap        → reservar ~56px
-     frame ≈ 70px  + 1rem gap        → reservar ~90px
-   Total franja inferior: ~226px → se redondea con los paddings del hero. */
+/* Alturas estimadas de cada franja (margenes compactos D2):
+     ctas  ≈ 50px + 1.6rem  → ocupa hasta ~76px  del fondo
+     meta  ≈ 36px + 4.2rem  → ocupa hasta ~103px del fondo
+     frame ≈ 70px + 6.8rem  → ocupa hasta ~180px del fondo
+   La franja inferior total ≈ 180px; el hero (78vh) deja el titulo arriba. */
 
 .tpl-f11 #mod-hero-ctas {
     grid-area: hero;
     z-index: 3;
     align-self: end;
     pointer-events: auto;
-    margin-bottom: 2.5rem !important;   /* espacio desde el fondo del hero */
+    margin-bottom: 1.6rem !important;   /* D2: franja inferior compacta, pegada al fondo */
 }
 
 .tpl-f11 #mod-hero-meta {
@@ -231,8 +234,8 @@
     align-self: end;
     pointer-events: auto;
     /* meta se eleva por encima de ctas:
-       altura de ctas (≈50px) + su margin-bottom (2.5rem≈40px) + gap (1rem≈16px) */
-    margin-bottom: 7rem !important;
+       altura de ctas (≈50px) + su margin-bottom (1.6rem≈26px) + gap (1rem≈16px) */
+    margin-bottom: 4.2rem !important;
 }
 
 .tpl-f11 #unified-frame {
@@ -241,8 +244,8 @@
     align-self: end;
     pointer-events: auto;
     /* countdown se eleva por encima de meta:
-       + altura meta (≈36px) + su margen total (7rem≈112px) + gap (0.8rem≈13px) */
-    margin-bottom: 11.5rem !important;
+       + altura meta (≈36px) + su margen total (4.2rem≈67px) + gap (0.8rem≈13px) */
+    margin-bottom: 6.8rem !important;
 }
 
 /* ==========================================================================
@@ -276,7 +279,7 @@
     align-items: center;
     justify-content: flex-start;
     text-align: center;
-    min-height: 88vh;
+    min-height: 78vh;   /* D2: compactado para acercar la franja inferior al titulo */
     padding: var(--f11-hero-pt) 6% var(--f11-hero-pb) !important;
     color: var(--f11-text);
     background-color: var(--f11-bg);
@@ -325,26 +328,37 @@
    5.1. TÍTULO DEL EVENTO — GRAN TIPOGRAFÍA CON GRADIENTE TRÍADA
    ========================================================================== */
 .tpl-f11 #event-title {
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.8rem;
     font-family: var(--f11-font);
     font-weight: 900 !important;
     font-style: italic;
-    letter-spacing: -0.02em;
-    line-height: 0.92;
-    font-size: clamp(3.2rem, 11vw, 7.5rem) !important;
+    letter-spacing: -0.03em;
+    line-height: 0.95;   /* D1: wrap seguro multi-linea sin recorte */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: clamp(2.6rem, 12vw, 7rem) !important;
     max-width: 100%;
     display: block !important;
     background: linear-gradient(
         135deg,
         var(--f11-yellow)  0%,
-        var(--f11-pink)   40%,
-        var(--f11-blue)   70%,
+        var(--f11-pink)   35%,
+        var(--f11-blue)   65%,
         var(--f11-yellow) 100%
     );
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 22px rgba(255, 229, 0, 0.45));
+    filter: drop-shadow(0 0 28px rgba(255, 229, 0, 0.55))
+            drop-shadow(0 0 60px rgba(255, 42, 133, 0.30));
+    animation: f11TitleGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes f11TitleGlow {
+    0%   { filter: drop-shadow(0 0 28px rgba(255, 229, 0, 0.55)) drop-shadow(0 0 60px rgba(255, 42, 133, 0.30)); }
+    50%  { filter: drop-shadow(0 0 40px rgba(255, 229, 0, 0.70)) drop-shadow(0 0 80px rgba(255, 42, 133, 0.45)); }
+    100% { filter: drop-shadow(0 0 30px rgba(255, 229, 0, 0.60)) drop-shadow(0 0 65px rgba(255, 42, 133, 0.35)); }
 }
 
 /* ==========================================================================
@@ -379,6 +393,13 @@
         0 4px 18px rgba(0, 0, 0, 0.45),
         inset 0 1px 0 rgba(0, 240, 255, 0.12);
     transition: border-color 0.3s ease;
+    animation: f11CountdownGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes f11CountdownGlow {
+    0%   { box-shadow: 0 0 12px rgba(0, 240, 255, 0.18), 0 4px 18px rgba(0, 0, 0, 0.45); }
+    50%  { box-shadow: 0 0 24px rgba(0, 240, 255, 0.42), 0 0 42px rgba(255, 42, 133, 0.16), 0 4px 18px rgba(0, 0, 0, 0.45); }
+    100% { box-shadow: 0 0 16px rgba(0, 240, 255, 0.25), 0 4px 18px rgba(0, 0, 0, 0.45); }
 }
 
 .tpl-f11 #unified-frame .cd-block:hover {
@@ -539,6 +560,78 @@
 }
 
 /* ==========================================================================
+   10B. DESCRIPCION - ACABADO GLAMUROSO (T3, aditivo sobre el bloque base)
+   Tipografia display italic, glow dorado/rosado, comillas ornamentales y
+   borde lateral decorativo. No elimina el bloque base (Cero Borrado).
+   ========================================================================== */
+.tpl-f11 .descripcion-inner,
+.tpl-f11 #db-descripcion-text {
+    position: relative;
+    font-family: var(--f11-font);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(1.04rem, 2.3vw, 1.28rem);
+    letter-spacing: 0.02em;
+    line-height: 1.85;
+    border-left: 3px solid var(--f11-pink);
+    border-radius: 4px 18px 18px 4px;
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.45),
+        0 0 44px rgba(255, 42, 133, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    text-shadow:
+        0 0 18px rgba(255, 229, 0, 0.18),
+        0 0 34px rgba(255, 42, 133, 0.12);
+    overflow: visible;
+}
+
+/* Comilla ornamental de apertura - gradiente amarillo a rosa */
+.tpl-f11 .descripcion-inner::before,
+.tpl-f11 #db-descripcion-text::before {
+    content: "\201C";
+    position: absolute;
+    top: 0.1rem;
+    left: 0.5rem;
+    z-index: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 4.5rem;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--f11-yellow), var(--f11-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgba(255, 229, 0, 0.45));
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+/* Comilla ornamental de cierre - gradiente azul a rosa */
+.tpl-f11 .descripcion-inner::after,
+.tpl-f11 #db-descripcion-text::after {
+    content: "\201D";
+    position: absolute;
+    bottom: 0.1rem;
+    right: 0.6rem;
+    z-index: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 4.5rem;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--f11-blue), var(--f11-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.35));
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.tpl-f11 .descripcion-inner > *,
+.tpl-f11 #db-descripcion-text > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================================================
    11 & 13. CARTEL Y PLAYLIST — COLUMNAS SIMÉTRICAS
    ========================================================================== */
 .tpl-f11 #mod-cartel,
@@ -654,6 +747,111 @@
 }
 
 /* ==========================================================================
+   12B. LINEUP - EFECTOS PREMIUM (T5, aditivo; paridad f8 adaptada a --f11-*)
+   El motor inyecta: .artist-card/.artist-photo/.artist-overlay/.artist-hora/
+   .artist-name/.artist-resena/.artist-social(.artist-social-icon).
+   ========================================================================== */
+.tpl-f11 .artist-card {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.tpl-f11 .artist-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 42, 133, 0.65) !important;
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(255, 42, 133, 0.35),
+        0 0 60px rgba(122, 0, 255, 0.15);
+}
+
+.tpl-f11 .artist-photo {
+    transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+.tpl-f11 .artist-card:hover .artist-photo {
+    filter: grayscale(0%) brightness(0.92) saturate(1.35);
+    transform: scale(1.06);
+}
+
+.tpl-f11 .artist-overlay {
+    transition: background 0.4s ease;
+}
+
+.tpl-f11 .artist-card:hover .artist-overlay {
+    background: linear-gradient(0deg, rgba(15, 2, 30, 0.98) 0%, rgba(25, 8, 48, 0.65) 55%, rgba(255, 42, 133, 0.08) 100%);
+}
+
+/* Hora del set - neon azul con glow */
+.tpl-f11 .artist-hora {
+    font-family: var(--f11-font);
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--f11-blue);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.55);
+    margin-bottom: 0.2rem;
+}
+
+/* Nombre - gradiente triada sobre la tipografia display */
+.tpl-f11 .artist-name {
+    background: linear-gradient(135deg, var(--f11-yellow) 0%, var(--f11-pink) 45%, var(--f11-blue) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255, 229, 0, 0.30));
+}
+
+/* Resena - parrafo corto en el overlay */
+.tpl-f11 .artist-resena {
+    font-family: var(--f11-font);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.66);
+    margin-top: 0.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Redes sociales - robots circulares con glow, visibles en hover */
+.tpl-f11 .artist-social {
+    display: flex;
+    gap: 0.55rem;
+    margin-top: 0.7rem;
+    justify-content: center;
+}
+
+.tpl-f11 .artist-social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 42, 133, 0.5);
+    background: rgba(15, 2, 30, 0.72);
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: transform 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.tpl-f11 .artist-social-icon:hover {
+    transform: translateY(-2px) scale(1.12);
+    color: var(--f11-yellow);
+    border-color: var(--f11-yellow);
+    background: rgba(255, 42, 133, 0.20);
+    box-shadow: 0 0 14px rgba(255, 229, 0, 0.45);
+}
+
+.tpl-f11 .artist-social-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* ==========================================================================
    13. EXPERIENCIAS — GRID DE CARDS
    ========================================================================== */
 .tpl-f11 #mod-experiencias {
@@ -758,6 +956,77 @@
 }
 
 /* ==========================================================================
+   16B. GALERIA - MOSAICO MASONRY CON PROPORCIONES VARIADAS (T7, aditivo)
+   grid-auto-rows pequenas + spans alternados (dense). Acepta cualquier
+   cantidad de fotos de la BD sin romperse. En >=992px usa 4 columnas;
+   las media queries al final del archivo la simplifican en mobile.
+   ========================================================================== */
+@media (min-width: 992px) {
+    .tpl-f11 #db-gallery-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        grid-auto-rows: 10px !important;
+        grid-auto-flow: dense !important;
+        gap: 0.5rem !important;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item {
+        aspect-ratio: auto !important;
+        grid-row-end: span 16;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255, 42, 133, 0.14) !important;
+        transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    /* Alternancia de proporciones: grandes, verticales, panoramicas */
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+1) {
+        grid-column-end: span 2;
+        grid-row-end: span 24;
+    }
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+2) {
+        grid-row-end: span 18;
+    }
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+3) {
+        grid-column-end: span 2;
+        grid-row-end: span 18;
+    }
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+4) {
+        grid-row-end: span 24;
+    }
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+5) {
+        grid-row-end: span 18;
+    }
+
+    /* Hover premium: zoom + overlay con glow */
+    .tpl-f11 #db-gallery-grid .gallery-item::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+        background: linear-gradient(180deg, transparent 40%, rgba(255, 42, 133, 0.22) 100%);
+        transition: opacity 0.4s ease;
+        border-radius: inherit;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item:hover {
+        border-color: rgba(255, 42, 133, 0.55) !important;
+        box-shadow:
+            0 12px 34px rgba(0, 0, 0, 0.55),
+            0 0 24px rgba(255, 42, 133, 0.30);
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item:hover::after {
+        opacity: 1;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item:hover img {
+        filter: brightness(1.14) saturate(1.35);
+        transform: scale(1.07);
+    }
+}
+
+/* ==========================================================================
    14. BOLETOS
    ========================================================================== */
 .tpl-f11 #mod-boletos {
@@ -824,6 +1093,104 @@
     font-weight: 900;
     text-transform: uppercase;
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.tpl-f11 .btn-submit:hover,
+.tpl-f11 #master-reg-form button[type=submit]:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+    box-shadow: var(--f11-glow-pink-strong);
+}
+
+/* ==========================================================================
+   15B. TABS "UNETE A NUESTRA COMUNIDAD" - Estado activo neon (T4)
+   Portado desde f8 y adaptado a variables --f11-*. Aplica a
+   #tab-new / #tab-old del formulario. El toggle JS ya funciona.
+   ========================================================================== */
+.tpl-f11 .form-tabs {
+    display: flex;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--f11-line);
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+}
+
+.tpl-f11 .form-tabs .tab-btn,
+.tpl-f11 .tab-btn {
+    flex: 1;
+    padding: 0.95rem 0.4rem;
+    background: rgba(15, 2, 30, 0.72);
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--f11-text-muted);
+    font-family: var(--f11-font);
+    font-weight: 800;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f11 .form-tabs .tab-btn.active,
+.tpl-f11 .tab-btn.active {
+    color: #0f021e;
+    background: var(--f11-yellow);
+    border-bottom-color: var(--f11-yellow);
+    text-shadow: none;
+    box-shadow: 0 0 18px rgba(255, 229, 0, 0.45);
+}
+
+.tpl-f11 .form-tabs .tab-btn:hover,
+.tpl-f11 .tab-btn:hover {
+    color: var(--f11-blue);
+    border-bottom-color: var(--f11-blue);
+}
+
+.tpl-f11 .form-tabs .tab-btn.active:hover,
+.tpl-f11 .tab-btn.active:hover {
+    color: #0f021e;
+    background: var(--f11-yellow);
+    border-bottom-color: var(--f11-yellow);
+}
+
+/* Bloque "Unete a nuestra comunidad" - presencia coherente */
+.tpl-f11 #reg-unir-comunidad-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 1rem 0 1.2rem;
+    padding: 0.85rem 1rem;
+    background: rgba(0, 240, 255, 0.06);
+    border: 1px solid rgba(0, 240, 255, 0.28);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f11 #reg-unir-comunidad-wrap:hover {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: rgba(0, 240, 255, 0.55);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.20);
+}
+
+.tpl-f11 #reg-unir-comunidad-wrap input[type=checkbox] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--f11-blue);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.tpl-f11 #reg-comunidad-msg {
+    font-family: var(--f11-font);
+    font-weight: 700;
+    font-size: 0.74rem;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--f11-text-cream);
+    line-height: 1.4;
 }
 
 /* ==========================================================================
@@ -842,9 +1209,114 @@
 }
 
 /* ==========================================================================
+   19B. FAQ - ACORDEON NEON (T2, portado desde f8)
+   El toggle JS (classList.toggle('active')) ya funciona en evento.html.
+   La pregunta viaja en un span con estilos inline; se blindan con !important.
+   ========================================================================== */
+.tpl-f11 #mod-faq {
+    padding: 4rem 8%;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tpl-f11 #db-faq-list {
+    width: 100%;
+}
+
+.tpl-f11 .faq-item {
+    border-bottom: 1px solid rgba(255, 42, 133, 0.35) !important;
+    padding: 1.4rem 0 !important;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s ease;
+}
+
+.tpl-f11 .faq-item:hover {
+    border-bottom-color: rgba(0, 240, 255, 0.55) !important;
+}
+
+.tpl-f11 .faq-item > div {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tpl-f11 .faq-item > div > span {
+    font-family: var(--f11-font);
+    font-weight: 800 !important;
+    font-size: 1.02rem !important;
+    letter-spacing: 0.04em !important;
+    color: var(--f11-text-cream);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.tpl-f11 .faq-item:hover > div > span {
+    color: var(--f11-blue);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+}
+
+/* Clase alternativa si el motor llegara a emitir .faq-q (paridad f8) */
+.tpl-f11 .faq-q {
+    font-family: var(--f11-font);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--f11-text-cream);
+    transition: color 0.3s ease;
+}
+
+.tpl-f11 .faq-item:hover .faq-q {
+    color: var(--f11-pink);
+}
+
+/* Circulo de estado +/x (SVG inline del motor) */
+.tpl-f11 .faq-icon-circle {
+    border: 1px solid var(--f11-pink) !important;
+    color: var(--f11-pink) !important;
+    background: rgba(255, 42, 133, 0.10);
+    box-shadow: 0 0 10px rgba(255, 42, 133, 0.25);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+}
+
+.tpl-f11 .faq-item:hover .faq-icon-circle {
+    border-color: var(--f11-blue) !important;
+    color: var(--f11-blue) !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.tpl-f11 .faq-item.active .faq-icon-circle {
+    transform: rotate(45deg);
+    border-color: var(--f11-blue) !important;
+    color: var(--f11-blue) !important;
+}
+
+/* Respuesta - colapsada por defecto */
+.tpl-f11 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+}
+
+.tpl-f11 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(0, 240, 255, 0.12);
+    margin-top: 1rem;
+    color: var(--f11-text-cream);
+}
+
+/* ==========================================================================
    21. FOOTER
    ========================================================================== */
 .tpl-f11 #mod-footer {
+    display: none !important;   /* T6: footer oculto por completo (Cero Borrado: el nodo permanece en el DOM) */
     background: var(--f11-bg) !important;
     border-top: 2px solid var(--f11-pink);
     padding: 2rem;
@@ -853,6 +1325,88 @@
 
 .tpl-f11 #mod-footer .footer-inner {
     display: none !important;
+}
+
+.Tpl-F11 #mod-footer {
+    display: none !important;
+}
+
+/* ==========================================================================
+   23. ACABADO PREMIUM GLOBAL (T8) - micro-interacciones y glassmorphism
+   Barrido de acabado "pagina de $10.000" sobre los modulos activos.
+   Aditivo; no elimina ningun estilo previo.
+   ========================================================================== */
+.tpl-f11 .form-master-box {
+    box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.55),
+        0 0 30px rgba(122, 0, 255, 0.10);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+}
+
+.tpl-f11 .form-master-box:hover {
+    border-color: rgba(0, 240, 255, 0.40);
+    box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.55),
+        0 0 34px rgba(0, 240, 255, 0.18);
+    transform: translateY(-2px);
+}
+
+.tpl-f11 .form-input:focus,
+.tpl-f11 #reg-nombre:focus,
+.tpl-f11 #reg-whatsapp:focus {
+    outline: none;
+    border-color: var(--f11-blue);
+    box-shadow: 0 0 0 1px var(--f11-blue), var(--f11-glow-blue);
+}
+
+.tpl-f11 .boleto-card-row {
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.tpl-f11 .boleto-card-row:hover {
+    background: rgba(255, 42, 133, 0.08);
+    transform: translateX(4px);
+}
+
+.tpl-f11 .boleto-precio,
+.tpl-f11 #price-neon-yellow {
+    text-shadow: 0 0 14px rgba(255, 229, 0, 0.45);
+}
+
+.tpl-f11 .exp-card {
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.tpl-f11 .exp-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 42, 133, 0.55);
+    box-shadow:
+        0 26px 58px rgba(0, 0, 0, 0.55),
+        0 0 34px rgba(255, 42, 133, 0.22);
+}
+
+.tpl-f11 #db-poster-img {
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.tpl-f11 #mod-cartel:hover #db-poster-img {
+    transform: translateY(-6px);
+    box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.65),
+        0 0 36px rgba(255, 42, 133, 0.35);
+}
+
+.tpl-f11 #db-mapa-container {
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), var(--f11-glow-blue);
+}
+
+.tpl-f11 #db-spotify-embed {
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tpl-f11 #mod-playlist:hover #db-spotify-embed {
+    border-color: rgba(0, 240, 255, 0.55);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), 0 0 30px rgba(0, 240, 255, 0.22);
 }
 
 /* ==========================================================================
@@ -869,8 +1423,9 @@
 /* — Mobile — */
 @media (max-width: 767px) {
     .tpl-f11 {
-        --f11-hero-pt: 4rem;
-        --f11-hero-pb: 3.5rem;
+        overflow-x: hidden;   /* D3: corta overflow horizontal sistemico en mobile */
+        --f11-hero-pt: 2.8rem;   /* D2: titulo mas arriba, compacta el hueco */
+        --f11-hero-pb: 2.0rem;
         --f11-hero-gap: 1.2rem;
     }
 
@@ -878,6 +1433,9 @@
         grid-template-columns: 1fr !important;
         grid-template-areas:
             "hero"
+            "countdown"
+            "meta"
+            "ctas"
             "descripcion"
             "form"
             "lineup"
@@ -887,35 +1445,51 @@
             "playlist"
             "video"
             "info"
+            "faq"
             "ubicacion"
             "sponsors"
             "footer" !important;
     }
 
-    /* Hero: altura generosa para que el título respire y los chips quepan */
+    /* T1 - orden forzado: TITULO -> COUNTDOWN -> META -> CTA.
+       Los 3 atomos del hero pasan a filas de grid independientes
+       (ya no comparten la celda "hero" con align-self: end). */
     .tpl-f11 #mod-hero {
-        min-height: 92vh;
+        grid-area: hero;
+        min-height: 42vh;   /* D2: sin hueco gigante entre titulo y countdown */
         background-position: center top;
     }
 
-    /* Redistribución vertical en mobile — la franja inferior es algo más compacta.
-       En mobile la meta puede crecer a dos filas, sumamos margen extra. */
-    .tpl-f11 #mod-hero-ctas {
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 2rem !important;
-    }
-
-    .tpl-f11 #mod-hero-meta {
-        margin-bottom: 8rem !important;   /* ctas (≈80px) + 2rem + gap */
+    /* D1: tamanio contenido en tablet/mobile - frases tipo "NEON TERRACE 2026"
+       caben o hacen wrap limpio dentro del viewport 360-390px */
+    .tpl-f11 #event-title {
+        font-size: clamp(2.4rem, 11.5vw, 3.6rem) !important;
     }
 
     .tpl-f11 #unified-frame {
-        gap: 8px !important;
-        margin-bottom: 12.5rem !important; /* meta puede ser 2 filas ≈ 72px */
+        grid-area: countdown;
+        align-self: stretch;
+        flex-wrap: wrap;          /* D3: los 4 chips envuelven centrados si no caben */
+        justify-content: center;
+        margin-bottom: 0 !important;
+        padding: 0.7rem 4% 0.9rem !important;
     }
 
-    /* Countdown: chips más compactos táctiles */
+    .tpl-f11 #mod-hero-meta {
+        grid-area: meta;
+        align-self: stretch;
+        margin-bottom: 0 !important;
+        padding: 0.5rem 4% 0.7rem !important;
+    }
+
+    .tpl-f11 #mod-hero-ctas {
+        grid-area: ctas;
+        align-self: stretch;
+        margin-bottom: 0 !important;
+        padding: 0.8rem 4% 2.2rem !important;
+    }
+
+    /* Countdown: chips compactos tactiles */
     .tpl-f11 #unified-frame .cd-block {
         min-width: 60px !important;
         max-width: 78px !important;
@@ -945,7 +1519,7 @@
 
     /* Lineup */
     .tpl-f11 #db-lineup {
-        grid-template-columns: repeat(1, 1fr) !important;
+        grid-template-columns: repeat(2, 1fr) !important;
     }
     .tpl-f11 .artist-card {
         min-height: 320px !important;
@@ -955,12 +1529,20 @@
     .tpl-f11 #db-gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
     }
+
+    /* FAQ y ubicacion apilados */
+    .tpl-f11 #mod-faq {
+        padding: 3.4rem 6%;
+    }
+    .tpl-f11 #mod-ubicacion {
+        padding: 3.4rem 6%;
+    }
 }
 
 /* — Mobile pequeño (< 480px) — */
 @media (max-width: 480px) {
     .tpl-f11 #event-title {
-        font-size: clamp(2.6rem, 13vw, 4rem) !important;
+        font-size: clamp(2.2rem, 11vw, 3.2rem) !important;  /* D1: reducido */
         letter-spacing: -0.01em;
     }
 
@@ -968,7 +1550,112 @@
         font-size: clamp(1.1rem, 5vw, 1.6rem) !important;
     }
 
+    /* D3: chips mas estrechos y con menos gap para que los 4 quepan en 360px */
+    .tpl-f11 #unified-frame {
+        gap: 6px !important;
+    }
+    .tpl-f11 #unified-frame .cd-block {
+        min-width: 56px !important;
+        max-width: 72px !important;
+        padding: 6px 9px !important;
+    }
+
     .tpl-f11 #mod-hero-meta .meta-item {
         font-size: 0.70rem !important;
+    }
+
+    /* T1 - CTA full-width y visible en pantallas pequenas */
+    .tpl-f11 #mod-hero-ctas .hero-cta-btn {
+        width: 100%;
+        max-width: 100%;
+        min-height: 48px !important;
+    }
+
+    /* T5 - tarjetas de lineup mas compactas en 1 columna centrada */
+    .tpl-f11 #db-lineup {
+        grid-template-columns: repeat(1, 1fr) !important;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .tpl-f11 .artist-card {
+        min-height: 300px !important;
+    }
+    .tpl-f11 .artist-name {
+        font-size: 1.1rem !important;
+    }
+
+    /* T7 - galeria: 2 columnas con un par de destacadas */
+    .tpl-f11 #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-auto-rows: 10px !important;
+        grid-auto-flow: dense !important;
+        gap: 0.35rem !important;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item {
+        aspect-ratio: auto !important;
+        grid-row-end: span 14;
+        border-radius: 6px !important;
+        border: 1px solid rgba(255, 42, 133, 0.14) !important;
+    }
+
+    /* Destacadas: cada 4 y el primero ocupan 2 filas extra */
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(4n+1),
+    .tpl-f11 #db-gallery-grid .gallery-item:first-child {
+        grid-row-end: span 20;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(4n+2) {
+        grid-row-end: span 16;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item:hover img {
+        transform: scale(1.06);
+    }
+}
+
+/* - Breakpoint intermedio 992-1279px (tablet landscape / laptop pequeno) - */
+@media (min-width: 992px) and (max-width: 1279px) {
+    .tpl-f11 #mod-hero {
+        min-height: 84vh;
+        padding: var(--f11-hero-pt) 6% var(--f11-hero-pb) !important;
+    }
+
+    .tpl-f11 #db-lineup {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .tpl-f11 .form-master-box {
+        max-width: 480px;
+    }
+
+    .tpl-f11 #mod-hero-ctas {
+        margin-bottom: 1.4rem !important;
+    }
+
+    .tpl-f11 #mod-hero-meta {
+        margin-bottom: 3.6rem !important;
+    }
+
+    .tpl-f11 #unified-frame {
+        margin-bottom: 5.6rem !important;
+    }
+
+    .tpl-f11 section {
+        padding: 3.6rem 6%;
+    }
+
+    .tpl-f11 #db-gallery-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* - Accesibilidad: prefers-reduced-motion apaga las animaciones - */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f11::before,
+    .tpl-f11::after,
+    .tpl-f11 #event-title,
+    .tpl-f11 #unified-frame .cd-block {
+        animation: none !important;
     }
 }
