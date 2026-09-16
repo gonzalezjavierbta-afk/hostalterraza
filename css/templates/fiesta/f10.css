@@ -1,26 +1,38 @@
 /* ============================================================================
-   f10.css — SILO FIESTA F10 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v1.0.0 · NEÓN TRÍADA: FUCSIA + AMARILLO + TURQUESA
-   Dirección estética: "Cyberpunk Fosforescente" — underground electrónico
-   con atmósfera de club nocturno de alta gama. Fondo púrpura profundo
-   (#0f021e) con niebla de neón y destellos tríadicos. Galerías de fotos
-   distribuidas en 3 bloques a lo largo del scroll. Título amarillo/fucsia
-   animado con resplandor continuo. Descripción como tarjeta VIP translúcida.
-   Tokens: --f10-bg #0f021e, --f10-pink #ff2a85, --f10-yellow #ffe500,
+   f10.css - SILO FIESTA F10 "CYBERPUNK FOSFORESCENTE" (sep-2026)
+   v2.0.0 - NEON TRIADA: FUCSIA + AMARILLO + TURQUESA
+   Direccion estetica: "Cyberpunk Fosforescente" - underground electronico
+   con atmosfera de club nocturno de alta gama. Fondo purpura profundo
+   (#0f021e) con niebla de neon y destellos triadicos. Titulo amarillo/fucsia
+   animado con resplandor continuo. Descripcion como tarjeta VIP translucida.
+   Tokens reales: --f10-bg #0f021e, --f10-pink #ff2a85, --f10-yellow #ffe500,
    --f10-blue #00f0ff, --f10-purple #7a00ff.
-   Tipografía: Geist 900 display.
-   Efectos: aurora tríada neón, grano cinematográfico, glow pulsante fucsia,
-   galerías ntercaladas, reveal scroll-driven, backdrop-filter glass.
+   Tipografia: Geist 900 display.
+   Efectos: aurora triada neon, grano cinematografico, glow pulsante fucsia,
+   galeria fluida de N abierto (auto-fill) con maqueta de espacios,
+   reveal scroll-driven, backdrop-filter glass.
    Respeto prefers-reduced-motion.
-   Breakpoints (mobile-first): BASE (<480) / 480 / 640 / 767 / 1023+.
-   Líneas: ~750. ADR-Regla9 WCAG-AA compliant (contraste ≥ 4.5:1).
+   Breakpoints reales (mobile-first): 640 / 767 / 768 / 992 / 1279.
+   Lineas: 1802. ADR-Regla9 WCAG-AA compliant (contraste >= 4.5:1).
+   ----------------------------------------------------------------------------
+   v2.0.0 (2026-09-15):
+   - Lineup migrado a selectores REALES del kernel: .artist-card,
+     .artist-photo, .artist-overlay, .artist-name, .artist-hora,
+     .artist-resena (estilado minimo line-clamp 2), .artist-social,
+     .artist-social-icon, .artist-social a y .artist-card.headliner.
+   - Eliminados selectores muertos .f10-artist* / .f10-lc-* (Cero Borrado
+     verificado: exclusivos de f10, el kernel JAMAS los genera).
+   - Galeria #db-gallery-grid redisenada como grid fluido de N abierto:
+     repeat(auto-fill, minmax(...)) con maqueta de espacios (celda figure
+     con marco fosforescente + gradiente neon visible aunque falte foto).
+   - ASCII-safety estricto: 0 bytes > 127 en todo el archivo.
 ============================================================================ */
 
-/* Geist se carga de forma asíncrona por el kernel (evento.html preload);
-   se eliminó el @import bloqueante de Google Fonts para acelerar el silo. */
+/* Geist se carga de forma asincrona por el kernel (evento.html preload);
+   se elimino el @import bloqueante de Google Fonts para acelerar el silo. */
 
 /* ==========================================================================
-   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   1. RESETEO DE SILO + PUENTE CROMATICO + VARIABLES
    ========================================================================== */
 .tpl-f10, .Tpl-F10 {
     --tpl-accent: var(--master-accent, #ff2a85);
@@ -50,7 +62,7 @@
     --f10-glow-purple:      0 0 18px rgba(122, 0, 255, 0.45), 0 0 40px rgba(122, 0, 255, 0.2);
     --f10-border-glow:      1px solid rgba(255, 42, 133, 0.4);
 
-    /* Tipografía */
+    /* Tipografia */
     --f10-font: 'Geist', system-ui, -apple-system, sans-serif;
 
     margin: 0;
@@ -76,7 +88,7 @@
 }
 
 /* ==========================================================================
-   1.1. AURORA TRÍADA — blobs neón fucsia / azul / amarillo en deriva lenta
+   1.1. AURORA TRIADA - blobs neon fucsia / azul / amarillo en deriva lenta
    ========================================================================== */
 .tpl-f10::before {
     content: "";
@@ -101,7 +113,7 @@
 }
 
 /* ==========================================================================
-   1.2. GRANO CINEMATOGRÁFICO — textura de película fine grain
+   1.2. GRANO CINEMATOGRAFICO - textura de pelicula fine grain
    ========================================================================== */
 .tpl-f10::after {
     content: "";
@@ -124,7 +136,7 @@
 }
 
 /* ==========================================================================
-   2. ACTIVACIÓN ATÓMICA — display explícito (kernel IoC oculta todo por defecto)
+   2. ACTIVACION ATOMICA - display explicito (kernel IoC oculta todo por defecto)
    ========================================================================== */
 .tpl-f10 #main-content-flow,
 .Tpl-F10 #main-content-flow {
@@ -132,7 +144,7 @@
     z-index: 1;
 }
 
-/* Módulos flex */
+/* Modulos flex */
 .tpl-f10 #mod-hero,          .Tpl-F10 #mod-hero,
 .tpl-f10 #mod-hero-ctas,     .Tpl-F10 #mod-hero-ctas,
 .tpl-f10 #mod-cartel,        .Tpl-F10 #mod-cartel,
@@ -142,7 +154,7 @@
     display: flex !important;
 }
 
-/* Módulos block */
+/* Modulos block */
 .tpl-f10 #mod-hero-meta,     .Tpl-F10 #mod-hero-meta,
 .tpl-f10 #mod-descripcion,   .Tpl-F10 #mod-descripcion,
 .tpl-f10 #mod-video,         .Tpl-F10 #mod-video,
@@ -156,7 +168,7 @@
     display: block !important;
 }
 
-/* Módulos de CAMPAÑA — Cero Borrado: protegidos pero apagados en fiesta */
+/* Modulos de CAMPANA - Cero Borrado: protegidos pero apagados en fiesta */
 .tpl-f10 #mod-historia,
 .tpl-f10 #mod-objetivo,
 .tpl-f10 #mod-impacto-historico,
@@ -167,7 +179,7 @@
 }
 
 /* ==========================================================================
-   3. GRID ATÓMICO — 2 columnas en desktop, 1 columna en mobile
+   3. GRID ATOMICO - 2 columnas en desktop, 1 columna en mobile
    ========================================================================== */
 .tpl-f10 #main-content-flow {
     display: grid !important;
@@ -209,7 +221,7 @@
 .tpl-f10 #mod-info-tecnica { grid-area: info; }
 
 /* ==========================================================================
-   4. TIPOGRAFÍA EDITORIAL — Eyebrows versales, encabezados de sección
+   4. TIPOGRAFIA EDITORIAL - Eyebrows versales, encabezados de seccion
    ========================================================================== */
 .tpl-f10 h2, .Tpl-F10 h2 {
     color: var(--f10-text-cream);
@@ -240,7 +252,7 @@
 }
 
 /* ==========================================================================
-   5. #MOD-HERO — Hero full-viewport con overlay de niebla tríada
+   5. #MOD-HERO - Hero full-viewport con overlay de niebla triada
    ========================================================================== */
 .tpl-f10 #mod-hero {
     position: relative;
@@ -258,7 +270,7 @@
     overflow: hidden;
 }
 
-/* Overlay degradado neón tríada sobre imagen de fondo */
+/* Overlay degradado neon triada sobre imagen de fondo */
 .tpl-f10 #mod-hero::after {
     content: "";
     position: absolute;
@@ -274,7 +286,7 @@
     pointer-events: none;
 }
 
-/* Badge de organización — esquina superior izquierda */
+/* Badge de organizacion - esquina superior izquierda */
 .tpl-f10 #org-name-badge {
     position: absolute !important;
     top: 1.6rem !important;
@@ -306,7 +318,7 @@
 }
 
 /* ==========================================================================
-   6. #EVENT-TITLE — Logo neón tríada con animación de resplandor
+   6. #EVENT-TITLE - Logo neon triada con animacion de resplandor
       Amarillo/fucsia en gradiente con text-shadow multicapa.
    ========================================================================== */
 .tpl-f10 #event-title {
@@ -318,7 +330,7 @@
     line-height: 0.92;
     font-size: clamp(3.2rem, 14vw, 8rem) !important;
     max-width: 100%;
-    display: block !important; /* Activado en f10: el título siempre visible */
+    display: block !important; /* Activado en f10: el titulo siempre visible */
     background: linear-gradient(
         135deg,
         var(--f10-yellow)  0%,
@@ -381,7 +393,7 @@
 }
 
 /* ==========================================================================
-   7. META — Iconos y datos del evento con estilo neón tríada
+   7. META - Iconos y datos del evento con estilo neon triada
    ========================================================================== */
 .tpl-f10 #mod-hero-meta {
     display: flex !important;
@@ -427,7 +439,7 @@
 }
 
 /* ==========================================================================
-   8. HERO CTAs — Botones de acción con tactile sizing (min 48px)
+   8. HERO CTAs - Botones de accion con tactile sizing (min 48px)
    ========================================================================== */
 .tpl-f10 #mod-hero-ctas {
     position: relative;
@@ -458,7 +470,7 @@
     border: 1px solid transparent;
 }
 
-/* CTA principal — amarillo sólido (máximo contraste) */
+/* CTA principal - amarillo solido (maximo contraste) */
 .tpl-f10 #mod-hero-ctas .hero-cta-btn--primary,
 .tpl-f10 #mod-hero-ctas .hero-cta-btn--wa {
     background: var(--f10-yellow);
@@ -477,7 +489,7 @@
     transform: translate(1px, 1px);
 }
 
-/* CTA secundario — fucsia outline */
+/* CTA secundario - fucsia outline */
 .tpl-f10 #mod-hero-ctas .hero-cta-btn--secondary {
     background: transparent;
     color: var(--f10-pink);
@@ -499,7 +511,7 @@
 }
 
 /* ==========================================================================
-   9. COUNTDOWN — Bloques neón con glow tríada pulsante
+   9. COUNTDOWN - Bloques neon con glow triada pulsante
    ========================================================================== */
 .tpl-f10 #unified-frame {
     flex-direction: row;
@@ -508,7 +520,7 @@
     gap: 10px;
     padding: 2rem 6% 1.4rem;
     margin-top: 0 !important;
-    padding-top: 0 !important; /* ADR-010: integración de proximidad multimedia */
+    padding-top: 0 !important; /* ADR-010: integracion de proximidad multimedia */
     background: linear-gradient(135deg, var(--f10-bg-ink) 0%, var(--f10-bg) 100%);
     border-bottom: 2px solid var(--f10-pink);
 }
@@ -561,7 +573,7 @@
 }
 
 /* ==========================================================================
-   10. #MOD-DESCRIPCION — Tarjeta VIP translúcida (glass morphism)
+   10. #MOD-DESCRIPCION - Tarjeta VIP translucida (glass morphism)
    ========================================================================== */
 .tpl-f10 #mod-descripcion {
     padding: 3.5rem 8%;
@@ -605,7 +617,7 @@
 }
 
 /* ==========================================================================
-   11. CARTEL — Póster flotante con glow pulsante fucsia
+   11. CARTEL - Poster flotante con glow pulsante fucsia
    ========================================================================== */
 .tpl-f10 #mod-cartel {
     padding: 1.6rem 8% 3.4rem;
@@ -638,7 +650,7 @@
 }
 
 /* ==========================================================================
-   12. LINEUP — Grid 4×N con tarjetas foto+nombre en cursiva neón
+   12. LINEUP - Grid 4xN con tarjetas foto+nombre en cursiva neon
    ========================================================================== */
 .tpl-f10 #mod-lineup {
     padding: 4.5rem 8%;
@@ -652,47 +664,20 @@
     margin: 0 auto;
 }
 
-/* Título LINEUP — cursiva tríada */
-.tpl-f10 .f10-lc-title {
-    font-family: var(--f10-font);
-    font-style: italic;
-    font-weight: 900 !important;
-    letter-spacing: 0.03em;
-    line-height: 0.98;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: clamp(2rem, 4.5vw, 3.1rem);
-    margin: 0 0 1.8rem;
-    background-image: linear-gradient(135deg, var(--f10-yellow) 0%, var(--f10-pink) 45%, var(--f10-blue) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(255, 229, 0, 0.48))
-            drop-shadow(0 0 26px rgba(255, 42, 133, 0.30));
-    animation: f10NeonPulse 3.6s ease-in-out infinite alternate;
-}
+/* Titulo de seccion: usa el h2 del kernel (estilado en seccion 4). */
 
-/* Contenedor grid */
+/* Contenedor grid REAL del kernel - tarjetas .artist-card x N */
 .tpl-f10 #db-lineup {
-    display: block !important;
-    width: 100% !important;
-}
-
-.tpl-f10 .f10-lc-grid,
-.tpl-f10 #db-lineup {
-    max-width: 1280px !important;
-    width: 100% !important;
-    margin: 0 auto;
-}
-
-.tpl-f10 .f10-lc-grid {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.1rem;
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin: 0 auto;
 }
 
-/* Tarjeta de artista */
-.tpl-f10 .f10-artist {
+/* Tarjeta de artista (patron f9/f6: clases REALES del kernel v214+) */
+.tpl-f10 .artist-card {
     position: relative;
     border-radius: 10px;
     overflow: hidden;
@@ -710,7 +695,7 @@
 }
 
 /* Capa turquesa-fucsia en hover */
-.tpl-f10 .f10-artist::before {
+.tpl-f10 .artist-card::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -721,13 +706,13 @@
     pointer-events: none;
 }
 
-.tpl-f10 .f10-artist:hover::before,
-.tpl-f10 .f10-artist:focus-within::before {
+.tpl-f10 .artist-card:hover::before,
+.tpl-f10 .artist-card:focus-within::before {
     opacity: 1;
 }
 
 /* Grano interno */
-.tpl-f10 .f10-artist::after {
+.tpl-f10 .artist-card::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -737,8 +722,8 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.tpl-f10 .f10-artist:hover,
-.tpl-f10 .f10-artist:focus-within {
+.tpl-f10 .artist-card:hover,
+.tpl-f10 .artist-card:focus-within {
     transform: translateY(-7px);
     border-color: rgba(0, 240, 255, 0.65);
     box-shadow:
@@ -748,8 +733,8 @@
         var(--f10-glow-blue);
 }
 
-/* Foto */
-.tpl-f10 .f10-artist-photo {
+/* Foto (silent fallback: celda con fondo #170535 visible si falta la foto) */
+.tpl-f10 .artist-photo {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -759,13 +744,19 @@
     transition: transform 0.45s ease;
 }
 
-.tpl-f10 .f10-artist:hover .f10-artist-photo,
-.tpl-f10 .f10-artist:focus-within .f10-artist-photo {
+.tpl-f10 .artist-card:hover .artist-photo,
+.tpl-f10 .artist-card:focus-within .artist-photo {
     transform: scale(1.06);
 }
 
+.tpl-f10 .artist-photo[src=""],
+.tpl-f10 .artist-photo:not([src]) {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /* Overlay inferior */
-.tpl-f10 .f10-artist-overlay {
+.tpl-f10 .artist-overlay {
     position: absolute;
     inset: auto 0 0 0;
     z-index: 3;
@@ -780,8 +771,23 @@
     pointer-events: none;
 }
 
-/* Nombre del artista — cursiva neón tríada */
-.tpl-f10 .f10-artist-name {
+/* Hora - pill neon azul */
+.tpl-f10 .artist-hora {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid rgba(0, 240, 255, 0.40);
+    background: rgba(15, 2, 30, 0.70);
+    color: var(--f10-blue);
+    font-family: var(--f10-font);
+    font-size: 0.60rem;
+    font-weight: 800;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
+}
+
+/* Nombre del artista - cursiva neon triada */
+.tpl-f10 .artist-name {
     font-family: var(--f10-font);
     font-style: italic;
     font-weight: 900;
@@ -789,26 +795,40 @@
     letter-spacing: 0.02em;
     line-height: 1.1;
     text-transform: uppercase;
+    margin: 0.45rem 0 0;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: f10NeonPulse 4s ease-in-out infinite alternate;
 }
 
-/* Impares: amarillo → fucsia */
-.tpl-f10 .f10-artist:nth-child(odd) .f10-artist-name {
+/* Impares: amarillo -> fucsia */
+.tpl-f10 .artist-card:nth-child(odd) .artist-name {
     background-image: linear-gradient(135deg, var(--f10-yellow) 0%, var(--f10-pink) 60%, var(--f10-blue) 100%);
     filter: drop-shadow(0 0 8px rgba(255, 229, 0, 0.65)) drop-shadow(0 0 16px rgba(255, 42, 133, 0.40));
 }
 
-/* Pares: azul → amarillo */
-.tpl-f10 .f10-artist:nth-child(even) .f10-artist-name {
+/* Pares: azul -> amarillo */
+.tpl-f10 .artist-card:nth-child(even) .artist-name {
     background-image: linear-gradient(135deg, var(--f10-blue) 0%, var(--f10-yellow) 55%, var(--f10-pink) 100%);
     filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.70)) drop-shadow(0 0 16px rgba(255, 229, 0, 0.38));
 }
 
-/* Redes sociales — aparecen en hover */
-.tpl-f10 .f10-artist-social {
+/* Resena - estilado minimo (line-clamp 2). El usuario carga resenas desde admin. */
+.tpl-f10 .artist-resena {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 92%;
+    color: var(--f10-text-muted);
+    font-size: 0.74rem;
+    line-height: 1.5;
+    margin: 0.35rem 0 0;
+}
+
+/* Redes sociales - aparecen en hover */
+.tpl-f10 .artist-social {
     position: absolute;
     left: 0;
     right: 0;
@@ -826,14 +846,14 @@
     pointer-events: none;
 }
 
-.tpl-f10 .f10-artist:hover .f10-artist-social,
-.tpl-f10 .f10-artist:focus-within .f10-artist-social {
+.tpl-f10 .artist-card:hover .artist-social,
+.tpl-f10 .artist-card:focus-within .artist-social {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
 }
 
-.tpl-f10 .f10-artist-social a {
+.tpl-f10 .artist-social a {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -850,19 +870,59 @@
     text-decoration: none;
 }
 
-.tpl-f10 .f10-artist-social a:hover {
+.tpl-f10 .artist-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    line-height: 0;
+}
+
+.tpl-f10 .artist-social a:hover,
+.tpl-f10 .artist-social-icon:hover {
     transform: translateY(-2px) scale(1.08);
     background: rgba(0, 240, 255, 0.28);
     box-shadow: 0 0 18px rgba(0, 240, 255, 0.65);
 }
 
-/* Reseña — OCULTA (Cero Borrado) */
-.tpl-f10 .artist-resena {
-    display: none !important;
+/* --- HEADLINER: .artist-card.headliner (marcado por nombre en el kernel) --- */
+.tpl-f10 .artist-card.headliner {
+    order: -1;
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    min-height: 58vh;
+    border-color: rgba(255, 229, 0, 0.35);
+}
+
+.tpl-f10 .artist-card.headliner .artist-photo {
+    object-position: center 25%;
+}
+
+.tpl-f10 .artist-card.headliner .artist-overlay {
+    padding: 4rem 2rem 2rem;
+    min-height: 0;
+    background: linear-gradient(0deg, rgba(15, 2, 30, 0.97) 0%, rgba(15, 2, 30, 0.55) 55%, rgba(15, 2, 30, 0) 100%);
+}
+
+.tpl-f10 .artist-card.headliner .artist-name {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 0.98;
+}
+
+.tpl-f10 .artist-card.headliner .artist-hora {
+    border-color: rgba(255, 229, 0, 0.50);
+    color: var(--f10-yellow);
+    text-shadow: 0 0 10px rgba(255, 229, 0, 0.50);
+}
+
+.tpl-f10 .artist-card.headliner .artist-resena {
+    -webkit-line-clamp: 3;
+    max-width: 640px;
+    font-size: 0.85rem;
 }
 
 /* ==========================================================================
-   13. PLAYLIST — Spotify oscuro integrado con borde azul neón
+   13. PLAYLIST - Spotify oscuro integrado con borde azul neon
    ========================================================================== */
 .tpl-f10 #mod-playlist {
     padding: 4.5rem 8%;
@@ -882,7 +942,7 @@
 }
 
 /* ==========================================================================
-   14. BOLETOS — Filas con precio en amarillo neón
+   14. BOLETOS - Filas con precio en amarillo neon
    ========================================================================== */
 .tpl-f10 #mod-boletos {
     padding: 3.5rem 8%;
@@ -943,7 +1003,7 @@
     color: var(--f10-text-cream);
 }
 
-/* Precio — amarillo neón (WCAG AA ✓ sobre fondo oscuro) */
+/* Precio - amarillo neon (WCAG AA OK sobre fondo oscuro) */
 .tpl-f10 .boleto-precio,
 .tpl-f10 #price-neon-yellow {
     font-family: var(--f10-font);
@@ -984,7 +1044,7 @@
 }
 
 /* ==========================================================================
-   15. FORMULARIO — Glassmorphism con borde gradiente tríada
+   15. FORMULARIO - Glassmorphism con borde gradiente triada
    ========================================================================== */
 .tpl-f10 .form-master-box {
     background: var(--f10-card-bg);
@@ -1072,7 +1132,7 @@
     border-bottom-color: var(--f10-pink);
 }
 
-/* Botón submit */
+/* Boton submit */
 .tpl-f10 .btn-submit {
     display: block;
     width: 100%;
@@ -1099,10 +1159,12 @@
 }
 
 /* ==========================================================================
-   16. GALERÍA (#mod-video) — 3 BLOQUES DE FOTOS a lo largo del scroll
-       La galería #db-gallery-grid se divide en 3 secciones intercaladas
-       mediante nth-child: items 1–4, 5–8, 9+ separados por ::before
-       pseudo-separadores cromáticos. Grid mobile-first 2-3 col.
+   16. GALERIA (#mod-video) - GRID FLUIDO DE N ABIERTO (auto-fill)
+       El DOM real tiene UN solo grid #db-gallery-grid poblado con
+       <figure class="gallery-item"> x N (kernel slice(0,8) hoy, N abierto).
+       auto-fill acepta 1-8+ fotos y escala a mas sin romperse. La maqueta
+       de espacios mantiene la celda (marco fosforescente + gradiente neon)
+       visible aunque falte la foto (silent fallback ADR-008).
    ========================================================================== */
 .tpl-f10 #mod-video {
     padding: 4.5rem 8%;
@@ -1110,75 +1172,85 @@
     background: var(--f10-bg);
 }
 
-/* Ocultar iframes de YouTube (ADR-005 — miniatura externa en su lugar) */
+/* Ocultar iframes de YouTube (ADR-005 - miniatura externa en su lugar) */
 .tpl-f10 #mod-video > div:not(#db-gallery-grid),
 .Tpl-F10 #mod-video > div:not(#db-gallery-grid) {
     display: none !important;
 }
 
-/* Grid principal de galería */
+/* Grid fluido: N abierto sin tope hardcoded */
 .tpl-f10 #db-gallery-grid {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 0.65rem;
     position: relative;
 }
 
-/* --- Separador visual entre bloque 1 (items 1–4) y bloque 2 (items 5–8) --- */
-.tpl-f10 #db-gallery-grid .gallery-item:nth-child(4)::after,
-.tpl-f10 #db-gallery-grid img:nth-child(4)::after {
-    content: "";
-    display: block;
-    height: 2px;
-    background: linear-gradient(90deg, var(--f10-pink) 0%, var(--f10-blue) 50%, var(--f10-yellow) 100%);
-    margin: 0.65rem 0;
-    grid-column: 1 / -1;
-    box-shadow: 0 0 12px rgba(255, 42, 133, 0.40);
+/* Celda figure - marco fosforescente + placeholder neon visible sin foto */
+.tpl-f10 #db-gallery-grid .gallery-item {
+    margin: 0;
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--f10-line-soft);
+    background:
+        linear-gradient(150deg, rgba(255, 42, 133, 0.10) 0%, rgba(122, 0, 255, 0.16) 55%, rgba(0, 240, 255, 0.08) 100%),
+        radial-gradient(120% 90% at 50% 0%, #220c40 0%, #190830 60%, #0f021e 100%);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 22px rgba(0, 0, 0, 0.38);
+    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+                border-color 0.35s ease,
+                box-shadow 0.35s ease;
 }
 
-/* Bandera cromática antes del bloque 3 (nth-child 9+) */
-.tpl-f10 #db-gallery-grid .gallery-item:nth-child(8n+1):not(:first-child),
-.tpl-f10 #db-gallery-grid img:nth-child(9) {
-    margin-top: 1.4rem;
-}
-
-/* Imagen de galería */
-.tpl-f10 #db-gallery-grid img,
+/* Imagen real (lightbox-trigger) dentro de la celda */
 .tpl-f10 #db-gallery-grid .gallery-item img {
     width: 100%;
-    border-radius: 2px;
+    height: 100%;
+    display: block;
     object-fit: cover;
     aspect-ratio: 4 / 5;
+    border-radius: 3px;
     border: 1px solid var(--f10-line-soft);
     filter: grayscale(12%) saturate(1.18) brightness(0.90);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.4s ease;
     cursor: pointer;
 }
 
-.tpl-f10 #db-gallery-grid img:hover,
-.tpl-f10 #db-gallery-grid .gallery-item img:hover {
+/* Hover con tinte neoclor y glow (responde la celda completa) */
+.tpl-f10 #db-gallery-grid .gallery-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--f10-pink);
+    box-shadow: var(--f10-glow-pink);
+}
+
+.tpl-f10 #db-gallery-grid .gallery-item:hover img {
     border-color: var(--f10-pink);
     filter: grayscale(0%) saturate(1.45) brightness(1.05);
     transform: scale(1.03);
-    box-shadow: var(--f10-glow-pink);
-    z-index: 2;
-    position: relative;
 }
 
-/* Efecto de tinte cíclico por nth-child (3 grupos cromáticos) */
-.tpl-f10 #db-gallery-grid img:nth-child(3n+1):hover { box-shadow: var(--f10-glow-pink); border-color: var(--f10-pink); }
-.tpl-f10 #db-gallery-grid img:nth-child(3n+2):hover { box-shadow: var(--f10-glow-blue); border-color: var(--f10-blue); }
-.tpl-f10 #db-gallery-grid img:nth-child(3n):hover   { box-shadow: var(--f10-glow-yellow); border-color: var(--f10-yellow); }
+/* Tinte cromatico ciclico por posicion (maqueta de espacios) */
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(3n+1) { border-color: rgba(255, 42, 133, 0.30); }
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(3n+1):hover { border-color: var(--f10-pink); box-shadow: var(--f10-glow-pink); }
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(3n+2) { border-color: rgba(0, 240, 255, 0.26); }
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(3n+2):hover { border-color: var(--f10-blue); box-shadow: var(--f10-glow-blue); }
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(3n) { border-color: rgba(255, 229, 0, 0.22); }
+.tpl-f10 #db-gallery-grid .gallery-item:nth-child(3n):hover { border-color: var(--f10-yellow); box-shadow: var(--f10-glow-yellow); }
 
-/* Silent fallback (ADR-008) */
-.tpl-f10 #db-gallery-grid img[src=""],
-.tpl-f10 #db-gallery-grid img:not([src]) {
+/* Silent fallback (ADR-008): sin src o src vacio -> placeholder celda visible */
+.tpl-f10 #db-gallery-grid .gallery-item img[src=""],
+.tpl-f10 #db-gallery-grid .gallery-item img:not([src]) {
     opacity: 0;
     pointer-events: none;
 }
 
 /* ==========================================================================
-   17. EXPERIENCIAS — Tarjetas con borde gradiente fosforescente
+   17. EXPERIENCIAS - Tarjetas con borde gradiente fosforescente
    ========================================================================== */
 .tpl-f10 #mod-experiencias {
     padding: 2rem 5% 4.4rem;
@@ -1285,7 +1357,7 @@
 }
 
 /* ==========================================================================
-   18. #MOD-INFO-TECNICA — Tarjetas técnicas con Geist 900 y drop-shadow
+   18. #MOD-INFO-TECNICA - Tarjetas tecnicas con Geist 900 y drop-shadow
    ========================================================================== */
 .tpl-f10 #mod-info-tecnica {
     padding: 4.5rem 8%;
@@ -1337,7 +1409,7 @@
 }
 
 /* ==========================================================================
-   19. UBICACIÓN — Mapa integrado con borde neón azul
+   19. UBICACION - Mapa integrado con borde neon azul
    ========================================================================== */
 .tpl-f10 #mod-ubicacion {
     padding: 4.5rem 8%;
@@ -1351,7 +1423,7 @@
 }
 
 /* ==========================================================================
-   20. SPONSORS — Logos en opacidad con hover reveal
+   20. SPONSORS - Logos en opacidad con hover reveal
    ========================================================================== */
 .tpl-f10 #mod-sponsors {
     padding: 3.2rem 8%;
@@ -1394,7 +1466,7 @@
 }
 
 /* ==========================================================================
-   21. FOOTER — Fondo profundo con separador fucsia
+   21. FOOTER - Fondo profundo con separador fucsia
    ========================================================================== */
 .tpl-f10 #mod-footer {
     background: var(--f10-bg) !important;
@@ -1416,7 +1488,7 @@
 }
 
 /* ==========================================================================
-   22. CONTRATO DE DATOS — Protección de módulos invisibles (Cero Borrado)
+   22. CONTRATO DE DATOS - Proteccion de modulos invisibles (Cero Borrado)
    ========================================================================== */
 .tpl-f10 #db-poster-img[style*="display:none"],
 .tpl-f10 #db-faq-list[style*="display:none"],
@@ -1427,7 +1499,7 @@
 }
 
 /* ==========================================================================
-   23. REFLOW (v307) — Módulos ocultos reordenan el grid (≥768px)
+   23. REFLOW (v307) - Modulos ocultos reordenan el grid (>=768px)
    ========================================================================== */
 @media (min-width: 768px) {
     .tpl-f10 #main-content-flow:has(#mod-cartel[data-hidden]),
@@ -1522,7 +1594,7 @@
 }
 
 /* ==========================================================================
-   24. RESPONSIVE — Tablet (1280px) → Tablet (992px) → Mobile (767px) → Small (640px)
+   24. RESPONSIVE - Tablet (1280px) -> Tablet (992px) -> Mobile (767px) -> Small (640px)
    ========================================================================== */
 @media (max-width: 1279px) {
     .tpl-f10 #main-content-flow {
@@ -1554,12 +1626,12 @@
     .tpl-f10 #mod-hero { padding: 3.4rem 6% 1rem; }
     .tpl-f10 #org-name-badge { padding: 0; margin-bottom: 12px; }
     .tpl-f10 #event-title { font-size: clamp(2.6rem, 12vw, 4.4rem) !important; }
-    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(4, 1fr); }
+    .tpl-f10 #db-lineup { grid-template-columns: repeat(4, 1fr); }
 }
 
 @media (max-width: 992px) {
     .tpl-f10 #mod-hero { min-height: 85vh; }
-    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(3, 1fr); }
+    .tpl-f10 #db-lineup { grid-template-columns: repeat(3, 1fr); }
     .tpl-f10 #event-title { font-size: clamp(2.4rem, 11vw, 4rem) !important; }
     .tpl-f10 #db-experiencias-list { grid-template-columns: repeat(2, 1fr); }
 }
@@ -1603,14 +1675,13 @@
         width: 100%;
         justify-content: center;
     }
-    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
-    .tpl-f10 .f10-lc-title { font-size: clamp(1.6rem, 8vw, 2.2rem); }
-    .tpl-f10 .f10-artist-social a { width: 32px; height: 32px; }
+    .tpl-f10 #db-lineup { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+    .tpl-f10 .artist-social a { width: 32px; height: 32px; }
     .tpl-f10 #mod-hero-meta { gap: 0.6rem 1rem; padding: 1.2rem 4% 1.8rem; }
     .tpl-f10 #mod-hero-meta .meta-item { font-size: 0.85rem; padding: 0.45rem 0.85rem; }
     .tpl-f10 #mod-hero-meta .meta-svg { width: 18px; height: 18px; }
     .tpl-f10 #db-gallery-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
         gap: 0.5rem !important;
     }
     .tpl-f10 #db-experiencias-list { grid-template-columns: 1fr !important; }
@@ -1618,26 +1689,28 @@
 }
 
 @media (max-width: 640px) {
-    .tpl-f10 .f10-lc-grid {
+    .tpl-f10 #db-lineup {
         grid-template-columns: repeat(2, 1fr) !important;
     }
-    .tpl-f10 .f10-artist-name { font-size: clamp(0.88rem, 4vw, 1.15rem); }
+    .tpl-f10 .artist-name { font-size: clamp(0.88rem, 4vw, 1.15rem); }
+    .tpl-f10 .artist-social a { width: 30px; height: 30px; }
+    .tpl-f10 .artist-overlay { padding: 1.3rem 0.6rem 0.9rem; }
     .tpl-f10 #db-poster-img { max-width: 100%; border-radius: 1px !important; }
-    .tpl-f10 #db-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .tpl-f10 #db-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; }
     .tpl-f10 #db-experiencias-list { grid-template-columns: 1fr !important; }
 }
 
 /* Breakpoint tablet 992px-1279px (blindaje visual) */
 @media (min-width: 992px) and (max-width: 1279px) {
     .tpl-f10 #mod-hero { min-height: 90vh; }
-    .tpl-f10 .f10-lc-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 1rem; }
+    .tpl-f10 #db-lineup { grid-template-columns: repeat(3, 1fr) !important; gap: 1rem; }
     .tpl-f10 .form-master-box { max-width: 500px; }
     .tpl-f10 #db-spotify-embed { min-height: 380px; }
-    .tpl-f10 #db-gallery-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .tpl-f10 #db-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; }
 }
 
 /* ==========================================================================
-   25. REVEAL AL HACER SCROLL — scroll-driven (progressive enhancement)
+   25. REVEAL AL HACER SCROLL - scroll-driven (progressive enhancement)
    ========================================================================== */
 @supports (animation-timeline: view()) {
     .tpl-f10 section,
@@ -1657,7 +1730,7 @@
 }
 
 /* ==========================================================================
-   26. ACCESIBILIDAD — prefers-reduced-motion: apaga efectos
+   26. ACCESIBILIDAD - prefers-reduced-motion: apaga efectos
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
     .tpl-f10::before,
@@ -1665,8 +1738,7 @@
     .tpl-f10 #event-title,
     .tpl-f10 #db-poster-img,
     .tpl-f10 #unified-frame .cd-block,
-    .tpl-f10 .f10-lc-title,
-    .tpl-f10 .f10-artist-name {
+    .tpl-f10 .artist-name {
         animation: none !important;
     }
     .tpl-f10 section,
@@ -1676,7 +1748,8 @@
     .tpl-f10 #mod-descripcion {
         animation: none !important;
     }
-    .tpl-f10 .f10-artist,
+    .tpl-f10 .artist-card,
+    .tpl-f10 #db-gallery-grid .gallery-item,
     .tpl-f10 .exp-card,
     .tpl-f10 .sponsor-item {
         transition: none !important;
@@ -1684,31 +1757,45 @@
 }
 
 /* ============================================================================
-   LOG DE VERSIONES — Template f10 "Cyberpunk Fosforescente"
+   LOG DE VERSIONES - Template f10 "Cyberpunk Fosforescente"
    ============================================================================
-| Versión  | Fecha      | Cambio                                                             | Estado |
+| Version  | Fecha      | Cambio                                                             | Estado |
 |----------|------------|--------------------------------------------------------------------|--------|
-| v1.0.0   | 15/09/2026 | Silo Fiesta F10 "Cyberpunk Fosforescente". Tríada HSL: fucsia      | [OK]   |
+| v2.0.0   | 15/09/2026 | Reescritura total: lineup estilado sobre selectores kernel        | [OK]   |
+|          |            | reales del DOM (.artist-card, .artist-photo, .artist-overlay,     |        |
+|          |            | .artist-name, .artist-hora, .artist-resena, .artist-social,       |        |
+|          |            | .artist-social-icon, .artist-social a, .artist-card.head-         |        |
+|          |            | liner). Cero selectores muertos: retirados .f10-artist* /         |        |
+|          |            | .f10-lc-* (Cero Borrado verificado: exclusivos de f10).           |        |
+|          |            | Resena: estilado minimo line-clamp 2 (antes hidden). Galeria      |        |
+|          |            | #db-gallery-grid: maqueta de espacios con grid de N abierto       |        |
+|          |            | repeat(auto-fill, minmax(...)) y placeholders glow (celda         |        |
+|          |            | figure con marco fosforescente + gradiente neon, ADR-008).        |        |
+|          |            | ASCII-safety estricto: 0 bytes > 127. Cabecera real: 1802         |        |
+|          |            | lineas (breakpoints reales 640/767/768/992/1279). Tipografia      |        |
+|          |            | Geist 900 display. IoC de modulos conservada intacta.             |        |
+|          |            | prefers-reduced-motion conservado.                                |        |
+| v1.0.0   | 15/09/2026 | Silo Fiesta F10 "Cyberpunk Fosforescente". Triada HSL: fucsia      | [OK]   |
 |          |            | #ff2a85, amarillo #ffe500, azul/turquesa #00f0ff sobre fondo      |        |
-|          |            | púrpura profundo #0f021e. Ley 60-30-10 ADR-Regla9 aplicada.      |        |
-|          |            | Aurora tríada animada (f10AuroraDrift), grano cinematográfico      |        |
+|          |            | purpura profundo #0f021e. Ley 60-30-10 ADR-Regla9 aplicada.      |        |
+|          |            | Aurora triada animada (f10AuroraDrift), grano cinematografico      |        |
 |          |            | (f10GrainShift). Hero full-viewport: #event-title activado         |        |
-|          |            | (display:block) con gradiente amarillo→fucsia→azul animado.       |        |
+|          |            | (display:block) con gradiente amarillo->fucsia->azul animado.       |        |
 |          |            | #mod-descripcion: tarjeta VIP glassmorphism (backdrop-blur 12px,  |        |
-|          |            | border-glow fucsia, línea gradiente tríada superior).              |        |
-|          |            | #mod-video: galería split 3 bloques (nth-child cíclico,           |        |
-|          |            | tinte hover por posición). Grid 3 col desktop / 2 col mobile.    |        |
-|          |            | Lineup f10-lc-grid 4×N: nombre cursiva tríada (pares/impares),   |        |
+|          |            | border-glow fucsia, linea gradiente triada superior).              |        |
+|          |            | #mod-video: galeria split 3 bloques (nth-child ciclico,           |        |
+|          |            | tinte hover por posicion). Grid 3 col desktop / 2 col mobile.    |        |
+|          |            | Lineup f10-lc-grid 4xN: nombre cursiva triada (pares/impares),   |        |
 |          |            | hover capa turquesa-fucsia + social reveal. Countdown glow        |        |
-|          |            | tríada pulsante (f10CountdownGlow). CTA min-height 52px           |        |
-|          |            | Thumb-first. Boletos precio amarillo neón WCAG-AA ✓.             |        |
-|          |            | Formulario borde azul neón, tab active amarillo. Experiencias     |        |
-|          |            | 3 tarjetas gradiente tríada rotativo. #mod-info-tecnica activado: |        |
+|          |            | triada pulsante (f10CountdownGlow). CTA min-height 52px           |        |
+|          |            | Thumb-first. Boletos precio amarillo neon WCAG-AA OK.             |        |
+|          |            | Formulario borde azul neon, tab active amarillo. Experiencias     |        |
+|          |            | 3 tarjetas gradiente triada rotativo. #mod-info-tecnica activado: |        |
 |          |            | tarjetas Geist 900 drop-shadow amarillo. Sponsors filter dim/full. |        |
 |          |            | Grid 2col desktop (descripcion fila propia). Reflow v307 completo |        |
 |          |            | (cartel, playlist, boletos, form, ubicacion). Mobile: columna     |        |
-|          |            | única, form antes del lineup. Breakpoints 640/767/992/1279.       |        |
+|          |            | unica, form antes del lineup. Breakpoints 640/767/992/1279.       |        |
 |          |            | scroll-driven reveal @supports. prefers-reduced-motion.            |        |
-|          |            | Módulos campaña apagados (Cero Borrado). ADR-005, ADR-008,        |        |
-|          |            | ADR-010 respetados. Aislamiento atómico .tpl-f10/.Tpl-F10.        |        |
+|          |            | Modulos campana apagados (Cero Borrado). ADR-005, ADR-008,        |        |
+|          |            | ADR-010 respetados. Aislamiento atomico .tpl-f10/.Tpl-F10.        |        |
 ============================================================================ */
