@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v3.2.0 — CORRECCIÓN MOBILE: HERO COMPACTO BAJO EL TÍTULO Y CUBRIMIENTO DE FONDO
+   v3.3.0 - SEGUNDA ITERACION MOBILE: TITULO DOMINANTE + TRIO ESCALONADO SOBRE EL FONDO DEL HERO
 ============================================================================ */
 
 /* ==========================================================================
@@ -1276,16 +1276,17 @@
     .tpl-f11 #mod-faq           { order: 14 !important; }
     .tpl-f11 #mod-ubicacion     { order: 15 !important; }
 
-    /* Seccion Hero en Mobile: Cubrimiento Total del Fondo - 60/40 aprobado:
-       titulo domina ~60% del alto; countdown + meta + boton comprimen en el
-       resto para que el hero completo quede en UNA sola pantalla, sin scroll. */
+    /* Seccion Hero en Mobile: Cubrimiento Total del Fondo - 68/32 (T2):
+       titulo domina ~68% del alto (min-height 68svh); countdown + meta + boton
+       cuelgan sobre el fondo con margenes negativos escalonados para que el
+       hero completo quede en UNA sola pantalla, sin scroll. */
     .tpl-f11 #mod-hero {
         display: flex !important;
         flex-direction: column !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         align-items: center !important;
-        min-height: 60vh !important;
-        min-height: 60svh !important;
+        min-height: 68vh !important;
+        min-height: 68svh !important;
         background-color: var(--f11-bg) !important;
         background-position: center center !important;
         background-size: cover !important;
@@ -1307,10 +1308,10 @@
         margin-bottom: 0 !important;
     }
 
-    /* Titulo Arriba - grande, domina el 60% del viewport (aprobado) */
+    /* Titulo Arriba - grande, domina hasta el 68% del viewport (aprobado T2) */
     .tpl-f11 #event-title {
         display: block !important;
-        font-size: clamp(2.6rem, 11vw, 4.2rem) !important;
+        font-size: clamp(3rem, 15vw, 5rem) !important;
         text-align: center !important;
         line-height: 1.05;
         margin: 0 0 1rem 0 !important;
@@ -1335,51 +1336,62 @@
         margin-right: 0 !important;
     }
 
-    /* 1. Countdown justo bajo el título */
-    .tpl-f11 #unified-frame {
+    /* 1. Countdown justo bajo el titulo, tirado hacia arriba sobre el
+       fondo del hero (fallback vh + svh moderno) */
+    .tpl-f11 #unified-frame,
+    .Tpl-F11 #unified-frame {
         flex-wrap: wrap !important;
         justify-content: center !important;
         padding: 0 !important;
         gap: 6px !important;
+        margin-top: -26vh !important;
+        margin-top: -26svh !important;
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 48px !important;
-        max-width: 64px !important;
-        padding: 6px 8px !important;
+        min-width: 60px !important;
+        max-width: 80px !important;
+        padding: 8px 10px !important;
     }
 
     .tpl-f11 #unified-frame .cd-block > span {
-        font-size: 1.1rem !important;
+        font-size: clamp(1.6rem, 6.5vw, 2.4rem) !important;
     }
 
-    /* 2. Metadatos agrupados */
-    .tpl-f11 #mod-hero-meta {
+    /* 2. Metadatos agrupados (fila larga puede partir en dos lineas) */
+    .tpl-f11 #mod-hero-meta,
+    .Tpl-F11 #mod-hero-meta {
         padding: 0 !important;
-        gap: 0.5rem 0.6rem !important;
+        gap: 0.15rem 0.6rem !important;
         justify-content: center !important;
+        flex-wrap: wrap !important;
+        margin-top: -1vh !important;
+        margin-top: -1svh !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.7rem !important;
+        font-size: 0.95rem !important;
         padding: 0.3rem 0.75rem !important;
         max-width: 100%;
         justify-content: center;
     }
 
-    /* 3. Botón CTA */
-    .tpl-f11 #mod-hero-ctas {
+    /* 3. Boton CTA compacto, termina en el borde del fondo del hero */
+    .tpl-f11 #mod-hero-ctas,
+    .Tpl-F11 #mod-hero-ctas {
         padding: 0 !important;
         justify-content: center !important;
         margin-bottom: 0 !important;
+        margin-top: -1vh !important;
+        margin-top: -1svh !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
         width: 100% !important;
-        max-width: 280px !important;
-        min-height: 42px !important;
-        font-size: 0.74rem !important;
-        padding: 0.7rem 1.4rem !important;
+        max-width: 92% !important;
+        min-height: 40px !important;
+        font-size: 0.85rem !important;
+        padding: 0.6rem 1.2rem !important;
     }
 
     /* Adaptación de Secciones y Tarjetas */
@@ -1448,12 +1460,12 @@
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.2rem, 10vw, 3.4rem) !important;
+        font-size: clamp(2.6rem, 14vw, 4.4rem) !important;
         letter-spacing: -0.01em;
     }
 
     .tpl-f11 #unified-frame .cd-block > span {
-        font-size: clamp(0.95rem, 4vw, 1.15rem) !important;
+        font-size: clamp(1.5rem, 6vw, 2.2rem) !important;
     }
 
     .tpl-f11 #unified-frame {
@@ -1461,9 +1473,9 @@
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 42px !important;
-        max-width: 56px !important;
-        padding: 4px 6px !important;
+        min-width: 56px !important;
+        max-width: 72px !important;
+        padding: 6px 8px !important;
     }
 
     .tpl-f11 #unified-frame .cd-sep {
@@ -1472,15 +1484,15 @@
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.62rem !important;
-        padding: 0.22rem 0.5rem !important;
+        font-size: 0.8rem !important;
+        padding: 0.26rem 0.6rem !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
         width: 100% !important;
-        max-width: 100% !important;
-        min-height: 40px !important;
-        font-size: 0.7rem !important;
+        max-width: 92% !important;
+        min-height: 38px !important;
+        font-size: 0.78rem !important;
     }
 
     .tpl-f11 #db-lineup {
