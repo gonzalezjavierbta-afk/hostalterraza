@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v3.3.0 - SEGUNDA ITERACION MOBILE: TITULO DOMINANTE + TRIO ESCALONADO SOBRE EL FONDO DEL HERO
+   v3.3.3 - CIERRE MOBILE: HERO 100svh + TITULO 26vw + COUNTDOWN 1 FILA + AIRE INFERIOR
 ============================================================================ */
 
 /* ==========================================================================
@@ -1276,23 +1276,25 @@
     .tpl-f11 #mod-faq           { order: 14 !important; }
     .tpl-f11 #mod-ubicacion     { order: 15 !important; }
 
-    /* Seccion Hero en Mobile: Cubrimiento Total del Fondo - 68/32 (T2):
-       titulo domina ~68% del alto (min-height 68svh); countdown + meta + boton
-       cuelgan sobre el fondo con margenes negativos escalonados para que el
-       hero completo quede en UNA sola pantalla, sin scroll. */
+    /* Seccion Hero en Mobile: pantalla completa 100svh (v3.3.3):
+       min-height 100svh exacto y padding-top 6.5svh. El trio
+       (countdown + meta + boton) cuelga elevado -64svh (top del
+       countdown = 36% del alto) con gaps de 5.3-7.2% (meta +3.5svh)
+       y 5.8-7.7% (boton +4svh). Aire inferior sobre el fondo:
+       28-38% en los anchos de telefono mas comunes. */
     .tpl-f11 #mod-hero {
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         align-items: center !important;
-        min-height: 68vh !important;
-        min-height: 68svh !important;
+        min-height: 100vh !important;
+        min-height: 100svh !important;
         background-color: var(--f11-bg) !important;
         background-position: center center !important;
         background-size: cover !important;
         background-repeat: no-repeat !important;
-        padding: 4.5vh 4% 1.2rem !important;
-        padding: 4.5svh 4% 1.2rem !important;
+        padding: 6.5vh 4% 1.2rem !important;
+        padding: 6.5svh 4% 1.2rem !important;
         gap: 0.7rem !important;
         width: 100% !important;
         position: relative !important;
@@ -1309,12 +1311,14 @@
         margin-bottom: 0 !important;
     }
 
-    /* Titulo Arriba - grande, domina hasta el 68% del viewport (aprobado T2) */
+    /* Titulo Arriba - mas grande (26vw, v3.3.3); break-word evita
+       desborde horizontal en titulos de una sola palabra larga. */
     .tpl-f11 #event-title {
         display: block !important;
-        font-size: clamp(3.6rem, 18vw, 6.4rem) !important;
+        font-size: clamp(4.5rem, 26vw, 9rem) !important;
         text-align: center !important;
         line-height: 1.05;
+        overflow-wrap: break-word;
         margin: 0 0 1rem 0 !important;
         width: 100% !important;
     }
@@ -1332,21 +1336,22 @@
         align-self: center !important;
         width: 100% !important;
         margin-top: 0 !important;
-        margin-bottom: 1rem !important;
+        margin-bottom: 1.1rem !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
 
-    /* 1. Countdown justo bajo el titulo, tirado hacia arriba sobre el
-       fondo del hero (fallback vh + svh moderno) */
+    /* 1. Countdown elevado: top_cd = 100svh - 64svh = 36% del alto.
+       La elevacion se mide contra el hero de 100svh (v3.3.3).
+       nowrap mantiene los 4 bloques SIEMPRE en una sola fila. */
     .tpl-f11 #unified-frame,
     .Tpl-F11 #unified-frame {
-        flex-wrap: wrap !important;
+        flex-wrap: nowrap !important;
         justify-content: center !important;
         padding: 0 !important;
         gap: 6px !important;
-        margin-top: -20vh !important;
-        margin-top: -20svh !important;
+        margin-top: -64vh !important;
+        margin-top: -64svh !important;
     }
 
     .tpl-f11 #unified-frame .cd-block {
@@ -1359,15 +1364,16 @@
         font-size: clamp(1.6rem, 6.5vw, 2.4rem) !important;
     }
 
-    /* 2. Metadatos agrupados (fila larga puede partir en dos lineas) */
+    /* 2. Metadatos: gap countdown->meta = mb_generico (1.1rem) + mt_meta
+       (+3.5svh) = 5.3-7.2% del alto segun viewport. */
     .tpl-f11 #mod-hero-meta,
     .Tpl-F11 #mod-hero-meta {
         padding: 0 !important;
         gap: 0.3rem 0.6rem !important;
         justify-content: center !important;
         flex-wrap: wrap !important;
-        margin-top: -3vh !important;
-        margin-top: -3svh !important;
+        margin-top: 3.5vh !important;
+        margin-top: 3.5svh !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
@@ -1377,14 +1383,20 @@
         justify-content: center;
     }
 
-    /* 3. Boton CTA compacto, termina en el borde del fondo del hero */
+    /* 3. Boton CTA: gap meta->boton = mb_generico (1.1rem) + mt_boton
+       (+4svh) = 5.8-7.7% del alto; cierra dentro del hero de 100svh.
+       El margin-bottom compensa el arrastre del trio elevado para que
+       #mod-descripcion (order 5) arranque justo en el pliegue (100svh):
+       aire real bajo el boton = 56.5svh - 11.6rem (28-38% del alto),
+       en vez de quedar tapado por la seccion de descripcion. */
     .tpl-f11 #mod-hero-ctas,
     .Tpl-F11 #mod-hero-ctas {
         padding: 0 !important;
         justify-content: center !important;
-        margin-bottom: 0 !important;
-        margin-top: -4vh !important;
-        margin-top: -4svh !important;
+        margin-bottom: calc(56.5vh - 11.6rem) !important;
+        margin-bottom: calc(56.5svh - 11.6rem) !important;
+        margin-top: 4vh !important;
+        margin-top: 4svh !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
@@ -1456,12 +1468,13 @@
 /* — Mobile pequeño (< 480px) — */
 @media (max-width: 480px) {
     .tpl-f11 #mod-hero {
-        padding: 1.4rem 4% 1rem !important;
+        padding: 6vh 4% 1rem !important;
+        padding: 6svh 4% 1rem !important;
         gap: 0.5rem !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(3rem, 17vw, 5.4rem) !important;
+        font-size: clamp(4rem, 26vw, 7rem) !important;
         letter-spacing: -0.01em;
     }
 
@@ -1470,11 +1483,17 @@
     }
 
     .tpl-f11 #unified-frame {
+        flex-wrap: nowrap !important;
         gap: 4px !important;
     }
 
+    /* Countdown SIEMPRE en 1 fila (v3.3.3): los 4 bloques se reparten
+       el ancho con flex 1 1 0 y base 0, asi que encogen en lugar de
+       desbordar (300px: ~72px por bloque; 480px: tope 72px y el
+       sobrante queda centrado por justify-content: center). */
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 56px !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
         max-width: 72px !important;
         padding: 6px 8px !important;
     }
@@ -1487,6 +1506,15 @@
     .tpl-f11 #mod-hero-meta .meta-item {
         font-size: 0.8rem !important;
         padding: 0.26rem 0.6rem !important;
+    }
+
+    /* Compensacion del trio elevado en <=480: stack mas bajo (meta item
+       30.8px + boton 38px), por eso el pliegue se recalcula con 10rem
+       y #mod-descripcion arranca en los 100svh del hero. */
+    .tpl-f11 #mod-hero-ctas,
+    .Tpl-F11 #mod-hero-ctas {
+        margin-bottom: calc(56.5vh - 10rem) !important;
+        margin-bottom: calc(56.5svh - 10rem) !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
