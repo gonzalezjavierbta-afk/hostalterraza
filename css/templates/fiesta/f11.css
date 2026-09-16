@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.6.0 — CORRECCIÓN MOBILE HERO INTEGRADO Y GRID GALERÍA MASONRY
+   v2.7.0 — CORRECCIÓN DEFICIENTE MOBILE: HERO INTEGRADO FORZADO
 ============================================================================ */
 
 /* ==========================================================================
@@ -39,9 +39,9 @@
     --f11-font: 'Geist', system-ui, -apple-system, sans-serif;
 
     /* Espaciado del hero */
-    --f11-hero-gap:        2.5rem;   /* gap incrementado para mejor aireamiento */
-    --f11-hero-pt:         6rem;     /* padding top holgado */
-    --f11-hero-pb:         6rem;     /* padding bottom holgado */
+    --f11-hero-gap:        2.5rem;
+    --f11-hero-pt:         6rem;
+    --f11-hero-pb:         6rem;
 
     margin: 0;
     padding: 0;
@@ -171,7 +171,7 @@
 .tpl-f11 #main-content-flow {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
-    row-gap: 3.5rem !important; /* Espaciado extra entre bloques en Escritorio */
+    row-gap: 3.5rem !important;
     column-gap: 3rem !important;
     grid-template-areas:
         "hero         hero"
@@ -216,7 +216,7 @@
     z-index: 3;
     align-self: end;
     pointer-events: auto;
-    margin-bottom: 6.8rem !important; /* Incrementado para mayor espaciado en Escritorio */
+    margin-bottom: 6.8rem !important;
 }
 
 .tpl-f11 #unified-frame {
@@ -224,7 +224,7 @@
     z-index: 3;
     align-self: end;
     pointer-events: auto;
-    margin-bottom: 11.2rem !important; /* Incrementado para mayor espaciado en Escritorio */
+    margin-bottom: 11.2rem !important;
 }
 
 /* ==========================================================================
@@ -241,7 +241,7 @@
 }
 
 .tpl-f11 section {
-    padding: 6rem 8% !important; /* Espaciado holgado en escritorio */
+    padding: 6rem 8% !important;
     border-bottom: 1px solid var(--f11-line-soft);
 }
 
@@ -254,7 +254,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    min-height: 85vh !important; /* Altura generosa para escritorio */
+    min-height: 85vh !important;
     padding: var(--f11-hero-pt) 6% var(--f11-hero-pb) !important;
     color: var(--f11-text);
     background-color: var(--f11-bg);
@@ -292,7 +292,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-bottom: 12rem; /* Mayor separación entre el título y los elementos flotantes inferiores */
+    padding-bottom: 12rem;
 }
 
 /* ==========================================================================
@@ -657,7 +657,7 @@
 .tpl-f11 #db-lineup {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
-    gap: 2.2rem !important; /* Espaciado extra entre tarjetas */
+    gap: 2.2rem !important;
     width: 100% !important;
     max-width: 1280px !important;
     margin: 0 auto;
@@ -906,24 +906,11 @@
     z-index: 2;
 }
 
-/* Patrón Masonry base (Mobile / Desktop) */
-.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+1) {
-    grid-column-end: span 2;
-    grid-row-end: span 24;
-}
-.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+2) {
-    grid-row-end: span 18;
-}
-.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+3) {
-    grid-column-end: span 2;
-    grid-row-end: span 18;
-}
-.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+4) {
-    grid-row-end: span 24;
-}
-.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+5) {
-    grid-row-end: span 18;
-}
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+1) { grid-column-end: span 2; grid-row-end: span 24; }
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+2) { grid-row-end: span 18; }
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+3) { grid-column-end: span 2; grid-row-end: span 18; }
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+4) { grid-row-end: span 24; }
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+5) { grid-row-end: span 18; }
 
 @media (min-width: 992px) {
     .tpl-f11 #db-gallery-grid {
@@ -1290,40 +1277,46 @@
             "footer" !important;
     }
 
-    /* MODIFICACIÓN HERO MOBILE: Elementos (countdown, meta y ctas) dentro del contenedor hero debajo del título */
+    /* FIX DEFINITIVO HERO MOBILE: ANULAMOS GRID-AREA EN HIJOS Y FORZAMOS FLEX-COLUMN */
     .tpl-f11 #mod-hero {
-        grid-area: hero;
-        min-height: auto !important;
+        grid-area: hero !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
+        min-height: auto !important;
         background-position: center top;
-        padding: 4rem 5% 3rem !important;
-        gap: 1.8rem !important;
+        padding: 3.5rem 5% 3rem !important;
+        gap: 1.4rem !important;
     }
 
     .tpl-f11 #mod-hero .hero-content {
         padding-bottom: 0 !important;
         justify-content: center !important;
         align-items: center !important;
-        width: 100%;
+        width: 100% !important;
+        margin-bottom: 0 !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(3rem, 13vw, 4.8rem) !important;
+        font-size: clamp(2.8rem, 12vw, 4.5rem) !important;
         text-align: center !important;
         line-height: 1.05;
-        margin: 0 0 1.5rem !important;
+        margin: 0 !important;
     }
 
+    /* Desactivación estricta de grid-area para obligar a los módulos a vivir dentro de #mod-hero */
     .tpl-f11 #unified-frame,
     .tpl-f11 #mod-hero-meta,
-    .tpl-f11 #mod-hero-ctas {
-        position: relative !important;
+    .tpl-f11 #mod-hero-ctas,
+    .Tpl-F11 #unified-frame,
+    .Tpl-F11 #mod-hero-meta,
+    .Tpl-F11 #mod-hero-ctas {
         grid-area: auto !important;
+        position: static !important;
         align-self: center !important;
         width: 100% !important;
+        margin-top: 0 !important;
         margin-bottom: 0 !important;
     }
 
@@ -1331,15 +1324,18 @@
         flex-wrap: wrap;
         justify-content: center;
         padding: 0 !important;
+        order: 2 !important;
     }
 
     .tpl-f11 #mod-hero-meta {
         padding: 0 !important;
         gap: 0.45rem 0.7rem !important;
+        order: 3 !important;
     }
 
     .tpl-f11 #mod-hero-ctas {
         padding: 0 !important;
+        order: 4 !important;
     }
 
     .tpl-f11 #unified-frame .cd-block {
@@ -1383,12 +1379,12 @@
 /* — Mobile pequeño (< 480px) — */
 @media (max-width: 480px) {
     .tpl-f11 #mod-hero {
-        padding: 3.5rem 4% 2.5rem !important;
-        gap: 1.5rem !important;
+        padding: 3rem 4% 2.2rem !important;
+        gap: 1.2rem !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.6rem, 12vw, 4.2rem) !important;
+        font-size: clamp(2.4rem, 11vw, 3.8rem) !important;
         letter-spacing: -0.01em;
     }
 
