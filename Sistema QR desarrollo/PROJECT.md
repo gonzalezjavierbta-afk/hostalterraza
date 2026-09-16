@@ -46,7 +46,7 @@ El sistema ha evolucionado de un modelo monolítico a un modelo de **Categorías
 
 ### 🎬 Silos Operativos Validados
 *   **Cinematografía (`cine`):** c1 (Arthouse) y c2 (Premiere Gold).
-*   **Fiesta (`fiesta`):** **f1 (Tropical Hostel)** ✅ Certificado v1.6.0 (Selina Style, verde selva y madera) y f2 (Rooftop Sunset). Silos adicionales verificados en `css/templates/fiesta/` al 15/09/2026: f3, f5 (Afromango), f6 (Afromango Editor), f7 (Tropical Brutalism - motor independiente `f7.html`), f8 (TropiLove), f9 (Mistico - ADR-041) y **f10 (Rico - Cyberpunk Fosforescente, v2.0.0 - ADR-042, evento `rico-5mw5` en produccion)**.
+*   **Fiesta (`fiesta`):** **f1 (Tropical Hostel)** ✅ Certificado v1.6.0 (Selina Style, verde selva y madera) y f2 (Rooftop Sunset). Silos adicionales verificados en `css/templates/fiesta/` al 15/09/2026: f3, f5 (Afromango), f6 (Afromango Editor), f7 (Tropical Brutalism - motor independiente `f7.html`), f8 (TropiLove), f9 (Mistico - ADR-041) y **f10 (Rico - Cyberpunk Fosforescente, v2.0.0 - ADR-042, evento `rico-5mw5` en produccion)** y **f11 (Cyberpunk Fosforescente, v3.2.0 - fix mobile hero 16/09/2026 - ADR-043)**.
 *   **Campaña (`campana`):** b1 (Solidario Moderno), b4 (Vintage & Orgánico) y b5 (Emergencia Crítica).
 
 ## 7. Evolución del Contrato de Datos (v110) y Funcionalidad

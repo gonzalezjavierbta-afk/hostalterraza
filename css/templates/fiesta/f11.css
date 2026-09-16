@@ -1255,33 +1255,43 @@
         row-gap: 0 !important;
     }
 
-    /* Reordenamiento de bloques globales */
-    .tpl-f11 #mod-hero         { order: 1 !important; }
-    .tpl-f11 #mod-descripcion  { order: 2 !important; }
-    .tpl-f11 #mod-lineup       { order: 3 !important; }
-    .tpl-f11 #mod-cartel       { order: 4 !important; }
-    .tpl-f11 #mod-playlist     { order: 5 !important; }
-    .tpl-f11 #mod-boletos      { order: 6 !important; }
-    .tpl-f11 #mod-form         { order: 7 !important; }
-    .tpl-f11 #mod-experiencias { order: 8 !important; }
-    .tpl-f11 #mod-video        { order: 9 !important; }
-    .tpl-f11 #mod-info-tecnica { order: 10 !important; }
-    .tpl-f11 #mod-faq          { order: 11 !important; }
-    .tpl-f11 #mod-ubicacion    { order: 12 !important; }
+    /* Reordenamiento de bloques globales - Hero: titulo, countdown, meta, boton.
+       Los 4 hermanos del hero reciben order explicito (T1); el resto se renumera. */
+    .tpl-f11 #mod-hero          { order: 1 !important; }
+    .tpl-f11 #unified-frame,
+    .Tpl-F11 #unified-frame     { order: 2 !important; }
+    .tpl-f11 #mod-hero-meta,
+    .Tpl-F11 #mod-hero-meta     { order: 3 !important; }
+    .tpl-f11 #mod-hero-ctas,
+    .Tpl-F11 #mod-hero-ctas     { order: 4 !important; }
+    .tpl-f11 #mod-descripcion   { order: 5 !important; }
+    .tpl-f11 #mod-lineup        { order: 6 !important; }
+    .tpl-f11 #mod-cartel        { order: 7 !important; }
+    .tpl-f11 #mod-playlist      { order: 8 !important; }
+    .tpl-f11 #mod-boletos       { order: 9 !important; }
+    .tpl-f11 #mod-form          { order: 10 !important; }
+    .tpl-f11 #mod-experiencias  { order: 11 !important; }
+    .tpl-f11 #mod-video         { order: 12 !important; }
+    .tpl-f11 #mod-info-tecnica  { order: 13 !important; }
+    .tpl-f11 #mod-faq           { order: 14 !important; }
+    .tpl-f11 #mod-ubicacion     { order: 15 !important; }
 
-    /* Sección Hero en Mobile: Cubrimiento Total del Fondo */
+    /* Seccion Hero en Mobile: Cubrimiento Total del Fondo - 60/40 aprobado:
+       titulo domina ~60% del alto; countdown + meta + boton comprimen en el
+       resto para que el hero completo quede en UNA sola pantalla, sin scroll. */
     .tpl-f11 #mod-hero {
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         align-items: center !important;
-        min-height: auto !important;
+        min-height: 60vh !important;
+        min-height: 60svh !important;
         background-color: var(--f11-bg) !important;
-        background-position: center top !important;
+        background-position: center center !important;
         background-size: cover !important;
         background-repeat: no-repeat !important;
-        padding: 3rem 4% 2.5rem !important;
-        gap: 0.8rem !important;
+        padding: 1.8rem 4% 1.2rem !important;
+        gap: 0.7rem !important;
         width: 100% !important;
         position: relative !important;
     }
@@ -1297,10 +1307,10 @@
         margin-bottom: 0 !important;
     }
 
-    /* Título Arriba */
+    /* Titulo Arriba - grande, domina el 60% del viewport (aprobado) */
     .tpl-f11 #event-title {
         display: block !important;
-        font-size: clamp(2rem, 8.5vw, 3.2rem) !important;
+        font-size: clamp(2.6rem, 11vw, 4.2rem) !important;
         text-align: center !important;
         line-height: 1.05;
         margin: 0 0 1rem 0 !important;
@@ -1320,7 +1330,7 @@
         align-self: center !important;
         width: 100% !important;
         margin-top: 0 !important;
-        margin-bottom: 0.8rem !important;
+        margin-bottom: 0.6rem !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
@@ -1433,12 +1443,12 @@
 /* — Mobile pequeño (< 480px) — */
 @media (max-width: 480px) {
     .tpl-f11 #mod-hero {
-        padding: 2.5rem 4% 2rem !important;
-        gap: 0.6rem !important;
+        padding: 1.4rem 4% 1rem !important;
+        gap: 0.5rem !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(1.8rem, 8vw, 2.6rem) !important;
+        font-size: clamp(2.2rem, 10vw, 3.4rem) !important;
         letter-spacing: -0.01em;
     }
 
