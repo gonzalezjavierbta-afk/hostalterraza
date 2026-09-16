@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.8.0 — CORRECCIÓN DE LAYOUT Y RESPONSIVE MOBILE COMPLETO
+   v2.9.0 — CORRECCIÓN DE LAYOUT MOBILE, REORDENAMIENTO Y MÓDULOS VACÍOS
 ============================================================================ */
 
 /* ==========================================================================
@@ -139,30 +139,36 @@
 .tpl-f11 #mod-experiencias,
 .tpl-f11 #mod-info-tecnica,
 .tpl-f11 #mod-ubicacion,
-.tpl-f11 #mod-sponsors,
 .tpl-f11 #mod-form,
 .tpl-f11 #mod-faq,
-.tpl-f11 #mod-footer,
 .Tpl-F11 #mod-descripcion,
 .Tpl-F11 #mod-video,
 .Tpl-F11 #mod-boletos,
 .Tpl-F11 #mod-experiencias,
 .Tpl-F11 #mod-info-tecnica,
 .Tpl-F11 #mod-ubicacion,
-.Tpl-F11 #mod-sponsors,
 .Tpl-F11 #mod-form,
-.Tpl-F11 #mod-faq,
-.Tpl-F11 #mod-footer {
+.Tpl-F11 #mod-faq {
     display: block !important;
 }
 
-/* Ocultos */
+/* Ocultos y Módulos Vacíos / Retirados */
 .tpl-f11 #mod-historia,
 .tpl-f11 #mod-objetivo,
 .tpl-f11 #mod-impacto-historico,
 .tpl-f11 #mod-mapa-crisis,
 .tpl-f11 #mod-como-ayudar,
-.tpl-f11 #mod-whatsapp {
+.tpl-f11 #mod-whatsapp,
+.tpl-f11 #mod-sponsors,
+.tpl-f11 #mod-footer,
+.Tpl-F11 #mod-historia,
+.Tpl-F11 #mod-objetivo,
+.Tpl-F11 #mod-impacto-historico,
+.Tpl-F11 #mod-mapa-crisis,
+.Tpl-F11 #mod-como-ayudar,
+.Tpl-F11 #mod-whatsapp,
+.Tpl-F11 #mod-sponsors,
+.Tpl-F11 #mod-footer {
     display: none !important;
 }
 
@@ -183,26 +189,22 @@
         "experiencias experiencias"
         "video        video"
         "info         info"
-        "faq          ubicacion"
-        "sponsors     sponsors"
-        "footer       footer";
+        "faq          ubicacion";
     width: 100%;
 }
 
 .tpl-f11 #mod-hero         { grid-area: hero; }
 .tpl-f11 #mod-descripcion  { grid-area: descripcion; }
-.tpl-f11 #mod-cartel       { grid-area: cartel; }
-.tpl-f11 #mod-video        { grid-area: video; }
 .tpl-f11 #mod-lineup       { grid-area: lineup; }
+.tpl-f11 #mod-cartel       { grid-area: cartel; }
 .tpl-f11 #mod-playlist     { grid-area: playlist; }
-.tpl-f11 #mod-ubicacion    { grid-area: ubicacion; }
-.tpl-f11 #mod-faq          { grid-area: faq; }
-.tpl-f11 #mod-sponsors     { grid-area: sponsors; }
-.tpl-f11 #mod-form         { grid-area: form; }
-.tpl-f11 #mod-footer       { grid-area: footer; }
 .tpl-f11 #mod-boletos      { grid-area: boletos; }
+.tpl-f11 #mod-form         { grid-area: form; }
 .tpl-f11 #mod-experiencias { grid-area: experiencias; }
+.tpl-f11 #mod-video        { grid-area: video; }
 .tpl-f11 #mod-info-tecnica { grid-area: info; }
+.tpl-f11 #mod-faq          { grid-area: faq; }
+.tpl-f11 #mod-ubicacion    { grid-area: ubicacion; }
 
 .tpl-f11 #mod-hero-ctas {
     grid-area: hero;
@@ -1141,11 +1143,6 @@
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), var(--f11-glow-blue);
 }
 
-.tpl-f11 #mod-sponsors,
-.Tpl-F11 #mod-sponsors {
-    display: none !important;
-}
-
 .tpl-f11 #mod-faq {
     padding: 5rem 8% !important;
     max-width: 820px;
@@ -1232,14 +1229,6 @@
 }
 
 /* ==========================================================================
-   21. FOOTER
-   ========================================================================== */
-.tpl-f11 #mod-footer,
-.Tpl-F11 #mod-footer {
-    display: none !important;
-}
-
-/* ==========================================================================
    24. RESPONSIVE BREAKPOINTS
    ========================================================================== */
 
@@ -1250,7 +1239,7 @@
     }
 }
 
-/* — Mobile (Ajustes Integrales) — */
+/* — Mobile (Ajustes Integrales con fondo debajo del hero y flujo vertical) — */
 @media (max-width: 767px) {
     .tpl-f11 {
         overflow-x: hidden;
@@ -1273,8 +1262,9 @@
         align-items: center !important;
         min-height: auto !important;
         background-position: center top;
-        padding: 4rem 5% 3rem !important;
-        gap: 1.5rem !important;
+        background-size: cover;
+        padding: 3.5rem 5% 2.5rem !important;
+        gap: 1.8rem !important;
         width: 100% !important;
     }
 
@@ -1287,7 +1277,7 @@
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.4rem, 10vw, 4.2rem) !important;
+        font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
         text-align: center !important;
         line-height: 1.05;
         margin: 0 !important;
@@ -1313,12 +1303,12 @@
         flex-wrap: wrap !important;
         justify-content: center !important;
         padding: 0 !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
     .tpl-f11 #mod-hero-meta {
         padding: 0 !important;
-        gap: 0.5rem 0.8rem !important;
+        gap: 0.5rem 0.6rem !important;
         justify-content: center !important;
     }
 
@@ -1329,21 +1319,28 @@
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 58px !important;
-        max-width: 76px !important;
-        padding: 8px 10px !important;
+        min-width: 52px !important;
+        max-width: 68px !important;
+        padding: 6px 8px !important;
+    }
+
+    .tpl-f11 #unified-frame .cd-block > span {
+        font-size: 1.2rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.75rem !important;
-        padding: 0.35rem 0.8rem !important;
+        font-size: 0.72rem !important;
+        padding: 0.3rem 0.75rem !important;
         max-width: 100%;
         justify-content: center;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
         width: 100% !important;
-        max-width: 340px !important;
+        max-width: 320px !important;
+        min-height: 46px !important;
+        font-size: 0.78rem !important;
+        padding: 0.8rem 1.8rem !important;
     }
 
     /* Adaptación de Secciones y Tarjetas */
@@ -1408,16 +1405,16 @@
 @media (max-width: 480px) {
     .tpl-f11 #mod-hero {
         padding: 3rem 4% 2.2rem !important;
-        gap: 1.2rem !important;
+        gap: 1.5rem !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.1rem, 9.5vw, 3.2rem) !important;
+        font-size: clamp(2rem, 8.5vw, 3rem) !important;
         letter-spacing: -0.01em;
     }
 
     .tpl-f11 #unified-frame .cd-block > span {
-        font-size: clamp(1.1rem, 5vw, 1.5rem) !important;
+        font-size: clamp(1rem, 4.5vw, 1.3rem) !important;
     }
 
     .tpl-f11 #unified-frame {
@@ -1425,25 +1422,26 @@
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 52px !important;
-        max-width: 68px !important;
-        padding: 6px 8px !important;
+        min-width: 48px !important;
+        max-width: 62px !important;
+        padding: 5px 6px !important;
     }
 
     .tpl-f11 #unified-frame .cd-sep {
-        font-size: 1.1rem !important;
-        margin-top: 0.2rem !important;
+        font-size: 1rem !important;
+        margin-top: 0.15rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.68rem !important;
+        font-size: 0.65rem !important;
+        padding: 0.25rem 0.6rem !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
         width: 100% !important;
         max-width: 100% !important;
-        min-height: 48px !important;
-        font-size: 0.78rem !important;
+        min-height: 44px !important;
+        font-size: 0.74rem !important;
     }
 
     .tpl-f11 #db-lineup {
