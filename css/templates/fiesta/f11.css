@@ -204,11 +204,46 @@
 .tpl-f11 #mod-info-tecnica { grid-area: info; }
 
 /* unified-frame, mod-hero-meta y mod-hero-ctas son átomos hermanos planos
-   en el DOM. Para este silo los «jalamos» al área hero via CSS grid stacking.
-   Se mantiene el patrón existente del contrato de datos (Cero Borrado). */
-.tpl-f11 #unified-frame    { grid-area: hero; z-index: 3; align-self: end;   pointer-events: auto; }
-.tpl-f11 #mod-hero-meta    { grid-area: hero; z-index: 3; align-self: end;   pointer-events: auto; }
-.tpl-f11 #mod-hero-ctas    { grid-area: hero; z-index: 3; align-self: end;   pointer-events: auto; }
+   en el DOM. Se ubican todos en grid-area: hero con align-self: end y se
+   separan verticalmente con margin-bottom escalonado (de abajo hacia arriba):
+     - ctas    → pegado al fondo (menor margin-bottom)
+     - meta    → encima de ctas
+     - frame   → encima de meta (mayor margin-bottom)
+   Los valores se definen como variables para ajuste rápido en un solo lugar. */
+
+/* Alturas estimadas de cada franja:
+     ctas  ≈ 50px  + 1.5rem padding  → reservar ~80px
+     meta  ≈ 36px  + 1rem gap        → reservar ~56px
+     frame ≈ 70px  + 1rem gap        → reservar ~90px
+   Total franja inferior: ~226px → se redondea con los paddings del hero. */
+
+.tpl-f11 #mod-hero-ctas {
+    grid-area: hero;
+    z-index: 3;
+    align-self: end;
+    pointer-events: auto;
+    margin-bottom: 2.5rem !important;   /* espacio desde el fondo del hero */
+}
+
+.tpl-f11 #mod-hero-meta {
+    grid-area: hero;
+    z-index: 3;
+    align-self: end;
+    pointer-events: auto;
+    /* meta se eleva por encima de ctas:
+       altura de ctas (≈50px) + su margin-bottom (2.5rem≈40px) + gap (1rem≈16px) */
+    margin-bottom: 7rem !important;
+}
+
+.tpl-f11 #unified-frame {
+    grid-area: hero;
+    z-index: 3;
+    align-self: end;
+    pointer-events: auto;
+    /* countdown se eleva por encima de meta:
+       + altura meta (≈36px) + su margen total (7rem≈112px) + gap (0.8rem≈13px) */
+    margin-bottom: 11.5rem !important;
+}
 
 /* ==========================================================================
    4. TIPOGRAFÍA EDITORIAL
@@ -320,15 +355,11 @@
     justify-content: center;
     align-items: center;
     gap: 10px !important;
-    padding: 0 6% 0 !important;
+    padding: 0 6% !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    /* Separa el countdown de la meta con un gap definido */
-    margin-bottom: 1rem !important;
-    /* Desplaza el grupo hacia arriba desde el fondo del hero */
-    margin-top: auto;
-    padding-bottom: 0 !important;
+    /* margin-bottom lo controla el bloque del grid (sección 3) */
 }
 
 .tpl-f11 #unified-frame .cd-block {
@@ -394,7 +425,7 @@
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    margin-bottom: 1rem !important;
+    /* margin-bottom lo controla el bloque del grid (sección 3) */
 }
 
 .tpl-f11 #mod-hero-meta .meta-item {
@@ -433,10 +464,11 @@
     justify-content: center;
     align-items: center;
     gap: 0.9rem;
-    padding: 0 6% var(--f11-hero-pb) !important;
+    padding: 0 6% !important;
     background: transparent !important;
     border: none !important;
     flex-wrap: wrap;
+    /* margin-bottom lo controla el bloque del grid (sección 3) */
 }
 
 .tpl-f11 #mod-hero-ctas .hero-cta-btn--primary,
@@ -866,12 +898,24 @@
         background-position: center top;
     }
 
-    /* Countdown: chips más anchos y separación táctil */
-    .tpl-f11 #unified-frame {
-        gap: 8px !important;
-        margin-bottom: 0.8rem !important;
+    /* Redistribución vertical en mobile — la franja inferior es algo más compacta.
+       En mobile la meta puede crecer a dos filas, sumamos margen extra. */
+    .tpl-f11 #mod-hero-ctas {
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem !important;
     }
 
+    .tpl-f11 #mod-hero-meta {
+        margin-bottom: 8rem !important;   /* ctas (≈80px) + 2rem + gap */
+    }
+
+    .tpl-f11 #unified-frame {
+        gap: 8px !important;
+        margin-bottom: 12.5rem !important; /* meta puede ser 2 filas ≈ 72px */
+    }
+
+    /* Countdown: chips más compactos táctiles */
     .tpl-f11 #unified-frame .cd-block {
         min-width: 60px !important;
         max-width: 78px !important;
@@ -881,18 +925,11 @@
     /* Meta: chips apilables en dos filas si hacen falta */
     .tpl-f11 #mod-hero-meta {
         gap: 0.45rem 0.7rem !important;
-        margin-bottom: 0.9rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
         font-size: 0.74rem !important;
         padding: 0.32rem 0.75rem !important;
-    }
-
-    /* CTA: ancho completo en mobile */
-    .tpl-f11 #mod-hero-ctas {
-        flex-direction: column;
-        align-items: center;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
