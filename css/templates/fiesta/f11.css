@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.5.0 — AJUSTES DE ESPACIADO ESCRITORIO Y TITULO RICO CENTRADO EN MOBILE
+   v2.6.0 — CORRECCIÓN MOBILE HERO INTEGRADO Y GRID GALERÍA MASONRY
 ============================================================================ */
 
 /* ==========================================================================
@@ -216,7 +216,7 @@
     z-index: 3;
     align-self: end;
     pointer-events: auto;
-    margin-bottom: 5.2rem !important;
+    margin-bottom: 6.8rem !important; /* Incrementado para mayor espaciado en Escritorio */
 }
 
 .tpl-f11 #unified-frame {
@@ -224,7 +224,7 @@
     z-index: 3;
     align-self: end;
     pointer-events: auto;
-    margin-bottom: 8.2rem !important;
+    margin-bottom: 11.2rem !important; /* Incrementado para mayor espaciado en Escritorio */
 }
 
 /* ==========================================================================
@@ -292,7 +292,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-bottom: 3rem;
+    padding-bottom: 12rem; /* Mayor separación entre el título y los elementos flotantes inferiores */
 }
 
 /* ==========================================================================
@@ -852,7 +852,7 @@
 }
 
 /* ==========================================================================
-   16. GALERÍA
+   16. GALERÍA MASONRY
    ========================================================================== */
 .tpl-f11 #mod-video {
     padding: 4rem 0 !important;
@@ -867,21 +867,25 @@
 
 .tpl-f11 #db-gallery-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-    gap: 0 !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 12px !important;
+    grid-auto-flow: dense !important;
+    gap: 0.5rem !important;
     width: 100% !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0 4% !important;
 }
 
 .tpl-f11 #db-gallery-grid .gallery-item {
+    position: relative;
     margin: 0 !important;
     padding: 0 !important;
-    border-radius: 0 !important;
-    border: none !important;
-    aspect-ratio: 1 / 1 !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 42, 133, 0.14) !important;
+    aspect-ratio: auto !important;
     overflow: hidden;
     background: #000;
+    grid-row-end: span 16;
 }
 
 .tpl-f11 #db-gallery-grid .gallery-item img {
@@ -902,39 +906,34 @@
     z-index: 2;
 }
 
+/* Patrón Masonry base (Mobile / Desktop) */
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+1) {
+    grid-column-end: span 2;
+    grid-row-end: span 24;
+}
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+2) {
+    grid-row-end: span 18;
+}
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+3) {
+    grid-column-end: span 2;
+    grid-row-end: span 18;
+}
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+4) {
+    grid-row-end: span 24;
+}
+.tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+5) {
+    grid-row-end: span 18;
+}
+
 @media (min-width: 992px) {
     .tpl-f11 #db-gallery-grid {
         grid-template-columns: repeat(4, 1fr) !important;
-        grid-auto-rows: 12px !important;
-        grid-auto-flow: dense !important;
         gap: 0.8rem !important;
-        padding: 0 4% !important;
     }
 
     .tpl-f11 #db-gallery-grid .gallery-item {
-        aspect-ratio: auto !important;
-        grid-row-end: span 16;
         border-radius: 8px !important;
-        border: 1px solid rgba(255, 42, 133, 0.14) !important;
         transition: border-color 0.4s ease, box-shadow 0.4s ease;
-    }
-
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+1) {
-        grid-column-end: span 2;
-        grid-row-end: span 24;
-    }
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+2) {
-        grid-row-end: span 18;
-    }
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+3) {
-        grid-column-end: span 2;
-        grid-row-end: span 18;
-    }
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+4) {
-        grid-row-end: span 24;
-    }
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(5n+5) {
-        grid-row-end: span 18;
     }
 
     .tpl-f11 #db-gallery-grid .gallery-item::after {
@@ -1276,9 +1275,6 @@
         row-gap: 2rem !important;
         grid-template-areas:
             "hero"
-            "countdown"
-            "meta"
-            "ctas"
             "descripcion"
             "form"
             "lineup"
@@ -1294,63 +1290,62 @@
             "footer" !important;
     }
 
-    /* MODIFICACIÓN CLAVE DE MOBILE: Título RICO centrado verticalmente en medio de la pantalla y grande */
+    /* MODIFICACIÓN HERO MOBILE: Elementos (countdown, meta y ctas) dentro del contenedor hero debajo del título */
     .tpl-f11 #mod-hero {
         grid-area: hero;
-        min-height: 75vh !important; /* Altura suficiente para destacar en el viewport */
+        min-height: auto !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important; /* Centra RICO verticalmente */
-        align-items: center !important;    /* Centra RICO horizontalmente */
+        justify-content: center !important;
+        align-items: center !important;
         background-position: center top;
-        padding: 3rem 5% !important;
+        padding: 4rem 5% 3rem !important;
+        gap: 1.8rem !important;
     }
 
     .tpl-f11 #mod-hero .hero-content {
         padding-bottom: 0 !important;
         justify-content: center !important;
         align-items: center !important;
+        width: 100%;
     }
 
-    /* Título RICO conservado grande y protagónico en medio de la pantalla */
     .tpl-f11 #event-title {
-        font-size: clamp(3.4rem, 15vw, 5.2rem) !important;
+        font-size: clamp(3rem, 13vw, 4.8rem) !important;
         text-align: center !important;
         line-height: 1.05;
-        margin: auto 0 !important;
+        margin: 0 0 1.5rem !important;
+    }
+
+    .tpl-f11 #unified-frame,
+    .tpl-f11 #mod-hero-meta,
+    .tpl-f11 #mod-hero-ctas {
+        position: relative !important;
+        grid-area: auto !important;
+        align-self: center !important;
+        width: 100% !important;
+        margin-bottom: 0 !important;
     }
 
     .tpl-f11 #unified-frame {
-        grid-area: countdown;
-        align-self: stretch;
         flex-wrap: wrap;
         justify-content: center;
-        margin-bottom: 0 !important;
-        padding: 0.8rem 4% 1rem !important;
+        padding: 0 !important;
     }
 
     .tpl-f11 #mod-hero-meta {
-        grid-area: meta;
-        align-self: stretch;
-        margin-bottom: 0 !important;
-        padding: 0.5rem 4% 0.7rem !important;
+        padding: 0 !important;
+        gap: 0.45rem 0.7rem !important;
     }
 
     .tpl-f11 #mod-hero-ctas {
-        grid-area: ctas;
-        align-self: stretch;
-        margin-bottom: 0 !important;
-        padding: 0.8rem 4% 2.2rem !important;
+        padding: 0 !important;
     }
 
     .tpl-f11 #unified-frame .cd-block {
         min-width: 60px !important;
         max-width: 78px !important;
         padding: 7px 10px !important;
-    }
-
-    .tpl-f11 #mod-hero-meta {
-        gap: 0.45rem 0.7rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
@@ -1375,10 +1370,6 @@
         min-height: 320px !important;
     }
 
-    .tpl-f11 #db-gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-    }
-
     .tpl-f11 section {
         padding: 3.5rem 6% !important;
     }
@@ -1392,11 +1383,12 @@
 /* — Mobile pequeño (< 480px) — */
 @media (max-width: 480px) {
     .tpl-f11 #mod-hero {
-        min-height: 70vh !important; /* Mantiene la presencia centrada en pantallas reducidas */
+        padding: 3.5rem 4% 2.5rem !important;
+        gap: 1.5rem !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(3rem, 14vw, 4.4rem) !important;
+        font-size: clamp(2.6rem, 12vw, 4.2rem) !important;
         letter-spacing: -0.01em;
     }
 
@@ -1434,33 +1426,6 @@
     .tpl-f11 .artist-name {
         font-size: 1.1rem !important;
     }
-
-    .tpl-f11 #db-gallery-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        grid-auto-rows: 10px !important;
-        grid-auto-flow: dense !important;
-        gap: 0.35rem !important;
-    }
-
-    .tpl-f11 #db-gallery-grid .gallery-item {
-        aspect-ratio: auto !important;
-        grid-row-end: span 14;
-        border-radius: 6px !important;
-        border: 1px solid rgba(255, 42, 133, 0.14) !important;
-    }
-
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(4n+1),
-    .tpl-f11 #db-gallery-grid .gallery-item:first-child {
-        grid-row-end: span 20;
-    }
-
-    .tpl-f11 #db-gallery-grid .gallery-item:nth-child(4n+2) {
-        grid-row-end: span 16;
-    }
-
-    .tpl-f11 #db-gallery-grid .gallery-item:hover img {
-        transform: scale(1.06);
-    }
 }
 
 /* — Breakpoint intermedio 992-1279px — */
@@ -1479,15 +1444,15 @@
     }
 
     .tpl-f11 #mod-hero-ctas {
-        margin-bottom: 1.4rem !important;
+        margin-bottom: 2rem !important;
     }
 
     .tpl-f11 #mod-hero-meta {
-        margin-bottom: 3.6rem !important;
+        margin-bottom: 5.2rem !important;
     }
 
     .tpl-f11 #unified-frame {
-        margin-bottom: 5.6rem !important;
+        margin-bottom: 8.8rem !important;
     }
 
     .tpl-f11 section {
