@@ -1,6 +1,6 @@
 /* ============================================================================
    f10.css - SILO FIESTA F10 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.0.0 - NEON TRIADA: FUCSIA + AMARILLO + TURQUESA
+   v2.0.1 - NEON TRIADA: FUCSIA + AMARILLO + TURQUESA (parchado A1-A4)
    Direccion estetica: "Cyberpunk Fosforescente" - underground electronico
    con atmosfera de club nocturno de alta gama. Fondo purpura profundo
    (#0f021e) con niebla de neon y destellos triadicos. Titulo amarillo/fucsia
@@ -13,7 +13,7 @@
    reveal scroll-driven, backdrop-filter glass.
    Respeto prefers-reduced-motion.
    Breakpoints reales (mobile-first): 640 / 767 / 768 / 992 / 1279.
-   Lineas: 1802. ADR-Regla9 WCAG-AA compliant (contraste >= 4.5:1).
+   Lineas: 1844. ADR-Regla9 WCAG-AA compliant (contraste >= 4.5:1).
    ----------------------------------------------------------------------------
    v2.0.0 (2026-09-15):
    - Lineup migrado a selectores REALES del kernel: .artist-card,
@@ -1756,6 +1756,40 @@
     }
 }
 
+/* ==========================================================================
+   27. PARCHES ADITIVOS v2.0.1 (A1-A4) - solo adiciones, cero borrado
+   ========================================================================== */
+
+/* A1 - OCULTAR #mod-sponsors (ceja de organizadores). Aditivo sobre el
+   display:block del grupo modulo-block (f10:165/168): gana por orden. */
+.tpl-f10 #mod-sponsors,
+.Tpl-F10 #mod-sponsors {
+    display: none !important;
+}
+
+/* A2 - OCULTAR boton "VER LINE UP COMPLETO" (.hero-cta-btn--lineup). El
+   contenedor #mod-hero-ctas es flex-wrap centrado: no rompe el layout. */
+.tpl-f10 .hero-cta-btn--lineup,
+.Tpl-F10 .hero-cta-btn--lineup {
+    display: none !important;
+}
+
+/* A3 - OCULTAR el titulo de la descripcion, dejando solo el texto. NO se usa
+   #mod-descripcion > div (matchearia .descripcion-inner y taparia el texto). */
+.tpl-f10 #db-descripcion-titulo,
+.Tpl-F10 #db-descripcion-titulo {
+    display: none !important;
+}
+
+/* A4 - REACTIVAR #mod-lineup cuando el kernel IoC le pone data-hidden="true"
+   + display:none !important inline (dj_lineup corrupto/vacio). Patron f9:1931
+   (:has + target) transpuesto a f10. No toca #db-lineup: el grid 4-col de
+   f10:670-677 queda intacto. Estado natural del silo: flex (f10:151). */
+.tpl-f10 #main-content-flow:has(#mod-lineup[data-hidden]) #mod-lineup,
+.Tpl-F10 #main-content-flow:has(#mod-lineup[data-hidden]) #mod-lineup {
+    display: flex !important;
+}
+
 /* ============================================================================
    LOG DE VERSIONES - Template f10 "Cyberpunk Fosforescente"
    ============================================================================
@@ -1798,4 +1832,13 @@
 |          |            | scroll-driven reveal @supports. prefers-reduced-motion.            |        |
 |          |            | Modulos campana apagados (Cero Borrado). ADR-005, ADR-008,        |        |
 |          |            | ADR-010 respetados. Aislamiento atomico .tpl-f10/.Tpl-F10.        |        |
+| v2.0.1   | 15/09/2026 | Parches aditivos A1-A4 (cero borrado, solo adicion):            | [OK]   |
+|          |            | A1 - ocultar #mod-sponsors (ceja de organizadores) con          |        |
+|          |            | display:none !important. A2 - ocultar .hero-cta-btn--lineup     |        |
+|          |            | (fantasma transparente). A3 - ocultar #db-descripcion-titulo    |        |
+|          |            | (queda solo #db-descripcion-texto). A4 - override               |        |
+|          |            | :has(#mod-lineup[data-hidden]) patron f9 transpuesto: revive    |        |
+|          |            | #mod-lineup con display:flex !important sin tocar el grid       |        |
+|          |            | 4-col de #db-lineup. Cabecera con line count real. ASCII puro,  |        |
+|          |            | llaves balanceadas, scope atomico .tpl-f10/.Tpl-F10.            |        |
 ============================================================================ */
