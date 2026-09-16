@@ -1,0 +1,808 @@
+/* ============================================================================
+   f11.css - SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
+   v2.1.0 - DERIVADO COMPLETO DE F10 CON AJUSTES EXPRESS (HERO, LINEUP, GALERÍA)
+   Direccion estetica: "Cyberpunk Fosforescente" - underground electronico
+   con atmosfera de club nocturno de alta gama. Fondo purpura profundo
+   (#0f021e) con niebla de neon y destellos triadicos.
+   Tokens reales: --f11-bg #0f021e, --f11-pink #ff2a85, --f11-yellow #ffe500,
+   --f11-blue #00f0ff, --f11-purple #7a00ff, --f11-btn-blue #00d2ff.
+   Tipografia: Geist 900 display.
+   Breakpoints reales (mobile-first): 640 / 767 / 768 / 992 / 1279.
+============================================================================ */
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMATICO + VARIABLES
+   ========================================================================== */
+.tpl-f11, .Tpl-F11 {
+    --tpl-accent: var(--master-accent, #ff2a85);
+    --gold: var(--tpl-accent, #ff2a85);
+
+    /* Paleta principal */
+    --f11-bg:        #0f021e;
+    --f11-bg-ink:    #190830;
+    --f11-bg-soft:   #220c40;
+    --f11-card-bg:   rgba(25, 8, 48, 0.75);
+    --f11-pink:      #ff2a85;
+    --f11-yellow:    #ffe500;
+    --f11-blue:      #00f0ff;
+    --f11-purple:    #7a00ff;
+    --f11-btn-blue:  #00d2ff; /* Azul claro para boton compra */
+    --f11-text:      #ffffff;
+    --f11-text-muted: rgba(255, 255, 255, 0.58);
+    --f11-text-cream: #f2e6ff;
+    --f11-line:      rgba(255, 255, 255, 0.10);
+    --f11-line-soft: rgba(255, 255, 255, 0.05);
+    --f11-green:     #25d366;
+
+    /* Glows */
+    --f11-glow-pink:        0 0 20px rgba(255, 42, 133, 0.6), 0 0 40px rgba(255, 42, 133, 0.3);
+    --f11-glow-pink-strong: 0 0 28px rgba(255, 42, 133, 0.75), 0 0 60px rgba(255, 42, 133, 0.35), 0 0 100px rgba(255, 42, 133, 0.12);
+    --f11-glow-yellow:      0 0 20px rgba(255, 229, 0, 0.6), 0 0 40px rgba(255, 229, 0, 0.3);
+    --f11-glow-blue:        0 0 20px rgba(0, 240, 255, 0.6), 0 0 40px rgba(0, 240, 255, 0.25);
+    --f11-glow-purple:      0 0 18px rgba(122, 0, 255, 0.45), 0 0 40px rgba(122, 0, 255, 0.2);
+    --f11-border-glow:      1px solid rgba(255, 42, 133, 0.4);
+
+    /* Tipografia */
+    --f11-font: 'Geist', system-ui, -apple-system, sans-serif;
+
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(130% 90% at 20% 5%, #220c40 0%, #0f021e 50%, #07001a 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f11-text);
+    font-family: var(--f11-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Box-sizing global dentro del silo (ADR-019) */
+.tpl-f11 *, .Tpl-F11 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f11 *::before, .Tpl-F11 *::before,
+.tpl-f11 *::after,  .Tpl-F11 *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1.1. AURORA TRIADA - blobs neon fucsia / azul / amarillo en deriva lenta
+   ========================================================================== */
+.tpl-f11::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(50% 38% at 10% 15%,  rgba(255, 42, 133, 0.18) 0%, transparent 70%),
+        radial-gradient(42% 32% at 88% 70%,  rgba(0, 240, 255, 0.14)  0%, transparent 70%),
+        radial-gradient(36% 28% at 72% 10%,  rgba(255, 229, 0,  0.12) 0%, transparent 70%),
+        radial-gradient(44% 40% at 26% 90%,  rgba(122, 0, 255,  0.14) 0%, transparent 72%);
+    animation: f11AuroraDrift 26s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f11AuroraDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1);       opacity: 0.88; }
+    33%  { transform: translate3d(-2%, 1.5%, 0) scale(1.05); opacity: 1; }
+    66%  { transform: translate3d(1.8%, -1.2%, 0) scale(1.08); opacity: 0.92; }
+    100% { transform: translate3d(2.5%, 1%, 0) scale(1.12); opacity: 0.82; }
+}
+
+/* ==========================================================================
+   1.2. GRANO CINEMATOGRAFICO
+   ========================================================================== */
+.tpl-f11::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.048;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: f11GrainShift 0.85s steps(4) infinite;
+}
+
+@keyframes f11GrainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1%); }
+    50%  { transform: translate(1.5%, -2%); }
+    75%  { transform: translate(-1%, 2.5%); }
+    100% { transform: translate(2%, -1.5%); }
+}
+
+/* ==========================================================================
+   2. ACTIVACION ATOMICA - display explicito (kernel IoC)
+   ========================================================================== */
+.tpl-f11 #main-content-flow,
+.Tpl-F11 #main-content-flow {
+    position: relative;
+    z-index: 1;
+}
+
+/* Modulos flex */
+.tpl-f11 #mod-hero,          .Tpl-F11 #mod-hero,
+.tpl-f11 #mod-hero-ctas,     .Tpl-F11 #mod-hero-ctas,
+.tpl-f11 #mod-cartel,        .Tpl-F11 #mod-cartel,
+.tpl-f11 #mod-lineup,        .Tpl-F11 #mod-lineup,
+.tpl-f11 #mod-playlist,      .Tpl-F11 #mod-playlist,
+.tpl-f11 #unified-frame,     .Tpl-F11 #unified-frame {
+    display: flex !important;
+}
+
+/* Modulos block */
+.tpl-f11 #mod-hero-meta,     .Tpl-F11 #mod-hero-meta,
+.tpl-f11 #mod-descripcion,   .Tpl-F11 #mod-descripcion,
+.tpl-f11 #mod-video,         .Tpl-F11 #mod-video,
+.tpl-f11 #mod-boletos,       .Tpl-F11 #mod-boletos,
+.tpl-f11 #mod-experiencias,  .Tpl-F11 #mod-experiencias,
+.tpl-f11 #mod-info-tecnica,  .Tpl-F11 #mod-info-tecnica,
+.tpl-f11 #mod-ubicacion,     .Tpl-F11 #mod-ubicacion,
+.tpl-f11 #mod-sponsors,      .Tpl-F11 #mod-sponsors,
+.tpl-f11 #mod-form,          .Tpl-F11 #mod-form,
+.tpl-f11 #mod-footer,        .Tpl-F11 #mod-footer {
+    display: block !important;
+}
+
+.tpl-f11 #mod-historia,
+.tpl-f11 #mod-objetivo,
+.tpl-f11 #mod-impacto-historico,
+.tpl-f11 #mod-mapa-crisis,
+.tpl-f11 #mod-como-ayudar,
+.tpl-f11 #mod-whatsapp {
+    display: none !important;
+}
+
+/* ==========================================================================
+   3. GRID ATOMICO Y ESTRUCTURA DE FLUJO
+   ========================================================================== */
+.tpl-f11 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "hero       hero"
+        "countdown  countdown"
+        "meta       meta"
+        "ctas       ctas"
+        "descripcion descripcion"
+        "lineup     lineup"
+        "cartel     playlist"
+        "boletos    form"
+        "experiencias experiencias"
+        "video      video"
+        "info       info"
+        "ubicacion  ubicacion"
+        "sponsors   sponsors"
+        "footer     footer";
+    width: 100%;
+}
+
+.tpl-f11 #mod-hero         { grid-area: hero; }
+.tpl-f11 #unified-frame    { grid-area: countdown; }
+.tpl-f11 #mod-hero-meta    { grid-area: meta; }
+.tpl-f11 #mod-hero-ctas    { grid-area: ctas; }
+.tpl-f11 #mod-descripcion  { grid-area: descripcion; }
+.tpl-f11 #mod-cartel       { grid-area: cartel; }
+.tpl-f11 #mod-video        { grid-area: video; }
+.tpl-f11 #mod-lineup       { grid-area: lineup; }
+.tpl-f11 #mod-playlist     { grid-area: playlist; }
+.tpl-f11 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f11 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f11 #mod-form         { grid-area: form; }
+.tpl-f11 #mod-footer       { grid-area: footer; }
+.tpl-f11 #mod-boletos      { grid-area: boletos; }
+.tpl-f11 #mod-experiencias { grid-area: experiencias; }
+.tpl-f11 #mod-info-tecnica { grid-area: info; }
+
+/* ==========================================================================
+   4. TIPOGRAFIA EDITORIAL
+   ========================================================================== */
+.tpl-f11 h2, .Tpl-F11 h2 {
+    color: var(--f11-text-cream);
+    font-family: var(--f11-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.44em;
+    font-weight: 800;
+    margin-bottom: 2.6rem;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 0;
+}
+
+.tpl-f11 h2::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 1px;
+    background: var(--f11-pink);
+    margin-right: 1rem;
+    vertical-align: middle;
+    box-shadow: var(--f11-glow-pink);
+}
+
+.tpl-f11 section {
+    padding: 4.5rem 8%;
+    border-bottom: 1px solid var(--f11-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO & ORDEN INTERNO (REQUERIMIENTO HERO EXPRESS)
+   ========================================================================== */
+.tpl-f11 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4.5rem 8% 1.4rem;
+    min-height: auto;
+    color: var(--f11-text);
+    background-color: var(--f11-bg);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.tpl-f11 #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(15, 2, 30, 0.50) 0%,
+        rgba(34, 12, 64, 0.42) 30%,
+        rgba(255, 42, 133, 0.10) 60%,
+        rgba(15, 2, 30, 0.88) 100%
+    );
+    pointer-events: none;
+}
+
+/* QUITAR LA CEJA / BADGE QUE DICE "Diego Velez" */
+.tpl-f11 #org-name-badge,
+.Tpl-F11 #org-name-badge {
+    display: none !important;
+}
+
+.tpl-f11 #mod-hero .hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Título en grande en el Hero */
+.tpl-f11 #event-title {
+    margin: 0 0 1.2rem;
+    font-family: var(--f11-font);
+    font-weight: 900 !important;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+    font-size: clamp(3.2rem, 14vw, 8rem) !important;
+    max-width: 100%;
+    display: block !important;
+    background: linear-gradient(
+        135deg,
+        var(--f11-yellow)  0%,
+        var(--f11-pink)   40%,
+        var(--f11-blue)   70%,
+        var(--f11-yellow) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 22px rgba(255, 229, 0, 0.45))
+            drop-shadow(0 0 44px rgba(255, 42, 133, 0.28));
+    animation: f11NeonPulse 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes f11NeonPulse {
+    0%   { filter: drop-shadow(0 0 20px rgba(255, 229, 0, 0.40)) drop-shadow(0 0 40px rgba(255, 42, 133, 0.22)); }
+    50%  { filter: drop-shadow(0 0 32px rgba(255, 229, 0, 0.65)) drop-shadow(0 0 65px rgba(255, 42, 133, 0.38)); }
+    100% { filter: drop-shadow(0 0 24px rgba(255, 229, 0, 0.46)) drop-shadow(0 0 48px rgba(255, 42, 133, 0.26)); }
+}
+
+.tpl-f11 #event-title .hero-title-line1 { display: block; line-height: 1; }
+.tpl-f11 #event-title .hero-title-line2 { display: block; line-height: 1; font-size: 0.62em; }
+
+/* ==========================================================================
+   9. COUNTDOWN — Abajo del título
+   ========================================================================== */
+.tpl-f11 #unified-frame {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    padding: 1.5rem 6% 1.4rem;
+    margin-top: 0 !important;
+    background: linear-gradient(135deg, var(--f11-bg-ink) 0%, var(--f11-bg) 100%);
+    border-bottom: 2px solid var(--f11-pink);
+}
+
+.tpl-f11 #unified-frame .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    padding: 12px 10px;
+    position: relative;
+    background: rgba(255, 42, 133, 0.06);
+    border: 1px solid rgba(255, 42, 133, 0.28);
+    min-width: 96px;
+    flex: 1;
+    max-width: 150px;
+    box-shadow: var(--f11-glow-pink);
+}
+
+.tpl-f11 #unified-frame .cd-block > span {
+    display: block;
+    font-size: clamp(1.9rem, 6vw, 3rem) !important;
+    font-weight: 900 !important;
+    font-variant-numeric: tabular-nums;
+    color: var(--f11-text);
+    line-height: 1;
+}
+
+.tpl-f11 #unified-frame .cd-block small {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--f11-blue);
+    margin-top: 0.4rem;
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   7. META — Luego del contador
+   ========================================================================== */
+.tpl-f11 #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem 2.2rem;
+    padding: 1.6rem 6% 2.2rem;
+    background: linear-gradient(135deg, var(--f11-bg-ink) 0%, var(--f11-bg) 100%);
+    border-bottom: 2px solid var(--f11-purple);
+}
+
+.tpl-f11 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: rgba(255, 42, 133, 0.07);
+    border: 1px solid rgba(255, 42, 133, 0.22);
+    color: var(--f11-text);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+}
+
+.tpl-f11 #mod-hero-meta .meta-svg {
+    display: block;
+    flex-shrink: 0;
+    fill: var(--f11-pink);
+    width: 22px;
+    height: 22px;
+}
+
+/* ==========================================================================
+   8. HERO CTAs — Botón Comprar Ahora en Azul Claro
+   ========================================================================== */
+.tpl-f11 #mod-hero-ctas {
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding: 1.5rem 6% 2.8rem;
+}
+
+/* Botón Comprar Ahora ajustado a azul claro */
+.tpl-f11 #mod-hero-ctas .hero-cta-btn--primary,
+.tpl-f11 #mod-hero-ctas .hero-cta-btn--wa,
+.tpl-f11 #mod-hero-ctas .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.1rem 2.6rem;
+    min-height: 52px;
+    min-width: 200px;
+    font-family: var(--f11-font);
+    font-weight: 900 !important;
+    font-size: 0.90rem;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--f11-btn-blue) !important;
+    color: #0f021e !important;
+    border: none !important;
+    box-shadow: 0 0 25px rgba(0, 210, 255, 0.5), 4px 4px 0 var(--f11-purple) !important;
+    transition: all 0.28s ease;
+}
+
+.tpl-f11 #mod-hero-ctas .hero-cta-btn:hover {
+    background: #ffffff !important;
+    color: #0f021e !important;
+    box-shadow: 0 0 35px rgba(0, 210, 255, 0.8), 6px 6px 0 var(--f11-purple) !important;
+    transform: translate(-2px, -2px);
+}
+
+.tpl-f11 .hero-cta-btn--lineup {
+    display: none !important;
+}
+
+/* ==========================================================================
+   10. DESCRIPCION
+   ========================================================================== */
+.tpl-f11 #mod-descripcion {
+    padding: 3.5rem 8%;
+    background: linear-gradient(135deg, var(--f11-bg-ink) 0%, var(--f11-bg) 100%);
+}
+
+.tpl-f11 #db-descripcion-text,
+.tpl-f11 .descripcion-inner {
+    background: var(--f11-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--f11-border-glow);
+    border-radius: 4px;
+    padding: 2.6rem 2.4rem;
+    max-width: 860px;
+    margin: 0 auto;
+    color: var(--f11-text-cream);
+    font-size: 1.02rem;
+    line-height: 1.75;
+}
+
+.tpl-f11 #db-descripcion-titulo,
+.Tpl-F11 #db-descripcion-titulo {
+    display: none !important;
+}
+
+/* ==========================================================================
+   11. CARTEL
+   ========================================================================== */
+.tpl-f11 #mod-cartel {
+    padding: 1.6rem 8% 3.4rem;
+}
+
+.tpl-f11 #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+}
+
+.tpl-f11 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 430px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 42, 133, 0.22);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), var(--f11-glow-pink);
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   12. LINEUP — REPARACIÓN DE TARJETAS DIMINUTAS
+   ========================================================================== */
+.tpl-f11 #mod-lineup {
+    padding: 4.5rem 8%;
+    background: linear-gradient(180deg, var(--f11-bg) 0%, var(--f11-bg-ink) 100%);
+    border-top: 2px solid var(--f11-pink);
+    border-bottom: 2px solid var(--f11-purple);
+}
+
+.tpl-f11 #mod-lineup > div {
+    max-width: 1200px !important;
+    margin: 0 auto;
+    width: 100% !important;
+}
+
+.tpl-f11 #db-lineup {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin: 0 auto;
+}
+
+/* Arreglo de espacio para tarjetas totalmente visibles */
+.tpl-f11 .artist-card {
+    position: relative;
+    width: 100% !important;
+    min-height: 380px !important;
+    aspect-ratio: 3 / 4;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #170535;
+    border: 1px solid rgba(255, 42, 133, 0.30);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.48);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.tpl-f11 .artist-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(0, 240, 255, 0.65);
+    box-shadow: var(--f11-glow-blue);
+}
+
+.tpl-f11 .artist-photo {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    filter: grayscale(15%) brightness(0.85);
+}
+
+.tpl-f11 .artist-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 3;
+    padding: 1.7rem 0.9rem 1.1rem;
+    background: linear-gradient(0deg, rgba(15, 2, 30, 0.97) 0%, rgba(25, 8, 48, 0.60) 70%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: center;
+}
+
+.tpl-f11 .artist-name {
+    font-family: var(--f11-font);
+    font-style: italic;
+    font-weight: 900;
+    font-size: 1.3rem !important;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--f11-yellow);
+}
+
+/* ==========================================================================
+   13. EXPERIENCIAS Y OCULTAMIENTO DE CARD-ITEMS Y TITULO
+   ========================================================================== */
+.tpl-f11 #mod-experiencias {
+    padding: 2rem 5% 4.4rem;
+}
+
+/* Quitar titulo de "experiencias" */
+.tpl-f11 #mod-experiencias h2,
+.Tpl-F11 #mod-experiencias h2 {
+    display: none !important;
+}
+
+/* Ocultar las "card-item" en todo el documento */
+.tpl-f11 .card-item,
+.Tpl-F11 .card-item {
+    display: none !important;
+}
+
+.tpl-f11 #db-experiencias-list {
+    max-width: 1100px !important;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem;
+}
+
+.tpl-f11 .exp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    min-height: 200px;
+    padding: 2rem 1.4rem;
+    border: 1px solid rgba(122, 0, 255, 0.28);
+    border-radius: 12px;
+    background: rgba(25, 8, 48, 0.75);
+    text-align: center;
+}
+
+.tpl-f11 .exp-titulo {
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--f11-text-cream);
+}
+
+.tpl-f11 .exp-tag {
+    font-size: 1.6rem;
+    font-style: italic;
+    font-weight: 900;
+    color: var(--f11-pink);
+}
+
+/* ==========================================================================
+   16. GALERIA — FOTOS UNIDAS SIN MARGEN (RECUADRO FOTOGRAFICO)
+   ========================================================================== */
+.tpl-f11 #mod-video {
+    padding: 3rem 0 !important;
+    width: 100% !important;
+    background: var(--f11-bg);
+}
+
+.tpl-f11 #mod-video > div:not(#db-gallery-grid),
+.Tpl-F11 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
+/* Grid de galería continuo, sin márgenes ni gaps */
+.tpl-f11 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.tpl-f11 #db-gallery-grid .gallery-item {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden;
+    background: #000;
+}
+
+.tpl-f11 #db-gallery-grid .gallery-item img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+    border: none !important;
+    filter: brightness(0.85) saturate(1.1);
+    transition: transform 0.4s ease, filter 0.4s ease;
+    cursor: pointer;
+}
+
+.tpl-f11 #db-gallery-grid .gallery-item:hover img {
+    filter: brightness(1.1) saturate(1.3);
+    transform: scale(1.04);
+    z-index: 2;
+}
+
+/* ==========================================================================
+   14. BOLETOS
+   ========================================================================== */
+.tpl-f11 #mod-boletos {
+    padding: 3.5rem 8%;
+}
+
+.tpl-f11 .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column;
+    max-width: 420px;
+    margin: 0 auto;
+    border: 1px solid var(--f11-line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(25, 8, 48, 0.55);
+}
+
+.tpl-f11 .boleto-card-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--f11-line);
+}
+
+.tpl-f11 .boleto-precio,
+.tpl-f11 #price-neon-yellow {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--f11-yellow) !important;
+}
+
+/* ==========================================================================
+   15. FORMULARIO
+   ========================================================================== */
+.tpl-f11 .form-master-box {
+    background: var(--f11-card-bg);
+    border: 1px solid var(--f11-line);
+    border-top: 2px solid var(--f11-blue);
+    border-radius: 4px;
+    padding: 2.6rem 2.4rem;
+    max-width: 520px;
+    margin: 2rem auto 0;
+}
+
+.tpl-f11 .form-input,
+.tpl-f11 #reg-nombre,
+.tpl-f11 #reg-whatsapp {
+    width: 100%;
+    padding: 1.1rem 1rem;
+    margin-bottom: 1.1rem;
+    background: rgba(15, 2, 30, 0.80);
+    border: 1px solid var(--f11-line);
+    color: var(--f11-text);
+}
+
+.tpl-f11 .btn-submit,
+.tpl-f11 #master-reg-form button[type=submit] {
+    width: 100%;
+    padding: 1.2rem;
+    background: var(--f11-pink) !important;
+    border: none;
+    color: #ffffff;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   19. UBICACION & SPONSORS
+   ========================================================================== */
+.tpl-f11 #mod-ubicacion { padding: 4.5rem 8%; }
+.tpl-f11 #db-mapa-container { border-radius: 2px; border: 1px solid rgba(0, 240, 255, 0.20); }
+
+.tpl-f11 #mod-sponsors,
+.Tpl-F11 #mod-sponsors {
+    display: none !important;
+}
+
+/* ==========================================================================
+   21. FOOTER
+   ========================================================================== */
+.tpl-f11 #mod-footer {
+    background: var(--f11-bg) !important;
+    border-top: 2px solid var(--f11-pink);
+    padding: 2rem;
+    text-align: center;
+}
+
+.tpl-f11 #mod-footer .footer-inner { display: none !important; }
+
+/* ==========================================================================
+   24. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 992px) {
+    .tpl-f11 #db-lineup { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+@media (max-width: 767px) {
+    .tpl-f11 #main-content-flow {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "countdown"
+            "meta"
+            "ctas"
+            "descripcion"
+            "form"
+            "lineup"
+            "boletos"
+            "experiencias"
+            "cartel"
+            "playlist"
+            "video"
+            "info"
+            "ubicacion"
+            "sponsors"
+            "footer" !important;
+    }
+    .tpl-f11 #db-lineup { grid-template-columns: repeat(1, 1fr) !important; }
+    .tpl-f11 .artist-card { min-height: 340px !important; }
+    .tpl-f11 #db-gallery-grid { grid-template-columns: repeat( auto-fill, minmax(140px, 1fr) ) !important; }
+}
