@@ -1,10 +1,10 @@
 /* ============================================================================
    f11.css - SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.4.0 - HERO HARMONIC LAYOUT & FULL-COVER BACKGROUND
+   v2.3.0 - HERO UNIFICADO FULL-COVER (COUNTDOWN, META & CTA DENTRO DEL HERO)
 ============================================================================ */
 
 /* ==========================================================================
-   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   1. RESETEO DE SILO + PUENTE CROMATICO + VARIABLES
    ========================================================================== */
 .tpl-f11, .Tpl-F11 {
     --tpl-accent: var(--master-accent, #ff2a85);
@@ -35,7 +35,7 @@
     --f11-glow-purple:      0 0 18px rgba(122, 0, 255, 0.45);
     --f11-border-glow:      1px solid rgba(255, 42, 133, 0.4);
 
-    /* Tipografía */
+    /* Tipografia */
     --f11-font: 'Geist', system-ui, -apple-system, sans-serif;
 
     margin: 0;
@@ -95,27 +95,12 @@
 }
 
 /* ==========================================================================
-   2. ACTIVACIÓN ATÓMICA Y GRID PRINCIPAL
+   2. ACTIVACION ATOMICA
    ========================================================================== */
 .tpl-f11 #main-content-flow,
 .Tpl-F11 #main-content-flow {
     position: relative;
     z-index: 1;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-        "hero       hero"
-        "descripcion descripcion"
-        "lineup     lineup"
-        "cartel     playlist"
-        "boletos    form"
-        "experiencias experiencias"
-        "video      video"
-        "info       info"
-        "ubicacion  ubicacion"
-        "sponsors   sponsors"
-        "footer     footer";
-    width: 100%;
 }
 
 .tpl-f11 #mod-hero,          .Tpl-F11 #mod-hero,
@@ -149,7 +134,33 @@
     display: none !important;
 }
 
-.tpl-f11 #mod-hero         { grid-area: hero; }
+/* ==========================================================================
+   3. GRID ATOMICO — HERO UNIFICADO EN LA MISMA ÁREA
+   ========================================================================== */
+.tpl-f11 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "hero       hero"
+        "descripcion descripcion"
+        "lineup     lineup"
+        "cartel     playlist"
+        "boletos    form"
+        "experiencias experiencias"
+        "video      video"
+        "info       info"
+        "ubicacion  ubicacion"
+        "sponsors   sponsors"
+        "footer     footer";
+    width: 100%;
+}
+
+/* Todos los elementos del segmento Hero comparten la misma area 'hero' */
+.tpl-f11 #mod-hero         { grid-area: hero; z-index: 1; }
+.tpl-f11 #unified-frame    { grid-area: hero; z-index: 3; align-self: center; margin-top: 5rem !important; }
+.tpl-f11 #mod-hero-meta    { grid-area: hero; z-index: 3; align-self: center; margin-top: 11.5rem !important; }
+.tpl-f11 #mod-hero-ctas    { grid-area: hero; z-index: 3; align-self: center; margin-top: 17rem !important; }
+
 .tpl-f11 #mod-descripcion  { grid-area: descripcion; }
 .tpl-f11 #mod-cartel       { grid-area: cartel; }
 .tpl-f11 #mod-video        { grid-area: video; }
@@ -164,17 +175,35 @@
 .tpl-f11 #mod-info-tecnica { grid-area: info; }
 
 /* ==========================================================================
-   3. HERO ESTILIZADO CON ALINEACIÓN Y ESPACIADO ARMÓNICO
+   4. TIPOGRAFIA EDITORIAL
+   ========================================================================== */
+.tpl-f11 h2, .Tpl-F11 h2 {
+    color: var(--f11-text-cream);
+    font-family: var(--f11-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.44em;
+    font-weight: 800;
+    margin-bottom: 2.6rem;
+    text-transform: uppercase;
+}
+
+.tpl-f11 section {
+    padding: 4.5rem 8%;
+    border-bottom: 1px solid var(--f11-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO FULL COVER — FONDO COMPLETO UNIFICADO
    ========================================================================== */
 .tpl-f11 #mod-hero {
     position: relative;
     display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 1.8rem !important; /* Espaciado uniforme y armónico entre módulos */
-    padding: 5rem 6% 4.5rem !important;
-    min-height: 90vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: 4.5rem 6% 19.5rem !important; /* Spacing para alojar el contenido flotante */
+    min-height: 85vh;
     color: var(--f11-text);
     background-color: var(--f11-bg);
     background-size: cover;
@@ -187,37 +216,41 @@
     content: "";
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: 1;
     background: linear-gradient(
         180deg,
-        rgba(15, 2, 30, 0.40) 0%,
-        rgba(15, 2, 30, 0.70) 65%,
-        rgba(15, 2, 30, 0.98) 100%
+        rgba(15, 2, 30, 0.35) 0%,
+        rgba(15, 2, 30, 0.60) 60%,
+        rgba(15, 2, 30, 0.95) 100%
     );
     pointer-events: none;
 }
 
-/* Ocultar badge "Diego Velez" */
+/* OCULTAR CEJA DIEGO VELEZ */
 .tpl-f11 #org-name-badge,
 .Tpl-F11 #org-name-badge {
     display: none !important;
 }
 
-.tpl-f11 #mod-hero > * {
+.tpl-f11 #mod-hero .hero-content {
     position: relative;
     z-index: 2;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* 3.1. Título */
+/* Titulo Grande */
 .tpl-f11 #event-title {
-    margin: 0 !important;
+    margin: 0;
     font-family: var(--f11-font);
     font-weight: 900 !important;
     font-style: italic;
     letter-spacing: -0.02em;
     line-height: 0.92;
-    font-size: clamp(3.2rem, 11vw, 7rem) !important;
-    text-align: center;
+    font-size: clamp(3rem, 11vw, 7rem) !important;
+    max-width: 100%;
     display: block !important;
     background: linear-gradient(
         135deg,
@@ -232,17 +265,17 @@
     filter: drop-shadow(0 0 22px rgba(255, 229, 0, 0.45));
 }
 
-/* 3.2. Countdown */
+/* Countdown Estilado, Pequeño y sobre el Hero */
 .tpl-f11 #unified-frame {
-    display: flex !important;
     flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 12px !important;
+    justify-content: center;
+    align-items: center;
+    gap: 8px !important;
     padding: 0 !important;
-    margin: 0 !important;
     background: transparent !important;
     border: none !important;
+    box-shadow: none !important;
+    pointer-events: auto;
 }
 
 .tpl-f11 #unified-frame .cd-block {
@@ -250,19 +283,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8px 14px !important;
+    padding: 6px 12px !important;
     background: rgba(15, 2, 30, 0.65) !important;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 240, 255, 0.35) !important;
-    border-radius: 8px;
-    min-width: 70px !important;
-    max-width: 95px !important;
+    border-radius: 6px;
+    min-width: 65px !important;
+    max-width: 90px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 .tpl-f11 #unified-frame .cd-block > span {
-    font-size: clamp(1.3rem, 3.5vw, 2.2rem) !important;
+    font-size: clamp(1.2rem, 3.5vw, 2rem) !important;
     font-weight: 900 !important;
     color: var(--f11-text);
     line-height: 1;
@@ -271,38 +304,39 @@
 
 .tpl-f11 #unified-frame .cd-block small {
     font-size: 0.55rem !important;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.2em;
     color: var(--f11-yellow);
-    margin-top: 0.25rem;
+    margin-top: 0.2rem;
     font-weight: 800;
 }
 
-/* 3.3. Metadata */
+/* Metadata Estilizada y Pequeña sobre el Hero */
 .tpl-f11 #mod-hero-meta {
     display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.6rem 1.2rem !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.2rem !important;
     padding: 0 !important;
-    margin: 0 !important;
     background: transparent !important;
     border: none !important;
+    box-shadow: none !important;
+    pointer-events: auto;
 }
 
 .tpl-f11 #mod-hero-meta .meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    font-size: 0.85rem !important;
+    gap: 0.4rem;
+    font-size: 0.82rem !important;
     letter-spacing: 0.08em;
     font-weight: 800;
-    background: rgba(255, 42, 133, 0.14) !important;
-    border: 1px solid rgba(255, 42, 133, 0.38) !important;
+    background: rgba(255, 42, 133, 0.15) !important;
+    border: 1px solid rgba(255, 42, 133, 0.4) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     color: var(--f11-text-cream);
-    padding: 0.4rem 0.95rem !important;
+    padding: 0.35rem 0.85rem !important;
     border-radius: 20px !important;
 }
 
@@ -312,15 +346,12 @@
     height: 15px !important;
 }
 
-/* 3.4. Botón CTA */
+/* Boton Comprar Ahora sobre el Hero */
 .tpl-f11 #mod-hero-ctas {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
     padding: 0 !important;
-    margin: 0 !important;
     background: transparent !important;
     border: none !important;
+    pointer-events: auto;
 }
 
 .tpl-f11 #mod-hero-ctas .hero-cta-btn--primary,
@@ -329,12 +360,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.9rem 2.4rem !important;
-    min-height: 48px !important;
+    padding: 0.85rem 2.2rem !important;
+    min-height: 46px !important;
     font-family: var(--f11-font);
     font-weight: 900 !important;
-    font-size: 0.85rem !important;
-    letter-spacing: 0.2em;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     text-decoration: none;
     border-radius: 30px !important;
@@ -358,23 +389,8 @@
 }
 
 /* ==========================================================================
-   4. SECCIONES GENERALES & DESCRIPCIÓN
+   10. DESCRIPCION
    ========================================================================== */
-.tpl-f11 h2, .Tpl-F11 h2 {
-    color: var(--f11-text-cream);
-    font-family: var(--f11-font);
-    font-size: 0.72rem;
-    letter-spacing: 0.44em;
-    font-weight: 800;
-    margin-bottom: 2.6rem;
-    text-transform: uppercase;
-}
-
-.tpl-f11 section {
-    padding: 4.5rem 8%;
-    border-bottom: 1px solid var(--f11-line-soft);
-}
-
 .tpl-f11 #mod-descripcion {
     padding: 3.5rem 8%;
     background: linear-gradient(135deg, var(--f11-bg-ink) 0%, var(--f11-bg) 100%);
@@ -401,7 +417,7 @@
 }
 
 /* ==========================================================================
-   5. CARTEL Y PLAYLIST (SINCRONIZACIÓN DE ALTURA)
+   11 & 13. CARTEL Y PLAYLIST CON MISMA ALTURA
    ========================================================================== */
 .tpl-f11 #mod-cartel,
 .tpl-f11 #mod-playlist {
@@ -450,7 +466,7 @@
 }
 
 /* ==========================================================================
-   6. LINEUP
+   12. LINEUP — ESPACIO DE TARJETAS
    ========================================================================== */
 .tpl-f11 #mod-lineup {
     padding: 4rem 8%;
@@ -517,7 +533,7 @@
 }
 
 /* ==========================================================================
-   7. EXPERIENCIAS
+   13. EXPERIENCIAS — SIN TITULO Y CARD-ITEMS OCULTAS
    ========================================================================== */
 .tpl-f11 #mod-experiencias {
     padding: 2rem 5% 4rem;
@@ -570,7 +586,7 @@
 }
 
 /* ==========================================================================
-   8. GALERÍA FOTOGRÁFICA UNIFORME
+   16. GALERIA — FOTOS DE LA SECCION SIN MARGEN
    ========================================================================== */
 .tpl-f11 #mod-video {
     padding: 2.5rem 0 !important;
@@ -621,9 +637,11 @@
 }
 
 /* ==========================================================================
-   9. BOLETOS & FORMULARIO
+   14. BOLETOS
    ========================================================================== */
-.tpl-f11 #mod-boletos { padding: 3.5rem 8%; }
+.tpl-f11 #mod-boletos {
+    padding: 3.5rem 8%;
+}
 
 .tpl-f11 .boleto-cards-wrap {
     display: flex !important;
@@ -651,6 +669,9 @@
     color: var(--f11-yellow) !important;
 }
 
+/* ==========================================================================
+   15. FORMULARIO
+   ========================================================================== */
 .tpl-f11 .form-master-box {
     background: var(--f11-card-bg);
     border: 1px solid var(--f11-line);
@@ -685,7 +706,7 @@
 }
 
 /* ==========================================================================
-   10. UBICACIÓN, SPONSORS & FOOTER
+   19. UBICACION & SPONSORS
    ========================================================================== */
 .tpl-f11 #mod-ubicacion { padding: 4rem 8%; }
 .tpl-f11 #db-mapa-container { border-radius: 2px; border: 1px solid rgba(0, 240, 255, 0.20); }
@@ -695,6 +716,9 @@
     display: none !important;
 }
 
+/* ==========================================================================
+   21. FOOTER
+   ========================================================================== */
 .tpl-f11 #mod-footer {
     background: var(--f11-bg) !important;
     border-top: 2px solid var(--f11-pink);
@@ -705,7 +729,7 @@
 .tpl-f11 #mod-footer .footer-inner { display: none !important; }
 
 /* ==========================================================================
-   11. BREAKPOINTS RESPONSIVOS
+   24. RESPONSIVE BREAKPOINTS
    ========================================================================== */
 @media (max-width: 992px) {
     .tpl-f11 #db-lineup { grid-template-columns: repeat(2, 1fr) !important; }
@@ -731,9 +755,12 @@
     }
 
     .tpl-f11 #mod-hero {
-        padding: 4rem 5% 3.5rem !important;
-        gap: 1.4rem !important;
+        padding-bottom: 21rem !important;
     }
+
+    .tpl-f11 #unified-frame { margin-top: 6rem !important; }
+    .tpl-f11 #mod-hero-meta { margin-top: 13rem !important; }
+    .tpl-f11 #mod-hero-ctas { margin-top: 18.5rem !important; }
 
     .tpl-f11 #db-poster-img,
     .tpl-f11 #db-spotify-embed {
