@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.9.0 — CORRECCIÓN DE LAYOUT MOBILE, REORDENAMIENTO Y MÓDULOS VACÍOS
+   v3.0.0 — REORDENAMIENTO DE GRID, MÓDULOS VACÍOS Y MOBILE HERO
 ============================================================================ */
 
 /* ==========================================================================
@@ -152,7 +152,7 @@
     display: block !important;
 }
 
-/* Ocultos y Módulos Vacíos / Retirados */
+/* Ocultos / Eliminación de módulos vacíos */
 .tpl-f11 #mod-historia,
 .tpl-f11 #mod-objetivo,
 .tpl-f11 #mod-impacto-historico,
@@ -1239,7 +1239,7 @@
     }
 }
 
-/* — Mobile (Ajustes Integrales con fondo debajo del hero y flujo vertical) — */
+/* — Mobile (Ajustes Estructurales con Reordenamiento de Flujo y Hero Espaciado) — */
 @media (max-width: 767px) {
     .tpl-f11 {
         overflow-x: hidden;
@@ -1255,17 +1255,35 @@
         row-gap: 0 !important;
     }
 
+    /* Reordenamiento explícito de módulos en Mobile */
+    .tpl-f11 #mod-hero         { order: 1 !important; }
+    .tpl-f11 #mod-descripcion  { order: 2 !important; }
+    .tpl-f11 #mod-lineup       { order: 3 !important; }
+    .tpl-f11 #mod-cartel       { order: 4 !important; }
+    .tpl-f11 #mod-playlist     { order: 5 !important; }
+    .tpl-f11 #mod-boletos      { order: 6 !important; }
+    .tpl-f11 #mod-form         { order: 7 !important; }
+    .tpl-f11 #mod-experiencias { order: 8 !important; }
+    .tpl-f11 #mod-video        { order: 9 !important; }
+    .tpl-f11 #mod-info-tecnica { order: 10 !important; }
+    .tpl-f11 #mod-faq          { order: 11 !important; }
+    .tpl-f11 #mod-ubicacion    { order: 12 !important; }
+
+    /* Hero como contenedor unificado de fondo y espacio */
     .tpl-f11 #mod-hero {
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
         min-height: auto !important;
-        background-position: center top;
-        background-size: cover;
-        padding: 3.5rem 5% 2.5rem !important;
-        gap: 1.8rem !important;
+        background-color: var(--f11-bg) !important;
+        background-position: center top !important;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
+        padding: 4.5rem 5% 4rem !important;
+        gap: 2rem !important;
         width: 100% !important;
+        position: relative !important;
     }
 
     .tpl-f11 #mod-hero .hero-content {
@@ -1277,10 +1295,10 @@
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
+        font-size: clamp(2rem, 8.5vw, 3.4rem) !important;
         text-align: center !important;
         line-height: 1.05;
-        margin: 0 !important;
+        margin: 0 0 1rem 0 !important;
         width: 100% !important;
     }
 
@@ -1290,11 +1308,11 @@
     .Tpl-F11 #unified-frame,
     .Tpl-F11 #mod-hero-meta,
     .Tpl-F11 #mod-hero-ctas {
-        position: static !important;
+        position: relative !important;
         align-self: center !important;
         width: 100% !important;
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
@@ -1303,12 +1321,12 @@
         flex-wrap: wrap !important;
         justify-content: center !important;
         padding: 0 !important;
-        gap: 6px !important;
+        gap: 8px !important;
     }
 
     .tpl-f11 #mod-hero-meta {
         padding: 0 !important;
-        gap: 0.5rem 0.6rem !important;
+        gap: 0.6rem 0.8rem !important;
         justify-content: center !important;
     }
 
@@ -1319,28 +1337,28 @@
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 52px !important;
-        max-width: 68px !important;
+        min-width: 50px !important;
+        max-width: 66px !important;
         padding: 6px 8px !important;
     }
 
     .tpl-f11 #unified-frame .cd-block > span {
-        font-size: 1.2rem !important;
+        font-size: 1.1rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
         font-size: 0.72rem !important;
-        padding: 0.3rem 0.75rem !important;
+        padding: 0.35rem 0.85rem !important;
         max-width: 100%;
         justify-content: center;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
         width: 100% !important;
-        max-width: 320px !important;
-        min-height: 46px !important;
-        font-size: 0.78rem !important;
-        padding: 0.8rem 1.8rem !important;
+        max-width: 300px !important;
+        min-height: 44px !important;
+        font-size: 0.75rem !important;
+        padding: 0.75rem 1.5rem !important;
     }
 
     /* Adaptación de Secciones y Tarjetas */
@@ -1404,17 +1422,17 @@
 /* — Mobile pequeño (< 480px) — */
 @media (max-width: 480px) {
     .tpl-f11 #mod-hero {
-        padding: 3rem 4% 2.2rem !important;
-        gap: 1.5rem !important;
+        padding: 3.8rem 4% 3rem !important;
+        gap: 1.6rem !important;
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2rem, 8.5vw, 3rem) !important;
+        font-size: clamp(1.8rem, 8vw, 2.8rem) !important;
         letter-spacing: -0.01em;
     }
 
     .tpl-f11 #unified-frame .cd-block > span {
-        font-size: clamp(1rem, 4.5vw, 1.3rem) !important;
+        font-size: clamp(0.95rem, 4vw, 1.2rem) !important;
     }
 
     .tpl-f11 #unified-frame {
@@ -1422,26 +1440,26 @@
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 48px !important;
-        max-width: 62px !important;
-        padding: 5px 6px !important;
+        min-width: 44px !important;
+        max-width: 58px !important;
+        padding: 4px 6px !important;
     }
 
     .tpl-f11 #unified-frame .cd-sep {
-        font-size: 1rem !important;
-        margin-top: 0.15rem !important;
+        font-size: 0.95rem !important;
+        margin-top: 0.1rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.65rem !important;
-        padding: 0.25rem 0.6rem !important;
+        font-size: 0.64rem !important;
+        padding: 0.25rem 0.55rem !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
         width: 100% !important;
         max-width: 100% !important;
-        min-height: 44px !important;
-        font-size: 0.74rem !important;
+        min-height: 42px !important;
+        font-size: 0.72rem !important;
     }
 
     .tpl-f11 #db-lineup {
