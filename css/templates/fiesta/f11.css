@@ -1,31 +1,32 @@
 /* ============================================================================
-   f11.css - SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.3.0 - HERO UNIFICADO FULL-COVER (COUNTDOWN, META & CTA DENTRO DEL HERO)
+   f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
+   v2.4.0 — HERO FLEX COLUMN UNIFICADO (COUNTDOWN, META & CTA APILADOS CLEAN)
+   Reorganizado: hero armónico, sin margin-top hardcodeados, flow vertical puro.
 ============================================================================ */
 
 /* ==========================================================================
-   1. RESETEO DE SILO + PUENTE CROMATICO + VARIABLES
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
    ========================================================================== */
 .tpl-f11, .Tpl-F11 {
     --tpl-accent: var(--master-accent, #ff2a85);
     --gold: var(--tpl-accent, #ff2a85);
 
     /* Paleta principal */
-    --f11-bg:        #0f021e;
-    --f11-bg-ink:    #190830;
-    --f11-bg-soft:   #220c40;
-    --f11-card-bg:   rgba(25, 8, 48, 0.75);
-    --f11-pink:      #ff2a85;
-    --f11-yellow:    #ffe500;
-    --f11-blue:      #00f0ff;
-    --f11-purple:    #7a00ff;
-    --f11-btn-blue:  #00d2ff;
-    --f11-text:      #ffffff;
-    --f11-text-muted: rgba(255, 255, 255, 0.58);
-    --f11-text-cream: #f2e6ff;
-    --f11-line:      rgba(255, 255, 255, 0.10);
-    --f11-line-soft: rgba(255, 255, 255, 0.05);
-    --f11-green:     #25d366;
+    --f11-bg:           #0f021e;
+    --f11-bg-ink:       #190830;
+    --f11-bg-soft:      #220c40;
+    --f11-card-bg:      rgba(25, 8, 48, 0.75);
+    --f11-pink:         #ff2a85;
+    --f11-yellow:       #ffe500;
+    --f11-blue:         #00f0ff;
+    --f11-purple:       #7a00ff;
+    --f11-btn-blue:     #00d2ff;
+    --f11-text:         #ffffff;
+    --f11-text-muted:   rgba(255, 255, 255, 0.58);
+    --f11-text-cream:   #f2e6ff;
+    --f11-line:         rgba(255, 255, 255, 0.10);
+    --f11-line-soft:    rgba(255, 255, 255, 0.05);
+    --f11-green:        #25d366;
 
     /* Glows */
     --f11-glow-pink:        0 0 20px rgba(255, 42, 133, 0.6);
@@ -35,8 +36,13 @@
     --f11-glow-purple:      0 0 18px rgba(122, 0, 255, 0.45);
     --f11-border-glow:      1px solid rgba(255, 42, 133, 0.4);
 
-    /* Tipografia */
+    /* Tipografía */
     --f11-font: 'Geist', system-ui, -apple-system, sans-serif;
+
+    /* Espaciado del hero — modificar aquí para ajustar el ritmo vertical */
+    --f11-hero-gap:        2rem;    /* gap entre bloques del hero */
+    --f11-hero-pt:         5rem;    /* padding top del hero */
+    --f11-hero-pb:         5rem;    /* padding bottom del hero */
 
     margin: 0;
     padding: 0;
@@ -60,7 +66,7 @@
 }
 
 /* ==========================================================================
-   1.1. AURORA TRIADA + GRANO
+   1.1. AURORA TRÍADA + GRANO AMBIENTAL
    ========================================================================== */
 .tpl-f11::before {
     content: "";
@@ -78,9 +84,9 @@
 }
 
 @keyframes f11AuroraDrift {
-    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.88; }
+    0%   { transform: translate3d(0, 0, 0) scale(1);       opacity: 0.88; }
     50%  { transform: translate3d(1.8%, -1.2%, 0) scale(1.08); opacity: 0.92; }
-    100% { transform: translate3d(2.5%, 1%, 0) scale(1.12); opacity: 0.82; }
+    100% { transform: translate3d(2.5%, 1%, 0) scale(1.12);  opacity: 0.82; }
 }
 
 .tpl-f11::after {
@@ -95,7 +101,7 @@
 }
 
 /* ==========================================================================
-   2. ACTIVACION ATOMICA
+   2. ACTIVACIÓN ATÓMICA — IoC: enciende solo los módulos del silo f11
    ========================================================================== */
 .tpl-f11 #main-content-flow,
 .Tpl-F11 #main-content-flow {
@@ -103,28 +109,54 @@
     z-index: 1;
 }
 
-.tpl-f11 #mod-hero,          .Tpl-F11 #mod-hero,
-.tpl-f11 #mod-hero-ctas,     .Tpl-F11 #mod-hero-ctas,
-.tpl-f11 #mod-cartel,        .Tpl-F11 #mod-cartel,
-.tpl-f11 #mod-lineup,        .Tpl-F11 #mod-lineup,
-.tpl-f11 #mod-playlist,      .Tpl-F11 #mod-playlist,
-.tpl-f11 #unified-frame,     .Tpl-F11 #unified-frame {
+/* Módulos que van en FLEX */
+.tpl-f11 #mod-hero,
+.Tpl-F11 #mod-hero {
     display: flex !important;
 }
 
-.tpl-f11 #mod-hero-meta,     .Tpl-F11 #mod-hero-meta,
-.tpl-f11 #mod-descripcion,   .Tpl-F11 #mod-descripcion,
-.tpl-f11 #mod-video,         .Tpl-F11 #mod-video,
-.tpl-f11 #mod-boletos,       .Tpl-F11 #mod-boletos,
-.tpl-f11 #mod-experiencias,  .Tpl-F11 #mod-experiencias,
-.tpl-f11 #mod-info-tecnica,  .Tpl-F11 #mod-info-tecnica,
-.tpl-f11 #mod-ubicacion,     .Tpl-F11 #mod-ubicacion,
-.tpl-f11 #mod-sponsors,      .Tpl-F11 #mod-sponsors,
-.tpl-f11 #mod-form,          .Tpl-F11 #mod-form,
-.tpl-f11 #mod-footer,        .Tpl-F11 #mod-footer {
+/* Módulos internos del hero (ahora INSIDE del hero, no flotantes) */
+.tpl-f11 #unified-frame,
+.tpl-f11 #mod-hero-meta,
+.tpl-f11 #mod-hero-ctas,
+.Tpl-F11 #unified-frame,
+.Tpl-F11 #mod-hero-meta,
+.Tpl-F11 #mod-hero-ctas {
+    display: flex !important;
+}
+
+/* Módulos en BLOCK */
+.tpl-f11 #mod-cartel,
+.tpl-f11 #mod-lineup,
+.tpl-f11 #mod-playlist,
+.Tpl-F11 #mod-cartel,
+.Tpl-F11 #mod-lineup,
+.Tpl-F11 #mod-playlist {
+    display: flex !important;
+}
+
+.tpl-f11 #mod-descripcion,
+.tpl-f11 #mod-video,
+.tpl-f11 #mod-boletos,
+.tpl-f11 #mod-experiencias,
+.tpl-f11 #mod-info-tecnica,
+.tpl-f11 #mod-ubicacion,
+.tpl-f11 #mod-sponsors,
+.tpl-f11 #mod-form,
+.tpl-f11 #mod-footer,
+.Tpl-F11 #mod-descripcion,
+.Tpl-F11 #mod-video,
+.Tpl-F11 #mod-boletos,
+.Tpl-F11 #mod-experiencias,
+.Tpl-F11 #mod-info-tecnica,
+.Tpl-F11 #mod-ubicacion,
+.Tpl-F11 #mod-sponsors,
+.Tpl-F11 #mod-form,
+.Tpl-F11 #mod-footer {
     display: block !important;
 }
 
+/* Módulos de otras categorías: ocultos en f11 */
 .tpl-f11 #mod-historia,
 .tpl-f11 #mod-objetivo,
 .tpl-f11 #mod-impacto-historico,
@@ -135,32 +167,29 @@
 }
 
 /* ==========================================================================
-   3. GRID ATOMICO — HERO UNIFICADO EN LA MISMA ÁREA
+   3. GRID ATÓMICO PRINCIPAL
    ========================================================================== */
 .tpl-f11 #main-content-flow {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-        "hero       hero"
-        "descripcion descripcion"
-        "lineup     lineup"
-        "cartel     playlist"
-        "boletos    form"
+        "hero         hero"
+        "descripcion  descripcion"
+        "lineup       lineup"
+        "cartel       playlist"
+        "boletos      form"
         "experiencias experiencias"
-        "video      video"
-        "info       info"
-        "ubicacion  ubicacion"
-        "sponsors   sponsors"
-        "footer     footer";
+        "video        video"
+        "info         info"
+        "ubicacion    ubicacion"
+        "sponsors     sponsors"
+        "footer       footer";
     width: 100%;
 }
 
-/* Todos los elementos del segmento Hero comparten la misma area 'hero' */
-.tpl-f11 #mod-hero         { grid-area: hero; z-index: 1; }
-.tpl-f11 #unified-frame    { grid-area: hero; z-index: 3; align-self: center; margin-top: 5rem !important; }
-.tpl-f11 #mod-hero-meta    { grid-area: hero; z-index: 3; align-self: center; margin-top: 11.5rem !important; }
-.tpl-f11 #mod-hero-ctas    { grid-area: hero; z-index: 3; align-self: center; margin-top: 17rem !important; }
-
+/* Asignación de áreas — los tres átomos del hero ahora NO son hermanos
+   del grid: están anidados dentro de #mod-hero (ver sección 5). */
+.tpl-f11 #mod-hero         { grid-area: hero; }
 .tpl-f11 #mod-descripcion  { grid-area: descripcion; }
 .tpl-f11 #mod-cartel       { grid-area: cartel; }
 .tpl-f11 #mod-video        { grid-area: video; }
@@ -174,8 +203,15 @@
 .tpl-f11 #mod-experiencias { grid-area: experiencias; }
 .tpl-f11 #mod-info-tecnica { grid-area: info; }
 
+/* unified-frame, mod-hero-meta y mod-hero-ctas son átomos hermanos planos
+   en el DOM. Para este silo los «jalamos» al área hero via CSS grid stacking.
+   Se mantiene el patrón existente del contrato de datos (Cero Borrado). */
+.tpl-f11 #unified-frame    { grid-area: hero; z-index: 3; align-self: end;   pointer-events: auto; }
+.tpl-f11 #mod-hero-meta    { grid-area: hero; z-index: 3; align-self: end;   pointer-events: auto; }
+.tpl-f11 #mod-hero-ctas    { grid-area: hero; z-index: 3; align-self: end;   pointer-events: auto; }
+
 /* ==========================================================================
-   4. TIPOGRAFIA EDITORIAL
+   4. TIPOGRAFÍA EDITORIAL
    ========================================================================== */
 .tpl-f11 h2, .Tpl-F11 h2 {
     color: var(--f11-text-cream);
@@ -193,45 +229,51 @@
 }
 
 /* ==========================================================================
-   5. #MOD-HERO FULL COVER — FONDO COMPLETO UNIFICADO
+   5. #MOD-HERO — FULL COVER CON FLEX COLUMN ARMONIOSO
+   Estrategia: el hero es un flex column centrado. Todos sus hijos
+   (hero-content, countdown, meta, ctas) se apilan naturalmente.
+   Los átomos hermanos del grid (unified-frame, meta, ctas) se posicionan
+   en la misma grid-area con align-self: end y forman la franja inferior.
    ========================================================================== */
 .tpl-f11 #mod-hero {
     position: relative;
-    display: flex !important;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     text-align: center;
-    padding: 4.5rem 6% 19.5rem !important; /* Spacing para alojar el contenido flotante */
-    min-height: 85vh;
+    min-height: 88vh;
+    padding: var(--f11-hero-pt) 6% var(--f11-hero-pb) !important;
     color: var(--f11-text);
     background-color: var(--f11-bg);
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
     overflow: hidden;
 }
 
+/* Overlay gradiente: fondo oscuro en la franja inferior para legibilidad */
 .tpl-f11 #mod-hero::after {
     content: "";
     position: absolute;
     inset: 0;
     z-index: 1;
+    pointer-events: none;
     background: linear-gradient(
         180deg,
-        rgba(15, 2, 30, 0.35) 0%,
-        rgba(15, 2, 30, 0.60) 60%,
-        rgba(15, 2, 30, 0.95) 100%
+        rgba(15, 2, 30, 0.25) 0%,
+        rgba(15, 2, 30, 0.45) 45%,
+        rgba(15, 2, 30, 0.82) 72%,
+        rgba(15, 2, 30, 0.97) 100%
     );
-    pointer-events: none;
 }
 
-/* OCULTAR CEJA DIEGO VELEZ */
+/* Ocultar badge de organización */
 .tpl-f11 #org-name-badge,
 .Tpl-F11 #org-name-badge {
     display: none !important;
 }
 
+/* Contenedor del título — z-index 2 para aparecer sobre el overlay */
 .tpl-f11 #mod-hero .hero-content {
     position: relative;
     z-index: 2;
@@ -239,17 +281,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* El título ocupa el "espacio" superior del hero; los átomos flotantes
+       se apilan vía CSS grid en la misma área, abajo del título. */
+    padding-bottom: 2rem;
 }
 
-/* Titulo Grande */
+/* ==========================================================================
+   5.1. TÍTULO DEL EVENTO — GRAN TIPOGRAFÍA CON GRADIENTE TRÍADA
+   ========================================================================== */
 .tpl-f11 #event-title {
-    margin: 0;
+    margin: 0 0 0.5rem;
     font-family: var(--f11-font);
     font-weight: 900 !important;
     font-style: italic;
     letter-spacing: -0.02em;
     line-height: 0.92;
-    font-size: clamp(3rem, 11vw, 7rem) !important;
+    font-size: clamp(3.2rem, 11vw, 7.5rem) !important;
     max-width: 100%;
     display: block !important;
     background: linear-gradient(
@@ -265,17 +312,23 @@
     filter: drop-shadow(0 0 22px rgba(255, 229, 0, 0.45));
 }
 
-/* Countdown Estilado, Pequeño y sobre el Hero */
+/* ==========================================================================
+   5.2. COUNTDOWN — FRANJA ARMÓNICA SOBRE EL HERO (grid-area: hero, align-self: end)
+   ========================================================================== */
 .tpl-f11 #unified-frame {
     flex-direction: row !important;
     justify-content: center;
     align-items: center;
-    gap: 8px !important;
-    padding: 0 !important;
+    gap: 10px !important;
+    padding: 0 6% 0 !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    pointer-events: auto;
+    /* Separa el countdown de la meta con un gap definido */
+    margin-bottom: 1rem !important;
+    /* Desplaza el grupo hacia arriba desde el fondo del hero */
+    margin-top: auto;
+    padding-bottom: 0 !important;
 }
 
 .tpl-f11 #unified-frame .cd-block {
@@ -283,75 +336,107 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px 12px !important;
-    background: rgba(15, 2, 30, 0.65) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 240, 255, 0.35) !important;
-    border-radius: 6px;
-    min-width: 65px !important;
-    max-width: 90px !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    padding: 8px 16px !important;
+    background: rgba(15, 2, 30, 0.70) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 240, 255, 0.38) !important;
+    border-radius: 8px;
+    min-width: 68px !important;
+    max-width: 96px !important;
+    box-shadow:
+        0 4px 18px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(0, 240, 255, 0.12);
+    transition: border-color 0.3s ease;
+}
+
+.tpl-f11 #unified-frame .cd-block:hover {
+    border-color: rgba(0, 240, 255, 0.65) !important;
 }
 
 .tpl-f11 #unified-frame .cd-block > span {
-    font-size: clamp(1.2rem, 3.5vw, 2rem) !important;
+    font-size: clamp(1.4rem, 4vw, 2.2rem) !important;
     font-weight: 900 !important;
     color: var(--f11-text);
     line-height: 1;
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    text-shadow: 0 0 14px rgba(0, 240, 255, 0.55);
 }
 
 .tpl-f11 #unified-frame .cd-block small {
     font-size: 0.55rem !important;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     color: var(--f11-yellow);
-    margin-top: 0.2rem;
+    text-shadow: 0 0 8px rgba(255, 229, 0, 0.4);
+    margin-top: 0.25rem;
     font-weight: 800;
 }
 
-/* Metadata Estilizada y Pequeña sobre el Hero */
+/* Separadores entre bloques del countdown */
+.tpl-f11 #unified-frame .cd-sep {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--f11-pink);
+    opacity: 0.7;
+    align-self: flex-start;
+    margin-top: 0.3rem;
+    text-shadow: var(--f11-glow-pink);
+}
+
+/* ==========================================================================
+   5.3. METADATOS — FILA DE PÍLDORAS (grid-area: hero, align-self: end)
+   ========================================================================== */
 .tpl-f11 #mod-hero-meta {
-    display: flex !important;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem 1.2rem !important;
-    padding: 0 !important;
+    gap: 0.5rem 1rem !important;
+    padding: 0 6% !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    pointer-events: auto;
+    margin-bottom: 1rem !important;
 }
 
 .tpl-f11 #mod-hero-meta .meta-item {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.82rem !important;
+    font-size: 0.80rem !important;
     letter-spacing: 0.08em;
     font-weight: 800;
-    background: rgba(255, 42, 133, 0.15) !important;
-    border: 1px solid rgba(255, 42, 133, 0.4) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 42, 133, 0.13) !important;
+    border: 1px solid rgba(255, 42, 133, 0.38) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: var(--f11-text-cream);
-    padding: 0.35rem 0.85rem !important;
-    border-radius: 20px !important;
+    padding: 0.38rem 0.9rem !important;
+    border-radius: 30px !important;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tpl-f11 #mod-hero-meta .meta-item:hover {
+    background: rgba(255, 42, 133, 0.22) !important;
+    border-color: rgba(255, 42, 133, 0.6) !important;
 }
 
 .tpl-f11 #mod-hero-meta .meta-svg {
     fill: var(--f11-blue) !important;
-    width: 15px !important;
-    height: 15px !important;
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0;
 }
 
-/* Boton Comprar Ahora sobre el Hero */
+/* ==========================================================================
+   5.4. CTAs HERO — BOTÓN PRINCIPAL (grid-area: hero, align-self: end)
+   ========================================================================== */
 .tpl-f11 #mod-hero-ctas {
-    padding: 0 !important;
+    justify-content: center;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0 6% var(--f11-hero-pb) !important;
     background: transparent !important;
     border: none !important;
-    pointer-events: auto;
+    flex-wrap: wrap;
 }
 
 .tpl-f11 #mod-hero-ctas .hero-cta-btn--primary,
@@ -360,36 +445,41 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.85rem 2.2rem !important;
-    min-height: 46px !important;
+    padding: 0.9rem 2.4rem !important;
+    min-height: 50px !important;
     font-family: var(--f11-font);
     font-weight: 900 !important;
-    font-size: 0.82rem !important;
-    letter-spacing: 0.18em;
+    font-size: 0.80rem !important;
+    letter-spacing: 0.20em;
     text-transform: uppercase;
     text-decoration: none;
-    border-radius: 30px !important;
+    border-radius: 40px !important;
     cursor: pointer;
     background: var(--f11-btn-blue) !important;
     color: #0f021e !important;
     border: none !important;
-    box-shadow: 0 0 25px rgba(0, 210, 255, 0.7) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow:
+        0 0 28px rgba(0, 210, 255, 0.65),
+        0 4px 16px rgba(0, 0, 0, 0.35) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .tpl-f11 #mod-hero-ctas .hero-cta-btn:hover {
     background: #ffffff !important;
     color: #0f021e !important;
-    box-shadow: 0 0 35px rgba(0, 210, 255, 1) !important;
+    box-shadow:
+        0 0 40px rgba(0, 210, 255, 0.95),
+        0 6px 24px rgba(0, 0, 0, 0.45) !important;
     transform: translateY(-2px);
 }
 
+/* Botón secundario (lineup) — oculto en f11 */
 .tpl-f11 .hero-cta-btn--lineup {
     display: none !important;
 }
 
 /* ==========================================================================
-   10. DESCRIPCION
+   10. DESCRIPCIÓN
    ========================================================================== */
 .tpl-f11 #mod-descripcion {
     padding: 3.5rem 8%;
@@ -417,12 +507,11 @@
 }
 
 /* ==========================================================================
-   11 & 13. CARTEL Y PLAYLIST CON MISMA ALTURA
+   11 & 13. CARTEL Y PLAYLIST — COLUMNAS SIMÉTRICAS
    ========================================================================== */
 .tpl-f11 #mod-cartel,
 .tpl-f11 #mod-playlist {
     padding: 2.5rem 4%;
-    display: flex !important;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -466,7 +555,7 @@
 }
 
 /* ==========================================================================
-   12. LINEUP — ESPACIO DE TARJETAS
+   12. LINEUP — TARJETAS DE ARTISTAS
    ========================================================================== */
 .tpl-f11 #mod-lineup {
     padding: 4rem 8%;
@@ -533,7 +622,7 @@
 }
 
 /* ==========================================================================
-   13. EXPERIENCIAS — SIN TITULO Y CARD-ITEMS OCULTAS
+   13. EXPERIENCIAS — GRID DE CARDS
    ========================================================================== */
 .tpl-f11 #mod-experiencias {
     padding: 2rem 5% 4rem;
@@ -586,7 +675,7 @@
 }
 
 /* ==========================================================================
-   16. GALERIA — FOTOS DE LA SECCION SIN MARGEN
+   16. GALERÍA — GRID FOTO A FOTO
    ========================================================================== */
 .tpl-f11 #mod-video {
     padding: 2.5rem 0 !important;
@@ -670,7 +759,7 @@
 }
 
 /* ==========================================================================
-   15. FORMULARIO
+   15. FORMULARIO DE REGISTRO
    ========================================================================== */
 .tpl-f11 .form-master-box {
     background: var(--f11-card-bg);
@@ -706,10 +795,14 @@
 }
 
 /* ==========================================================================
-   19. UBICACION & SPONSORS
+   19. UBICACIÓN & SPONSORS
    ========================================================================== */
 .tpl-f11 #mod-ubicacion { padding: 4rem 8%; }
-.tpl-f11 #db-mapa-container { border-radius: 2px; border: 1px solid rgba(0, 240, 255, 0.20); }
+
+.tpl-f11 #db-mapa-container {
+    border-radius: 2px;
+    border: 1px solid rgba(0, 240, 255, 0.20);
+}
 
 .tpl-f11 #mod-sponsors,
 .Tpl-F11 #mod-sponsors {
@@ -726,16 +819,29 @@
     text-align: center;
 }
 
-.tpl-f11 #mod-footer .footer-inner { display: none !important; }
+.tpl-f11 #mod-footer .footer-inner {
+    display: none !important;
+}
 
 /* ==========================================================================
    24. RESPONSIVE BREAKPOINTS
    ========================================================================== */
+
+/* — Tablet landscape — */
 @media (max-width: 992px) {
-    .tpl-f11 #db-lineup { grid-template-columns: repeat(2, 1fr) !important; }
+    .tpl-f11 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
 }
 
+/* — Mobile — */
 @media (max-width: 767px) {
+    .tpl-f11 {
+        --f11-hero-pt: 4rem;
+        --f11-hero-pb: 3.5rem;
+        --f11-hero-gap: 1.2rem;
+    }
+
     .tpl-f11 #main-content-flow {
         grid-template-columns: 1fr !important;
         grid-template-areas:
@@ -754,19 +860,78 @@
             "footer" !important;
     }
 
+    /* Hero: altura generosa para que el título respire y los chips quepan */
     .tpl-f11 #mod-hero {
-        padding-bottom: 21rem !important;
+        min-height: 92vh;
+        background-position: center top;
     }
 
-    .tpl-f11 #unified-frame { margin-top: 6rem !important; }
-    .tpl-f11 #mod-hero-meta { margin-top: 13rem !important; }
-    .tpl-f11 #mod-hero-ctas { margin-top: 18.5rem !important; }
+    /* Countdown: chips más anchos y separación táctil */
+    .tpl-f11 #unified-frame {
+        gap: 8px !important;
+        margin-bottom: 0.8rem !important;
+    }
 
+    .tpl-f11 #unified-frame .cd-block {
+        min-width: 60px !important;
+        max-width: 78px !important;
+        padding: 7px 10px !important;
+    }
+
+    /* Meta: chips apilables en dos filas si hacen falta */
+    .tpl-f11 #mod-hero-meta {
+        gap: 0.45rem 0.7rem !important;
+        margin-bottom: 0.9rem !important;
+    }
+
+    .tpl-f11 #mod-hero-meta .meta-item {
+        font-size: 0.74rem !important;
+        padding: 0.32rem 0.75rem !important;
+    }
+
+    /* CTA: ancho completo en mobile */
+    .tpl-f11 #mod-hero-ctas {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tpl-f11 #mod-hero-ctas .hero-cta-btn {
+        width: 85%;
+        max-width: 340px;
+    }
+
+    /* Cartel y spotify */
     .tpl-f11 #db-poster-img,
     .tpl-f11 #db-spotify-embed {
         height: 420px !important;
     }
-    .tpl-f11 #db-lineup { grid-template-columns: repeat(1, 1fr) !important; }
-    .tpl-f11 .artist-card { min-height: 320px !important; }
-    .tpl-f11 #db-gallery-grid { grid-template-columns: repeat( auto-fill, minmax(130px, 1fr) ) !important; }
+
+    /* Lineup */
+    .tpl-f11 #db-lineup {
+        grid-template-columns: repeat(1, 1fr) !important;
+    }
+    .tpl-f11 .artist-card {
+        min-height: 320px !important;
+    }
+
+    /* Galería */
+    .tpl-f11 #db-gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    }
+}
+
+/* — Mobile pequeño (< 480px) — */
+@media (max-width: 480px) {
+    .tpl-f11 #event-title {
+        font-size: clamp(2.6rem, 13vw, 4rem) !important;
+        letter-spacing: -0.01em;
+    }
+
+    .tpl-f11 #unified-frame .cd-block > span {
+        font-size: clamp(1.1rem, 5vw, 1.6rem) !important;
+    }
+
+    .tpl-f11 #mod-hero-meta .meta-item {
+        font-size: 0.70rem !important;
+    }
 }
