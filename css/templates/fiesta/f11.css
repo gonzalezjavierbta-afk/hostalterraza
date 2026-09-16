@@ -1,6 +1,6 @@
 /* ============================================================================
    f11.css — SILO FIESTA F11 "CYBERPUNK FOSFORESCENTE" (sep-2026)
-   v2.7.0 — CORRECCIÓN DEFICIENTE MOBILE: HERO INTEGRADO FORZADO
+   v2.8.0 — CORRECCIÓN DE LAYOUT Y RESPONSIVE MOBILE COMPLETO
 ============================================================================ */
 
 /* ==========================================================================
@@ -53,6 +53,7 @@
     min-height: 100vh;
     box-sizing: border-box;
     position: relative;
+    overflow-x: hidden;
 }
 
 .tpl-f11 *, .Tpl-F11 * {
@@ -166,7 +167,7 @@
 }
 
 /* ==========================================================================
-   3. GRID ATÓMICO PRINCIPAL
+   3. GRID ATÓMICO PRINCIPAL (DESKTOP)
    ========================================================================== */
 .tpl-f11 #main-content-flow {
     display: grid !important;
@@ -1170,6 +1171,7 @@
 }
 
 .tpl-f11 .faq-item > div {
+    display: flex;
     justify-content: space-between;
     align-items: center;
 }
@@ -1248,7 +1250,7 @@
     }
 }
 
-/* — Mobile — */
+/* — Mobile (Ajustes Integrales) — */
 @media (max-width: 767px) {
     .tpl-f11 {
         overflow-x: hidden;
@@ -1258,36 +1260,22 @@
     }
 
     .tpl-f11 #main-content-flow {
-        grid-template-columns: 1fr !important;
-        row-gap: 2rem !important;
-        grid-template-areas:
-            "hero"
-            "descripcion"
-            "form"
-            "lineup"
-            "boletos"
-            "experiencias"
-            "cartel"
-            "playlist"
-            "video"
-            "info"
-            "faq"
-            "ubicacion"
-            "sponsors"
-            "footer" !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        row-gap: 0 !important;
     }
 
-    /* FIX DEFINITIVO HERO MOBILE: ANULAMOS GRID-AREA EN HIJOS Y FORZAMOS FLEX-COLUMN */
     .tpl-f11 #mod-hero {
-        grid-area: hero !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
         min-height: auto !important;
         background-position: center top;
-        padding: 3.5rem 5% 3rem !important;
-        gap: 1.4rem !important;
+        padding: 4rem 5% 3rem !important;
+        gap: 1.5rem !important;
+        width: 100% !important;
     }
 
     .tpl-f11 #mod-hero .hero-content {
@@ -1299,80 +1287,120 @@
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.8rem, 12vw, 4.5rem) !important;
+        font-size: clamp(2.4rem, 10vw, 4.2rem) !important;
         text-align: center !important;
         line-height: 1.05;
         margin: 0 !important;
+        width: 100% !important;
     }
 
-    /* Desactivación estricta de grid-area para obligar a los módulos a vivir dentro de #mod-hero */
     .tpl-f11 #unified-frame,
     .tpl-f11 #mod-hero-meta,
     .tpl-f11 #mod-hero-ctas,
     .Tpl-F11 #unified-frame,
     .Tpl-F11 #mod-hero-meta,
     .Tpl-F11 #mod-hero-ctas {
-        grid-area: auto !important;
         position: static !important;
         align-self: center !important;
         width: 100% !important;
         margin-top: 0 !important;
         margin-bottom: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
     .tpl-f11 #unified-frame {
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
         padding: 0 !important;
-        order: 2 !important;
+        gap: 8px !important;
     }
 
     .tpl-f11 #mod-hero-meta {
         padding: 0 !important;
-        gap: 0.45rem 0.7rem !important;
-        order: 3 !important;
+        gap: 0.5rem 0.8rem !important;
+        justify-content: center !important;
     }
 
     .tpl-f11 #mod-hero-ctas {
         padding: 0 !important;
-        order: 4 !important;
+        justify-content: center !important;
+        width: 100% !important;
     }
 
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 60px !important;
-        max-width: 78px !important;
-        padding: 7px 10px !important;
+        min-width: 58px !important;
+        max-width: 76px !important;
+        padding: 8px 10px !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.74rem !important;
-        padding: 0.32rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        padding: 0.35rem 0.8rem !important;
+        max-width: 100%;
+        justify-content: center;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
-        width: 85%;
-        max-width: 340px;
+        width: 100% !important;
+        max-width: 340px !important;
+    }
+
+    /* Adaptación de Secciones y Tarjetas */
+    .tpl-f11 section {
+        padding: 3.5rem 5% !important;
+    }
+
+    .tpl-f11 .descripcion-inner,
+    .tpl-f11 #db-descripcion-text {
+        padding: 2rem 1.5rem !important;
+        font-size: 1rem !important;
+        border-radius: 4px 12px 12px 4px !important;
+    }
+
+    .tpl-f11 .descripcion-inner::before,
+    .tpl-f11 #db-descripcion-text::before,
+    .tpl-f11 .descripcion-inner::after,
+    .tpl-f11 #db-descripcion-text::after {
+        font-size: 3.5rem !important;
     }
 
     .tpl-f11 #db-poster-img,
     .tpl-f11 #db-spotify-embed {
-        height: 420px !important;
+        height: 380px !important;
+        max-width: 100% !important;
     }
 
     .tpl-f11 #db-lineup {
         grid-template-columns: repeat(2, 1fr) !important;
-    }
-    .tpl-f11 .artist-card {
-        min-height: 320px !important;
+        gap: 1rem !important;
     }
 
-    .tpl-f11 section {
-        padding: 3.5rem 6% !important;
+    .tpl-f11 .artist-card {
+        min-height: 280px !important;
+        aspect-ratio: auto !important;
+    }
+
+    .tpl-f11 .artist-overlay {
+        padding: 1rem 0.6rem 0.8rem !important;
+    }
+
+    .tpl-f11 .artist-name {
+        font-size: 1.05rem !important;
+    }
+
+    .tpl-f11 .artist-resena {
+        font-size: 0.75rem !important;
+    }
+
+    .tpl-f11 .form-master-box {
+        padding: 2rem 1.2rem !important;
+        margin-top: 1rem !important;
     }
 
     .tpl-f11 #mod-faq,
     .tpl-f11 #mod-ubicacion {
-        padding: 3.5rem 6% !important;
+        padding: 3.5rem 5% !important;
     }
 }
 
@@ -1384,43 +1412,61 @@
     }
 
     .tpl-f11 #event-title {
-        font-size: clamp(2.4rem, 11vw, 3.8rem) !important;
+        font-size: clamp(2.1rem, 9.5vw, 3.2rem) !important;
         letter-spacing: -0.01em;
     }
 
     .tpl-f11 #unified-frame .cd-block > span {
-        font-size: clamp(1.1rem, 5vw, 1.6rem) !important;
+        font-size: clamp(1.1rem, 5vw, 1.5rem) !important;
     }
 
     .tpl-f11 #unified-frame {
-        gap: 6px !important;
+        gap: 4px !important;
     }
+
     .tpl-f11 #unified-frame .cd-block {
-        min-width: 56px !important;
-        max-width: 72px !important;
-        padding: 6px 9px !important;
+        min-width: 52px !important;
+        max-width: 68px !important;
+        padding: 6px 8px !important;
+    }
+
+    .tpl-f11 #unified-frame .cd-sep {
+        font-size: 1.1rem !important;
+        margin-top: 0.2rem !important;
     }
 
     .tpl-f11 #mod-hero-meta .meta-item {
-        font-size: 0.70rem !important;
+        font-size: 0.68rem !important;
     }
 
     .tpl-f11 #mod-hero-ctas .hero-cta-btn {
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
         min-height: 48px !important;
+        font-size: 0.78rem !important;
     }
 
     .tpl-f11 #db-lineup {
         grid-template-columns: repeat(1, 1fr) !important;
-        max-width: 400px;
+        max-width: 320px;
         margin: 0 auto;
     }
+
     .tpl-f11 .artist-card {
-        min-height: 300px !important;
+        min-height: 320px !important;
     }
+
     .tpl-f11 .artist-name {
-        font-size: 1.1rem !important;
+        font-size: 1.2rem !important;
+    }
+
+    .tpl-f11 #db-gallery-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tpl-f11 #db-gallery-grid .gallery-item {
+        grid-column-end: auto !important;
+        grid-row-end: span 14 !important;
     }
 }
 
