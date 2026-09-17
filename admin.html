@@ -128,6 +128,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .ld-theme-card{transition:.15s;cursor:pointer}
 .ld-theme-card:hover{opacity:.85;transform:scale(1.01)}
 .ld-theme-card.selected{border-color:var(--gold)!important;box-shadow:0 0 0 1px var(--gold)}
+.ld-theme-oculto{display:none!important}
+.ld-theme-legacy-forzado{display:block!important}
 
 
 /* STATS */
@@ -543,77 +545,81 @@ tr:hover td{background:var(--surface)}
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem" data-cat="cinematografia">🎬 Cinematografía</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" id="ev-theme-cards" data-cat="cinematografia">
             <div class="ld-theme-card" data-theme="arthouse" onclick="seleccionarTheme('arthouse')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div><span style="font-size:12px;font-weight:600;color:#0d0d0b">P1 · Arthouse</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div><span style="font-size:12px;font-weight:600;color:#0d0d0b">Arthouse</span></div>
               <div style="font-size:10px;color:#555">A24 · MUBI · Editorial blanco/negro</div>
             </div>
             <div class="ld-theme-card" data-theme="premiere-gold" onclick="seleccionarTheme('premiere-gold')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a1408,#2d2210)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 5px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">P2 · Premiere Gold</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 5px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Premiere Gold</span></div>
               <div style="font-size:10px;color:#a08040">Gala · Ovation · Negro y dorado</div>
             </div>
             <div class="ld-theme-card" data-theme="neon-cult-cine" onclick="seleccionarTheme('neon-cult-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#08030d,#120820)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#bf00ff;box-shadow:0 0 7px #bf00ff"></div><span style="font-size:12px;font-weight:600;color:#bf00ff">P3 · Neon Cult Cine</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#bf00ff;box-shadow:0 0 7px #bf00ff"></div><span style="font-size:12px;font-weight:600;color:#bf00ff">Neon Cult Cine</span></div>
               <div style="font-size:10px;color:#8040a0">Experimental · Por definir</div>
             </div>
             <div class="ld-theme-card" data-theme="interactive-cine" onclick="seleccionarTheme('interactive-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#080c0f,#0d1820)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 5px #4fc3f7"></div><span style="font-size:12px;font-weight:600;color:#4fc3f7">P4 · Interactive Cine</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 5px #4fc3f7"></div><span style="font-size:12px;font-weight:600;color:#4fc3f7">Interactive Cine</span></div>
               <div style="font-size:10px;color:#3080a0">Multimedia · Por definir</div>
             </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="fiesta">🎉 Fiesta</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="fiesta">
             <div class="ld-theme-card" data-theme="tropical-hostel" onclick="seleccionarTheme('tropical-hostel')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f1f0f,#1a3010)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-size:12px;font-weight:600;color:#4ade80">P5 · Tropical Hostel</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-size:12px;font-weight:600;color:#4ade80">Tropical Hostel</span></div>
               <div style="font-size:10px;color:#2d7040">Selina · Naturaleza · Mochileros</div>
             </div>
             <div class="ld-theme-card" data-theme="rooftop-sunset" onclick="seleccionarTheme('rooftop-sunset')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0a00,#2d1800)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 5px #f59e0b"></div><span style="font-size:12px;font-weight:600;color:#f59e0b">P6 · Rooftop Sunset</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 5px #f59e0b"></div><span style="font-size:12px;font-weight:600;color:#f59e0b">Rooftop Sunset</span></div>
               <div style="font-size:10px;color:#a06010">Edition Hotels · Golden Hour</div>
             </div>
             <div class="ld-theme-card" data-theme="underground" onclick="seleccionarTheme('underground')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a0000,#1a0000)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2d55;box-shadow:0 0 7px #ff2d55"></div><span style="font-size:12px;font-weight:600;color:#ff2d55">P7 · Underground</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2d55;box-shadow:0 0 7px #ff2d55"></div><span style="font-size:12px;font-weight:600;color:#ff2d55">Underground</span></div>
               <div style="font-size:10px;color:#a01030">Boiler Room · RA.co · Techno</div>
             </div>
             <div class="ld-theme-card" data-theme="elegant-cocktail" onclick="seleccionarTheme('elegant-cocktail')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f2efe9,#e8e3d8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#8b7355"></div><span style="font-size:12px;font-weight:600;color:#3a3530">P8 · Elegant Cocktail</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#8b7355"></div><span style="font-size:12px;font-weight:600;color:#3a3530">Elegant Cocktail</span></div>
               <div style="font-size:10px;color:#7a7570">Aman · Standard Hotels · VIP</div>
             </div>
             <div class="ld-theme-card" data-theme="afromango" onclick="seleccionarTheme('afromango')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#2a1800,#4a2c06)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9d00;box-shadow:0 0 7px #ff9d00"></div><span style="font-size:12px;font-weight:600;color:#ffb020">P9 · Afromango</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9d00;box-shadow:0 0 7px #ff9d00"></div><span style="font-size:12px;font-weight:600;color:#ffb020">Afromango</span></div>
               <div style="font-size:10px;color:#c8862a">Mango · Fiesta Tropical · DJ & Playlist</div>
             </div>
             <div class="ld-theme-card" data-theme="afromango-editor" onclick="seleccionarTheme('afromango-editor')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0b0806,#18120d)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9f1c;box-shadow:0 0 8px #ff9f1c"></div><span style="font-size:12px;font-weight:600;color:#ffb84d">P10 · Afromango Editor</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9f1c;box-shadow:0 0 8px #ff9f1c"></div><span style="font-size:12px;font-weight:600;color:#ffb84d">Afromango Editor</span></div>
               <div style="font-size:10px;color:#a89b85">Editorial Oscura · Vervee x Deep End · Aurora</div>
             </div>
             <div class="ld-theme-card" data-theme="tropical-brutalism" onclick="seleccionarTheme('tropical-brutalism')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#090909,#171020)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#F4D000;box-shadow:0 0 8px #F4D000"></div><span style="font-size:12px;font-weight:600;color:#F4D000">P11 · Tropical Brutalism</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#F4D000;box-shadow:0 0 8px #F4D000"></div><span style="font-size:12px;font-weight:600;color:#F4D000">Tropical Brutalism</span></div>
               <div style="font-size:10px;color:#7B2CFF">Festival Afro-Caribeño · Afromango · Poster Brutalista</div>
             </div>
             <div class="ld-theme-card" data-theme="tropilove" onclick="seleccionarTheme('tropilove')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0B0117,#14032C)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#FF3CAC;box-shadow:0 0 8px #FF3CAC"></div><span style="font-size:12px;font-weight:600;color:#FF3CAC">P12 · TropiLove</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#FF3CAC;box-shadow:0 0 8px #FF3CAC"></div><span style="font-size:12px;font-weight:600;color:#FF3CAC">TropiLove</span></div>
               <div style="font-size:10px;color:#FFE500">Tropical Neón · Brutalismo Maximalista · Palm Grain</div>
             </div>
             <div class="ld-theme-card" data-theme="mistico" onclick="seleccionarTheme('mistico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#14110e)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">P13 &middot; Mistico</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Mistico</span></div>
               <div style="font-size:10px;color:#a89f91">Dorado Antiguo &middot; Editorial Oscuro &middot; Rastro MC</div>
+            </div>
+            <div class="ld-theme-card" data-theme="fosforescente" onclick="seleccionarTheme('fosforescente')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f021e,#190830)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2a85;box-shadow:0 0 8px #ff2a85"></div><span style="font-size:12px;font-weight:600;color:#ff2a85">Fosforescente</span></div>
+              <div style="font-size:10px;color:#c0508a">Neon fucsia &middot; Hero 100svh &middot; Mobile-first</div>
             </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
             <div class="ld-theme-card" data-theme="solidario-moderno" onclick="seleccionarTheme('solidario-moderno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a1628,#0d2040)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;box-shadow:0 0 5px #3b82f6"></div><span style="font-size:12px;font-weight:600;color:#3b82f6">P9 · Solidario Moderno</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;box-shadow:0 0 5px #3b82f6"></div><span style="font-size:12px;font-weight:600;color:#3b82f6">Solidario Moderno</span></div>
               <div style="font-size:10px;color:#4060a0">Azul · Esperanza · ONG profesional</div>
             </div>
             <div class="ld-theme-card" data-theme="urgente-impactante" onclick="seleccionarTheme('urgente-impactante')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0000,#2d0000)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 5px #ef4444"></div><span style="font-size:12px;font-weight:600;color:#ef4444">P10 · Urgente & Impactante</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 5px #ef4444"></div><span style="font-size:12px;font-weight:600;color:#ef4444">Urgente & Impactante</span></div>
               <div style="font-size:10px;color:#a03030">Rojo · Emergencia · Urgencia</div>
             </div>
             <div class="ld-theme-card" data-theme="tech-futurista" onclick="seleccionarTheme('tech-futurista')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#001428,#001e3c)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#06b6d4;box-shadow:0 0 5px #06b6d4"></div><span style="font-size:12px;font-weight:600;color:#06b6d4">P11 · Tech & Futurista</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#06b6d4;box-shadow:0 0 5px #06b6d4"></div><span style="font-size:12px;font-weight:600;color:#06b6d4">Tech & Futurista</span></div>
               <div style="font-size:10px;color:#0080a0">Cyan · Innovación · Tecnología</div>
             </div>
             <div class="ld-theme-card" data-theme="vintage-organico" onclick="seleccionarTheme('vintage-organico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5efe0,#e8dcc8)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#6b7c3c"></div><span style="font-size:12px;font-weight:600;color:#4a5c2a">P12 · Vintage & Orgánico</span></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#6b7c3c"></div><span style="font-size:12px;font-weight:600;color:#4a5c2a">Vintage & Org&aacute;nico</span></div>
               <div style="font-size:10px;color:#7a7050">Verde · Raíces · Comunidad</div>
             </div>
           </div>
@@ -2052,6 +2058,7 @@ tr:hover td{background:var(--surface)}
       <button class="stab on" id="ga-tab-orgs"    onclick="gaTab('orgs')">Organizaciones</button>
       <button class="stab"    id="ga-tab-compare" onclick="gaTab('compare')">Comparativa</button>
       <button class="stab"    id="ga-tab-detalle" onclick="gaTab('detalle')" style="display:none">&#128202; <span id="ga-detalle-nombre">—</span></button>
+      <button class="stab"    id="ga-tab-plantillas" onclick="gaTab('plantillas')">Plantillas</button>
     </div>
     <!-- TAB orgs -->
     <div id="ga-panel-orgs">
@@ -2084,6 +2091,16 @@ tr:hover td{background:var(--surface)}
     <!-- TAB detalle org -->
     <div id="ga-panel-detalle" style="display:none">
       <div id="ga-detalle-content"></div>
+    </div>
+    <!-- TAB plantillas (ADR-040) - curacion global del catalogo de themes -->
+    <div id="ga-panel-plantillas" style="display:none">
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:.85rem">Curar el cat&aacute;logo de plantillas que ver&aacute;n los administradores de todas las organizaciones. Lo oculto y el orden se guardan en <code>config_global</code> (ADR-040); las tarjetas permanecen en el DOM (Cero Borrado) y cada plantilla nueva nace visible por defecto.</div>
+      <div id="ga-tpl-alert" style="margin-bottom:.75rem"></div>
+      <div id="ga-tpl-lista"></div>
+      <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+        <button class="btn btn-teal" onclick="guardarPlantillasGlobal()">&#128190; Guardar cambios</button>
+        <button class="btn btn-ghost" onclick="_renderPanelPlantillas()">&#8635; Recargar del DOM</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2722,7 +2739,12 @@ function toggleLandingConfig(activa) {
   document.getElementById('ev-landing-config').style.display = activa ? 'block' : 'none';
   if (activa) {
     if (typeof _ensureI18nPanels === 'function') _ensureI18nPanels();
-    if (!_ldThemeSeleccionado) seleccionarTheme('arthouse');
+    // ADR-040: el fallback respeta el catalogo curado por la cuenta master.
+    // Si no hay ninguna plantilla visible en Cine, no preselecciona ninguna.
+    if (!_ldThemeSeleccionado) {
+      const primerVisible = _primerThemeVisible('cinematografia');
+      if (primerVisible) seleccionarTheme(primerVisible);
+    }
   }
 }
 
@@ -2782,7 +2804,7 @@ const _THEME_TYPE = {
   'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
   'underground':'fiesta','elegant-cocktail':'fiesta','afromango':'fiesta',
   'afromango-editor':'fiesta','tropical-brutalism':'fiesta',
-  'tropilove':'fiesta','mistico':'fiesta',
+  'tropilove':'fiesta','mistico':'fiesta','fosforescente':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
 };
@@ -2795,6 +2817,7 @@ const _THEME_TPL = {
   'tropical-brutalism':'f7',
   'tropilove':'f8',
   'mistico':'f9',
+  'fosforescente':'f11',
 };
 
 // Reverse map template_id → theme slug (para cargar la plantilla al editar).
@@ -2802,6 +2825,184 @@ const _TPL_THEME = Object.keys(_THEME_TPL).reduce((acc, theme) => {
   acc[_THEME_TPL[theme]] = theme;
   return acc;
 }, {});
+
+// === ADR-040 - Catalogo de Plantillas Curado por la Cuenta Master ===
+// Fuente de verdad: public.config_global (fila unica id='default', columna
+// JSONB 'templates'). Se guarda LO OCULTO + EL ORDEN, nunca lo visible: toda
+// plantilla nueva nace visible por defecto (fail-open y forward-compatible).
+// Aplicacion = ocultar sin borrar: las cards permanecen en el DOM (Cero Borrado).
+let _GLOBAL_CFG  = null;               // ultimo documento templates leido
+let hiddenSet    = new Set();          // slugs de themes ocultos
+let _orderArr    = [];                 // orden global de slugs (no listados al final, orden DOM)
+
+const _TPL_CACHE_KEY = 'htz_tpl_visibilidad';
+
+function _aplicarDocTemplates(doc) {
+  _GLOBAL_CFG = doc;
+  hiddenSet = new Set(Array.isArray(doc.hidden) ? doc.hidden : []);
+  _orderArr = Array.isArray(doc.order) ? doc.order.slice() : [];
+}
+
+function _leerCacheTplVisibilidad() {
+  try {
+    const raw = localStorage.getItem(_TPL_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+async function _cargarConfigGlobal() {
+  // FAIL-OPEN: si falla la red o no hay dato, todo visible y orden DOM.
+  // La cache local (read-through) nunca es autoritativa: se relee la BD en cada loadAll().
+  try {
+    const res = await SB.from('config_global')
+      .select('templates,updated_at').eq('id','default').maybeSingle();
+    // Observabilidad: error de lectura (tabla inexistente o cache de PostgREST
+    // sin recargar) => traza diagnostica sin cambiar el fail-open (todo visible).
+    if (res && res.error) console.warn('[_cargarConfigGlobal] lectura fallida (fail-open, todo visible):', res.error.message);
+    const doc = res && res.data && res.data.templates;
+    if (doc && typeof doc === 'object') {
+      _aplicarDocTemplates(doc);
+      try {
+        localStorage.setItem(_TPL_CACHE_KEY, JSON.stringify({
+          templates: doc, updated_at: res.data.updated_at || null
+        }));
+      } catch(e) {}
+      return;
+    }
+  } catch(e) {
+    console.warn('[_cargarConfigGlobal] lectura fallida, fail-open:', e.message);
+  }
+  const cached = _leerCacheTplVisibilidad();
+  if (cached && cached.templates && typeof cached.templates === 'object') {
+    _aplicarDocTemplates(cached.templates);
+  } else {
+    _GLOBAL_CFG = null;
+    hiddenSet = new Set();
+    _orderArr = [];
+  }
+}
+
+async function _guardarConfigGlobal(hidden, order) {
+  // ADR-040 + RPC fn_config_global_merge (SECURITY DEFINER): el merge JSONB lo
+  // hace la BD (COALESCE(templates,'{}') || p_templates) y setea updated_at y
+  // updated_by. El cliente solo envia las claves que cura (version/hidden/order).
+  // NUNCA se reporta exito en falso: error RPC o respuesta sin fila => false.
+  try {
+    const doc = {
+      version: 2,
+      hidden: hidden || [],
+      order: order || []
+    };
+    const { data, error } = await SB.rpc('fn_config_global_merge', { p_templates: doc });
+    if (error) {
+      console.error('[_guardarConfigGlobal] RPC error:', error.message);
+      return false;
+    }
+    // PostgREST puede devolver fila unica o array segun la configuracion de la RPC.
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row || !row.templates || typeof row.templates !== 'object') {
+      console.warn('[_guardarConfigGlobal] RPC sin fila devuelta (RLS/0 filas) - no se reporta exito');
+      return false;
+    }
+    const tpl = row.templates;
+    _aplicarDocTemplates(tpl);
+    try {
+      localStorage.setItem(_TPL_CACHE_KEY, JSON.stringify({
+        templates: tpl,
+        updated_at: row.updated_at || null
+      }));
+    } catch(e) {}
+    return true;
+  } catch(e) {
+    console.error('[_guardarConfigGlobal]', e.message);
+    return false;
+  }
+}
+
+function _actualizarEstadoVacioCategorias() {
+  const cats = [];
+  document.querySelectorAll('.ld-theme-card').forEach(c => {
+    const grid = c.parentElement;
+    if (grid && grid.dataset && grid.dataset.cat && cats.indexOf(grid.dataset.cat) === -1) {
+      cats.push(grid.dataset.cat);
+    }
+  });
+  // Flag data-cat-empty en rotulos y grids (lo respeta seleccionarCategoria).
+  // El mensaje de estado vacio se excluye del flag: lleva data-cat propio y el
+  // filtro de seleccionarCategoria lo muestra/oculta segun la categoria activa.
+  cats.forEach(cat => {
+    const visibles = document.querySelectorAll(
+      '[data-cat="' + cat + '"] .ld-theme-card:not(.ld-theme-oculto)'
+    ).length;
+    document.querySelectorAll('[data-cat="' + cat + '"]').forEach(el => {
+      if (el.id && el.id.indexOf('ld-cat-empty-msg-') === 0) return;
+      if (visibles === 0) { el.dataset.catEmpty = '1'; }
+      else { delete el.dataset.catEmpty; }
+    });
+  });
+  // Mensaje de estado vacio por categoria: nodo transitorio propio (no es parte
+  // del contrato de datos ni del HTML hardcodeado). Lleva data-cat para que el
+  // filtro de seleccionarCategoria lo muestre/oculte al cambiar de categoria y
+  // se elimina cuando la categoria deja de estar vacia.
+  cats.forEach(cat => {
+    const msgId = 'ld-cat-empty-msg-' + cat;
+    const oldMsg = document.getElementById(msgId);
+    const visibles = document.querySelectorAll(
+      '[data-cat="' + cat + '"] .ld-theme-card:not(.ld-theme-oculto)'
+    ).length;
+    if (visibles === 0) {
+      if (!oldMsg) {
+        const first = document.querySelector('[data-cat="' + cat + '"] .ld-theme-card');
+        const grid = first && first.parentElement;
+        if (grid && grid.parentElement) {
+          const msg = document.createElement('div');
+          msg.id = msgId;
+          msg.dataset.cat = cat; // el filtro [data-cat] de seleccionarCategoria lo gobierna
+          msg.style.cssText = 'font-size:12px;color:var(--ink3);background:var(--surface);border:1px dashed var(--border);border-radius:var(--rsm);padding:.75rem;margin-bottom:.85rem';
+          msg.textContent = 'No hay plantillas disponibles para esta categor\u00eda.';
+          grid.parentElement.insertBefore(msg, grid.nextSibling);
+        }
+      }
+    } else if (oldMsg && oldMsg.parentNode) {
+      oldMsg.parentNode.removeChild(oldMsg);
+    }
+  });
+}
+
+function _aplicarTemplatesOcultos() {
+  // Ocultar sin borrar: nunca card.remove(), nunca se edita el HTML hardcodeado.
+  document.querySelectorAll('.ld-theme-card').forEach(card => {
+    card.classList.toggle('ld-theme-oculto', hiddenSet.has(card.dataset.theme));
+  });
+  // ORDEN: reordenar SOLO nodos existentes por grid de categoria. Los slugs
+  // listados en _orderArr van primero (en ese orden); el resto conserva su
+  // orden relativo y va despues. appendChild mueve, nunca recrea.
+  const grids = [];
+  document.querySelectorAll('.ld-theme-card').forEach(c => {
+    if (c.parentElement && grids.indexOf(c.parentElement) === -1) grids.push(c.parentElement);
+  });
+  grids.forEach(grid => {
+    const cards = Array.prototype.slice.call(grid.querySelectorAll('.ld-theme-card'));
+    if (cards.length <= 1) return;
+    const listados = cards
+      .filter(c => _orderArr.indexOf(c.dataset.theme) !== -1)
+      .sort((a, b) => _orderArr.indexOf(a.dataset.theme) - _orderArr.indexOf(b.dataset.theme));
+    const resto = cards.filter(c => _orderArr.indexOf(c.dataset.theme) === -1);
+    listados.concat(resto).forEach(c => grid.appendChild(c));
+  });
+  _actualizarEstadoVacioCategorias();
+}
+
+function _limpiarRevelacionLegacy() {
+  document.querySelectorAll('.ld-theme-legacy-forzado').forEach(c => c.classList.remove('ld-theme-legacy-forzado'));
+  const hint = document.getElementById('ld-legacy-hint');
+  if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
+}
+
+function _primerThemeVisible(tipo) {
+  return Object.keys(_THEME_TYPE)
+    .find(k => _THEME_TYPE[k] === tipo && !hiddenSet.has(k)) || null;
+}
 
 // Enruta el link público según el silo asignado. F7 es un motor independiente
 // (f7.html), el resto usa el orquestador maestro evento.html.
@@ -2841,17 +3042,18 @@ function seleccionarTheme(theme) {
 
   // Preview badge
   const names = {
-    'arthouse':'P1 · Arthouse','premiere-gold':'P2 · Premiere Gold',
-    'neon-cult-cine':'P3 · Neon Cult Cine','interactive-cine':'P4 · Interactive Cine',
-    'tropical-hostel':'P5 · Tropical Hostel','rooftop-sunset':'P6 · Rooftop Sunset',
-    'underground':'P7 · Underground','elegant-cocktail':'P8 · Elegant Cocktail',
-    'afromango':'P9 · Afromango',
-  'afromango-editor':'P10 · Afromango Editor',
-    'tropical-brutalism':'P11 · Tropical Brutalism',
-    'tropilove':'P12 · TropiLove',
-    'mistico':'P13 \u00B7 Mistico',
-    'solidario-moderno':'P9 · Solidario Moderno','urgente-impactante':'P10 · Urgente & Impactante',
-    'tech-futurista':'P11 · Tech & Futurista','vintage-organico':'P12 · Vintage & Orgánico',
+    'arthouse':'Arthouse','premiere-gold':'Premiere Gold',
+    'neon-cult-cine':'Neon Cult Cine','interactive-cine':'Interactive Cine',
+    'tropical-hostel':'Tropical Hostel','rooftop-sunset':'Rooftop Sunset',
+    'underground':'Underground','elegant-cocktail':'Elegant Cocktail',
+    'afromango':'Afromango',
+  'afromango-editor':'Afromango Editor',
+    'tropical-brutalism':'Tropical Brutalism',
+    'tropilove':'TropiLove',
+    'mistico':'Mistico',
+    'solidario-moderno':'Solidario Moderno','urgente-impactante':'Urgente & Impactante',
+    'tech-futurista':'Tech & Futurista','vintage-organico':'Vintage & Org\u00e1nico',
+    'fosforescente':'Fosforescente',
   };
   const badge  = document.getElementById('ld-preview-badge');
   const nameEl = document.getElementById('ld-preview-theme-name');
@@ -2881,13 +3083,14 @@ function seleccionarCategoria(tipo) {
   });
   // Filtrar qué grupo de plantillas (Paso 2) y qué bloque de módulos-tipo se ofrece
   document.querySelectorAll('[data-cat]').forEach(el => {
-    el.style.display = (el.dataset.cat === tipo) ? '' : 'none';
+    el.style.display = (el.dataset.cat === tipo && el.dataset.catEmpty !== '1') ? '' : 'none';
   });
 
-  // Preseleccionar automáticamente la primera plantilla de la categoría elegida
-  // (el usuario puede cambiarla libremente en el Paso 2 — ADN Visual).
+  // Preseleccionar automaticamente la primera plantilla VISIBLE de la categoria
+  // elegida (ADR-040: ignora las ocultas por la cuenta master). El usuario
+  // puede cambiarla libremente en el Paso 2 - ADN Visual.
   if (!_ldThemeSeleccionado || _THEME_TYPE[_ldThemeSeleccionado] !== tipo) {
-    const primera = Object.keys(_THEME_TYPE).find(k => _THEME_TYPE[k] === tipo);
+    const primera = _primerThemeVisible(tipo);
     if (primera) seleccionarTheme(primera);
   }
 }
@@ -3621,13 +3824,105 @@ const _IS_SYSTEM_ADMIN = () =>
 
 // ── Tabs ──────────────────────────────────────────────
 function gaTab(tab) {
-  ['orgs','compare','detalle'].forEach(t => {
+  ['orgs','compare','detalle','plantillas'].forEach(t => {
     const p = document.getElementById('ga-panel-' + t);
     if (p) p.style.display = t === tab ? 'block' : 'none';
     const b = document.getElementById('ga-tab-' + t);
     if (b) b.classList.toggle('on', t === tab);
   });
   if (tab === 'compare') renderGlobalCharts();
+  if (tab === 'plantillas') _renderPanelPlantillas();
+}
+
+// -- Tab Plantillas (ADR-040) --------------------------
+// La lista se construye SIEMPRE desde el DOM real (document.querySelectorAll
+// de .ld-theme-card), nunca desde una lista duplicada del catalogo.
+function _nombreThemeCard(card) {
+  const span = card && card.querySelector('span');
+  const label = span ? span.textContent : '';
+  return label ? label.trim() : (card.dataset.theme || '');
+}
+
+function _renderPanelPlantillas() {
+  if (!_IS_SYSTEM_ADMIN()) return;
+  const cont = document.getElementById('ga-tpl-lista');
+  if (!cont) return;
+  const cards = Array.prototype.slice.call(document.querySelectorAll('.ld-theme-card'));
+  if (!cards.length) { cont.innerHTML = '<div class="empty">No hay tarjetas de plantilla en el DOM.</div>'; return; }
+  const cats = ['cinematografia','fiesta','campana'];
+  let html = '';
+  cats.forEach(cat => {
+    const labelEl = document.querySelector('[data-cat="' + cat + '"]');
+    const label = labelEl ? labelEl.textContent.replace(/\s+/g,' ').trim() : cat;
+    const filas = cards.filter(c => c.parentElement && c.parentElement.dataset && c.parentElement.dataset.cat === cat);
+    if (!filas.length) return;
+    html += '<div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin:.9rem 0 .4rem">' + esc(label) + '</div>';
+    html += '<div class="ga-tpl-cat" data-tplcat="' + cat + '" style="border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden">';
+    filas.forEach(card => {
+      const slug = card.dataset.theme || '';
+      const visible = !card.classList.contains('ld-theme-oculto');
+      html += '<div class="ga-tpl-row" data-theme="' + esc(slug) + '" style="display:flex;align-items:center;gap:8px;padding:.5rem .75rem;border-bottom:1px solid var(--border);background:var(--surface)">'
+        + '<input type="checkbox" ' + (visible ? 'checked' : '') + ' title="Mostrar / Ocultar" style="width:16px;height:16px;accent-color:var(--teal)">'
+        + '<span style="flex:1;font-size:13px;font-weight:500;color:var(--ink2)">' + esc(_nombreThemeCard(card)) + '</span>'
+        + '<button type="button" class="btn btn-ghost btn-sm" onclick="gaTplMover(\'' + slug + '\',-1,this)" title="Subir">\u2191</button>'
+        + '<button type="button" class="btn btn-ghost btn-sm" onclick="gaTplMover(\'' + slug + '\',1,this)" title="Bajar">\u2193</button>'
+        + '</div>';
+    });
+    html += '</div>';
+  });
+  cont.innerHTML = html;
+}
+
+function gaTplMover(slug, dir, btn) {
+  const row = btn && btn.closest('.ga-tpl-row');
+  if (!row || row.dataset.theme !== slug) return;
+  const catBox = row.parentElement;
+  if (!catBox) return;
+  const rows = Array.prototype.slice.call(catBox.querySelectorAll('.ga-tpl-row'));
+  const i = rows.indexOf(row);
+  const j = i + dir;
+  if (j < 0 || j >= rows.length) return;
+  catBox.insertBefore(row, dir < 0 ? rows[j] : rows[j].nextSibling);
+}
+
+async function guardarPlantillasGlobal() {
+  if (!_IS_SYSTEM_ADMIN()) return;
+  const hidden = [];
+  const order = [];
+  const porCat = {};
+  document.querySelectorAll('#ga-tpl-lista .ga-tpl-cat').forEach(sec => {
+    const cat = sec.dataset.tplcat || '';
+    let vis = 0;
+    sec.querySelectorAll('.ga-tpl-row').forEach(row => {
+      const slug = row.dataset.theme || '';
+      order.push(slug);
+      const chk = row.querySelector('input[type=checkbox]');
+      if (chk && chk.checked) { vis++; } else { hidden.push(slug); }
+    });
+    porCat[cat] = vis;
+  });
+  // Guarda 1 - BLOQUEO DURO: el catalogo completo en cero visibles.
+  if (order.length && order.length === hidden.length) {
+    alrt('ga-tpl-alert', 'No puedes ocultar el cat\u00e1logo completo de plantillas: el Wizard no podr\u00eda crear eventos. Mant\u00e9n al menos una visible.', 'err');
+    return;
+  }
+  // Guarda 2 - aviso suave (confirm) por categoria en cero visibles.
+  const vacias = Object.keys(porCat).filter(c => porCat[c] === 0);
+  if (vacias.length) {
+    const txt = vacias.length === 1
+      ? 'la categor\u00eda ' + vacias[0] + ' quedar\u00e1 sin plantillas visibles.'
+      : 'las categor\u00edas ' + vacias.join(', ') + ' quedar\u00e1n sin plantillas visibles.';
+    if (!confirm('Con este cambio, ' + txt + ' \u00bfContinuar?')) return;
+  }
+  alrt('ga-tpl-alert', '', '');
+  const okSave = await _guardarConfigGlobal(hidden, order);
+  if (!okSave) {
+    alrt('ga-tpl-alert', 'No se pudo guardar la configuraci\u00f3n (revisa permisos o conexi\u00f3n).', 'err');
+    return;
+  }
+  _aplicarTemplatesOcultos();
+  _renderPanelPlantillas();
+  alrt('ga-tpl-alert', '\u2713 Cat\u00e1logo actualizado en vivo.', 'ok');
 }
 
 // ── Load ──────────────────────────────────────────────
@@ -4199,8 +4494,10 @@ async function loadAll() {
     return;
   }
   try {
+    await _cargarConfigGlobal(); // ADR-040 - catalogo curado (fail-open: todo visible si falla)
     await loadEventos();
     await loadEventosSelects();
+    _aplicarTemplatesOcultos();  // ADR-040 - ocultar sin borrar + orden global
   } catch(e) {
     console.error('[loadAll] Error:', e.message);
   }
@@ -4462,6 +4759,30 @@ function openEditMod(evId) {
   seleccionarCategoria(tipo);
   if (theme) seleccionarTheme(theme);
 
+  // ADR-040 - revelacion legacy (temporal, no persiste nada): si el theme de
+  // este evento esta oculto del catalogo, se fuerza visible SOLO esa card con
+  // una nota. El resolvedor (_THEME_TPL/_TPL_THEME) queda intacto y el
+  // template_id se conserva al guardar (sin allowlist, sin validacion).
+  _limpiarRevelacionLegacy();
+  document.querySelectorAll('.ld-theme-card').forEach(c => {
+    c.classList.toggle('ld-theme-oculto', hiddenSet.has(c.dataset.theme));
+  });
+  if (theme && hiddenSet.has(theme)) {
+    const cardLegacy = document.querySelector('.ld-theme-card[data-theme="' + theme + '"]');
+    if (cardLegacy) {
+      cardLegacy.classList.add('ld-theme-legacy-forzado');
+      cardLegacy.classList.remove('ld-theme-oculto');
+      if (!document.getElementById('ld-legacy-hint')) {
+        const hint = document.createElement('div');
+        hint.id = 'ld-legacy-hint';
+        hint.style.cssText = 'font-size:11px;color:var(--gold-d);background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--rsm);padding:.5rem .75rem;margin:.85rem 0';
+        hint.textContent = 'Esta plantilla ya no est\u00e1 en el cat\u00e1logo; tu evento la conserva. Puedes mantenerla o cambiar a una disponible.';
+        cardLegacy.parentElement.insertBefore(hint, cardLegacy.nextSibling);
+      }
+    }
+  }
+  _actualizarEstadoVacioCategorias();
+
   const hayLanding = !!cfg.theme || !!cfg.modules || !!content;
   if (hayLanding) {
     document.getElementById('ev-landing-activa').checked = true;
@@ -4528,6 +4849,9 @@ function openEditMod(evId) {
 }
 
 function _limpiarWizardCompleto() {
+  // ADR-040: la revelacion legacy (clase ld-theme-legacy-forzado + hint) no debe
+  // persistir al cancelar, guardar o iniciar un alta nueva.
+  _limpiarRevelacionLegacy();
   ['ev-n','ev-f','ev-h','ev-ubic','ev-aforo','ev-img','ev-video','ev-poster-url','ev-cabezote-form'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
   });
@@ -4708,6 +5032,8 @@ function _poblarContenidoWizard(content, suf) {
 
 function cancelarEdicion() {
   _evEditandoId = null;
+  // ADR-040: la revelacion legacy no debe persistir al cancelar la edicion.
+  _limpiarRevelacionLegacy();
   _limpiarWizardCompleto();
   const btn = document.getElementById('btn-crear-ev');
   // ADR-FIX: rehabilitar SIEMPRE el botón. Antes quedaba disabled=true tras guardar
