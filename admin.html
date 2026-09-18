@@ -4735,7 +4735,7 @@ function renderEventos() {
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0" class="ev-actions">
           <button class="btn btn-gold btn-sm" onclick="openMod('${e.id}','${(e.nombre||'').replace(/'/g,"\\'")}','${e.fecha||''}','${e.hora||''}')">Invitación QR</button>
-          ${hayLanding ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${pubLink}',this)">Página pública</button>` : ''}
+          ${hayLanding ? `<button class="btn btn-ghost btn-sm" onclick="window.open('${pubLink}','_blank','noopener,noreferrer')">Página pública</button>` : ''}
           ${hayForm ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${window.location.origin}/registroaforo.html?slug=${encodeURIComponent(e.slug||'')}',this)">Formulario aforo</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="openEditMod('${e.id}')">✏ Editar</button>
           <button class="btn btn-ghost btn-sm btn-red" onclick="delEvento('${e.id}')">Eliminar</button>
