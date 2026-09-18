@@ -771,6 +771,11 @@ tr:hover td{background:var(--surface)}
               </div>
             </div>
             <div id="ld-campo-whatsapp" style="display:none" class="fg"><label style="font-size:12px">WhatsApp de contacto — número internacional sin + (57...)</label><input id="ld-whatsapp-tel" placeholder="Ej. 573001234567" style="font-size:12px"></div>
+            <div class="fg" style="margin-top:.5rem">
+              <label style="font-size:12px">Link de redireccion del formulario (WhatsApp / grupo / comunidad)</label>
+              <input id="ld-form-redirect" type="url" placeholder="https://wa.me/57... o https://chat.whatsapp.com/..." style="font-family:monospace;font-size:12px">
+              <div style="font-size:10px;color:var(--ink3);margin-top:3px">A donde se redirige el asistente despues de enviar el formulario. Si se deja vacio, se usa el link de comunidad de WhatsApp del formulario.</div>
+            </div>
 
             <!-- CAMPOS CAMPAÑA -->
             <div id="ld-campo-historia" style="display:none">
@@ -808,16 +813,6 @@ tr:hover td{background:var(--surface)}
           </div>
         </div><!-- /wiz-step 3 -->
 
-        <!-- ══ Pestaña Idiomas · Overrides FR/EN (ADR-035) ══ -->
-        <div id="ld-i18n-config" style="margin-top:1rem;border:1px solid var(--border);border-radius:var(--r);padding:1rem .9rem .9rem;background:var(--surface)">
-          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem">🌐 Idiomas (traducción FR / EN)</div>
-          <div style="font-size:11px;color:var(--ink3);margin-bottom:.75rem;line-height:1.55">El español (ES) es el idioma base y se edita en los campos anteriores. Aquí traduces contenido opcional para FR y EN. Deja un campo vacío para usar el texto en español.</div>
-          <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);margin-bottom:.85rem;width:fit-content">
-            <button id="ld-i18n-tab-fr" onclick="ldI18nSetLang('fr')" style="padding:7px 18px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--ink);color:#fff">Français (FR)</button>
-            <button id="ld-i18n-tab-en" onclick="ldI18nSetLang('en')" style="padding:7px 18px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--surface);color:var(--ink3)">English (EN)</button>
-          </div>
-          <div id="ld-i18n-fields"></div>
-        </div>
         </div><!-- /ev-landing-config -->
       </div><!-- /contenedor compartido pasos 2-3 -->
       <!-- ════════════════════════════════════════════════════ -->
@@ -1075,6 +1070,18 @@ tr:hover td{background:var(--surface)}
         </div>
       </div>
 
+
+      <!-- Idiomas (FR/EN): dentro del paso 4 Blindaje, antes de Crear evento -->
+        <!-- ══ Pestaña Idiomas · Overrides FR/EN (ADR-035) ══ -->
+        <div id="ld-i18n-config" style="margin-top:1rem;border:1px solid var(--border);border-radius:var(--r);padding:1rem .9rem .9rem;background:var(--surface)">
+          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem">🌐 Idiomas (traducción FR / EN)</div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:.75rem;line-height:1.55">El español (ES) es el idioma base y se edita en los campos anteriores. Aquí traduces contenido opcional para FR y EN. Deja un campo vacío para usar el texto en español.</div>
+          <div style="display:flex;gap:0;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border);margin-bottom:.85rem;width:fit-content">
+            <button id="ld-i18n-tab-fr" onclick="ldI18nSetLang('fr')" style="padding:7px 18px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--ink);color:#fff">Français (FR)</button>
+            <button id="ld-i18n-tab-en" onclick="ldI18nSetLang('en')" style="padding:7px 18px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;background:var(--surface);color:var(--ink3)">English (EN)</button>
+          </div>
+          <div id="ld-i18n-fields"></div>
+        </div>
 
       <div style="margin-top:1rem">
         <button class="btn btn-gold" id="btn-crear-ev" onclick="crearEvento()">Crear evento</button>
@@ -2737,6 +2744,10 @@ let _ldThemeSeleccionado = null;
 
 function toggleLandingConfig(activa) {
   document.getElementById('ev-landing-config').style.display = activa ? 'block' : 'none';
+  // ADR-035: #ld-i18n-config vive ahora en su propio wiz-step 4 (fuera del
+  // contenedor compartido). Su display se sigue gateando por 'landing activa'.
+  const i18nCfg = document.getElementById('ld-i18n-config');
+  if (i18nCfg) i18nCfg.style.display = activa ? 'block' : 'none';
   if (activa) {
     if (typeof _ensureI18nPanels === 'function') _ensureI18nPanels();
     // ADR-040: el fallback respeta el catalogo curado por la cuenta master.
@@ -2825,6 +2836,31 @@ const _TPL_THEME = Object.keys(_THEME_TPL).reduce((acc, theme) => {
   acc[_THEME_TPL[theme]] = theme;
   return acc;
 }, {});
+
+// === ADN Visual (Feature 3) - Preset de modulos por template ===
+// requeridos: se marcan y quedan bloqueados (disabled). recomendados: se marcan,
+// editables. selectivos: habilitados y desmarcados. metaDosLineas: gobierna la
+// visibilidad de #ld-meta-hero-wrap. Fallback: theme sin entrada => sin preset.
+const _THEME_MODULES = {
+  'arthouse': { requeridos:[], recomendados:['ld-mod-countdown-cine','ld-mod-sinopsis','ld-mod-trailer','ld-mod-gallery-cine','ld-mod-aforo-cine'], selectivos:['ld-mod-director','ld-mod-dresscode-cine','ld-mod-sponsors-cine','ld-mod-faq-cine'], metaDosLineas:false },
+  'premiere-gold': { requeridos:[], recomendados:['ld-mod-countdown-cine','ld-mod-sinopsis','ld-mod-trailer','ld-mod-gallery-cine','ld-mod-aforo-cine'], selectivos:['ld-mod-director','ld-mod-dresscode-cine','ld-mod-sponsors-cine','ld-mod-faq-cine'], metaDosLineas:false },
+  'neon-cult-cine': { requeridos:[], recomendados:['ld-mod-countdown-cine','ld-mod-sinopsis','ld-mod-trailer','ld-mod-gallery-cine','ld-mod-aforo-cine'], selectivos:['ld-mod-director','ld-mod-dresscode-cine','ld-mod-sponsors-cine','ld-mod-faq-cine'], metaDosLineas:false },
+  'interactive-cine': { requeridos:[], recomendados:['ld-mod-countdown-cine','ld-mod-sinopsis','ld-mod-trailer','ld-mod-gallery-cine','ld-mod-aforo-cine'], selectivos:['ld-mod-director','ld-mod-dresscode-cine','ld-mod-sponsors-cine','ld-mod-faq-cine'], metaDosLineas:false },
+  'tropical-hostel': { requeridos:[], recomendados:['ld-mod-dj-lineup','ld-mod-playlist','ld-mod-boletos','ld-mod-ubicacion','ld-mod-whatsapp'], selectivos:['ld-mod-countdown-fiesta','ld-mod-gallery-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta'], metaDosLineas:false },
+  'rooftop-sunset': { requeridos:[], recomendados:['ld-mod-dj-lineup','ld-mod-playlist','ld-mod-boletos','ld-mod-ubicacion','ld-mod-whatsapp'], selectivos:['ld-mod-countdown-fiesta','ld-mod-gallery-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta'], metaDosLineas:false },
+  'underground': { requeridos:[], recomendados:['ld-mod-dj-lineup','ld-mod-playlist','ld-mod-boletos','ld-mod-ubicacion','ld-mod-whatsapp'], selectivos:['ld-mod-countdown-fiesta','ld-mod-gallery-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta'], metaDosLineas:false },
+  'elegant-cocktail': { requeridos:[], recomendados:['ld-mod-dj-lineup','ld-mod-playlist','ld-mod-boletos','ld-mod-ubicacion','ld-mod-whatsapp'], selectivos:['ld-mod-countdown-fiesta','ld-mod-gallery-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta'], metaDosLineas:false },
+  'afromango': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-ubicacion'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp','ld-mod-gallery-fiesta'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:false },
+  'afromango-editor': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-ubicacion'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp','ld-mod-gallery-fiesta'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:false },
+  'tropical-brutalism': { requeridos:[], recomendados:['ld-mod-dj-lineup','ld-mod-playlist','ld-mod-boletos','ld-mod-ubicacion','ld-mod-whatsapp','ld-mod-gallery-fiesta'], selectivos:['ld-mod-countdown-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta'], metaDosLineas:false },
+  'tropilove': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-ubicacion','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp','ld-mod-gallery-fiesta'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:false },
+  'mistico': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-faq-fiesta'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-ubicacion','ld-mod-whatsapp','ld-mod-sponsors-fiesta','ld-mod-gallery-fiesta'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:true },
+  'fosforescente': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-ubicacion'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-faq-fiesta','ld-mod-gallery-fiesta','ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], selectivos:['ld-mod-sponsors-fiesta','ld-mod-whatsapp'], metaDosLineas:false },
+  'solidario-moderno': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
+  'urgente-impactante': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
+  'tech-futurista': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
+  'vintage-organico': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false }
+};
 
 // === ADR-040 - Catalogo de Plantillas Curado por la Cuenta Master ===
 // Fuente de verdad: public.config_global (fila unica id='default', columna
@@ -3014,7 +3050,8 @@ function landingUrl(ev) {
   return window.location.origin + base + '?' + (ev.slug ? 'slug=' + ev.slug : 'id=' + ev.id);
 }
 
-function seleccionarTheme(theme) {
+function seleccionarTheme(theme, opts) {
+  opts = opts || {};
   _ldThemeSeleccionado = theme;
 
   // Mark active card
@@ -3029,6 +3066,11 @@ function seleccionarTheme(theme) {
   document.querySelectorAll('.mods-tipo').forEach(d => d.style.display = 'none');
   const modDiv = document.getElementById('mods-' + tipo);
   if (modDiv) modDiv.style.display = 'block';
+
+  // ADN Visual: preset de modulos por template. Sobrescribe el estado de los
+  // checkboxes de la categoria activa. Se omite en edicion (preserveModules)
+  // para no pisar los cfg.modules guardados.
+  if (!opts.preserveModules) _aplicarPresetTheme(theme, tipo);
 
   // Campañas: Fecha y Ubicación son opcionales (algunas campañas no tienen fecha/lugar fijo)
   const fechaLabel = document.querySelector('#ev-fecha-wrap label');
@@ -3061,6 +3103,56 @@ function seleccionarTheme(theme) {
   if (nameEl) nameEl.textContent   = names[theme] || theme;
 
   try { sessionStorage.setItem('ld_theme', theme); } catch(e) {}
+}
+
+// Aplica el preset ADN Visual del template sobre los checkboxes de la categoria
+// activa. Sobrescribe SIEMPRE su estado (checked + disabled).
+function _aplicarPresetTheme(theme, tipo) {
+  const preset = _THEME_MODULES[theme];
+  if (!preset) return; // fallback: theme sin preset, no se toca nada
+  const panel = document.getElementById('mods-' + tipo);
+  if (!panel) return;
+  // Reset de TODAS las categorias (no solo la destino): evita que checkboxes de
+  // categorias previas queden checked+disabled y se persistan en modules.*.
+  // #ld-meta-hero-wrap no es [id^='ld-mod-'] y se gobierna aparte al final.
+  document.querySelectorAll('.mods-tipo [id^="ld-mod-"]').forEach(chk => {
+    if (chk.checked) {
+      chk.checked = false;
+      chk.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    chk.disabled = false;
+  });
+  const fire = id => {
+    const chk = document.getElementById(id);
+    if (chk) chk.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  // recomendados: marcados, editables.
+  (preset.recomendados || []).forEach(id => {
+    const chk = document.getElementById(id);
+    if (!chk) return;
+    chk.checked = true;
+    chk.disabled = false;
+    fire(id);
+  });
+  // selectivos: habilitados y desmarcados por defecto.
+  (preset.selectivos || []).forEach(id => {
+    const chk = document.getElementById(id);
+    if (!chk) return;
+    chk.checked = false;
+    chk.disabled = false;
+    fire(id);
+  });
+  // requeridos: marcados y bloqueados.
+  (preset.requeridos || []).forEach(id => {
+    const chk = document.getElementById(id);
+    if (!chk) return;
+    chk.checked = true;
+    chk.disabled = true;
+    fire(id);
+  });
+  // Hero meta a 2 lineas: solo visibilidad, SIN limpiar los inputs ld-meta-*.
+  const metaWrap = document.getElementById('ld-meta-hero-wrap');
+  if (metaWrap) metaWrap.style.display = preset.metaDosLineas ? '' : 'none';
 }
 
 // ════════════════════════════════════════════════════════════
@@ -3808,6 +3900,11 @@ function _buildConfigLanding(slug) {
     },
   };
   Object.keys(cfg.content).forEach(k => { if (cfg.content[k] === null) delete cfg.content[k]; });
+  // FEATURE form_redirect: solo se persiste si hay valor. Si esta vacio se elimina
+  // la clave para que evento.html aplique el fallback a comunidad_whatsapp.
+  const formRedirect = val('ld-form-redirect');
+  if (formRedirect) cfg.content.form_redirect = formRedirect;
+  else delete cfg.content.form_redirect;
   // ADR-035 — overrides de idioma FR/EN (omitidos si no hay contenido traducido).
   const i18nCfg = _buildI18nFromFields();
   if (i18nCfg) cfg.i18n = i18nCfg;
@@ -4757,7 +4854,8 @@ function openEditMod(evId) {
   }
 
   seleccionarCategoria(tipo);
-  if (theme) seleccionarTheme(theme);
+  // ADN Visual (edicion): se omite el preset para no pisar cfg.modules guardado.
+  if (theme) seleccionarTheme(theme, { preserveModules: true });
 
   // ADR-040 - revelacion legacy (temporal, no persiste nada): si el theme de
   // este evento esta oculto del catalogo, se fuerza visible SOLO esa card con
@@ -4788,6 +4886,9 @@ function openEditMod(evId) {
     document.getElementById('ev-landing-activa').checked = true;
     toggleLandingConfig(true);
     // Módulos activos → marcar checkbox y mostrar su campo de contenido
+    // ADN Visual (edicion): limpiar disabled heredado del preset antes de
+    // restaurar cfg.modules, para no dejar requeridos bloqueados de otro theme.
+    document.querySelectorAll('[id^="ld-mod-"]').forEach(c => { c.disabled = false; });
     const mods = cfg.modules || {};
     const idsChecked = new Set();
     Object.keys(mods).forEach(key => {
@@ -4801,6 +4902,25 @@ function openEditMod(evId) {
     document.querySelectorAll('.mods-tipo:not([style*="display: none"]) [id^="ld-mod-"]').forEach(chk => {
       if (!idsChecked.has(chk.id)) chk.checked = false;
     });
+    // ADN Visual (edicion): los modulos requeridos son el MINIMO del theme: deben
+    // quedar marcados y bloqueados siempre, aunque cfg.modules los traiga en false.
+    // Se dispara change para refrescar la visibilidad de sus campos de contenido.
+    const presetEdit = _THEME_MODULES[theme];
+    if (presetEdit && Array.isArray(presetEdit.requeridos)) {
+      presetEdit.requeridos.forEach(id => {
+        const chk = document.getElementById(id);
+        if (!chk) return;
+        chk.checked = true;
+        chk.disabled = true;
+        chk.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
+    // ADN Visual (edicion): gobernar el hero meta a 2 lineas segun el theme (el
+    // preset se omite con preserveModules). No limpia los inputs ld-meta-*.
+    if (presetEdit) {
+      const metaWrapEdit = document.getElementById('ld-meta-hero-wrap');
+      if (metaWrapEdit) metaWrapEdit.style.display = presetEdit.metaDosLineas ? '' : 'none';
+    }
     // Efectos
     const fx = cfg.effects || {};
     if (fx.grain     != null) { const el = document.getElementById('ld-fx-grain');     if (el) el.checked = !!fx.grain; }
@@ -4856,7 +4976,7 @@ function _limpiarWizardCompleto() {
     const el = document.getElementById(i); if (el) el.value = '';
   });
   ['ev-d','ld-sinopsis-text','ev-titulo-display','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
-   'ld-playlist-url','ld-guest-list-val','ld-ubicacion-val','ld-whatsapp-tel','ld-boletos-preventa',
+   'ld-playlist-url','ld-guest-list-val','ld-ubicacion-val','ld-whatsapp-tel','ld-form-redirect','ld-boletos-preventa',
    'ld-boletos-taquilla','ld-meta-fecha-l1','ld-meta-fecha-l2','ld-meta-hora-l1','ld-meta-hora-l2',
    'ld-meta-lugar-l1','ld-meta-lugar-l2','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
    'ld-sponsors-fiesta-val','ld-sponsors-val','ld-dir-nombre','ld-dir-rol','ld-dir-foto','ld-dir-bio',
@@ -4866,7 +4986,9 @@ function _limpiarWizardCompleto() {
    'ld-actualizaciones-val','ld-contacto-email','ld-contacto-tel','ld-contacto-dir'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
   });
-  document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; });
+  document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; chk.disabled = false; });
+  const metaHeroWrapClear = document.getElementById('ld-meta-hero-wrap');
+  if (metaHeroWrapClear) metaHeroWrapClear.style.display = '';
   document.querySelectorAll('[id^="ld-campo-"]').forEach(c => { c.style.display = 'none'; });
   if (window._sponsorsSetEntries) window._sponsorsSetEntries([]);
   if (window._djLineupSetEntries) window._djLineupSetEntries([]);
@@ -4933,6 +5055,7 @@ function hideForeignModulesByType(tipo, suf) {
     if (cat === tipo) return;            // módulo de la categoría activa → se conserva
     // Módulo de otra categoría → desmarcar y ocultar su campo de contenido
     chk.checked = false;
+    chk.disabled = false;
     const e = document.getElementById(fieldOf[chk.id]);
     if (e) e.style.display = 'none';
   });
@@ -4957,6 +5080,7 @@ function _poblarContenidoWizard(content, suf) {
   set('ld-guest-list-val', content.guest_list);
   set('ld-ubicacion-val', content.ubicacion);
   set('ld-whatsapp-tel', content.whatsapp);
+  set('ld-form-redirect', content.form_redirect);
   if (content.boletos) {
     set('ld-boletos-preventa', content.boletos.preventa);
     set('ld-boletos-taquilla', content.boletos.taquilla);

@@ -1,13 +1,12 @@
-# AGENTS.md — Sistema QR Hostal Terraza (ExploraCO)
+# AGENTS.md — Sistema QR Hostal Terraza (HostalTerraza)
 
 Enrutamiento de agentes para OpenCode. Generado a partir de `Sistema QR desarrollo/BLUEPRINT.md`, `Sistema QR desarrollo/Reglas de Oro QR.md` (v127-MASTER) y `Sistema QR desarrollo/PROJECT.md` (v1.6.4-FIX). Este archivo cierra el punto que la Sección 6 del Blueprint pedía guardar en la raíz pero no incluía, y se reescribe completo el 2026-09-14 para reflejar el estado real verificado del repositorio (34 agentes en `.opencode/agent/`, esquema gratuito como dirección estratégica).
 
 ## Decisión estratégica 2026-09-14: esquema GRATUITO como dirección de operación
 
-El 2026-09-14 el proveedor `opencode-go` dejó de conectar ("Cannot connect to API", evidenciado en `~/.local/share/opencode/log/opencode.log`: `providerID=opencode-go modelID=deepseek-v4.1-flash agent=qa-auditor`), mientras el gateway free `opencode` operaba con normalidad. Por eso la dirección estratégica es el esquema GRATUITO:
 
 - **Toda la operación del día a día se ejecuta con subagentes `*-free` + `@free-build`** (modelo `opencode/big-pickle`), con planificación previa de `@free-plan`.
-- Los 15 agentes pro (`opencode-go/*`) quedan como **respaldo de capacidad/calidad** y para excepciones de modelo documentadas (`seo-dev` pro, `qa-auditor`, `media-reader-free` con visión).
+- Los agentes pro (`opencode-go/*`) quedan como **respaldo de capacidad/calidad** y para excepciones de modelo documentadas (`seo-dev` pro, `qa-auditor`, `media-reader-free` con visión).
 - Detalle operativo: `frontend-tpl.md` pro usa `deepseek-v4.1-flash` (ver sección "Modelos verificados").
 
 ## Decisiones de reconciliación (confirmadas 2026-09-14)

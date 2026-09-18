@@ -1,5 +1,5 @@
 ---
-description: Agente de implementacion GRATUITO de ExploraCO. Modelo open-source (big-pickle). NO usa agentes de pago: delega a subagentes gratuitos (*-free). Maneja el flujo completo de build: modifica archivos del proyecto y coordina subagentes gratuitos por dominio.
+description: Agente de implementacion GRATUITO de HostalTerraza. Modelo open-source (big-pickle). NO usa agentes de pago: delega a subagentes gratuitos (*-free). Maneja el flujo completo de build: modifica archivos del proyecto y coordina subagentes gratuitos por dominio.
 mode: primary
 model: opencode/big-pickle
 permission:

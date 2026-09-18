@@ -1618,9 +1618,14 @@ if (document.getElementById('db-poster-img')) {
                     // v304 (regla general): si el evento tiene comunidad de WhatsApp,
                     // se ofrece al asistente la opción de unirse (checkbox marcado por
                     // defecto) o solo guardar su registro en la base de datos.
-                    const comunidadLink = effContent.comunidad_whatsapp || '';
+                    // form_redirect (dato dinamico desde admin): destino generico del
+                    // formulario del landing (WhatsApp, grupo o comunidad). Es DISTINTO
+                    // del WhatsApp de contacto/ventas (effContent.whatsapp).
+                    // Retrocompatibilidad: si no existe o esta vacio cae a
+                    // comunidad_whatsapp; si tampoco hay, no se redirige.
+                    const formRedirect = effContent.form_redirect || effContent.comunidad_whatsapp || '';
                     const unirComWrap = document.getElementById('reg-unir-comunidad-wrap');
-                    if (comunidadLink && unirComWrap) {
+                    if (formRedirect && unirComWrap) {
                         unirComWrap.style.display = 'flex';
                     }
                     regForm.addEventListener('submit', async function (e) {
@@ -1673,17 +1678,18 @@ if (document.getElementById('db-poster-img')) {
                                 if (error) { console.error('Inscrito landing -> error insert:', error); throw error; }
                                 __ANALYTICS.emit('form_submit', 'comunidad_ok', 'landing', 1);
                             }
-                            // Redirigir a la comunidad de WhatsApp solo si el asistente
-                            // eligió unirse (v304: opción de solo guardar en BD).
-                            if (comunidadLink && unirComunidad) {
-                                window.open(comunidadLink, '_blank');
+                            // Redirigir al destino dinamico solo si el asistente
+                            // eligio unirse (v304: opcion de solo guardar en BD).
+                            // Mismo tab (window.location.href), no pestana nueva.
+                            if (formRedirect && unirComunidad) {
+                                window.location.href = formRedirect;
                             }
                             if (msgBox) {
                                 msgBox.style.display = 'block';
-                                msgBox.textContent = (comunidadLink && unirComunidad)
+                                msgBox.textContent = (formRedirect && unirComunidad)
                                     ? T('landing.form_ok_comunidad')
                                     : T('landing.form_ok_guardado');
-                                msgBox.style.borderColor = (comunidadLink && unirComunidad) ? 'rgba(37,211,102,0.4)' : 'rgba(241,196,15,0.5)';
+                                msgBox.style.borderColor = (formRedirect && unirComunidad) ? 'rgba(37,211,102,0.4)' : 'rgba(241,196,15,0.5)';
                             }
                             regForm.querySelectorAll('input').forEach(i => i.style.display = 'none');
                             regForm.querySelector('button[type=submit]').style.display = 'none';
