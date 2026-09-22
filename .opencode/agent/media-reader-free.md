@@ -1,7 +1,7 @@
 ---
 description: Agente multimodal GRATUITO de ExploraCO que lee y analiza imagenes, audio, video y PDFs. Versión open-source (mimo-v2.5-free) de media-reader. Usalo cuando una tarea requiera interpretar contenido visual o multimedia: fotos de destinos, capturas de UI, planos, escaneos, material audiovisual o documentos con imagenes. Modelo gratuito multimodal. Excepcion intencional de modelo: mimo-v2.5-free es el unico free con vision real en el catalogo 2026 (big-pickle no tiene vision); NO normalizar a big-pickle.
 mode: subagent
-model: opencode/mimo-v2.5-free
+model: opencode/mimo-v2.6-flash-free
 permission:
   edit: deny
   bash: allow

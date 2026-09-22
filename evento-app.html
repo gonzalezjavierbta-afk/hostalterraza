@@ -925,8 +925,14 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
   // === INICIO SEGMENTO: HISTORIA DE LA CAUSA CON FALLBACK (v215) ===
     const historiaData = effContent.historia || {};
     const isHistoriaFallback = !effContent.historia;
-    const histTitulo = historiaData.titulo || T('landing.historia_titulo_def');
-    const histTexto = historiaData.texto || T('landing.historia_texto_def');
+    // v1.2.0 f12 (Kande): el silo f12 apaga #mod-descripcion, asi que la
+    // descripcion del evento se muestra en #mod-historia. Exclusivo tpl-f12.
+    const __esF12Hist = document.body.className && document.body.className.includes('tpl-f12');
+    const __f12DescRaw = __esF12Hist ? (effContent.descripcion || ev.descripcion) : null;
+    const __f12DescObj = (__f12DescRaw && typeof __f12DescRaw === 'object') ? __f12DescRaw : {};
+    const __f12DescTexto = __f12DescObj.texto || (typeof __f12DescRaw === 'string' ? __f12DescRaw.trim() : '');
+    const histTitulo = (__esF12Hist && __f12DescObj.titulo) || historiaData.titulo || T('landing.historia_titulo_def');
+    const histTexto = (__esF12Hist && __f12DescTexto) || historiaData.texto || T('landing.historia_texto_def');
 
     if (document.getElementById('db-historia-titulo')) {
         document.getElementById('db-historia-titulo').innerText = histTitulo.toUpperCase();

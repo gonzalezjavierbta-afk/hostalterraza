@@ -1,6 +1,6 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
-   v1.0.0 - Alta inicial del silo.
+   v1.2.0 - Footer freemium visible + historia desde "descripcion" (2026-09-22).
    Categoria: fiesta | template_id: f12 | theme: Kande
    Reglas de la casa:
      - ASCII-safety estricta: 0 bytes > 127 (comentarios sin tildes).
@@ -32,6 +32,8 @@
     --f12-mustard-2:  #c98f18;
     --f12-fuchsia:    #ff2f8e;
     --f12-turq:       #2fe0d0;
+    --f12-neon:       #efff00;
+    --f12-cartel-2:   #e6007e;
     --f12-cream:      #f6f2e7;
     --f12-text:       #f6f2e7;
     --f12-text-muted: rgba(246, 242, 231, 0.66);
@@ -46,6 +48,7 @@
     --f12-asset-hero-mobile: url("https://i.ibb.co/bjMgLtzf/Gemini-Generated-Image-smw5qhsmw5qhsmw5.jpg");
     --f12-asset-papel:       url("https://png.pngtree.com/png-clipart/20221230/ourmid/pngtree-torn-paper-effect-png-image_6543482.png");
     --f12-asset-flora:       url("https://i.pinimg.com/236x/24/ce/44/24ce44251b4822112969e9cf9bb5d07e.jpg");
+    --f12-asset-agrupacion:  url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJCeZJnPM6ixGIltbyB3992BJr02iNe50tFcYSLUjgaQ&s");
 
     /* Grano SVG (data-URI ASCII-safe) */
     --f12-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -177,17 +180,23 @@
     display: block !important;
 }
 
-.tpl-f12 #mod-video,
 .tpl-f12 #mod-form,
 .tpl-f12 #mod-faq,
 .tpl-f12 #mod-ubicacion,
 .tpl-f12 #mod-footer,
-.Tpl-F12 #mod-video,
 .Tpl-F12 #mod-form,
 .Tpl-F12 #mod-faq,
 .Tpl-F12 #mod-ubicacion,
 .Tpl-F12 #mod-footer {
     display: block !important;
+}
+
+/* #mod-video queda APAGADO por decision de Direccion (v1.1.0). El ID se
+   mantiene intacto (Cero Borrado); #db-gallery-grid vive DENTRO de el, por
+   lo que la galeria tambien sale de la vista. */
+.tpl-f12 #mod-video,
+.Tpl-F12 #mod-video {
+    display: none !important;
 }
 
 /* --- Modulos APAGADOS (IDs intactos, Cero Borrado) --- */
@@ -227,7 +236,6 @@
         "historia  historia"
         "cartel    playlist"
         "boletos   form"
-        "video     video"
         "faq       ubicacion"
         "whatsapp  whatsapp"
         "footer    footer";
@@ -240,7 +248,6 @@
 .tpl-f12 #mod-playlist   { grid-area: playlist; }
 .tpl-f12 #mod-boletos    { grid-area: boletos; }
 .tpl-f12 #mod-form       { grid-area: form; }
-.tpl-f12 #mod-video      { grid-area: video; }
 .tpl-f12 #mod-faq        { grid-area: faq; }
 .tpl-f12 #mod-ubicacion  { grid-area: ubicacion; }
 .tpl-f12 #mod-whatsapp   { grid-area: whatsapp; }
@@ -328,7 +335,7 @@
 /* Cinta mostaza tipo papel rasgado (pseudoelemento de #mod-hero) */
 .tpl-f12 #mod-hero::before,
 .Tpl-F12 #mod-hero::before {
-    content: "\2605\00a0KANDE\00a0\2022\00a0TROPICAL NOIR\00a0\2605";
+    content: "\2605\00a0MUSICA TRADICIONAL DEL CARIBE COLOMBIANO\00a0\2605";
     position: absolute;
     top: 59%;
     left: -3%;
@@ -345,9 +352,9 @@
     background-repeat: no-repeat, no-repeat;
     color: var(--f12-ink);
     font-family: var(--f12-font);
-    font-size: 0.72rem;
+    font-size: 0.64rem;
     font-weight: 900;
-    letter-spacing: 0.34em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     transform: rotate(-2.4deg);
     border-top: 2px solid rgba(11, 11, 13, 0.85);
@@ -448,18 +455,19 @@
     word-break: break-word;
     font-size: clamp(2.6rem, 11vw, 7rem) !important;
     max-width: 100%;
-    color: var(--f12-cream) !important;
-    -webkit-text-stroke: 2px var(--f12-ink);
+    /* Estetica CARTEL: amarillo neon sobre sombras duras en capas. */
+    color: var(--f12-neon) !important;
+    -webkit-text-stroke: 3px var(--f12-ink);
     text-shadow:
-        4px 4px 0 var(--f12-fuchsia),
-        8px 8px 0 rgba(47, 224, 208, 0.45),
-        0 0 32px rgba(255, 47, 142, 0.35);
+        3px 3px 0 #000000,
+        6px 6px 0 var(--f12-cartel-2),
+        0 0 30px rgba(239, 255, 0, 0.45);
     animation: f12TitlePulse 5s ease-in-out infinite alternate;
 }
 
 @keyframes f12TitlePulse {
-    0%   { text-shadow: 4px 4px 0 var(--f12-fuchsia), 8px 8px 0 rgba(47, 224, 208, 0.45), 0 0 32px rgba(255, 47, 142, 0.35); }
-    100% { text-shadow: 4px 4px 0 var(--f12-fuchsia), 8px 8px 0 rgba(47, 224, 208, 0.62), 0 0 46px rgba(255, 47, 142, 0.55); }
+    0%   { text-shadow: 3px 3px 0 #000000, 6px 6px 0 var(--f12-cartel-2), 0 0 30px rgba(239, 255, 0, 0.40); }
+    100% { text-shadow: 3px 3px 0 #000000, 6px 6px 0 var(--f12-cartel-2), 0 0 48px rgba(239, 255, 0, 0.62); }
 }
 
 /* ==========================================================================
@@ -544,21 +552,9 @@
     box-shadow: none !important;
 }
 
-/* Fallback sin :has() -> los dos primeros .meta-item son fecha y hora */
-.tpl-f12 #mod-hero-meta .meta-item:nth-child(1),
-.tpl-f12 #mod-hero-meta .meta-item:nth-child(2),
-.Tpl-F12 #mod-hero-meta .meta-item:nth-child(1),
-.Tpl-F12 #mod-hero-meta .meta-item:nth-child(2) {
-    display: none !important;
-}
-
-/* Preciso por ID (si el navegador soporta :has) */
-.tpl-f12 #mod-hero-meta .meta-item:has(#meta-fecha),
-.tpl-f12 #mod-hero-meta .meta-item:has(#meta-hora),
-.Tpl-F12 #mod-hero-meta .meta-item:has(#meta-fecha),
-.Tpl-F12 #mod-hero-meta .meta-item:has(#meta-hora) {
-    display: none !important;
-}
+/* v1.1.0 (brief de Direccion): el hero muestra la META COMPLETA.
+   Se eliminan los ocultamientos de fecha/hora (v1.0.0 solo dejaba visible
+   #meta-lugar): fecha + hora + lugar se muestran juntos. IDs intactos. */
 
 .tpl-f12 #mod-hero-meta .meta-item,
 .Tpl-F12 #mod-hero-meta .meta-item {
@@ -655,43 +651,87 @@
 .tpl-f12 #mod-historia,
 .Tpl-F12 #mod-historia {
     position: relative;
-    background: linear-gradient(160deg, var(--f12-bg-ink) 0%, var(--f12-bg) 100%);
+    isolation: isolate;
+    /* v1.1.0: FONDO AMARILLO en toda la seccion (brief de Direccion). */
+    background: var(--f12-mustard) !important;
+    color: var(--f12-ink) !important;
 }
 
+/* Transicion de papel rasgado hacia la seccion siguiente */
+.tpl-f12 #mod-historia::after,
+.Tpl-F12 #mod-historia::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    z-index: 2;
+    height: 22px;
+    background-image:
+        var(--f12-asset-papel),
+        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
+    background-size: 100% 100%, cover;
+    background-repeat: no-repeat, no-repeat;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+    pointer-events: none;
+}
+
+/* v1.1.0: layout de 2 columnas -> FOTO a la izquierda, TEXTO a la derecha */
 .tpl-f12 #mod-historia .historia-inner,
 .Tpl-F12 #mod-historia .historia-inner {
-    max-width: 900px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "titulo titulo"
+        "foto   texto";
+    align-items: center;
+    gap: 1.4rem 2.8rem;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 0 0 0 1.6rem !important;
-    border-left: 4px solid var(--f12-fuchsia);
+    padding: 0 !important;
+    border-left: none !important;
     text-align: left !important;
 }
 
 .tpl-f12 #db-historia-titulo,
 .Tpl-F12 #db-historia-titulo {
-    color: var(--f12-mustard) !important;
+    grid-area: titulo;
+    color: var(--f12-ink) !important;
     font-weight: 900 !important;
     text-transform: uppercase;
     letter-spacing: 0.24em;
     font-size: 1.1rem !important;
-    margin-bottom: 1.4rem;
+    margin-bottom: 0.4rem;
 }
 
+/* Foto de la agrupacion (izquierda). El src real lo inyecta el kernel; el
+   background-image actua como Silent Fallback (ADR-008) si el asset falla. */
 .tpl-f12 #db-historia-img,
 .Tpl-F12 #db-historia-img {
-    display: block;
+    display: block !important;
+    grid-area: foto;
     width: 100% !important;
-    max-width: 700px !important;
-    margin: 1.6rem auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    aspect-ratio: 4 / 5;
+    min-height: 280px;
+    object-fit: cover;
+    background-image:
+        var(--f12-asset-agrupacion),
+        linear-gradient(160deg, var(--f12-bg-ink) 0%, var(--f12-bg) 100%);
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
     border-radius: var(--f12-radius) !important;
-    border: 1px solid var(--f12-line);
+    border: 3px solid var(--f12-ink);
     filter: saturate(1.05) contrast(1.03);
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+    box-shadow: 10px 10px 0 var(--f12-fuchsia);
 }
 
 .tpl-f12 #db-historia-texto,
 .Tpl-F12 #db-historia-texto {
-    color: var(--f12-text-muted) !important;
+    grid-area: texto;
+    color: var(--f12-ink) !important;
     font-size: 1.02rem;
     line-height: 1.85 !important;
     opacity: 1 !important;
@@ -771,13 +811,22 @@
 /* Banda de papel rasgado sobre el modulo */
 .tpl-f12 #mod-boletos::before,
 .Tpl-F12 #mod-boletos::before {
-    content: "";
+    content: "BOLETERIA";
     position: absolute;
     top: -6px;
     left: 50%;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: min(100%, 980px);
     height: 40px;
+    color: var(--f12-ink);
+    font-family: var(--f12-font);
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
     transform: translateX(-50%);
     background-image:
         var(--f12-asset-papel),
@@ -917,13 +966,22 @@
 /* Banda rasgada superior del formulario (reusa el patron de #mod-boletos) */
 .tpl-f12 #mod-form .form-master-box::before,
 .Tpl-F12 #mod-form .form-master-box::before {
-    content: "";
+    content: "UNETE A NUESTRA COMUNIDAD";
     position: absolute;
     top: -6px;
     left: 50%;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 40px;
+    color: var(--f12-ink);
+    font-family: var(--f12-font);
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
     transform: translateX(-50%);
     background-image:
         var(--f12-asset-papel),
@@ -1185,14 +1243,61 @@
     border-bottom: none !important;
 }
 
+/* v1.2.0: FOOTER SENCILLO. Se retiran visualmente las columnas, el tagline
+   y el copyright (#footer-copy); queda el nombre dinamico de la organizacion.
+   IDs intactos (display:none, no se borra nada - Cero Borrado).
+   IMPORTANTE: .footer-bottom NO se oculta porque el kernel inyecta ahi el
+   badge freemium .htz-powered (evento-app.html L1162-1180), requisito del
+   contrato del plan. Solo se oculta si el badge no existe (plan no freemium),
+   para no dejar espacios muertos. */
+.tpl-f12 #mod-footer .footer-col,
+.tpl-f12 #mod-footer #footer-tagline,
+.tpl-f12 #mod-footer #footer-copy,
+.Tpl-F12 #mod-footer .footer-col,
+.Tpl-F12 #mod-footer #footer-tagline,
+.Tpl-F12 #mod-footer #footer-copy {
+    display: none !important;
+}
+
+.tpl-f12 #mod-footer .footer-bottom,
+.Tpl-F12 #mod-footer .footer-bottom {
+    display: block !important;
+    margin-top: 1.4rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--f12-line);
+}
+
+/* Sin badge freemium inyectado, la linea inferior queda vacia: se colapsa. */
+.tpl-f12 #mod-footer .footer-bottom:not(:has(.htz-powered)),
+.Tpl-F12 #mod-footer .footer-bottom:not(:has(.htz-powered)) {
+    display: none !important;
+}
+
+/* Badge freemium integrado al footer sencillo, bajo el nombre de la org.
+   Los !important vencen los estilos inline que el kernel inyecta. */
+.tpl-f12 #mod-footer .htz-powered,
+.Tpl-F12 #mod-footer .htz-powered {
+    display: block !important;
+    text-align: center !important;
+    margin-top: 0 !important;
+    color: var(--f12-text-muted);
+    font-size: 0.66rem !important;
+    font-weight: 700;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase;
+    opacity: 0.72 !important;
+}
+
 .tpl-f12 #mod-footer .footer-inner,
 .Tpl-F12 #mod-footer .footer-inner {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.6rem;
     max-width: 1100px;
     margin: 0 auto;
-    justify-content: space-between;
 }
 
 .tpl-f12 #footer-org-name,
@@ -1200,9 +1305,10 @@
     display: block;
     color: var(--f12-cream);
     font-weight: 900;
-    font-size: 1.2rem;
-    letter-spacing: 0.14em;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
+    text-shadow: 3px 3px 0 rgba(255, 47, 142, 0.55);
 }
 
 .tpl-f12 #mod-footer h4,
@@ -1237,6 +1343,96 @@
 .tpl-f12 #db-footer-links a:hover,
 .Tpl-F12 #db-footer-links a:hover {
     color: var(--f12-turq) !important;
+}
+
+/* ==========================================================================
+   15-bis. CAPA DE FLORA REUTILIZABLE + SEGMENTACION CROMATICA
+   --------------------------------------------------------------------------
+   La flora del silo (--f12-asset-flora) se reutiliza como capa decorativa
+   de varios modulos. SIEMPRE por DEBAJO de la informacion: z-index -1 dentro
+   de un stacking context propio (isolation: isolate) para no tapar contenido.
+   Sin HTML nuevo: solo pseudoelementos del silo.
+   ========================================================================== */
+.tpl-f12 #mod-cartel,
+.tpl-f12 #mod-playlist,
+.tpl-f12 #mod-whatsapp,
+.tpl-f12 #mod-faq,
+.tpl-f12 #mod-footer,
+.tpl-f12 #mod-form,
+.tpl-f12 #mod-boletos,
+.Tpl-F12 #mod-cartel,
+.Tpl-F12 #mod-playlist,
+.Tpl-F12 #mod-whatsapp,
+.Tpl-F12 #mod-faq,
+.Tpl-F12 #mod-footer,
+.Tpl-F12 #mod-form,
+.Tpl-F12 #mod-boletos {
+    position: relative;
+    isolation: isolate;
+}
+
+.tpl-f12 #mod-cartel::before,
+.tpl-f12 #mod-playlist::before,
+.tpl-f12 #mod-whatsapp::before,
+.tpl-f12 #mod-faq::before,
+.tpl-f12 #mod-footer::before,
+.tpl-f12 #mod-form::before,
+.Tpl-F12 #mod-cartel::before,
+.Tpl-F12 #mod-playlist::before,
+.Tpl-F12 #mod-whatsapp::before,
+.Tpl-F12 #mod-faq::before,
+.Tpl-F12 #mod-footer::before,
+.Tpl-F12 #mod-form::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.14;
+    background-image:
+        var(--f12-asset-flora),
+        radial-gradient(60% 60% at 88% 90%, rgba(255, 47, 142, 0.35) 0%, rgba(47, 224, 208, 0.18) 45%, transparent 72%);
+    background-size: 280px 280px, cover;
+    background-position: right -50px bottom -50px, center;
+    background-repeat: no-repeat, no-repeat;
+    filter: drop-shadow(0 0 28px rgba(255, 47, 142, 0.35));
+}
+
+/* Variante espejo para boletos (su ::before ya lleva la cinta mostaza) */
+.tpl-f12 #mod-boletos::after,
+.Tpl-F12 #mod-boletos::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.13;
+    background-image:
+        var(--f12-asset-flora),
+        radial-gradient(60% 60% at 10% 90%, rgba(47, 224, 208, 0.30) 0%, transparent 70%);
+    background-size: 260px 260px, cover;
+    background-position: left -50px bottom -50px, center;
+    background-repeat: no-repeat, no-repeat;
+    filter: drop-shadow(0 0 26px rgba(47, 224, 208, 0.30));
+}
+
+/* Segmentacion: acentos de color por seccion (lenguaje cartel) */
+.tpl-f12 #mod-cartel,
+.Tpl-F12 #mod-cartel {
+    border-top: 3px solid var(--f12-turq);
+}
+
+.tpl-f12 #mod-playlist,
+.Tpl-F12 #mod-playlist {
+    border-top: 3px solid var(--f12-mustard);
+    background:
+        linear-gradient(180deg, rgba(47, 224, 208, 0.05) 0%, transparent 40%),
+        var(--f12-bg);
+}
+
+.tpl-f12 #mod-faq,
+.Tpl-F12 #mod-faq {
+    border-top: 3px solid var(--f12-fuchsia);
 }
 
 /* ==========================================================================
@@ -1328,8 +1524,8 @@
         top: auto;
         bottom: 24%;
         height: 2rem;
-        font-size: 0.6rem;
-        letter-spacing: 0.24em;
+        font-size: 0.55rem;
+        letter-spacing: 0.1em;
     }
 
     .tpl-f12 #mod-hero::after,
@@ -1340,10 +1536,10 @@
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
         font-size: clamp(2.4rem, 13vw, 4.6rem) !important;
-        -webkit-text-stroke: 1.5px var(--f12-ink);
+        -webkit-text-stroke: 2px var(--f12-ink);
         text-shadow:
-            3px 3px 0 var(--f12-fuchsia),
-            6px 6px 0 rgba(47, 224, 208, 0.45);
+            2px 2px 0 #000000,
+            4px 4px 0 var(--f12-cartel-2);
     }
 
     /* El grupo del hero pierde el overlay de grid y fluye en columna */
@@ -1403,7 +1599,18 @@
 
     .tpl-f12 #mod-historia .historia-inner,
     .Tpl-F12 #mod-historia .historia-inner {
-        padding-left: 1.1rem !important;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "titulo"
+            "foto"
+            "texto";
+        gap: 1.2rem;
+    }
+
+    .tpl-f12 #db-historia-img,
+    .Tpl-F12 #db-historia-img {
+        aspect-ratio: 16 / 10;
+        min-height: 200px;
     }
 
     .tpl-f12 #db-gallery-grid,
@@ -1457,8 +1664,8 @@
 
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
-        font-size: 0.52rem;
-        letter-spacing: 0.18em;
+        font-size: 0.46rem;
+        letter-spacing: 0.06em;
     }
 
     .tpl-f12 #db-gallery-grid,
@@ -1514,6 +1721,35 @@
     }
 }
 
+/* --- Alturas pareadas: CARTEL y PLAYLIST a la MISMA altura (escritorio) --- */
+@media (min-width: 992px) {
+    .tpl-f12 #mod-cartel,
+    .tpl-f12 #mod-playlist,
+    .Tpl-F12 #mod-cartel,
+    .Tpl-F12 #mod-playlist {
+        display: flex !important;
+        flex-direction: column;
+    }
+
+    .tpl-f12 #mod-cartel .cartel-inner,
+    .tpl-f12 #mod-playlist > div,
+    .Tpl-F12 #mod-cartel .cartel-inner,
+    .Tpl-F12 #mod-playlist > div {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .tpl-f12 #mod-playlist #db-spotify-embed,
+    .Tpl-F12 #mod-playlist #db-spotify-embed {
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 420px;
+    }
+}
+
 /* --- Escritorio amplio (>= 1280px) --- */
 @media (min-width: 1280px) {
     .tpl-f12 #mod-hero,
@@ -1560,4 +1796,30 @@
    |         |            | countdown en tira horizontal con divisores CSS;    |
    |         |            | grid-template-areas + banda 992-1279px; reducir    |
    |         |            | movimiento al pie. Assets con Silent Fallback.     |
+   |---------|------------|----------------------------------------------------|
+   | v1.1.0  | 2026-09-22 | Iteracion "cartel Kande" (brief de Direccion):     |
+   |         |            | titulo estilo cartel (amarillo neon #efff00 con    |
+   |         |            | sombras duras 3px/6px y mayusculas); cinta mostaza |
+   |         |            | con subtitulo "musica tradicional del caribe       |
+   |         |            | colombiano"; hero con META COMPLETA (fecha + hora  |
+   |         |            | + lugar); #mod-historia en 2 columnas (foto izq /  |
+   |         |            | texto der) con fondo amarillo y borde de papel     |
+   |         |            | rasgado; franja del formulario "unete a nuestra    |
+   |         |            | comunidad"; #mod-video apagado (ID intacto, la     |
+   |         |            | galeria vive dentro); footer reducido al nombre    |
+   |         |            | dinamico de la organizacion; capa de flora         |
+   |         |            | reutilizable por debajo del contenido; acentos de  |
+   |         |            | segmentacion por seccion; cartel y playlist a igual|
+   |         |            | altura en escritorio (>=992px).                    |
+   |---------|------------|----------------------------------------------------|
+   | v1.2.0  | 2026-09-22 | Fix de contrato de plan: el footer sencillo ya no |
+   |         |            | oculta .footer-bottom, de modo que el badge       |
+   |         |            | freemium .htz-powered (inyectado por el kernel    |
+   |         |            | solo en plan freemium) sigue visible e integrado  |
+   |         |            | bajo el nombre de la organizacion; #footer-copy   |
+   |         |            | se mantiene oculto y la linea se colapsa si no    |
+   |         |            | hay badge (:has). Kernel: #mod-historia de tpl-   |
+   |         |            | f12 lee el texto de "descripcion" (string u       |
+   |         |            | objeto) con degradado seguro al comportamiento    |
+   |         |            | previo.                                           |
    ============================================================================ */
