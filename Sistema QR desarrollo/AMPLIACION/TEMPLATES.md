@@ -2,13 +2,29 @@
 
 | Campo | Valor |
 |---|---|
-| **Versión** | v1.3.0 |
-| **Propósito** | Hub normativo de silos CSS de `evento.html`: inventario real del DOM, metodología de creación en 8 pasos y brief obligatorio — para que cualquier IA cree, edite o audite un template de forma reproducible. |
-| **Fecha** | 2026-09-16 |
+| **Versión** | v1.4.0 |
+| **Propósito** | Hub normativo de silos CSS de `evento.html` (motor real: `evento-app.html`, ver banner de reconciliacion abajo): inventario real del DOM, metodologia de creacion en 8 pasos y brief obligatorio - para que cualquier IA cree, edite o audite un template de forma reproducible. |
+| **Fecha** | 2026-09-16 (v1.3.0) · **2026-09-22 (v1.4.0, ver Anexo A)** |
 | **Audiencia** | `@frontend-tpl-free`, `@frontend-tpl`, `@free-build`, `@admin-dev-free`, `@docs-keeper-free`, `@qa-auditor` |
 | **Marco** | MOTHER, AI-DOS v1.2, 16 Mandatos de `Reglas de Oro QR.md` (v127-MASTER) |
-| **Baseline de verdad** | Archivos REALES del repositorio (ADR-006). Ningún dato citado aquí se dio por supuesto; todo se verificó contra `evento.html`, `css/templates/**`, `admin.html` y los docs del Dossier. |
+| **Baseline de verdad** | Archivos REALES del repositorio (ADR-006). Ningún dato citado aquí se dio por supuesto; todo se verificó contra `evento-app.html` (motor real, reconciliado 2026-09-22), `css/templates/**`, `admin.html` y los docs del Dossier. |
 | **Estado** | ACTIVE |
+
+---
+
+> ## ⚠️ RECONCILIACION ESTRUCTURAL (2026-09-22, ADR-006 / ADR-048) — `evento.html` NO existe como archivo
+>
+> El archivo **`evento.html` NO existe** en el repositorio (`Test-Path` = False). El **motor publico real es `evento-app.html`** (1724 lineas, titulo "Master Orchestrator v214"): `vercel.json` reescribe la ruta `/evento.html` hacia `/api/evento-og.js`, y ese endpoint sirve `evento-app.html`. Evidencia verificada en `evento-app.html` real: `injectAtomicCSS(cat, tplId)` **L598-638** construye `css/templates/{categoria}/{template_id}.css?v=${Date.now()}` (L600-601) y **L691-693** aplica la doble clase `tpl-{template_id}` + `tpl-{lowercase}` al `body`.
+>
+> **Otros hechos del kernel real verificados (ADR-006):**
+> - `#db-gallery-grid` (L148) esta **DENTRO** de `#mod-video` (L147) — apagar `#mod-video` oculta tambien la galeria.
+> - `#mod-hero-ctas` nace con `display:none !important` (L33) y exige encendido explicito via CSS del silo.
+> - NO existe override `?tpl=`/`?cat=` en el kernel real (solo existe en `evento2.html`, legado).
+> - El array `MODULE_IDS` **ya no existe** en el kernel v214 (0 ocurrencias case-sensitive; solo en legados).
+>
+> **Politica documental:** todas las citas a `evento.html` como archivo/unico motor que existen en este documento (y en `PROJECT.md`, `BLUEPRINT.md`, `AGENTS.md`, hitos de `NEXT.md`, TSK-016/017/018) se conservan **intactas (Cero Borrado)** y se interpretan desde aqui como el link publico `/evento.html` reescrito por Vercel hacia el motor real `evento-app.html`. Ver `DECISIONS.md` **ADR-048** (Seccion Hallazgo estructural) y `PROJECT.md` Seccion 6.
+
+---
 
 ---
 
@@ -36,7 +52,7 @@ Este documento es la **única puerta de entrada** para crear, modificar o docume
 | Escudo GOLD (node --check + ASCII + balance divs) | Reporte de `gold-shield` |
 | Cero regresiones al Contrato v112 | Diff sin borrado de IDs |
 
-**Silos involucrados:** todos (f1-f11).
+**Silos involucrados:** todos (f1-f12).
 
 ---
 
@@ -48,9 +64,11 @@ Este documento es la **única puerta de entrada** para crear, modificar o docume
 
 **Regla práctica:** NO reportes como "faltante" ni "bug" ninguno de los 12 átomos clásicos ausentes. Antes de tocar un selector, verifica contra `evento.html` real con `grep` (ADR-006). Si un módulo fue renombrado, usa el nombre real del DOM.
 
+> **NOTA de reconciliacion (ADR-048, 2026-09-22):** el archivo real descrito en este capitulo como `evento.html` es en el repositorio **`evento-app.html`** (1724 lineas, "Master Orchestrator v214" — ver banner al inicio del documento). La ruta publica `/evento.html` la reescribe `vercel.json` hacia `/api/evento-og`, que sirve `evento-app.html`. Ademas, verificado en `evento-app.html`: `#db-gallery-grid` (L148) vive **DENTRO** de `#mod-video` (L147) — apagar `#mod-video` oculta la galeria; `#mod-hero-ctas` (L84) nace con `display:none !important` (L33) y exige encendido explicito.
+
 | Entregables | Evidencia |
 |---|---|
-| Lista de IDs kernel que el silo estiliza | grep de `id=` en `evento.html` |
+| Lista de IDs kernel que el silo estiliza | grep de `id=` en `evento-app.html` |
 | Átomos del contrato realmente presentes | Comparativa 21 vs ~81 (reporte) |
 | Justificación si un átomo clásico no aplica | Anexo de ADR del silo |
 
@@ -151,9 +169,9 @@ Moléculas que cada silo puede declarar (y las clases kernel reales que estiliza
 
 - **Qué es:** archivo CSS autocontenido por template en `css/templates/{categoria}/{id}.css`.
 - **Qué hace:** estiliza los módulos del kernel de `evento.html` **sin tocarlo** (HTML inamovible — Mandato 10; Aislamiento Atómico — Mandato 9).
-- **Nomenclatura:** `.tpl-{id}` / `.Tpl-{id}` (el kernel aplica ambas a `body`). Ejemplos reales verificados: `.tpl-f8`/`.Tpl-F8` (TropiLove), `.tpl-f9`/`.Tpl-F9` (Místico), `.tpl-f10`/`.Tpl-F10` (Rico/Cyberpunk Fosforescente), `.tpl-f11`/`.Tpl-F11` (Cyberpunk Fosforescente, ADR-043).
-- **Silos en disco (verificado 2026-09-16 con glob sobre `css/templates/`):**
-  - **fiesta:** f1, f3, f5, f6, f7, f8, f9, f10, f11 → archivos `f1.css`, `f3.css`, `f5.css`, `f6.css`, `f7.css`, `f8.css` (TropiLove), `f9.css` (Místico, ADR-041), `f10.css` (Rico, ADR-042 v2.0.0), `f11.css` (Cyberpunk, ADR-043 v3.2.0).
+- **Nomenclatura:** `.tpl-{id}` / `.Tpl-{id}` (el kernel aplica ambas a `body`). Ejemplos reales verificados: `.tpl-f8`/`.Tpl-F8` (TropiLove), `.tpl-f9`/`.Tpl-F9` (Místico), `.tpl-f10`/`.Tpl-F10` (Rico/Cyberpunk Fosforescente), `.tpl-f11`/`.Tpl-F11` (Cyberpunk Fosforescente, ADR-043), `.tpl-f12`/`.Tpl-F12` (**Kande, ADR-048**).
+- **Silos en disco (verificado 2026-09-16 con glob sobre `css/templates/`; f12 agregado 2026-09-22 ADR-048):**
+  - **fiesta:** f1, f3, f5, f6, f7, f8, f9, f10, f11, f12 → archivos `f1.css`, `f3.css`, `f5.css`, `f6.css`, `f7.css`, `f8.css` (TropiLove), `f9.css` (Místico, ADR-041), `f10.css` (Rico, ADR-042 v2.0.0), `f11.css` (Cyberpunk Fosforescente, ADR-043/044, v3.3.3), `f12.css` (**Kande, ADR-048, v1.0.0 — Tropical Noir Brutalista**).
   - **campaña:** b2, b3, b4, b5 → `b2.css`, `b3.css`, `b4.css`, `b5.css` (silo campaña; contiene los átomos de campaña `#mod-impacto-historico`, `#mod-mapa-crisis`, `#mod-como-ayudar`).
   - **cine:** c1, c4 → `c1.css`, `c4opencode.css`.
   - ⚠️ **Documentados pero SIN archivo real en disco:** f2, c2, b1 — NO crear silos que los referencien; si un template_id los pide, escalar al Plan.
@@ -169,6 +187,8 @@ Moléculas que cada silo puede declarar (y las clases kernel reales que estiliza
 ## 8. Inyección y Puente Cromático (Cómo se Monta el Silo)
 
 > **Decisión de Dirección (zanjada):** el silo NO se monta por hoja `<link>` estática en el HTML; lo inyecta el kernel de `evento.html` en runtime. Documentado del código REAL (ADR-006):
+
+> **NOTA de reconciliacion (ADR-048, 2026-09-22):** los numeros de linea de este capitulo (L598-638, L677-681, L692-694, L701-752) corresponden al archivo real **`evento-app.html`** (motor publico; `evento.html` no existe como archivo — ver banner del documento). El texto original se conserva intacto (Cero Borrado); desde este ADR todo `evento.html` kernel se lee como `evento-app.html`.
 
 1. **Propósito:** `injectAtomicCSS(cat, tplId)` (≈`evento.html` L598-638) construye el path `css/templates/{categoria_slug}/{template_id}.css?v={Date.now()}` y lo inyecta en un `<link data-template-css>` (≈L601) — el bypass de caché `?v=timestamp` certifica con latido LINK del Escudo GOLD (Mandato 4).
 2. **Timeout:** 5000 ms; ante fallo, el kernel muestra el texto de error del i18n (`landing.css_error`, ≈L687) — fallback de idioma incluido.
@@ -190,13 +210,16 @@ Moléculas que cada silo puede declarar (y las clases kernel reales que estiliza
 
 > **Decisión de Dirección (zanjada):** toda entrega de silo DEBE registrar su theme en `admin.html` como paso final (paso 8 del flujo de creación). Un silo sin registro NO se considera entregado.
 
-Requisitos verificados contra `admin.html` real (ADR-006):
+Requisitos verificados contra `admin.html` real (ADR-006). **A partir del silo `kande`/f12 (ADR-048, 2026-09-22) el registro completo son 6 puntos** (corrige la version previa que enumeraba 3 y citaba `seleccionarTheme` — el patron vigente es `abrirFichaTheme`):
 
-1. **Tarjeta del theme:** nueva card `.ld-theme-card` con `data-theme="{slug}"` y `onclick="seleccionarTheme('{slug}')"` (patrón real en `admin.html` ~L547-621; gradiente inline, título y descripción corta). **Toda tarjeta nueva nace VISIBLE por defecto (fail-open)** — el curado (ocultar/reordenar) lo hace la cuenta master vía `config_global` (ADR-040); las tarjetas permanecen en el DOM (Cero Borrado).
-2. **Mapa de tipos:** `_THEME_TYPE` (slug → categoria_slug, `admin.html` ≈L2801).
-3. **Mapa de plantillas:** `_THEME_TPL` (slug → template_id, `admin.html` ≈L2814).
-4. **Fuente de verdad:** `public.config_global` (fila id='default') — orden y visibilidad global (ADR-040).
-5. **Validación del Wizard:** si `_evModoPublico !== 'formulario'` y no hay theme seleccionado, el Wizard bloquea el guardado (`alrt('ev-alert', 'Elige una plantilla visual.', 'err')`, ≈L3131).
+1. **Tarjeta del theme:** nueva card `.ld-theme-card` con `data-theme="{slug}"` y **`onclick="abrirFichaTheme('{slug}')"`** (patrón real en `admin.html`: `kande` en **L606**, grupo Fiesta tras `fosforescente`; gradiente inline, título y descripción corta). **Toda tarjeta nueva nace VISIBLE por defecto (fail-open)** — el curado (ocultar/reordenar) lo hace la cuenta master vía `config_global` (ADR-040); las tarjetas permanecen en el DOM (Cero Borrado).
+2. **Mapa de tipos:** `_THEME_TYPE` (slug → categoria_slug, `admin.html` ≈L2830; `kande`→`fiesta`).
+3. **Mapa de plantillas:** `_THEME_TPL` (slug → template_id, `admin.html` ≈L2844; `kande`→`f12`). El derivado `_TPL_THEME` (template_id → slug) sale del `reduce` sobre `_THEME_TPL` (≈L2848-2852) y NO se edita directo.
+4. **Preset ADN Visual:** `_THEME_MODULES` (mapa de ADR-047 con `requeridos/recomendados/selectivos/metaDosLineas`, `admin.html` ≈L2858-2879; `kande` en **L2875**; **19 themes** al 2026-09-22). ⚠️ Cuidado de namespacing: los checkboxes `ld-mod-*` dependen de la categoria — `ld-mod-historia`/`ld-mod-objetivo`/`ld-mod-impacto` solo existen en `#mods-campana` (L684), NO en `#mods-fiesta` (L651-665); NO listar un checkbox de campaña en un preset de Fiesta (defecto MAYOR corregido en ADR-048; familia `ERRORES_HISTORICOS.md` §13).
+5. **Ficha visual:** `_THEME_FICHA` (`admin.html` ≈L3075+; `kande` en **L3103-3104**: nombre, 5 colores de paleta y descripción corta).
+6. **Etiqueta humana:** `names` de `seleccionarTheme()` (`admin.html` ≈L3235; `'kande':'Kande'`).
+7. **Fuente de verdad:** `public.config_global` (fila id='default') — orden y visibilidad global (ADR-040).
+8. **Validación del Wizard:** si `_evModoPublico !== 'formulario'` y no hay theme seleccionado, el Wizard bloquea el guardado (`alrt('ev-alert', 'Elige una plantilla visual.', 'err')`, ≈L3131).
 
 **ADRs citados:** ADR-040 (catálogo curado por master, con su crítica de alcance: "0 cambios a _THEME_TYPE/_THEME_TPL" en su estado original), ADR-041 (registro de `mistico`, paso 8 de ese silo), ADR-042, ADR-043. **Errores históricos:** §8 (INSERT que no escribía `template_id`/`categoria_slug`), §9/§10 (selectores posicionales y de atributo rotos por reorganización de pestañas).
 
@@ -244,8 +267,8 @@ Mobile-first con los cortes normativos: **640 / 767 / 992 / 1279** (768 solo par
 **Paso 7 — Escudo GOLD del silo.**
 Ejecutar el **checklist de aceptación (10/10)** del Cap. 10 sobre el archivo real. Si un punto falla: corregir y re-ejecutar; no continuar al paso 8 con fallos abiertos.
 
-**Paso 8 — Registro del theme en admin.**
-Tarjeta `.ld-theme-card[data-theme="{slug}"]` + `onclick="seleccionarTheme('{slug}')"` + alta en `_THEME_TYPE` y `_THEME_TPL` (Cap. 9). La tarjeta **nace visible** (fail-open); el curado (ocultar/reordenar) es prerrogativa de la cuenta master vía `config_global` (ADR-040). Sin este paso el silo NO está entregado.
+**Paso 8 — Registro del theme en admin (6 puntos, patrón `abrirFichaTheme`).**
+Los **6 puntos reales** del registro (corrección mayor 2026-09-22, ADR-048; el patrón previo citado `seleccionarTheme` con 3 puntos era el de la versión 1.3.0 y quedó superado): (1) tarjeta `.ld-theme-card[data-theme="{slug}"]` con **`onclick="abrirFichaTheme('{slug}')"`** (`admin.html` L606 para `kande`); (2) alta en `_THEME_TYPE` (slug → categoria_slug, ≈L2830); (3) alta en `_THEME_TPL` (slug → template_id, ≈L2844; el derivado `_TPL_THEME` sale del `reduce`, NO se edita directo); (4) preset `_THEME_MODULES` `requeridos/recomendados/selectivos/metaDosLineas` (ADR-047, ≈L2858-2879) — ⚠️ respetar el namespacing por categoria de los checkboxes `ld-mod-*` (defecto MAYOR de ADR-048: `ld-mod-historia` solo existe en `#mods-campana` L684, jamás en un preset de Fiesta; `#mods-fiesta` L651-665); (5) ficha `_THEME_FICHA` (≈L3075+; `kande` L3103-3104); (6) etiqueta en `names` de `seleccionarTheme()` (≈L3235). Detalle completo en Cap. 9. La tarjeta **nace visible** (fail-open); el curado (ocultar/reordenar) es prerrogativa de la cuenta master vía `config_global` (ADR-040). Sin este paso el silo NO está entregado.
 
 ---
 
@@ -287,6 +310,7 @@ Si algún punto falla, la entrega NO es completa: corregir y re-ejecutar el Escu
 | v1.0.0 | (previo) | Antecedente del hub (deuda de documentación detectada en TSK-016/017/018 y auditoría de silos) |
 | v1.2.0 | 2026-09-16 | Creación del hub normativo TEMPLATES.md: 10 capítulos; baseline verificado contra código real (f10 v2.0.0, f11 v3.2.0, f9 ADR-041, kernel v222, admin cards, ADR-040/041/042/043) |
 | v1.3.0 | 2026-09-16 | Correcciones de Dirección + Anexo C (inventario DOM real); nueva metodología de creación en 8 pasos (9-ter); brief obligatorio (9-bis); Cap. 10 como checklist de aceptación 10/10; doble notación de casing corregida; silos en disco reales; subconmutaciones JS reales del kernel |
+| **v1.4.0** | **2026-09-22** | **Silo f12 "Kande" (ADR-048) + reconciliación estructural + corrección del registro.** Banner de reconciliación (al inicio): `evento.html` NO existe como archivo — el motor real es `evento-app.html` (1724 lineas, v214; `vercel.json` → `/api/evento-og`); `#db-gallery-grid` dentro de `#mod-video`; `#mod-hero-ctas` nace oculto; sin override `?tpl=`/`?cat=`; `MODULE_IDS` ausente en v214. Cap. 7: silo `f12.css` (Kande, v1.0.0) agregado a fiesta. Cap. 9 y Paso 8 (9-ter): registro corregido a los **6 puntos reales** con patrón `abrirFichaTheme` (cards, `_THEME_TYPE`, `_THEME_TPL`, `_THEME_MODULES` ADR-047 — 19 themes —, `_THEME_FICHA`, `names`) + advertencia de namespacing por categoria de `ld-mod-*` (defecto MAYOR ADR-048). Anexo B: filas de kernel real y f12; registro de themes actualizado. Anexo C: nota de la galería dentro de `#mod-video`. Nota de Cap. 2: `evento.html` se lee desde este ADR como `evento-app.html` (Cero Borrado: el texto previo se conserva intacto) |
 
 ---
 
@@ -294,6 +318,7 @@ Si algún punto falla, la entrega NO es completa: corregir y re-ejecutar el Escu
 
 | Concepto | Archivo real | Referencia |
 |---|---|---|
+| **Motor publico (reconciliado ADR-048, 2026-09-22)** | **`evento-app.html`** (1724 lineas, "Master Orchestrator v214"); `vercel.json` reescribe `/evento.html` → `/api/evento-og` | Inyección: `injectAtomicCSS` L598-638; doble clase L691-693; `#mod-hero-ctas` oculto L33 + HTML L84 |
 | Kernel IoC (`display:none` inicial) | `evento.html` | ≈L30 (section/header/footer), ≈L32 (`#mod-hero-ctas`) |
 | Inyección del silo | `evento.html` | `injectAtomicCSS` ≈L598-638; `<link data-template-css>` ≈L601 |
 | Fallback de carga CSS | `evento.html` | `landing.css_error` ≈L687 |
@@ -301,16 +326,19 @@ Si algún punto falla, la entrega NO es completa: corregir y re-ejecutar el Escu
 | Acento maestro | `evento.html` | ≈L677-681 (`--master-accent`) |
 | Puente cromático HSL | `evento.html` | ≈L701-752 (`__hexToHsl`/`__hslToHex`) |
 | Silos canónicos | `css/templates/fiesta/f9.css`, `f10.css`, `f11.css` | f9 ADR-041; f10 v2.0.0 ADR-042; f11 v3.2.0 ADR-043 |
-| Registro de themes | `admin.html` | `.ld-theme-card` ≈L547-621; `_THEME_TYPE` ≈L2801; `_THEME_TPL` ≈L2814; `config_global` ≈L2830+ |
+| **Silo f12 "Kande" (ADR-048)** | `css/templates/fiesta/f12.css` | v1.0.0, 1563 lineas, 50294 bytes, ASCII limpio, 193/193 llaves, 0 `@import` reales, 14 modulos ON / 9 OFF, 5 media queries, hero sin 100vh; assets `assets/templates/f12/` (pendientes, fallback ADR-008) |
+| Registro de themes (6 puntos, patrón `abrirFichaTheme`) | `admin.html` | `.ld-theme-card` L606 (kande) · `_THEME_TYPE` ≈L2830 · `_THEME_TPL` ≈L2844 · `_THEME_MODULES` ≈L2858-2879 (19 themes, ADR-047) · `_THEME_FICHA` ≈L3075+ (kande L3103-3104) · `names` ≈L3235 · `config_global` ≈L2920+ (ADR-040/045) |
 | Contrato de Datos | `BLUEPRINT.md` | Sección 4, v112, 21 Átomos Soberanos |
 | Reglas de oro | `Reglas de Oro QR.md` | 16 Mandatos v127-MASTER |
-| Inventario del DOM real | `evento.html` | **Anexo C** (inventario completo por bloque) |
+| Inventario del DOM real | `evento-app.html` | **Anexo C** (inventario completo por bloque; nota: `#db-gallery-grid` L148 dentro de `#mod-video` L147) |
 
 ---
 
 ## Anexo C. Inventario del DOM Real de evento.html (~81 IDs)
 
 > ⚠️ **Líneas aproximadas a la fecha 2026-09-16** (ADR-006): el archivo puede moverse con cada entrega. Verificar SIEMPRE con `grep` antes de usar un selector; las líneas citadas son orientativas. El kernel real es v214+ (interno v222, ~81 IDs, 1630 líneas aprox.).
+>
+> **Reconciliado 2026-09-22 (ADR-048):** el archivo real de este inventario es **`evento-app.html`** en el repositorio (1724 lineas; `evento.html` es solo el link publico reescrito por Vercel hacia `/api/evento-og`). Hechos clave del kernel real: **`#db-gallery-grid` (L148) vive DENTRO de `#mod-video` (L147)** — un silo que apague `#mod-video` oculta la galeria; `#mod-hero-ctas` (L84, con ancla `--lineup` hacia `#mod-lineup` L86) nace con `display:none !important` (L33) y exige encendido explicito via CSS del silo.
 
 ### BLOQUE A — Hero / título / meta / countdown / ctas (~L55-87)
 
@@ -435,4 +463,4 @@ Si algún punto falla, la entrega NO es completa: corregir y re-ejecutar el Escu
 
 ---
 
-*Documento sellado bajo el estándar de calidad de $10,000. v1.3.0 — Template Hub Normativo (ADR-006: todos los datos verificados contra archivos reales del repositorio).*
+*Documento sellado bajo el estándar de calidad de $10,000. v1.4.0 — Template Hub Normativo (ADR-006: todos los datos verificados contra archivos reales del repositorio; ADR-048: reconciliacion del motor real `evento-app.html` y silo f12 "Kande" 2026-09-22).*

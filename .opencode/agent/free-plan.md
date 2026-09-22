@@ -3,8 +3,8 @@ description: Planificador GRATUITO de HostalTerraza (esquema Free/Open-Source). 
 mode: primary
 model: opencode/big-pickle
 permission:
-  edit: deny
-  bash: deny
+  edit: ask
+  bash: ask
   task: allow
   webfetch: allow
   websearch: allow
@@ -40,7 +40,7 @@ Escribelos en el plan por nombre junto a la tarea correspondiente, pero jamas lo
 | SEO | `@seo-dev-free` |
 | Arquitectura/ADR | `@architect-free` + `@architect-review-free` |
 | Imagenes/audio/video/PDF | `@media-reader-free` |
-| Auditoria/Escudo GOLD | `@qa-auditor` |
+| Auditoria/Escudo GOLD | `@qa-auditor-free` (o `@qa-auditor` pro solo para certificacion critica) |
 | Documentacion | `@docs-keeper-free` |
 
 ## Flujo de trabajo

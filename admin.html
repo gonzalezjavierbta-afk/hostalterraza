@@ -603,6 +603,10 @@ tr:hover td{background:var(--surface)}
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2a85;box-shadow:0 0 8px #ff2a85"></div><span style="font-size:12px;font-weight:600;color:#ff2a85">Fosforescente</span></div>
               <div style="font-size:10px;color:#c0508a">Neon fucsia &middot; Hero 100svh &middot; Mobile-first</div>
             </div>
+            <div class="ld-theme-card" data-theme="kande" onclick="abrirFichaTheme('kande')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#140f0a,#2b1f08)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d98a00;box-shadow:0 0 8px #d98a00"></div><span style="font-size:12px;font-weight:600;color:#d98a00">Kande</span></div>
+              <div style="font-size:10px;color:#b8894a">Tropical Noir &middot; Brutalismo Caribeno &middot; Papel Rasgado</div>
+            </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
@@ -2823,7 +2827,7 @@ const _THEME_TYPE = {
   'tropical-hostel':'fiesta','rooftop-sunset':'fiesta',
   'underground':'fiesta','elegant-cocktail':'fiesta','afromango':'fiesta',
   'afromango-editor':'fiesta','tropical-brutalism':'fiesta',
-  'tropilove':'fiesta','mistico':'fiesta','fosforescente':'fiesta',
+  'tropilove':'fiesta','mistico':'fiesta','fosforescente':'fiesta','kande':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
 };
@@ -2837,6 +2841,7 @@ const _THEME_TPL = {
   'tropilove':'f8',
   'mistico':'f9',
   'fosforescente':'f11',
+  'kande':'f12',
 };
 
 // Reverse map template_id → theme slug (para cargar la plantilla al editar).
@@ -2864,6 +2869,10 @@ const _THEME_MODULES = {
   'tropilove': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-ubicacion','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp','ld-mod-gallery-fiesta'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:false },
   'mistico': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-faq-fiesta'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-ubicacion','ld-mod-whatsapp','ld-mod-sponsors-fiesta','ld-mod-gallery-fiesta'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:true },
   'fosforescente': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-ubicacion'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-faq-fiesta','ld-mod-gallery-fiesta','ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], selectivos:['ld-mod-sponsors-fiesta','ld-mod-whatsapp'], metaDosLineas:false },
+  // ADR-006: el modulo de historia es id de CAMPANA (#mod-historia del render
+  // publico lo enciende el CSS del silo). Listarlo aqui reproduciria la colision
+  // de namespace fiesta/campana (ERRORES_HISTORICOS seccion 13). Se omite por diseno.
+  'kande': { requeridos:['ld-mod-boletos','ld-mod-playlist','ld-mod-ubicacion'], recomendados:['ld-mod-countdown-fiesta','ld-mod-gallery-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp'], selectivos:['ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-dj-lineup'], metaDosLineas:false },
   'solidario-moderno': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
   'urgente-impactante': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
   'tech-futurista': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
@@ -3092,6 +3101,8 @@ const _THEME_FICHA = {
     t: ['Dorado antiguo sobre negro editorial.','Serif Georgia con Geist 900 en datos.','Prelanzamientos y musica en vivo.','Requeridos: lineup, boletos y FAQ.'] },
   'fosforescente': { n: 'Fosforescente', c: [['Fondo','#0f021e'],['Secundario','#220c40'],['Primario','#ff2a85'],['Acento','#00f0ff'],['Texto','#ffffff']],
     t: ['Cyberpunk neon fucsia con azul electrico.','Hero 100svh, mobile-first, Geist 900.','Publico joven y electronica urbana.','Requeridos: lineup, boletos, ubicacion.'] },
+  'kande': { n: 'Kande', c: [['Fondo','#0d0b09'],['Secundario','#123b3a'],['Primario','#d98a00'],['Acento','#d6218a'],['Texto','#f5f0e8']],
+    t: ['Tropical noir con mostaza y fucsia sobre negro carbon.','Display pesada y textura de papel rasgado.','Publico joven de fiesta caribena.','Requeridos: boletos, playlist y ubicacion.'] },
   'solidario-moderno': { n: 'Solidario Moderno', c: [['Fondo','#0a1628'],['Secundario','#0d2040'],['Primario','#3b82f6'],['Acento','#4060a0'],['Texto','#3b82f6']],
     t: ['Azul esperanza, tono ONG profesional.','Geist 900 y tarjetas de impacto.','Causas sociales y recaudacion.','Requeridos: historia, objetivo e impacto.'] },
   'urgente-impactante': { n: 'Urgente & Impactante', c: [['Fondo','#1a0000'],['Secundario','#2d0000'],['Primario','#ef4444'],['Acento','#a03030'],['Texto','#ef4444']],
@@ -3221,6 +3232,7 @@ function seleccionarTheme(theme, opts) {
     'solidario-moderno':'Solidario Moderno','urgente-impactante':'Urgente & Impactante',
     'tech-futurista':'Tech & Futurista','vintage-organico':'Vintage & Org\u00e1nico',
     'fosforescente':'Fosforescente',
+    'kande':'Kande',
   };
   const badge  = document.getElementById('ld-preview-badge');
   const nameEl = document.getElementById('ld-preview-theme-name');

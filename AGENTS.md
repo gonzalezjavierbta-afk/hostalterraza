@@ -1,6 +1,75 @@
 # AGENTS.md — Sistema QR Hostal Terraza (HostalTerraza)
 
-Enrutamiento de agentes para OpenCode. Generado a partir de `Sistema QR desarrollo/BLUEPRINT.md`, `Sistema QR desarrollo/Reglas de Oro QR.md` (v127-MASTER) y `Sistema QR desarrollo/PROJECT.md` (v1.6.4-FIX). Este archivo cierra el punto que la Sección 6 del Blueprint pedía guardar en la raíz pero no incluía, y se reescribe completo el 2026-09-14 para reflejar el estado real verificado del repositorio (34 agentes en `.opencode/agent/`, esquema gratuito como dirección estratégica).
+Enrutamiento de agentes para OpenCode. Generado a partir de `Sistema QR desarrollo/BLUEPRINT.md`, `Sistema QR desarrollo/Reglas de Oro QR.md` (v127-MASTER) y `Sistema QR desarrollo/PROJECT.md` (v1.6.4-FIX). Este archivo cierra el punto que la Sección 6 del Blueprint pedía guardar en la raíz pero no incluía, y se reescribe completo el 2026-09-14 para reflejar el estado real verificado del repositorio (34 agentes en `.opencode/agent/`, esquema gratuito como dirección estratégica). Se actualiza el 2026-09-21 para adoptar el **esquema TRIPARTITO de rutas (Free / Hybrid / Pro)** con 39 agentes en `.opencode/agent/` — la ruta gratuita sigue siendo el default.
+
+## 1. Matriz de Enrutamiento de Agentes (esquema TRIPARTITO de rutas)
+
+Antes de procesar cualquier código, los agentes principales deben delegar las tareas a los subagentes especializados configurados en la carpeta `.opencode/agent/` según el dominio de la tarea. Esta matriz es la fuente de verdad operativa del enrutamiento (ADR-006).
+
+Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `opencode/*` de costo cero), una HYBRID (mezcla deliberada PRO/FREE en una misma sesión, ruteo por riesgo) y una de PAGO (agentes pro `opencode-go/*`). Los agentes gratuitos se identifican con el sufijo `-free`. La ruta gratuita es el default de `opencode.json` (`default_agent: free-plan`).
+
+### 1.1 Ruta GRATUITA (0 costo — default)
+
+**Agentes primarios gratuitos:**
+
+| Agente | Modelo | Uso |
+|---|---|---|
+| `free-plan` | `opencode/big-pickle` | Orquestador gratuito (mode primary, edit/bash ask) |
+| `free-build` | `opencode/big-pickle` | Build gratuito (mode primary, edit/bash allow) |
+
+**Subagentes gratuitos (sufijo `-free`; modelo por defecto `opencode/big-pickle`, salvo `@media-reader-free` = `opencode/mimo-v2.5-free`):**
+
+| Agente | Uso |
+|---|---|
+| `exp-pickle-free` | Validaciones de bajo riesgo, linter, smoke tests simples (temperature 0.3; reporta y soporta, no corrige) |
+| `qa-auditor-free` | Escudo GOLD y auditoría (solo reporta, no corrige) |
+| `explore-free` | Exploración masiva de código (solo lectura) |
+| `docs-keeper-free` | Documentación: TASKS/NEXT/BLUEPRINT/DECISIONS/ERRORES_HISTORICOS, ADRs, handoffs |
+| `content-loader-free` | Creación repetitiva de páginas dinámicas (seed+loader+smoke) |
+| `research-agent-free` | Investigación web de destinos y fichas verificadas |
+| `js-silo-dev-free` | JS/TS rutinario y refactor menor (superset funcional de exp-pickle) |
+| `frontend-tpl-free` | `evento.html` y CSS de silos (`css/templates/*/*.css`) |
+| `admin-dev-free` | `admin.html`, `scanner.html` |
+| `renderer-dev-free` | Motor de render `pagina-destino.js` |
+| `data-migration-free` | Migraciones y seeds (SQL crítico escala a `sql-security`) |
+| `seo-dev-free` | Sitemap, meta tags, robots, redirects |
+| `media-reader-free` | Multimedia (imagen/audio/video/PDF) — `opencode/mimo-v2.5-free` |
+| `architect-free` | Arquitectura y ADRs |
+| `architect-review-free` | Segunda opinión de arquitectura |
+| `backend-dev-free` | Backend serverless `api/*.js` |
+| `sql-security-free` | SQL de bajo riesgo; crítico escala a `sql-security` (pro) |
+
+**Limitación de `sql-security-free`:** NO gestiona RLS, autenticación, claves ni integridad de datos crítica. Esas tareas SIEMPRE se escalan a `sql-security` (versión pro).
+
+### 1.2 Ruta HYBRID (mixta — ruteo por riesgo)
+
+La ruta Hybrid mezcla en una misma sesión agentes PRO (`opencode-go/*`, criterio, esfuerzo y riesgo de runtime) y agentes FREE (`opencode/*`, trabajo rutinario, repetitivo y dispendioso de bajo riesgo), según la tarea.
+
+**Agentes primarios hybrid:**
+
+| Agente | Modelo | Uso |
+|---|---|---|
+| `hybrid-plan` | `opencode-go/deepseek-v4.1-flash` | Planificador híbrido (mode primary, edit/bash deny) |
+| `hybrid-build` | `opencode-go/deepseek-v4.1-flash` | Build híbrido (mode primary, edit/bash allow) |
+
+**Regla de oro del ruteo hybrid:** el ruteo PRO/FREE se decide por riesgo y criterio (matriz del ADR del esquema tripartito en `Sistema QR desarrollo/DECISIONS.md`), **nunca por preferencia**. Nunca asignar un dominio PRO a un agente FREE (riesgo de runtime/seguridad); nunca gastar cuota PRO en trabajo mecánico que FREE resuelve igual (ahorro ~95% en tareas rutinarias).
+
+### 1.3 Ruta de PAGO (`opencode-go/*` — opcional, mayor calidad)
+
+**Agentes primarios de pago:**
+
+| Agente | Modelo | Uso |
+|---|---|---|
+| `plan` | `opencode-go/deepseek-v4.1-flash` | Orquestador de pago (mode primary, edit/bash deny) |
+| `build` (default legacy) | `opencode-go/deepseek-v4.1-flash` | Build de pago (mode primary, edit/bash allow) |
+
+**Subagentes de pago:** los 15 pares pro del Roster (`frontend-tpl`, `admin-dev`, `backend-dev`, `sql-security`, `architect`, `architect-review`, `content-loader`, `data-migration`, `docs-keeper`, `explore`, `js-silo-dev`, `media-reader`, `renderer-dev`, `research-agent`, `seo-dev`) + el auditor `qa-auditor`.
+
+**Regla de oro:** todo agente DEBE tener `model:` explícito en su `.md` (prohibido heredar el modelo principal). Los IDs usan el prefijo real del proveedor OpenCode Go (`opencode-go/*`) o los modelos gratis (`opencode/*`); cualquier ID fuera de `opencode models` se considera inválido y se corrige.
+
+**Ruteo por ruta:** los primarios de pago (`plan`/`build`) delegan SIEMPRE a subagentes pro (`admin-dev`, `backend-dev`, ...). Los primarios gratuitos (`free-plan`/`free-build`) delegan SIEMPRE a subagentes `-free` (`admin-dev-free`, `backend-dev-free`, ...). Los primarios hybrid (`hybrid-plan`/`hybrid-build`) delegan por la matriz de riesgo: PRO para dominios de criterio/riesgo de runtime y FREE para trabajo rutinario. Prohibido mezclar rutas excepto para escalar seguridad crítica (`sql-security-free` → `sql-security`).
+
+**Plan = orquestador:** el agente `plan` (`.opencode/agent/plan.md`) NO ejecuta trabajo operativo. Explora mediante `@explore`, investiga vía `gemini-research`/`@research-agent`, y deriva toda implementación al subagente por dominio. `free-plan` hace lo mismo con `@explore-free`/`@research-agent-free` y modelo `opencode/big-pickle`; `hybrid-plan` idéntico con la matriz de riesgo del esquema tripartito.
 
 ## Decisión estratégica 2026-09-14: esquema GRATUITO como dirección de operación
 
@@ -30,11 +99,11 @@ Se auditó el `evento.html` real del repositorio (1630 líneas, 81 IDs) contra e
 
 **Estado real de ADR-040 (16-09-2026, actualización):** el catálogo de plantillas curado por la cuenta master ya está **IMPLEMENTADO** (ADR-045, QA APTO) — ya no es "solo diseño". `admin.html` incluye el sub-tab Plantillas en `pg-globaladmin` (MOSTRAR/OCULTAR/REORDENAR vía `config_global` + RPC `fn_config_global_merge`) y la migración `migrations/adr040_config_global_templates.sql` existe pero **está pendiente de ejecución manual por Dirección** (TSK-035): hasta ejecutarla, el front degrada a fail-open (todo visible), no bloquea. El registro del silo f11 como theme `fosforescente` ya está en `admin.html` (ADR-044). Para tareas de silo/template, la norma completa vive en `Sistema QR desarrollo/AMPLIACION/TEMPLATES.md` (hub, ADR-046) y la skill `.opencode/skills/templates/` — leer el hub antes de tocar CSS.
 
-## Roster de agentes (34 archivos en `.opencode/agent/`)
+## Roster de agentes (39 archivos en `.opencode/agent/`)
 
-Universo: 15 pares pro/free (mismo nombre con sufijo `-free`) + 4 singulares (`plan`, `free-plan`, `free-build`, `qa-auditor`). El agente experimental `exp-pickle` fue **retirado físicamente** (fusión d2 avalada por `architect-review` con condiciones C1/C2/C3 — ver `Sistema QR desarrollo/DECISIONS.md` ADR-031, Addendum A): se eliminó su bloque inline de `opencode.json` (JSON validado correcto), se borró `.opencode/agent/exp-pickle.md` y sus rutas de enrutamiento en `free-build.md`, `free-plan.md` y `plan.md`. `@js-silo-dev-free` es su superset funcional (con `temperature: 0.3`, paridad C1).
+Universo: 15 pares pro/free (30 agentes, mismo nombre con sufijo `-free`) + 9 singulares (`plan`, `build`, `free-plan`, `free-build`, `hybrid-plan`, `hybrid-build`, `qa-auditor`, `qa-auditor-free`, `exp-pickle-free`). El agente experimental `exp-pickle` fue **retirado físicamente** (fusión d2 avalada por `architect-review` con condiciones C1/C2/C3 — ver `Sistema QR desarrollo/DECISIONS.md` ADR-031, Addendum A): se eliminó su bloque inline de `opencode.json` (JSON validado correcto) y se borró `.opencode/agent/exp-pickle.md`. El 2026-09-21 reaparece como subagente **gratuito** `exp-pickle-free` (validaciones de bajo riesgo, linter, smoke simples; temperature 0.3; modelo `opencode/big-pickle`) — versión FREE del soporte mecánico, no primario. `@js-silo-dev-free` es su superset funcional (con `temperature: 0.3`, paridad C1).
 
-`@plan` y `@free-plan` son orquestadores primarios (`mode: primary`) y el único punto de entrada para asignar trabajo. Los demás son subagentes invocados por delegación explícita (o asignados por nombre en el plan para que `@free-build`/subagentes los ejecuten): ninguno edita código fuera de su dominio sin que el orquestador lo asigne.
+`@plan`, `@build`, `@free-plan`, `@free-build`, `@hybrid-plan` y `@hybrid-build` son orquestadores primarios (`mode: primary`, 6 en total) y el único punto de entrada para asignar trabajo. Los demás son subagentes invocados por delegación explícita (o asignados por nombre en el plan para que el build de la ruta correspondiente los ejecute): ninguno edita código fuera de su dominio sin que el orquestador lo asigne.
 
 ### Pares PRO (15) — respaldo de capacidad/calidad (`opencode-go`)
 
@@ -78,18 +147,23 @@ Universo: 15 pares pro/free (mismo nombre con sufijo `-free`) + 4 singulares (`p
 
 **Excepción de modelo intencional:** `@media-reader-free` usa `opencode/mimo-v2.5-free` (único modelo free con visión real en el catálogo 2026-09-14; `big-pickle` no tiene visión) — NO normalizar a big-pickle.
 
-### Singulares (4)
+### Singulares (9)
 
 | Agente | Dominio de archivos | Permisos | Modelo |
 |---|---|---|---|
-| `@plan` | `TASKS.md`, `NEXT.md`, `DECISIONS.md` (orquestación pro, no implementa) | edit: deny · bash: deny · task: allow · webfetch: allow · websearch: allow | `opencode-go/qwen3.8-flash` |
-| `@free-plan` | Plan escrito por dominio (nunca implementa ni invoca subagentes de edición) | edit: deny · bash: deny · task: allow (solo `@explore-free`/`@research-agent-free`) · webfetch: allow · websearch: allow | `opencode/big-pickle` |
+| `@plan` | `TASKS.md`, `NEXT.md`, `DECISIONS.md` (orquestación pro, no implementa) | edit: deny · bash: deny · task: allow · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
+| `@build` | Implementación de pago (coordina subagentes pro; no usa agentes free) | edit: allow · bash: allow · task: allow · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
+| `@free-plan` | Plan escrito por dominio (nunca implementa ni invoca subagentes de edición) | edit: ask · bash: ask · task: allow (solo `@explore-free`/`@research-agent-free`) · webfetch: allow · websearch: allow | `opencode/big-pickle` |
 | `@free-build` | Implementación gratuita (coordina subagentes `*-free` y herramientas directas) | edit: allow · bash: allow · task: allow · webfetch: allow · websearch: allow | `opencode/big-pickle` |
+| `@hybrid-plan` | Plan híbrido (ruteo PRO/FREE por matriz de riesgo del ADR del esquema tripartito; nunca implementa) | edit: deny · bash: deny · task: allow (solo `@explore-free`/`@research-agent-free`) · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
+| `@hybrid-build` | Implementación híbrida (delega PRO para riesgo de runtime/criterio y FREE para rutinario) | edit: allow · bash: allow · task: allow · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@qa-auditor` | Todo el repositorio (solo lectura, reporta hallazgos con evidencia) | edit: deny · bash: allow · webfetch: allow | `opencode-go/deepseek-v4.1-flash` |
+| `@qa-auditor-free` | QA/auditoría gratuita: Escudo GOLD y validaciones (solo reporta, no corrige) | edit: ask · bash: allow · webfetch: allow | `opencode/big-pickle` |
+| `@exp-pickle-free` | Soporte mecánico de bajo coste (validaciones, linter, smoke simples, conteos; reporta y soporta, no corrige) | edit: allow · bash: allow · temperature: 0.3 | `opencode/big-pickle` |
 
 ## Reglas anti-absorción (ADR-031)
 
-Cierran el hueco detectado el 2026-09-14: la regla transversal "Participante" del AGENTS.md original y `free-build.md` NO prohíben al agente principal hacer él mismo el trabajo (read/grep/glob/edit directos), lo que causa sesiones de absorción (el principal hace el trabajo del subagente). Aplican al agente principal y a los orquestadores (`@free-build`, `@plan`, `@free-plan` y cualquier agente que coordine subagentes):
+Cierran el hueco detectado el 2026-09-14: la regla transversal "Participante" del AGENTS.md original y `free-build.md` NO prohíben al agente principal hacer él mismo el trabajo (read/grep/glob/edit directos), lo que causa sesiones de absorción (el principal hace el trabajo del subagente). Aplican al agente principal y a los orquestadores (`@free-build`, `@hybrid-build`, `@build`, `@plan`, `@free-plan`, `@hybrid-plan` y cualquier agente que coordine subagentes):
 
 1. **Delegación obligatoria antes de tocar:** toda implementación compleja se delega al subagente especializado (`*-free` en esquema gratuito; su par pro como respaldo) ANTES de que el principal toque el archivo. El principal no abre el archivo de la tarea delegada para "ver cómo está" mientras el subagente trabaja.
 2. **Regla de No-Duplicidad:** el principal no duplica trabajo ya delegado. Si una tarea fue asignada a un subagente, el principal no la reimplementa, no la "mejora" ni la rehace después.
@@ -101,7 +175,18 @@ Cierran el hueco detectado el 2026-09-14: la regla transversal "Participante" de
 8. **Medidas anti-absorción cuando el principal supera el umbral:** si el contador de llamadas del principal supera **30 llamadas de herramienta directa** (read/grep/glob/edit/webfetch) en una sesión donde existan tareas delegables sin delegar, el principal DEBE detenerse, re-delegar las tareas pendientes y no continuar operando en su contexto.
 9. **Auditoría periódica de KPIs:** `@explore-free` audita los KPIs de delegación sobre los logs de uso (`logs/uso/`) y reporta a `@plan`/`@free-plan`; el resultado se registra en `NEXT.md` como parte del ciclo documental (AI-DOS Cap. 9.9).
 
-## Reglas transversales (aplican a los 34 agentes)
+## Modo Express (xpress)
+
+Cuando el usuario pida trabajar "**express**", "**xpress**" o "**rápido**", la skill `.opencode/skills/express-mode/SKILL.md` rige toda la sesión como skill **transversal** a cualquier dominio y a cualquier ruta (gratuita `*-free`, hybrid o de pago). El modo NO elimina controles: cambia su **orden** y su **profundidad**.
+
+1. **Brief quirúrgico de delegación:** un subagente por dominio con rutas exactas + números de línea + bloque `old`/`new`; sin exploración masiva (solo `grep`/`read` dirigido y 1 `@explore-free` si es imprescindible).
+2. **Verificación local mínima** proporcional al riesgo (sintaxis, ASCII-safety, balance de divs, `grep` de residuos, smoke puntual). Escudo GOLD formal (`gold-shield`) y QA de subagente (`@qa-auditor`) solo si el cambio puede romper runtime.
+3. **Documentación y deuda diferidas** a un único cierre de sesión (`TASKS.md` + `NEXT.md` + ADR/`ERRORES_HISTORICOS.md` si aplica), con la deuda etiquetada `[DEUDA-EXPRESS]`.
+4. **Escalado obligatorio a modo normal** en arquitectura, esquema/RLS/seguridad (siempre `@sql-security`, nunca `sql-security-free`), migraciones de datos, refactors compartidos o alcance > 3 archivos críticos (> 10 archivos en total).
+
+Comando único de verificación mínima: `node scripts/express_check.js`. Manual ampliado: `DOCUMENTOS/MODO_EXPRESS_ANALISIS.md`.
+
+## Reglas transversales (aplican a los 39 agentes)
 
 1. **Cero Borrado (Reglas de Oro #2):** ningún agente elimina IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).
 2. **Vanilla JS puro (ADR-001):** prohibido Node.js en runtime cliente, React o build tools.
@@ -109,15 +194,16 @@ Cierran el hueco detectado el 2026-09-14: la regla transversal "Participante" de
 4. **Silent Fallback (ADR-008):** todo `<img>` dinámico lleva `onerror="this.src='path/to/fallback.png';"`.
 5. **Prioridad Estructural — Data-First (Reglas de Oro #1):** Fase I (datos/IDs/Supabase, log TRACE positivo) certificada antes de Fase II (estética Afterglow/Geist 900).
 6. **Mandato de Actualización Documental (Reglas de Oro #12):** toda actualización de `TASKS.md`/`NEXT.md`/`DECISIONS.md` (dominio de `@plan`/`@free-plan`) se entrega completa e íntegra, sin perder historial.
+7. **Modo Express (xpress):** cuando el usuario pida trabajar "express", "xpress" o "rápido", aplica la sección `## Modo Express (xpress)` de este archivo y la skill `express-mode`: briefs quirúrgicos por dominio, verificación local proporcional al riesgo y cierre documental diferido a un solo pase.
 
 ## Flujo de delegación
 
 ```
-usuario → @free-plan (esquema gratuito)  ·  @plan (esquema pro, respaldo)
+usuario → @free-plan (esquema gratuito)  ·  @plan (esquema pro, respaldo)  ·  @hybrid-plan (esquema hybrid)
             │
             ├─ plan aprobado
             ↓
-        @free-build (@build pro como respaldo)
+        @free-build (@build pro como respaldo)  ·  @hybrid-build (ruteo PRO/FREE por riesgo)
             │
             ├─ cambio visual/CSS de silo ──────────────→ @frontend-tpl-free
             ├─ admin.html / scanner.html ──────────────→ @admin-dev-free
@@ -133,10 +219,11 @@ usuario → @free-plan (esquema gratuito)  ·  @plan (esquema pro, respaldo)
             ├─ investigación de destinos ──────────────→ @research-agent-free
             ├─ exploración masiva del repo ────────────→ @explore-free
             ├─ cierre documental ──────────────────────→ @docs-keeper-free
-            └─ certificación de una entrega ───────────→ @qa-auditor (solo lectura, reporta a @free-build)
+            ├─ sesión en modo express (xpress) ────────→ skill express-mode (transversal)
+            └─ certificación de una entrega ───────────→ @qa-auditor (solo lectura, reporta al build de la ruta)
 ```
 
-El par pro de cada dominio sustituye a su gemelo `*-free` cuando la tarea exige calidad máxima o el modelo free no aplica (p.ej. `@seo-dev`, `@media-reader` con visión).
+El par pro de cada dominio sustituye a su gemelo `*-free` cuando la tarea exige calidad máxima o el modelo free no aplica (p.ej. `@seo-dev`, `@media-reader` con visión). En la ruta hybrid, `@hybrid-build` enruta por la matriz de riesgo del ADR del esquema tripartito.
 
 ## Modelos verificados (T8, 2026-09-14) — catálogo vigente
 
@@ -151,10 +238,18 @@ El par pro de cada dominio sustituye a su gemelo `*-free` cuando la tarea exige 
 
 Proveedores: `opencode-go` = gateway suscripción low-cost (https://opencode.ai/zen/go/v1); `opencode` = gateway free Zen. El 2026-09-14 `opencode-go` NO conecta — por eso la operación diaria se ejecuta con subagentes `*-free` + `@free-build`.
 
+## Modelos gratis: gatekeeper del tier gratuito (hallazgo 2026-09-21)
+
+OpenCode Zen agregó un **gatekeeper** en el tier gratuito (aprox. 16–19 sep 2026) que exige, **simultáneamente**: (1) `stream=true`, (2) declarar las tools `bash`/`shell` y `read` en el body del request, (3) cabeceras de cliente OpenCode.
+
+**CONSECUENCIA PRÁCTICA:** un agente que use un modelo gratis (`opencode/*`) NO debe poner `bash: deny` en su frontmatter, porque eso omite la tool `bash` del request y el servidor responde `403 "OpenCode's free tier can only be used from within OpenCode"`. Usar `bash: ask` o `bash: allow` en su lugar.
+
+Evidencia (2026-09-21, verificada contra los archivos reales, ADR-006): `free-plan` con `bash: deny` fallaba; tras cambiarlo a `bash: ask` responde OK (`.opencode/agent/free-plan.md` vigente: `edit: ask` · `bash: ask`). `free-build` (`bash: allow`) siempre funcionó (`.opencode/agent/free-build.md` vigente: `edit: allow` · `bash: allow`). Modelos gratis válidos del catálogo Zen: `opencode/big-pickle`, `opencode/mimo-v2.5-free`, `opencode/mimo-v2.6-flash-free`, `opencode/nemotron-3.5-lightning-free`, entre otros del catálogo Zen.
+
 ## Instalación
 
 1. Colocar este archivo (`AGENTS.md`) en la raíz del repositorio.
-2. Colocar los 34 archivos de `.opencode/agent/` en `.opencode/agent/` dentro del repo (mismo nombre de archivo que el campo `name` de cada frontmatter). El universo operativo es `.opencode/`; la carpeta `.agents/` del repo se declara LEGADO (ver ADR-031 Addendum B).
+2. Colocar los 39 archivos de `.opencode/agent/` en `.opencode/agent/` dentro del repo (mismo nombre de archivo que el campo `name` de cada frontmatter). El universo operativo es `.opencode/`; la carpeta `.agents/` del repo se declara LEGADO (ver ADR-031 Addendum B).
 3. Verificar que los modelos referenciados estén habilitados en la cuenta de OpenCode: `big-pickle`, `mimo-v2.5-free` (gateway `opencode`) y `qwen3.8-flash`, `deepseek-v4.1-flash`, `minimax-m3` (gateway `opencode-go`). NOTA: `deepseek-v4-flash` está RETIRADO — no pedir verificación de ese modelo.
 4. Antes de la primera tarea delegada, leer la sección "⚠️ Discrepancia conocida" de arriba — el chequeo de los 21 Átomos contra `evento.html` va a fallar en 12 de 21 hasta que se traiga un Contrato de Datos actualizado.
 

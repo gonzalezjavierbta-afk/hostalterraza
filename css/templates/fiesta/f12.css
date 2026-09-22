@@ -1,0 +1,1563 @@
+/* ============================================================================
+   f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.0.0 - Alta inicial del silo.
+   Categoria: fiesta | template_id: f12 | theme: Kande
+   Reglas de la casa:
+     - ASCII-safety estricta: 0 bytes > 127 (comentarios sin tildes).
+     - Cero Borrado: los IDs se apagan con display:none !important.
+     - Sin @import. Tipografia system stack con peso 900.
+     - Notacion doble obligatoria .tpl-f12 / .Tpl-F12 en cada selector.
+   NOTA DE ENCARGO: la seccion 7 (orden vertical del hero) y la seccion 8
+   (listado de areas) entran en conflicto respecto a meta/countdown/ctas.
+   Se prioriza la seccion 7 (aprobada): meta -> countdown -> CTA. El grupo
+   del hero se superpone con grid-area: hero + align-self: end + margenes
+   (patron probado de f11) para que el fondo del hero cubra a los tres.
+============================================================================ */
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMATICO + TOKENS
+   ========================================================================== */
+.tpl-f12, .Tpl-F12 {
+    /* Puente cromatico obligatorio: acento del evento si existe */
+    --tpl-accent: var(--master-accent, #ff2f8e);
+    --gold: var(--master-accent, #ff2f8e);
+
+    /* Paleta Kande: negro carbon + flora fucsia/turquesa + mostaza */
+    --f12-bg:         #0b0b0d;
+    --f12-bg-ink:     #14141a;
+    --f12-bg-soft:    #1c1c24;
+    --f12-card-bg:    rgba(20, 20, 26, 0.78);
+    --f12-ink:        #0b0b0d;
+    --f12-mustard:    #e0a92b;
+    --f12-mustard-2:  #c98f18;
+    --f12-fuchsia:    #ff2f8e;
+    --f12-turq:       #2fe0d0;
+    --f12-cream:      #f6f2e7;
+    --f12-text:       #f6f2e7;
+    --f12-text-muted: rgba(246, 242, 231, 0.66);
+    --f12-line:       rgba(246, 242, 231, 0.12);
+    --f12-line-soft:  rgba(246, 242, 231, 0.06);
+    --f12-green:      #25d366;
+
+    /* Assets del silo. Los archivos aun no existen: cada uso declara
+       DEBAJO una capa de respaldo (color/gradiente + grano SVG data-URI)
+       para cumplir Silent Fallback (ADR-008). */
+    --f12-asset-hero:        url("https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/templates/f12/f12-hero-bg.v1.webp");
+    --f12-asset-hero-mobile: url("https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/templates/f12/f12-hero-bg-mobile.v1.webp");
+    --f12-asset-papel:       url("https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/templates/f12/f12-papel-rasgado.v1.png");
+    --f12-asset-flora:       url("https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/templates/f12/f12-flora-esquina.v1.png");
+
+    /* Grano SVG (data-URI ASCII-safe) */
+    --f12-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+    /* Glows */
+    --f12-glow-fuchsia: 0 0 22px rgba(255, 47, 142, 0.55);
+    --f12-glow-turq:    0 0 22px rgba(47, 224, 208, 0.50);
+    --f12-glow-mustard: 0 0 20px rgba(224, 169, 43, 0.50);
+
+    /* Tipografia: system stack, sin @import */
+    --f12-font: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /* Espaciado del hero */
+    --f12-hero-pt:  5.5rem;
+    --f12-hero-pb:  5.5rem;
+    --f12-hero-gap: 1.6rem;
+
+    --f12-radius: 2px;
+
+    margin: 0;
+    padding: 0;
+    background-color: #0b0b0d !important;
+    background-image:
+        radial-gradient(120% 80% at 12% 8%, rgba(255, 47, 142, 0.16) 0%, transparent 60%),
+        radial-gradient(110% 70% at 90% 85%, rgba(47, 224, 208, 0.13) 0%, transparent 62%),
+        radial-gradient(90% 60% at 78% 12%, rgba(224, 169, 43, 0.12) 0%, transparent 60%),
+        linear-gradient(160deg, #14141a 0%, #0b0b0d 52%, #050506 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f12-text);
+    font-family: var(--f12-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.tpl-f12 *, .Tpl-F12 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f12 *::before, .Tpl-F12 *::before,
+.tpl-f12 *::after,  .Tpl-F12 *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1.1. GRANO BRUTALISTA + AURORA FLORA (fondo ambiental fijo)
+   ========================================================================== */
+.tpl-f12::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(46% 34% at 8% 12%,  rgba(255, 47, 142, 0.20) 0%, transparent 70%),
+        radial-gradient(40% 30% at 92% 72%, rgba(47, 224, 208, 0.16) 0%, transparent 70%),
+        radial-gradient(34% 26% at 70% 6%,  rgba(224, 169, 43, 0.14) 0%, transparent 70%),
+        radial-gradient(42% 38% at 24% 92%, rgba(255, 47, 142, 0.12) 0%, transparent 72%);
+    animation: f12FloraDrift 28s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f12FloraDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1);           opacity: 0.86; }
+    50%  { transform: translate3d(1.6%, -1.4%, 0) scale(1.07); opacity: 0.92; }
+    100% { transform: translate3d(2.2%, 1.1%, 0) scale(1.11);  opacity: 0.80; }
+}
+
+.tpl-f12::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.055;
+    mix-blend-mode: overlay;
+    background-image: var(--f12-grain);
+    background-repeat: repeat;
+    animation: f12GrainShift 0.9s steps(4) infinite;
+}
+
+@keyframes f12GrainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1%); }
+    50%  { transform: translate(1%, -2%); }
+    75%  { transform: translate(-1%, 2%); }
+    100% { transform: translate(2%, -1%); }
+}
+
+/* ==========================================================================
+   2. ACTIVACION ATOMICA (el kernel IoC oculta todo por defecto)
+   ========================================================================== */
+.tpl-f12 #main-content-flow,
+.Tpl-F12 #main-content-flow {
+    position: relative;
+    z-index: 1;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* --- Modulos ENCENDIDOS --- */
+.tpl-f12 #mod-hero,
+.Tpl-F12 #mod-hero {
+    display: flex !important;
+}
+
+.tpl-f12 #unified-frame,
+.tpl-f12 #mod-hero-meta,
+.tpl-f12 #mod-hero-ctas,
+.Tpl-F12 #unified-frame,
+.Tpl-F12 #mod-hero-meta,
+.Tpl-F12 #mod-hero-ctas {
+    display: flex !important;
+}
+
+.tpl-f12 #mod-cartel,
+.tpl-f12 #mod-playlist,
+.tpl-f12 #mod-boletos,
+.tpl-f12 #mod-whatsapp,
+.tpl-f12 #mod-historia,
+.Tpl-F12 #mod-cartel,
+.Tpl-F12 #mod-playlist,
+.Tpl-F12 #mod-boletos,
+.Tpl-F12 #mod-whatsapp,
+.Tpl-F12 #mod-historia {
+    display: block !important;
+}
+
+.tpl-f12 #mod-video,
+.tpl-f12 #mod-form,
+.tpl-f12 #mod-faq,
+.tpl-f12 #mod-ubicacion,
+.tpl-f12 #mod-footer,
+.Tpl-F12 #mod-video,
+.Tpl-F12 #mod-form,
+.Tpl-F12 #mod-faq,
+.Tpl-F12 #mod-ubicacion,
+.Tpl-F12 #mod-footer {
+    display: block !important;
+}
+
+/* --- Modulos APAGADOS (IDs intactos, Cero Borrado) --- */
+.tpl-f12 #mod-lineup,
+.tpl-f12 #mod-experiencias,
+.tpl-f12 #mod-objetivo,
+.tpl-f12 #mod-impacto,
+.tpl-f12 #mod-info-tecnica,
+.tpl-f12 #mod-sponsors,
+.tpl-f12 #mod-equipo,
+.tpl-f12 #mod-cta-final,
+/* #mod-descripcion no aparece en la lista de encendidos del encargo:
+   se apaga de forma explicita para blindar el grid (decision conservadora). */
+.tpl-f12 #mod-descripcion,
+.Tpl-F12 #mod-lineup,
+.Tpl-F12 #mod-experiencias,
+.Tpl-F12 #mod-objetivo,
+.Tpl-F12 #mod-impacto,
+.Tpl-F12 #mod-info-tecnica,
+.Tpl-F12 #mod-sponsors,
+.Tpl-F12 #mod-equipo,
+.Tpl-F12 #mod-cta-final,
+.Tpl-F12 #mod-descripcion {
+    display: none !important;
+}
+
+/* ==========================================================================
+   3. GRID ATOMICO PRINCIPAL (DESKTOP)
+   ========================================================================== */
+.tpl-f12 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 3.5rem !important;
+    column-gap: 3rem !important;
+    grid-template-areas:
+        "hero      hero"
+        "historia  historia"
+        "cartel    playlist"
+        "boletos   form"
+        "video     video"
+        "faq       ubicacion"
+        "whatsapp  whatsapp"
+        "footer    footer";
+    width: 100%;
+}
+
+.tpl-f12 #mod-hero       { grid-area: hero; }
+.tpl-f12 #mod-historia   { grid-area: historia; }
+.tpl-f12 #mod-cartel     { grid-area: cartel; }
+.tpl-f12 #mod-playlist   { grid-area: playlist; }
+.tpl-f12 #mod-boletos    { grid-area: boletos; }
+.tpl-f12 #mod-form       { grid-area: form; }
+.tpl-f12 #mod-video      { grid-area: video; }
+.tpl-f12 #mod-faq        { grid-area: faq; }
+.tpl-f12 #mod-ubicacion  { grid-area: ubicacion; }
+.tpl-f12 #mod-whatsapp   { grid-area: whatsapp; }
+.tpl-f12 #mod-footer     { grid-area: footer; }
+
+/* El grupo del hero comparte el area `hero` y se apila desde el pie
+   (seccion 7): meta (mas alto) -> countdown -> CTA (mas bajo). */
+.tpl-f12 #mod-hero-meta,
+.Tpl-F12 #mod-hero-meta {
+    grid-area: hero;
+    z-index: 6;
+    align-self: end;
+    pointer-events: auto;
+    margin-top: 0 !important;
+    margin-bottom: 13.6rem !important;
+}
+
+.tpl-f12 #unified-frame,
+.Tpl-F12 #unified-frame {
+    grid-area: hero;
+    z-index: 6;
+    align-self: end;
+    pointer-events: auto;
+    margin-top: 0 !important;
+    margin-bottom: 8.4rem !important;
+}
+
+.tpl-f12 #mod-hero-ctas,
+.Tpl-F12 #mod-hero-ctas {
+    grid-area: hero;
+    z-index: 6;
+    align-self: end;
+    pointer-events: auto;
+    margin-top: 0 !important;
+    margin-bottom: 2.2rem !important;
+}
+
+/* ==========================================================================
+   4. TIPOGRAFIA EDITORIAL
+   ========================================================================== */
+.tpl-f12 h2, .Tpl-F12 h2 {
+    color: var(--f12-mustard);
+    font-family: var(--f12-font);
+    font-size: 0.8rem;
+    letter-spacing: 0.42em;
+    font-weight: 900;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+}
+
+.tpl-f12 section, .Tpl-F12 section {
+    padding: 5.5rem 8% !important;
+    border-bottom: 1px solid var(--f12-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO
+   ========================================================================== */
+.tpl-f12 #mod-hero,
+.Tpl-F12 #mod-hero {
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 72vh !important;
+    min-height: 72svh !important;
+    padding: var(--f12-hero-pt) 6% var(--f12-hero-pb) !important;
+    color: var(--f12-text);
+    background-color: var(--f12-bg);
+    /* Capas (de arriba a abajo): velo oscuro -> asset hero -> respaldo
+       gradiente carbon -> grano SVG. Si el asset no existe, el respaldo
+       y el grano siguen pintando (Silent Fallback, ADR-008). */
+    background-image:
+        linear-gradient(180deg, rgba(11, 11, 13, 0.22) 0%, rgba(11, 11, 13, 0.50) 46%, rgba(11, 11, 13, 0.90) 100%),
+        var(--f12-asset-hero),
+        linear-gradient(135deg, #1c1c24 0%, #14141a 45%, #0b0b0d 100%),
+        var(--f12-grain);
+    background-size: cover, cover, cover, 160px 160px;
+    background-position: center center, center top, center center, 0 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    overflow: hidden;
+}
+
+/* Cinta mostaza tipo papel rasgado (pseudoelemento de #mod-hero) */
+.tpl-f12 #mod-hero::before,
+.Tpl-F12 #mod-hero::before {
+    content: "\2605\00a0KANDE\00a0\2022\00a0TROPICAL NOIR\00a0\2605";
+    position: absolute;
+    top: 59%;
+    left: -3%;
+    z-index: 3;
+    width: 106%;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image:
+        var(--f12-asset-papel),
+        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
+    background-size: 100% 100%, cover;
+    background-repeat: no-repeat, no-repeat;
+    color: var(--f12-ink);
+    font-family: var(--f12-font);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    transform: rotate(-2.4deg);
+    border-top: 2px solid rgba(11, 11, 13, 0.85);
+    border-bottom: 2px solid rgba(11, 11, 13, 0.85);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+}
+
+/* Texto lateral vertical (pseudoelemento de #mod-hero) */
+.tpl-f12 #mod-hero::after,
+.Tpl-F12 #mod-hero::after {
+    content: "\2022\00a0FIESTA\00a0NOIR\00a0\2022\00a0KANDE";
+    position: absolute;
+    top: 50%;
+    right: 0.7rem;
+    z-index: 3;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    color: rgba(246, 242, 231, 0.72);
+    font-family: var(--f12-font);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.tpl-f12 #mod-hero .hero-content,
+.Tpl-F12 #mod-hero .hero-content {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 17rem;
+}
+
+/* Flora de esquina (asset + respaldo radial fucsia/turquesa) */
+.tpl-f12 #mod-hero .hero-content::before,
+.Tpl-F12 #mod-hero .hero-content::before {
+    content: "";
+    position: absolute;
+    right: -2.5rem;
+    bottom: -1rem;
+    z-index: 1;
+    width: 230px;
+    height: 230px;
+    background-image:
+        var(--f12-asset-flora),
+        radial-gradient(circle at 70% 70%, rgba(255, 47, 142, 0.35) 0%, rgba(47, 224, 208, 0.18) 45%, transparent 72%);
+    background-size: contain, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 26px rgba(255, 47, 142, 0.35));
+    pointer-events: none;
+}
+
+/* --- Badge de organizacion (primero en el orden vertical del hero) --- */
+.tpl-f12 #org-name-badge,
+.Tpl-F12 #org-name-badge {
+    position: static !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    margin: 0 auto 1.4rem !important;
+    padding: 0.4rem 1.2rem !important;
+    max-width: 100%;
+    background: rgba(255, 47, 142, 0.14) !important;
+    border: 1px solid rgba(255, 47, 142, 0.55) !important;
+    border-radius: var(--f12-radius) !important;
+    color: var(--f12-cream) !important;
+    font-family: var(--f12-font);
+    font-size: 0.7rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.28em !important;
+    text-transform: uppercase;
+    z-index: 4 !important;
+}
+
+/* ==========================================================================
+   5.1. TITULO DEL EVENTO (display pesado con contorno)
+   ========================================================================== */
+.tpl-f12 #event-title,
+.Tpl-F12 #event-title {
+    display: block !important;
+    margin: 0 0 1.2rem !important;
+    font-family: var(--f12-font);
+    font-weight: 900 !important;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: clamp(2.6rem, 11vw, 7rem) !important;
+    max-width: 100%;
+    color: var(--f12-cream) !important;
+    -webkit-text-stroke: 2px var(--f12-ink);
+    text-shadow:
+        4px 4px 0 var(--f12-fuchsia),
+        8px 8px 0 rgba(47, 224, 208, 0.45),
+        0 0 32px rgba(255, 47, 142, 0.35);
+    animation: f12TitlePulse 5s ease-in-out infinite alternate;
+}
+
+@keyframes f12TitlePulse {
+    0%   { text-shadow: 4px 4px 0 var(--f12-fuchsia), 8px 8px 0 rgba(47, 224, 208, 0.45), 0 0 32px rgba(255, 47, 142, 0.35); }
+    100% { text-shadow: 4px 4px 0 var(--f12-fuchsia), 8px 8px 0 rgba(47, 224, 208, 0.62), 0 0 46px rgba(255, 47, 142, 0.55); }
+}
+
+/* ==========================================================================
+   5.2. COUNTDOWN - tira compacta horizontal con divisores
+   ========================================================================== */
+.tpl-f12 #unified-frame,
+.Tpl-F12 #unified-frame {
+    flex-direction: row !important;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0 !important;
+    padding: 0.35rem 0.8rem !important;
+    background: rgba(11, 11, 13, 0.80) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(224, 169, 43, 0.55) !important;
+    border-radius: var(--f12-radius) !important;
+    box-shadow:
+        0 6px 26px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(224, 169, 43, 0.18);
+}
+
+.tpl-f12 #unified-frame .cd-block,
+.Tpl-F12 #unified-frame .cd-block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 1.15rem !important;
+    background: transparent !important;
+    border: none !important;
+    min-width: 64px !important;
+    max-width: 110px !important;
+    text-align: center;
+}
+
+/* Divisor entre bloques (no existe .cd-sep en el DOM: se genera por CSS) */
+.tpl-f12 #unified-frame .cd-block:not(:last-child)::after,
+.Tpl-F12 #unified-frame .cd-block:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 16%;
+    width: 1px;
+    height: 68%;
+    background: linear-gradient(180deg, transparent 0%, var(--f12-turq) 50%, transparent 100%);
+    opacity: 0.7;
+}
+
+.tpl-f12 #unified-frame .cd-block > span,
+.Tpl-F12 #unified-frame .cd-block > span {
+    font-size: clamp(1.5rem, 4vw, 2.3rem) !important;
+    font-weight: 900 !important;
+    color: var(--f12-turq);
+    line-height: 1;
+    text-shadow: var(--f12-glow-turq);
+}
+
+.tpl-f12 #unified-frame .cd-block small,
+.Tpl-F12 #unified-frame .cd-block small {
+    margin-top: 0.28rem;
+    font-size: 0.55rem !important;
+    font-weight: 900;
+    letter-spacing: 0.24em;
+    color: var(--f12-mustard);
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   5.3. METADATOS (solo #meta-lugar visible)
+   ========================================================================== */
+.tpl-f12 #mod-hero-meta,
+.Tpl-F12 #mod-hero-meta {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem 1rem !important;
+    padding: 0 6% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Fallback sin :has() -> los dos primeros .meta-item son fecha y hora */
+.tpl-f12 #mod-hero-meta .meta-item:nth-child(1),
+.tpl-f12 #mod-hero-meta .meta-item:nth-child(2),
+.Tpl-F12 #mod-hero-meta .meta-item:nth-child(1),
+.Tpl-F12 #mod-hero-meta .meta-item:nth-child(2) {
+    display: none !important;
+}
+
+/* Preciso por ID (si el navegador soporta :has) */
+.tpl-f12 #mod-hero-meta .meta-item:has(#meta-fecha),
+.tpl-f12 #mod-hero-meta .meta-item:has(#meta-hora),
+.Tpl-F12 #mod-hero-meta .meta-item:has(#meta-fecha),
+.Tpl-F12 #mod-hero-meta .meta-item:has(#meta-hora) {
+    display: none !important;
+}
+
+.tpl-f12 #mod-hero-meta .meta-item,
+.Tpl-F12 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 1.15rem !important;
+    background: rgba(47, 224, 208, 0.10) !important;
+    border: 1px solid rgba(47, 224, 208, 0.45) !important;
+    border-radius: var(--f12-radius) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--f12-cream);
+    font-size: 0.85rem !important;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tpl-f12 #mod-hero-meta .meta-item:hover,
+.Tpl-F12 #mod-hero-meta .meta-item:hover {
+    background: rgba(47, 224, 208, 0.18) !important;
+    border-color: rgba(47, 224, 208, 0.75) !important;
+}
+
+.tpl-f12 #mod-hero-meta .meta-svg,
+.Tpl-F12 #mod-hero-meta .meta-svg {
+    width: 14px !important;
+    height: 14px !important;
+    fill: var(--f12-mustard) !important;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   5.4. CTAs DEL HERO (solo WhatsApp; el ancla de lineup queda oculta)
+   ========================================================================== */
+.tpl-f12 #mod-hero-ctas,
+.Tpl-F12 #mod-hero-ctas {
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0 6% !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* El ancla apunta a #mod-lineup, que esta apagado: se oculta por CSS */
+.tpl-f12 #mod-hero-ctas .hero-cta-btn--lineup,
+.Tpl-F12 #mod-hero-ctas .hero-cta-btn--lineup {
+    display: none !important;
+}
+
+.tpl-f12 #mod-hero-ctas #f6-hero-wa,
+.tpl-f12 #mod-hero-ctas .hero-cta-btn--wa,
+.Tpl-F12 #mod-hero-ctas #f6-hero-wa,
+.Tpl-F12 #mod-hero-ctas .hero-cta-btn--wa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.6rem !important;
+    min-height: 52px !important;
+    font-family: var(--f12-font);
+    font-weight: 900 !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: var(--f12-fuchsia) !important;
+    color: var(--f12-ink) !important;
+    border: 2px solid var(--f12-mustard) !important;
+    border-radius: var(--f12-radius) !important;
+    cursor: pointer;
+    box-shadow:
+        6px 6px 0 rgba(224, 169, 43, 0.85),
+        var(--f12-glow-fuchsia) !important;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.tpl-f12 #mod-hero-ctas #f6-hero-wa:hover,
+.tpl-f12 #mod-hero-ctas .hero-cta-btn--wa:hover,
+.Tpl-F12 #mod-hero-ctas #f6-hero-wa:hover,
+.Tpl-F12 #mod-hero-ctas .hero-cta-btn--wa:hover {
+    background: var(--f12-turq) !important;
+    color: var(--f12-ink) !important;
+    border-color: var(--f12-ink) !important;
+    box-shadow: 4px 4px 0 rgba(255, 47, 142, 0.85), var(--f12-glow-turq) !important;
+    transform: translate(-2px, -2px);
+}
+
+/* ==========================================================================
+   6. HISTORIA
+   ========================================================================== */
+.tpl-f12 #mod-historia,
+.Tpl-F12 #mod-historia {
+    position: relative;
+    background: linear-gradient(160deg, var(--f12-bg-ink) 0%, var(--f12-bg) 100%);
+}
+
+.tpl-f12 #mod-historia .historia-inner,
+.Tpl-F12 #mod-historia .historia-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 0 1.6rem !important;
+    border-left: 4px solid var(--f12-fuchsia);
+    text-align: left !important;
+}
+
+.tpl-f12 #db-historia-titulo,
+.Tpl-F12 #db-historia-titulo {
+    color: var(--f12-mustard) !important;
+    font-weight: 900 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 1.1rem !important;
+    margin-bottom: 1.4rem;
+}
+
+.tpl-f12 #db-historia-img,
+.Tpl-F12 #db-historia-img {
+    display: block;
+    width: 100% !important;
+    max-width: 700px !important;
+    margin: 1.6rem auto !important;
+    border-radius: var(--f12-radius) !important;
+    border: 1px solid var(--f12-line);
+    filter: saturate(1.05) contrast(1.03);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+}
+
+.tpl-f12 #db-historia-texto,
+.Tpl-F12 #db-historia-texto {
+    color: var(--f12-text-muted) !important;
+    font-size: 1.02rem;
+    line-height: 1.85 !important;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   7. CARTEL
+   ========================================================================== */
+.tpl-f12 #mod-cartel,
+.Tpl-F12 #mod-cartel {
+    position: relative;
+    padding: 4rem 5% !important;
+    text-align: center;
+}
+
+.tpl-f12 #mod-cartel .cartel-inner,
+.Tpl-F12 #mod-cartel .cartel-inner {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 1.2rem !important;
+    background: var(--f12-card-bg);
+    border: 1px solid rgba(224, 169, 43, 0.45);
+    border-radius: var(--f12-radius);
+    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 47, 142, 0.12);
+}
+
+.tpl-f12 #db-poster-img,
+.Tpl-F12 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: var(--f12-radius) !important;
+    cursor: zoom-in;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.tpl-f12 #db-poster-img:hover,
+.Tpl-F12 #db-poster-img:hover {
+    transform: scale(1.015);
+    filter: saturate(1.1);
+}
+
+/* ==========================================================================
+   8. PLAYLIST
+   ========================================================================== */
+.tpl-f12 #mod-playlist,
+.Tpl-F12 #mod-playlist {
+    padding: 4rem 5% !important;
+}
+
+.tpl-f12 #mod-playlist > div,
+.Tpl-F12 #mod-playlist > div {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.tpl-f12 #db-spotify-embed,
+.Tpl-F12 #db-spotify-embed {
+    min-height: 420px;
+    border: 1px solid rgba(47, 224, 208, 0.35) !important;
+    border-radius: var(--f12-radius) !important;
+    background: var(--f12-bg-ink);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   9. BOLETOS (bloque mostaza tipo papel rasgado)
+   ========================================================================== */
+.tpl-f12 #mod-boletos,
+.Tpl-F12 #mod-boletos {
+    position: relative;
+    padding: 5rem 5% !important;
+}
+
+/* Banda de papel rasgado sobre el modulo */
+.tpl-f12 #mod-boletos::before,
+.Tpl-F12 #mod-boletos::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    z-index: 2;
+    width: min(100%, 980px);
+    height: 40px;
+    transform: translateX(-50%);
+    background-image:
+        var(--f12-asset-papel),
+        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
+    background-size: 100% 100%, cover;
+    background-repeat: no-repeat, no-repeat;
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+    pointer-events: none;
+}
+
+.tpl-f12 #mod-boletos .boleto-inner,
+.Tpl-F12 #mod-boletos .boleto-inner {
+    max-width: 520px !important;
+    margin: 1.4rem auto 0 !important;
+    padding: 2.2rem 1.8rem !important;
+    background:
+        linear-gradient(180deg, rgba(224, 169, 43, 0.16) 0%, rgba(11, 11, 13, 0.90) 42%),
+        var(--f12-bg-ink);
+    border: 1px solid rgba(224, 169, 43, 0.45);
+    border-radius: var(--f12-radius);
+    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+.tpl-f12 #mod-boletos .boleto-cards-wrap,
+.Tpl-F12 #mod-boletos .boleto-cards-wrap {
+    margin-top: 1.2rem;
+    border: 1px solid var(--f12-line);
+    border-radius: var(--f12-radius);
+    overflow: hidden;
+    background: rgba(11, 11, 13, 0.5);
+}
+
+.tpl-f12 #mod-boletos #db-boletos-preventa:empty,
+.tpl-f12 #mod-boletos #db-boletos-taquilla:empty,
+.Tpl-F12 #mod-boletos #db-boletos-preventa:empty,
+.Tpl-F12 #mod-boletos #db-boletos-taquilla:empty {
+    display: none !important;
+}
+
+.tpl-f12 #mod-boletos .boleto-card-row,
+.Tpl-F12 #mod-boletos .boleto-card-row {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.3rem !important;
+    border-bottom: 1px solid var(--f12-line-soft) !important;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tpl-f12 #mod-boletos a.boleto-card-row:hover,
+.Tpl-F12 #mod-boletos a.boleto-card-row:hover {
+    background: rgba(47, 224, 208, 0.10) !important;
+    border-left-color: var(--f12-turq);
+    transform: translateX(3px);
+}
+
+.tpl-f12 #mod-boletos .boleto-card-row:last-child,
+.Tpl-F12 #mod-boletos .boleto-card-row:last-child {
+    border-bottom: none !important;
+}
+
+.tpl-f12 #mod-boletos .boleto-icon,
+.Tpl-F12 #mod-boletos .boleto-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tpl-f12 #mod-boletos .boleto-icon svg,
+.Tpl-F12 #mod-boletos .boleto-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.tpl-f12 #mod-boletos .boleto-tipo,
+.Tpl-F12 #mod-boletos .boleto-tipo {
+    color: var(--f12-mustard) !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.2em !important;
+}
+
+.tpl-f12 #mod-boletos .boleto-precio,
+.Tpl-F12 #mod-boletos .boleto-precio {
+    color: var(--f12-cream) !important;
+    font-weight: 900 !important;
+}
+
+.tpl-f12 #mod-boletos .boleto-desc,
+.Tpl-F12 #mod-boletos .boleto-desc {
+    color: var(--f12-text-muted) !important;
+}
+
+.tpl-f12 #mod-boletos .boleto-arrow,
+.Tpl-F12 #mod-boletos .boleto-arrow {
+    color: var(--f12-turq) !important;
+    transition: transform 0.2s ease;
+}
+
+.tpl-f12 #mod-boletos a.boleto-card-row:hover .boleto-arrow,
+.Tpl-F12 #mod-boletos a.boleto-card-row:hover .boleto-arrow {
+    transform: translateX(4px);
+}
+
+.tpl-f12 #mod-boletos .boleto-trust,
+.Tpl-F12 #mod-boletos .boleto-trust {
+    margin-top: 1.4rem;
+    color: var(--f12-text-muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   10. FORMULARIO
+   ========================================================================== */
+.tpl-f12 #mod-form,
+.Tpl-F12 #mod-form {
+    position: relative;
+    padding: 4.5rem 5% !important;
+}
+
+.tpl-f12 #mod-form .form-master-box,
+.Tpl-F12 #mod-form .form-master-box {
+    position: relative;
+    max-width: 560px !important;
+    margin: 1.2rem auto 0 !important;
+    padding: 2.6rem 2rem !important;
+    background: var(--f12-card-bg) !important;
+    border: 1px solid rgba(224, 169, 43, 0.45) !important;
+    border-radius: var(--f12-radius) !important;
+    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+/* Banda rasgada superior del formulario (reusa el patron de #mod-boletos) */
+.tpl-f12 #mod-form .form-master-box::before,
+.Tpl-F12 #mod-form .form-master-box::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    z-index: 2;
+    width: 100%;
+    height: 40px;
+    transform: translateX(-50%);
+    background-image:
+        var(--f12-asset-papel),
+        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
+    background-size: 100% 100%, cover;
+    background-repeat: no-repeat, no-repeat;
+    pointer-events: none;
+}
+
+.tpl-f12 #mod-form .form-master-box input,
+.tpl-f12 #mod-form .form-master-box select,
+.tpl-f12 #mod-form .form-master-box textarea,
+.Tpl-F12 #mod-form .form-master-box input,
+.Tpl-F12 #mod-form .form-master-box select,
+.Tpl-F12 #mod-form .form-master-box textarea {
+    width: 100%;
+    padding: 0.85rem 1rem !important;
+    background: rgba(11, 11, 13, 0.85) !important;
+    border: 1px solid var(--f12-line) !important;
+    border-radius: var(--f12-radius) !important;
+    color: var(--f12-cream) !important;
+    font-family: var(--f12-font);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tpl-f12 #mod-form .form-master-box input:focus,
+.tpl-f12 #mod-form .form-master-box select:focus,
+.tpl-f12 #mod-form .form-master-box textarea:focus,
+.Tpl-F12 #mod-form .form-master-box input:focus,
+.Tpl-F12 #mod-form .form-master-box select:focus,
+.Tpl-F12 #mod-form .form-master-box textarea:focus {
+    border-color: var(--f12-turq) !important;
+    box-shadow: 0 0 0 3px rgba(47, 224, 208, 0.18);
+}
+
+.tpl-f12 #mod-form .form-master-box button,
+.Tpl-F12 #mod-form .form-master-box button {
+    background: var(--f12-mustard) !important;
+    color: var(--f12-ink) !important;
+    border: 2px solid var(--f12-ink) !important;
+    border-radius: var(--f12-radius) !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tpl-f12 #mod-form .form-master-box button:hover,
+.Tpl-F12 #mod-form .form-master-box button:hover {
+    box-shadow: 4px 4px 0 var(--f12-fuchsia);
+    transform: translate(-2px, -2px);
+}
+
+/* ==========================================================================
+   11. VIDEO / GALERIA
+   ========================================================================== */
+.tpl-f12 #mod-video,
+.Tpl-F12 #mod-video {
+    padding: 4.5rem 5% !important;
+}
+
+.tpl-f12 #db-gallery-grid,
+.Tpl-F12 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1rem !important;
+    margin-bottom: 2rem !important;
+}
+
+.tpl-f12 #db-gallery-grid .gallery-item,
+.Tpl-F12 #db-gallery-grid .gallery-item {
+    margin: 0 !important;
+    border-radius: var(--f12-radius) !important;
+    border: 1px solid var(--f12-line);
+    overflow: hidden;
+    background: var(--f12-bg-ink);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.tpl-f12 #db-gallery-grid .gallery-item:hover,
+.Tpl-F12 #db-gallery-grid .gallery-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--f12-fuchsia);
+}
+
+.tpl-f12 #db-gallery-grid .gallery-item img,
+.Tpl-F12 #db-gallery-grid .gallery-item img {
+    filter: saturate(1.08) contrast(1.04);
+}
+
+/* ==========================================================================
+   12. FAQ
+   ========================================================================== */
+.tpl-f12 #mod-faq,
+.Tpl-F12 #mod-faq {
+    padding: 4.5rem 6% !important;
+}
+
+.tpl-f12 #db-faq-list,
+.Tpl-F12 #db-faq-list {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.tpl-f12 #mod-faq .faq-item,
+.Tpl-F12 #mod-faq .faq-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 0 !important;
+    border-bottom: 1px solid rgba(224, 169, 43, 0.30) !important;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.tpl-f12 #mod-faq .faq-item:hover,
+.Tpl-F12 #mod-faq .faq-item:hover {
+    border-bottom-color: var(--f12-turq) !important;
+}
+
+.tpl-f12 #mod-faq .faq-item > div,
+.Tpl-F12 #mod-faq .faq-item > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tpl-f12 #mod-faq .faq-item > div > span,
+.Tpl-F12 #mod-faq .faq-item > div > span {
+    font-family: var(--f12-font);
+    font-weight: 900 !important;
+    font-size: 1.02rem !important;
+    letter-spacing: 0.05em !important;
+    color: var(--f12-cream);
+    transition: color 0.3s ease;
+}
+
+.tpl-f12 #mod-faq .faq-item:hover > div > span,
+.Tpl-F12 #mod-faq .faq-item:hover > div > span {
+    color: var(--f12-turq);
+}
+
+.tpl-f12 #mod-faq .faq-icon-circle,
+.Tpl-F12 #mod-faq .faq-icon-circle {
+    flex-shrink: 0;
+    border: 1px solid var(--f12-mustard) !important;
+    color: var(--f12-mustard) !important;
+    background: rgba(224, 169, 43, 0.10);
+    box-shadow: 0 0 10px rgba(224, 169, 43, 0.25);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, color 0.3s ease;
+}
+
+.tpl-f12 #mod-faq .faq-item:hover .faq-icon-circle,
+.Tpl-F12 #mod-faq .faq-item:hover .faq-icon-circle {
+    border-color: var(--f12-turq) !important;
+    color: var(--f12-turq) !important;
+}
+
+.tpl-f12 #mod-faq .faq-item.active .faq-icon-circle,
+.Tpl-F12 #mod-faq .faq-item.active .faq-icon-circle {
+    transform: rotate(45deg);
+    border-color: var(--f12-fuchsia) !important;
+    color: var(--f12-fuchsia) !important;
+}
+
+.tpl-f12 #mod-faq .faq-answer,
+.Tpl-F12 #mod-faq .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    color: var(--f12-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tpl-f12 #mod-faq .faq-item.active .faq-answer,
+.Tpl-F12 #mod-faq .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1.1rem !important;
+    margin-top: 1rem;
+    border-top: 1px solid rgba(47, 224, 208, 0.18);
+    color: var(--f12-text);
+}
+
+/* ==========================================================================
+   13. UBICACION
+   ========================================================================== */
+.tpl-f12 #mod-ubicacion,
+.Tpl-F12 #mod-ubicacion {
+    padding: 4.5rem 6% !important;
+}
+
+.tpl-f12 #db-mapa-container,
+.Tpl-F12 #db-mapa-container {
+    max-width: 900px;
+    margin: 0 auto;
+    height: 400px !important;
+    border: 1px solid rgba(224, 169, 43, 0.45) !important;
+    border-radius: var(--f12-radius) !important;
+    overflow: hidden !important;
+    filter: grayscale(0.25) contrast(1.05);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   14. WHATSAPP
+   ========================================================================== */
+.tpl-f12 #mod-whatsapp,
+.Tpl-F12 #mod-whatsapp {
+    padding: 4rem 6% !important;
+    text-align: center;
+    background: linear-gradient(160deg, var(--f12-bg) 0%, var(--f12-bg-ink) 100%);
+}
+
+.tpl-f12 #db-whatsapp-btn,
+.Tpl-F12 #db-whatsapp-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 2.4rem !important;
+    background: var(--f12-green) !important;
+    color: var(--f12-ink) !important;
+    border: 2px solid var(--f12-ink) !important;
+    border-radius: var(--f12-radius) !important;
+    font-family: var(--f12-font);
+    font-weight: 900 !important;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 6px 6px 0 rgba(224, 169, 43, 0.85), 0 10px 34px rgba(37, 211, 102, 0.30) !important;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tpl-f12 #db-whatsapp-btn:hover,
+.Tpl-F12 #db-whatsapp-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 rgba(255, 47, 142, 0.85), 0 12px 40px rgba(37, 211, 102, 0.40) !important;
+}
+
+.tpl-f12 #db-whatsapp-text,
+.Tpl-F12 #db-whatsapp-text {
+    font-weight: 900 !important;
+}
+
+/* ==========================================================================
+   15. FOOTER
+   ========================================================================== */
+.tpl-f12 #mod-footer,
+.Tpl-F12 #mod-footer {
+    padding: 4rem 6% 2.5rem !important;
+    background: var(--f12-bg) !important;
+    border-top: 3px solid var(--f12-mustard);
+    border-bottom: none !important;
+}
+
+.tpl-f12 #mod-footer .footer-inner,
+.Tpl-F12 #mod-footer .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    justify-content: space-between;
+}
+
+.tpl-f12 #footer-org-name,
+.Tpl-F12 #footer-org-name {
+    display: block;
+    color: var(--f12-cream);
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.tpl-f12 #mod-footer h4,
+.Tpl-F12 #mod-footer h4 {
+    color: var(--f12-mustard) !important;
+    font-size: 0.72rem !important;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+}
+
+.tpl-f12 #db-footer-links,
+.Tpl-F12 #db-footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tpl-f12 #db-footer-links a,
+.Tpl-F12 #db-footer-links a {
+    color: var(--f12-text-muted) !important;
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    transition: color 0.2s ease;
+}
+
+.tpl-f12 #db-footer-links a:hover,
+.Tpl-F12 #db-footer-links a:hover {
+    color: var(--f12-turq) !important;
+}
+
+/* ==========================================================================
+   16. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+/* --- Movil y tablet vertical (<= 767px) --- */
+@media (max-width: 767px) {
+    .tpl-f12 {
+        --f12-hero-pt: 2rem;
+        --f12-hero-pb: 2rem;
+        --f12-hero-gap: 1rem;
+    }
+
+    .tpl-f12 #main-content-flow,
+    .Tpl-F12 #main-content-flow {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        row-gap: 0 !important;
+    }
+
+    /* Renumeracion COMPLETA de TODOS los hermanos del flujo (evita el bug
+       de f11 documentado en ERRORES_HISTORICOS seccion 12: renumerar solo
+       algunos rompe el layout). Orden visual pedido en la seccion 8. */
+    .tpl-f12 #mod-hero          { order: 1 !important; }
+    .tpl-f12 #mod-hero-meta,
+    .Tpl-F12 #mod-hero-meta     { order: 2 !important; }
+    .tpl-f12 #unified-frame,
+    .Tpl-F12 #unified-frame     { order: 3 !important; }
+    .tpl-f12 #mod-hero-ctas,
+    .Tpl-F12 #mod-hero-ctas     { order: 4 !important; }
+    .tpl-f12 #mod-historia      { order: 5 !important; }
+    .tpl-f12 #mod-cartel        { order: 6 !important; }
+    .tpl-f12 #mod-playlist      { order: 7 !important; }
+    .tpl-f12 #mod-boletos       { order: 8 !important; }
+    .tpl-f12 #mod-form          { order: 9 !important; }
+    .tpl-f12 #mod-video         { order: 10 !important; }
+    .tpl-f12 #mod-faq           { order: 11 !important; }
+    .tpl-f12 #mod-ubicacion     { order: 12 !important; }
+    .tpl-f12 #mod-whatsapp      { order: 13 !important; }
+    .tpl-f12 #mod-footer        { order: 14 !important; }
+
+    /* Apagados: reordenados explicitamente para no dejar huecos de orden */
+    .tpl-f12 #mod-descripcion   { order: 15 !important; }
+    .tpl-f12 #mod-objetivo      { order: 16 !important; }
+    .tpl-f12 #mod-impacto       { order: 17 !important; }
+    .tpl-f12 #mod-lineup        { order: 18 !important; }
+    .tpl-f12 #mod-info-tecnica  { order: 19 !important; }
+    .tpl-f12 #mod-experiencias  { order: 20 !important; }
+    .tpl-f12 #mod-sponsors      { order: 21 !important; }
+    .tpl-f12 #mod-equipo        { order: 22 !important; }
+    .tpl-f12 #mod-cta-final     { order: 23 !important; }
+
+    /* Hero compacto (fallback vh + svh) */
+    .tpl-f12 #mod-hero,
+    .Tpl-F12 #mod-hero {
+        min-height: 68vh !important;
+        min-height: 68svh !important;
+        justify-content: flex-start !important;
+        padding: 5vh 5% 2.5rem !important;
+        padding: 5svh 5% 2.5rem !important;
+        /* Asset movil + respaldo identico al de escritorio */
+        background-image:
+            linear-gradient(180deg, rgba(11, 11, 13, 0.28) 0%, rgba(11, 11, 13, 0.58) 48%, rgba(11, 11, 13, 0.94) 100%),
+            var(--f12-asset-hero-mobile),
+            linear-gradient(160deg, #1c1c24 0%, #14141a 45%, #0b0b0d 100%),
+            var(--f12-grain);
+        background-size: cover, cover, cover, 160px 160px;
+        background-position: center center, center top, center center, 0 0;
+        background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    }
+
+    .tpl-f12 #mod-hero .hero-content,
+    .Tpl-F12 #mod-hero .hero-content {
+        padding-bottom: 0 !important;
+    }
+
+    .tpl-f12 #mod-hero .hero-content::before,
+    .Tpl-F12 #mod-hero .hero-content::before {
+        width: 150px;
+        height: 150px;
+        right: -1.4rem;
+        bottom: -0.5rem;
+    }
+
+    .tpl-f12 #mod-hero::before,
+    .Tpl-F12 #mod-hero::before {
+        top: auto;
+        bottom: 24%;
+        height: 2rem;
+        font-size: 0.6rem;
+        letter-spacing: 0.24em;
+    }
+
+    .tpl-f12 #mod-hero::after,
+    .Tpl-F12 #mod-hero::after {
+        display: none !important;
+    }
+
+    .tpl-f12 #event-title,
+    .Tpl-F12 #event-title {
+        font-size: clamp(2.4rem, 13vw, 4.6rem) !important;
+        -webkit-text-stroke: 1.5px var(--f12-ink);
+        text-shadow:
+            3px 3px 0 var(--f12-fuchsia),
+            6px 6px 0 rgba(47, 224, 208, 0.45);
+    }
+
+    /* El grupo del hero pierde el overlay de grid y fluye en columna */
+    .tpl-f12 #mod-hero-meta,
+    .tpl-f12 #unified-frame,
+    .tpl-f12 #mod-hero-ctas,
+    .Tpl-F12 #mod-hero-meta,
+    .Tpl-F12 #unified-frame,
+    .Tpl-F12 #mod-hero-ctas {
+        position: relative !important;
+        inset: auto !important;
+        grid-area: auto !important;
+        align-self: center !important;
+        width: 100% !important;
+        margin: 0.9rem 0 !important;
+    }
+
+    .tpl-f12 #unified-frame,
+    .Tpl-F12 #unified-frame {
+        flex-wrap: nowrap !important;
+        padding: 0.3rem 0.5rem !important;
+    }
+
+    .tpl-f12 #unified-frame .cd-block,
+    .Tpl-F12 #unified-frame .cd-block {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        padding: 0.4rem 0.3rem !important;
+    }
+
+    .tpl-f12 #unified-frame .cd-block > span,
+    .Tpl-F12 #unified-frame .cd-block > span {
+        font-size: clamp(1.4rem, 6.5vw, 2rem) !important;
+    }
+
+    .tpl-f12 #mod-hero-meta .meta-item,
+    .Tpl-F12 #mod-hero-meta .meta-item {
+        font-size: 0.85rem !important;
+        padding: 0.35rem 0.9rem !important;
+    }
+
+    .tpl-f12 #mod-hero-ctas .hero-cta-btn--wa,
+    .Tpl-F12 #mod-hero-ctas .hero-cta-btn--wa {
+        width: 100% !important;
+        max-width: 94% !important;
+        min-height: 46px !important;
+        font-size: 0.82rem !important;
+        padding: 0.8rem 1.2rem !important;
+    }
+
+    /* Secciones y tarjetas */
+    .tpl-f12 section,
+    .Tpl-F12 section {
+        padding: 3.2rem 5% !important;
+    }
+
+    .tpl-f12 #mod-historia .historia-inner,
+    .Tpl-F12 #mod-historia .historia-inner {
+        padding-left: 1.1rem !important;
+    }
+
+    .tpl-f12 #db-gallery-grid,
+    .Tpl-F12 #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.7rem !important;
+    }
+
+    .tpl-f12 #db-mapa-container,
+    .Tpl-F12 #db-mapa-container {
+        height: 300px !important;
+    }
+
+    .tpl-f12 #mod-boletos::before,
+    .tpl-f12 #mod-form .form-master-box::before,
+    .Tpl-F12 #mod-boletos::before,
+    .Tpl-F12 #mod-form .form-master-box::before {
+        height: 30px;
+    }
+
+    .tpl-f12 #mod-boletos .boleto-inner,
+    .Tpl-F12 #mod-boletos .boleto-inner {
+        padding: 1.8rem 1.2rem !important;
+    }
+
+    .tpl-f12 #mod-form .form-master-box,
+    .Tpl-F12 #mod-form .form-master-box {
+        padding: 2.2rem 1.3rem !important;
+    }
+}
+
+/* --- Movil pequeno (<= 480px) --- */
+@media (max-width: 480px) {
+    .tpl-f12 #mod-hero,
+    .Tpl-F12 #mod-hero {
+        padding: 4.5vh 4% 2rem !important;
+        padding: 4.5svh 4% 2rem !important;
+    }
+
+    .tpl-f12 #org-name-badge,
+    .Tpl-F12 #org-name-badge {
+        font-size: 0.6rem !important;
+        letter-spacing: 0.2em !important;
+        padding: 0.32rem 0.8rem !important;
+    }
+
+    .tpl-f12 #event-title,
+    .Tpl-F12 #event-title {
+        font-size: clamp(2.1rem, 14vw, 3.6rem) !important;
+    }
+
+    .tpl-f12 #mod-hero::before,
+    .Tpl-F12 #mod-hero::before {
+        font-size: 0.52rem;
+        letter-spacing: 0.18em;
+    }
+
+    .tpl-f12 #db-gallery-grid,
+    .Tpl-F12 #db-gallery-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tpl-f12 #mod-hero-ctas .hero-cta-btn--wa,
+    .Tpl-F12 #mod-hero-ctas .hero-cta-btn--wa {
+        max-width: 100% !important;
+        min-height: 44px !important;
+        box-shadow: 4px 4px 0 rgba(224, 169, 43, 0.85) !important;
+    }
+}
+
+/* --- Banda obligatoria 992-1279px --- */
+@media (min-width: 992px) and (max-width: 1279px) {
+    .tpl-f12 #mod-hero,
+    .Tpl-F12 #mod-hero {
+        min-height: 72vh !important;
+        min-height: 72svh !important;
+        padding: var(--f12-hero-pt) 6% var(--f12-hero-pb) !important;
+    }
+
+    .tpl-f12 #event-title,
+    .Tpl-F12 #event-title {
+        font-size: clamp(3rem, 9vw, 5.4rem) !important;
+    }
+
+    .tpl-f12 #mod-hero-meta,
+    .Tpl-F12 #mod-hero-meta {
+        margin-bottom: 12.4rem !important;
+    }
+
+    .tpl-f12 #unified-frame,
+    .Tpl-F12 #unified-frame {
+        margin-bottom: 7.6rem !important;
+    }
+
+    .tpl-f12 #mod-hero-ctas,
+    .Tpl-F12 #mod-hero-ctas {
+        margin-bottom: 2rem !important;
+    }
+
+    .tpl-f12 section,
+    .Tpl-F12 section {
+        padding: 4.5rem 6% !important;
+    }
+
+    .tpl-f12 #db-gallery-grid,
+    .Tpl-F12 #db-gallery-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* --- Escritorio amplio (>= 1280px) --- */
+@media (min-width: 1280px) {
+    .tpl-f12 #mod-hero,
+    .Tpl-F12 #mod-hero {
+        min-height: 78vh !important;
+        min-height: 78svh !important;
+    }
+
+    .tpl-f12 #event-title,
+    .Tpl-F12 #event-title {
+        font-size: clamp(4rem, 8vw, 7rem) !important;
+    }
+}
+
+/* ==========================================================================
+   17. ACCESIBILIDAD - MOVIMIENTO REDUCIDO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f12::before,
+    .tpl-f12::after,
+    .tpl-f12 #event-title,
+    .tpl-f12 #mod-hero::before,
+    .tpl-f12 #mod-hero::after,
+    .tpl-f12 #mod-hero .hero-content::before,
+    .tpl-f12 #mod-hero-ctas .hero-cta-btn--wa,
+    .tpl-f12 #db-whatsapp-btn,
+    .tpl-f12 #db-gallery-grid .gallery-item {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ============================================================================
+   REGISTRO DE VERSIONES - SILO F12 "KANDE"
+   ----------------------------------------------------------------------------
+   | Version | Fecha      | Descripcion                                        |
+   |---------|------------|----------------------------------------------------|
+   | v1.0.0  | 2026-09-22 | Alta inicial del silo Kande (Tropical Noir         |
+   |         |            | brutalista): paleta negro carbon + flora fucsia    |
+   |         |            | y turquesa + bloques mostaza tipo papel rasgado;   |
+   |         |            | titulo display 900 con -webkit-text-stroke; hero   |
+   |         |            | en overlay (badge -> titulo -> cinta -> meta ->    |
+   |         |            | countdown -> CTA) con min-heights 68svh/72svh/78vh;|
+   |         |            | countdown en tira horizontal con divisores CSS;    |
+   |         |            | grid-template-areas + banda 992-1279px; reducir    |
+   |         |            | movimiento al pie. Assets con Silent Fallback.     |
+   ============================================================================ */
