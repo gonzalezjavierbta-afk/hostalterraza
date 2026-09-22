@@ -1,5 +1,9 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.6.0 - Cinta del hero de vuelta a su posicion anterior (top 52%) con el
+   subtitulo del evento; banda "BOLETERIA" neutralizada (content:none, con
+   su selector intacto, Cero Borrado); fondo AMARILLO (mostaza -> neon) en
+   #mod-whatsapp. Solo este archivo (2026-09-22).
    v1.5.0 - META en 2 lineas por item (patron f9): #meta-fecha/#meta-hora/
    #meta-lugar conservan su texto crudo del kernel en el DOM (font-size:0,
    Cero Borrado) y las 2 lineas (l1 principal via ::before / l2 atenuada via
@@ -351,19 +355,21 @@
     overflow: hidden;
 }
 
-/* v1.4.0: cinta/ceja "KLANDESTINO BAR" con fondo tematico del Caribe
-   colombiano (turquesa -> fucsia -> mostaza + rayas sutiles). El subtitulo
-   del evento ahora vive en #event-title::after, por eso la cinta sube a la
-   zona de ceja para no chocar con el titulo de 2 lineas. */
+/* v1.6.0: la cinta vuelve a su posicion anterior (top 52%) mostrando el
+   SUBTITULO del evento. Se conserva el fondo tematico del Caribe colombiano
+   (turquesa -> fucsia -> mostaza + rayas sutiles) que pide Direccion.
+   Ajuste critico: el titulo es ahora grande (2 lineas, --f12-title-size
+   hasta 8.5rem), por eso se baja el top de 46% a 52% (minimo necesario)
+   para que la cinta quede justo debajo del bloque "KANDE" sin solaparlo. */
 .tpl-f12 #mod-hero::before,
 .Tpl-F12 #mod-hero::before {
-    content: "KLANDESTINO\00a0BAR";
+    content: "\2605\00a0M\00daSICA TRADICIONAL DEL CARIBE COLOMBIANO\00a0\2605";
     position: absolute;
-    top: 18%;
+    top: 52%;
     left: -3%;
     z-index: 3;
     width: 106%;
-    height: 2.6rem;
+    height: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -375,9 +381,9 @@
     background-repeat: repeat, no-repeat, no-repeat;
     color: var(--f12-ink);
     font-family: var(--f12-font);
-    font-size: 0.78rem;
+    font-size: 0.64rem;
     font-weight: 900;
-    letter-spacing: 0.34em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     text-shadow: 1px 1px 0 rgba(246, 242, 231, 0.35);
     transform: rotate(-2.4deg);
@@ -518,11 +524,14 @@
     animation: f12TitlePulse 5s ease-in-out infinite alternate;
 }
 
-/* LINEA 2 - subtitulo suave; resetea explicitamente stroke/sombras neon */
+/* LINEA 2 - subtitulo suave; resetea explicitamente stroke/sombras neon.
+   v1.6.0: el subtitulo se movio a la cinta del hero (#mod-hero::before), por
+   eso aqui queda NEUTRALIZADO (content:none) para no duplicar el texto. El
+   selector se conserva (Cero Borrado). */
 .tpl-f12 #event-title::after,
 .Tpl-F12 #event-title::after {
-    content: "m\00fasica tradicional del caribe colombiano";
-    display: block;
+    content: none !important;
+    display: none !important;
     font-size: var(--f12-sub-size);
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -972,15 +981,18 @@
     padding: 5rem 5% !important;
 }
 
-/* Banda de papel rasgado sobre el modulo (v1.4.0: paleta caribe) */
+/* Banda de papel rasgado sobre el modulo (v1.4.0: paleta caribe).
+   v1.6.0: banda "BOLETERIA" NEUTRALIZADA (el h2 del kernel ya estaba
+   oculto): content:none + display:none CONSERVANDO el selector y sus
+   propiedades (Cero Borrado). */
 .tpl-f12 #mod-boletos::before,
 .Tpl-F12 #mod-boletos::before {
-    content: "BOLETERIA";
+    content: none !important;
+    display: none !important;
     position: absolute;
     top: -6px;
     left: 50%;
     z-index: 2;
-    display: flex;
     align-items: center;
     justify-content: center;
     width: min(100%, 980px);
@@ -1512,7 +1524,10 @@
 .Tpl-F12 #mod-whatsapp {
     padding: 4rem 6% !important;
     text-align: center;
-    background: linear-gradient(160deg, var(--f12-bg) 0%, var(--f12-bg-ink) 100%);
+    /* v1.6.0: fondo AMARILLO del Caribe (mostaza -> neon) pedido por
+       Direccion; la capa de flora ::before (z-index:-1) y el isolation
+       del grupo 15-bis siguen intactos. */
+    background: linear-gradient(135deg, var(--f12-mustard) 0%, var(--f12-neon) 100%) !important;
 }
 
 .tpl-f12 #db-whatsapp-btn,
@@ -1530,7 +1545,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
-    box-shadow: 6px 6px 0 rgba(224, 169, 43, 0.85), 0 10px 34px rgba(37, 211, 102, 0.30) !important;
+    box-shadow: 6px 6px 0 var(--f12-ink), 0 10px 34px rgba(37, 211, 102, 0.30) !important;
     transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -1839,11 +1854,11 @@
 
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
-        top: 3%;
-        bottom: auto;
-        height: 2.1rem;
-        font-size: 0.6rem;
-        letter-spacing: 0.2em;
+        top: auto;
+        bottom: 30%;
+        height: 2rem;
+        font-size: 0.55rem;
+        letter-spacing: 0.1em;
     }
 
     .tpl-f12 #mod-hero::after,
@@ -2195,6 +2210,15 @@
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
    |---------|------------|----------------------------------------------------|
+   | v1.6.0  | 2026-09-22 | Cinta del hero de vuelta a su posicion    |
+   |         |            | anterior (top 52%) mostrando el subtitulo |
+   |         |            | del evento con el fondo caribe (turquesa  |
+   |         |            | -> fucsia -> mostaza); banda "BOLETERIA"  |
+   |         |            | neutralizada (content:none, selector y    |
+   |         |            | Cero Borrado intactos); fondo AMARILLO    |
+   |         |            | (mostaza -> neon) en #mod-whatsapp con la |
+   |         |            | sombra del boton en ink. [solo f12.css]   |
+   |---------|------------|-------------------------------------------|
    | v1.5.0  | 2026-09-22 | META en 2 lineas por item (patron f9, contenido    |
    |         |            | fijo Kande) 100% CSS: l1 principal via ::before /  |
    |         |            | l2 atenuada via ::after sobre #meta-fecha,         |
