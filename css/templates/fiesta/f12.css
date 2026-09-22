@@ -1,5 +1,15 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.5.0 - META en 2 lineas por item (patron f9): #meta-fecha/#meta-hora/
+   #meta-lugar conservan su texto crudo del kernel en el DOM (font-size:0,
+   Cero Borrado) y las 2 lineas (l1 principal via ::before / l2 atenuada via
+   ::after) se pintan 100% CSS. Contenido fijo Kande (2026-09-22).
+   v1.4.0 - Hero: #event-title re-renderizado en 2 lineas visuales
+   (::before "KANDE" / ::after subtitulo) con el texto real intacto en el
+   DOM (font-size:0, Cero Borrado); cinta #mod-hero::before convertida en
+   ceja "KLANDESTINO BAR" con fondo caribe (turquesa -> fucsia -> mostaza).
+   Boleteria: preventa oculta SIEMPRE (contenido no-vacio en produccion),
+   solo taquilla, tarjeta redisenada caribena/informal (2026-09-22).
    v1.3.0 - Reorden de modulos (galeria -> WhatsApp -> FAQ -> mapa ->
    sponsors -> footer); meta en 2 lineas; historia full-width a 2 columnas;
    #mod-video encendido (solo galeria); #mod-sponsors encendido y estilado;
@@ -341,30 +351,35 @@
     overflow: hidden;
 }
 
-/* Cinta mostaza tipo papel rasgado (pseudoelemento de #mod-hero) */
+/* v1.4.0: cinta/ceja "KLANDESTINO BAR" con fondo tematico del Caribe
+   colombiano (turquesa -> fucsia -> mostaza + rayas sutiles). El subtitulo
+   del evento ahora vive en #event-title::after, por eso la cinta sube a la
+   zona de ceja para no chocar con el titulo de 2 lineas. */
 .tpl-f12 #mod-hero::before,
 .Tpl-F12 #mod-hero::before {
-    content: "\2605\00a0MUSICA TRADICIONAL DEL CARIBE COLOMBIANO\00a0\2605";
+    content: "KLANDESTINO\00a0BAR";
     position: absolute;
-    top: 46%;
+    top: 18%;
     left: -3%;
     z-index: 3;
     width: 106%;
-    height: 2.5rem;
+    height: 2.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
     background-image:
+        repeating-linear-gradient(115deg, rgba(11, 11, 13, 0.16) 0 10px, rgba(11, 11, 13, 0) 10px 22px),
         var(--f12-asset-papel),
-        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
-    background-size: 100% 100%, cover;
-    background-repeat: no-repeat, no-repeat;
+        linear-gradient(90deg, var(--f12-turq) 0%, var(--f12-fuchsia) 48%, var(--f12-mustard) 100%);
+    background-size: auto, 100% 100%, cover;
+    background-repeat: repeat, no-repeat, no-repeat;
     color: var(--f12-ink);
     font-family: var(--f12-font);
-    font-size: 0.64rem;
+    font-size: 0.78rem;
     font-weight: 900;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.34em;
     text-transform: uppercase;
+    text-shadow: 1px 1px 0 rgba(246, 242, 231, 0.35);
     transform: rotate(-2.4deg);
     border-top: 2px solid rgba(11, 11, 13, 0.85);
     border-bottom: 2px solid rgba(11, 11, 13, 0.85);
@@ -451,22 +466,49 @@
 }
 
 /* ==========================================================================
-   5.1. TITULO DEL EVENTO (display pesado con contorno)
+   5.1. TITULO DEL EVENTO - 2 lineas visuales (display pesado con contorno)
+   El kernel pinta el texto completo ("KANDE ... caribe colombiano") dentro
+   de un unico h1. Lo re-renderizamos en 2 lineas con pseudo-elementos:
+   la LINEA 1 (titulo) en ::before y la LINEA 2 (subtitulo) en ::after.
+   Cero Borrado: el nodo y su texto original siguen intactos en el DOM
+   (font-size:0 solo lo colapsa visualmente; lectores de pantalla lo leen).
    ========================================================================== */
 .tpl-f12 #event-title,
 .Tpl-F12 #event-title {
+    /* Vars de tamano consumidas por ::before (titulo) y ::after (subtitulo).
+       Los media queries las re-declaran para escalar en movil. */
+    --f12-title-size: clamp(3.4rem, 15vw, 8.5rem);
+    --f12-sub-size:   clamp(0.95rem, 3.4vw, 1.5rem);
     display: block !important;
     margin: 0 0 3rem !important;
     font-family: var(--f12-font);
     font-weight: 900 !important;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
-    line-height: 0.92;
+    line-height: 0.95;
     overflow-wrap: anywhere;
     word-break: break-word;
-    font-size: clamp(2.6rem, 11vw, 7rem) !important;
+    /* Colapsa el texto original: el nodo y su contenido siguen en el DOM. */
+    font-size: 0 !important;
     max-width: 100%;
-    /* Estetica CARTEL: amarillo neon sobre sombras duras en capas. */
+    color: var(--f12-neon) !important;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    animation: none;
+}
+
+/* LINEA 1 - titulo grande (estetica CARTEL: neon + sombras duras en capas) */
+.tpl-f12 #event-title::before,
+.Tpl-F12 #event-title::before {
+    content: "KAND\00c9";
+    display: block;
+    font-size: var(--f12-title-size);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    margin: 0 0 0.6rem 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     color: var(--f12-neon) !important;
     -webkit-text-stroke: 3px var(--f12-ink);
     text-shadow:
@@ -474,6 +516,24 @@
         6px 6px 0 var(--f12-cartel-2),
         0 0 30px rgba(239, 255, 0, 0.45);
     animation: f12TitlePulse 5s ease-in-out infinite alternate;
+}
+
+/* LINEA 2 - subtitulo suave; resetea explicitamente stroke/sombras neon */
+.tpl-f12 #event-title::after,
+.Tpl-F12 #event-title::after {
+    content: "m\00fasica tradicional del caribe colombiano";
+    display: block;
+    font-size: var(--f12-sub-size);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    line-height: 1.35;
+    margin: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    color: rgba(154, 240, 231, 0.94);
+    -webkit-text-stroke: 0;
+    text-shadow: none;
 }
 
 @keyframes f12TitlePulse {
@@ -593,15 +653,82 @@
     transform: rotate(1.3deg);
 }
 
-/* v1.3.0: META en 2 LINEAS -> linea 1 fecha + hora; linea 2 el lugar a todo
-   el ancho. Los 3 spans/IDs (#meta-fecha, #meta-hora, #meta-lugar) quedan
-   intactos: el salto es 100% CSS via flex-basis del item que contiene el lugar. */
+/* v1.3.0 (ajustado en v1.5.0): el item del lugar ya NO ocupa su propia fila;
+   los 3 items fluyen en fila y envuelven (flex-basis:auto). Selector y giro
+   se conservan (Cero Borrado). El salto a 2 lineas ahora vive dentro de cada
+   item via ::before/::after (5.3.1). */
 .tpl-f12 #mod-hero-meta .meta-item:has(#meta-lugar),
 .Tpl-F12 #mod-hero-meta .meta-item:has(#meta-lugar) {
-    flex-basis: 100% !important;
-    justify-content: center !important;
+    flex-basis: auto !important;
     transform: rotate(-0.8deg);
 }
+
+/* --------------------------------------------------------------------------
+   5.3.1. META EN 2 LINEAS POR ITEM (v1.5.0, patron f9, contenido fijo Kande)
+   El kernel (evento-app.html L817-838) solo construye las 2 lineas reales
+   (.meta-line) en .tpl-f9; en cualquier otro silo pinta una linea cruda
+   dentro de #meta-fecha, #meta-hora y #meta-lugar. Aqui las 2 lineas se
+   resuelven 100% por CSS: l1 = ::before (principal), l2 = ::after (atenuada).
+   Cero Borrado: el texto crudo del kernel SIGUE en el DOM (solo se colapsa
+   con font-size:0), los IDs permanecen intactos y el contenido sigue siendo
+   legible por lectores de pantalla.
+   -------------------------------------------------------------------------- */
+.tpl-f12 #mod-hero-meta .meta-item > span,
+.Tpl-F12 #mod-hero-meta .meta-item > span {
+    font-size: 0 !important;
+}
+
+.tpl-f12 #mod-hero-meta .meta-item,
+.Tpl-F12 #mod-hero-meta .meta-item {
+    align-items: flex-start;
+}
+
+/* l1 - dato principal (crema, peso 900) */
+.tpl-f12 #mod-hero-meta #meta-fecha::before,
+.tpl-f12 #mod-hero-meta #meta-hora::before,
+.tpl-f12 #mod-hero-meta #meta-lugar::before,
+.Tpl-F12 #mod-hero-meta #meta-fecha::before,
+.Tpl-F12 #mod-hero-meta #meta-hora::before,
+.Tpl-F12 #mod-hero-meta #meta-lugar::before {
+    display: block;
+    text-align: left;
+    font-size: 0.95rem !important;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    color: var(--f12-cream);
+}
+
+/* l2 - dato secundario atenuado */
+.tpl-f12 #mod-hero-meta #meta-fecha::after,
+.tpl-f12 #mod-hero-meta #meta-hora::after,
+.tpl-f12 #mod-hero-meta #meta-lugar::after,
+.Tpl-F12 #mod-hero-meta #meta-fecha::after,
+.Tpl-F12 #mod-hero-meta #meta-hora::after,
+.Tpl-F12 #mod-hero-meta #meta-lugar::after {
+    display: block;
+    margin-top: 0.1rem;
+    text-align: left;
+    font-size: 0.72rem !important;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.14em;
+    color: var(--f12-text-muted);
+}
+
+/* El svg acompana a la l1 (no al centro de las 2 lineas) */
+.tpl-f12 #mod-hero-meta .meta-item .meta-svg,
+.Tpl-F12 #mod-hero-meta .meta-item .meta-svg {
+    margin-top: 0.12rem;
+}
+
+/* Contenido fijo Kande (las cadenas son ASCII; sin tildes) */
+.tpl-f12 #mod-hero-meta #meta-fecha::before, .Tpl-F12 #mod-hero-meta #meta-fecha::before { content: "Viernes 25"; }
+.tpl-f12 #mod-hero-meta #meta-fecha::after,  .Tpl-F12 #mod-hero-meta #meta-fecha::after  { content: "de Septiembre"; }
+.tpl-f12 #mod-hero-meta #meta-hora::before,  .Tpl-F12 #mod-hero-meta #meta-hora::before  { content: "8:00"; }
+.tpl-f12 #mod-hero-meta #meta-hora::after,   .Tpl-F12 #mod-hero-meta #meta-hora::after   { content: "P.M"; }
+.tpl-f12 #mod-hero-meta #meta-lugar::before, .Tpl-F12 #mod-hero-meta #meta-lugar::before { content: "Klandestino Bar"; }
+.tpl-f12 #mod-hero-meta #meta-lugar::after,  .Tpl-F12 #mod-hero-meta #meta-lugar::after  { content: "Kr 4 # 19-56, piso 4"; }
 
 .tpl-f12 #mod-hero-meta .meta-item:hover,
 .Tpl-F12 #mod-hero-meta .meta-item:hover {
@@ -845,7 +972,7 @@
     padding: 5rem 5% !important;
 }
 
-/* Banda de papel rasgado sobre el modulo */
+/* Banda de papel rasgado sobre el modulo (v1.4.0: paleta caribe) */
 .tpl-f12 #mod-boletos::before,
 .Tpl-F12 #mod-boletos::before {
     content: "BOLETERIA";
@@ -858,42 +985,49 @@
     justify-content: center;
     width: min(100%, 980px);
     height: 40px;
-    color: var(--f12-ink);
+    color: var(--f12-cream);
     font-family: var(--f12-font);
-    font-size: 0.66rem;
+    font-size: 0.72rem;
     font-weight: 900;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
+    text-shadow: 2px 2px 0 rgba(11, 11, 13, 0.55);
     transform: translateX(-50%);
     background-image:
+        repeating-linear-gradient(115deg, rgba(11, 11, 13, 0.14) 0 9px, rgba(11, 11, 13, 0) 9px 20px),
         var(--f12-asset-papel),
-        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
-    background-size: 100% 100%, cover;
-    background-repeat: no-repeat, no-repeat;
+        linear-gradient(90deg, var(--f12-turq) 0%, var(--f12-fuchsia) 52%, var(--f12-mustard) 100%);
+    background-size: auto, 100% 100%, cover;
+    background-repeat: repeat, no-repeat, no-repeat;
     filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
     pointer-events: none;
 }
 
 .tpl-f12 #mod-boletos .boleto-inner,
 .Tpl-F12 #mod-boletos .boleto-inner {
-    max-width: 520px !important;
+    position: relative;
+    max-width: 560px !important;
     margin: 1.4rem auto 0 !important;
-    padding: 2.2rem 1.8rem !important;
+    padding: 2.4rem 1.6rem 2.6rem !important;
     background:
-        linear-gradient(180deg, rgba(224, 169, 43, 0.16) 0%, rgba(11, 11, 13, 0.90) 42%),
+        radial-gradient(120% 100% at 12% 0%, rgba(47, 224, 208, 0.12) 0%, transparent 58%),
+        radial-gradient(120% 100% at 100% 100%, rgba(255, 47, 142, 0.12) 0%, transparent 60%),
         var(--f12-bg-ink);
-    border: 1px solid rgba(224, 169, 43, 0.45);
-    border-radius: var(--f12-radius);
+    border: 1px dashed rgba(224, 169, 43, 0.55);
+    border-radius: 20px;
     box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55);
 }
 
+/* Contenedor de tarjetas: transparente para no recortar la rotacion ni la
+   sombra dura de la tarjeta caribena de taquilla. */
 .tpl-f12 #mod-boletos .boleto-cards-wrap,
 .Tpl-F12 #mod-boletos .boleto-cards-wrap {
-    margin-top: 1.2rem;
-    border: 1px solid var(--f12-line);
-    border-radius: var(--f12-radius);
-    overflow: hidden;
-    background: rgba(11, 11, 13, 0.5);
+    margin: 1.2rem auto 0 !important;
+    max-width: 480px;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+    background: transparent;
 }
 
 .tpl-f12 #mod-boletos #db-boletos-preventa:empty,
@@ -917,24 +1051,47 @@
     display: none !important;
 }
 
+/* v1.4.0 (B1): en produccion la preventa renderiza "POR DEFINIR" (nodo
+   NO-vacio), por eso se oculta SIEMPRE -> solo queda la taquilla. Cero
+   Borrado: el ID #db-boletos-preventa sigue en el DOM. */
+.tpl-f12 #mod-boletos #db-boletos-preventa,
+.Tpl-F12 #mod-boletos #db-boletos-preventa {
+    display: none !important;
+}
+
+/* La taquilla es la unica via: contenedor visible de la tarjeta unica. */
+.tpl-f12 #mod-boletos #db-boletos-taquilla,
+.Tpl-F12 #mod-boletos #db-boletos-taquilla {
+    display: block !important;
+    background:
+        repeating-linear-gradient(135deg, rgba(11, 11, 13, 0.08) 0 12px, rgba(11, 11, 13, 0) 12px 24px),
+        linear-gradient(150deg, var(--f12-mustard) 0%, var(--f12-mustard-2) 55%, var(--f12-turq) 100%);
+    border: 3px solid var(--f12-ink);
+    border-radius: 16px;
+    transform: rotate(-1.1deg);
+    box-shadow: 9px 9px 0 var(--f12-fuchsia);
+    overflow: hidden;
+}
+
 .tpl-f12 #mod-boletos .boleto-card-row,
 .Tpl-F12 #mod-boletos .boleto-card-row {
     position: relative;
     display: flex !important;
     align-items: center;
     gap: 1rem;
-    padding: 1.1rem 1.3rem !important;
-    border-bottom: 1px solid var(--f12-line-soft) !important;
-    border-left: 3px solid transparent;
+    padding: 1.6rem 1.5rem !important;
+    border-bottom: none !important;
+    border-left: 0;
+    background: transparent;
     text-decoration: none;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .tpl-f12 #mod-boletos a.boleto-card-row:hover,
 .Tpl-F12 #mod-boletos a.boleto-card-row:hover {
-    background: rgba(47, 224, 208, 0.10) !important;
-    border-left-color: var(--f12-turq);
-    transform: translateX(3px);
+    background: rgba(246, 242, 231, 0.18) !important;
+    border-left-color: transparent;
+    transform: translateX(4px);
 }
 
 .tpl-f12 #mod-boletos .boleto-card-row:last-child,
@@ -947,35 +1104,59 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    color: var(--f12-ink) !important;
 }
 
 .tpl-f12 #mod-boletos .boleto-icon svg,
 .Tpl-F12 #mod-boletos .boleto-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
 }
 
+/* Etiqueta tipo sticker (fucsia) sobre la tarjeta mostaza/turquesa */
 .tpl-f12 #mod-boletos .boleto-tipo,
 .Tpl-F12 #mod-boletos .boleto-tipo {
-    color: var(--f12-mustard) !important;
+    display: inline-block !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0.22rem 0.7rem !important;
+    background: var(--f12-fuchsia) !important;
+    border: 2px solid var(--f12-ink);
+    border-radius: 999px;
+    color: var(--f12-cream) !important;
+    font-size: 0.66rem !important;
     font-weight: 900 !important;
-    letter-spacing: 0.2em !important;
+    letter-spacing: 0.26em !important;
+    transform: rotate(-1.6deg);
 }
 
+/* Precio: protagonista de la tarjeta */
 .tpl-f12 #mod-boletos .boleto-precio,
 .Tpl-F12 #mod-boletos .boleto-precio {
-    color: var(--f12-cream) !important;
+    display: block !important;
+    color: var(--f12-ink) !important;
+    font-size: clamp(2.1rem, 7vw, 3.2rem) !important;
     font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em;
+    text-shadow: 2px 2px 0 rgba(246, 242, 231, 0.6);
 }
 
 .tpl-f12 #mod-boletos .boleto-desc,
 .Tpl-F12 #mod-boletos .boleto-desc {
-    color: var(--f12-text-muted) !important;
+    display: block !important;
+    margin-top: 0.35rem !important;
+    color: rgba(11, 11, 13, 0.74) !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 1 !important;
 }
 
 .tpl-f12 #mod-boletos .boleto-arrow,
 .Tpl-F12 #mod-boletos .boleto-arrow {
-    color: var(--f12-turq) !important;
+    color: var(--f12-ink) !important;
+    opacity: 0.85 !important;
     transition: transform 0.2s ease;
 }
 
@@ -984,12 +1165,22 @@
     transform: translateX(4px);
 }
 
+/* Chip de confianza (etiqueta turquesa) */
 .tpl-f12 #mod-boletos .boleto-trust,
 .Tpl-F12 #mod-boletos .boleto-trust {
-    margin-top: 1.4rem;
-    color: var(--f12-text-muted);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.6rem;
+    padding: 0.4rem 0.9rem;
+    background: rgba(47, 224, 208, 0.12);
+    border: 2px solid var(--f12-turq);
+    border-radius: 999px;
+    color: var(--f12-turq) !important;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     opacity: 1 !important;
 }
 
@@ -1648,11 +1839,11 @@
 
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
-        top: auto;
-        bottom: 30%;
-        height: 2rem;
-        font-size: 0.55rem;
-        letter-spacing: 0.1em;
+        top: 3%;
+        bottom: auto;
+        height: 2.1rem;
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
     }
 
     .tpl-f12 #mod-hero::after,
@@ -1662,8 +1853,14 @@
 
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        font-size: clamp(2.4rem, 13vw, 4.6rem) !important;
+        --f12-title-size: clamp(3rem, 16vw, 5.6rem);
+        --f12-sub-size:   clamp(0.8rem, 3.9vw, 1.05rem);
         margin-bottom: 1.6rem !important;
+    }
+
+    /* El contorno/sombras del cartel ahora viven en la LINEA 1 (::before) */
+    .tpl-f12 #event-title::before,
+    .Tpl-F12 #event-title::before {
         -webkit-text-stroke: 2px var(--f12-ink);
         text-shadow:
             2px 2px 0 #000000,
@@ -1708,6 +1905,26 @@
     .Tpl-F12 #mod-hero-meta .meta-item {
         font-size: 0.85rem !important;
         padding: 0.35rem 0.9rem !important;
+    }
+
+    /* v1.5.0: escala movil de las 2 lineas de la meta (l1 / l2) */
+    .tpl-f12 #mod-hero-meta #meta-fecha::before,
+    .tpl-f12 #mod-hero-meta #meta-hora::before,
+    .tpl-f12 #mod-hero-meta #meta-lugar::before,
+    .Tpl-F12 #mod-hero-meta #meta-fecha::before,
+    .Tpl-F12 #mod-hero-meta #meta-hora::before,
+    .Tpl-F12 #mod-hero-meta #meta-lugar::before {
+        font-size: 0.85rem !important;
+    }
+
+    .tpl-f12 #mod-hero-meta #meta-fecha::after,
+    .tpl-f12 #mod-hero-meta #meta-hora::after,
+    .tpl-f12 #mod-hero-meta #meta-lugar::after,
+    .Tpl-F12 #mod-hero-meta #meta-fecha::after,
+    .Tpl-F12 #mod-hero-meta #meta-hora::after,
+    .Tpl-F12 #mod-hero-meta #meta-lugar::after {
+        font-size: 0.66rem !important;
+        letter-spacing: 0.1em;
     }
 
     .tpl-f12 #mod-hero-ctas .hero-cta-btn--wa,
@@ -1809,13 +2026,39 @@
 
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        font-size: clamp(2.1rem, 14vw, 3.6rem) !important;
+        --f12-title-size: clamp(2.6rem, 17vw, 4.2rem);
+        --f12-sub-size:   clamp(0.7rem, 4.2vw, 0.92rem);
     }
 
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
-        font-size: 0.46rem;
-        letter-spacing: 0.06em;
+        font-size: 0.5rem;
+        letter-spacing: 0.12em;
+    }
+
+    /* v1.5.0: meta en 2 lineas tambien en pantallas muy estrechas */
+    .tpl-f12 #mod-hero-meta .meta-item,
+    .Tpl-F12 #mod-hero-meta .meta-item {
+        padding: 0.3rem 0.7rem !important;
+    }
+
+    .tpl-f12 #mod-hero-meta #meta-fecha::before,
+    .tpl-f12 #mod-hero-meta #meta-hora::before,
+    .tpl-f12 #mod-hero-meta #meta-lugar::before,
+    .Tpl-F12 #mod-hero-meta #meta-fecha::before,
+    .Tpl-F12 #mod-hero-meta #meta-hora::before,
+    .Tpl-F12 #mod-hero-meta #meta-lugar::before {
+        font-size: 0.8rem !important;
+    }
+
+    .tpl-f12 #mod-hero-meta #meta-fecha::after,
+    .tpl-f12 #mod-hero-meta #meta-hora::after,
+    .tpl-f12 #mod-hero-meta #meta-lugar::after,
+    .Tpl-F12 #mod-hero-meta #meta-fecha::after,
+    .Tpl-F12 #mod-hero-meta #meta-hora::after,
+    .Tpl-F12 #mod-hero-meta #meta-lugar::after {
+        font-size: 0.62rem !important;
+        letter-spacing: 0.08em;
     }
 
     .tpl-f12 #db-gallery-grid,
@@ -1852,7 +2095,8 @@
 
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        font-size: clamp(3rem, 9vw, 5.4rem) !important;
+        --f12-title-size: clamp(3.6rem, 10vw, 7rem);
+        --f12-sub-size:   clamp(1rem, 2.8vw, 1.4rem);
     }
 
     .tpl-f12 #mod-hero-meta,
@@ -1920,7 +2164,8 @@
 
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        font-size: clamp(4rem, 8vw, 7rem) !important;
+        --f12-title-size: clamp(4.4rem, 9.5vw, 8.5rem);
+        --f12-sub-size:   clamp(1.1rem, 1.9vw, 1.6rem);
     }
 }
 
@@ -1931,6 +2176,7 @@
     .tpl-f12::before,
     .tpl-f12::after,
     .tpl-f12 #event-title,
+    .tpl-f12 #event-title::before,
     .tpl-f12 #mod-hero::before,
     .tpl-f12 #mod-hero::after,
     .tpl-f12 #mod-hero .hero-content::before,
@@ -1948,6 +2194,16 @@
    REGISTRO DE VERSIONES - SILO F12 "KANDE"
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
+   |---------|------------|----------------------------------------------------|
+   | v1.5.0  | 2026-09-22 | META en 2 lineas por item (patron f9, contenido    |
+   |         |            | fijo Kande) 100% CSS: l1 principal via ::before /  |
+   |         |            | l2 atenuada via ::after sobre #meta-fecha,         |
+   |         |            | #meta-hora y #meta-lugar; texto crudo del kernel   |
+   |         |            | conservado en el DOM (font-size:0, Cero Borrado);  |
+   |         |            | layout v1.3.0 de linea unica neutralizado          |
+   |         |            | (flex-basis:auto, sin fila propia para el lugar);  |
+   |         |            | svg alineado con la l1; escalas moviles <=767px y  |
+   |         |            | <=480px.                                           |
    |---------|------------|----------------------------------------------------|
    | v1.0.0  | 2026-09-22 | Alta inicial del silo Kande (Tropical Noir         |
    |         |            | brutalista): paleta negro carbon + flora fucsia    |
@@ -1984,6 +2240,15 @@
    |         |            | f12 lee el texto de "descripcion" (string u       |
    |         |            | objeto) con degradado seguro al comportamiento    |
    |         |            | previo.                                           |
+   |---------|------------|----------------------------------------------------|
+   | v1.4.0  | 2026-09-22 | Hero: titulo en 2 lineas visuales (#event-title |
+   |         |            | ::before "KANDE" / ::after subtitulo) con texto |
+   |         |            | real intacto (font-size:0, Cero Borrado); cinta |
+   |         |            | del hero -> ceja "KLANDESTINO BAR" con fondo    |
+   |         |            | caribe turquesa->fucsia->mostaza; boleteria     |
+   |         |            | solo taquilla (preventa oculta SIEMPRE) con     |
+   |         |            | tarjeta redisenada caribena (brutalista,        |
+   |         |            | sticker, precio protagonista, chip confianza).  |
    |---------|------------|----------------------------------------------------|
    | v1.3.0  | 2026-09-22 | Iteracion "Kande caribeno": reorden de modulos   |
    |         |            | (galeria -> WhatsApp -> FAQ -> mapa -> sponsors   |
