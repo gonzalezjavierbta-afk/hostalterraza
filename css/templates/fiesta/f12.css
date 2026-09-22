@@ -1,6 +1,9 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
-   v1.2.0 - Footer freemium visible + historia desde "descripcion" (2026-09-22).
+   v1.3.0 - Reorden de modulos (galeria -> WhatsApp -> FAQ -> mapa ->
+   sponsors -> footer); meta en 2 lineas; historia full-width a 2 columnas;
+   #mod-video encendido (solo galeria); #mod-sponsors encendido y estilado;
+   footer f5 de 1 linea; flor siempre por DEBAJO del contenido (2026-09-22).
    Categoria: fiesta | template_id: f12 | theme: Kande
    Reglas de la casa:
      - ASCII-safety estricta: 0 bytes > 127 (comentarios sin tildes).
@@ -184,28 +187,31 @@
 .tpl-f12 #mod-faq,
 .tpl-f12 #mod-ubicacion,
 .tpl-f12 #mod-footer,
+.tpl-f12 #mod-sponsors,
 .Tpl-F12 #mod-form,
 .Tpl-F12 #mod-faq,
 .Tpl-F12 #mod-ubicacion,
-.Tpl-F12 #mod-footer {
+.Tpl-F12 #mod-footer,
+.Tpl-F12 #mod-sponsors {
     display: block !important;
 }
 
-/* #mod-video queda APAGADO por decision de Direccion (v1.1.0). El ID se
-   mantiene intacto (Cero Borrado); #db-gallery-grid vive DENTRO de el, por
-   lo que la galeria tambien sale de la vista. */
+/* v1.3.0: #mod-video ENCENDIDO (Direccion). La galeria (#db-gallery-grid) es
+   hija directa del modulo y debe verse SOLA; el contenido de video (el div
+   que envuelve a #db-video-content) se oculta mas abajo. ID intacto. */
 .tpl-f12 #mod-video,
 .Tpl-F12 #mod-video {
-    display: none !important;
+    display: block !important;
 }
 
-/* --- Modulos APAGADOS (IDs intactos, Cero Borrado) --- */
+/* --- Modulos APAGADOS (IDs intactos, Cero Borrado) ---
+   v1.3.0: #mod-sponsors SALE de esta lista y pasa al grupo de ENCENDIDOS;
+   su ID sigue existiendo en el CSS (bloque de encendidos + grid-area + estilos). */
 .tpl-f12 #mod-lineup,
 .tpl-f12 #mod-experiencias,
 .tpl-f12 #mod-objetivo,
 .tpl-f12 #mod-impacto,
 .tpl-f12 #mod-info-tecnica,
-.tpl-f12 #mod-sponsors,
 .tpl-f12 #mod-equipo,
 .tpl-f12 #mod-cta-final,
 /* #mod-descripcion no aparece en la lista de encendidos del encargo:
@@ -216,7 +222,6 @@
 .Tpl-F12 #mod-objetivo,
 .Tpl-F12 #mod-impacto,
 .Tpl-F12 #mod-info-tecnica,
-.Tpl-F12 #mod-sponsors,
 .Tpl-F12 #mod-equipo,
 .Tpl-F12 #mod-cta-final,
 .Tpl-F12 #mod-descripcion {
@@ -236,8 +241,10 @@
         "historia  historia"
         "cartel    playlist"
         "boletos   form"
-        "faq       ubicacion"
+        "video     video"
         "whatsapp  whatsapp"
+        "faq       ubicacion"
+        "sponsors  sponsors"
         "footer    footer";
     width: 100%;
 }
@@ -248,9 +255,11 @@
 .tpl-f12 #mod-playlist   { grid-area: playlist; }
 .tpl-f12 #mod-boletos    { grid-area: boletos; }
 .tpl-f12 #mod-form       { grid-area: form; }
+.tpl-f12 #mod-video      { grid-area: video; }
 .tpl-f12 #mod-faq        { grid-area: faq; }
 .tpl-f12 #mod-ubicacion  { grid-area: ubicacion; }
 .tpl-f12 #mod-whatsapp   { grid-area: whatsapp; }
+.tpl-f12 #mod-sponsors   { grid-area: sponsors; }
 .tpl-f12 #mod-footer     { grid-area: footer; }
 
 /* El grupo del hero comparte el area `hero` y se apila desde el pie
@@ -262,7 +271,7 @@
     align-self: end;
     pointer-events: auto;
     margin-top: 0 !important;
-    margin-bottom: 13.6rem !important;
+    margin-bottom: 15.2rem !important;
 }
 
 .tpl-f12 #unified-frame,
@@ -337,7 +346,7 @@
 .Tpl-F12 #mod-hero::before {
     content: "\2605\00a0MUSICA TRADICIONAL DEL CARIBE COLOMBIANO\00a0\2605";
     position: absolute;
-    top: 59%;
+    top: 46%;
     left: -3%;
     z-index: 3;
     width: 106%;
@@ -395,14 +404,16 @@
     padding-bottom: 17rem;
 }
 
-/* Flora de esquina (asset + respaldo radial fucsia/turquesa) */
+/* Flora de esquina (asset + respaldo radial fucsia/turquesa).
+   v1.3.0: z-index NEGATIVO para que la flor quede SIEMPRE por DETRAS de la
+   informacion (titulo/badge). El pointer-events:none ya evita capturar clicks. */
 .tpl-f12 #mod-hero .hero-content::before,
 .Tpl-F12 #mod-hero .hero-content::before {
     content: "";
     position: absolute;
     right: -2.5rem;
     bottom: -1rem;
-    z-index: 1;
+    z-index: -1;
     width: 230px;
     height: 230px;
     background-image:
@@ -445,7 +456,7 @@
 .tpl-f12 #event-title,
 .Tpl-F12 #event-title {
     display: block !important;
-    margin: 0 0 1.2rem !important;
+    margin: 0 0 3rem !important;
     font-family: var(--f12-font);
     font-weight: 900 !important;
     text-transform: uppercase;
@@ -562,22 +573,40 @@
     align-items: center;
     gap: 0.45rem;
     padding: 0.45rem 1.15rem !important;
-    background: rgba(47, 224, 208, 0.10) !important;
-    border: 1px solid rgba(47, 224, 208, 0.45) !important;
-    border-radius: var(--f12-radius) !important;
+    background: linear-gradient(135deg, rgba(224, 169, 43, 0.18) 0%, rgba(255, 47, 142, 0.12) 100%) !important;
+    border: 2px solid rgba(224, 169, 43, 0.65) !important;
+    border-radius: 0.4rem !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     color: var(--f12-cream);
     font-size: 0.85rem !important;
     font-weight: 900;
-    letter-spacing: 0.08em;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    letter-spacing: 0.03em;
+    box-shadow: 3px 3px 0 rgba(255, 47, 142, 0.30);
+    transform: rotate(-1.5deg);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Rotacion alterna (look etiqueta informal / caribeno) */
+.tpl-f12 #mod-hero-meta .meta-item:nth-child(even),
+.Tpl-F12 #mod-hero-meta .meta-item:nth-child(even) {
+    transform: rotate(1.3deg);
+}
+
+/* v1.3.0: META en 2 LINEAS -> linea 1 fecha + hora; linea 2 el lugar a todo
+   el ancho. Los 3 spans/IDs (#meta-fecha, #meta-hora, #meta-lugar) quedan
+   intactos: el salto es 100% CSS via flex-basis del item que contiene el lugar. */
+.tpl-f12 #mod-hero-meta .meta-item:has(#meta-lugar),
+.Tpl-F12 #mod-hero-meta .meta-item:has(#meta-lugar) {
+    flex-basis: 100% !important;
+    justify-content: center !important;
+    transform: rotate(-0.8deg);
 }
 
 .tpl-f12 #mod-hero-meta .meta-item:hover,
 .Tpl-F12 #mod-hero-meta .meta-item:hover {
-    background: rgba(47, 224, 208, 0.18) !important;
-    border-color: rgba(47, 224, 208, 0.75) !important;
+    background: linear-gradient(135deg, rgba(224, 169, 43, 0.30) 0%, rgba(255, 47, 142, 0.22) 100%) !important;
+    border-color: var(--f12-fuchsia) !important;
 }
 
 .tpl-f12 #mod-hero-meta .meta-svg,
@@ -676,16 +705,18 @@
     pointer-events: none;
 }
 
-/* v1.1.0: layout de 2 columnas -> FOTO a la izquierda, TEXTO a la derecha */
+/* v1.3.0: layout full-width -> FOTO vertical a todo el ancho; el TEXTO va
+   debajo repartido en 2 columnas. El titulo (#db-historia-titulo) se oculta
+   mas abajo con display:none (ID intacto, Cero Borrado). */
 .tpl-f12 #mod-historia .historia-inner,
 .Tpl-F12 #mod-historia .historia-inner {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-        "titulo titulo"
-        "foto   texto";
-    align-items: center;
-    gap: 1.4rem 2.8rem;
+        "foto   foto"
+        "texto  texto";
+    align-items: start;
+    gap: 1.8rem 2.4rem;
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 !important;
@@ -695,6 +726,7 @@
 
 .tpl-f12 #db-historia-titulo,
 .Tpl-F12 #db-historia-titulo {
+    display: none !important;
     grid-area: titulo;
     color: var(--f12-ink) !important;
     font-weight: 900 !important;
@@ -714,7 +746,8 @@
     max-width: 100% !important;
     margin: 0 !important;
     aspect-ratio: 4 / 5;
-    min-height: 280px;
+    max-height: 78vh;
+    min-height: 320px;
     object-fit: cover;
     background-image:
         var(--f12-asset-agrupacion),
@@ -735,6 +768,10 @@
     font-size: 1.02rem;
     line-height: 1.85 !important;
     opacity: 1 !important;
+    /* v1.3.0: la informacion se reparte en 2 columnas (1 en movil). */
+    columns: 2;
+    column-gap: 2.8rem;
+    column-rule: 1px solid rgba(11, 11, 13, 0.18);
 }
 
 /* ==========================================================================
@@ -866,6 +903,20 @@
     display: none !important;
 }
 
+/* v1.3.0: se oculta el h2 del kernel dentro del modulo (la banda mostaza
+   "BOLETERIA" ya es el titulo del diseno). Selector intacto, ID no borrado. */
+.tpl-f12 #mod-boletos .boleto-inner > h2,
+.Tpl-F12 #mod-boletos .boleto-inner > h2 {
+    display: none !important;
+}
+
+/* v1.3.0: refuerzo -> si la preventa no tiene tarjetas, se oculta para que
+   quede SOLO la taquilla (aunque el kernel deje un nodo vacio no-:empty). */
+.tpl-f12 #mod-boletos #db-boletos-preventa:not(:has(.boleto-card-row)),
+.Tpl-F12 #mod-boletos #db-boletos-preventa:not(:has(.boleto-card-row)) {
+    display: none !important;
+}
+
 .tpl-f12 #mod-boletos .boleto-card-row,
 .Tpl-F12 #mod-boletos .boleto-card-row {
     position: relative;
@@ -991,6 +1042,14 @@
     pointer-events: none;
 }
 
+/* v1.3.0: se oculta la banda duplicada "UNETE A NUESTRA COMUNIDAD" (el boton
+   tab del kernel ya muestra ese texto). El pseudo se conserva en el CSS. */
+.tpl-f12 #mod-form .form-master-box::before,
+.Tpl-F12 #mod-form .form-master-box::before {
+    content: none !important;
+    display: none !important;
+}
+
 .tpl-f12 #mod-form .form-master-box input,
 .tpl-f12 #mod-form .form-master-box select,
 .tpl-f12 #mod-form .form-master-box textarea,
@@ -1044,6 +1103,18 @@
 .tpl-f12 #mod-video,
 .Tpl-F12 #mod-video {
     padding: 4.5rem 5% !important;
+}
+
+/* v1.3.0: el modulo se ENCIENDE pero el contenido de VIDEO se oculta para que
+   la galeria (#db-gallery-grid) se vea SOLA. El div que envuelve a
+   #db-video-content es hijo DIRECTO de #mod-video; #db-gallery-grid tambien
+   es hijo directo y NO se ve afectado. #db-video-content se incluye como
+   respaldo por si el kernel cambia el wrapper. */
+.tpl-f12 #mod-video > div:has(#db-video-content),
+.Tpl-F12 #mod-video > div:has(#db-video-content),
+.tpl-f12 #mod-video #db-video-content,
+.Tpl-F12 #mod-video #db-video-content {
+    display: none !important;
 }
 
 .tpl-f12 #db-gallery-grid,
@@ -1193,6 +1264,57 @@
 }
 
 /* ==========================================================================
+   13-bis. SPONSORS (v1.3.0: encendido + estilos propios)
+   --------------------------------------------------------------------------
+   El kernel emite <div class="sponsor-item"><img class="sponsor-img"></div>
+   dentro de #db-sponsors-list. El modulo se enciende en el bloque de
+   activacion atomica y aqui se le da el acento de la paleta f12. */
+.tpl-f12 #mod-sponsors,
+.Tpl-F12 #mod-sponsors {
+    padding: 4.5rem 6% !important;
+}
+
+.tpl-f12 #db-sponsors-list,
+.Tpl-F12 #db-sponsors-list {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.6rem 3rem !important;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f12 #mod-sponsors .sponsor-item,
+.Tpl-F12 #mod-sponsors .sponsor-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 1.6rem !important;
+    background: rgba(20, 20, 26, 0.60);
+    border: 1px solid rgba(224, 169, 43, 0.35);
+    border-radius: var(--f12-radius);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tpl-f12 #mod-sponsors .sponsor-item:hover,
+.Tpl-F12 #mod-sponsors .sponsor-item:hover {
+    transform: translateY(-3px);
+    border-color: var(--f12-fuchsia);
+    box-shadow: 0 10px 30px rgba(255, 47, 142, 0.18);
+}
+
+.tpl-f12 #mod-sponsors .sponsor-img,
+.Tpl-F12 #mod-sponsors .sponsor-img {
+    height: 44px !important;
+    width: auto !important;
+    max-width: 180px;
+    object-fit: contain;
+    filter: grayscale(0.2) brightness(1.05);
+    opacity: 0.92;
+}
+
+/* ==========================================================================
    14. WHATSAPP
    ========================================================================== */
 .tpl-f12 #mod-whatsapp,
@@ -1237,40 +1359,45 @@
    ========================================================================== */
 .tpl-f12 #mod-footer,
 .Tpl-F12 #mod-footer {
-    padding: 4rem 6% 2.5rem !important;
+    padding: 2.4rem 6% 2rem !important;
     background: var(--f12-bg) !important;
     border-top: 3px solid var(--f12-mustard);
     border-bottom: none !important;
 }
 
-/* v1.2.0: FOOTER SENCILLO. Se retiran visualmente las columnas, el tagline
-   y el copyright (#footer-copy); queda el nombre dinamico de la organizacion.
-   IDs intactos (display:none, no se borra nada - Cero Borrado).
-   IMPORTANTE: .footer-bottom NO se oculta porque el kernel inyecta ahi el
-   badge freemium .htz-powered (evento-app.html L1162-1180), requisito del
-   contrato del plan. Solo se oculta si el badge no existe (plan no freemium),
-   para no dejar espacios muertos. */
+/* v1.3.0: FOOTER SENCILLO tipo f5 (Afromango). Se oculta TODO .footer-inner
+   (marca, columnas, redes, contacto, #footer-org-name) y queda unicamente
+   .footer-bottom con el copyright que genera el kernel/i18n. IDs intactos. */
+.tpl-f12 #mod-footer .footer-inner,
+.Tpl-F12 #mod-footer .footer-inner {
+    display: none !important;
+}
+
 .tpl-f12 #mod-footer .footer-col,
 .tpl-f12 #mod-footer #footer-tagline,
-.tpl-f12 #mod-footer #footer-copy,
 .Tpl-F12 #mod-footer .footer-col,
-.Tpl-F12 #mod-footer #footer-tagline,
-.Tpl-F12 #mod-footer #footer-copy {
+.Tpl-F12 #mod-footer #footer-tagline {
     display: none !important;
 }
 
 .tpl-f12 #mod-footer .footer-bottom,
 .Tpl-F12 #mod-footer .footer-bottom {
     display: block !important;
-    margin-top: 1.4rem;
-    padding-top: 0.9rem;
-    border-top: 1px solid var(--f12-line);
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--f12-text-muted);
+    opacity: 0.7;
 }
 
-/* Sin badge freemium inyectado, la linea inferior queda vacia: se colapsa. */
+/* Sin badge freemium inyectado, la linea inferior sigue mostrando el
+   copyright: NO se colapsa (v1.3.0). El selector original se conserva. */
 .tpl-f12 #mod-footer .footer-bottom:not(:has(.htz-powered)),
 .Tpl-F12 #mod-footer .footer-bottom:not(:has(.htz-powered)) {
-    display: none !important;
+    display: block !important;
 }
 
 /* Badge freemium integrado al footer sencillo, bajo el nombre de la org.
@@ -1471,19 +1598,19 @@
     .tpl-f12 #mod-boletos       { order: 8 !important; }
     .tpl-f12 #mod-form          { order: 9 !important; }
     .tpl-f12 #mod-video         { order: 10 !important; }
-    .tpl-f12 #mod-faq           { order: 11 !important; }
-    .tpl-f12 #mod-ubicacion     { order: 12 !important; }
-    .tpl-f12 #mod-whatsapp      { order: 13 !important; }
-    .tpl-f12 #mod-footer        { order: 14 !important; }
+    .tpl-f12 #mod-whatsapp      { order: 11 !important; }
+    .tpl-f12 #mod-faq           { order: 12 !important; }
+    .tpl-f12 #mod-ubicacion     { order: 13 !important; }
+    .tpl-f12 #mod-sponsors      { order: 14 !important; }
+    .tpl-f12 #mod-footer        { order: 15 !important; }
 
     /* Apagados: reordenados explicitamente para no dejar huecos de orden */
-    .tpl-f12 #mod-descripcion   { order: 15 !important; }
-    .tpl-f12 #mod-objetivo      { order: 16 !important; }
-    .tpl-f12 #mod-impacto       { order: 17 !important; }
-    .tpl-f12 #mod-lineup        { order: 18 !important; }
-    .tpl-f12 #mod-info-tecnica  { order: 19 !important; }
-    .tpl-f12 #mod-experiencias  { order: 20 !important; }
-    .tpl-f12 #mod-sponsors      { order: 21 !important; }
+    .tpl-f12 #mod-descripcion   { order: 16 !important; }
+    .tpl-f12 #mod-objetivo      { order: 17 !important; }
+    .tpl-f12 #mod-impacto       { order: 18 !important; }
+    .tpl-f12 #mod-lineup        { order: 19 !important; }
+    .tpl-f12 #mod-info-tecnica  { order: 20 !important; }
+    .tpl-f12 #mod-experiencias  { order: 21 !important; }
     .tpl-f12 #mod-equipo        { order: 22 !important; }
     .tpl-f12 #mod-cta-final     { order: 23 !important; }
 
@@ -1522,7 +1649,7 @@
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
         top: auto;
-        bottom: 24%;
+        bottom: 30%;
         height: 2rem;
         font-size: 0.55rem;
         letter-spacing: 0.1em;
@@ -1536,6 +1663,7 @@
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
         font-size: clamp(2.4rem, 13vw, 4.6rem) !important;
+        margin-bottom: 1.6rem !important;
         -webkit-text-stroke: 2px var(--f12-ink);
         text-shadow:
             2px 2px 0 #000000,
@@ -1601,16 +1729,38 @@
     .Tpl-F12 #mod-historia .historia-inner {
         grid-template-columns: 1fr;
         grid-template-areas:
-            "titulo"
             "foto"
             "texto";
         gap: 1.2rem;
     }
 
+    .tpl-f12 #db-historia-texto,
+    .Tpl-F12 #db-historia-texto {
+        columns: 1;
+        column-rule: none;
+    }
+
     .tpl-f12 #db-historia-img,
     .Tpl-F12 #db-historia-img {
-        aspect-ratio: 16 / 10;
-        min-height: 200px;
+        aspect-ratio: 4 / 5;
+        max-height: 60vh;
+        min-height: 240px;
+    }
+
+    .tpl-f12 #db-sponsors-list,
+    .Tpl-F12 #db-sponsors-list {
+        gap: 1rem 1.8rem !important;
+    }
+
+    .tpl-f12 #mod-sponsors .sponsor-img,
+    .Tpl-F12 #mod-sponsors .sponsor-img {
+        height: 36px !important;
+        max-width: 140px;
+    }
+
+    .tpl-f12 #mod-footer,
+    .Tpl-F12 #mod-footer {
+        padding: 2.6rem 6% 2rem !important;
     }
 
     .tpl-f12 #db-gallery-grid,
@@ -1679,6 +1829,16 @@
         min-height: 44px !important;
         box-shadow: 4px 4px 0 rgba(224, 169, 43, 0.85) !important;
     }
+
+    .tpl-f12 #db-historia-img,
+    .Tpl-F12 #db-historia-img {
+        min-height: 220px;
+    }
+
+    .tpl-f12 #db-sponsors-list,
+    .Tpl-F12 #db-sponsors-list {
+        gap: 0.8rem 1.2rem !important;
+    }
 }
 
 /* --- Banda obligatoria 992-1279px --- */
@@ -1697,7 +1857,7 @@
 
     .tpl-f12 #mod-hero-meta,
     .Tpl-F12 #mod-hero-meta {
-        margin-bottom: 12.4rem !important;
+        margin-bottom: 13.8rem !important;
     }
 
     .tpl-f12 #unified-frame,
@@ -1776,6 +1936,8 @@
     .tpl-f12 #mod-hero .hero-content::before,
     .tpl-f12 #mod-hero-ctas .hero-cta-btn--wa,
     .tpl-f12 #db-whatsapp-btn,
+    .tpl-f12 #mod-hero-meta .meta-item,
+    .tpl-f12 #mod-sponsors .sponsor-item,
     .tpl-f12 #db-gallery-grid .gallery-item {
         animation: none !important;
         transition: none !important;
@@ -1822,4 +1984,18 @@
    |         |            | f12 lee el texto de "descripcion" (string u       |
    |         |            | objeto) con degradado seguro al comportamiento    |
    |         |            | previo.                                           |
+   |---------|------------|----------------------------------------------------|
+   | v1.3.0  | 2026-09-22 | Iteracion "Kande caribeno": reorden de modulos   |
+   |         |            | (galeria -> WhatsApp -> FAQ -> mapa -> sponsors   |
+   |         |            | -> footer); meta en 2 lineas (fecha + hora arriba,|
+   |         |            | lugar abajo a todo el ancho) con etiquetas        |
+   |         |            | informales giradas; historia sin titulo, foto     |
+   |         |            | full-width vertical y texto a 2 columnas; titulo  |
+   |         |            | del hero mas separado de la cinta subtitulo;      |
+   |         |            | #mod-video encendido mostrando SOLO la galeria;   |
+   |         |            | boleteria solo taquilla (h2 oculto); banda        |
+   |         |            | duplicada del form oculta; #mod-sponsors encendido|
+   |         |            | y estilado; footer tipo f5 de 1 linea (copyright);|
+   |         |            | flor siempre por DEBAJO del contenido (z-index    |
+   |         |            | negativo + pointer-events:none).                  |
    ============================================================================ */
