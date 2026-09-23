@@ -1548,7 +1548,13 @@ if (document.getElementById('db-poster-img')) {
         // (remanente huérfano de una versión anterior), la condición nunca era verdadera.
 
         // 2. Construcción Dinámica del Mapa (Google Maps Embed) [cite: 301]
-        const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        // v1.11.0: si el silo define --f12-mapa-query (coordenada exacta), el
+        // mapa se centra con ll= SIN marcador nativo de Google: el pin fucsia
+        // del silo es el unico marcador. Sin override se usa q=<ubicacion>.
+        const __mapaQuerySilo = (getComputedStyle(document.body).getPropertyValue('--f12-mapa-query') || '').trim();
+        const mapUrl = __mapaQuerySilo
+            ? `https://maps.google.com/maps?ll=${encodeURIComponent(__mapaQuerySilo)}&z=16&output=embed`
+            : `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
         const mapContainer = document.getElementById('db-mapa-container');
         
         if (mapContainer) {
