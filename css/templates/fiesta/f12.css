@@ -1,5 +1,11 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.8.0 - mobile: menos hueco bajo el titulo y mas aire entre items; CTA
+   'COMPRAR ENTRADAS' (CSS); cinta de vuelta al fondo mostaza. Grupo
+   meta/countdown/CTA elevado a -44svh y cinta mobile en bottom 46% (ambos
+   +6 para conservar el hueco de 2% sin solape); margen del grupo 0.75rem;
+   compensacion del CTA calc(44svh - 12rem). Texto del CTA pintado 100% CSS
+   (::after) sin tocar js/i18n.js. Solo este archivo (2026-09-22).
    v1.7.0 - Hero mobile compacto + fondo cubre todo el hero (100svh, trio
    elevado con margen negativo -38svh y compensacion en el CTA; patron f11);
    cinta mas cerca del titulo (escritorio top 42% / mobile bottom 40%);
@@ -364,9 +370,10 @@
 /* v1.7.0: la cinta se sube a top 42% para quedar justo DEBAJO del titulo
    "KANDE" y claramente ARRIBA/lejos de los chips del meta (#mod-hero-meta,
    z-index 6; la cinta es z-index 3), que Direccion reportaba tapandola.
-   Se conserva el fondo tematico del Caribe colombiano (turquesa -> fucsia ->
-   mostaza + rayas sutiles). El titulo es de una linea (--f12-title-size
-   hasta 8.5rem) centrada; 42% deja aire suficiente sin solaparla. */
+   v1.8.0: se retoma el fondo MOSTAZA original (commit 5d3676c): papel +
+   gradiente mostaza simetrico; se elimina el caribe (turquesa->fucsia->mostaza)
+   y el repeating-linear-gradient de rayas. El titulo es de una linea
+   (--f12-title-size hasta 8.5rem) centrada; 42% deja aire suficiente. */
 .tpl-f12 #mod-hero::before,
 .Tpl-F12 #mod-hero::before {
     content: "\2605\00a0M\00daSICA TRADICIONAL DEL CARIBE COLOMBIANO\00a0\2605";
@@ -380,11 +387,10 @@
     align-items: center;
     justify-content: center;
     background-image:
-        repeating-linear-gradient(115deg, rgba(11, 11, 13, 0.16) 0 10px, rgba(11, 11, 13, 0) 10px 22px),
         var(--f12-asset-papel),
-        linear-gradient(90deg, var(--f12-turq) 0%, var(--f12-fuchsia) 48%, var(--f12-mustard) 100%);
-    background-size: auto, 100% 100%, cover;
-    background-repeat: repeat, no-repeat, no-repeat;
+        linear-gradient(90deg, var(--f12-mustard-2) 0%, var(--f12-mustard) 50%, var(--f12-mustard-2) 100%);
+    background-size: 100% 100%, cover;
+    background-repeat: no-repeat, no-repeat;
     color: var(--f12-ink);
     font-family: var(--f12-font);
     font-size: 0.64rem;
@@ -816,6 +822,26 @@
     border-color: var(--f12-ink) !important;
     box-shadow: 4px 4px 0 rgba(255, 47, 142, 0.85), var(--f12-glow-turq) !important;
     transform: translate(-2px, -2px);
+}
+
+/* v1.8.0: el texto real lo inyecta i18n ("COMPRA ENTRADAS AHORA"; no se toca
+   js/i18n.js). Se conserva intacto en el DOM (Cero Borrado) y se oculta con
+   font-size:0, pintando el nuevo texto 100% por CSS en ::after. gap:0 evita
+   cualquier hueco entre el nodo de texto colapsado y el pseudo. */
+.tpl-f12 #mod-hero-ctas #f6-hero-wa,
+.Tpl-F12 #mod-hero-ctas #f6-hero-wa {
+    font-size: 0 !important;
+    gap: 0 !important;
+}
+
+.tpl-f12 #mod-hero-ctas #f6-hero-wa::after,
+.Tpl-F12 #mod-hero-ctas #f6-hero-wa::after {
+    content: "COMPRAR ENTRADAS";
+    font-size: 0.85rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -1868,13 +1894,14 @@
         bottom: -0.5rem;
     }
 
-    /* v1.7.0: la cinta sube a bottom 40% (60% del alto) para quedar justo
-       sobre el trio de meta/countdown/CTA, que ahora se eleva sobre el
-       fondo del hero (ver grupo mas abajo). */
+    /* v1.8.0: la cinta sube a bottom 46% (54% del alto) en la MISMA medida
+       que el trio (+6): asi el trio arranca al 56% y la cinta conserva su
+       hueco de 2% por encima, sin solape (incluida su esquina rotada -2.4deg),
+       reduciendo el hueco entre el titulo y los demas elementos. */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
         top: auto;
-        bottom: 40%;
+        bottom: 46%;
         height: 2rem;
         font-size: 0.55rem;
         letter-spacing: 0.1em;
@@ -1918,15 +1945,15 @@
         align-self: center !important;
         z-index: 6 !important;
         width: 100% !important;
-        margin: 0.45rem 0 !important;
+        margin: 0.75rem 0 !important;
     }
 
-    /* Elevacion del trio: arranca al 62% del alto (100svh - 38svh), justo
-       bajo la cinta (bottom 40%) y lejos del titulo. */
+    /* Elevacion del trio: arranca al 56% del alto (100svh - 44svh), justo
+       bajo la cinta (bottom 46%) y mas cerca del titulo (v1.8.0). */
     .tpl-f12 #mod-hero-meta,
     .Tpl-F12 #mod-hero-meta {
-        margin-top: -38vh !important;
-        margin-top: -38svh !important;
+        margin-top: -44vh !important;
+        margin-top: -44svh !important;
     }
 
     /* Compensacion: devuelve el flujo al pliegue (100svh) para que la
@@ -1935,7 +1962,7 @@
        seccion siguiente sobre el hero. */
     .tpl-f12 #mod-hero-ctas,
     .Tpl-F12 #mod-hero-ctas {
-        margin-bottom: max(0px, calc(38svh - 12rem)) !important;
+        margin-bottom: max(0px, calc(44svh - 12rem)) !important;
     }
 
     .tpl-f12 #unified-frame,
@@ -1992,6 +2019,13 @@
         font-size: 0.74rem !important;
         padding: 0.6rem 1.1rem !important;
         letter-spacing: 0.12em !important;
+    }
+
+    /* v1.8.0: el texto CSS del CTA acompana la escala movil del boton. */
+    .tpl-f12 #mod-hero-ctas #f6-hero-wa::after,
+    .Tpl-F12 #mod-hero-ctas #f6-hero-wa::after {
+        font-size: 0.74rem;
+        letter-spacing: 0.12em;
     }
 
     /* Secciones y tarjetas */
@@ -2135,6 +2169,13 @@
         font-size: 0.72rem !important;
         padding: 0.55rem 1rem !important;
         box-shadow: 4px 4px 0 rgba(224, 169, 43, 0.85) !important;
+    }
+
+    /* v1.8.0: el texto CSS del CTA sigue la escala de <=480 (0.72rem). */
+    .tpl-f12 #mod-hero-ctas #f6-hero-wa::after,
+    .Tpl-F12 #mod-hero-ctas #f6-hero-wa::after {
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
     }
 
     .tpl-f12 #db-historia-img,
