@@ -184,6 +184,9 @@ color:#0B0A09;padding:4px 9px;border-radius:6px;z-index:2;text-transform:upperca
 .htz-next-pill{position:absolute;bottom:12px;left:12px;z-index:2;display:inline-flex;align-items:center;gap:.4rem;
 font-size:11px;font-weight:700;letter-spacing:.08em;color:#0B0A09;background:rgba(245,239,226,.9);border-radius:999px;padding:4px 10px}
 .htz-campa-pill{background:var(--camp);color:#fff}
+.htz-badge-prox{display:inline-flex;align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.16em;
+color:var(--gold);background:rgba(227,180,87,.12);border:1px solid var(--gold);border-radius:999px;
+padding:3px 9px;text-transform:uppercase}
 .htz-card-body{padding:1.05rem 1.15rem 1.1rem;display:flex;flex-direction:column;gap:.3rem;flex:1}
 .htz-card-org{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
 .htz-card-name{font-family:'Anton';font-size:24px;line-height:1.02;text-transform:uppercase;color:var(--cream)}
@@ -684,6 +687,9 @@ function initEv(e){
   const stamp = e._abierta
     ? `<span class="htz-next-pill htz-campa-pill">${I18N.t('index.card.en_curso')}</span>`
     : `<span class="htz-next-pill">${I18N.t('index.card.proxima')}</span>`;
+  const badgeProx = e.fase_landing === 'proximamente'
+    ? `<span class="htz-badge-prox" data-i18n="landing.badge_proxima">${I18N.t('landing.badge_proxima')}</span>`
+    : '';
   return `<a class="htz-card" href="/evento.html?slug=${esc(e.slug)}" style="--acd:${e._color}" data-track="abrir_evento" data-track-label="${esc(e.slug)}">
     ${media}
       <div class="htz-card-shade"></div>
@@ -692,6 +698,7 @@ function initEv(e){
     </div>
     <div class="htz-card-body">
       <div class="htz-card-org">${esc(e._org.nombre || I18N.t('common.hostal'))}</div>
+      ${badgeProx}
       <h3 class="htz-card-name">${esc(e.nombre || I18N.t('index.cat.evento'))}</h3>
       <div class="htz-card-meta">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>

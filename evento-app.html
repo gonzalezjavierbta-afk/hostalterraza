@@ -61,6 +61,7 @@
         <div id="org-name-badge" style="position:absolute; top:2.5rem; left:2.5rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; z-index:10;">--</div>
         <div class="hero-content" style="position:relative; z-index:5;">
             <h1 id="event-title">--</h1>
+            <p id="event-subtitle" class="hero-subtitle" style="display:none;"></p>
         </div>
     </header>
 
@@ -886,6 +887,20 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     __tituloEl.appendChild(__l2);
                 } else {
                     __tituloEl.innerText = __tituloRaw;
+                }
+                // v310 (aditivo): ATOMO #event-subtitle. Nace oculto (display:none
+                // inline en el HTML) y solo se enciende si effContent.subtitulo trae
+                // texto (effContent ya fusiona content + capa i18n activa). Regla de
+                // vacio: sin texto queda oculto y no ocupa espacio. Cero Borrado.
+                const __subtituloEl = document.getElementById('event-subtitle');
+                if (__subtituloEl) {
+                    const __subtituloRaw = String(effContent.subtitulo || '').trim();
+                    if (__subtituloRaw) {
+                        __subtituloEl.textContent = __subtituloRaw;
+                        __subtituloEl.style.display = '';
+                    } else {
+                        __subtituloEl.style.display = 'none';
+                    }
                 }
                 document.getElementById('org-name-badge').innerText = effOrgNombre ? effOrgNombre.toUpperCase() : "--";
                 // v1.4.0 (aditivo): soporte de metadata en 2 lineas por tarjeta via
@@ -1804,6 +1819,66 @@ if (document.getElementById('db-poster-img')) {
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = T('landing.form_error_general'); }
                         }
                     });
+                }
+
+                // v310 · FASE LANDING "PROXIMAMENTE" (aditivo, Cero Borrado): si
+                // eventos.fase_landing === 'proximamente' la landing muestra
+                // SOLO el nucleo del hero (titulo, subtitulo, countdown, meta y CTA).
+                // El resto de modulos se ocultan visualmente (display:none +
+                // data-fase-hidden); ningun ID se elimina ni renombra. Cuando la fase
+                // es 'completa' esta rama no se ejecuta: regresion cero.
+                // OBS-1: validacion conservadora de la fecha — un teaser sin fecha
+                // futura valida degrada a 'completa' (no se rompe la feature si el
+                // formato de fecha es inesperado: NaN mantiene 'proximamente').
+                var __faseProx = !!(ev && ev.fase_landing === 'proximamente');
+                // Guarda de tipo: parseSpanishDate hace dateStr.toLowerCase(); si
+                // fecha no fuese string lanzaria y abortaria el gate (se mantiene
+                // 'proximamente', degradacion segura).
+                if (__faseProx && typeof parseSpanishDate === 'function' && typeof ev.fecha === 'string') {
+                    var __tFase = parseSpanishDate(ev.fecha, ev.hora).getTime();
+                    if (!isNaN(__tFase)) {
+                        var __yearFase = new Date(__tFase).getFullYear();
+                        // centinela de campana (2099-12-31) o fecha ya pasada => no es teaser valido
+                        if (__yearFase >= 2090 || __tFase <= Date.now()) __faseProx = false;
+                    }
+                }
+                var __fase = __faseProx ? 'proximamente' : 'completa';
+                document.body.setAttribute('data-fase', __fase);
+                if (__fase === 'proximamente') {
+                    // a) Neutralizar el grid del flow: evita filas fantasma de los silos
+                    //    que refluyen con :has([data-hidden]) (f6/f8/b4).
+                    var __flow = document.getElementById('main-content-flow');
+                    if (__flow) __flow.style.setProperty('display', 'block', 'important');
+                    // b) Ocultar los hijos directos del flow fuera de la whitelist.
+                    var __whitelist = { 'mod-hero': 1, 'unified-frame': 1, 'mod-hero-meta': 1, 'mod-hero-ctas': 1, 'event-subtitle': 1 };
+                    if (__flow) {
+                        Array.prototype.forEach.call(__flow.children, function (el) {
+                            if (!el.id || !__whitelist[el.id]) {
+                                el.style.setProperty('display', 'none', 'important');
+                                el.setAttribute('data-fase-hidden', 'true');
+                            }
+                        });
+                    }
+                    // c) Garantizar el CTA (nace oculto por kernel IoC y algunos silos
+                    //    no lo encienden).
+                    var __ctas = document.getElementById('mod-hero-ctas');
+                    if (__ctas) {
+                        __ctas.style.setProperty('display', 'flex', 'important');
+                        __ctas.style.setProperty('flex-wrap', 'wrap', 'important');
+                        __ctas.style.setProperty('justify-content', 'center', 'important');
+                        __ctas.style.setProperty('align-items', 'center', 'important');
+                        __ctas.style.setProperty('gap', '1rem', 'important');
+                        // d) Ocultar el ancla al line-up (apunta a #mod-lineup, oculto).
+                        var __lineupBtn = __ctas.querySelector('.hero-cta-btn--lineup');
+                        if (__lineupBtn) __lineupBtn.style.setProperty('display', 'none', 'important');
+                        // e) Rotulo de expectativa en el CTA principal (key i18n
+                        //    'landing.hero_wa_prox' ya registrado en js/i18n.js; no se toca href).
+                        var __waBtn = document.getElementById('f6-hero-wa');
+                        if (__waBtn) {
+                            __waBtn.setAttribute('data-i18n', 'landing.hero_wa_prox');
+                            __waBtn.textContent = (typeof T === 'function') ? T('landing.hero_wa_prox') : 'MÁS INFO';
+                        }
+                    }
                 }
 
             } catch (err) {

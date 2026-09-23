@@ -27,7 +27,7 @@ var BACKSLASH = String.fromCharCode(92);
 var BACKTICK_CHAR = String.fromCharCode(96);
 var DOUBLE_ESCAPE = BACKSLASH + BACKSLASH + 'u';
 
-var HTML_SET = ['index.html', 'admin.html', 'scanner.html', 'eventovenezuela.html'];
+var HTML_SET = ['index.html', 'admin.html', 'scanner.html', 'eventovenezuela.html', 'evento-app.html'];
 
 var BASELINE_DIV_DIFF = { 'index.html': 1, 'admin.html': 3 };
 

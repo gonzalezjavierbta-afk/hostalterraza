@@ -93,8 +93,8 @@ async function loadShell(req) {
   return readShellFromDisk();
 }
 
-function buildMeta(nombre, desc, imagen, host, slug) {
-  var ogTitle = nombre + ' - Hostal Terraza';
+function buildMeta(nombre, desc, imagen, host, slug, isProx) {
+  var ogTitle = isProx ? (nombre + ' - Pr\u00f3ximamente - Hostal Terraza') : (nombre + ' - Hostal Terraza');
   var url = 'https://' + host + '/evento.html?slug=' + slug;
   var lines = [
     '<meta name="description" content="' + esc(desc) + '">',
@@ -112,11 +112,11 @@ function buildMeta(nombre, desc, imagen, host, slug) {
   return lines.join('\n');
 }
 
-function inject(html, nombre, desc, imagen, host, slug) {
+function inject(html, nombre, desc, imagen, host, slug, isProx) {
   var h = String(html || '');
-  var title = '<title>' + esc(nombre) + ' - Hostal Terraza</title>';
+  var title = isProx ? ('<title>' + esc(nombre) + ' - Pr\u00f3ximamente - Hostal Terraza</title>') : ('<title>' + esc(nombre) + ' - Hostal Terraza</title>');
   h = h.replace(/<title>[\s\S]*?<\/title>/i, title);
-  var meta = buildMeta(nombre, desc, imagen, host, slug);
+  var meta = buildMeta(nombre, desc, imagen, host, slug, isProx);
   var idx = h.indexOf('</head>');
   if (idx !== -1) {
     h = h.slice(0, idx) + meta + '\n' + h.slice(idx);
@@ -140,7 +140,7 @@ function send(res, html) {
 async function loadEvento(slug) {
   if (!slug) return null;
   try {
-    var restUrl = SB_URL + '/rest/v1/eventos?select=nombre,descripcion,imagen_url,poster_url,config_landing,fecha,hora,ubicacion,categoria_slug&slug=eq.' + encodeURIComponent(slug) + '&limit=1';
+    var restUrl = SB_URL + '/rest/v1/eventos?select=*&slug=eq.' + encodeURIComponent(slug) + '&limit=1';
     var headers = {
       'apikey': SB_KEY,
       'Authorization': 'Bearer ' + SB_KEY
@@ -156,7 +156,13 @@ async function loadEvento(slug) {
   return null;
 }
 
-function resolveDesc(nombre, ev, content) {
+function resolveDesc(nombre, ev, content, isProx) {
+  if (isProx) {
+    var sub = content && content.subtitulo;
+    var sd = (typeof sub === 'string') ? sub : '';
+    var sc = trimTo(cleanText(sd), 200);
+    return sc || (nombre + ' - Muy pronto en Hostal Terraza');
+  }
   var raw = content.descripcion || ev.descripcion || '';
   var d = '';
   if (typeof raw === 'string') {
@@ -219,12 +225,13 @@ module.exports = async function handler(req, res) {
     if (ev) {
       nombre = ev.nombre || 'Hostal Terraza';
       var content = (ev.config_landing && ev.config_landing.content) || {};
-      desc = resolveDesc(nombre, ev, content);
+      var isProx = !!(ev && String(ev.fase_landing || '') === 'proximamente');
+      desc = resolveDesc(nombre, ev, content, isProx);
       imagen = await resolveImagen(ev, host);
     }
 
     var shell = await loadShell(req);
-    var out = shell ? inject(shell, nombre, desc, imagen, host, slug) : MIN_HTML;
+    var out = shell ? inject(shell, nombre, desc, imagen, host, slug, isProx) : MIN_HTML;
     send(res, out);
   } catch (err) {
     try {

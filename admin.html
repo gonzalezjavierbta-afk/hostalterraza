@@ -515,6 +515,23 @@ tr:hover td{background:var(--surface)}
           </button>
         </div>
 
+        <!-- ══ ADR-051: Fase de la landing (completa / proximamente). Se oculta si la columna eventos.fase_landing no existe (feature-detection) ══ -->
+        <div id="ev-fase-landing-wrap" style="margin-bottom:1rem">
+          <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px">🚦 Fase de la landing</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="ev-fase-landing">
+            <button type="button" id="ev-fase-completa" data-fase="completa" onclick="setFaseLanding('completa')" class="modo-card">
+              <div class="modo-emoji">🗓</div>
+              <div class="modo-title">Completa</div>
+              <div class="modo-sub">Landing ampliada con todos los módulos</div>
+            </button>
+            <button type="button" id="ev-fase-proximamente" data-fase="proximamente" onclick="setFaseLanding('proximamente')" class="modo-card">
+              <div class="modo-emoji">⏳</div>
+              <div class="modo-title">Próximamente</div>
+              <div class="modo-sub">Teaser: hero, contador y meta + WhatsApp</div>
+            </button>
+          </div>
+        </div>
+
         <!-- Checkboxes de estado interno (ADR-030 / ADR-033) — ocultos, controlados por setModoPublico() -->
         <input type="checkbox" id="ev-landing-activa" style="display:none" onchange="toggleLandingConfig(this.checked)">
         <input type="checkbox" id="ev-sist-dual" style="display:none" onchange="toggleSistDual(this.checked)">
@@ -721,6 +738,12 @@ tr:hover td{background:var(--surface)}
                 </label>
                 <input id="ev-titulo-display" placeholder="Ej. ZZZZZ (deja vacío para usar el nombre del evento)" style="font-size:12px">
               </div>
+            </div>
+            <!-- ADR-051: subtítulo del hero (opcional). Se persiste en config_landing.content.subtitulo. -->
+            <div class="fg"><label style="font-size:12px">Subtítulo del hero
+                <span style="font-size:11px;color:var(--ink3);font-weight:400"> — opcional; se muestra bajo el título (útil en la fase "Próximamente")</span>
+              </label>
+              <input id="ev-hero-subtitulo" placeholder="Ej. Muy pronto en Bogotá" style="font-size:12px">
             </div>
             <div id="ld-campo-trailer" style="display:none" class="fg"><label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label><input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px"></div>
             <div id="ld-campo-director" style="display:none">
@@ -2486,6 +2509,9 @@ let ORG_ID = null;       // UUID de la organización activa
 // B1: feature-detection de la columna 'eventos.estado' (migracion adr037 no
 // aplicada en esta instancia). Se resuelve UNA VEZ en _detectarEstadoEventos().
 let HAS_EVENTO_ESTADO = false;
+// ADR-051: feature-detection de la columna 'eventos.fase_landing' (migracion
+// adr051 aplicada manualmente). Se resuelve UNA VEZ en _detectarFaseLanding().
+let HAS_EVENTO_FASE = false;
 let _orgData = null;     // Datos completos de la organización (branding, plan, etc.) // cliente Supabase global
 
 const STORAGE_CFG = 'hostal_supa_cfg';
@@ -2537,6 +2563,31 @@ async function _detectarEstadoEventos() {
     console.warn('[B1] no se pudo detectar eventos.estado; default false:', e.message);
     HAS_EVENTO_ESTADO = false;
   }
+}
+
+// ADR-051: consulta el schema cache de PostgREST una sola vez: un error
+// PGRST204 / query-failed significa que la columna 'eventos.fase_landing' NO
+// existe en esta instancia. Default conservador: false (el bloque de fase se
+// mantiene oculto y nunca se escribe 'fase_landing' en el payload).
+async function _detectarFaseLanding() {
+  if (!SB) { HAS_EVENTO_FASE = false; _aplicarEstadoFaseLanding(); return; }
+  try {
+    const { error } = await SB.from('eventos').select('fase_landing').limit(1);
+    HAS_EVENTO_FASE = !error;
+    if (error) console.info('[ADR-051] eventos.fase_landing no existe en esta instancia (' + (error.code || 'query-failed') + '):', error.message);
+    else       console.info('[ADR-051] eventos.fase_landing disponible; se escribira en los INSERT/UPDATE de eventos.');
+  } catch (e) {
+    console.warn('[ADR-051] no se pudo detectar eventos.fase_landing; default false:', e.message);
+    HAS_EVENTO_FASE = false;
+  }
+  _aplicarEstadoFaseLanding();
+}
+
+// ADR-051: oculta/deshabilita el bloque "Fase de la landing" cuando la columna
+// no existe. Cero Borrado: el bloque permanece en el DOM, solo se oculta.
+function _aplicarEstadoFaseLanding() {
+  const wrap = document.getElementById('ev-fase-landing-wrap');
+  if (wrap) wrap.style.display = HAS_EVENTO_FASE ? '' : 'none';
 }
 
 async function checkConnection() {
@@ -2822,6 +2873,37 @@ function toggleSistDual(activa) {
 // ev-sist-dual (que a su vez alimentan _buildConfigLanding). Mantiene retrocompatibilidad
 // con eventos legacy que no tienen la columna modo_publico.
 let _evModoPublico = 'landing';
+
+// ADR-051 — Fase de la landing del evento: 'completa' | 'proximamente'.
+// ORTOGONAL al modo de página pública (ADR-033): el modo decide QUE hay
+// (landing/formulario) y la fase decide QUE TAN PROFUNDA es la landing.
+// Requiere la columna eventos.fase_landing (migracion adr051); si la columna
+// no existe (HAS_EVENTO_FASE=false) el bloque se oculta y nunca se escribe.
+let _evFaseLanding = 'completa';
+
+function setFaseLanding(f) {
+  _evFaseLanding = (f === 'proximamente') ? 'proximamente' : 'completa';
+  const wrap = document.getElementById('ev-fase-landing');
+  if (wrap) wrap.querySelectorAll('.modo-card').forEach(b => {
+    b.classList.toggle('active', b.dataset.fase === _evFaseLanding);
+  });
+}
+
+// ADR-051 — Validacion de fecha (decision de Direccion): la fase
+// "proximamente" exige una fecha REAL y FUTURA (no vacia, no el centinela de
+// campana 2099-12-31 y posterior a hoy). Devuelve true si es valida; false si
+// aborta el guardado (ya mostro el aviso).
+function _validarFaseLandingProximamente(fechaInput) {
+  if (!HAS_EVENTO_FASE || _evFaseLanding !== 'proximamente') return true;
+  const _d = new Date();
+  const _hoyISO = _d.getFullYear() + '-' + String(_d.getMonth() + 1).padStart(2, '0') + '-' + String(_d.getDate()).padStart(2, '0');
+  const f = (fechaInput || '').trim();
+  if (!f || f === '2099-12-31' || f < _hoyISO) {
+    alrt('ev-alert', 'La fase "Próximamente" requiere una fecha real y futura. Corrige la fecha del evento (no vacía, distinta del centinela 2099-12-31 y no anterior a hoy) o cambia la fase a "Completa".', 'err');
+    return false;
+  }
+  return true;
+}
 
 function setModoPublico(modo) {
   _evModoPublico = modo;
@@ -3510,6 +3592,7 @@ document.addEventListener('DOMContentLoaded', () => {
   admGoTab('historial'); // ADR-022 — vista por defecto de Admin
   pnlGoTab('resumen');   // ADR-023 — vista por defecto de Panel
   setModoPublico('landing'); // ADR-033 — modo de página pública por defecto
+  _aplicarEstadoFaseLanding(); // ADR-051 — oculto hasta verificar eventos.fase_landing
   // Marcar visualmente las plantillas "por definir" (Cero Borrado: siguen siendo seleccionables)
   _TEMAS_POR_DEFINIR.forEach(theme => {
     const card = document.querySelector(`.ld-theme-card[data-theme="${theme}"]`);
@@ -4018,6 +4101,9 @@ function _buildConfigLanding(slug) {
       sinopsis:       val('ld-sinopsis-text')    || null,
       poster_url:     val('ev-poster-url')       || null,
       titulo_display: val('ev-titulo-display')   || null,
+      // ADR-051 — subtitulo del hero (teaser). El sweep de nulls de abajo lo
+      // elimina cuando esta vacio, por lo que solo se persiste si tiene valor.
+      subtitulo:      val('ev-hero-subtitulo')   || null,
       trailer_url:    val('ld-trailer-url')      || null,
       dresscode:      val('ld-dresscode-val')    || null,
       // Fiesta
@@ -5124,6 +5210,12 @@ function openEditMod(evId) {
   // ADR-033 — restaurar el selector de modo de página pública (y sus paneles).
   setModoPublico(_deriveModoPublico(ev));
 
+  // ADR-051 — restaurar la fase de la landing y el subtítulo del hero.
+  _evFaseLanding = (ev.fase_landing === 'proximamente') ? 'proximamente' : 'completa';
+  setFaseLanding(_evFaseLanding);
+  const _subtEl = document.getElementById('ev-hero-subtitulo');
+  if (_subtEl) _subtEl.value = (content && content.subtitulo) || '';
+
   // ── Estado de guardado: botón del Paso 4 pasa a UPDATE ──
   const btn = document.getElementById('btn-crear-ev');
   if (btn) btn.textContent = 'Guardar cambios';
@@ -5153,7 +5245,7 @@ function _limpiarWizardCompleto() {
   ['ev-n','ev-f','ev-h','ev-ubic','ev-aforo','ev-img','ev-video','ev-poster-url','ev-cabezote-form'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
   });
-  ['ev-d','ld-sinopsis-text','ev-titulo-display','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
+  ['ev-d','ld-sinopsis-text','ev-titulo-display','ev-hero-subtitulo','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
    'ld-playlist-url','ld-guest-list-val','ld-ubicacion-val','ld-whatsapp-tel','ld-form-redirect','ld-boletos-preventa',
    'ld-boletos-taquilla','ld-meta-fecha-l1','ld-meta-fecha-l2','ld-meta-hora-l1','ld-meta-hora-l2',
    'ld-meta-lugar-l1','ld-meta-lugar-l2','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
@@ -5184,6 +5276,7 @@ function _limpiarWizardCompleto() {
   _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
   if (typeof _limpiarI18nEditor === 'function') _limpiarI18nEditor();
   setModoPublico('landing');
+  setFaseLanding('completa'); // ADR-051 — la fase vuelve a su default
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -5370,6 +5463,12 @@ async function guardarEventoWizard() {
   }
   const _fechaParaGuardar = f || (_tipoActual === 'campana' ? '2099-12-31' : f);
 
+  // ADR-051 — "Proximamente" exige fecha real y futura. Aborta el guardado.
+  if (!_validarFaseLandingProximamente(f)) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar cambios'; }
+    return;
+  }
+
   try {
     const payload = {
       nombre:         n,
@@ -5397,6 +5496,8 @@ async function guardarEventoWizard() {
         custom: getCamposCustom(),
       },
     };
+    // ADR-051 — fase de la landing (solo si la columna existe en esta instancia).
+    if (HAS_EVENTO_FASE) payload.fase_landing = _evFaseLanding || 'completa';
     const prevSlug = _eventos.find(e => e.id === id)?.slug || null;
     const cfgLanding = _buildConfigLanding(prevSlug);
     // Edición: si la landing se desactivó, limpiar el JSON previo (Cero Huérfanos).
@@ -6442,6 +6543,9 @@ async function _crearEventoUnico(n) {
   // porque evento.html oculta la fila de fecha cuando es este valor centinela.
   const _fechaParaGuardar = f || (_tipoActual === 'campana' ? '2099-12-31' : f);
 
+  // ADR-051 — "Proximamente" exige fecha real y futura. Aborta el guardado.
+  if (!_validarFaseLandingProximamente(f)) return;
+
   const slug = n.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9\s-]/g,'')
@@ -6479,6 +6583,8 @@ async function _crearEventoUnico(n) {
     org_id:    ORG_ID,
   };
   if (HAS_EVENTO_ESTADO) payload.estado = await _calcularEstadoEvento();
+  // ADR-051 — fase de la landing (solo si la columna existe en esta instancia).
+  if (HAS_EVENTO_FASE) payload.fase_landing = _evFaseLanding || 'completa';
   const {data:ev, error} = await SB.from('eventos').insert(payload).select().single();
 
   if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
@@ -9664,6 +9770,10 @@ async function onLogin(user) {
   // B1: unica deteccion de 'eventos.estado' (fire-and-forget; si aun no
   // termino, _calcularEstadoEvento degrada a 'publicado' sin columna).
   _detectarEstadoEventos();
+
+  // ADR-051: unica deteccion de 'eventos.fase_landing' (fire-and-forget; si
+  // aun no termino, el bloque de fase se mantiene oculto y no se escribe).
+  _detectarFaseLanding();
 
   // 1. Cargar perfil del usuario
   const { data: perfil, error: perfilErr } = await SB.from('perfiles')
