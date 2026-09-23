@@ -2,9 +2,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Versión** | v1.4.0 |
+| **Versión** | v1.5.0 |
 | **Propósito** | Hub normativo de silos CSS de `evento.html` (motor real: `evento-app.html`, ver banner de reconciliacion abajo): inventario real del DOM, metodologia de creacion en 8 pasos y brief obligatorio - para que cualquier IA cree, edite o audite un template de forma reproducible. |
-| **Fecha** | 2026-09-16 (v1.3.0) · **2026-09-22 (v1.4.0, ver Anexo A)** |
+| **Fecha** | 2026-09-16 (v1.3.0) · **2026-09-22 (v1.4.0)** · **2026-09-23 (v1.5.0, salvaguarda hero movil f12 — ver Anexo A)** |
 | **Audiencia** | `@frontend-tpl-free`, `@frontend-tpl`, `@free-build`, `@admin-dev-free`, `@docs-keeper-free`, `@qa-auditor` |
 | **Marco** | MOTHER, AI-DOS v1.2, 16 Mandatos de `Reglas de Oro QR.md` (v127-MASTER) |
 | **Baseline de verdad** | Archivos REALES del repositorio (ADR-006). Ningún dato citado aquí se dio por supuesto; todo se verificó contra `evento-app.html` (motor real, reconciliado 2026-09-22), `css/templates/**`, `admin.html` y los docs del Dossier. |
@@ -139,6 +139,7 @@ Moléculas que cada silo puede declarar (y las clases kernel reales que estiliza
 - La banda **992px-1279px** debe recibir tratamiento explícito (f11 la mantiene intacta: `breakpoint 992-1279px intacto` en ADR-043).
 - **Regla Edge-to-Edge:** todo cambio de layout en un breakpoint debe tener alcance definido; una regla sin media query que rompe desktop fue error histórico (ERRORES §5).
 - El orden de hermanos en columnas flex se controla con `order` COMPLETO (renumerar todos los hermanos, no reordenar parcialmente — ERRORES §12, f11 v3.2.0).
+- **Patron recomendado — salvaguarda por ALTURA en bandas anchas (silo f12 "Kande", v1.13.3, 2026-09-23):** cuando el titulo del hero escala por ANCHO (`24vw`) hasta su tope (`11.5rem`) en anchos de tablet/landscape (**481-767px**) y la cinta de subtitulo (`#mod-hero::before`, al `bottom:67%`) + el badge de ceja (`#org-name-badge`, `margin-top:5vh`) se acercan, titulo y cinta pueden solaparse. Mitigacion normativa: limitar el titulo por **ALTURA** con `min()` en una media query de banda ancha — `--f12-title-size: clamp(3rem, min(24vw, calc(20vh - 4rem)), 11.5rem)` — y recortar el badge (`margin-top:3vh !important`), todo dentro de `@media (min-width:481px) and (max-width:767px)`; los telefonos (`<=480px`) NO se afectan. **Regla general:** cuando un hero usa tamaño tipografico por ancho y toca su tope, validar el caso por ALTURA en la banda ancha (evita el solape titulo/cinta en tablets verticales y landscape extremo). Evidencia real: `css/templates/fiesta/f12.css` L2217-2231; contexto del ciclo express v1.13.0 -> v1.13.3 en `TASKS.md` (TSK-062) y `NEXT.md` (hito -19).
 
 **ADRs citados:** ADR-043. **Errores históricos:** §5 (edge-to-edge), §7 (brecha entre breakpoint de layout y de seguridad), §12 (orden flexbox incompleto f11).
 
@@ -311,6 +312,7 @@ Si algún punto falla, la entrega NO es completa: corregir y re-ejecutar el Escu
 | v1.2.0 | 2026-09-16 | Creación del hub normativo TEMPLATES.md: 10 capítulos; baseline verificado contra código real (f10 v2.0.0, f11 v3.2.0, f9 ADR-041, kernel v222, admin cards, ADR-040/041/042/043) |
 | v1.3.0 | 2026-09-16 | Correcciones de Dirección + Anexo C (inventario DOM real); nueva metodología de creación en 8 pasos (9-ter); brief obligatorio (9-bis); Cap. 10 como checklist de aceptación 10/10; doble notación de casing corregida; silos en disco reales; subconmutaciones JS reales del kernel |
 | **v1.4.0** | **2026-09-22** | **Silo f12 "Kande" (ADR-048) + reconciliación estructural + corrección del registro.** Banner de reconciliación (al inicio): `evento.html` NO existe como archivo — el motor real es `evento-app.html` (1724 lineas, v214; `vercel.json` → `/api/evento-og`); `#db-gallery-grid` dentro de `#mod-video`; `#mod-hero-ctas` nace oculto; sin override `?tpl=`/`?cat=`; `MODULE_IDS` ausente en v214. Cap. 7: silo `f12.css` (Kande, v1.0.0) agregado a fiesta. Cap. 9 y Paso 8 (9-ter): registro corregido a los **6 puntos reales** con patrón `abrirFichaTheme` (cards, `_THEME_TYPE`, `_THEME_TPL`, `_THEME_MODULES` ADR-047 — 19 themes —, `_THEME_FICHA`, `names`) + advertencia de namespacing por categoria de `ld-mod-*` (defecto MAYOR ADR-048). Anexo B: filas de kernel real y f12; registro de themes actualizado. Anexo C: nota de la galería dentro de `#mod-video`. Nota de Cap. 2: `evento.html` se lee desde este ADR como `evento-app.html` (Cero Borrado: el texto previo se conserva intacto) |
+| **v1.5.0** | **2026-09-23** | **Salvaguarda anti-solape del hero movil del silo f12 "Kande" (ciclo express v1.13.0 -> v1.13.3).** Cap. 5: nuevo bullet de patron recomendado — cuando el titulo del hero escala por ancho (`24vw`) hasta su tope (`11.5rem`) en la banda 481-767px, limitar el titulo por ALTURA (`clamp(3rem, min(24vw, calc(20vh - 4rem)), 11.5rem)`) y recortar el badge (`margin-top:3vh`) para evitar el solape titulo/cinta; no afecta telefonos (`<=480px`). Evidencia real: `css/templates/fiesta/f12.css` L2217-2231; contexto en `TASKS.md` TSK-062/TSK-063 y `NEXT.md` hito -19 |
 
 ---
 
@@ -463,4 +465,4 @@ Si algún punto falla, la entrega NO es completa: corregir y re-ejecutar el Escu
 
 ---
 
-*Documento sellado bajo el estándar de calidad de $10,000. v1.4.0 — Template Hub Normativo (ADR-006: todos los datos verificados contra archivos reales del repositorio; ADR-048: reconciliacion del motor real `evento-app.html` y silo f12 "Kande" 2026-09-22).*
+*Documento sellado bajo el estándar de calidad de $10,000. v1.5.0 — Template Hub Normativo (ADR-006: todos los datos verificados contra archivos reales del repositorio; ADR-048: reconciliacion del motor real `evento-app.html` y silo f12 "Kande" 2026-09-22; v1.5.0: patron recomendado de salvaguarda por ALTURA del hero movil f12, 2026-09-23).*
