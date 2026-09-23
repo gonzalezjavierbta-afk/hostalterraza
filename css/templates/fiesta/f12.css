@@ -1,5 +1,7 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.13.1 - hero movil (express r2): cinta a bottom 62%; ceja+titulo
+   bajados 2.5vh. Solo este archivo (2026-09-23).
    v1.13.0 - hero movil (express): titulo ~75vw (24vw), cinta mas alta
    (bottom 58%, 2.15rem) y letra de la cinta mayor (0.62/0.58rem). Solo
    este archivo (2026-09-23).
@@ -1985,6 +1987,13 @@
         padding-bottom: 0 !important;
     }
 
+    /* v1.13.1: baja la ceja (y con ella el titulo) para centrar la composicion
+       movil; el badge es el primer hijo en flujo dentro de #mod-hero. */
+    .tpl-f12 #org-name-badge,
+    .Tpl-F12 #org-name-badge {
+        margin-top: 2.5vh !important;
+    }
+
     .tpl-f12 #mod-hero .hero-content::before,
     .Tpl-F12 #mod-hero .hero-content::before {
         width: 150px;
@@ -1993,13 +2002,13 @@
         bottom: -0.5rem;
     }
 
-    /* v1.13.0 (base v1.9.0): la cinta sube a bottom 58% (42% del alto), mas
-       cerca del titulo y MAS lejos del grupo (que arranca al 50%): holgura de
-       ~8% del alto, sin solape con el titulo/badge (esquina rotada -2.4deg). */
+    /* v1.13.1 (base v1.13.0/v1.9.0): la cinta sube a bottom 62% (38% del alto),
+       mas cerca del titulo y MAS lejos del grupo (que arranca al 50%): holgura
+       de ~12% del alto, sin solape con el titulo/badge (rotada -2.4deg). */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
         top: auto;
-        bottom: 58%;
+        bottom: 62%;
         height: 2.15rem;
         font-size: 0.62rem;
         letter-spacing: 0.1em;
@@ -2223,7 +2232,7 @@
         --f12-sub-size:   clamp(0.7rem, 4.2vw, 0.92rem);
     }
 
-    /* v1.9.0: coherencia con <=767px -> cinta bottom 58% y trio -50svh
+    /* v1.9.0: coherencia con <=767px -> cinta bottom 62% y trio -50svh
        (heredados); aqui solo se reduce la tipografia de la cinta. */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
@@ -2400,6 +2409,9 @@
    REGISTRO DE VERSIONES - SILO F12 "KANDE"
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
+   |---------|------------|----------------------------------------------------|
+   | v1.13.1 | 2026-09-23 | Hero movil (express r2): cinta a bottom 62%;   |
+   |         |            | ceja+titulo bajados 2.5vh. Solo este archivo.  |
    |---------|------------|----------------------------------------------------|
    | v1.13.0 | 2026-09-23 | Hero movil (express): titulo ~75vw (24vw,   |
    |         |            | 11.5rem/7.6rem), cinta mas alta (bottom     |
