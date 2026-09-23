@@ -1,5 +1,8 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.9.0 - mobile +35% de subida (cinta cerca del titulo, lejos del grupo);
+   boleto-trust sin resalte de color; footer 'Klandestino Bar' via CSS; ceja
+   con transparencia. Solo este archivo (2026-09-22).
    v1.8.0 - mobile: menos hueco bajo el titulo y mas aire entre items; CTA
    'COMPRAR ENTRADAS' (CSS); cinta de vuelta al fondo mostaza. Grupo
    meta/countdown/CTA elevado a -44svh y cinta mobile en bottom 46% (ambos
@@ -460,8 +463,10 @@
     pointer-events: none;
 }
 
-/* v1.7.0: badge de organizacion en fondo CYAN solido con texto ink (alto
-   contraste) y mas pequeno/discreto que la version fucsia translucida.
+/* v1.7.0: badge de organizacion en fondo CYAN con texto ink (alto contraste)
+   y mas pequeno/discreto que la version fucsia translucida.
+   v1.9.0: el cyan pasa a translucido (0.68) + blur suave para una ceja menos
+   plana, sin perder legibilidad del texto ink.
    El `content` lo inyecta el kernel con el nombre de la org (intacto). */
 .tpl-f12 #org-name-badge,
 .Tpl-F12 #org-name-badge {
@@ -473,7 +478,9 @@
     margin: 0 auto 1.4rem !important;
     padding: 0.3rem 0.95rem !important;
     max-width: 100%;
-    background: rgba(47, 224, 208, 0.92) !important;
+    background: rgba(47, 224, 208, 0.68) !important;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     border: 2px solid var(--f12-ink) !important;
     border-radius: var(--f12-radius) !important;
     color: var(--f12-ink) !important;
@@ -1211,7 +1218,8 @@
     transform: translateX(4px);
 }
 
-/* Chip de confianza (etiqueta turquesa). v1.7.0: mas pequeno y discreto. */
+/* Chip de confianza. v1.9.0: sin resalte de color (texto gris discreto, sin
+   fondo ni borde de acento); sigue siendo una etiqueta inline de confianza. */
 .tpl-f12 #mod-boletos .boleto-trust,
 .Tpl-F12 #mod-boletos .boleto-trust {
     display: inline-flex !important;
@@ -1219,23 +1227,25 @@
     gap: 0.35rem;
     margin-top: 1.6rem;
     padding: 0.26rem 0.7rem;
-    background: rgba(47, 224, 208, 0.07);
-    border: 1px solid rgba(47, 224, 208, 0.55);
-    border-radius: 999px;
-    color: var(--f12-turq) !important;
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    background: none !important;
+    border: none !important;
+    border-radius: 0;
+    color: var(--f12-text-muted) !important;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.72 !important;
+    opacity: 0.55 !important;
 }
 
-/* Icono interno del chip: reducido a juego con el texto. */
+/* Icono interno del chip: reducido a juego con el texto y heredando el color
+   (currentColor) para no quedar con un fill turquesa inline. */
 .tpl-f12 #mod-boletos .boleto-trust svg,
 .Tpl-F12 #mod-boletos .boleto-trust svg {
     width: 11px !important;
     height: 11px !important;
     flex: 0 0 auto;
+    fill: currentColor !important;
 }
 
 /* ==========================================================================
@@ -1648,6 +1658,22 @@
     display: block !important;
 }
 
+/* v1.9.0: el kernel/i18n pinta #footer-copy con "Chongotronik". El texto real
+   se colapsa (font-size:0, Cero Borrado: nodo y texto intactos) y se repinta
+   100% por CSS con el nombre real del cliente via ::before. El pseudo hereda
+   color/centrado/opacidad de .footer-bottom. */
+.tpl-f12 #mod-footer #footer-copy,
+.Tpl-F12 #mod-footer #footer-copy {
+    font-size: 0 !important;
+}
+
+.tpl-f12 #mod-footer #footer-copy::before,
+.Tpl-F12 #mod-footer #footer-copy::before {
+    content: "\00a9 2026 Klandestino Bar. Todos los derechos reservados.";
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+}
+
 /* Badge freemium integrado al footer sencillo, bajo el nombre de la org.
    Los !important vencen los estilos inline que el kernel inyecta. */
 .tpl-f12 #mod-footer .htz-powered,
@@ -1894,14 +1920,13 @@
         bottom: -0.5rem;
     }
 
-    /* v1.8.0: la cinta sube a bottom 46% (54% del alto) en la MISMA medida
-       que el trio (+6): asi el trio arranca al 56% y la cinta conserva su
-       hueco de 2% por encima, sin solape (incluida su esquina rotada -2.4deg),
-       reduciendo el hueco entre el titulo y los demas elementos. */
+    /* v1.9.0: la cinta sube a bottom 54% (46% del alto), mas cerca del titulo
+       y MAS lejos del grupo (que arranca al 50%): holgura de ~4% del alto,
+       sin solape con el titulo/badge (incluida su esquina rotada -2.4deg). */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
         top: auto;
-        bottom: 46%;
+        bottom: 54%;
         height: 2rem;
         font-size: 0.55rem;
         letter-spacing: 0.1em;
@@ -1948,12 +1973,12 @@
         margin: 0.75rem 0 !important;
     }
 
-    /* Elevacion del trio: arranca al 56% del alto (100svh - 44svh), justo
-       bajo la cinta (bottom 46%) y mas cerca del titulo (v1.8.0). */
+    /* v1.9.0: elevacion del trio +35% del hueco anterior: arranca al 50% del
+       alto (100svh - 50svh), con la cinta en bottom 54% (holgura ~4%). */
     .tpl-f12 #mod-hero-meta,
     .Tpl-F12 #mod-hero-meta {
-        margin-top: -44vh !important;
-        margin-top: -44svh !important;
+        margin-top: -50vh !important;
+        margin-top: -50svh !important;
     }
 
     /* Compensacion: devuelve el flujo al pliegue (100svh) para que la
@@ -1962,7 +1987,7 @@
        seccion siguiente sobre el hero. */
     .tpl-f12 #mod-hero-ctas,
     .Tpl-F12 #mod-hero-ctas {
-        margin-bottom: max(0px, calc(44svh - 12rem)) !important;
+        margin-bottom: max(0px, calc(50svh - 12rem)) !important;
     }
 
     .tpl-f12 #unified-frame,
@@ -2125,6 +2150,8 @@
         --f12-sub-size:   clamp(0.7rem, 4.2vw, 0.92rem);
     }
 
+    /* v1.9.0: coherencia con <=767px -> cinta bottom 54% y trio -50svh
+       (heredados); aqui solo se reduce la tipografia de la cinta. */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
         font-size: 0.5rem;
@@ -2300,6 +2327,14 @@
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
    |---------|------------|----------------------------------------------------|
+   | v1.9.0  | 2026-09-22 | Mobile: subida +35% del hueco (trio -50svh y   |
+   |         |            | cinta bottom 54%, holgura ~4% con el grupo);   |
+   |         |            | .boleto-trust sin resalte de color (gris       |
+   |         |            | discreto, sin fondo/borde); footer "Chongotronik"|
+   |         |            | -> "Klandestino Bar" 100% CSS (#footer-copy    |
+   |         |            | font-size:0 + ::before, Cero Borrado); ceja    |
+   |         |            | #org-name-badge con cyan translucido 0.68.     |
+   |---------|------------|-------------------------------------------|
    | v1.7.0  | 2026-09-22 | Hero mobile compacto + fondo cubre TODO el     |
    |         |            | hero (min-height 100svh; trio meta/countdown/  |
    |         |            | CTA elevado -38svh con compensacion en el CTA);|
