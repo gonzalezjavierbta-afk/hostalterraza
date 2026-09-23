@@ -1,5 +1,8 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.13.3 - salvaguarda anti-solape hero movil en 481-767px: titulo
+   limitado por altura (min(24vw, calc(20vh - 4rem))) + badge 3vh. Solo
+   este archivo (2026-09-23).
    v1.13.2 - hero movil (express r3): cinta a bottom 67%; ceja+titulo
    bajados 5vh. Solo este archivo (2026-09-23).
    v1.13.1 - hero movil (express r2): cinta a bottom 62%; ceja+titulo
@@ -2211,6 +2214,22 @@
     }
 }
 
+/* v1.13.3: salvaguarda anti-solape en anchos de tablet/landscape (481-767px).
+   El titulo a 24vw toca su tope (11.5rem) y con la cinta al 67% + badge 5vh
+   el hueco se cierra; se limita el titulo por ALTURA con min() y se recorta
+   el badge a 3vh. No afecta a telefonos (<=480px). */
+@media (min-width: 481px) and (max-width: 767px) {
+    .tpl-f12 #event-title,
+    .Tpl-F12 #event-title {
+        --f12-title-size: clamp(3rem, min(24vw, calc(20vh - 4rem)), 11.5rem);
+    }
+
+    .tpl-f12 #org-name-badge,
+    .Tpl-F12 #org-name-badge {
+        margin-top: 3vh !important;
+    }
+}
+
 /* --- Movil pequeno (<= 480px) --- */
 @media (max-width: 480px) {
     .tpl-f12 #mod-hero,
@@ -2412,6 +2431,10 @@
    REGISTRO DE VERSIONES - SILO F12 "KANDE"
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
+   |---------|------------|----------------------------------------------------|
+   | v1.13.3 | 2026-09-23 | Salvaguarda anti-solape hero movil en          |
+   |         |            | 481-767px (titulo limitado por altura + badge  |
+   |         |            | 3vh). Solo este archivo.                       |
    |---------|------------|----------------------------------------------------|
    | v1.13.2 | 2026-09-23 | Hero movil (express r3): cinta a bottom 67%;   |
    |         |            | ceja+titulo bajados 5vh. Solo este archivo.    |
