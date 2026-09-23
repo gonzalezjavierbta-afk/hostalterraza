@@ -1,5 +1,9 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.10.0 - historia: agrupacion horizontal completa a todo el ancho
+   (640/419) y fix del icono de imagen rota (#db-historia-img sin src
+   vacio); playlist mobile: iframe llena la altura del contenedor; boton
+   "Abrir en Spotify" centrado/activo. Solo este archivo (2026-09-23).
    v1.9.0 - mobile +35% de subida (cinta cerca del titulo, lejos del grupo);
    boleto-trust sin resalte de color; footer 'Klandestino Bar' via CSS; ceja
    con transparencia. Solo este archivo (2026-09-22).
@@ -922,9 +926,11 @@
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    aspect-ratio: 4 / 5;
-    max-height: 78vh;
-    min-height: 320px;
+    /* v1.10.0: la agrupacion es HORIZONTAL (640x419). Se muestra completa
+       y a todo el ancho (antes 4/5 vertical la recortaba). */
+    aspect-ratio: 640 / 419;
+    max-height: none;
+    min-height: 0;
     object-fit: cover;
     background-image:
         var(--f12-asset-agrupacion),
@@ -1006,11 +1012,37 @@
 
 .tpl-f12 #db-spotify-embed,
 .Tpl-F12 #db-spotify-embed {
+    height: 420px;
     min-height: 420px;
     border: 1px solid rgba(47, 224, 208, 0.35) !important;
     border-radius: var(--f12-radius) !important;
     background: var(--f12-bg-ink);
     box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
+}
+
+.tpl-f12 #db-spotify-embed iframe,
+.Tpl-F12 #db-spotify-embed iframe {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+}
+
+/* v1.10.0: boton "Abrir en Spotify" (lo inyecta el kernel con estilo inline)
+   centrado y con la paleta del silo. */
+.tpl-f12 .spotify-open-link,
+.Tpl-F12 .spotify-open-link {
+    display: block !important;
+    width: max-content;
+    margin: 1rem auto 0 !important;
+    color: var(--f12-turq, #2fe0d0) !important;
+    border-color: var(--f12-turq, #2fe0d0) !important;
+}
+
+.tpl-f12 .spotify-open-link:hover,
+.Tpl-F12 .spotify-open-link:hover {
+    background: var(--f12-turq, #2fe0d0);
+    color: var(--f12-bg-ink, #14141a) !important;
 }
 
 /* ==========================================================================
@@ -2076,9 +2108,9 @@
 
     .tpl-f12 #db-historia-img,
     .Tpl-F12 #db-historia-img {
-        aspect-ratio: 4 / 5;
-        max-height: 60vh;
-        min-height: 240px;
+        aspect-ratio: 640 / 419;
+        max-height: none;
+        min-height: 0;
     }
 
     .tpl-f12 #db-sponsors-list,
@@ -2207,7 +2239,7 @@
 
     .tpl-f12 #db-historia-img,
     .Tpl-F12 #db-historia-img {
-        min-height: 220px;
+        min-height: 0;
     }
 
     .tpl-f12 #db-sponsors-list,
@@ -2326,6 +2358,12 @@
    REGISTRO DE VERSIONES - SILO F12 "KANDE"
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
+   |---------|------------|----------------------------------------------------|
+   | v1.10.0 | 2026-09-23 | historia: agrupacion horizontal completa a todo|
+   |         |            | el ancho (640/419); fix icono de imagen rota   |
+   |         |            | (#db-historia-img sin src vacio); playlist     |
+   |         |            | mobile: iframe llena la altura del contenedor; |
+   |         |            | boton Abrir en Spotify centrado/activo.        |
    |---------|------------|----------------------------------------------------|
    | v1.9.0  | 2026-09-22 | Mobile: subida +35% del hueco (trio -50svh y   |
    |         |            | cinta bottom 54%, holgura ~4% con el grupo);   |
