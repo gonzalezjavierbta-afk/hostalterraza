@@ -406,17 +406,24 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             };
 
             // Clics — tabla de reglas delegadas (primera coincidencia gana).
+            // ADR-050 (ampliado): la apertura ampliada del poster y de la galeria
+            // ahora la emite LIGHTBOX GLOBAL de forma nativa (event_type
+            // 'lightbox'), sin duplicar clics; se agregan btn:spotify (anchor
+            // directo del playlist), link:externo (generico para
+            // target=_blank+noopener, antes de [data-track]) y link:externo
+            // para el video-placeholder (div, no es anchor).
             const CLICK_RULES = [
                 { sel: '#db-whatsapp-btn', act: 'whatsapp_contact' },
                 { sel: '#f6-hero-wa', act: 'hero_cta' },
-                { sel: '#db-poster-img', act: 'poster_zoom' },
                 { sel: '.f8-artist-social-icon', act: (t) => 'artist_social_' + String((t.getAttribute('title') || 'link').toLowerCase()) },
                 { sel: 'a.boleto-card-row', act: (t) => { const tp = (t.querySelector('.boleto-tipo') || {}).textContent || ''; return 'buy_' + tp.trim().toLowerCase(); }, lbl: (t) => { const pr = (t.querySelector('.boleto-precio') || {}).textContent || ''; return pr.trim().slice(0, 80); } },
                 { sel: '#db-footer-social a', act: 'footer_social' },
                 { sel: '#db-sponsors-list a', act: 'sponsor_link' },
                 { sel: '#db-faq-list .faq-item', act: 'faq_toggle' },
-                { sel: '#db-gallery-grid .gallery-item', act: 'gallery_view' },
                 { sel: 'a[href*="wa.me"]', act: 'wa_link' },
+                { sel: '.spotify-open-link', act: 'btn:spotify', lbl: (t) => 'abrir', ext: (t) => ({ src: String(t.getAttribute('data-embed-src') || '').slice(0, 120) }) },
+                { sel: '.video-placeholder', act: 'link:externo', lbl: (t) => { try { const m = (t.getAttribute('onclick') || '').match(/window\.open\('([^']+)'/); if (!m) return ''; return (new URL(m[1]).hostname || '').slice(0, 60); } catch (er) { return ''; } } },
+                { sel: 'a[target="_blank"][rel~="noopener"]', act: 'link:externo', lbl: (t) => { try { return (new URL(t.href).hostname || '').slice(0, 60); } catch (er) { return ''; } } },
                 { sel: '[data-track]', act: (t) => t.getAttribute('data-track') }
             ];
             document.addEventListener('click', (e) => {
@@ -427,7 +434,8 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     if (el) {
                         const action = typeof rule.act === 'function' ? rule.act(el) : rule.act;
                         const label = rule.lbl ? rule.lbl(el) : '';
-                        track('click', action, label, 1);
+                        const extra = rule.ext ? rule.ext(el) : undefined;
+                        track('click', action, label, 1, extra);
                         return;
                     }
                 }
@@ -449,6 +457,27 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     window.__anaRaf = requestAnimationFrame(() => { window.__anaRaf = null; depthOnScroll(); });
                 }
             }, { passive: true });
+
+            // Section view - secciones visibles (ADR-050). IntersectionObserver
+            // con umbral 0.5 sobre los modulos que el silo activo encendio en el
+            // DOM (los ocultos por IoC o por __hideEmptyModule jamas intersectan).
+            // Dedupe: maximo 1 envio por seccion por sesion (mismo patron SENT).
+            // Es un evento distinto de scroll_depth: no se registran aqui.
+            const SECTION_MODS = ['section', 'header', 'footer'].map((tag) => tag + '[id^="mod-"]').join(',');
+            if ('IntersectionObserver' in window) {
+                try {
+                    const secObs = new IntersectionObserver((entries) => {
+                        for (const en of entries) {
+                            if (!en.isIntersecting) continue;
+                            const id = (en.target.id || '').replace(/^mod-/, '');
+                            if (!id || SENT['sec:' + id]) continue;
+                            SENT['sec:' + id] = 1;
+                            track('section_view', 'sec:visible', id, 1, { section: en.target.id, threshold: 0.5 });
+                        }
+                    }, { threshold: 0.5 });
+                    document.querySelectorAll(SECTION_MODS).forEach((el) => secObs.observe(el));
+                } catch (e) { console.debug('[Analytics]', e.message); }
+            }
 
             // Tiempo activo al salir + errores JS con keepalive.
             window.addEventListener('pagehide', () => {
@@ -498,6 +527,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 #global-lightbox img{display:block;max-width:94vw;max-height:88vh;width:auto;height:auto;border-radius:8px;box-shadow:0 30px 90px rgba(0,0,0,.7);}
 #global-lightbox .glb-close{position:absolute;top:-10px;right:-10px;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:rgba(20,3,44,.9);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.55);}
 #global-lightbox .glb-hint{position:absolute;bottom:-34px;left:0;right:0;text-align:center;font-size:.68rem;letter-spacing:.22em;color:rgba(255,255,255,.45);}
+#global-lightbox .glb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:rgba(20,3,44,.85);color:#fff;font-size:24px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.5);z-index:2;}
+#global-lightbox .glb-prev{left:14px;}
+#global-lightbox .glb-next{right:14px;}
 .lightbox-trigger{cursor:zoom-in;}
 @media (prefers-reduced-motion: reduce){#global-lightbox{transition:none;}}
 `;
@@ -511,18 +543,39 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 lb.setAttribute('role', 'dialog');
                 lb.setAttribute('aria-modal', 'true');
                 lb.setAttribute('aria-label', 'Vista ampliada');
-                lb.innerHTML = `<figure><img src="" alt=""><button class="glb-close" aria-label="Cerrar">×</button><div class="glb-hint">PRESIONA ESC PARA CERRAR</div></figure>`;
+                lb.innerHTML = `<figure><button class="glb-nav glb-prev" aria-label="Anterior">&lsaquo;</button><img src="" alt=""><button class="glb-nav glb-next" aria-label="Siguiente">&rsaquo;</button><button class="glb-close" aria-label="Cerrar">&times;</button><div class="glb-hint">PRESIONA ESC PARA CERRAR</div></figure>`;
                 document.body.appendChild(lb);
             }
             const lbImg = lb.querySelector('img');
             const lbClose = lb.querySelector('.glb-close');
+            const lbPrev = lb.querySelector('.glb-prev');
+            const lbNext = lb.querySelector('.glb-next');
             let lastFocused = null;
+            // Estado de navegacion de galeria (ADR-050): lista de fotos y el
+            // indice activo. -1 = visor unico (poster, sin next/prev).
+            let lbPhotos = [];
+            let lbIdx = -1;
+            let lbGal = false;
 
-            const closeLb = () => {
+            // Emision nativa del LIGHTBOX (event_type='lightbox').
+            const emitLb = (action, label, extra) => {
+                try { __ANALYTICS.emit('lightbox', action, label, 1, extra || {}); } catch (e) {}
+            };
+
+            const closeLb = (method) => {
                 lb.classList.remove('glb-open');
                 lbImg.src = '';
+                lbPhotos = [];
+                lbIdx = -1;
+                lbGal = false;
                 if (lastFocused) { try { lastFocused.focus(); } catch (e) {} }
                 console.debug('[Lightbox] cerrado');
+                emitLb('lb:close', method || 'x', {});
+            };
+
+            const showPhoto = (src, alt) => {
+                lbImg.src = src;
+                lbImg.alt = alt || 'Vista ampliada';
             };
 
             const openLb = (el) => {
@@ -531,12 +584,37 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     : (el.getAttribute('data-lightbox') || '');
                 if (!src) return;
                 lastFocused = document.activeElement;
-                lbImg.src = src;
-                lbImg.alt = el.getAttribute('alt') || 'Vista ampliada';
+                lbGal = !!(el.closest && el.closest('#db-gallery-grid .gallery-item'));
+                if (lbGal) {
+                    lbPhotos = Array.from(document.querySelectorAll('#db-gallery-grid .gallery-item img'))
+                        .map((im) => (im.currentSrc || im.src || ''));
+                    lbIdx = lbPhotos.indexOf(src);
+                    if (lbIdx === -1) lbIdx = 0;
+                } else {
+                    lbPhotos = [];
+                    lbIdx = -1;
+                }
+                lbPrev.style.display = (lbGal && lbPhotos.length > 1) ? 'flex' : 'none';
+                lbNext.style.display = (lbGal && lbPhotos.length > 1) ? 'flex' : 'none';
+                showPhoto(src, el.getAttribute('alt') || 'Vista ampliada');
                 lb.classList.add('glb-open');
                 lbClose.focus();
                 console.debug('[Lightbox] abierto:', src.slice(0, 80));
+                const label = lbGal ? ('photo:' + (lbIdx + 1)) : 'poster';
+                emitLb('lb:open', label, { src: src.slice(0, 120) });
             };
+
+            const navLb = (dir) => {
+                if (!lbGal || lbPhotos.length === 0) return;
+                lbIdx = (lbIdx + dir + lbPhotos.length) % lbPhotos.length;
+                const src = lbPhotos[lbIdx];
+                showPhoto(src, 'Vista ampliada');
+                console.debug('[Lightbox] navegar:', src.slice(0, 80));
+                emitLb(dir > 0 ? 'lb:next' : 'lb:prev', 'photo:' + (lbIdx + 1), { src: src.slice(0, 120) });
+            };
+
+            lbPrev.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); navLb(-1); });
+            lbNext.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); navLb(1); });
 
             document.addEventListener('click', (e) => {
                 const trig = e.target.closest ? e.target.closest('.lightbox-trigger') : null;
@@ -545,14 +623,16 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     openLb(trig);
                     return;
                 }
-                if (lb.classList.contains('glb-open') &&
-                    (e.target === lb || (e.target.closest && e.target.closest('.glb-close')))) {
-                    closeLb();
-                }
+                if (!lb.classList.contains('glb-open')) return;
+                if (e.target === lb) { closeLb('backdrop'); return; }
+                if (e.target.closest && e.target.closest('.glb-close')) { closeLb('x'); }
             });
 
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && lb.classList.contains('glb-open')) closeLb();
+                if (!lb.classList.contains('glb-open')) return;
+                if (e.key === 'Escape') { closeLb('esc'); return; }
+                if (e.key === 'ArrowLeft' && lbGal) navLb(-1);
+                if (e.key === 'ArrowRight' && lbGal) navLb(1);
             });
         })();
         // === FIN SEGMENTO: LIGHTBOX GLOBAL ===
@@ -590,6 +670,8 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             const cT = document.getElementById('db-boletos-taquilla');
             if (cP) cP.style.display = isPrev ? 'block' : 'none';
             if (cT) cT.style.display = isPrev ? 'none' : 'block';
+            // ESCUDO ANALYTICS: cambio de pestana de boleteria (ADR-050).
+            try { __ANALYTICS.track('btn:tab_' + tipo, '', 1); } catch (e) {}
         }
 
 
@@ -913,6 +995,22 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             } else {
                 sContainer.style.borderColor = 'var(--tpl-accent)';
                 sContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameBorder="0" allow="encrypted-media" style="border-radius:15px;"></iframe>`;
+                // ADR-050: anchor directo "Abrir en Spotify" bajo el embed.
+                const spMatch = embedUrl.match(/open\.spotify\.com\/embed\/(playlist|track|album|artist|show)\/([a-zA-Z0-9]+)/);
+                const spHref = spMatch
+                    ? ('https://open.spotify.com/' + spMatch[1] + '/' + spMatch[2])
+                    : (playUrl.indexOf('/embed/') === -1 ? playUrl : '');
+                if (spHref) {
+                    const spLink = document.createElement('a');
+                    spLink.className = 'spotify-open-link';
+                    spLink.href = spHref;
+                    spLink.target = '_blank';
+                    spLink.rel = 'noopener';
+                    spLink.setAttribute('data-embed-src', embedUrl);
+                    spLink.textContent = 'Abrir en Spotify';
+                    spLink.style.cssText = 'display:inline-block;margin-top:14px;padding:10px 20px;border:1px solid var(--tpl-accent, #d72dc0);border-radius:40px;color:var(--tpl-accent, #d72dc0);text-decoration:none;font-size:.78rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;';
+                    sContainer.insertAdjacentElement('afterend', spLink);
+                }
             }
         }
     } else {

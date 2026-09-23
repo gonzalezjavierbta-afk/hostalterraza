@@ -1436,6 +1436,7 @@ tr:hover td{background:var(--surface)}
       <button class="adm-tab" data-pnl-pill="tendencias" onclick="pnlGoTab('tendencias')">📈 Tendencias</button>
       <button class="adm-tab" data-pnl-pill="rankings" onclick="pnlGoTab('rankings')">🏆 Rankings</button>
       <button class="adm-tab" data-pnl-pill="asistentes" onclick="pnlGoTab('asistentes')">👥 Asistentes <span class="adm-tab-badge" id="pnl-badge-asistentes">0</span></button>
+      <button class="adm-tab" data-pnl-pill="landing" onclick="pnlGoTab('landing')">🌐 Landing</button>
     </div>
 
     <div data-pnl-tab="resumen">
@@ -1655,6 +1656,46 @@ tr:hover td{background:var(--surface)}
       <div id="pn-log"><div class="empty">Sin actividad</div></div>
     </div>
     </div><!-- /data-pnl-tab="asistentes" -->
+    <div data-pnl-tab="landing">
+    <!-- KPIs de telemetria del landing (ADR-032/050) -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:1.25rem">
+      <div class="stat"><div class="stat-n" id="pn-ld-pageviews">—</div><div class="stat-l">Pageviews</div></div>
+      <div class="stat"><div class="stat-n" id="pn-ld-visitors">—</div><div class="stat-l">Visitantes únicos</div></div>
+      <div class="stat"><div class="stat-n" id="pn-ld-clicks">—</div><div class="stat-l">Clicks</div></div>
+      <div class="stat"><div class="stat-n" id="pn-ld-forms">—</div><div class="stat-l">Formularios</div></div>
+      <div class="stat"><div class="stat-n" id="pn-ld-formok">—</div><div class="stat-l">Form. OK</div></div>
+      <div class="stat"><div class="stat-n" id="pn-ld-avgsec">—</div><div class="stat-l">Tiempo activo</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="card">
+        <div class="ch" style="margin-bottom:.75rem">Series diarias</div>
+        <div style="position:relative;height:220px"><canvas id="pn-chart-landing"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch" style="margin-bottom:.75rem">Embudo de conversión</div>
+        <div id="pn-ld-funnel"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="card">
+        <div class="ch" style="margin-bottom:.75rem">Ranking de interacciones</div>
+        <div style="display:flex;gap:4px;margin-bottom:.75rem;flex-wrap:wrap" id="pn-ld-chips">
+          <button class="btn btn-ghost btn-sm pn-ld-chip on" onclick="setLandingChip(this,'all')">Todos</button>
+          <button class="btn btn-ghost btn-sm pn-ld-chip" onclick="setLandingChip(this,'click')">Clicks</button>
+          <button class="btn btn-ghost btn-sm pn-ld-chip" onclick="setLandingChip(this,'lightbox')">Lightbox</button>
+          <button class="btn btn-ghost btn-sm pn-ld-chip" onclick="setLandingChip(this,'section_view')">Secciones</button>
+        </div>
+        <div id="pn-ld-rank"></div>
+      </div>
+      <div class="card">
+        <div class="ch" style="margin-bottom:.75rem">Eventos recientes</div>
+        <div id="pn-ld-events"></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem">
+      <button class="btn btn-ghost btn-sm" onclick="exportarLandingXLSX()">📥 Exportar Landing (.xlsx)</button>
+    </div>
+    </div><!-- /data-pnl-tab="landing" -->
   </div>
 </div>
 
@@ -8047,6 +8088,7 @@ async function renderPanel() {
       if (wrap) wrap.innerHTML = '<div class="empty" style="font-size:12px">Selecciona un período más amplio para ver la tendencia.</div>';
     }
 
+    renderLanding(); // Sub-tab Landing: telemetria del landing (ADR-032/050)
   } catch(err) {
     console.error('renderPanel error:', err);
     const upd = document.getElementById('last-upd');
@@ -8055,6 +8097,222 @@ async function renderPanel() {
 }
 
 const tipoColors={frecuente:'#C8A96E',invitado:'#1D9E75',artista:'#534AB7',produccion:'#9B2DDB',pago:'#2D6A4F'};
+
+// ═════════════════════════════════════════════════════════════════════
+// LANDING — telemetria del landing page (ADR-032/050)
+// Prefijo de categoria: landing (Regla anti-duplicados BUG-006/018/019)
+// ═════════════════════════════════════════════════════════════════════
+let _ldChip = 'all';               // chip activo del ranking de interacciones
+let _ldRankCache = [];             // ranking completo (para filtrar por chip sin re-query)
+let _pnChartLanding = null;        // chart de la serie diaria
+
+function setLandingChip(btn, tipo) {
+  _ldChip = tipo;
+  const chipsEl = document.getElementById('pn-ld-chips');
+  if (chipsEl) {
+    [...chipsEl.querySelectorAll('.pn-ld-chip')].forEach(b => {
+      b.classList.remove('on'); b.style.background=''; b.style.color='';
+    });
+    btn.classList.add('on');
+    btn.style.background = 'var(--ink)'; btn.style.color = '#fff';
+  }
+  _renderLandingRank();
+}
+
+function _renderLandingRank() {
+  const el = document.getElementById('pn-ld-rank');
+  if (!el) return;
+  const rows = _ldRankCache.filter(r => _ldChip === 'all' || r.event_type === _ldChip).slice(0, 10);
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty">Sin datos de navegabilidad todavía — el landing emite telemetría desde su carga</div>';
+    return;
+  }
+  const max = Math.max(...rows.map(r => r.veces || 0), 1);
+  const chipLabel = { click:'Click', lightbox:'Lightbox', section_view:'Vista sección' }[_ldChip] || 'Toda interacción';
+  el.innerHTML =
+    '<div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">Top ' + rows.length + ' · ' + chipLabel + '</div>' +
+    rows.map((r, i) => {
+      const pctv = Math.round((r.veces || 0) / max * 100);
+      return '<div style="display:flex;align-items:center;gap:10px;padding:.4rem 0;border-bottom:1px solid var(--surface)">' +
+        '<span style="font-size:11px;color:var(--ink3);width:16px;text-align:right">' + (i + 1) + '</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(r.event_label || r.event_action || '—') + '</div>' +
+          '<div style="font-size:11px;color:var(--ink3)">' + esc(r.event_type || '') + ' · ' + (r.visitantes_unicos || 0) + ' únicos</div>' +
+        '</div>' +
+        '<div style="flex:1;max-width:120px;background:var(--surface);border-radius:4px;height:6px;overflow:hidden">' +
+          '<div style="height:100%;background:var(--gold);width:' + pctv + '%;border-radius:4px"></div>' +
+        '</div>' +
+        '<span style="font-size:12px;font-weight:600;color:var(--gold-d);min-width:26px;text-align:right">' + (r.veces || 0) + '</span>' +
+      '</div>';
+    }).join('') +
+    '<div style="margin-top:.5rem;font-size:11px;color:var(--ink3)">Último evento: ' + (rows[0]?.ultimo_evento || '—') + '</div>';
+}
+
+async function renderLanding() {
+  if (!SB || !ORG_ID) return;
+  const wrap = document.querySelector('[data-pnl-tab="landing"]');
+  if (!wrap) return;
+  try {
+    const vista = document.getElementById('pn-vista');
+    const _isAdminEv = currentPerfil?.rol === 'admin_evento' && _eventoAsignado;
+    const vv = _isAdminEv ? ('ev:' + _eventoAsignado) : ((vista && vista.value) || '');
+    const evSel = _eventos.find(e => vv === 'ev:' + e.id);
+    const slug = evSel ? (evSel.slug || null) : null;
+    const empty = 'Sin datos de navegabilidad todavía — el landing emite telemetría desde su carga';
+
+    const fKPIs   = SB.from('v_landing_analytics').select('*').eq('org_id', ORG_ID);
+    const fRank   = SB.from('v_landing_clicks_rank').select('*').eq('org_id', ORG_ID).order('veces', { ascending: false }).limit(25);
+    const fSerie  = SB.from('v_landing_serie_diaria').select('*').eq('org_id', ORG_ID).order('dia', { ascending: true });
+    const fFunnel = SB.from('v_landing_funnel').select('*').eq('org_id', ORG_ID);
+    if (slug) {
+      fKPIs.eq('evento_slug', slug);
+      fRank.eq('evento_slug', slug);
+      fSerie.eq('evento_slug', slug);
+      fFunnel.eq('evento_slug', slug);
+    }
+    // Periodo: filtra la serie diaria (el sub-tab respeta el filtro de pn-period)
+    let since = null;
+    const now = new Date();
+    if (_pnPeriod === '7d')  { const d = new Date(now); d.setDate(d.getDate() - 7);  since = d.toISOString().slice(0,10); }
+    if (_pnPeriod === '30d') { const d = new Date(now); d.setDate(d.getDate() - 30); since = d.toISOString().slice(0,10); }
+    if (_pnPeriod === '90d') { const d = new Date(now); d.setDate(d.getDate() - 90); since = d.toISOString().slice(0,10); }
+    if (since) fSerie.gte('dia', since);
+
+    const [kRes, rRes, sRes, fRes] = await Promise.all([
+      sbQuery(fKPIs, 15000), sbQuery(fRank, 15000), sbQuery(fSerie, 20000), sbQuery(fFunnel, 15000),
+    ]);
+
+    const k = kRes.data || [];
+    const kRow = k.reduce((a, c) => {
+      a.pageviews += c.pageviews || 0; a.unique_visitors += c.unique_visitors || 0;
+      a.clicks += c.clicks || 0; a.section_views += c.section_views || 0; a.lightbox_events += c.lightbox_events || 0;
+      a.form_submits += c.form_submits || 0; a.form_ok += c.form_ok || 0;
+      return a;
+    }, { pageviews: 0, unique_visitors: 0, clicks: 0, section_views: 0, lightbox_events: 0, form_submits: 0, form_ok: 0 });
+
+    const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = Number.isFinite(val) ? val.toLocaleString('es-CO') : String(val); };
+
+    setTxt('pn-ld-pageviews', kRow.pageviews);
+    setTxt('pn-ld-visitors', kRow.unique_visitors);
+    setTxt('pn-ld-clicks', kRow.clicks);
+    setTxt('pn-ld-forms', kRow.form_submits);
+    setTxt('pn-ld-formok', kRow.form_ok);
+    const avgSrc = k.filter(x => x.avg_seconds_active);
+    const avg = avgSrc.length ? Math.round(avgSrc.reduce((s, x) => s + (x.avg_seconds_active || 0), 0) / avgSrc.length) : null;
+    setTxt('pn-ld-avgsec', avg ? avg.toLocaleString('es-CO') + 's' : '—');
+
+    // Serie diaria -> chart (pageviews, unicos, clicks)
+    const serie = sRes.data || [];
+    const dias = serie.map(x => (x.dia || '').slice(5));
+    const canvLd = document.getElementById('pn-chart-landing');
+    if (canvLd) {
+      if (_pnChartLanding) { _pnChartLanding.destroy(); _pnChartLanding = null; }
+      if (serie.length) {
+        _pnChartLanding = new Chart(canvLd, {
+          type: 'line',
+          data: {
+            labels: dias,
+            datasets: [
+              { label: 'Pageviews', data: serie.map(x => x.pageviews || 0), borderColor: '#378ADD', backgroundColor: 'rgba(55,138,221,.08)', fill: true, tension: .3, pointRadius: 2, borderWidth: 2 },
+              { label: 'Unicos', data: serie.map(x => x.unique_visitors || 0), borderColor: '#1D9E75', fill: false, tension: .3, pointRadius: 2, borderWidth: 2 },
+              { label: 'Clicks', data: serie.map(x => x.clicks || 0), borderColor: '#C8A96E', fill: false, tension: .3, pointRadius: 2, borderWidth: 2 },
+            ]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: 'rgba(128,128,128,.08)' }, ticks: { font: { size: 9 } } } } }
+        });
+      }
+    }
+
+    // Embudo
+    const funnelEl = document.getElementById('pn-ld-funnel');
+    if (funnelEl) {
+      const f = fRes.data || [];
+      const fRow = f.reduce((a, c) => {
+        a.pageviews += c.pageviews || 0; a.unicos += c.unicos_pageview || 0;
+        a.scroll += c.scroll_50pct || 0; a.submits += c.form_submits || 0; a.ok += c.form_ok || 0;
+        return a;
+      }, { pageviews: 0, unicos: 0, scroll: 0, submits: 0, ok: 0 });
+      const base = Math.max(fRow.pageviews, 1);
+      const steps = [['Pageviews', fRow.pageviews, '#378ADD'], ['Unicos', fRow.unicos, '#378ADD'], ['Scroll 50%', fRow.scroll, '#1D9E75'], ['Formularios', fRow.submits, '#C8A96E'], ['Form. OK', fRow.ok, '#C8A96E']];
+      if (fRow.pageviews || fRow.unicos) {
+        funnelEl.innerHTML = steps.map(s => {
+          const pct = Math.round(s[1] / base * 100);
+          return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+            '<div style="font-size:12px;color:var(--ink3);width:104px;flex-shrink:0">' + s[0] + '</div>' +
+            '<div style="height:26px;border-radius:4px;background:' + s[2] + ';width:' + Math.max(pct, 2) + '%;min-width:36px;display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:500;color:#fff">' + s[1] + '</div>' +
+            '<div style="font-size:12px;color:var(--ink3)">' + pct + '%</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        funnelEl.innerHTML = '<div class="empty">' + empty + '</div>';
+      }
+    }
+
+    // Ranking (cache para chips)
+    _ldRankCache = rRes.data || [];
+    _renderLandingRank();
+
+    // Eventos recientes (page_events directo)
+    const evEl = document.getElementById('pn-ld-events');
+    if (evEl) {
+      let eq = SB.from('page_events').select('*').eq('org_id', ORG_ID).order('created_at', { ascending: false }).limit(10);
+      if (slug) eq = eq.eq('evento_slug', slug);
+      const { data: recents } = await sbQuery(eq, 15000);
+      if (!recents || !recents.length) {
+        evEl.innerHTML = '<div class="empty">' + empty + '</div>';
+      } else {
+        const tipoCol = { pageview: '#378ADD', click: '#C8A96E', form_submit: '#1D9E75', scroll_depth: '#9B2DDB', active_visit: '#2D6A4F', section_view: '#1D9E75', lightbox: '#9B2DDB', error: '#C0392B' };
+        evEl.innerHTML =
+          '<div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">Últimos ' + recents.length + ' eventos en el landing</div>' +
+          recents.map(r => {
+            const d = r.created_at ? new Date(r.created_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '—';
+            const col = tipoCol[r.event_type] || 'var(--teal)';
+            return '<div style="display:flex;align-items:center;gap:8px;padding:.35rem 0;border-bottom:1px solid var(--surface)">' +
+              '<span style="font-size:10px;color:var(--ink3);width:44px;flex-shrink:0">' + d + '</span>' +
+              '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:9px;background:' + col + '22;color:' + col + ';flex-shrink:0">' + esc(r.event_type || '') + '</span>' +
+              '<div style="flex:1;min-width:0;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(r.event_label || r.event_action || '—') + '</div>' +
+            '</div>';
+          }).join('');
+      }
+    }
+  } catch (e) {
+    console.error('[renderLanding]', e.message);
+  }
+}
+
+async function exportarLandingXLSX() {
+  await _ensureXLSX();
+  if (!SB || !ORG_ID) return;
+  try {
+    const vista = document.getElementById('pn-vista');
+    const _isAdminEv = currentPerfil?.rol === 'admin_evento' && _eventoAsignado;
+    const vv = _isAdminEv ? ('ev:' + _eventoAsignado) : ((vista && vista.value) || '');
+    const evSel = _eventos.find(e => vv === 'ev:' + e.id);
+    let eq = SB.from('page_events').select('*').eq('org_id', ORG_ID).order('created_at', { ascending: false }).limit(5000);
+    if (evSel && evSel.slug) eq = eq.eq('evento_slug', evSel.slug);
+    const { data: filas } = await sbQuery(eq, 20000);
+    if (!filas || !filas.length) { alert('Sin datos de navegabilidad para exportar.'); return; }
+    const rows = [['Fecha', 'Hora', 'Tipo', 'Acción', 'Etiqueta', 'Valor', 'Evento', 'URL', 'Sesión', 'Visitante']];
+    filas.forEach(r => {
+      const d = r.created_at ? new Date(r.created_at) : null;
+      rows.push([
+        d ? d.toLocaleDateString('es-CO') : '',
+        d ? d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '',
+        r.event_type || '', r.event_action || '', r.event_label || '',
+        (r.event_value != null ? r.event_value : ''),
+        r.evento_nombre || r.evento_slug || '',
+        r.page_url || '',
+        r.session_id ? String(r.session_id).slice(0, 8) : '',
+        r.visitor_id || '',
+      ]);
+    });
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    _setColWidths(ws, [12, 8, 14, 18, 26, 8, 24, 34, 10, 18]);
+    XLSX.utils.book_append_sheet(wb, ws, 'Landing');
+    XLSX.writeFile(wb, 'landing-analytics.xlsx');
+  } catch (e) { console.error('[exportarLandingXLSX]', e.message); }
+}
 
 function catBadge(c) {
   const map = {
@@ -8565,6 +8823,13 @@ async function generarInforme() {
   ]);
   const list=ins||[], clientes=cli||[], logs=logsData||[];
 
+  // Navegabilidad del landing (ADR-032/050) — fail-open si la vista no existe
+  let ldStats = [];
+  try {
+    const { data: ld } = await sbQuery(SB.from('v_landing_analytics').select('*').eq('org_id', ORG_ID), 12000);
+    ldStats = ld || [];
+  } catch(e) { /* fail-open: el informe no depende del landing */ }
+
   // ── Métricas base ─────────────────────────────────
   const total      = list.length;
   const ingresaron = list.filter(i=>i.used).length;
@@ -8989,6 +9254,26 @@ tr:nth-child(even) td{background:#fafaf7}
   <div id="pn-crec-chart" style="position:relative;height:100px"><canvas id="pn-chart-crec"></canvas></div>
 </div>
 
+${ldStats.length ? `
+<!-- ══ 5F. NAVEGABILIDAD DEL LANDING (ADR-050) ══ -->
+<div class="sec">
+  <div class="sec-title">Navegabilidad del landing</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem">
+    <div class="kpi-mini"><div class="kpi-mini-v">${ldStats.reduce((s,r)=>s+(r.pageviews||0),0)}</div><div class="kpi-mini-l">Pageviews</div></div>
+    <div class="kpi-mini"><div class="kpi-mini-v">${ldStats.reduce((s,r)=>s+(r.unique_visitors||0),0)}</div><div class="kpi-mini-l">Unicos</div></div>
+    <div class="kpi-mini"><div class="kpi-mini-v">${ldStats.reduce((s,r)=>s+(r.clicks||0)+(r.section_views||0)+(r.lightbox_events||0),0)}</div><div class="kpi-mini-l">Interacciones</div></div>
+    <div class="kpi-mini"><div class="kpi-mini-v">${ldStats.reduce((s,r)=>s+(r.form_submits||0),0)}</div><div class="kpi-mini-l">Formularios</div></div>
+  </div>
+  ${ldStats.slice(0,5).map(r=>{
+    const pv=(r.pageviews||0), maxPv=Math.max(...ldStats.map(x=>x.pageviews||0),1), bar=Math.round(pv/maxPv*100);
+    return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+      <div style="width:110px;font-size:11px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.evento_nombre||r.evento_slug)}</div>
+      <div style="flex:1;background:#f0f0ea;border-radius:3px;height:13px;overflow:hidden"><div style="height:100%;background:#378ADD;width:${bar}%;border-radius:3px"></div></div>
+      <div style="font-size:11px;font-weight:600;color:#181815;min-width:24px">${pv}</div>
+      <div style="font-size:10px;color:#aaa;min-width:34px">${pv>0?Math.round((r.form_submits||0)/pv*100):0}% form.</div>
+    </div>`;
+  }).join('')}
+</div>`:''}
 
 <!-- ── 6. LISTA COMPLETA DE INSCRITOS ── -->
 <div class="sec page-break">

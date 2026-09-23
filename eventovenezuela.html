@@ -556,6 +556,182 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        // === INICIO SEGMENTO: ESCUDO ANALYTICS (v1.0.0 - campana b5) ===
+        // Telemetria de primer partido sobre Supabase (tabla page_events, ADR-032/050).
+        // Mide: vistas del landing (pageview con visitante/sesion unicos), envios del
+        // formulario de la campana (form_submit con labels comunidad_ok/form_error),
+        // clics en CTA/FAQ/enlaces externos/video-placeholder (click) y aperturas
+        // del visor de galeria (event_type 'lightbox', contrato ADR-050),
+        // profundidad de scroll (scroll_depth), tiempo activo (active_visit keepalive)
+        // y secciones visibles (section_view con IntersectionObserver, dedupe 1/sesion).
+        // Fire-and-forget: nunca bloquea la UI ni depende del resultado de la
+        // escritura. Sin PII: los labels son genericos; los datos personales ya
+        // viven en la tabla inscritos.
+        const __ANALYTICS = (() => {
+            const SESSION_KEY = 'ht_analytics_session';
+            const VISITOR_KEY = 'ht_analytics_visitor';
+            const STARTS = Date.now();
+            const SENT = {};
+            const CTX = { org_id: null, evento_id: null, evento_slug: '', evento_nombre: '' };
+
+            const uid = () => {
+                try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : ((r & 0x3) | 0x8);
+                    return v.toString(16);
+                });
+            };
+
+            let sessionId = sessionStorage.getItem(SESSION_KEY);
+            if (!sessionId) { sessionId = uid(); try { sessionStorage.setItem(SESSION_KEY, sessionId); } catch (e) {} }
+            let visitorId = localStorage.getItem(VISITOR_KEY);
+            if (!visitorId) { visitorId = uid(); try { localStorage.setItem(VISITOR_KEY, visitorId); } catch (e) {} }
+
+            const slugFromUrl = () => (new URLSearchParams(window.location.search).get('slug') || '');
+
+            const buildEvt = (type, action, label, value, extra) => ({
+                org_id: CTX.org_id,
+                evento_id: CTX.evento_id,
+                evento_slug: CTX.evento_slug || slugFromUrl(),
+                evento_nombre: CTX.evento_nombre,
+                page_url: String(window.location.href).slice(0, 2048),
+                page_ref: String(document.referrer || '').slice(0, 500),
+                event_type: type,
+                event_action: String(action || '').slice(0, 100),
+                event_label: String(label || '').slice(0, 200),
+                event_value: (value === undefined || value === null) ? null : Number(value),
+                session_id: sessionId,
+                visitor_id: visitorId,
+                user_meta: Object.assign({ path: location.pathname }, extra || {})
+            });
+
+            const track = (type, action, label, value, extra) => {
+                try {
+                    sbClient.from('page_events').insert(buildEvt(type, action, label, value, extra))
+                        .then(() => {}).catch((e) => console.debug('[Analytics]', e.message));
+                } catch (e) { console.debug('[Analytics]', e.message); }
+            };
+
+            // keepalive: sobrevive a pagehide (cierre de pestana o navegacion).
+            const trackKeepalive = (type, action, label, value, extra) => {
+                try {
+                    fetch(SB_URL + '/rest/v1/page_events', {
+                        method: 'POST',
+                        keepalive: true,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SB_KEY,
+                            'Authorization': 'Bearer ' + SB_KEY,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(buildEvt(type, action, label, value, extra))
+                    }).catch(() => {});
+                } catch (e) {}
+            };
+
+            // Clics - tabla de reglas delegadas (primera coincidencia gana).
+            // Adaptacion al silo b5 (eventovenezuela.html): selectores reales de
+            // esta pagina. No se instrumentan reglas del kernel sin objetivo real:
+            // no hay boton WhatsApp ni wa.me, el playlist es iframe embebido (sin
+            // anchor spotify), los sponsors no son clicables y el cartel no tiene
+            // zoom propio - seria codigo muerto (regla de Cero codigo muerto).
+            // La galeria tampoco tiene regla aqui: su apertura/cierre la emite el
+            // handler del lightbox (abrirGaleriaLightbox/cerrarGaleriaLightbox)
+            // con event_type 'lightbox' (ADR-050), evitando doble emision.
+            const CLICK_RULES = [
+                { sel: '#cta-final-btn', act: 'hero_cta', lbl: () => 'cta_final' },
+                { sel: '.hero-nav-cta', act: 'hero_cta', lbl: () => 'nav' },
+                { sel: '#db-footer-social a', act: 'footer_social' },
+                { sel: '#db-faq-list .faq-item', act: 'faq_toggle' },
+                { sel: 'a[href*="wa.me"]', act: 'wa_link' },
+                { sel: '.video-placeholder', act: 'link:externo', lbl: (t) => { try { const m = (t.getAttribute('onclick') || '').match(/window\.open\('([^']+)'/); if (!m) return ''; return (new URL(m[1]).hostname || '').slice(0, 60); } catch (er) { return ''; } } },
+                { sel: 'a[target="_blank"][rel~="noopener"]', act: 'link:externo', lbl: (t) => { try { return (new URL(t.href).hostname || '').slice(0, 60); } catch (er) { return ''; } } },
+                { sel: '[data-track]', act: (t) => t.getAttribute('data-track') }
+            ];
+            document.addEventListener('click', (e) => {
+                const target = e.target;
+                if (!target || !(target instanceof Element)) return;
+                for (const rule of CLICK_RULES) {
+                    const el = target.closest(rule.sel);
+                    if (el) {
+                        const action = typeof rule.act === 'function' ? rule.act(el) : rule.act;
+                        const label = rule.lbl ? rule.lbl(el) : '';
+                        const extra = rule.ext ? rule.ext(el) : undefined;
+                        track('click', action, label, 1, extra);
+                        return;
+                    }
+                }
+            }, true);
+
+            // Scroll depth - umbrales de lectura (1 envio por umbral por sesion).
+            const depthOnScroll = () => {
+                const doc = document.documentElement;
+                const ratio = window.scrollY / Math.max(1, (doc.scrollHeight - window.innerHeight));
+                [0.25, 0.5, 0.75, 0.95].forEach((th) => {
+                    if (!SENT['depth_' + th] && ratio >= th) {
+                        SENT['depth_' + th] = 1;
+                        track('scroll_depth', 'scroll_' + Math.round(th * 100) + 'pct', '', 1);
+                    }
+                });
+            };
+            window.addEventListener('scroll', () => {
+                if (!window.__anaRaf) {
+                    window.__anaRaf = requestAnimationFrame(() => { window.__anaRaf = null; depthOnScroll(); });
+                }
+            }, { passive: true });
+
+            // Section view - secciones visibles del silo b5 (ADR-050). IntersectionObserver
+            // con umbral 0.5 sobre los modulos que la CSS del silo encendio (los ocultos
+            // por IoC jamas intersectan). Se agregan las 2 secciones de emergencia
+            // #crisistext-vzla y #crisistext-col que el silo b5 enciende en el DOM.
+            // Dedupe: maximo 1 envio por seccion por sesion (mismo patron SENT).
+            const SECTION_MODS = ['section', 'header', 'footer'].map((tag) => tag + '[id^="mod-"]').join(',') + ',#crisistext-vzla,#crisistext-col';
+            if ('IntersectionObserver' in window) {
+                try {
+                    const secObs = new IntersectionObserver((entries) => {
+                        for (const en of entries) {
+                            if (!en.isIntersecting) continue;
+                            const id = (en.target.id || '').replace(/^mod-/, '');
+                            if (!id || SENT['sec:' + id]) continue;
+                            SENT['sec:' + id] = 1;
+                            track('section_view', 'sec:visible', id, 1, { section: en.target.id, threshold: 0.5 });
+                        }
+                    }, { threshold: 0.5 });
+                    document.querySelectorAll(SECTION_MODS).forEach((el) => secObs.observe(el));
+                } catch (e) { console.debug('[Analytics]', e.message); }
+            }
+
+            // Tiempo activo al salir + errores JS con keepalive.
+            window.addEventListener('pagehide', () => {
+                const secs = Math.round((Date.now() - STARTS) / 1000);
+                if (secs > 0) trackKeepalive('active_visit', 'session_seconds', CTX.evento_slug || slugFromUrl(), secs, {});
+            });
+            window.addEventListener('error', (e) => {
+                trackKeepalive('error', 'js_error', String(e.message || 'error').slice(0, 200), 1, { line: e.lineno });
+            });
+
+            depthOnScroll();
+
+            return {
+                // Contexto del evento: se llama dentro de initEvento cuando el landing
+                // ya cargo el evento (lanza el pageview con el silo activo en tpl).
+                setContext: (ev) => {
+                    CTX.org_id = ev.org_id ?? null;
+                    CTX.evento_id = ev.id ?? null;
+                    CTX.evento_slug = ev.slug || '';
+                    CTX.evento_nombre = ev.nombre || '';
+                    track('pageview', 'landing_view', CTX.evento_nombre || CTX.evento_slug, 1, { tpl: document.body.className || '' });
+                },
+                // Emision cruda con tipo explicito (pageview/form_submit/click/...).
+                emit: (type, action, label, value, extra) => track(type, action, label, value, extra),
+                // Acceso directo para instrumentar botones con data-track.
+                track: (action, label, value, extra) => track('click', action, label, value, extra)
+            };
+        })();
+        if (window) { window.__track = (action, label, value, extra) => { __ANALYTICS.track(action, label, value, extra); }; }
+        // === FIN SEGMENTO: ESCUDO ANALYTICS ===
+
         // === TEXTO ENRIQUECIDO MARKDOWN-LITE (anti-XSS) ===
         // Soporta **negrita** y saltos de línea desde el JSON (historia, actualizaciones, FAQ).
         // Primero se escapa todo el HTML crudo (blinda contra inyección), luego se re-inyectan
@@ -691,7 +867,12 @@
                     document.getElementById('fase1-fields').style.display = 'none';
                     document.getElementById('form-fase2').style.display = 'block';
                     mostrarBloqueFase2(tipoAyuda);
+                    // Telemetria: Fase 1 insertada con exito (campana b5).
+                    if (typeof __ANALYTICS !== 'undefined') { try { __ANALYTICS.emit('form_submit', 'comunidad_ok', 'campana_b5', 1); } catch (eA) {} }
                 } catch (err) {
+                    // Telemetria: error en el INSERT de Fase 1 (incluye duplicados de
+                    // WhatsApp si el check unico de la tabla los rechaza).
+                    if (typeof __ANALYTICS !== 'undefined') { try { __ANALYTICS.emit('form_submit', 'form_error', 'campana_b5', 0); } catch (eA) {} }
                     alert('No pudimos procesar tu registro. Por favor intenta de nuevo en unos segundos.');
                 } finally {
                     submitBtn.disabled = false; submitBtn.innerText = originalText;
@@ -760,6 +941,8 @@
 
                     document.getElementById('form-fase2').style.display = 'none';
                     document.getElementById('form-fase-success').style.display = 'block';
+                    // Telemetria: registro completo (Fase 2 confirmada).
+                    if (typeof __ANALYTICS !== 'undefined') { try { __ANALYTICS.emit('form_submit', 'comunidad_ok', 'campana_b5_fase2', 1); } catch (eA) {} }
                 } catch (err) {
                     alert('No pudimos guardar tu registro. Intenta de nuevo.');
                 } finally {
@@ -984,9 +1167,9 @@
         lightboxEl.id = 'gallery-lightbox-root';
         lightboxEl.className = 'gallery-lightbox';
         lightboxEl.innerHTML = `
-            <button type="button" class="gallery-lightbox-cerrar" onclick="cerrarGaleriaLightbox()" aria-label="Cerrar">&times;</button>
+            <button type="button" class="gallery-lightbox-cerrar" onclick="cerrarGaleriaLightbox('x')" aria-label="Cerrar">&times;</button>
             <img class="gallery-lightbox-img" id="gallery-lightbox-img" src="" alt="">`;
-        lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) cerrarGaleriaLightbox(); });
+        lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) cerrarGaleriaLightbox('backdrop'); });
         document.body.appendChild(lightboxEl);
     }
     window.abrirGaleriaLightbox = function (url) {
@@ -995,12 +1178,19 @@
         if (!root || !img) return;
         img.src = url;
         root.classList.add('activo');
+        // Telemetria (ADR-050): apertura del visor con event_type 'lightbox'
+        // (el panel admin filtra por este tipo; el kernel lo emite nativo).
+        // Unica via de emision: CLICK_RULES no instrumenta .gallery-thumb.
+        if (typeof __ANALYTICS !== 'undefined') { try { __ANALYTICS.emit('lightbox', 'lb:open', 'gallery', 1); } catch (eA) {} }
     };
-    window.cerrarGaleriaLightbox = function () {
+    window.cerrarGaleriaLightbox = function (origen) {
         const root = document.getElementById('gallery-lightbox-root');
         if (root) root.classList.remove('activo');
+        // Telemetria (ADR-050): cierre del visor, par open -> close.
+        // origen: 'x' (boton), 'backdrop' (click fuera), 'esc' (teclado).
+        if (typeof __ANALYTICS !== 'undefined') { try { __ANALYTICS.emit('lightbox', 'lb:close', String(origen || 'x').slice(0, 20), 1); } catch (eA) {} }
     };
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarGaleriaLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarGaleriaLightbox('esc'); });
     // === FIN SEGMENTO LIGHTBOX ===
 
     // 2. Sincronía Spotify 1:1 [cite: 462, 767]
@@ -1612,6 +1802,14 @@ if (document.getElementById('db-poster-img')) {
     // OCULTAR LOADER — después de que todo el contenido está inyectado
     const loader = document.getElementById('loader');
     if (loader) loader.style.display = 'none';
+
+    // === INICIO SEGMENTO: TELEMETRIA (pageview con contexto real del evento) ===
+    // Lanza el pageview una vez el evento cargo y el body ya tiene las clases tpl
+    // del silo activo (user_meta.tpl). Si el escudo no llego a cargar, no rompe nada.
+    if (typeof __ANALYTICS !== 'undefined') {
+        try { __ANALYTICS.setContext(ev); } catch (eA) { console.debug('[Analytics]', eA.message); }
+    }
+    // === FIN SEGMENTO: TELEMETRIA ===
 
             } catch (err) {
                 console.error(err);
