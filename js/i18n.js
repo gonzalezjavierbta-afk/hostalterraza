@@ -1,6 +1,6 @@
 'use strict';
 /* ═════════════════════════════════════════════════════════════════
-   HOSTAL TERRAZA · i18n v308 (es/fr/en)
+   TAQUILLA DIRECTA · i18n v308 (es/fr/en)
    Compartido por todo el sitio público y las landings de eventos.
    Se carga síncrono en <head> para que los kernels inline
    del final del body encuentren window.I18N ya definido.
@@ -23,16 +23,16 @@ window.I18N = (function () {
       /* ── Switcher / común ── */
       'switch.aria': 'Idioma',
       'common.otro': 'Otro…',
-      'common.hostal': 'Hostal Terraza',
+      'common.hostal': 'Taquilla Directa',
 
       /* ── index.html ── */
-      'index.title': 'Hostal Terraza · Sistema QR & Landing Pages para Eventos',
+      'index.title': 'Taquilla Directa · Entradas y eventos con código QR',
       'index.meta_desc': 'Registra invitados por WhatsApp, reparte entradas con QR personal y controla la puerta desde el celular. Cada evento con su propia landing page.',
       'index.nav.cartelera': 'Cartelera',
-      'index.nav.sistema': 'Sistema QR',
-      'index.nav.landings': 'Landings',
+      'index.nav.sistema': 'Cómo Funciona',
+      'index.nav.landings': 'Silos Visuales',
       'index.nav.contacto': 'Contacto',
-      'index.nav.planes': 'Planes y precios',
+      'index.nav.planes': 'Planes B2B',
       'index.nav.aria_burger': 'Abrir menú',
       'index.hero.kicker': 'Sistema QR · Landings · Tickets',
       'index.hero.t1': 'Donde la fiesta',
@@ -153,6 +153,7 @@ window.I18N = (function () {
       'index.planes.bloque_a_p': 'Venta Directa en WhatsApp ($0 comisión) recibiendo Nequi/Daviplata/Efectivo, o conectar pasarela directa (Wompi/MercadoPago).',
       'index.planes.bloque_b_t': '¿Cómo pagas la plataforma?',
       'index.planes.bloque_b_p': 'Integración transparente con pasarela local (PSE, Nequi, Tarjetas) para activar los pases de $40.000 o la mensualidad de $400.000 de forma instantánea.',
+      'planes.title': 'Planes y precios · Taquilla Directa',
       'index.cta.kicker': '¿Tienes un hostal, bar o venue?',
       'index.cta.title1': 'Lleva el sistema',
       'index.cta.title2': 'a tu espacio.',
@@ -167,7 +168,7 @@ window.I18N = (function () {
       'index.footer.landings': 'Landing pages',
       'index.footer.equipo': 'Equipo',
       'index.footer.acceso': 'Acceso al panel',
-      'index.footer.bottom2': 'Hostal Terraza · Sistema QR & Landings',
+      'index.footer.bottom2': 'Taquilla Directa · Entradas QR & Eventos',
       'index.footer.hecho': 'Hecho para las noches que se recuerdan.',
       'index.login.kicker': 'Acceso del equipo',
       'index.login.title': 'Entrar al panel',
@@ -199,7 +200,7 @@ window.I18N = (function () {
       'index.login.aviso_vacio': 'Escribe tu correo y contraseña.',
       'index.login.entrando': 'Entrando…',
       'index.login.aviso_bad': 'Credenciales incorrectas. Verifica e intenta de nuevo.',
-      'index.login.acceso': 'Acceso',
+      'index.login.acceso': 'Acceso Team',
       'index.login.panel': 'Panel',
       'index.login.cerrar_sesion': 'Cerrar sesión',
 
@@ -282,7 +283,7 @@ window.I18N = (function () {
       'qr.no_existe': 'Este código no existe o fue desactivado.',
 
       /* ── serie.html ── */
-      'serie.title': 'Serie · Terraza Hostal',
+      'serie.title': 'Serie · Taquilla Directa',
       'serie.cargando': 'Cargando…',
       'serie.err_titulo': 'Serie no encontrada',
       'serie.err_p': 'El link no corresponde a ninguna serie activa.',
@@ -320,7 +321,7 @@ window.I18N = (function () {
       'serie.descargar': 'Descargar mi entrada',
       'serie.enviar_wa': 'Enviar por WhatsApp',
       'serie.ver_otras_sesiones': '← Ver otras sesiones',
-      'serie.no_encontrado_dup': 'No encontramos tu registro. Contacta al hostal.',
+      'serie.no_encontrado_dup': 'No encontramos tu registro. Contacta al equipo.',
       'serie.inscritos': 'inscritos',
       'serie.pasada': 'Pasada',
       'serie.sesion_x': 'Sesión {n}',
@@ -375,7 +376,7 @@ window.I18N = (function () {
       'serie.nota_usounico2': 'Muestra este QR en la puerta · Uso único por sesión',
 
       /* ── registroaforo.html ── */
-      'reg.title': 'Registro · Hostal Terraza',
+      'reg.title': 'Registro · Taquilla Directa',
       'reg.f_nombre_ph': 'Nombre completo *',
       'reg.f_cedula_ph': 'Cédula *',
       'reg.f_wa_ph': 'WhatsApp *',
@@ -397,15 +398,15 @@ window.I18N = (function () {
     fr: {
       'switch.aria': 'Langue',
       'common.otro': 'Autre…',
-      'common.hostal': 'Hostal Terraza',
+      'common.hostal': 'Taquilla Directa',
 
-      'index.title': "Hostal Terraza · Système QR & Landing Pages pour Événements",
+      'index.title': "Taquilla Directa · Billets et événements avec QR",
       'index.meta_desc': "Inscrivez vos invités via WhatsApp, distribuez des billets avec un QR personnel et contrôlez l'entrée depuis votre téléphone. Chaque événement vit sur sa propre landing page.",
       'index.nav.cartelera': 'Programation',
-      'index.nav.sistema': 'Système QR',
-      'index.nav.landings': 'Landings',
+      'index.nav.sistema': 'Comment ça marche',
+      'index.nav.landings': 'Silos Visuels',
       'index.nav.contacto': 'Contact',
-      'index.nav.planes': 'Plans et tarifs',
+      'index.nav.planes': 'Plans B2B',
       'index.nav.aria_burger': 'Ouvrir le menu',
       'index.hero.kicker': 'Système QR · Landings · Billets',
       'index.hero.t1': 'Là où la fête',
@@ -526,6 +527,7 @@ window.I18N = (function () {
       'index.planes.bloque_a_p': "Vente directe sur WhatsApp (0 $ de commission) en recevant Nequi/Daviplata/Espèces, ou connectez une passerelle directe (Wompi/MercadoPago).",
       'index.planes.bloque_b_t': 'Comment payez-vous la plateforme ?',
       'index.planes.bloque_b_p': "Intégration transparente avec une passerelle locale (PSE, Nequi, Cartes) pour activer instantanément les passes à 40 000 $ ou l'abonnement mensuel à 400 000 $.",
+      'planes.title': 'Plans et tarifs · Taquilla Directa',
       'index.cta.kicker': 'Vous avez un hostel, un bar ou un lieu ?',
       'index.cta.title1': 'Amenez le système',
       'index.cta.title2': 'dans votre espace.',
@@ -540,7 +542,7 @@ window.I18N = (function () {
       'index.footer.landings': 'Landing pages',
       'index.footer.equipo': 'Équipe',
       'index.footer.acceso': 'Accès au panneau',
-      'index.footer.bottom2': 'Hostal Terraza · Système QR & Landings',
+      'index.footer.bottom2': 'Taquilla Directa · Billets QR & Événements',
       'index.footer.hecho': 'Fait pour les nuits inoubliables.',
       'index.login.kicker': 'Accès équipe',
       'index.login.title': 'Ouvrir le panneau',
@@ -571,7 +573,7 @@ window.I18N = (function () {
       'index.login.aviso_vacio': 'Saisissez votre e-mail et mot de passe.',
       'index.login.entrando': 'Connexion…',
       'index.login.aviso_bad': 'Identifiants incorrects. Vérifiez et réessayez.',
-      'index.login.acceso': 'Accès',
+      'index.login.acceso': 'Accès équipe',
       'index.login.panel': 'Panneau',
       'index.login.cerrar_sesion': 'Se déconnecter',
 
@@ -654,7 +656,7 @@ window.I18N = (function () {
       'qr.no_existe': "Ce code n'existe pas ou a été désactivé.",
 
       /* ── serie.html ── */
-      'serie.title': 'Série · Terraza Hostal',
+      'serie.title': 'Série · Taquilla Directa',
       'serie.cargando': 'Chargement…',
       'serie.err_titulo': 'Série introuvable',
       'serie.err_p': "Le lien ne correspond à aucune série active.",
@@ -692,7 +694,7 @@ window.I18N = (function () {
       'serie.descargar': 'Télécharger mon billet',
       'serie.enviar_wa': 'Envoyer par WhatsApp',
       'serie.ver_otras_sesiones': '← Voir autres sessions',
-      'serie.no_encontrado_dup': "Inscription introuvable. Contactez l'hôtel.",
+      'serie.no_encontrado_dup': "Inscription introuvable. Contactez l'équipe.",
       'serie.inscritos': 'inscrits',
       'serie.pasada': 'Passée',
       'serie.sesion_x': 'Session {n}',
@@ -747,7 +749,7 @@ window.I18N = (function () {
       'serie.nota_usounico2': 'Présentez ce QR à l\'entrée · Usage unique par session',
 
       /* ── registroaforo.html ── */
-      'reg.title': 'Inscription · Hostal Terraza',
+      'reg.title': 'Inscription · Taquilla Directa',
       'reg.f_nombre_ph': 'Nom complet *',
       'reg.f_cedula_ph': 'CNI *',
       'reg.f_wa_ph': 'WhatsApp *',
@@ -769,15 +771,15 @@ window.I18N = (function () {
     en: {
       'switch.aria': 'Language',
       'common.otro': 'Other…',
-      'common.hostal': 'Hostal Terraza',
+      'common.hostal': 'Taquilla Directa',
 
-      'index.title': 'Hostal Terraza · QR System & Event Landing Pages',
+      'index.title': 'Taquilla Directa · Tickets and events with QR',
       'index.meta_desc': 'Register guests through WhatsApp, hand out tickets with a personal QR and control the door from your phone. Each event lives on its own landing page.',
       'index.nav.cartelera': 'Agenda',
-      'index.nav.sistema': 'QR System',
-      'index.nav.landings': 'Landings',
+      'index.nav.sistema': 'How it works',
+      'index.nav.landings': 'Visual Silos',
       'index.nav.contacto': 'Contact',
-      'index.nav.planes': 'Plans & pricing',
+      'index.nav.planes': 'B2B Plans',
       'index.nav.aria_burger': 'Open menu',
       'index.hero.kicker': 'QR System · Landings · Tickets',
       'index.hero.t1': 'Where the party',
@@ -898,6 +900,7 @@ window.I18N = (function () {
       'index.planes.bloque_a_p': 'Direct WhatsApp sales ($0 commission) receiving Nequi/Daviplata/Cash, or connect a direct gateway (Wompi/MercadoPago).',
       'index.planes.bloque_b_t': 'How do you pay for the platform?',
       'index.planes.bloque_b_p': 'Transparent integration with a local gateway (PSE, Nequi, Cards) to instantly activate the $40,000 passes or the $400,000 monthly plan.',
+      'planes.title': 'Plans and pricing · Taquilla Directa',
       'index.cta.kicker': 'Got a hostel, bar or venue?',
       'index.cta.title1': 'Bring the system',
       'index.cta.title2': 'into your space.',
@@ -912,7 +915,7 @@ window.I18N = (function () {
       'index.footer.landings': 'Landing pages',
       'index.footer.equipo': 'Team',
       'index.footer.acceso': 'Panel access',
-      'index.footer.bottom2': 'Hostal Terraza · QR System & Landings',
+      'index.footer.bottom2': 'Taquilla Directa · QR Tickets & Events',
       'index.footer.hecho': 'Made for the nights you remember.',
       'index.login.kicker': 'Team access',
       'index.login.title': 'Sign in to the panel',
@@ -943,7 +946,7 @@ window.I18N = (function () {
       'index.login.aviso_vacio': 'Enter your email and password.',
       'index.login.entrando': 'Signing in…',
       'index.login.aviso_bad': 'Incorrect credentials. Check and try again.',
-      'index.login.acceso': 'Access',
+      'index.login.acceso': 'Team Access',
       'index.login.panel': 'Panel',
       'index.login.cerrar_sesion': 'Sign out',
 
@@ -1026,7 +1029,7 @@ window.I18N = (function () {
       'qr.no_existe': 'This code does not exist or was disabled.',
 
       /* ── serie.html ── */
-      'serie.title': 'Series · Terraza Hostal',
+      'serie.title': 'Series · Taquilla Directa',
       'serie.cargando': 'Loading…',
       'serie.err_titulo': 'Series not found',
       'serie.err_p': 'The link does not match any active series.',
@@ -1064,7 +1067,7 @@ window.I18N = (function () {
       'serie.descargar': 'Download my ticket',
       'serie.enviar_wa': 'Send via WhatsApp',
       'serie.ver_otras_sesiones': '← See other sessions',
-      'serie.no_encontrado_dup': 'We could not find your registration. Contact the hostel.',
+      'serie.no_encontrado_dup': 'We could not find your registration. Contact the team.',
       'serie.inscritos': 'registered',
       'serie.pasada': 'Past',
       'serie.sesion_x': 'Session {n}',
@@ -1119,7 +1122,7 @@ window.I18N = (function () {
       'serie.nota_usounico2': 'Show this QR at the door · Single use per session',
 
       /* ── registroaforo.html ── */
-      'reg.title': 'Registration · Hostal Terraza',
+      'reg.title': 'Registration · Taquilla Directa',
       'reg.f_nombre_ph': 'Full name *',
       'reg.f_cedula_ph': 'ID *',
       'reg.f_wa_ph': 'WhatsApp *',
@@ -1214,12 +1217,12 @@ window.I18N = (function () {
       style.id = 'i18n-sw-style';
       style.textContent =
         '#i18n-sw{position:fixed;right:14px;bottom:14px;z-index:78;display:inline-flex;gap:2px;' +
-        'background:rgba(20,17,12,.88);border:1px solid rgba(227,180,87,.3);border-radius:999px;' +
+        'background:rgba(5,13,16,.92);border:1px solid rgba(0,229,213,.3);border-radius:999px;' +
         'padding:3px;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.55)}' +
-        '#i18n-sw button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(245,239,226,.72);' +
+        '#i18n-sw button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(249,247,242,.72);' +
         'background:none;border:0;border-radius:999px;padding:5px 11px;cursor:pointer;line-height:1;transition:background .15s,color .15s}' +
-        '#i18n-sw button:hover{color:var(--cream,#F5EFE2)}' +
-        '#i18n-sw button.on{background:#E3B457;color:#191307}' +
+        '#i18n-sw button:hover{color:var(--cream,#F9F7F2)}' +
+        '#i18n-sw button.on{background:#00E5D5;color:#050D10}' +
         '@media (prefers-reduced-motion:reduce){#i18n-sw button{transition:none}}';
       document.head.appendChild(style);
       var box = document.createElement('div');

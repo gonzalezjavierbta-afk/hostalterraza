@@ -1,0 +1,99 @@
+ ESPECIFICACIÓN TOTAL DE LA LANDING PAGE: TAQUILLADIRECTA.COM
+1. Sistema de Identidad Gráfica y Manual de Marca
+Isotipo / Imagotipo: Logo taquilladirecta.com con símbolo de cuadro de enfoque/visor QR (focus-frame) en cian eléctrico (#00EDD5).
+Regla Cromática (60-30-10):
+60% Fondo: Negro Obsidiana (#0A0A0C).
+30% Estructura/Tarjetas: Gris Carbón Industrial elevado (#121316) con bordes en cristal sutil (rgba(255, 255, 255, 0.08)).
+10% Acentos de Verificación: Turquesa Eléctrico (#00EDD5) para botones primarios/foco, y Verde Acceso (#00FF66) para estados de verificación exitosa.
+Tipografía: Sans-Serif geométrica pesada de alto contraste (estilo Geist 900 / Inter Display).
+2. Estructura de Componentes y Flujo de Pantalla (index.html)
+A. Barra de Navegación (<nav>)
+Logo: taquilladirecta.com con isotipo de visor turquesa encendido.
+Enlaces: Cartelera (#eventos) · Cómo Funciona (#sistema) · Silos Visuales (#landings) · Planes B2B (planes-precios.html) · Contacto (#contacto).
+Acción: Botón Acceso Team que despliega el modal de administración.
+B. Hero Rediseñado: Buscador B2C + Creadores B2B
+Kicker: ACCESO DIRECTO · TIQUETERÍA DIGITAL · $0 COMISIONES
+H1: Tu acceso directo a los mejores eventos.
+Subtítulo: "Explora la cartelera en vivo, asegura tu entrada digital al instante con código QR y entra al recinto sin filas. ¿Organizas un evento? Crea tu propia taquilla con $0 comisiones."
+Buscador Central Protagonista:
+Input principal con placeholder: 🔍 Busca por evento, artista, recinto o ciudad...
+Botón de acción: [ Buscar Eventos ] (Turquesa #00EDD5).
+Chips/Pills de categoría rápida: [ Todos ] · [ 🍸 Fiestas ] · [ 🎬 Cine & Teatro ] · [ 📣 Cultura ] · [ ⚡ Hoy ].
+Botones de Acción Doble:
+Primario (Asistentes): Explorar Cartelera Completa ↓
+Secundario (B2B / Creadores): ➕ Crear Mi Evento (Sistema QR)
+Barra de Métricas: 0% Comisiones · < 1s Validación QR · 100% Pases Digitales.
+Columna Derecha (Split-Screen Laptop): Tarjeta interactiva del evento destacado con contador regresivo en vivo y simulador de Guest Pass QR activado.
+C. Sección Cartelera de Eventos (#eventos)
+Grilla dinámica con filtros por estado (Próximos, Pasados, Todos) y buscador conectado en tiempo real.
+D. Sección Sistema y Flujo QR (#sistema)
+Título: "Tres pasos. Una puerta sin filas."
+Explicación gráfica: 1) Registro web/WhatsApp -> 2) Emisión de QR -> 3) Escáner en puerta con validación de cédula.
+E. Showroom de Plantillas y Silos (#landings)
+Muestrario de silos atómicos por categoría (f8 TropiLove, c1 Noche de Estreno, b5 Campaña).
+F. Sección Planes B2B y Contacto (#contacto)
+Propuesta para recintos y hostales con modelo Freemium ($0 hasta 60 asistentes) y planes por evento o suscripción.
+🤖 PROMPT MAESTRO PARA OPENCODE (EJECUCIÓN DE CÓDIGO)
+Copia y pega el siguiente prompt directamente en OpenCode (o tu agente CLI de desarrollo):
+# TASK INSTRUCTION FOR OPENCODE: REDESIGN HERO AND BRANDING FOR TAQUILLADIRECTA.COM
+
+## CONTEXT & OBJECTIVE
+We are updating the main landing page (`index.html`) and global styles of the project to align with the new brand identity: **taquilladirecta.com**. 
+The main goal of this update is to elevate the website into a **primary Event Search Engine and Discovery Portal (B2C)** while maintaining strong lead generation for **Event Creators who want a \$0 Commission QR Ticketing System (B2B)**.
+
+---
+
+## CRITICAL RULES & CONSTRAINTS (GOLDEN RULES)
+1. ZERO ERASURE POLICY: Do NOT remove or change existing logical HTML IDs used by script bindings (e.g., `#eventos`, `#sistema`, `#landings`, `#contacto`, `#login-modal`, `#login-form`).
+2. CSS ISOLATION & DESIGN SYSTEM: Use pure Vanilla CSS and HTML5. Maintain clean geometry and zero heavy framework dependencies.
+3. 1PX FIDELITY & HIGH CONTRAST: Strict adherence to the Cyber-Premium dark theme aesthetics.
+
+---
+
+## BRANDING & COLOR SYSTEM (CSS VARIABLES)
+Update or inject the following CSS variables in the main stylesheet:
+- `--bg-obsidian: #0A0A0C;` (Main page background)
+- `--bg-surface: #121316;` (Elevated cards and containers)
+- `--accent-cyan: #00EDD5;` (Primary brand color for logo, focus frames, and active buttons)
+- `--accent-green: #00FF66;` (Verification status and success badges)
+- `--border-glass: rgba(255, 255, 255, 0.08);` (Subtle borders)
+- `--font-main: 'Geist', 'Inter', -apple-system, sans-serif;`
+
+---
+
+## STEP-BY-STEP IMPLEMENTATION IN `index.html`
+
+### STEP 1: HEADER & LOGO UPDATE
+- Replace the header logo text/markup with the official branding:
+  ```html
+  <a href="#top" class="brand-logo">
+    <span class="logo-icon"><svg>...</svg></span> <!-- Minimalist focus-frame / QR bracket icon in #00EDD5 -->
+    <span class="logo-text">taquilladirecta<span class="logo-domain">.com</span></span>
+  </a>
+STEP 2: RESTRUCTURE THE HERO SECTION (<section id="hero">)
+Implement a Split-Screen Grid layout (Desktop 2 columns: 1.1fr 0.9fr; Mobile: 1 column stacked):
+Columna Izquierda (Mensaje y Buscador):
+Kicker Badge: <span class="hero-kicker">ACCESO DIRECTO · TIQUETERÍA DIGITAL · $0 COMISIONES</span>
+Headline (H1): <h1 class="hero-title">Tu acceso directo a los mejores eventos.</h1>
+Subtitle: <p class="hero-subtitle">Explora la cartelera en vivo, asegura tu entrada digital al instante con código QR y entra sin filas. <strong class="b2b-highlight">¿Organizas un evento? Crea tu propia taquilla con $0 comisiones.</strong></p>
+Interactive Event Search Box (.hero-search-container):
+Search Input: <input type="text" id="event-search-input" placeholder="🔍 Busca por evento, artista, recinto o ciudad..." />
+Search Button: <button id="btn-hero-search" class="btn-cyan">Buscar Eventos</button>
+Quick Filter Pills: `<div class="search-pills"> <button class="pill active" data-cat="all">Todos</button> <button class="pill" data-cat="fiesta">🍸 Fiestas</button> <button class="pill" data-cat="cine">🎬 Cine & Teatro</button> <button class="pill" data-cat="cultura">📣 Cultura</button> <button class="pill" data-cat="today">⚡ Hoy</button>
+Dual CTAs:
+Primary: <a href="#eventos" class="btn-primary-cyan">Explorar Cartelera Completa ↓</a>
+Secondary: <a href="/admin.html" class="btn-glass-b2b">➕ Crear Mi Evento (Sistema QR)</a>
+Social Proof / Metrics Bar:
+Item 1: <strong>0%</strong> Comisiones
+Item 2: <strong>< 1s</strong> Validación QR
+Item 3: <strong>100%</strong> Pases Digitales
+Columna Derecha (Preview Card):
+Render a live featured event preview card with a glowing Guest Pass showing a dynamic QR code mockup, live countdown timer, and a green badge saying [ ACCESO DIRECTO VALIDADO ].
+STEP 3: JAVASCRIPT BINDINGS FOR THE HERO SEARCH
+In the main script powering index.html:
+Bind input events on #event-search-input and click events on .search-pills to filter the existing event cards in the #eventos container in real time.
+Smooth scroll to #eventos when clicking Buscar Eventos or Explorar Cartelera Completa.
+VERIFICATION & CHECKS
+Ensure mobile responsiveness at < 992px (Stack Hero elements gracefully).
+Check contrast levels: High legibility white text (#FFFFFF) on dark obsidian (#0A0A0C).
+Verify that clicking ➕ Crear Mi Evento directs correctly to the B2B admin wizard.
