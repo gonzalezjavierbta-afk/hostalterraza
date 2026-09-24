@@ -3756,7 +3756,11 @@ document.addEventListener('DOMContentLoaded', () => {
       entry.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <span style="font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:0.03em">PATROCINADOR</span>
-        <button type="button" class="sponsor-remove" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;line-height:1;padding:2px 6px">✕</button>
+        <div style="display:flex;align-items:center;gap:2px">
+          <button type="button" class="sponsor-up" title="Subir" aria-label="Subir patrocinador" style="background:none;border:none;color:var(--ink3);font-size:14px;cursor:pointer;line-height:1;padding:2px 6px">↑</button>
+          <button type="button" class="sponsor-down" title="Bajar" aria-label="Bajar patrocinador" style="background:none;border:none;color:var(--ink3);font-size:14px;cursor:pointer;line-height:1;padding:2px 6px">↓</button>
+          <button type="button" class="sponsor-remove" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;line-height:1;padding:2px 6px">✕</button>
+        </div>
       </div>
       <div class="fg"><label style="font-size:11px">Nombre del patrocinador</label><input class="sponsor-name" placeholder="Ej. Águila, Spotify, Davivienda" value="${name.replace(/"/g,'&quot;')}"></div>
       <div style="display:flex;gap:8px;align-items:flex-end">
@@ -3775,6 +3779,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const previewWrap = entry.querySelector('.sponsor-upload-status');
 
       entry.querySelector('.sponsor-remove').addEventListener('click', () => entry.remove());
+
+      // Reordenar: mueve la entrada dentro de su contenedor (el orden del DOM
+      // es el orden que guarda _sponsorsGetEntries via querySelectorAll).
+      const moveEntry = (dir) => {
+        if (dir < 0) {
+          const prev = entry.previousElementSibling;
+          if (prev && prev.classList.contains('sponsor-entry')) container.insertBefore(entry, prev);
+        } else {
+          const next = entry.nextElementSibling;
+          if (next && next.classList.contains('sponsor-entry')) container.insertBefore(next, entry);
+        }
+      };
+      entry.querySelector('.sponsor-up').addEventListener('click', () => moveEntry(-1));
+      entry.querySelector('.sponsor-down').addEventListener('click', () => moveEntry(1));
 
       // Refresh preview when URL changes
       urlInput.addEventListener('input', () => {

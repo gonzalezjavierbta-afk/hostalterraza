@@ -3,7 +3,7 @@ description: QA Specialist / Auditor GRATUITO de HostalTerraza. Ejecuta el Escud
 mode: subagent
 model: opencode/big-pickle
 permission:
-  edit: ask
+  edit: deny
   bash: allow
   webfetch: allow
 ---

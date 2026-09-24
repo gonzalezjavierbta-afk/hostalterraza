@@ -3,7 +3,7 @@ description: Planificador GRATUITO de HostalTerraza (esquema Free/Open-Source). 
 mode: primary
 model: opencode/big-pickle
 permission:
-  edit: ask
+  edit: deny
   bash: ask
   task: allow
   webfetch: allow

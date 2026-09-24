@@ -1,12 +1,12 @@
 # AGENTS.md — Sistema QR Hostal Terraza (HostalTerraza)
 
-Enrutamiento de agentes para OpenCode. Generado a partir de `Sistema QR desarrollo/BLUEPRINT.md`, `Sistema QR desarrollo/Reglas de Oro QR.md` (v127-MASTER) y `Sistema QR desarrollo/PROJECT.md` (v1.6.4-FIX). Este archivo cierra el punto que la Sección 6 del Blueprint pedía guardar en la raíz pero no incluía, y se reescribe completo el 2026-09-14 para reflejar el estado real verificado del repositorio (34 agentes en `.opencode/agent/`, esquema gratuito como dirección estratégica). Se actualiza el 2026-09-21 para adoptar el **esquema TRIPARTITO de rutas (Free / Hybrid / Pro)** con 39 agentes en `.opencode/agent/` — la ruta gratuita sigue siendo el default.
+Enrutamiento de agentes para OpenCode. Generado a partir de `Sistema QR desarrollo/BLUEPRINT.md`, `Sistema QR desarrollo/Reglas de Oro QR.md` (v127-MASTER) y `Sistema QR desarrollo/PROJECT.md` (v1.6.4-FIX). Este archivo cierra el punto que la Sección 6 del Blueprint pedía guardar en la raíz pero no incluía, y se reescribe completo el 2026-09-14 para reflejar el estado real verificado del repositorio (34 agentes en `.opencode/agent/`, esquema gratuito como dirección estratégica). Se actualiza el 2026-09-21 para adoptar el **esquema TRIPARTITO de rutas (Free / Hybrid / Pro)** con 39 agentes en `.opencode/agent/` — la ruta gratuita sigue siendo el default. Se actualiza el 2026-09-24: `permission.edit`/`permission.bash` globales en `allow`, `default_agent: free-build` y planificadores/auditores/lectores en `edit: deny` (ADR-052).
 
 ## 1. Matriz de Enrutamiento de Agentes (esquema TRIPARTITO de rutas)
 
 Antes de procesar cualquier código, los agentes principales deben delegar las tareas a los subagentes especializados configurados en la carpeta `.opencode/agent/` según el dominio de la tarea. Esta matriz es la fuente de verdad operativa del enrutamiento (ADR-006).
 
-Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `opencode/*` de costo cero), una HYBRID (mezcla deliberada PRO/FREE en una misma sesión, ruteo por riesgo) y una de PAGO (agentes pro `opencode-go/*`). Los agentes gratuitos se identifican con el sufijo `-free`. La ruta gratuita es el default de `opencode.json` (`default_agent: free-plan`).
+Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `opencode/*` de costo cero), una HYBRID (mezcla deliberada PRO/FREE en una misma sesión, ruteo por riesgo) y una de PAGO (agentes pro `opencode-go/*`). Los agentes gratuitos se identifican con el sufijo `-free`. La ruta gratuita es el default de `opencode.json` (`default_agent: free-build`; hasta el 2026-09-23 era `free-plan`, cambiado por ADR-052).
 
 ### 1.1 Ruta GRATUITA (0 costo — default)
 
@@ -14,7 +14,7 @@ Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `
 
 | Agente | Modelo | Uso |
 |---|---|---|
-| `free-plan` | `opencode/big-pickle` | Orquestador gratuito (mode primary, edit/bash ask) |
+| `free-plan` | `opencode/big-pickle` | Orquestador gratuito (mode primary, edit: deny · bash: ask por gatekeeper del tier gratuito) |
 | `free-build` | `opencode/big-pickle` | Build gratuito (mode primary, edit/bash allow) |
 
 **Subagentes gratuitos (sufijo `-free`; modelo por defecto `opencode/big-pickle`, salvo `@media-reader-free` = `opencode/mimo-v2.5-free`):**
@@ -118,7 +118,7 @@ Universo: 15 pares pro/free (30 agentes, mismo nombre con sufijo `-free`) + 9 si
 | `@content-loader` | seed + loader + smoke de páginas dinámicas | edit: allow · bash: allow · webfetch: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@data-migration` | Migraciones / seeds | edit: allow · bash: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@docs-keeper` | PROJECT/NEXT/TASKS/BLUEPRINT/DECISIONS/ERRORES_HISTORICOS | edit: allow · bash: allow | `opencode-go/deepseek-v4.1-flash` |
-| `@explore` | Exploración de codebase (solo lectura) | solo lectura (sin bloque permission) | `opencode-go/deepseek-v4.1-flash` |
+| `@explore` | Exploración de codebase (solo lectura) | edit: deny (solo lectura, sin bash) | `opencode-go/deepseek-v4.1-flash` |
 | `@js-silo-dev` | JS/TS rutinario | edit: allow · bash: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@media-reader` | Multimedia (imágenes/audio/video/PDF) | edit: deny · bash: allow · webfetch: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@renderer-dev` | `pagina-destino.js`, `vercel.json`, rewrites | edit: allow · bash: allow | `opencode-go/deepseek-v4.1-flash` |
@@ -138,7 +138,7 @@ Universo: 15 pares pro/free (30 agentes, mismo nombre con sufijo `-free`) + 9 si
 | `@content-loader-free` | seed + loader + smoke de páginas dinámicas | edit: allow · bash: allow · webfetch: allow | `opencode/big-pickle` |
 | `@data-migration-free` | Migraciones / seeds | edit: allow · bash: allow | `opencode/big-pickle` |
 | `@docs-keeper-free` | PROJECT/NEXT/TASKS/BLUEPRINT/DECISIONS/ERRORES_HISTORICOS | edit: allow · bash: allow | `opencode/big-pickle` |
-| `@explore-free` | Exploración de codebase (solo lectura) | solo lectura (sin bloque permission) | `opencode/big-pickle` |
+| `@explore-free` | Exploración de codebase (solo lectura) | edit: deny (solo lectura, sin bash) | `opencode/big-pickle` |
 | `@js-silo-dev-free` | JS/TS rutinario (superset funcional de exp-pickle) | edit: allow · bash: allow · temperature: 0.3 | `opencode/big-pickle` |
 | `@media-reader-free` | Multimedia (imágenes/audio/video/PDF) | edit: deny · bash: allow · webfetch: allow | `opencode/mimo-v2.5-free` |
 | `@renderer-dev-free` | `pagina-destino.js`, `vercel.json`, rewrites | edit: allow · bash: allow | `opencode/big-pickle` |
@@ -153,12 +153,12 @@ Universo: 15 pares pro/free (30 agentes, mismo nombre con sufijo `-free`) + 9 si
 |---|---|---|---|
 | `@plan` | `TASKS.md`, `NEXT.md`, `DECISIONS.md` (orquestación pro, no implementa) | edit: deny · bash: deny · task: allow · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@build` | Implementación de pago (coordina subagentes pro; no usa agentes free) | edit: allow · bash: allow · task: allow · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
-| `@free-plan` | Plan escrito por dominio (nunca implementa ni invoca subagentes de edición) | edit: ask · bash: ask · task: allow (solo `@explore-free`/`@research-agent-free`) · webfetch: allow · websearch: allow | `opencode/big-pickle` |
+| `@free-plan` | Plan escrito por dominio (nunca implementa ni invoca subagentes de edición) | edit: deny · bash: ask (requisito del gatekeeper del tier gratuito) · task: allow (solo `@explore-free`/`@research-agent-free`) · webfetch: allow · websearch: allow | `opencode/big-pickle` |
 | `@free-build` | Implementación gratuita (coordina subagentes `*-free` y herramientas directas) | edit: allow · bash: allow · task: allow · webfetch: allow · websearch: allow | `opencode/big-pickle` |
 | `@hybrid-plan` | Plan híbrido (ruteo PRO/FREE por matriz de riesgo del ADR del esquema tripartito; nunca implementa) | edit: deny · bash: deny · task: allow (solo `@explore-free`/`@research-agent-free`) · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@hybrid-build` | Implementación híbrida (delega PRO para riesgo de runtime/criterio y FREE para rutinario) | edit: allow · bash: allow · task: allow · webfetch: allow · websearch: allow | `opencode-go/deepseek-v4.1-flash` |
 | `@qa-auditor` | Todo el repositorio (solo lectura, reporta hallazgos con evidencia) | edit: deny · bash: allow · webfetch: allow | `opencode-go/deepseek-v4.1-flash` |
-| `@qa-auditor-free` | QA/auditoría gratuita: Escudo GOLD y validaciones (solo reporta, no corrige) | edit: ask · bash: allow · webfetch: allow | `opencode/big-pickle` |
+| `@qa-auditor-free` | QA/auditoría gratuita: Escudo GOLD y validaciones (solo reporta, no corrige) | edit: deny · bash: allow · webfetch: allow | `opencode/big-pickle` |
 | `@exp-pickle-free` | Soporte mecánico de bajo coste (validaciones, linter, smoke simples, conteos; reporta y soporta, no corrige) | edit: allow · bash: allow · temperature: 0.3 | `opencode/big-pickle` |
 
 ## Reglas anti-absorción (ADR-031)
@@ -244,7 +244,9 @@ OpenCode Zen agregó un **gatekeeper** en el tier gratuito (aprox. 16–19 sep 2
 
 **CONSECUENCIA PRÁCTICA:** un agente que use un modelo gratis (`opencode/*`) NO debe poner `bash: deny` en su frontmatter, porque eso omite la tool `bash` del request y el servidor responde `403 "OpenCode's free tier can only be used from within OpenCode"`. Usar `bash: ask` o `bash: allow` en su lugar.
 
-Evidencia (2026-09-21, verificada contra los archivos reales, ADR-006): `free-plan` con `bash: deny` fallaba; tras cambiarlo a `bash: ask` responde OK (`.opencode/agent/free-plan.md` vigente: `edit: ask` · `bash: ask`). `free-build` (`bash: allow`) siempre funcionó (`.opencode/agent/free-build.md` vigente: `edit: allow` · `bash: allow`). Modelos gratis válidos del catálogo Zen: `opencode/big-pickle`, `opencode/mimo-v2.5-free`, `opencode/mimo-v2.6-flash-free`, `opencode/nemotron-3.5-lightning-free`, entre otros del catálogo Zen.
+Evidencia (2026-09-21, verificada contra los archivos reales, ADR-006): `free-plan` con `bash: deny` fallaba; tras cambiarlo a `bash: ask` responde OK (`.opencode/agent/free-plan.md` vigente al 2026-09-24: `edit: deny` · `bash: ask`; su `edit` paso de `ask` a `deny` por ADR-052 pero `bash` se conserva en `ask` a proposito). `free-build` (`bash: allow`) siempre funcionó (`.opencode/agent/free-build.md` vigente: `edit: allow` · `bash: allow`). Modelos gratis válidos del catálogo Zen: `opencode/big-pickle`, `opencode/mimo-v2.5-free`, `opencode/mimo-v2.6-flash-free`, `opencode/nemotron-3.5-lightning-free`, entre otros del catálogo Zen.
+
+**Nota (2026-09-24):** `free-plan` conserva `bash: ask` a proposito (NUNCA `bash: deny`) por el gatekeeper del tier gratuito, aunque su `edit` ya sea `deny` (ADR-052). Un planificador gratuito no necesita escribir archivos, pero SI debe declarar la tool `bash` en el request para no recibir el 403 del tier gratuito.
 
 ## Instalación
 

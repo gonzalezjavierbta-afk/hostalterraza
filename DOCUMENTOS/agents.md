@@ -6,7 +6,7 @@ Este repositorio utiliza el Desarrollo Dirigido por Subagentes (SDD). Queda proh
 
 Antes de procesar cualquier código, los agentes principales deben delegar las tareas a los subagentes especializados configurados en la carpeta `.opencode/agent/` según el lenguaje o dominio de la tarea. La tabla es la fuente de verdad (ADR-006).
 
-Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `opencode/*` de costo cero), una de PAGO (agentes pro/economicos `opencode-go/*`) y una HYBRID (mezcla deliberada PRO/FREE en una misma sesion, ruteo por riesgo). Los agentes gratuitos se identifican con el sufijo `-free`. La ruta gratuita es el default de `opencode.json` (`free-plan`).
+Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `opencode/*` de costo cero), una de PAGO (agentes pro/economicos `opencode-go/*`) y una HYBRID (mezcla deliberada PRO/FREE en una misma sesion, ruteo por riesgo). Los agentes gratuitos se identifican con el sufijo `-free`. La ruta gratuita es el default de `opencode.json` (`free-build`; hasta el 2026-09-23 era `free-plan`, cambiado por ADR-052).
 
 ### 1.1 Ruta GRATUITA (0 costo — default)
 
@@ -14,7 +14,7 @@ Existen **tres rutas completas**: una GRATUITA (todos los agentes usan modelos `
 
 | Agente | Modelo | Uso |
 |---|---|---|
-| `free-plan` | `opencode/big-pickle` | Orquestador gratuito (mode primary, edit/bash deny) |
+| `free-plan` | `opencode/big-pickle` | Orquestador gratuito (mode primary, edit: deny · bash: ask) |
 | `free-build` | `opencode/big-pickle` | Build gratuito (mode primary, edit/bash allow) |
 
 **Subagentes gratuitos (sufijo `-free`):**

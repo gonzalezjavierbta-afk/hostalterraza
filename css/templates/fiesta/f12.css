@@ -1,5 +1,10 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.14.0 - parallax del fondo del hero (background-attachment fixed en
+   las 3 capas principales, movil+escritorio); cinta movil mas baja
+   (bottom 63%) y tipografia mayor (0.72/0.68rem); meta movil mas arriba
+   (-53svh), mas grande (0.95rem) y sin iconos (solo movil); pin del mapa
+   fucsia estatico (sin rebote). Solo este archivo (2026-09-24).
    v1.13.3 - salvaguarda anti-solape hero movil en 481-767px: titulo
    limitado por altura (min(24vw, calc(20vh - 4rem))) + badge 3vh. Solo
    este archivo (2026-09-23).
@@ -391,6 +396,10 @@
     background-size: cover, cover, cover, 160px 160px;
     background-position: center center, center top, center center, 0 0;
     background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    /* Parallax clasico del fondo del hero: las 3 capas principales quedan
+       fijas al viewport (el grano sigue en scroll). En iOS el attachment
+       fixed se ignora y degrada a scroll sin romper (DEUDA-EXPRESS). */
+    background-attachment: fixed, fixed, fixed, scroll;
     overflow: hidden;
 }
 
@@ -1571,9 +1580,9 @@
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 
-/* v1.11.0: pin FUCSIA del silo, UNICO marcador del mapa. El embed de Google
-   se centra con ll= en la coordenada (--f12-mapa-query) SIN marcador nativo,
-   y este pin resalta sobre el punto. */
+/* v1.11.0 + v1.14.0: pin FUCSIA ESTATICO (sin rebote) del silo, UNICO
+   marcador del mapa. El embed de Google se centra con ll= en la coordenada
+   (--f12-mapa-query) SIN marcador nativo, y este pin resalta sobre el punto. */
 .tpl-f12 #db-mapa-container::after,
 .Tpl-F12 #db-mapa-container::after {
     content: "";
@@ -1590,9 +1599,12 @@
     pointer-events: none;
     z-index: 3;
     filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 10px rgba(255, 47, 142, 0.85));
-    animation: f12-pin-bounce 1.8s ease-in-out infinite;
+    /* Pin ESTATICO: se anula el rebote/flotante (el usuario quiere el pin
+       fucsia fijo sobre el punto, no flotando). */
+    animation: none !important;
 }
 
+/* v1.14.0: @keyframes conservado pero SIN USO (el pin quedo estatico). */
 @keyframes f12-pin-bounce {
     0%, 100% { transform: translate(-50%, -100%); }
     50%      { transform: translate(-50%, -114%); }
@@ -1985,6 +1997,7 @@
         background-size: cover, cover, cover, 160px 160px;
         background-position: center center, center top, center center, 0 0;
         background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+        background-attachment: fixed, fixed, fixed, scroll;
     }
 
     .tpl-f12 #mod-hero .hero-content,
@@ -2008,15 +2021,15 @@
         bottom: -0.5rem;
     }
 
-    /* v1.13.2 (base v1.13.0/v1.9.0): la cinta sube a bottom 67% (33% del alto),
-       mas cerca del titulo y MAS lejos del grupo (que arranca al 50%): holgura
-       de ~17% del alto, sin solape con el titulo/badge (rotada -2.4deg). */
+    /* v1.14.0 (base v1.13.2/v1.13.0/v1.9.0): la cinta baja a bottom 63%,
+       mas cerca del grupo (que arranca al 47%) y con tipografia mayor
+       (0.72rem), sin solapar con el titulo/badge (rotada -2.4deg). */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
         top: auto;
-        bottom: 67%;
+        bottom: 63%;
         height: 2.15rem;
-        font-size: 0.62rem;
+        font-size: 0.72rem;
         letter-spacing: 0.1em;
     }
 
@@ -2061,12 +2074,12 @@
         margin: 0.75rem 0 !important;
     }
 
-    /* v1.9.0: elevacion del trio +35% del hueco anterior: arranca al 50% del
-       alto (100svh - 50svh), con la cinta en bottom 54% (holgura ~4%). */
+    /* v1.14.0: el trio arranca al 53% del alto (100svh - 53svh), mas arriba
+       que antes para dar mas distancia del contador; cinta en bottom 63%. */
     .tpl-f12 #mod-hero-meta,
     .Tpl-F12 #mod-hero-meta {
-        margin-top: -50vh !important;
-        margin-top: -50svh !important;
+        margin-top: -53vh !important;
+        margin-top: -53svh !important;
     }
 
     /* Compensacion: devuelve el flujo al pliegue (100svh) para que la
@@ -2075,7 +2088,7 @@
        seccion siguiente sobre el hero. */
     .tpl-f12 #mod-hero-ctas,
     .Tpl-F12 #mod-hero-ctas {
-        margin-bottom: max(0px, calc(50svh - 12rem)) !important;
+        margin-bottom: max(0px, calc(53svh - 12rem)) !important;
     }
 
     .tpl-f12 #unified-frame,
@@ -2099,8 +2112,15 @@
 
     .tpl-f12 #mod-hero-meta .meta-item,
     .Tpl-F12 #mod-hero-meta .meta-item {
-        font-size: 0.85rem !important;
-        padding: 0.35rem 0.9rem !important;
+        font-size: 0.95rem !important;
+        padding: 0.45rem 1.05rem !important;
+    }
+
+    /* v1.14.0: los iconos de la meta se ocultan SOLO en movil (el nodo
+       .meta-svg sigue en el DOM; Cero Borrado). */
+    .tpl-f12 #mod-hero-meta .meta-svg,
+    .Tpl-F12 #mod-hero-meta .meta-svg {
+        display: none !important;
     }
 
     /* v1.5.0: escala movil de las 2 lineas de la meta (l1 / l2) */
@@ -2110,7 +2130,7 @@
     .Tpl-F12 #mod-hero-meta #meta-fecha::before,
     .Tpl-F12 #mod-hero-meta #meta-hora::before,
     .Tpl-F12 #mod-hero-meta #meta-lugar::before {
-        font-size: 0.85rem !important;
+        font-size: 0.95rem !important;
     }
 
     .tpl-f12 #mod-hero-meta #meta-fecha::after,
@@ -2119,7 +2139,7 @@
     .Tpl-F12 #mod-hero-meta #meta-fecha::after,
     .Tpl-F12 #mod-hero-meta #meta-hora::after,
     .Tpl-F12 #mod-hero-meta #meta-lugar::after {
-        font-size: 0.66rem !important;
+        font-size: 0.72rem !important;
         letter-spacing: 0.1em;
     }
 
@@ -2254,18 +2274,18 @@
         --f12-sub-size:   clamp(0.7rem, 4.2vw, 0.92rem);
     }
 
-    /* v1.9.0: coherencia con <=767px -> cinta bottom 67% y trio -50svh
-       (heredados); aqui solo se reduce la tipografia de la cinta. */
+    /* v1.14.0: coherencia con <=767px -> cinta bottom 63% y trio -53svh
+       (heredados); aqui la tipografia de la cinta sube a 0.68rem. */
     .tpl-f12 #mod-hero::before,
     .Tpl-F12 #mod-hero::before {
-        font-size: 0.58rem;
+        font-size: 0.68rem;
         letter-spacing: 0.12em;
     }
 
     /* v1.5.0: meta en 2 lineas tambien en pantallas muy estrechas */
     .tpl-f12 #mod-hero-meta .meta-item,
     .Tpl-F12 #mod-hero-meta .meta-item {
-        padding: 0.3rem 0.7rem !important;
+        padding: 0.4rem 0.85rem !important;
     }
 
     .tpl-f12 #mod-hero-meta #meta-fecha::before,
@@ -2274,7 +2294,7 @@
     .Tpl-F12 #mod-hero-meta #meta-fecha::before,
     .Tpl-F12 #mod-hero-meta #meta-hora::before,
     .Tpl-F12 #mod-hero-meta #meta-lugar::before {
-        font-size: 0.8rem !important;
+        font-size: 0.9rem !important;
     }
 
     .tpl-f12 #mod-hero-meta #meta-fecha::after,
@@ -2283,7 +2303,7 @@
     .Tpl-F12 #mod-hero-meta #meta-fecha::after,
     .Tpl-F12 #mod-hero-meta #meta-hora::after,
     .Tpl-F12 #mod-hero-meta #meta-lugar::after {
-        font-size: 0.62rem !important;
+        font-size: 0.68rem !important;
         letter-spacing: 0.08em;
     }
 
@@ -2431,6 +2451,13 @@
    REGISTRO DE VERSIONES - SILO F12 "KANDE"
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
+   |---------|------------|----------------------------------------------------|
+   | v1.14.0 | 2026-09-24 | Parallax del fondo del hero (fixed, movil+PC);  |
+   |         |            | cinta movil a bottom 63% con letra mayor        |
+   |         |            | (0.72/0.68rem); meta movil mas arriba           |
+   |         |            | (-53svh) y mayor (0.95rem) sin iconos           |
+   |         |            | (solo movil); pin del mapa fucsia estatico      |
+   |         |            | (sin rebote). [f12]                              |
    |---------|------------|----------------------------------------------------|
    | v1.13.3 | 2026-09-23 | Salvaguarda anti-solape hero movil en          |
    |         |            | 481-767px (titulo limitado por altura + badge  |
