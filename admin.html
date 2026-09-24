@@ -3739,6 +3739,19 @@ document.addEventListener('DOMContentLoaded', () => {
 // ════════════════════════════════════════════════════════════════
 (function() {
   const pairs = [];
+  // Habilita/atenua los botones de reorden segun la posicion en la lista.
+  const refreshMoveBtns = (container) => {
+    if (!container) return;
+    const entries = Array.from(container.querySelectorAll('.sponsor-entry'));
+    entries.forEach((en, i) => {
+      const up = en.querySelector('.sponsor-up');
+      const down = en.querySelector('.sponsor-down');
+      const first = i === 0;
+      const last = i === entries.length - 1;
+      if (up) { up.disabled = first; up.style.opacity = first ? '0.3' : ''; up.style.cursor = first ? 'default' : 'pointer'; }
+      if (down) { down.disabled = last; down.style.opacity = last ? '0.3' : ''; down.style.cursor = last ? 'default' : 'pointer'; }
+    });
+  };
   document.querySelectorAll('#sponsors-add').forEach(addBtn => {
     const panel = addBtn.closest('[id^="ld-campo-sponsors"]');
     const container = panel ? panel.querySelector('#sponsors-entries') : null;
@@ -3778,7 +3791,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const fileInput = entry.querySelector('.sponsor-file');
       const previewWrap = entry.querySelector('.sponsor-upload-status');
 
-      entry.querySelector('.sponsor-remove').addEventListener('click', () => entry.remove());
+      entry.querySelector('.sponsor-remove').addEventListener('click', () => { entry.remove(); refreshMoveBtns(container); });
 
       // Reordenar: mueve la entrada dentro de su contenedor (el orden del DOM
       // es el orden que guarda _sponsorsGetEntries via querySelectorAll).
@@ -3790,6 +3803,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const next = entry.nextElementSibling;
           if (next && next.classList.contains('sponsor-entry')) container.insertBefore(next, entry);
         }
+        refreshMoveBtns(container);
       };
       entry.querySelector('.sponsor-up').addEventListener('click', () => moveEntry(-1));
       entry.querySelector('.sponsor-down').addEventListener('click', () => moveEntry(1));
@@ -3855,6 +3869,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       container.appendChild(entry);
+      refreshMoveBtns(container);
     };
 
     addBtn.addEventListener('click', () => createEntry());

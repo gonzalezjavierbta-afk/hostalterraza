@@ -1,9 +1,12 @@
 /* ============================================================================
    f12.css - SILO FIESTA F12 "KANDE" - TROPICAL NOIR BRUTALISTA (sep-2026)
+   v1.14.1 - titulo movil mas grande (26vw; 12rem/8.4rem) e iconos de la
+   meta ocultos en todas las presentaciones (el nodo .meta-svg sigue en el
+   DOM; Cero Borrado). Solo este archivo (2026-09-24).
    v1.14.0 - parallax del fondo del hero (background-attachment fixed en
    las 3 capas principales, movil+escritorio); cinta movil mas baja
    (bottom 63%) y tipografia mayor (0.72/0.68rem); meta movil mas arriba
-   (-53svh), mas grande (0.95rem) y sin iconos (solo movil); pin del mapa
+   (-53svh), mas grande (0.95rem) y sin iconos; pin del mapa
    fucsia estatico (sin rebote). Solo este archivo (2026-09-24).
    v1.13.3 - salvaguarda anti-solape hero movil en 481-767px: titulo
    limitado por altura (min(24vw, calc(20vh - 4rem))) + badge 3vh. Solo
@@ -799,8 +802,11 @@
     border-color: var(--f12-fuchsia) !important;
 }
 
+/* v1.14.1: los iconos de la meta se ocultan en todas las presentaciones
+   (el nodo .meta-svg sigue en el DOM; Cero Borrado). */
 .tpl-f12 #mod-hero-meta .meta-svg,
 .Tpl-F12 #mod-hero-meta .meta-svg {
+    display: none !important;
     width: 14px !important;
     height: 14px !important;
     fill: var(--f12-mustard) !important;
@@ -2040,7 +2046,7 @@
 
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        --f12-title-size: clamp(3.4rem, 24vw, 11.5rem);
+        --f12-title-size: clamp(3.6rem, 26vw, 12rem);
         --f12-sub-size:   clamp(0.8rem, 3.9vw, 1.05rem);
         margin-bottom: 0.8rem !important;
     }
@@ -2114,13 +2120,6 @@
     .Tpl-F12 #mod-hero-meta .meta-item {
         font-size: 0.95rem !important;
         padding: 0.45rem 1.05rem !important;
-    }
-
-    /* v1.14.0: los iconos de la meta se ocultan SOLO en movil (el nodo
-       .meta-svg sigue en el DOM; Cero Borrado). */
-    .tpl-f12 #mod-hero-meta .meta-svg,
-    .Tpl-F12 #mod-hero-meta .meta-svg {
-        display: none !important;
     }
 
     /* v1.5.0: escala movil de las 2 lineas de la meta (l1 / l2) */
@@ -2234,14 +2233,14 @@
     }
 }
 
-/* v1.13.3: salvaguarda anti-solape en anchos de tablet/landscape (481-767px).
-   El titulo a 24vw toca su tope (11.5rem) y con la cinta al 67% + badge 5vh
-   el hueco se cierra; se limita el titulo por ALTURA con min() y se recorta
-   el badge a 3vh. No afecta a telefonos (<=480px). */
+/* v1.13.3 (ajustada v1.14.1): salvaguarda anti-solape en anchos de tablet/
+   landscape (481-767px). El titulo a 26vw toca su tope (12rem) y con la
+   cinta al 63% + badge 5vh el hueco se cierra; se limita el titulo por
+   ALTURA con min() y se recorta el badge a 3vh. No afecta a <=480px. */
 @media (min-width: 481px) and (max-width: 767px) {
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        --f12-title-size: clamp(3rem, min(24vw, calc(20vh - 4rem)), 11.5rem);
+        --f12-title-size: clamp(3rem, min(26vw, calc(20vh - 4rem)), 12rem);
     }
 
     .tpl-f12 #org-name-badge,
@@ -2270,7 +2269,7 @@
 
     .tpl-f12 #event-title,
     .Tpl-F12 #event-title {
-        --f12-title-size: clamp(3rem, 24vw, 7.6rem);
+        --f12-title-size: clamp(3rem, 26vw, 8.4rem);
         --f12-sub-size:   clamp(0.7rem, 4.2vw, 0.92rem);
     }
 
@@ -2452,12 +2451,15 @@
    ----------------------------------------------------------------------------
    | Version | Fecha      | Descripcion                                        |
    |---------|------------|----------------------------------------------------|
+   | v1.14.1 | 2026-09-24 | Titulo movil mas grande (26vw;                  |
+   |         |            | 12rem/8.4rem) e iconos de la meta ocultos en    |
+   |         |            | todas las presentaciones (desktop incluido).    |
+   |---------|------------|----------------------------------------------------|
    | v1.14.0 | 2026-09-24 | Parallax del fondo del hero (fixed, movil+PC);  |
    |         |            | cinta movil a bottom 63% con letra mayor        |
    |         |            | (0.72/0.68rem); meta movil mas arriba           |
-   |         |            | (-53svh) y mayor (0.95rem) sin iconos           |
-   |         |            | (solo movil); pin del mapa fucsia estatico      |
-   |         |            | (sin rebote). [f12]                              |
+   |         |            | (-53svh) y mayor (0.95rem) sin iconos; pin      |
+   |         |            | del mapa fucsia estatico (sin rebote). [f12]    |
    |---------|------------|----------------------------------------------------|
    | v1.13.3 | 2026-09-23 | Salvaguarda anti-solape hero movil en          |
    |         |            | 481-767px (titulo limitado por altura + badge  |
