@@ -624,6 +624,10 @@ tr:hover td{background:var(--surface)}
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d98a00;box-shadow:0 0 8px #d98a00"></div><span style="font-size:12px;font-weight:600;color:#d98a00">Kande</span></div>
               <div style="font-size:10px;color:#b8894a">Tropical Noir &middot; Brutalismo Caribeno &middot; Papel Rasgado</div>
             </div>
+            <div class="ld-theme-card" data-theme="mistico-nocturno" onclick="abrirFichaTheme('mistico-nocturno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#1a140c)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37, 0 0 16px rgba(212,175,55,.45)"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Mistico Nocturno</span></div>
+              <div style="font-size:10px;color:#a89f91">Dorado Antiguo &middot; Profundidad Suave &middot; Hero Editorial</div>
+            </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
@@ -682,14 +686,25 @@ tr:hover td{background:var(--surface)}
               </div>
               <div id="ld-meta-hero-wrap" style="margin-top:.6rem;border-top:1px solid var(--border);padding-top:.6rem">
                 <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Hero Meta - 2 lineas (opcional)</div>
-                <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Linea 1 / Linea 2 por cada dato. Se persiste en config_landing.content.meta.</div>
-                <div class="grid2">
-                  <div class="fg"><label style="font-size:11px">Fecha L1</label><input id="ld-meta-fecha-l1" placeholder="Ej. Sabado 15" style="font-size:12px"></div>
-                  <div class="fg"><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
-                  <div class="fg"><label style="font-size:11px">Hora L1</label><input id="ld-meta-hora-l1" placeholder="Ej. Puertas 8:00 PM" style="font-size:12px"></div>
-                  <div class="fg"><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
-                  <div class="fg"><label style="font-size:11px">Lugar L1</label><input id="ld-meta-lugar-l1" placeholder="Ej. Terraza Central" style="font-size:12px"></div>
-                  <div class="fg"><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
+                <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Si dejas el interruptor apagado, la linea del hero se arma sola con la fecha, la hora y la ubicacion del evento. Activalo solo si quieres escribirla a mano.</div>
+                <!-- ADR-056 (filas 7/8/11) - override del hero, colapsado y APAGADO por
+                     defecto. Se reutiliza el patron de despliegue que ya usa el wizard
+                     (#ev-multi-acceso + #ev-puntos-wrap: casilla visible + contenedor
+                     oculto por display). No hay <details> ni .ld-collapse en el archivo,
+                     asi que este es el patron existente mas cercano. -->
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--ink3)">
+                  <input type="checkbox" data-hero-meta-override onchange="toggleHeroMetaOverride(this.checked)" style="width:13px;height:13px;accent-color:var(--gold)">
+                  Personalizar texto del hero (avanzado)
+                </label>
+                <div data-hero-meta-fields style="display:none">
+                  <div class="grid2" style="margin-top:.5rem">
+                    <div class="fg"><label style="font-size:11px">Fecha L1</label><input id="ld-meta-fecha-l1" placeholder="Ej. Sabado 15" style="font-size:12px"></div>
+                    <div class="fg"><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
+                    <div class="fg"><label style="font-size:11px">Hora L1</label><input id="ld-meta-hora-l1" placeholder="Ej. Puertas 8:00 PM" style="font-size:12px"></div>
+                    <div class="fg"><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
+                    <div class="fg"><label style="font-size:11px">Lugar L1</label><input id="ld-meta-lugar-l1" placeholder="Ej. Terraza Central" style="font-size:12px"></div>
+                    <div class="fg"><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -717,9 +732,9 @@ tr:hover td{background:var(--surface)}
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Efectos</div>
           <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.85rem">
             <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-grain" style="width:13px;height:13px;accent-color:var(--gold)"> Grano</label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-glow" checked style="width:13px;height:13px;accent-color:var(--gold)"> Glow</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-glow" style="width:13px;height:13px;accent-color:var(--gold)"> Glow</label>
             <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-vhs" style="width:13px;height:13px;accent-color:var(--gold)"> VHS</label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-parallax" style="width:13px;height:13px;accent-color:var(--gold)"> Parallax</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-parallax" checked style="width:13px;height:13px;accent-color:var(--gold)"> Parallax</label>
           </div>
 
         </div><!-- /wiz-step 2 -->
@@ -730,7 +745,12 @@ tr:hover td{background:var(--surface)}
           <div id="ld-contenido-campos">
             <!-- CAMPOS CINEMATOGRAFÍA -->
             <div id="ld-campo-sinopsis" style="display:none">
-              <div class="fg"><label style="font-size:12px">Sinopsis</label>
+              <!-- ADR-056 (fila 12) - #ld-sinopsis-text se retira del formulario
+                   (duplicaba #ev-d): la descripcion canonica vive en #ev-d (Paso 1)
+                   y se persiste en la columna eventos.descripcion. El id se
+                   conserva por Cero Borrado y su lectura legacy sigue en
+                   _poblarContenidoWizard, pero el campo ya no se muestra. -->
+              <div class="fg" style="display:none"><label style="font-size:12px">Sinopsis</label>
                 <textarea id="ld-sinopsis-text" rows="3" placeholder="Descripción larga del evento..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>
               </div>
               <div class="fg"><label style="font-size:12px">Nombre a mostrar en la página
@@ -787,8 +807,14 @@ tr:hover td{background:var(--surface)}
                 <strong>Tamaño ideal:</strong> 400×150px (ratio 8:3) o similar en proporción<br>
                 <strong>Los logos se muestran en blanco</strong> sobre fondo oscuro
               </div>
-              <div id="sponsors-entries" style="display:flex;flex-direction:column;gap:12px"></div>
-              <button type="button" id="sponsors-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Patrocinador</button>
+              <!-- ADR-056 (filas 1-3) - PANEL CONSOLIDADO. Este bloque declaraba
+                   #sponsors-entries y #sponsors-add, los MISMOS ids que el panel
+                   #ld-campo-sponsors, y se retiran para que exista UN SOLO bloque
+                   de patrocinadores en el wizard, compartido por cine, fiesta y
+                   campana. El panel NO se borra (Cero Borrado, Mandato 2): conserva
+                   su id y su display:none de origen, y ninguna logica lo apunta
+                   (modMap, hideForeignModulesByType y la UI de patrocinadores lo
+                   ignoran), de modo que no puede llegar a mostrarse. -->
             </div>
             <div id="ld-campo-boletos" style="display:none" class="fg">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">🎟 Precio de boletería (preventa / taquilla)</div>
@@ -1110,8 +1136,9 @@ tr:hover td{background:var(--surface)}
           <div id="ld-i18n-fields"></div>
         </div>
 
-      <div style="margin-top:1rem">
+      <div style="margin-top:1rem;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-gold" id="btn-crear-ev" onclick="crearEvento()">Crear evento</button>
+        <button type="button" class="btn btn-ghost" onclick="abrirVistaPrevia()">Vista previa</button>
       </div>
 
       </div><!-- /wiz-step 4 -->
@@ -1126,6 +1153,25 @@ tr:hover td{background:var(--surface)}
       </div>
     </div>
     </div><!-- /data-adm-tab="crear" -->
+
+    <!-- ADR-056 (punto 7) - MODAL VISTA PREVIA. Render del BORRADOR en memoria:
+         monta evento-app.html?preview=1 en un iframe; el kernel lee la clave
+         'ht_preview_payload' de sessionStorage. Cero escrituras a Supabase. Se
+         usa data-* (no ids) para no sumar ids al DOM; el boton de pestana nueva
+         queda como fallback si el iframe fuera bloqueado por CSP. -->
+    <div data-preview-modal style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center" onclick="if(event.target===this)cerrarVistaPrevia()">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);width:92vw;max-width:980px;padding:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:.6rem">
+          <h3 style="font-size:16px;margin:0">Vista previa</h3>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="abrirVistaPreviaPestana()">Abrir en pestana nueva</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="cerrarVistaPrevia()">Cerrar</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">Borrador en memoria: no se guarda nada. El formulario conserva lo escrito al cerrar.</div>
+        <iframe data-preview-frame title="Vista previa del evento" style="width:100%;height:70vh;border:1px solid var(--border);border-radius:var(--rsm);background:#0a0a0c" src="about:blank"></iframe>
+      </div>
+    </div>
 
     <!-- INVITADORES -->
     <div data-adm-tab="invitadores">
@@ -2951,6 +2997,8 @@ const _THEME_TYPE = {
   'underground':'fiesta','elegant-cocktail':'fiesta','afromango':'fiesta',
   'afromango-editor':'fiesta','tropical-brutalism':'fiesta',
   'tropilove':'fiesta','mistico':'fiesta','fosforescente':'fiesta','kande':'fiesta',
+  // ADR-054: silo f9b "Mistico Nocturno" (categoria fiesta, ruta css/templates/fiesta/f9b.css).
+  'mistico-nocturno':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
 };
@@ -2965,6 +3013,12 @@ const _THEME_TPL = {
   'mistico':'f9',
   'fosforescente':'f11',
   'kande':'f12',
+  // ADR-054: silo NUEVO e independiente (no variante de f9). Su scope es
+  // .tpl-f9b/.Tpl-F9b y lo enciende el kernel desde template_id='f9b'.
+  // 'mistico' -> 'f9' NO SE TOCA: f9 esta en produccion (evento rico-5mw5).
+  // El reverse map _TPL_THEME (linea siguiente) se deriva de este objeto, asi
+  // que 'f9b' -> 'mistico-nocturno' queda registrado sin codigo adicional.
+  'mistico-nocturno':'f9b',
 };
 
 // Reverse map template_id → theme slug (para cargar la plantilla al editar).
@@ -2996,6 +3050,27 @@ const _THEME_MODULES = {
   // publico lo enciende el CSS del silo). Listarlo aqui reproduciria la colision
   // de namespace fiesta/campana (ERRORES_HISTORICOS seccion 13). Se omite por diseno.
   'kande': { requeridos:['ld-mod-boletos','ld-mod-playlist','ld-mod-ubicacion'], recomendados:['ld-mod-countdown-fiesta','ld-mod-gallery-fiesta','ld-mod-faq-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp'], selectivos:['ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-dj-lineup'], metaDosLineas:false },
+  // ADR-054 (d.4 + f9b.css seccion 2.1). f9b enciende 17 modulos; solo 9 de
+  // ellos tienen checkbox en el panel de Fiesta y se mapean aqui:
+  //   #unified-frame  -> ld-mod-countdown-fiesta
+  //   #mod-lineup     -> ld-mod-dj-lineup
+  //   #mod-video      -> ld-mod-gallery-fiesta  (galeria)
+  //   #mod-playlist   -> ld-mod-playlist
+  //   #mod-faq        -> ld-mod-faq-fiesta
+  //   #mod-ubicacion  -> ld-mod-ubicacion
+  //   #mod-boletos    -> ld-mod-boletos
+  //   #mod-whatsapp   -> ld-mod-whatsapp
+  //   #mod-sponsors   -> ld-mod-sponsors-fiesta
+  // Los otros 8 ON NO tienen checkbox y por eso no se inventa ninguno:
+  //   #mod-hero, #mod-hero-meta, #mod-hero-ctas, #mod-descripcion, #mod-cartel,
+  //   #mod-form, #mod-footer  -> los gobierna el silo (CSS) o un campo de
+  //   primer nivel ya presente en el wizard (#ev-d, #ev-poster-url, fase).
+  //   #mod-experiencias -> lee content.experiencias, clave que el admin NO
+  //   escribe: queda ON por CSS pero el kernel lo oculta si llega vacio.
+  // metaDosLineas:true = el hero editorial de 2 segmentos que define al silo.
+  // NEVERA ADR-006: antes de listar un ld-mod-* se verifico en QUE panel existe
+  // el checkbox (ERRORES_HISTORICOS seccion 13); los 12 listados estan en #mods-fiesta.
+  'mistico-nocturno': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-faq-fiesta'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-ubicacion','ld-mod-gallery-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:true },
   'solidario-moderno': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
   'urgente-impactante': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
   'tech-futurista': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
@@ -3226,6 +3301,11 @@ const _THEME_FICHA = {
     t: ['Cyberpunk neon fucsia con azul electrico.','Hero 100svh, mobile-first, Geist 900.','Publico joven y electronica urbana.','Requeridos: lineup, boletos, ubicacion.'] },
   'kande': { n: 'Kande', c: [['Fondo','#0d0b09'],['Secundario','#123b3a'],['Primario','#d98a00'],['Acento','#d6218a'],['Texto','#f5f0e8']],
     t: ['Tropical noir con mostaza y fucsia sobre negro carbon.','Display pesada y textura de papel rasgado.','Publico joven de fiesta caribena.','Requeridos: boletos, playlist y ubicacion.'] },
+  // ADR-054: paleta CALIDA DE f9 HEREDADA con los mismos valores (solo cambia
+  // la profundidad, nunca el cromatismo), por eso los 5 colores coinciden con
+  // los de 'mistico' a proposito.
+  'mistico-nocturno': { n: 'Mistico Nocturno', c: [['Fondo','#0c0a08'],['Secundario','#14110e'],['Primario','#d4af37'],['Acento','#8c7323'],['Texto','#f3f3f1']],
+    t: ['Dorado antiguo sobre negro, con profundidad en vez de plano.','Hermano de Mistico: mismo cromatismo, sombras suaves admitidas.','Hero editorial de dos lineas de meta.','Efectos del canal: grano, glow, vhs y parallax.'] },
   'solidario-moderno': { n: 'Solidario Moderno', c: [['Fondo','#0a1628'],['Secundario','#0d2040'],['Primario','#3b82f6'],['Acento','#4060a0'],['Texto','#3b82f6']],
     t: ['Azul esperanza, tono ONG profesional.','Geist 900 y tarjetas de impacto.','Causas sociales y recaudacion.','Requeridos: historia, objetivo e impacto.'] },
   'urgente-impactante': { n: 'Urgente & Impactante', c: [['Fondo','#1a0000'],['Secundario','#2d0000'],['Primario','#ef4444'],['Acento','#a03030'],['Texto','#ef4444']],
@@ -3356,6 +3436,7 @@ function seleccionarTheme(theme, opts) {
     'tech-futurista':'Tech & Futurista','vintage-organico':'Vintage & Org\u00e1nico',
     'fosforescente':'Fosforescente',
     'kande':'Kande',
+    'mistico-nocturno':'Mistico Nocturno',
   };
   const badge  = document.getElementById('ld-preview-badge');
   const nameEl = document.getElementById('ld-preview-theme-name');
@@ -3367,6 +3448,14 @@ function seleccionarTheme(theme, opts) {
 
 // Aplica el preset ADN Visual del template sobre los checkboxes de la categoria
 // activa. Sobrescribe SIEMPRE su estado (checked + disabled).
+// ADR-056 (filas 7/8/11) - despliegue del bloque de override del hero. Copia el
+// patron #ev-multi-acceso/#ev-puntos-wrap: la casilla es visible, el contenedor
+// de campos nace display:none y solo se abre cuando el usuario la marca.
+function toggleHeroMetaOverride(on) {
+  const fields = document.querySelector('[data-hero-meta-fields]');
+  if (fields) fields.style.display = on ? 'block' : 'none';
+}
+
 function _aplicarPresetTheme(theme, tipo) {
   const preset = _THEME_MODULES[theme];
   if (!preset) return; // fallback: theme sin preset, no se toca nada
@@ -3413,6 +3502,16 @@ function _aplicarPresetTheme(theme, tipo) {
   // Hero meta a 2 lineas: solo visibilidad, SIN limpiar los inputs ld-meta-*.
   const metaWrap = document.getElementById('ld-meta-hero-wrap');
   if (metaWrap) metaWrap.style.display = preset.metaDosLineas ? '' : 'none';
+  // ADR-055 (tabla d.3 + punto 8): el canal de efectos de f9b nace con parallax
+  // ON y grain/glow/vhs OFF. Se fija al elegir el theme para que un evento f9b
+  // nuevo no dependa solo del atributo checked del HTML (MEDIA-1 de la revision).
+  if (theme === 'mistico-nocturno') {
+    const fxDefault = { 'ld-fx-parallax': true, 'ld-fx-grain': false, 'ld-fx-glow': false, 'ld-fx-vhs': false };
+    Object.keys(fxDefault).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.checked = fxDefault[id];
+    });
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -3627,10 +3726,16 @@ document.addEventListener('DOMContentLoaded', () => {
     'ld-mod-dj-lineup':       'ld-campo-dj-lineup',
     'ld-mod-playlist':        'ld-campo-playlist',
     'ld-mod-guest-list':      'ld-campo-guest-list',
-    'ld-mod-ubicacion':       'ld-campo-ubicacion',
-    'ld-mod-gallery-fiesta':  'ld-campo-gallery-fiesta',
-    'ld-mod-faq-fiesta':      'ld-campo-faq-fiesta',
-    'ld-mod-sponsors-fiesta': 'ld-campo-sponsors-fiesta',
+    // ADR-056 (fila 9) - #ld-ubicacion-val se retira del formulario: duplicaba
+    // #ev-ubic (Paso 1), que es la fuente canonica y la que escribe la columna
+    // eventos.ubicacion. El campo y su contenedor siguen en el DOM (Cero
+    // Borrado) y su lectura legacy se conserva, pero modMap ya no los muestra.
+    // ADR-056 (filas 1-3): las tres cajas de FIESTA pasan al panel COMPARTIDO
+    // con Cine/Campana, igual que ya ocurria con esas dos categorias en galeria,
+    // patrocinadores y FAQ. Un bloque por concepto, no dos.
+    'ld-mod-gallery-fiesta':  'ld-campo-gallery',
+    'ld-mod-faq-fiesta':      'ld-campo-faq',
+    'ld-mod-sponsors-fiesta': 'ld-campo-sponsors',
   'ld-mod-boletos':         'ld-campo-boletos',
   'ld-mod-whatsapp':        'ld-campo-whatsapp',
     'ld-mod-dresscode-fiesta':'ld-campo-dresscode',
@@ -3732,10 +3837,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // PATROCINADORES v223 — Gestión dinámica de logos (nombre + logo)
 // Cada entrada: URL o subida a Supabase Storage.
 // Los logos se renderizan en BLANCO en la landing (filtro CSS).
-// FIX v223.1: soporta DOS paneles (cine/campaña -> ld-campo-sponsors y
-// fiesta -> ld-campo-sponsors-fiesta). Antes solo se enlazaba el PRIMER
-// contenedor con getElementById (IDs duplicados), por lo que el botón
-// "+ Agregar Patrocinador" del panel activo hacía nada.
+// FIX v223.1: el bloque se enlaza por closest() + querySelector scoped, no con
+// getElementById, para no depender del orden del DOM.
+// ADR-056 (filas 1-3): hoy existe UN SOLO bloque (#ld-campo-sponsors) para Cine,
+// Fiesta y Campana. El panel #ld-campo-sponsors-fiesta se conserva por Cero
+// Borrado, ya sin controles, y este IIFE enlaza el unico "#sponsors-add".
 // ════════════════════════════════════════════════════════════════
 (function() {
   const pairs = [];
@@ -3876,24 +3982,16 @@ document.addEventListener('DOMContentLoaded', () => {
     pairs.push({ container, createEntry, panelId });
   });
 
-  // Resuelve el contenedor ACTIVO (el del panel de categoría visible).
-  // ADR-FIX: se prioriza la categoría activa (fiesta -> ld-campo-sponsors-fiesta,
-  // cine/campaña -> ld-campo-sponsors) por encima de la visibilidad, porque al
-  // poblar en edición el panel correcto aún puede estar oculto y el código
-  // anterior caía siempre al PRIMER panel (cine), perdiendo los logos subidos.
-  const activeContainer = (suf) => {
-    const want = suf === 'fiesta' ? 'ld-campo-sponsors-fiesta' : 'ld-campo-sponsors';
-    for (const p of pairs) { if (p.panelId === want) return p.container; }
-    for (const p of pairs) {
-      const panel = p.container.closest('[id^="ld-campo-sponsors"]');
-      if (panel && panel.style.display !== 'none') return p.container;
-    }
-    return pairs.length ? pairs[0].container : null;
-  };
+  // ADR-056 (fila 3) - PANEL UNICO. Los dos bloques de patrocinadores se
+  // consolidaron en #ld-campo-sponsors, que hoy sirve a Cine, Fiesta y Campana:
+  // ya no hay seleccion por categoria que hacer y activeContainer() no recibe
+  // sufijo. El fallback a pairs[0] se conserva por fail-open (si el markup
+  // llegara sin ningun boton enlazado, la UI queda inerte pero no revienta).
+  const activeContainer = () => (pairs.length ? pairs[0].container : null);
 
   // Expose functions globally for loading/saving (operan sobre el panel activo)
-  window._sponsorsGetEntries = (suf) => {
-    const c = activeContainer(suf);
+  window._sponsorsGetEntries = () => {
+    const c = activeContainer();
     if (!c) return [];
     return Array.from(c.querySelectorAll('.sponsor-entry')).map(entry => {
       const nombre = entry.querySelector('.sponsor-name').value.trim();
@@ -3903,8 +4001,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }).filter(Boolean);
   };
 
-  window._sponsorsSetEntries = (arr, suf) => {
-    const c = activeContainer(suf);
+  window._sponsorsSetEntries = (arr) => {
+    const c = activeContainer();
     if (!c) return;
     c.innerHTML = '';
     // Normaliza so soporta array de objetos {nombre, logo_url} O legacy de strings/comas.
@@ -3929,7 +4027,11 @@ const LD_I18N_FIELDS = [
   { id:'orgnombre',      label:'Nombre de la organización',               path:['org_nombre'] },
   { id:'ubicacion',      label:'Ubicación',                               path:['ubicacion'] },
   { id:'titulo',         label:'Título a mostrar',                        path:['content','titulo_display'] },
-  { id:'sinopsis',       label:'Sinopsis',                                path:['content','sinopsis'], textarea:true },
+  // ADR-056 (fila 12) / BAJA-3: el path sigue siendo content.sinopsis (el repoint
+  // a content.descripcion va como TSK aparte: i18n es un subsistema de riesgo
+  // sobre los 20 themes). El campo se OCULTA para no dejar un control visible que
+  // el kernel no lee; el dato y la entrada se conservan (Cero Borrado).
+  { id:'sinopsis',       label:'Sinopsis',                                path:['content','sinopsis'], textarea:true, hidden:true },
   { id:'dresscode',      label:'Dress code',                              path:['content','dresscode'] },
   { id:'guestlist',      label:'Guest list',                              path:['content','guest_list'] },
   { id:'wamsg',          label:'Mensaje WhatsApp (compra)',               path:['content','whatsapp_msg'] },
@@ -3958,7 +4060,7 @@ function _ensureI18nPanels() {
     box.innerHTML = LD_I18N_FIELDS.map(f => {
       const ph = f.faq ? '¿Pregunta?|Respuesta' : '';
       const tag = f.textarea ? 'textarea' : 'input';
-      return `<div class="fg" style="margin-bottom:.6rem"><label style="font-size:11px">${f.label}</label>` +
+      return `<div class="fg" style="margin-bottom:.6rem${f.hidden ? ';display:none' : ''}"><label style="font-size:11px">${f.label}</label>` +
         (f.textarea
           ? `<textarea id="${ldI18nFieldId(f, lang)}" rows="2" placeholder="${ph}" style="width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea>`
           : `<input id="${ldI18nFieldId(f, lang)}" placeholder="${f.label}" style="width:100%;font-size:12px">`) +
@@ -4084,7 +4186,9 @@ function _buildConfigLanding(slug) {
   const faq      = faqRaw ? faqRaw.split('\n').filter(l => l.includes('|')).map(l => {
     const [q, ...rest] = l.split('|'); return { q: q.trim(), a: rest.join('|').trim() };
   }) : [];
-  const sponsors = window._sponsorsGetEntries ? window._sponsorsGetEntries(suf) : [];
+  // ADR-056 (fila 3): lectura unica y sin sufijo (el bloque de patrocinadores
+  // es uno solo). Este es el unico punto que decide si 'sponsors' se persiste.
+  const sponsors = window._sponsorsGetEntries ? window._sponsorsGetEntries() : [];
   const gallery  = val('ld-gallery-urls') ? val('ld-gallery-urls').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8) : [];
   const director = (val('ld-dir-nombre') || val('ld-dir-bio')) ? {
     nombre: val('ld-dir-nombre') || null,
@@ -4131,8 +4235,17 @@ function _buildConfigLanding(slug) {
     },
     content: {
       // Cinematografía
-      sinopsis:       val('ld-sinopsis-text')    || null,
-      poster_url:     val('ev-poster-url')       || null,
+      // ADR-056 (fila 12) - 'sinopsis' NO se escribe en el JSONB. La descripcion
+      // se persiste en la columna eventos.descripcion (desde #ev-d; ver payload
+      // de guardarEventoWizard/_crearEventoUnico). El kernel lee
+      // content.descripcion || ev.descripcion, asi que la columna manda. La
+      // lectura legacy de content.sinopsis se conserva en _poblarContenidoWizard
+      // y en el fallback 5.b de openEditMod.
+      // ADR-056 (fila 15): el poster deja de escribirse en el JSONB. La columna
+      // eventos.poster_url es la fuente canonica (UPDATE en guardarEventoWizard
+      // e INSERT en _crearEventoUnico). La clave content.poster_url se conserva
+      // SOLO en lectura (2o eslabon del fallback al precargar, y lo que lee el
+      // kernel) para los eventos previos que unicamente tienen ese dato.
       titulo_display: val('ev-titulo-display')   || null,
       // ADR-051 — subtitulo del hero (teaser). El sweep de nulls de abajo lo
       // elimina cuando esta vacio, por lo que solo se persiste si tiene valor.
@@ -4144,19 +4257,37 @@ function _buildConfigLanding(slug) {
       dj_lineup:   window._djLineupGetEntries ? window._djLineupGetEntries() : undefined,
       playlist_url:val('ld-playlist-url')   || null,
       guest_list:  val('ld-guest-list-val') || null,
-      ubicacion:   val('ld-ubicacion-val')  || null,
+      // ADR-056 (fila 9) - 'ubicacion' NO se escribe en el JSONB. La ubicacion
+      // del venue es la columna eventos.ubicacion (desde #ev-ubic). La lectura
+      // legacy de content.ubicacion se conserva en _poblarContenidoWizard y en
+      // el fallback 5.b de openEditMod. #ld-ubicacion-val se retira del formulario
+      // (modMap ya no lo muestra); el kernel nunca leyo content.ubicacion.
       whatsapp:    val('ld-whatsapp-tel')   || null,
       boletos:     (val('ld-boletos-preventa') || val('ld-boletos-taquilla')) ? { preventa: val('ld-boletos-preventa') || null, taquilla: val('ld-boletos-taquilla') || null } : null,
-      // F9 Mistico - hero meta a 2 lineas (contrato: {fecha:{l1,l2},hora:{l1,l2},lugar:{l1,l2}})
-      meta: (val('ld-meta-fecha-l1') || val('ld-meta-fecha-l2') || val('ld-meta-hora-l1') || val('ld-meta-hora-l2') || val('ld-meta-lugar-l1') || val('ld-meta-lugar-l2')) ? {
+      // ADR-056 (filas 7/8/11) - override del hero, APAGADO por defecto. El
+      // interruptor data-hero-meta-override gobierna el bloque: si esta OFF (o si
+      // los 6 campos estan vacios) NO se escribe content.meta y el kernel deriva
+      // la linea desde fecha/hora/ubicacion. Si esta ON y hay algun valor, los 6
+      // campos mandan (__metaSet consulta el override antes que la derivacion).
+      // El preload enciende el interruptor si el evento ya trae content.meta,
+      // para no perder el override al re-guardar.
+      meta: (document.querySelector('[data-hero-meta-override]')?.checked && (val('ld-meta-fecha-l1') || val('ld-meta-fecha-l2') || val('ld-meta-hora-l1') || val('ld-meta-hora-l2') || val('ld-meta-lugar-l1') || val('ld-meta-lugar-l2'))) ? {
         fecha: { l1: val('ld-meta-fecha-l1') || null, l2: val('ld-meta-fecha-l2') || null },
         hora:  { l1: val('ld-meta-hora-l1')  || null, l2: val('ld-meta-hora-l2')  || null },
         lugar: { l1: val('ld-meta-lugar-l1') || null, l2: val('ld-meta-lugar-l2') || null },
       } : null,
-      // Fiesta extra fields
-      gallery:     (()=>{ const v=val('ld-gallery-fiesta-urls')||val('ld-gallery-urls'); return v ? v.split('\n').filter(Boolean) : undefined; })(),
-      faq:         (()=>{ const v=val('ld-faq-fiesta-val')||val('ld-faq-val'); return v ? v.split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{q:p[0]?.trim(),a:p[1]?.trim()};}) : undefined; })(),
-      sponsors:    window._sponsorsGetEntries ? window._sponsorsGetEntries() : undefined,
+      // ADR-056 (filas 4-6) - 'gallery' y 'faq' NO se escriben aqui. Estos dos
+      // literales re-leian los campos legacy #ld-gallery-fiesta-urls y
+      // #ld-faq-fiesta-val (el segundo con un parseo que truncaba en el primer
+      // pipe). Quedan como unica fuente la lectura canonica de arriba
+      // (#ld-gallery-urls / #ld-faq-val) y los spreads finales (gallery/faq),
+      // que van al final del literal y por tanto ganan. Los campos legacy siguen
+      // en el DOM (Cero Borrado) pero ya no se leen para persistir.
+      // ADR-056 (fila 3) - 'sponsors' NO se escribe aqui: su unica fuente de
+      // escritura es el spread final ...(sponsors.length ? {sponsors} : {}), que
+      // va al final del literal y por tanto gana sobre cualquier clave previa. La
+      // escritura de esta linea leia el panel equivocado (sin sufijo, cine) y solo
+      // sobrevivia cuando la lista de arriba venia vacia.
       // Campaña
       historia:    val('ld-historia-val')   || null,
       historia_titulo: val('ld-historia-titulo') || null,
@@ -5093,7 +5224,13 @@ function openEditMod(evId) {
   // ── Paso 3 · Contenido (descripción + media) ──
   const descInput = document.getElementById('ev-d');
   if (descInput) descInput.value = ev.descripcion || '';
-  const poster = ev.poster_url || ev.config_landing?.content?.poster_url || '';
+  // ADR-056 (fila 15) - orden canonico del poster en las TRES capas:
+  // columna eventos.poster_url -> config_landing.content.poster_url ->
+  // imagen_url. Es el mismo orden de __posterUrlDeEvento() (evento-app.html:829)
+  // y de index.html:736. _buildConfigLanding() ya no escribe content.poster_url
+  // (la columna es la fuente unica), pero su LECTURA se conserva en 2o lugar
+  // para los eventos que solo tienen el dato guardado ahi.
+  const poster = ev.poster_url || ev.config_landing?.content?.poster_url || ev.imagen_url || '';
   if (poster) {
     document.getElementById('ev-poster-url').value = poster;
     document.getElementById('ev-poster-thumb').src = poster;
@@ -5292,6 +5429,9 @@ function _limpiarWizardCompleto() {
   document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; chk.disabled = false; });
   const metaHeroWrapClear = document.getElementById('ld-meta-hero-wrap');
   if (metaHeroWrapClear) metaHeroWrapClear.style.display = '';
+  // ADR-056 (filas 7/8/11) - el override vuelve a su default: apagado y colapsado.
+  const ovrClear = document.querySelector('[data-hero-meta-override]');
+  if (ovrClear) { ovrClear.checked = false; toggleHeroMetaOverride(false); }
   document.querySelectorAll('[id^="ld-campo-"]').forEach(c => { c.style.display = 'none'; });
   if (window._sponsorsSetEntries) window._sponsorsSetEntries([]);
   if (window._djLineupSetEntries) window._djLineupSetEntries([]);
@@ -5341,11 +5481,18 @@ function hideForeignModulesByType(tipo, suf) {
     'ld-mod-trailer':'ld-campo-trailer','ld-mod-sinopsis':'ld-campo-sinopsis','ld-mod-director':'ld-campo-director',
     'ld-mod-gallery-cine':'ld-campo-gallery','ld-mod-dresscode-cine':'ld-campo-dresscode',
     'ld-mod-sponsors-cine':'ld-campo-sponsors','ld-mod-faq-cine':'ld-campo-faq',
+    // ADR-056 (fila 14) - #ld-campo-aforo y #ld-campo-countdown NO existen en el
+    // HTML: el guard `if (e)` de abajo los trata como fail-open (getElementById
+    // devuelve null y no se toca nada). No se inventan campos ni se rompe el mapa.
     'ld-mod-countdown-cine':'ld-campo-countdown','ld-mod-aforo-cine':'ld-campo-aforo',
     'ld-mod-dj-lineup':'ld-campo-dj-lineup','ld-mod-playlist':'ld-campo-playlist','ld-mod-guest-list':'ld-campo-guest-list',
     'ld-mod-ubicacion':'ld-campo-ubicacion','ld-mod-boletos':'ld-campo-boletos','ld-mod-whatsapp':'ld-campo-whatsapp',
-    'ld-mod-gallery-fiesta':'ld-campo-gallery-fiesta','ld-mod-faq-fiesta':'ld-campo-faq-fiesta',
-    'ld-mod-sponsors-fiesta':'ld-campo-sponsors-fiesta','ld-mod-dresscode-fiesta':'ld-campo-dresscode',
+    // ADR-056 (filas 1-3): misma relacion que modMap - las cajas de Fiesta
+    // apuntan al panel compartido con Cine/Campana (si se dejaran apuntando al
+    // panel -fiesta, editar un evento de Cine/Campana ocultaria el campo que
+    // la UI acaba de mostrar).
+    'ld-mod-gallery-fiesta':'ld-campo-gallery','ld-mod-faq-fiesta':'ld-campo-faq',
+    'ld-mod-sponsors-fiesta':'ld-campo-sponsors','ld-mod-dresscode-fiesta':'ld-campo-dresscode',
     'ld-mod-countdown-fiesta':'ld-campo-countdown','ld-mod-aforo-fiesta':'ld-campo-aforo',
     'ld-mod-historia':'ld-campo-historia','ld-mod-objetivo':'ld-campo-objetivo','ld-mod-impacto':'ld-campo-impacto',
     'ld-mod-gallery-campana':'ld-campo-gallery','ld-mod-sponsors-campana':'ld-campo-sponsors','ld-mod-faq-campana':'ld-campo-faq',
@@ -5353,6 +5500,17 @@ function hideForeignModulesByType(tipo, suf) {
     'ld-mod-actualizaciones':'ld-campo-actualizaciones','ld-mod-contacto':'ld-campo-contacto',
   };
 
+  // ADR-056 (filas 1-3): galeria, FAQ y patrocinadores tienen UN campo
+  // compartido por las 3 categorias, asi que ocultar el campo de una caja
+  // extranjera ya no basta: el campo solo se apaga si NINGUNA caja de la
+  // categoria activa lo usa. Sin este filtro, el orden de recorrido (cine antes
+  // que fiesta) dejaba el formulario de Fiesta SIN el campo que su propia caja
+  // acababa de marcar - el mismo fallo que ya sufrian cine/campana.
+  const camposDeLaActiva = new Set(
+    Array.from(document.querySelectorAll('[id^="ld-mod-"]'))
+      .filter(c => map[c.id] === tipo)
+      .map(c => fieldOf[c.id])
+  );
   document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => {
     const cat = map[chk.id];
     if (!cat) return;                    // cajas auxiliares sin categoría (fx, etc.) se respetan
@@ -5360,6 +5518,7 @@ function hideForeignModulesByType(tipo, suf) {
     // Módulo de otra categoría → desmarcar y ocultar su campo de contenido
     chk.checked = false;
     chk.disabled = false;
+    if (camposDeLaActiva.has(fieldOf[chk.id])) return;  // campo en uso por la categoria activa
     const e = document.getElementById(fieldOf[chk.id]);
     if (e) e.style.display = 'none';
   });
@@ -5368,9 +5527,18 @@ function hideForeignModulesByType(tipo, suf) {
 // Escribe en los campos ld-* del wizard los valores del config_landing guardado.
 function _poblarContenidoWizard(content, suf) {
   const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
-  const fiesta = suf === 'fiesta';
+  // ADR-056 (filas 1-3): galeria, FAQ y patrocinadores se precargan SIEMPRE en
+  // su campo canonico, que es el que modMap muestra. El parametro 'suf' ya no
+  // decide el destino; se conserva por firma.
   // Cine
   set('ld-sinopsis-text', content.sinopsis);
+  // ADR-056 (fila 12) - fallback 5.b: si #ev-d quedo vacio (evento guardado solo
+  // con content.sinopsis de una version previa del admin), se precarga el campo
+  // canonico para que el proximo guardado escriba la columna eventos.descripcion.
+  const evDfb = document.getElementById('ev-d');
+  if (evDfb && !evDfb.value && (content.sinopsis || content.descripcion)) {
+    evDfb.value = content.sinopsis || content.descripcion || '';
+  }
   set('ld-trailer-url',   content.trailer_url);
   set('ld-dresscode-val', content.dresscode);
   if (content.director) {
@@ -5383,6 +5551,12 @@ function _poblarContenidoWizard(content, suf) {
   set('ld-playlist-url', content.playlist_url);
   set('ld-guest-list-val', content.guest_list);
   set('ld-ubicacion-val', content.ubicacion);
+  // ADR-056 (fila 9) - fallback 5.b: si #ev-ubic quedo vacio y el evento solo
+  // trae content.ubicacion, se precarga el canonico para migrarlo a la columna.
+  const evUbicfb = document.getElementById('ev-ubic');
+  if (evUbicfb && !evUbicfb.value && content.ubicacion) {
+    evUbicfb.value = content.ubicacion;
+  }
   set('ld-whatsapp-tel', content.whatsapp);
   set('ld-form-redirect', content.form_redirect);
   if (content.boletos) {
@@ -5396,19 +5570,27 @@ function _poblarContenidoWizard(content, suf) {
     set('ld-meta-hora-l2',  content.meta.hora  && content.meta.hora.l2);
     set('ld-meta-lugar-l1', content.meta.lugar && content.meta.lugar.l1);
     set('ld-meta-lugar-l2', content.meta.lugar && content.meta.lugar.l2);
+    // ADR-056 (filas 7/8/11) - compatibilidad hacia atras: si el evento ya trae
+    // content.meta, el override se enciende y sus campos se despliegan; si el
+    // usuario lo deja asi, el re-guardado conserva EXACTAMENTE el mismo meta.
+    const ovrPrev = document.querySelector('[data-hero-meta-override]');
+    if (ovrPrev) { ovrPrev.checked = true; toggleHeroMetaOverride(true); }
   }
   if (Array.isArray(content.dj_lineup)) {
     if (window._djLineupSetEntries) window._djLineupSetEntries(content.dj_lineup);
   }
-  // Galería / FAQ / Sponsors — id depende de la categoría activa
+  // Galeria / FAQ / Sponsors - ADR-056 (filas 1-3): van siempre al campo
+  // canonico. Los duplicados -fiesta siguen en el DOM (Cero Borrado) y se limpian
+  // en _limpiarWizardCompleto(), pero no se vuelven a poblar: escribir en un
+  // campo que la UI no muestra dejaria al usuario un formulario vacio al editar.
   if (Array.isArray(content.gallery) && content.gallery.length) {
-    set(fiesta ? 'ld-gallery-fiesta-urls' : 'ld-gallery-urls', content.gallery.join('\n'));
+    set('ld-gallery-urls', content.gallery.join('\n'));
   }
   if (Array.isArray(content.faq) && content.faq.length) {
-    set(fiesta ? 'ld-faq-fiesta-val' : 'ld-faq-val', content.faq.map(f => (f.q || '') + '|' + (f.a || '')).join('\n'));
+    set('ld-faq-val', content.faq.map(f => (f.q || '') + '|' + (f.a || '')).join('\n'));
   }
   if (content.sponsors && (Array.isArray(content.sponsors) || typeof content.sponsors === 'string')) {
-    if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors, suf);
+    if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors);
   }
   // Campaña
   set('ld-historia-titulo', content.historia_titulo);
@@ -5456,6 +5638,95 @@ function _poblarContenidoWizard(content, suf) {
   if (dualCfg) dualCfg.style.display = dualActivo ? 'block' : 'none';
   if (comunEl) comunEl.value = content.comunidad_whatsapp || '';
   if (urlEl) urlEl.value = (formSolo && formSolo.url) ? formSolo.url.replace(window.location.origin, '') : '';
+}
+
+// ADR-056 (punto 7) - vista previa del landing. Serializa el BORRADOR en memoria
+// (cero Supabase) bajo 'ht_preview_payload' y lo monta en evento-app.html?preview=1.
+// El adapter __evDesdePreview del kernel reusa ese JSON con la forma de una fila
+// de 'eventos' {ev, content, theme, template_id, categoria_slug, effects}.
+function _buildPreviewPayload() {
+  const nEl = document.getElementById('ev-n');
+  const slugBase = (nEl && nEl.value.trim())
+    ? nEl.value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-')
+    : 'vista-previa';
+  let cfg = null;
+  try { cfg = _buildConfigLanding(slugBase); } catch (e) { cfg = null; }
+  const content = (cfg && cfg.content) ? cfg.content : {};
+  const effects = {
+    grain:    !!(document.getElementById('ld-fx-grain')    && document.getElementById('ld-fx-grain').checked),
+    glow:     !!(document.getElementById('ld-fx-glow')     && document.getElementById('ld-fx-glow').checked),
+    vhs:      !!(document.getElementById('ld-fx-vhs')      && document.getElementById('ld-fx-vhs').checked),
+    parallax: !!(document.getElementById('ld-fx-parallax') && document.getElementById('ld-fx-parallax').checked),
+  };
+  const prevEv = _eventos.find(e => e.id === _evEditandoId) || {};
+  // ADR-056 punto 7 / BAJA-2: sin default silencioso. Si no hay theme elegido, el
+  // payload sale sin template_id/categoria_slug y _previewValido muestra el aviso
+  // en vez de renderizar arthouse por defecto.
+  const tpl = _THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null;
+  const cat = _THEME_TYPE[_ldThemeSeleccionado] || _evCategoria || null;
+  return {
+    ev: {
+      nombre:      (document.getElementById('ev-n')?.value || '').trim(),
+      slug:        prevEv.slug || slugBase,
+      fecha:       (document.getElementById('ev-f')?.value || '').trim(),
+      hora:        (document.getElementById('ev-h')?.value || '').trim(),
+      ubicacion:   (document.getElementById('ev-ubic')?.value || '').trim(),
+      descripcion: (document.getElementById('ev-d')?.value || '').trim(),
+      poster_url:  (document.getElementById('ev-poster-url')?.value || '').trim(),
+      imagen_url:  (document.getElementById('ev-img')?.value || '').trim(),
+      aforo_max:   parseInt(document.getElementById('ev-aforo')?.value) || null,
+      org_nombre:  prevEv.org_nombre || (_orgData && _orgData.nombre) || '',
+      plan:        prevEv.plan || (_orgData && _orgData.plan) || 'freemium',
+      fase_landing:_evFaseLanding || 'completa',
+    },
+    content,
+    // ADR-056 punto 7 / BAJA-1: el adapter __evDesdePreview del kernel ya lee
+    // p.i18n (evento-app.html:886); sin esta clave la capa FR/EN moria en preview.
+    i18n:           (cfg && cfg.i18n) ? cfg.i18n : null,
+    theme:          _ldThemeSeleccionado || null,
+    template_id:    tpl,
+    categoria_slug: cat,
+    effects,
+  };
+}
+
+function _guardarPreviewPayload(payload) {
+  try { sessionStorage.setItem('ht_preview_payload', JSON.stringify(payload)); }
+  catch (e) { alrt('ev-alert', 'No se pudo preparar la vista previa: ' + (e.message || ''), 'err'); return false; }
+  return true;
+}
+
+function _previewValido(payload) {
+  if (!payload.template_id || !payload.categoria_slug) {
+    alrt('ev-alert', 'Elige un tipo de evento y una plantilla antes de ver la vista previa.', 'err');
+    return false;
+  }
+  return true;
+}
+
+function abrirVistaPrevia() {
+  const payload = _buildPreviewPayload();
+  if (!_previewValido(payload)) return;
+  if (!_guardarPreviewPayload(payload)) return;
+  const mod = document.querySelector('[data-preview-modal]');
+  const ifr = document.querySelector('[data-preview-frame]');
+  if (ifr) ifr.src = 'evento-app.html?preview=1&_=' + Date.now();
+  if (mod) mod.style.display = 'flex';
+}
+
+function abrirVistaPreviaPestana() {
+  const payload = _buildPreviewPayload();
+  if (!_previewValido(payload)) return;
+  if (!_guardarPreviewPayload(payload)) return;
+  window.open('evento-app.html?preview=1', '_blank');
+}
+
+function cerrarVistaPrevia() {
+  const mod = document.querySelector('[data-preview-modal]');
+  const ifr = document.querySelector('[data-preview-frame]');
+  if (ifr) ifr.src = 'about:blank';   // corta cualquier carga residual
+  if (mod) mod.style.display = 'none';
+  // No se toca ningun campo: el borrador tecleado se conserva al volver.
 }
 
 function cancelarEdicion() {

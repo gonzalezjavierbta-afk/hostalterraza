@@ -1,0 +1,2921 @@
+/* ============================================================================
+   f9b.css - SILO FIESTA F9B "MISTICO NOCTURNO" (sep-2026)
+   Categoria: fiesta  |  template_id: f9b  |  theme: mistico-nocturno
+   Scoped CSS: .tpl-f9b / .Tpl-F9b   |   Basado en: f9.css (intacto)
+   Version: v1.0.0   |   Estandar: $10,000   |   Ajuste: 25/09/2026
+   ----------------------------------------------------------------------------
+   CONTRATO DE CABECERA (ADR-054, decision 8, los 8 puntos en orden):
+
+   1) IDENTIDAD. Silo NUEVO e INDEPENDIENTE (d.1), no una variante de f9 ni
+      un alias suyo. El kernel escribe en body "tpl-{template_id}" tal cual y
+      en minusculas (evento-app.html L836-838), de modo que un template_id con
+      sufijo ("f9b") no puede ser estilado por un silo cuyo scope no lo
+      incluya: por eso este archivo, antes de tener identidad, estaba 100%
+      muerto (0 de 306 selectores aplicaban) y no renderizaba nada. Scope
+      .tpl-f9b con doble notacion obligatoria .Tpl-F9b (Cap. 8 punto 3).
+      f9.css NO se toco en ningun byte y sigue vivo: evento "rico-5mw5".
+
+   2) EXCEPCION JUSTIFICADA AL "CERO BRILLO" DE f9 (d.2). f9 se declara
+      "PLANO y ELEGANTE" y anula text-shadow / box-shadow / filter /
+      backdrop-filter con none !important en todo el silo. f9b ROMPE esa
+      regla A PROPOSITO: admite sombras suaves, gradientes sutiles y
+      profundidad (superficies flotantes). El freno de brillo no desaparece,
+      se traslada a los TOKENS: las escalas --f9b-shadow-1/2/3 y
+      --f9b-elev-1/2/3 mas --f9b-glow son de opacidad baja, se apoyan en la
+      paleta oro calida y no contienen ningun tono neon ni sombra pura.
+      Efecto buscado: SOBRIO Y ELEGANTE, no brillante. NO se crea ningun tono
+      nuevo: la paleta se hereda de f9 con prefijo --f9b-* y los MISMOS
+      valores. Lo unico que cambia es la PROFUNDIDAD, no el cromatismo.
+
+   3) MODULOS ON (d.4). Los que ya encendia f9 y aqui se mantienen:
+        #mod-hero  #unified-frame  #mod-hero-meta  #mod-hero-ctas
+        #mod-descripcion  #mod-lineup  #mod-video  #mod-cartel
+        #mod-playlist  #mod-faq  #mod-ubicacion  #mod-boletos
+        #mod-experiencias  #mod-whatsapp  #mod-sponsors  #mod-form
+        #mod-footer
+      Nucleo minimo del Cap. 6 cubierto: hero, meta, ctas, descripcion, form
+      y footer estan los 6. Ademas el kernel oculta por :has(:empty) los que
+      llegan sin contenido (experiencias, ubicacion, video, galeria, spotify).
+      Pulido permitido en esta ola: solo #org-name-badge. El pulido de
+      #event-subtitle y #loader, tambien autorizado en d.4, queda para la
+      v1.1.0 (no entra en esta ola). FRONTERA DURA: esta lista NO PUEDE
+      CRECER sin un ADR nuevo (Cap. 8 punto 6).
+
+   4) MODULOS OFF CON CSS CONSERVADO (d.4). Los 4 siguientes conservan TODO
+      su CSS en las secciones 9, 10, 11 y 16 y quedan apagados en la seccion
+      2.1 de este archivo con display:none !important. Los IDs siguen
+      INTACTOS en evento-app.html (Cero Borrado, Mandato 2). Motivo de cada
+      uno: la silueta de Mistico Nocturno es un hero editorial de lineas
+      cortas con 2 segmentos de meta; no hay lugar para narrativa de campana
+      ni para instrumentacion de recaudo.
+        #mod-historia      narrativa larga; el lugar narrativo lo ocupa
+                           #mod-descripcion
+        #mod-objetivo      stats + barra de progreso; ajeno a un evento con
+                           lineup y boleteria
+        #mod-impacto       grilla de impacto de campana; duplica la funcion
+                           de la lineup
+        #mod-info-tecnica  dato tecnico en 4 tarjetas; ademas es el UNICO
+                           consumidor de #db-aforo-val, que ADR-056
+                           (solapamiento 15) consolida en el formulario de
+                           ADMIN: se espera a que exista una sola fuente
+
+   5) IDs OFF VERIFICADOS SIN DISENO (d.5). El clon de f9 no los estiliza y
+      aqui tampoco. Se verifican OFF explicitamente en la seccion 2.1 para
+      que el IoC global no los deje en un limbo de "depende del kernel":
+        #mod-equipo  #db-equipo-grid  #mod-cta-final  #db-cta-final-titulo
+        #db-cta-final-subtitulo  #cta-final-btn
+
+   6) PUNTO DE SWAP DE FONDOS (d.3 y d.9). Los fondos son placeholders
+      SOBRIOS generados procedualmente (gradientes + grano SVG en data-URI),
+      NO fotos reales. Los 4 tokens --f9b-asset-* se DECLARAN AUNQUE VALGAN
+      VACIO y se usan YA: cada uno lleva una CAPA DE RESPALDO DEBAJO en su
+      background-image (gradiente + --f9b-grain) para cumplir Silent Fallback
+      (ADR-008). METIDA LA FOTO REAL ES EDITAR UNA SOLA LINEA: asignar la URL
+      al token. Ningun selector tiene que cambiar para hacerlo.
+      ORDEN CANONICO DE LAS 4 CAPAS (de arriba hacia abajo, seccion 27.1):
+        1 velo --f9b-tex-veil    legibilidad del texto, mas denso abajo
+        2 asset --f9b-asset-*   la foto real, cuando exista
+        3 respaldo --f9b-tex-deep  sostiene el fondo si el asset no carga
+        4 grano --f9b-grain     data-URI ASCII (patron de f12.css:118)
+      Con los assets vacios el resultado pintado NO cambia: la capa 2 no
+      pinta nada y las capas 1, 3 y 4 siguen sosteniendo el fondo.
+      MAPA DE USO DE LOS 4 TOKENS DE ASSET:
+        --f9b-asset-hero          capa 2 del fondo del hero (escritorio)
+        --f9b-asset-hero-mobile   capa 2 del hero en la banda <= 767px
+        --f9b-asset-fondo         capa 1 del fondo de la raiz del silo
+        --f9b-asset-textura       capa 2 del fondo del footer (cierre)
+
+   7) CONTRATO DE CLASES DE EFECTO (ADR-055, capa 3 de 3). El silo NO lee
+      config_landing.effects: solo conoce clases de cuerpo y no inventa
+      ninguna. Literales, fuente unica e irrevocable (ADR-055 punto 3):
+        fx-explicit  marcador de presencia: el admin si envio effects
+        fx-grain     overlay de grano cinematografico     OFF por defecto
+        fx-glow      resplandor suave en lo que se marque  OFF por defecto
+        fx-vhs       lineas de scanline/CRT                OFF por defecto
+        fx-parallax  background-attachment: fixed          ON  por defecto
+      Precedencia: sin fx-explicit rigen los defaults del silo; con
+      fx-explicit el default queda ANULADO y solo rigen las clases positivas
+      presentes. No existen clases negativas: la AUSENCIA de la clase positiva
+      es el apagado. El grano ESTRUCTURAL del fondo (--f9b-grain) y el overlay
+      fx-grain son capas DISTINTAS y nunca se aplican al mismo elemento
+      (doble grano, ADR-055 punto 5). La v1.1.0 MONTA las 5 capas: aurora
+      ambiental en la raiz, parallax en 3 superficies, overlay de grano en
+      #mod-hero::after, scanlines en la raiz::after y glow contenido en 3
+      elementos marcos (seccion 27).
+
+   8) SELECTOR FANTASMA. El clon mencionaba #mod-footer-brand, que NO existe
+      en el DOM real de evento-app.html (verificado: 0 coincidencias de
+      id="mod-footer-brand"). En f9 era solo una mencion dentro de su log de
+      versiones, no una regla viva; en f9b no queda ni la mencion y se
+      declara aqui como referencia sin correlato. NO se le agregan reglas
+      nuevas ni se usa como apoyo de ningun diseno.
+   ----------------------------------------------------------------------------
+   REGLAS DE LA CASA: ASCII-safety estricta (0 bytes > 127, sin acentos, sin
+   comillas tipograficas, sin em-dash, sin emojis) | Cero Borrado (los IDs se
+   apagan con display:none !important, nunca se borran) | Sin @import y sin
+   @font-face | Aislamiento atomico: cero reglas fuera de .tpl-f9b /
+   .Tpl-F9b, nada en :root global (Mandato 9) | Prefijo de token y de
+   keyframes --f9b-* / f9b* para no colisionar con f9 si ambos se cargan.
+   ============================================================================ */
+
+/* ============================================================================
+   BRIEF OBLIGATORIO (TEMPLATES.md Cap. 9-bis) - las 8 preguntas respondidas
+   ANTES de escribir una sola linea de CSS de este silo. Sellado por ADR-054.
+   ----------------------------------------------------------------------------
+   1) DIRECCION ESTETICA EN UNA FRASE.
+      "Mistico nocturno: el mismo dorado antiguo sobre tinta calida de f9,
+      pero con PLANOS - la superficie respira, las tarjetas flotan sobre
+      sombras suaves y el fondo tiene profundidad de gradiente en vez de ser
+      una sola tinta plana."
+
+   2) MODULOS A ENCENDER (lista concreta; los 17 existen en el DOM real de
+      evento-app.html, verificado con grep sobre los 85 IDs):
+        #mod-hero  #unified-frame  #mod-hero-meta  #mod-hero-ctas
+        #mod-descripcion  #mod-lineup  #mod-video  #mod-cartel
+        #mod-playlist  #mod-faq  #mod-ubicacion  #mod-boletos
+        #mod-experiencias  #mod-whatsapp  #mod-sponsors  #mod-form
+        #mod-footer
+      Nucleo minimo del Cap. 6: los 6 estan (hero, meta, ctas, descripcion,
+      form, footer). Se apagan ademas por :has(:empty) los que llegan sin
+      contenido: experiencias, ubicacion, video-content, galeria, spotify.
+
+   3) MODULOS A APAGAR (display:none !important; IDs INTACTOS, Cero Borrado):
+        #mod-historia  #mod-objetivo  #mod-impacto  #mod-info-tecnica
+      con su CSS conservado en las secciones 9, 10, 11 y 16 (no se borra
+      nada). Verificados OFF sin diseno: #mod-equipo  #db-equipo-grid
+        #mod-cta-final  #db-cta-final-titulo  #db-cta-final-subtitulo
+        #cta-final-btn
+      El porque de cada uno esta escrito en el punto 4 de la cabecera.
+
+   4) PALETA: FIJA, no derivada. Se conservan los valores de f9 con prefijo
+      nuevo --f9b-* (decision 2 del ADR-054): --f9b-bg #0c0a08,
+      --f9b-card-bg #14110e, --f9b-gold #d4af37, --f9b-gold-muted #8c7323,
+      --f9b-text #f3f3f1, --f9b-muted #a89f91, --f9b-border
+      rgba(212, 175, 55, 0.25), --f9b-border-soft rgba(212, 175, 55, 0.12).
+      POR QUE ES ACEPTABLE ROMPER AQUI LA REGLA DE f9: porque no se rompe el
+      CROMATISMO, se rompe la PROFUNDIDAD. La ruptura declarada (punto 2 de la
+      cabecera) es de estructura y de luz, nunca de tono, y por eso los dos
+      silos pueden convivir sin duplicar la paleta. El silo tampoco se deriva
+      de --master-accent (que el kernel define en evento-app.html L824): el
+      ADN oro calida es de la plantilla, igual que en f9, y asi el admin
+      puede marcar un acento distinto sin desarmar el catalogo.
+      CONTRASTE MEDIDO sobre #0c0a08 (WCAG AA = 4.5:1 para texto normal):
+        #f3f3f1 17.8:1  (texto principal)
+        #a89f91  7.6:1  (texto secundario)
+        #d4af37  9.4:1  (acentos y titulos de seccion)
+        #8c7323  4.3:1  -> DECORATIVO SOLO (filetes, bordes, divisores);
+                  no se usa para texto de cuerpo, queda por debajo de AA.
+
+   5) TIPOGRAFIA. Stack existente, CERO @import y CERO @font-face:
+        --f9b-serif: Georgia, "Times New Roman", "Palatino Linotype", serif
+        --f9b-sans:  "Geist", system-ui, -apple-system, "Segoe UI", Roboto,
+                    sans-serif
+      Display y titulos en serif (identidad editorial de la familia), cuerpo
+      en la sans del sistema, pesos 500 y 700. No se anade ninguna familia
+      nueva: ni peticion de red ni FOUT, ni un solo byte de fuente nueva.
+
+   6) REQUIERE SUBCONMUTACION JS? SI, y por eso ESCALA AL PLAN.
+      f9b necesita cobertura en 5 puntos de kernel (ADR-054 punto 6) y la
+      cablea @renderer-dev-free con predicado de scope explicito. En ESTA
+      OLA no se anade ninguna subconmutacion nueva: el silo solo generaliza
+      lo que el kernel YA activa (meta a 2 lineas, headliner marcado por
+      nombre, segmento de experiencias, FAQ editorial con fallback neutral y
+      boleteria solo con tarifa real), y lo hace como estilo de las clases
+      que el kernel ya produce, nunca como comportamiento propio. El unico
+      canal que el silo declara es el de efectos (ADR-055), que es una
+      traduccion dato -> clase hecha por el kernel, no una subconmutacion.
+      Politica aplicada (Cap. 8 punto 6): una subconmutacion nueva NO se
+      implementa en la entrega del silo; escala al Plan con ADR + TSK.
+
+   7) EXISTE YA UN SILO CON ESA DIRECCION? SI: f9 (Mistico / Rastro MC).
+      NO se duplica: se justifica el silo nuevo con DOS razones, y las dos
+      estan escritas en la cabecera.
+      (a) IDENTIDAD. f9 tiene contenido editorial propio atado a un evento
+          (headliner marcado por NOMBRE "RASTRO MC", sello del footer, FAQ
+          editorial de 5 preguntas). El kernel ya distingue el silo literal
+          'tpl-f9' de su hermano comparando el token completo, de modo que
+          f9b NO hereda ese contenido y necesita silueta propia.
+      (b) DIRECCION. f9 es plano y sin brillo por declaracion propia; f9b
+          es la misma paleta con profundidad. Son dos direcciones esteticas,
+          no dos nombres del mismo diseno.
+      f9.css NO se modifica en ningun byte: los selectores de este archivo
+      son una COPIA con scope propio, y la coexistencia esta justificada por
+      identidad y por ruptura documentada, no por el nombre.
+
+   8) CATEGORIA Y TEMPLATE_ID DEFINITIVOS.
+        categoria_slug:  fiesta
+        template_id:     f9b
+        theme slug:      mistico-nocturno  (Wizard: .ld-theme-card,
+                         _THEME_TYPE, _THEME_TPL, _THEME_MODULES,
+                         _THEME_FICHA y names; los 6 puntos de registro)
+        display name:    Mistico Nocturno
+        ruta servida:    css/templates/fiesta/f9b.css?v={Date.now()}
+   ============================================================================ */
+
+/* ==========================================================================
+   1. RESET DE SILO + VARIABLES SCOPED
+   ========================================================================== */
+.tpl-f9b, .Tpl-F9b,
+.tpl-f9b *, .Tpl-F9b *,
+.tpl-f9b *::before, .Tpl-F9b *::before,
+.tpl-f9b *::after, .Tpl-F9b *::after {
+    box-sizing: border-box !important;
+}
+
+.tpl-f9b, .Tpl-F9b {
+    --f9b-bg: #0c0a08;
+    --f9b-card-bg: #14110e;
+    --f9b-gold: #d4af37;
+    --f9b-gold-muted: #8c7323;
+    --f9b-text: #f3f3f1;
+    --f9b-muted: #a89f91;
+    --f9b-border: rgba(212, 175, 55, 0.25);
+    --f9b-border-soft: rgba(212, 175, 55, 0.12);
+    /* Puente cromatico para los estilos inline del kernel (FAQ, mapa, video,
+       playlist). Es fijo y dorado: el diseno no depende de --master-accent. */
+    --tpl-accent: var(--f9b-gold);
+    --gold: var(--f9b-gold);
+    --f9b-serif: Georgia, "Times New Roman", "Palatino Linotype", serif;
+    --f9b-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f9b-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Puente cromatico (contrato con el kernel y con el HTML inline de
+       evento-app.html). Los DOS nombres se conservan aunque el silo se llame
+       f9b, porque el motor y los estilos inline los consumen por su nombre:
+         --gold        evento-app.html L43 (spinner del loader, con fallback
+                        #ff9f1c), L79/80/81 (fill de los 3 .meta-svg, SIN
+                        fallback), L151 (borde de #db-video-content), L180/184/
+                        188/192 (rotulos de las 4 tarjetas de
+                        #mod-info-tecnica), L275 (fondo del boton submit)
+         --tpl-accent  evento-app.html L1039/1040 (play-button del video),
+                        L1082 (borde de la tarjeta de Spotify), L1097 (enlace
+                        de WhatsApp), L1627 (circulo del FAQ), L1659 (borde
+                        del contenedor del mapa)
+       --master-accent lo define el kernel en evento-app.html L824 sobre
+       documentElement. Este silo NO se deriva de el (paleta fija, igual que
+       f9): el ADN oro calida es de la plantilla, no del evento. */
+
+    /* Escala de sombras SUAVES (3 niveles). Es la ruptura declarada del
+       "cero brillo" de f9 (ADR-054 d.2). Nada puro, nada neon, opacidad
+       baja, difuminado amplio: dan plano sin delatar la fuente de luz. */
+    --f9b-shadow-1: 0 1px 2px rgba(4, 3, 2, 0.55);
+    --f9b-shadow-2: 0 10px 24px -14px rgba(4, 3, 2, 0.78), 0 2px 6px rgba(4, 3, 2, 0.32);
+    --f9b-shadow-3: 0 26px 60px -26px rgba(4, 3, 2, 0.86), 0 4px 12px rgba(4, 3, 2, 0.34);
+    --f9b-shadow-gold: 0 0 0 1px rgba(212, 175, 55, 0.16), 0 18px 42px -24px rgba(212, 175, 55, 0.30);
+
+    /* Escala de elevacion (3 niveles): el filo claro de 1px que despega la
+       superficie del fondo. Complementa a las sombras, no las duplica. */
+    --f9b-elev-1: 0 1px 0 rgba(243, 243, 241, 0.03);
+    --f9b-elev-2: 0 1px 0 rgba(243, 243, 241, 0.04), 0 18px 32px -24px rgba(4, 3, 2, 0.9);
+    --f9b-elev-3: 0 1px 0 rgba(243, 243, 241, 0.06), 0 36px 72px -34px rgba(4, 3, 2, 0.95);
+
+    /* Resplandor contenido (unico "glow" admitido; lo enciende fx-glow). */
+    --f9b-glow: 0 0 22px rgba(212, 175, 55, 0.22);
+
+    /* Texturas de placeholder: gradientes sobrios + grano SVG data-URI
+       (ASCII-safe). Son ESTRUCTURA del silo, no efectos configurables. */
+    --f9b-tex-veil: linear-gradient(180deg, rgba(12, 10, 8, 0.55) 0%, rgba(12, 10, 8, 0.78) 55%, #0c0a08 100%);
+    --f9b-tex-halo: radial-gradient(70% 55% at 50% 18%, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0) 70%);
+    --f9b-tex-deep: linear-gradient(160deg, #14110e 0%, #0c0a08 55%, #050403 100%);
+    --f9b-tex-card: linear-gradient(158deg, rgba(31, 27, 22, 0.92) 0%, rgba(20, 17, 14, 0.94) 58%, rgba(12, 10, 8, 0.96) 100%);
+    --f9b-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+    /* ASSETS - PUNTO DE SWAP (ADR-054 d.3 y d.9). Se DECLARAN AUNQUE VALGAN
+       VACIO y se usan YA en la seccion 27.1. Cada uso escribe una CAPA DE
+       RESPALDO DEBAJO en su background-image (--f9b-tex-deep + --f9b-grain)
+       para cumplir Silent Fallback (ADR-008): con el asset vacio el fondo se
+       ve igual. CAMBIAR EL FONDO REAL ES UNA SOLA LINEA: asignar la URL al
+       token; ningun selector tiene que cambiar. */
+    --f9b-asset-hero: url("");
+    --f9b-asset-hero-mobile: url("");
+    --f9b-asset-fondo: url("");
+    --f9b-asset-textura: url("");
+
+    /* Andamiaje del canal de efectos (ADR-055, capa 3 de 3). La estilizacion
+       concreta llega en la v1.1.0; aqui solo se fija el CONTRATO por token,
+       de modo que montar el parallax, la aurora, el reveal y el bloque
+       prefers-reduced-motion sea escribir una regla, no re-liturar el silo. */
+    --f9b-parallax-attachment: scroll;
+    --f9b-fx-grain-opacity: 0;
+    --f9b-fx-glow: none;
+    --f9b-fx-vhs-opacity: 0;
+
+    margin: 0;
+    padding: 0;
+    background-color: var(--f9b-bg) !important;
+    /* PARALLAX 1 DE 3 - raiz del silo (seccion 27.1). Mismo orden canonico de
+       4 capas que el hero y el cierre: velo, asset, respaldo, grano. El velo va
+       de primera tambien aqui porque la raiz SI sostiene texto: todas las
+       secciones que no llevan fondo propio se apoyan en este lienzo a traves de
+       #main-content-flow, y sin el velo el asset de fondo les queda al aire.
+       El token de attachment se repite en las 3 primeras capas, para que apagar
+       el canal no deje un fixed colgando en el respaldo. */
+    background-image:
+        var(--f9b-tex-veil),
+        var(--f9b-asset-fondo),
+        var(--f9b-tex-deep),
+        var(--f9b-grain);
+    background-size: cover, cover, cover, 160px 160px;
+    background-position: center center, center center, center center, 0 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    background-attachment:
+        var(--f9b-parallax-attachment),
+        var(--f9b-parallax-attachment),
+        var(--f9b-parallax-attachment),
+        scroll;
+    color: var(--f9b-text);
+    font-family: var(--f9b-sans);
+    font-size: 16px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* ==========================================================================
+   2.3 CAPA AMBIENTAL FIJA - AURORA (v1.1.0, seccion 27.2)
+   Patron canonico de f12.css:165-184. Va en ::before de la raiz, que estaba
+   libre. GRADIENTES PUROS: nada de filter: blur(), que es caro y rompe en
+   moviles. El zoom de los keyframes va en transform, nunca en width/height,
+   para que el zoom no muestre bordes (Mandato 14: solo transform/opacity).
+   El contenido va por encima porque #main-content-flow se levanta a z-index 1
+   (seccion 3), igual que hace f12 con el suyo.
+   ========================================================================== */
+.tpl-f9b::before,
+.Tpl-F9b::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(46% 36% at 14% 10%, rgba(212, 175, 55, 0.11) 0%, rgba(212, 175, 55, 0) 70%),
+        radial-gradient(42% 32% at 88% 74%, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0) 72%),
+        radial-gradient(36% 28% at 68% 8%, rgba(243, 243, 241, 0.05) 0%, rgba(243, 243, 241, 0) 70%),
+        radial-gradient(44% 40% at 26% 92%, rgba(212, 175, 55, 0.06) 0%, rgba(212, 175, 55, 0) 74%);
+    animation: f9bAuroraDrift 26s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f9bAuroraDrift {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.78;
+    }
+    50% {
+        transform: translate3d(1.4%, -1.2%, 0) scale(1.06);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate3d(2%, 0.9%, 0) scale(1.1);
+        opacity: 0.72;
+    }
+}
+
+/* fx-vhs: scanlines muy contenidas (ADR-055). Solo pintan si el admin enciende
+   la clase, porque el token --f9b-fx-vhs-opacity vale 0 por defecto. Van en
+   ::after de la raiz, que es una capa DISTINTA de la aurora de ::before y de
+   los fondos que llevan --f9b-grain: por construccion no pueden duplicar el
+   grano. No es un silo retro. */
+.tpl-f9b::after,
+.Tpl-F9b::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--f9b-fx-vhs-opacity);
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(243, 243, 241, 0.05) 0px,
+        rgba(243, 243, 241, 0.05) 1px,
+        rgba(12, 10, 8, 0) 1px,
+        rgba(12, 10, 8, 0) 3px
+    );
+}
+
+/* --- v1.0.0 f9b: EXCEPCION DE PROFUNDIDAD (ADR-054, decision 2) ----------
+   f9 se declara "PLANO y ELEGANTE, cero glow" y por eso ANULA
+   text-shadow / box-shadow / filter / backdrop-filter con none !important
+   en TODO el silo. f9b RELAJA ese reset a proposito: la profundidad
+   (sombras suaves, gradientes sutiles, plano flotante) es su direccion
+   estetica propia y su motivo de existir (pregunta 7 del Brief).
+   El freno de brillo NO se elimina: se traslada a los TOKENS. Las escalas
+   --f9b-shadow-1/2/3 y --f9b-elev-1/2/3 son de opacidad baja, se apoyan en
+   la paleta oro calida y no contienen ningun tono neon ni ninguna sombra
+   pura; el resplandor, si el canal de efectos lo enciende, pasa por
+   --f9b-glow y --f9b-fx-glow, que tambien son de baja opacidad.
+   Efecto buscado: SOBRIO Y ELEGANTE, no brillante.
+   ---------------------------------------------------------------------- */
+
+.tpl-f9b img, .Tpl-F9b img {
+    max-width: 100%;
+    display: block;
+}
+
+.tpl-f9b a, .Tpl-F9b a {
+    color: var(--f9b-gold);
+    text-decoration: none;
+}
+
+.tpl-f9b button, .Tpl-F9b button {
+    font-family: inherit;
+}
+
+/* Tipografia editorial: encabezados de seccion en serif dorado versal. */
+.tpl-f9b h2, .Tpl-F9b h2 {
+    color: var(--f9b-gold);
+    font-family: var(--f9b-serif);
+    font-weight: 500;
+    font-size: clamp(1.35rem, 3vw, 1.95rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 2rem 0;
+    line-height: 1.2;
+}
+
+.tpl-f9b h3, .Tpl-F9b h3 {
+    font-family: var(--f9b-serif);
+    font-weight: 500;
+    margin: 0;
+}
+
+.tpl-f9b p, .Tpl-F9b p {
+    color: var(--f9b-muted);
+    margin: 0 0 1rem 0;
+}
+
+.tpl-f9b ::selection, .Tpl-F9b ::selection {
+    background: var(--f9b-gold);
+    color: var(--f9b-bg);
+}
+
+/* ==========================================================================
+   2. KERNEL IoC - ACTIVACION ATOMICA (display explicito por modulo)
+   El kernel declara "section, header, footer { display: none; }". Un grid-area
+   NO vuelve visible un display:none: cada modulo se enciende AQUI.
+   ========================================================================== */
+.tpl-f9b #mod-hero, .Tpl-F9b #mod-hero,
+.tpl-f9b #unified-frame, .Tpl-F9b #unified-frame,
+.tpl-f9b #mod-hero-ctas, .Tpl-F9b #mod-hero-ctas,
+.tpl-f9b #mod-lineup, .Tpl-F9b #mod-lineup,
+.tpl-f9b #mod-playlist, .Tpl-F9b #mod-playlist,
+.tpl-f9b #mod-form, .Tpl-F9b #mod-form,
+.tpl-f9b #mod-whatsapp, .Tpl-F9b #mod-whatsapp {
+    display: flex !important;
+}
+
+/* v1.0.0 f9b: los 4 modulos de campana NO entran en el IoC de este silo
+   (#mod-historia, #mod-objetivo, #mod-impacto, #mod-info-tecnica). Los IDs
+   siguen intactos en el HTML (Cero Borrado) y los demas silos los siguen
+   encendiendo; aqui se apagan con display:none !important (ver seccion 2.1,
+   OFF con CSS conservado). En su lugar se enciende #mod-descripcion. */
+.tpl-f9b #mod-descripcion, .Tpl-F9b #mod-descripcion,
+.tpl-f9b #mod-video, .Tpl-F9b #mod-video,
+.tpl-f9b #mod-cartel, .Tpl-F9b #mod-cartel,
+.tpl-f9b #mod-faq, .Tpl-F9b #mod-faq,
+.tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion,
+.tpl-f9b #mod-boletos, .Tpl-F9b #mod-boletos,
+.tpl-f9b #mod-experiencias, .Tpl-F9b #mod-experiencias,
+.tpl-f9b #mod-sponsors, .Tpl-F9b #mod-sponsors {
+    display: block !important;
+}
+
+.tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {
+    display: block !important;
+}
+
+/* Modulos sin contenido: el JS les pone display:none !important inline y
+   data-hidden="true". Las reglas siguientes evitan cajas vacias cuando el
+   motor no los oculta (experiencias solo se puebla en el silo f8; el mapa
+   queda vacio si el evento no tiene ubicacion; video/playlist vacios). */
+.tpl-f9b #mod-experiencias:has(#db-experiencias-list:empty), .Tpl-F9b #mod-experiencias:has(#db-experiencias-list:empty) {
+    display: none !important;
+}
+
+.tpl-f9b #mod-ubicacion:has(#db-mapa-container:empty), .Tpl-F9b #mod-ubicacion:has(#db-mapa-container:empty) {
+    display: none !important;
+}
+
+.tpl-f9b #db-video-content:empty, .Tpl-F9b #db-video-content:empty {
+    display: none !important;
+}
+
+.tpl-f9b #db-gallery-grid:empty, .Tpl-F9b #db-gallery-grid:empty {
+    display: none !important;
+}
+
+.tpl-f9b #db-spotify-embed:empty, .Tpl-F9b #db-spotify-embed:empty {
+    display: none !important;
+}
+
+/* ==========================================================================
+   2.1 OFF DEL SILO (display:none !important, IDs INTACTOS)
+   Los modulos OFF conservan TODO su CSS mas abajo (secciones 9, 10, 11 y 16):
+   no se borra ni una linea, queda como base si un dia se encienden. Encender
+   cualquiera de ellos es cambio de kernel y escala al Plan con ADR + TSK
+   (frontera dura, ADR-054 decision 5).
+   ========================================================================== */
+
+/* OFF: narrativa larga de campana; el lugar narrativo de esta silueta lo
+   ocupa #mod-descripcion y el hero editorial de lineas cortas. */
+.tpl-f9b #mod-historia,
+.Tpl-F9b #mod-historia {
+    display: none !important;
+}
+
+/* OFF: instrumentacion de recaudo (stats + barra de progreso); ajena a un
+   evento con lineup y boleteria. */
+.tpl-f9b #mod-objetivo,
+.Tpl-F9b #mod-objetivo {
+    display: none !important;
+}
+
+/* OFF: grilla de impacto de campana; duplica la funcion de la lineup. */
+.tpl-f9b #mod-impacto,
+.Tpl-F9b #mod-impacto {
+    display: none !important;
+}
+
+/* OFF: dato tecnico en 4 tarjetas; ademas es el unico consumidor de
+   #db-aforo-val, que ADR-056 (solapamiento 15) consolida en el formulario de
+   ADMIN. Se espera a que exista una sola fuente de verdad. */
+.tpl-f9b #mod-info-tecnica,
+.Tpl-F9b #mod-info-tecnica {
+    display: none !important;
+}
+
+/* OFF verificados SIN DISENO (ADR-054 d.5): el clon de f9 no los estiliza y
+   aqui tampoco. Se apagan explicitamente para que el IoC global no los deje
+   en un limbo de "depende del kernel" y para que no se lean como un olvido. */
+.tpl-f9b #mod-equipo,
+.Tpl-F9b #mod-equipo,
+.tpl-f9b #db-equipo-grid,
+.Tpl-F9b #db-equipo-grid,
+.tpl-f9b #mod-cta-final,
+.Tpl-F9b #mod-cta-final,
+.tpl-f9b #db-cta-final-titulo,
+.Tpl-F9b #db-cta-final-titulo,
+.tpl-f9b #db-cta-final-subtitulo,
+.Tpl-F9b #db-cta-final-subtitulo,
+.tpl-f9b #cta-final-btn,
+.Tpl-F9b #cta-final-btn {
+    display: none !important;
+}
+
+/* ==========================================================================
+   2.2 CANAL DE EFECTOS - ANDAMIAJE (ADR-055, capa 3 de 3)
+   El silo NO lee config_landing.effects: solo conoce clases de cuerpo, y no
+   inventa ninguna. Literales (fuente unica e irrevocable, ADR-055 p.3):
+     fx-explicit  marcador de presencia (el admin si envio effects)
+     fx-grain     overlay de grano cinematografico     OFF por defecto
+     fx-glow      resplandor suave en lo que se marque  OFF por defecto
+     fx-vhs       lineas de scanline/CRT                OFF por defecto
+     fx-parallax  background-attachment: fixed          ON  por defecto
+   Reglas del contrato, ya resueltas aqui en CSS:
+     4.1 precedencia - sin fx-explicit rigen los defaults del silo; con
+         fx-explicit el default de parallax queda ANULADO y solo rigen las
+         clases positivas presentes.
+     4.2 solo clases positivas: la AUSENCIA de la clase es el apagado. No se
+         crean clases negativas.
+     4.3 el kernel las anade DESPUES de la reasignacion completa de
+         document.body.className (evento-app.html L838) y con classList.add.
+     4.4 fail-open: sin effects valido el kernel no anade nada, ni siquiera
+         fx-explicit, y el silo cae a sus defaults.
+     4.5/punto 5 el grano ESTRUCTURAL del fondo (--f9b-grain) y el overlay
+         fx-grain son capas DISTINTAS: fx-grain nunca se aplica a un elemento
+         que ya trae el grano estructural (doble grano).
+   ESTA OLA entrega el ANDAMIAJE (los 5 selectores + los 4 tokens). La
+   estilizacion concreta -parallax de 4 capas, aurora, reveal con
+   animation-timeline y prefers-reduced-motion propio- llega en la v1.1.0
+   sin necesidad re-liturar este archivo.
+   Los defaults (scroll / 0 / none / 0) NO se repiten aqui: viven una sola
+   vez en el bloque de tokens de la seccion 1, que es la fuente unica.
+   ========================================================================== */
+
+/* Default del silo: parallax ON (ADR-055, tabla de la d.3 y punto 8). */
+.tpl-f9b:not(.fx-explicit),
+.Tpl-F9b:not(.fx-explicit) {
+    --f9b-parallax-attachment: fixed;
+}
+
+/* El admin si envio effects: el default se ignora y manda la clase positiva
+   (regla 4.1). Con fx-explicit y sin fx-parallax, no hay parallax. */
+.tpl-f9b.fx-parallax,
+.Tpl-F9b.fx-parallax {
+    --f9b-parallax-attachment: fixed;
+}
+
+.tpl-f9b.fx-explicit:not(.fx-parallax),
+.Tpl-F9b.fx-explicit:not(.fx-parallax) {
+    --f9b-parallax-attachment: scroll;
+}
+
+.tpl-f9b.fx-grain,
+.Tpl-F9b.fx-grain {
+    --f9b-fx-grain-opacity: 1;
+}
+
+.tpl-f9b.fx-glow,
+.Tpl-F9b.fx-glow {
+    --f9b-fx-glow: var(--f9b-glow);
+}
+
+.tpl-f9b.fx-vhs,
+.Tpl-F9b.fx-vhs {
+    --f9b-fx-vhs-opacity: 1;
+}
+
+/* v1.1.0: fx-grain se MONTA en #mod-hero::after. Es grano CINEMATOGRAFICO y
+   vive en un pseudo-elemento, mientras el grano ESTRUCTURAL --f9b-grain vive
+   en el background-image del propio #mod-hero: elemento distinto, capa
+   distinta, nunca los dos sobre la misma caja (ADR-055 punto 5). Por defecto
+   el token vale 0, asi que sin la clase no se ve nada. z-index 1: por encima
+   del halo de ::before y por debajo del texto, que va en 3. */
+.tpl-f9b #mod-hero::after,
+.Tpl-F9b #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: var(--f9b-fx-grain-opacity);
+    background-image: var(--f9b-grain);
+    background-size: 160px 160px;
+    background-repeat: repeat;
+}
+
+/* v1.1.0: fx-glow se MONTA en 3 elementos marcos y no en todo el silo. El
+   resplandor va PRIMERO en la lista para que las sombras de profundidad
+  opian la suya; nunca se usa var(--f9b-fx-glow) dentro de una lista con otras
+   sombras, porque vale none por defecto y la declaracion completa seria
+   invalida. */
+.tpl-f9b.fx-glow .form-master-box,
+.Tpl-F9b.fx-glow .form-master-box,
+.tpl-f9b.fx-glow .faq-icon-circle,
+.Tpl-F9b.fx-glow .faq-icon-circle,
+.tpl-f9b.fx-glow #db-whatsapp-btn,
+.Tpl-F9b.fx-glow #db-whatsapp-btn {
+    box-shadow: var(--f9b-fx-glow), var(--f9b-shadow-3), var(--f9b-shadow-gold);
+}
+
+/* ==========================================================================
+   3. LAYOUT GRID - #main-content-flow (columna unica por defecto)
+   ========================================================================== */
+.tpl-f9b #main-content-flow, .Tpl-F9b #main-content-flow {
+    /* v1.1.0: se levanta sobre la aurora de la raiz (z-index 0), patron de
+       f12.css:210-217. Sin esto, el contenido estatico quedaria debajo. */
+    position: relative;
+    z-index: 1;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "countdown"
+        "meta"
+        "ctas"
+        "descripcion"
+        "lineup"
+        "video"
+        "cartel"
+        "playlist"
+        "boletos"
+        "experiencias"
+        "faq"
+        "ubicacion"
+        "whatsapp"
+        "sponsors"
+        "form"
+        "footer";
+    row-gap: 0;
+    column-gap: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background-color: var(--f9b-bg);
+}
+
+.tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {  grid-area: hero; }
+.tpl-f9b #unified-frame, .Tpl-F9b #unified-frame {  grid-area: countdown; }
+.tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {  grid-area: meta; }
+.tpl-f9b #mod-hero-ctas, .Tpl-F9b #mod-hero-ctas {  grid-area: ctas; }
+.tpl-f9b #mod-descripcion, .Tpl-F9b #mod-descripcion {  grid-area: descripcion; }
+.tpl-f9b #mod-lineup, .Tpl-F9b #mod-lineup {  grid-area: lineup; }
+.tpl-f9b #mod-cartel, .Tpl-F9b #mod-cartel {  grid-area: cartel; }
+.tpl-f9b #mod-video, .Tpl-F9b #mod-video {  grid-area: video; }
+.tpl-f9b #mod-playlist, .Tpl-F9b #mod-playlist {  grid-area: playlist; }
+.tpl-f9b #mod-boletos, .Tpl-F9b #mod-boletos {  grid-area: boletos; }
+.tpl-f9b #mod-experiencias, .Tpl-F9b #mod-experiencias {  grid-area: experiencias; }
+.tpl-f9b #mod-faq, .Tpl-F9b #mod-faq {  grid-area: faq; }
+.tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion {  grid-area: ubicacion; }
+.tpl-f9b #mod-whatsapp, .Tpl-F9b #mod-whatsapp {  grid-area: whatsapp; }
+.tpl-f9b #mod-sponsors, .Tpl-F9b #mod-sponsors {  grid-area: sponsors; }
+.tpl-f9b #mod-form, .Tpl-F9b #mod-form {  grid-area: form; }
+.tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {  grid-area: footer; }
+
+/* Blindaje de blowout: ninguna celda del grid puede empujar el ancho. */
+.tpl-f9b #main-content-flow > *, .Tpl-F9b #main-content-flow > * {
+    min-width: 0;
+}
+
+/* Desktop y tablet ancha (>=992px): dos columnas con filas pareadas
+   (cartel|playlist, faq|ubicacion, whatsapp|sponsors). Descripcion, lineup y
+   video ocupan fila completa. Las filas pareadas vacias colapsan porque
+   row-gap es 0. El REFLOW (seccion 26) expande al companero cuando falta. */
+@media (min-width: 992px) {
+    .tpl-f9b #main-content-flow, .Tpl-F9b #main-content-flow {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "descripcion descripcion"
+            "lineup lineup"
+            "video video"
+            "cartel playlist"
+            "boletos boletos"
+            "experiencias experiencias"
+            "faq ubicacion"
+            "whatsapp sponsors"
+            "form form"
+            "footer footer";
+    }
+}
+
+/* ==========================================================================
+   4. ANIMACION DE ENTRADA f9bFadeUp (keyframes con prefijo f9b)
+   ========================================================================== */
+@keyframes f9bFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tpl-f9b .hero-content, .Tpl-F9b .hero-content,
+.tpl-f9b #db-lineup .artist-card, .Tpl-F9b #db-lineup .artist-card,
+.tpl-f9b .impacto-card, .Tpl-F9b .impacto-card,
+.tpl-f9b .exp-card, .Tpl-F9b .exp-card,
+.tpl-f9b .card-item, .Tpl-F9b .card-item {
+    animation: f9bFadeUp 0.8s var(--f9b-ease) both;
+}
+
+.tpl-f9b #db-lineup .artist-card:nth-child(2), .Tpl-F9b #db-lineup .artist-card:nth-child(2),
+.tpl-f9b .impacto-card:nth-child(2), .Tpl-F9b .impacto-card:nth-child(2),
+.tpl-f9b .card-item:nth-child(2), .Tpl-F9b .card-item:nth-child(2) {  animation-delay: 0.08s; }
+
+.tpl-f9b #db-lineup .artist-card:nth-child(3), .Tpl-F9b #db-lineup .artist-card:nth-child(3),
+.tpl-f9b .impacto-card:nth-child(3), .Tpl-F9b .impacto-card:nth-child(3),
+.tpl-f9b .card-item:nth-child(3), .Tpl-F9b .card-item:nth-child(3) {  animation-delay: 0.16s; }
+
+.tpl-f9b #db-lineup .artist-card:nth-child(4), .Tpl-F9b #db-lineup .artist-card:nth-child(4),
+.tpl-f9b .impacto-card:nth-child(4), .Tpl-F9b .impacto-card:nth-child(4),
+.tpl-f9b .card-item:nth-child(4), .Tpl-F9b .card-item:nth-child(4) {  animation-delay: 0.24s; }
+
+.tpl-f9b #db-lineup .artist-card:nth-child(n+5), .Tpl-F9b #db-lineup .artist-card:nth-child(n+5) {  animation-delay: 0.32s; }
+
+/* El bloque prefers-reduced-motion de esta ola vivia aqui y se movio al
+   cierre del archivo (seccion 28): la v1.1.0 anade aurora, reveal, parallax y
+   scanlines, y una regla de accessibility al principio del silo dejaba de
+   cubrir el alcance real. En su lugar de origen queda esta nota. */
+
+/* ==========================================================================
+   5. HERO - #mod-hero (background-image inline del motor)
+   ========================================================================== */
+.tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 80vh;
+    padding: 7rem 1.5rem 4.5rem 1.5rem;
+    background-color: #050403;
+    /* PARALLAX 2 DE 3 - hero (seccion 27.1). Orden canonico de 4 capas, de
+       arriba hacia abajo: velo, asset, respaldo, grano. El respaldo va DEBAJO
+       del asset a proposito: si --f9b-asset-hero sigue vacio, esta capa es la
+       que se ve, y el hero queda bien SIN FOTO. El token de attachment se
+       repite en las 3 primeras capas para que apagar el canal no deje un
+       fixed colgando en el respaldo. El grano va en scroll: fijarlo seria
+       repintar un patron de 160px en cada scroll. */
+    background-image:
+        var(--f9b-tex-veil),
+        var(--f9b-asset-hero),
+        var(--f9b-tex-deep),
+        var(--f9b-grain);
+    background-size: cover, cover, cover, 160px 160px;
+    background-position: center bottom, center center, center center, 0 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    background-attachment:
+        var(--f9b-parallax-attachment),
+        var(--f9b-parallax-attachment),
+        var(--f9b-parallax-attachment),
+        scroll;
+    border-bottom: 1px solid var(--f9b-border);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Halo dorado sobre el fondo. El velo de legibilidad YA vive en la capa 1
+   del background-image del hero (--f9b-tex-veil): si se repitiera aqui el
+   mismo token, el gradiente estaria pintado dos veces y el fondo se veria mas
+   tapado de lo que pide el diseno. Este pseudo conserva SOLO el halo, que es
+   luz y no velo, y queda por debajo del texto (z-index 3). */
+.tpl-f9b #mod-hero::before, .Tpl-F9b #mod-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--f9b-tex-halo);
+}
+
+.tpl-f9b #mod-hero .hero-content, .Tpl-F9b #mod-hero .hero-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Badge de organizacion: kicker centrado arriba del titulo. */
+.tpl-f9b #org-name-badge, .Tpl-F9b #org-name-badge {
+    position: static !important;
+    z-index: 10 !important;
+    display: inline-block !important;
+    margin: 0 auto 1.6rem auto !important;
+    padding: 0.55rem 1.35rem 0.55rem 1.55rem !important;
+    border: 1px solid var(--f9b-border) !important;
+    color: var(--f9b-gold) !important;
+    font-family: var(--f9b-sans) !important;
+    font-size: 0.66rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4em !important;
+    text-transform: uppercase !important;
+    /* Translucido, no opaco: es un badge y no una caja. El tracking lleva
+       espacio de compensacion a la derecha porque letter-spacing suma un
+       espacio despues del ultimo caracter y descuadra el centrado. */
+    background: rgba(20, 17, 14, 0.62);
+    box-shadow: var(--f9b-shadow-1), var(--f9b-elev-1);
+}
+
+/* v1.1.0 (ADR-054 d.4): #event-subtitle NACE con display:none inline y el
+   kernel lo enciende solo si content.subtitulo trae texto
+   (evento-app.html:966-975, que hace style.display = ''). Por eso esta regla
+   va SIN !important: si el kernel lo deja en none manda el inline y el
+   subtitulo no ocupa espacio (Cero Borrado); si lo enciende, manda este
+   display:block. Encenderlo con !important ROMPERIA el toggle del kernel.
+   Jerarquia de segundo nivel: mismo serif del titulo, cuerpo mas pequeno,
+   muted y sin versalitas, para no competir con el h1. */
+.tpl-f9b #event-subtitle, .Tpl-F9b #event-subtitle {
+    display: block;
+    max-width: 46ch;
+    margin: 1.15rem auto 0 auto;
+    color: var(--f9b-muted);
+    font-family: var(--f9b-serif);
+    font-size: clamp(0.95rem, 2.1vw, 1.2rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: none;
+}
+
+/* v1.1.0: #loader es la CAPA DE CARGA, no un modulo de contenido. El kernel lo
+   pinta como un bloque opaco (background #000, z-index 999) y con eso tapa el
+   hero durante la carga. Aqui se vuelve velo translucido de la paleta con el
+   mismo token del velo del hero, para que se vea la portada por detras. Sin
+   backdrop-filter: blur(), que es de los Costs mas caros en moviles.
+   El spinner lo dibuja el kernel con border-top-color: var(--gold, #ff9f1c);
+   como --gold esta declarado en la raiz del silo, sale dorado sin tocar el
+   kernel, y esta regla solo fija el color de forma explicita. */
+.tpl-f9b #loader, .Tpl-F9b #loader {
+    background: linear-gradient(180deg, rgba(12, 10, 8, 0.82) 0%, rgba(12, 10, 8, 0.92) 58%, #0c0a08 100%);
+}
+
+.tpl-f9b #loader .spinner, .Tpl-F9b #loader .spinner {
+    border-top-color: var(--f9b-gold);
+}
+
+.tpl-f9b #event-title, .Tpl-F9b #event-title {
+    display: block;
+    font-family: var(--f9b-serif);
+    font-weight: 500 !important;
+    /* Salvaguarda por ALTURA (TEMPLATES.md Cap. 5, patron que resolvio f12):
+       el clamp escala con vw hasta su tope, y en una pantalla ancha pero
+       baja el titulo se come el alto del hero. El min() con vh acota el
+       resultado al 12% del alto de la ventana: en un monitor normal no cambia
+       nada (12vh > 5rem) y en un landscape de telefono el titulo baja. */
+    font-size: min(clamp(2.4rem, 8vw, 5rem), 12vh) !important;
+    line-height: 1.02;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase;
+    color: var(--f9b-text) !important;
+    margin: 0 !important;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* v1.1.0: SIN soporte de titulo partido, y estas son las 2 reglas eliminadas
+   de la onda (unico borrado autorizado). El kernel solo crea
+   .hero-title-line1 / .hero-title-line2 detras del gate
+   tpl-f6 || tpl-f8 (evento-app.html:947-958), que no matchea tpl-f9b: en f9b
+   el titulo llega entero dentro de #event-title y se estiliza ahi. Eran codigo
+   muerto y sostenian una promesa que el kernel no cumple. */
+
+/* ==========================================================================
+   6. COUNTDOWN - #unified-frame.unified-countdown-frame
+   ========================================================================== */
+.tpl-f9b #unified-frame, .Tpl-F9b #unified-frame {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 0 !important;
+    padding: 2.6rem 1.5rem;
+    background-color: var(--f9b-card-bg);
+    border-bottom: 1px solid var(--f9b-border);
+}
+
+.tpl-f9b .cd-block, .Tpl-F9b .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    padding: 0 1.8rem;
+    border-right: 1px solid var(--f9b-border-soft);
+    text-align: center;
+
+    /* Superficie clara sobre fondo oscuro: filo de 1px + sombra de contacto. */
+    box-shadow: var(--f9b-shadow-1), var(--f9b-elev-1);}
+
+.tpl-f9b .cd-block:last-child, .Tpl-F9b .cd-block:last-child {
+    border-right: none;
+}
+
+.tpl-f9b [id^="cd-"], .Tpl-F9b [id^="cd-"] {
+    display: block !important;
+    font-family: var(--f9b-serif) !important;
+    font-size: clamp(2.1rem, 5vw, 3.1rem) !important;
+    font-weight: 500 !important;
+    line-height: 1;
+    color: var(--f9b-gold) !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+}
+
+.tpl-f9b .cd-block small, .Tpl-F9b .cd-block small {
+    display: block;
+    margin-top: 0.7rem;
+    font-family: var(--f9b-sans);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--f9b-muted);
+}
+
+/* ==========================================================================
+   7. METADATA - #mod-hero-meta.hero-meta > .meta-item
+   ========================================================================== */
+.tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem 1.2rem;
+    padding: 2.6rem 1.5rem;
+}
+
+.tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.4rem;
+    background-color: var(--f9b-card-bg);
+    border: 1px solid var(--f9b-border);
+    color: var(--f9b-gold);
+    font-family: var(--f9b-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: border-color 0.3s ease, color 0.3s ease;
+
+    box-shadow: var(--f9b-shadow-1), var(--f9b-elev-1);}
+
+.tpl-f9b #mod-hero-meta .meta-item:hover, .Tpl-F9b #mod-hero-meta .meta-item:hover {
+    border-color: var(--f9b-gold);
+}
+
+.tpl-f9b #mod-hero-meta .meta-svg, .Tpl-F9b #mod-hero-meta .meta-svg {
+    flex-shrink: 0;
+    width: 18px !important;
+    height: 18px !important;
+    fill: var(--f9b-gold);
+}
+
+/* Metadata en 2 lineas por tarjeta (config_landing.content.meta.*.l1/l2). El
+   fallback historico de una sola linea no se altera: sin .meta-line, identico. */
+.tpl-f9b #mod-hero-meta .meta-line, .Tpl-F9b #mod-hero-meta .meta-line {
+    display: block;
+    text-align: left;
+    line-height: 1.35;
+}
+
+.tpl-f9b #mod-hero-meta .meta-line--2, .Tpl-F9b #mod-hero-meta .meta-line--2 {
+    margin-top: 0.1rem;
+    color: var(--f9b-muted);
+}
+
+/* ==========================================================================
+   8. HERO CTAs - #mod-hero-ctas.hero-ctas
+   Nace con display:none !important desde el kernel; se enciende aqui.
+   ========================================================================== */
+.tpl-f9b #mod-hero-ctas, .Tpl-F9b #mod-hero-ctas {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 2.4rem 1.5rem;
+    background-color: var(--f9b-bg);
+    border-bottom: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-hero-ctas .hero-cta-btn, .Tpl-F9b #mod-hero-ctas .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.2rem;
+    font-family: var(--f9b-sans);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    border: 1px solid var(--f9b-gold);
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9b #mod-hero-ctas .hero-cta-btn--wa, .Tpl-F9b #mod-hero-ctas .hero-cta-btn--wa {
+    background-color: var(--f9b-gold);
+    color: var(--f9b-bg);
+}
+
+.tpl-f9b #mod-hero-ctas .hero-cta-btn--wa:hover, .Tpl-F9b #mod-hero-ctas .hero-cta-btn--wa:hover {
+    background-color: transparent;
+    color: var(--f9b-gold);
+    transform: translateY(-2px);
+}
+
+.tpl-f9b #mod-hero-ctas .hero-cta-btn--lineup, .Tpl-F9b #mod-hero-ctas .hero-cta-btn--lineup {
+    background-color: transparent;
+    color: var(--f9b-gold);
+}
+
+.tpl-f9b #mod-hero-ctas .hero-cta-btn--lineup:hover, .Tpl-F9b #mod-hero-ctas .hero-cta-btn--lineup:hover {
+    background-color: var(--f9b-gold);
+    color: var(--f9b-bg);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   9. HISTORIA - #mod-historia > .historia-inner
+   ========================================================================== */
+.tpl-f9b #mod-historia, .Tpl-F9b #mod-historia {
+    padding: 5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-historia .historia-inner, .Tpl-F9b #mod-historia .historia-inner {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    text-align: center;
+}
+
+.tpl-f9b #db-historia-titulo, .Tpl-F9b #db-historia-titulo {
+    color: var(--f9b-gold) !important;
+    font-family: var(--f9b-serif);
+    font-weight: 500 !important;
+    font-size: clamp(1.5rem, 4vw, 2.3rem) !important;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0 0 1.8rem 0 !important;
+    line-height: 1.25;
+}
+
+.tpl-f9b #db-historia-img, .Tpl-F9b #db-historia-img {
+    display: block;
+    width: 100% !important;
+    max-width: 700px !important;
+    margin: 0 auto 2rem auto !important;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    object-fit: cover;
+}
+
+.tpl-f9b #db-historia-texto, .Tpl-F9b #db-historia-texto {
+    max-width: 640px;
+    margin: 0 auto !important;
+    color: var(--f9b-muted) !important;
+    font-size: 1.02rem;
+    line-height: 1.9;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   9b. DESCRIPCION - #mod-descripcion > .descripcion-inner (atomo heredado)
+   Toma el lugar visual que ocupaba #mod-historia. Fuente: content.descripcion.
+   ========================================================================== */
+.tpl-f9b #mod-descripcion, .Tpl-F9b #mod-descripcion {
+    padding: 5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-descripcion .descripcion-inner, .Tpl-F9b #mod-descripcion .descripcion-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tpl-f9b #db-descripcion-titulo, .Tpl-F9b #db-descripcion-titulo {
+    color: var(--f9b-gold) !important;
+    font-family: var(--f9b-serif);
+    font-weight: 500 !important;
+    font-size: clamp(1.5rem, 4vw, 2.3rem) !important;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0 0 1.8rem 0 !important;
+    line-height: 1.25;
+}
+
+.tpl-f9b #db-descripcion-texto, .Tpl-F9b #db-descripcion-texto {
+    max-width: 660px;
+    margin: 0 auto !important;
+    color: var(--f9b-muted) !important;
+    font-size: 1.02rem;
+    line-height: 1.9;
+}
+
+/* ==========================================================================
+   10. OBJETIVO - #mod-objetivo > .objetivo-inner (meta + barra de progreso)
+   ========================================================================== */
+.tpl-f9b #mod-objetivo, .Tpl-F9b #mod-objetivo {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-objetivo .objetivo-inner, .Tpl-F9b #mod-objetivo .objetivo-inner {
+    max-width: 840px;
+    margin: 0 auto;
+}
+
+.tpl-f9b .objetivo-stats, .Tpl-F9b .objetivo-stats {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem !important;
+}
+
+.tpl-f9b .objetivo-stat-block, .Tpl-F9b .objetivo-stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 130px;
+    text-align: center;
+}
+
+.tpl-f9b .objetivo-label, .Tpl-F9b .objetivo-label {
+    color: var(--f9b-muted);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.tpl-f9b .objetivo-value, .Tpl-F9b .objetivo-value {
+    color: var(--f9b-gold);
+    font-family: var(--f9b-serif);
+    font-size: clamp(1.25rem, 3vw, 1.8rem);
+    line-height: 1.1;
+}
+
+.tpl-f9b .objetivo-barra-track, .Tpl-F9b .objetivo-barra-track {
+    height: 6px;
+    width: 100%;
+    background-color: rgba(243, 243, 241, 0.06);
+    border: 1px solid var(--f9b-border-soft);
+    overflow: hidden;
+}
+
+.tpl-f9b #db-objetivo-barra.objetivo-barra-fill, .Tpl-F9b #db-objetivo-barra.objetivo-barra-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--f9b-gold-muted) 0%, var(--f9b-gold) 100%);
+    transition: width 0.7s var(--f9b-ease);
+}
+
+.tpl-f9b #db-objetivo-pct.objetivo-pct, .Tpl-F9b #db-objetivo-pct.objetivo-pct {
+    display: block;
+    margin-top: 0.7rem;
+    text-align: right;
+    color: var(--f9b-gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+}
+
+/* ==========================================================================
+   11. IMPACTO - #mod-impacto > #db-impacto-grid.impacto-grid
+   ========================================================================== */
+.tpl-f9b #mod-impacto, .Tpl-F9b #mod-impacto {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #db-impacto-grid.impacto-grid, .Tpl-F9b #db-impacto-grid.impacto-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f9b .impacto-card, .Tpl-F9b .impacto-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2.4rem 1.6rem;
+    background-color: var(--f9b-card-bg);
+    border: 1px solid var(--f9b-border);
+    text-align: center;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-1);}
+
+.tpl-f9b .impacto-card:hover, .Tpl-F9b .impacto-card:hover {
+    border-color: var(--f9b-gold);
+    transform: translateY(-4px);
+}
+
+.tpl-f9b .impacto-card--donacion, .Tpl-F9b .impacto-card--donacion {
+    cursor: pointer;
+}
+
+.tpl-f9b .impacto-icono, .Tpl-F9b .impacto-icono {
+    color: var(--f9b-gold);
+    line-height: 0;
+}
+
+.tpl-f9b .impacto-valor, .Tpl-F9b .impacto-valor {
+    color: var(--f9b-gold);
+    font-family: var(--f9b-serif);
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.tpl-f9b .impacto-etiqueta, .Tpl-F9b .impacto-etiqueta {
+    color: var(--f9b-muted);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+}
+
+.tpl-f9b .impacto-monto, .Tpl-F9b .impacto-monto {
+    color: var(--f9b-gold);
+    font-family: var(--f9b-serif);
+    font-size: 1.65rem;
+    line-height: 1.1;
+}
+
+.tpl-f9b .impacto-titulo, .Tpl-F9b .impacto-titulo {
+    color: var(--f9b-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.tpl-f9b .impacto-desc, .Tpl-F9b .impacto-desc {
+    color: var(--f9b-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ==========================================================================
+   12. VIDEO Y GALERIA - #mod-video > #db-gallery-grid + #db-video-content
+   ========================================================================== */
+.tpl-f9b #mod-video, .Tpl-F9b #mod-video {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #db-gallery-grid, .Tpl-F9b #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    max-width: 1100px;
+    margin: 0 auto 3rem auto !important;
+}
+
+.tpl-f9b #db-gallery-grid .gallery-item, .Tpl-F9b #db-gallery-grid .gallery-item {
+    border: 1px solid var(--f9b-border-soft);
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.4s var(--f9b-ease);
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-2);
+}
+
+.tpl-f9b #db-gallery-grid .gallery-item:hover, .Tpl-F9b #db-gallery-grid .gallery-item:hover {
+    border-color: var(--f9b-gold);
+    box-shadow: var(--f9b-shadow-3), var(--f9b-elev-3);
+}
+
+.tpl-f9b #db-gallery-grid img, .Tpl-F9b #db-gallery-grid img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    cursor: zoom-in;
+    transition: transform 0.5s var(--f9b-ease);
+}
+
+.tpl-f9b #db-gallery-grid .gallery-item:hover img, .Tpl-F9b #db-gallery-grid .gallery-item:hover img {
+    transform: scale(1.04);
+}
+
+.tpl-f9b #db-video-content, .Tpl-F9b #db-video-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    background-color: #000;
+    border: 1px solid var(--f9b-border);
+    border-radius: 0 !important;
+    overflow: hidden;
+
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-2);}
+
+.tpl-f9b #db-video-content iframe, .Tpl-F9b #db-video-content iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.tpl-f9b #db-video-content .video-placeholder, .Tpl-F9b #db-video-content .video-placeholder {
+    width: 100%;
+    height: 100%;
+}
+
+.tpl-f9b #db-video-content .play-button, .Tpl-F9b #db-video-content .play-button {
+    border: 1px solid var(--f9b-gold) !important;
+    background: rgba(12, 10, 8, 0.6) !important;
+}
+
+.tpl-f9b #db-video-content .play-button span, .Tpl-F9b #db-video-content .play-button span {
+    color: var(--f9b-gold) !important;
+}
+
+/* ==========================================================================
+   13. CARTEL - #mod-cartel > .cartel-inner > #db-poster-img
+   ========================================================================== */
+.tpl-f9b #mod-cartel, .Tpl-F9b #mod-cartel {
+    padding: 4.5rem 1.5rem;
+}
+
+.tpl-f9b #mod-cartel .cartel-inner, .Tpl-F9b #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto !important;
+}
+
+.tpl-f9b #db-poster-img, .Tpl-F9b #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 420px;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    object-fit: cover;
+
+    box-shadow: var(--f9b-shadow-3), var(--f9b-elev-2);}
+
+/* ==========================================================================
+   14. LINEUP - #mod-lineup (FOTOGRAFIA PREDOMINANTE)
+   Headliner = .artist-card.headliner (marcado por NOMBRE: RASTRO MC en el JS).
+   No por posicion: foto 60vh, nombre dorado gigante encima.
+   Demas artistas: grid 2-3 columnas, foto 3/4, sin avatares circulares.
+   ========================================================================== */
+.tpl-f9b #mod-lineup, .Tpl-F9b #mod-lineup {
+    display: flex !important;
+    flex-direction: column;
+    padding: 5rem 1.5rem;
+    background-color: var(--f9b-bg);
+    border-top: 1px solid var(--f9b-border);
+    border-bottom: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-lineup .lineup-grid, .Tpl-F9b #mod-lineup .lineup-grid {
+    display: block;
+    max-width: 1200px !important;
+    width: 100%;
+    margin: 0 auto !important;
+}
+
+.tpl-f9b #db-lineup, .Tpl-F9b #db-lineup {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 1.4rem !important;
+    width: 100% !important;
+}
+
+/* --- Tarjeta base (artistas no headliner) --- */
+.tpl-f9b #db-lineup .artist-card, .Tpl-F9b #db-lineup .artist-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background-color: #000;
+    border: 1px solid var(--f9b-border);
+    border-radius: 0;
+    cursor: pointer;
+    transition: border-color 0.4s ease, transform 0.4s ease;
+
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-2);}
+
+.tpl-f9b #db-lineup .artist-card:hover, .Tpl-F9b #db-lineup .artist-card:hover {
+    border-color: var(--f9b-gold);
+    transform: translateY(-4px);
+    box-shadow: var(--f9b-shadow-3), var(--f9b-elev-3);
+}
+
+.tpl-f9b #db-lineup .artist-photo, .Tpl-F9b #db-lineup .artist-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition: transform 0.7s var(--f9b-ease);
+}
+
+.tpl-f9b #db-lineup .artist-card:hover .artist-photo, .Tpl-F9b #db-lineup .artist-card:hover .artist-photo {
+    transform: scale(1.05);
+}
+
+/* Overlay superpuesto sobre la foto: gradiente oscuro de abajo hacia arriba. */
+.tpl-f9b #db-lineup .artist-overlay, .Tpl-F9b #db-lineup .artist-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    background: linear-gradient(
+        0deg,
+        rgba(12, 10, 8, 0.96) 0%,
+        rgba(12, 10, 8, 0.72) 45%,
+        rgba(12, 10, 8, 0) 100%
+    );
+}
+
+.tpl-f9b #db-lineup .artist-hora, .Tpl-F9b #db-lineup .artist-hora {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.28rem 0.7rem;
+    border: 1px solid var(--f9b-border);
+    background-color: rgba(12, 10, 8, 0.55);
+    color: var(--f9b-gold);
+    font-family: var(--f9b-sans);
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.tpl-f9b #db-lineup .artist-name, .Tpl-F9b #db-lineup .artist-name {
+    display: block;
+    color: #ffffff;
+    font-family: var(--f9b-serif);
+    font-weight: 500;
+    font-size: clamp(1.45rem, 3vw, 2.15rem);
+    line-height: 1.05;
+    letter-spacing: 0.03em;
+}
+
+.tpl-f9b #db-lineup .artist-resena, .Tpl-F9b #db-lineup .artist-resena {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--f9b-muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.tpl-f9b #db-lineup .artist-social, .Tpl-F9b #db-lineup .artist-social {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-top: 0.4rem;
+}
+
+.tpl-f9b #db-lineup .artist-social-icon, .Tpl-F9b #db-lineup .artist-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--f9b-gold);
+    opacity: 0.85;
+    line-height: 0;
+    transition: color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9b #db-lineup .artist-social-icon:hover, .Tpl-F9b #db-lineup .artist-social-icon:hover {
+    color: #ffffff;
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+/* --- HEADLINER: artist-card.headliner (marcado por nombre en JS) ---
+   order:-1 garantiza que el headliner sea el primer item del grid sin depender
+   del orden en que venga en los datos (auto-placement de Grid usa order). */
+.tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
+    order: -1;
+    grid-column: 1 / -1;
+    aspect-ratio: auto !important;
+    min-height: 60vh;
+    border-color: var(--f9b-border);
+    /* Uno de los 3 elementos que llevan --f9b-shadow-gold: es el protagonista
+       de la seccion de lineup y el que ancla la lectura vertical de la
+       pagina. El resto de la escala se reparte en shadow-1/2/3. */
+    box-shadow: var(--f9b-shadow-3), var(--f9b-shadow-gold), var(--f9b-elev-3);
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-photo, .Tpl-F9b #db-lineup .artist-card.headliner .artist-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-position: center 25%;
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
+    inset: auto 0 0 0;
+    padding: 5rem 3rem 3rem 3rem;
+    background: linear-gradient(
+        0deg,
+        rgba(12, 10, 8, 0.97) 0%,
+        rgba(12, 10, 8, 0.8) 40%,
+        rgba(12, 10, 8, 0) 100%
+    );
+    gap: 0.75rem;
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
+    color: var(--f9b-gold);
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.98;
+    letter-spacing: 0.02em;
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-hora, .Tpl-F9b #db-lineup .artist-card.headliner .artist-hora {
+    background-color: rgba(212, 175, 55, 0.12);
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-resena, .Tpl-F9b #db-lineup .artist-card.headliner .artist-resena {
+    max-width: 640px;
+    font-size: 0.95rem;
+    -webkit-line-clamp: 3;
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-social, .Tpl-F9b #db-lineup .artist-card.headliner .artist-social {
+    margin-top: 0.8rem;
+    gap: 1.1rem;
+}
+
+.tpl-f9b #db-lineup .artist-card.headliner .artist-social-icon, .Tpl-F9b #db-lineup .artist-card.headliner .artist-social-icon {
+    opacity: 1;
+}
+
+/* Etiqueta "HEADLINER" sobre la foto del artista marcado por NOMBRE (RASTRO MC). */
+.tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
+    content: "HEADLINER";
+    position: absolute;
+    top: 2.2rem;
+    left: 3rem;
+    z-index: 4;
+    color: var(--f9b-gold);
+    font-family: var(--f9b-sans);
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   15. PLAYLIST - #mod-playlist > #db-spotify-embed
+   ========================================================================== */
+.tpl-f9b #mod-playlist, .Tpl-F9b #mod-playlist {
+    display: flex !important;
+    flex-direction: column;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-playlist > div, .Tpl-F9b #mod-playlist > div {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto !important;
+}
+
+.tpl-f9b #db-spotify-embed, .Tpl-F9b #db-spotify-embed {
+    background-color: var(--f9b-card-bg);
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    min-height: 400px;
+
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-2);}
+
+.tpl-f9b #db-spotify-embed iframe, .Tpl-F9b #db-spotify-embed iframe {
+    display: block;
+    width: 100% !important;
+    min-height: 500px !important;
+    border: none;
+    border-radius: 0 !important;
+}
+
+/* ==========================================================================
+   16. INFO TECNICA - #mod-info-tecnica > .data-cards-container > .card-item
+   ========================================================================== */
+.tpl-f9b #mod-info-tecnica, .Tpl-F9b #mod-info-tecnica {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b .data-cards-container, .Tpl-F9b .data-cards-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f9b .card-item, .Tpl-F9b .card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 2rem 1.4rem !important;
+    background-color: var(--f9b-card-bg) !important;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    text-align: center;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-1);}
+
+.tpl-f9b .card-item:hover, .Tpl-F9b .card-item:hover {
+    border-color: var(--f9b-gold) !important;
+    transform: translateY(-3px);
+}
+
+.tpl-f9b .card-item > span:first-child, .Tpl-F9b .card-item > span:first-child {
+    color: var(--f9b-gold) !important;
+    font-size: 0.6rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3em !important;
+    text-transform: uppercase !important;
+}
+
+.tpl-f9b .card-item span[id*="-val"], .Tpl-F9b .card-item span[id*="-val"] {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--f9b-text) !important;
+    font-family: var(--f9b-serif);
+    font-size: 1.5rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   17. FAQ - #mod-faq > h2 + #db-faq-list > .faq-item
+   ========================================================================== */
+.tpl-f9b #mod-faq, .Tpl-F9b #mod-faq {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #db-faq-list, .Tpl-F9b #db-faq-list {
+    max-width: 840px;
+    margin: 0 auto;
+}
+
+.tpl-f9b .faq-item, .Tpl-F9b .faq-item {
+    padding: 1.4rem 0 !important;
+    border-bottom: 1px solid var(--f9b-border-soft) !important;
+    cursor: pointer;
+    /* El FAQ es una lista, no una grilla: cada item lleva solo sombra de
+       contacto, y el realce de plano llega al abrirse. */
+    box-shadow: var(--f9b-shadow-1);
+    transition: box-shadow 0.4s var(--f9b-ease), border-color 0.3s ease;
+}
+
+.tpl-f9b .faq-item.active, .Tpl-F9b .faq-item.active {
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-1);
+}
+
+.tpl-f9b .faq-item > div:first-child span, .Tpl-F9b .faq-item > div:first-child span {
+    color: var(--f9b-text);
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+}
+
+.tpl-f9b .faq-icon-circle, .Tpl-F9b .faq-icon-circle {
+    border-color: var(--f9b-gold) !important;
+    color: var(--f9b-gold) !important;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.tpl-f9b .faq-item.active .faq-icon-circle, .Tpl-F9b .faq-item.active .faq-icon-circle {
+    transform: rotate(45deg);
+}
+
+.tpl-f9b .faq-answer, .Tpl-F9b .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s var(--f9b-ease), opacity 0.4s ease, padding 0.4s ease;
+    color: var(--f9b-muted);
+    font-size: 0.92rem;
+    line-height: 1.75;
+    padding-top: 0;
+}
+
+.tpl-f9b .faq-item.active .faq-answer, .Tpl-F9b .faq-item.active .faq-answer {
+    max-height: 560px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
+}
+
+/* ==========================================================================
+   18. UBICACION - #mod-ubicacion > #db-mapa-container
+   ========================================================================== */
+.tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #db-mapa-container, .Tpl-F9b #db-mapa-container {
+    max-width: 1000px;
+    height: 380px;
+    margin: 0 auto;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    background-color: var(--f9b-card-bg);
+
+    box-shadow: var(--f9b-shadow-3), var(--f9b-elev-2);}
+
+.tpl-f9b #db-mapa-container iframe, .Tpl-F9b #db-mapa-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ==========================================================================
+   19. BOLETOS - #mod-boletos (filas compactas inyectadas por el motor)
+   ========================================================================== */
+.tpl-f9b #mod-boletos, .Tpl-F9b #mod-boletos {
+    display: block !important;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-boletos .boleto-inner, .Tpl-F9b #mod-boletos .boleto-inner {
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    text-align: center;
+}
+
+.tpl-f9b .boleto-subtitle, .Tpl-F9b .boleto-subtitle {
+    color: var(--f9b-muted) !important;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+}
+
+.tpl-f9b .boleto-cards-wrap, .Tpl-F9b .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column;
+    margin-top: 1.8rem !important;
+    background-color: var(--f9b-card-bg);
+    border: 1px solid var(--f9b-border);
+    gap: 0 !important;
+
+    /* --f9b-tex-card da el plano de la caja; las filas heredan el fondo. */
+    background-image: var(--f9b-tex-card);
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-2);}
+
+.tpl-f9b .boleto-card-row, .Tpl-F9b .boleto-card-row {
+    border-bottom: 1px solid var(--f9b-border-soft) !important;
+    transition: background-color 0.3s ease;
+}
+
+.tpl-f9b .boleto-card-row:last-child, .Tpl-F9b .boleto-card-row:last-child {
+    border-bottom: none !important;
+}
+
+.tpl-f9b a.boleto-card-row:hover, .Tpl-F9b a.boleto-card-row:hover {
+    background-color: rgba(212, 175, 55, 0.06);
+}
+
+.tpl-f9b .boleto-icon, .Tpl-F9b .boleto-icon {
+    color: var(--f9b-gold) !important;
+}
+
+.tpl-f9b .boleto-tipo, .Tpl-F9b .boleto-tipo {
+    color: var(--f9b-gold) !important;
+    letter-spacing: 0.24em !important;
+}
+
+.tpl-f9b .boleto-precio, .Tpl-F9b .boleto-precio {
+    color: var(--f9b-text) !important;
+    font-family: var(--f9b-serif);
+    font-weight: 500 !important;
+}
+
+.tpl-f9b .boleto-arrow, .Tpl-F9b .boleto-arrow {
+    color: var(--f9b-gold) !important;
+    opacity: 0.85 !important;
+}
+
+.tpl-f9b .boleto-desc, .Tpl-F9b .boleto-desc {
+    color: var(--f9b-muted) !important;
+}
+
+.tpl-f9b .boleto-trust, .Tpl-F9b .boleto-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.8rem;
+    color: var(--f9b-muted);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.tpl-f9b .boleto-trust svg, .Tpl-F9b .boleto-trust svg {
+    fill: var(--f9b-gold);
+}
+
+/* ==========================================================================
+   20. EXPERIENCIAS - #mod-experiencias (opcional; oculto si llega vacio)
+   ========================================================================== */
+.tpl-f9b #mod-experiencias, .Tpl-F9b #mod-experiencias {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-experiencias .exp-inner, .Tpl-F9b #mod-experiencias .exp-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tpl-f9b #db-experiencias-list, .Tpl-F9b #db-experiencias-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.tpl-f9b .exp-card, .Tpl-F9b .exp-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 2.2rem 1.6rem;
+    background-color: var(--f9b-card-bg);
+    border: 1px solid var(--f9b-border);
+    text-align: left;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+
+    background-image: var(--f9b-tex-card);
+    box-shadow: var(--f9b-shadow-2), var(--f9b-elev-2);}
+
+.tpl-f9b .exp-card:hover, .Tpl-F9b .exp-card:hover {
+    border-color: var(--f9b-gold);
+    transform: translateY(-4px);
+    box-shadow: var(--f9b-shadow-3), var(--f9b-elev-3);
+}
+
+.tpl-f9b .exp-titulo, .Tpl-F9b .exp-titulo {
+    color: var(--f9b-gold);
+    font-family: var(--f9b-serif);
+    font-size: 1.3rem;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.tpl-f9b .exp-tag, .Tpl-F9b .exp-tag {
+    color: var(--f9b-muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+}
+
+/* ==========================================================================
+   21. WHATSAPP - #mod-whatsapp > .whatsapp-inner > #db-whatsapp-btn
+   ========================================================================== */
+.tpl-f9b #mod-whatsapp, .Tpl-F9b #mod-whatsapp {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    padding: 3.2rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #mod-whatsapp .whatsapp-inner, .Tpl-F9b #mod-whatsapp .whatsapp-inner {
+    max-width: 1100px;
+    margin: 0 auto !important;
+    text-align: center;
+}
+
+.tpl-f9b #db-whatsapp-btn, .Tpl-F9b #db-whatsapp-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 1.1rem 2.4rem !important;
+    background-color: transparent !important;
+    color: var(--f9b-gold) !important;
+    border: 1px solid var(--f9b-gold) !important;
+    border-radius: 0 !important;
+    font-family: var(--f9b-sans);
+    font-weight: 800 !important;
+    font-size: 0.74rem !important;
+    letter-spacing: 0.22em !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9b #db-whatsapp-btn:hover, .Tpl-F9b #db-whatsapp-btn:hover {
+    background-color: var(--f9b-gold) !important;
+    color: var(--f9b-bg) !important;
+    transform: translateY(-2px);
+}
+
+.tpl-f9b #db-whatsapp-btn svg, .Tpl-F9b #db-whatsapp-btn svg {
+    fill: currentColor !important;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   22. SPONSORS - #mod-sponsors > #db-sponsors-list > .sponsor-item
+   ========================================================================== */
+.tpl-f9b #mod-sponsors, .Tpl-F9b #mod-sponsors {
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b #db-sponsors-list, .Tpl-F9b #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f9b .sponsor-item, .Tpl-F9b .sponsor-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 1.6rem !important;
+    background-color: transparent;
+    border: 1px solid var(--f9b-border-soft);
+    transition: border-color 0.3s ease;
+
+    box-shadow: var(--f9b-shadow-1), var(--f9b-elev-1);}
+
+.tpl-f9b .sponsor-item:hover, .Tpl-F9b .sponsor-item:hover {
+    border-color: var(--f9b-gold);
+}
+
+.tpl-f9b .sponsor-img, .Tpl-F9b .sponsor-img {
+    height: 42px;
+    width: auto;
+    opacity: 0.72;
+    transition: opacity 0.3s ease;
+}
+
+.tpl-f9b .sponsor-item:hover .sponsor-img, .Tpl-F9b .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   23. FORMULARIO - #mod-form > .form-master-box (tabs + inputs + submit)
+   ========================================================================== */
+.tpl-f9b #mod-form, .Tpl-F9b #mod-form {
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--f9b-border-soft);
+}
+
+.tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
+    width: 100%;
+    max-width: 560px !important;
+    margin: 0 auto !important;
+    padding: 2.6rem !important;
+    background-color: var(--f9b-card-bg) !important;
+    background-image: var(--f9b-tex-card);
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    box-shadow: var(--f9b-shadow-3), var(--f9b-shadow-gold), var(--f9b-elev-3);
+}
+
+.tpl-f9b .form-tabs, .Tpl-F9b .form-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1.6rem;
+    margin-bottom: 1.8rem !important;
+    border-bottom: 1px solid var(--f9b-border-soft);
+}
+
+/* El titulo del formulario (#tab-new "Unete a nuestra comunidad") va centrado. */
+.tpl-f9b #tab-new, .Tpl-F9b #tab-new {
+    text-align: center;
+    letter-spacing: 0.24em;
+}
+
+.tpl-f9b .tab-btn, .Tpl-F9b .tab-btn {
+    background: none;
+    border: none;
+    padding: 0 0 0.8rem 0;
+    color: var(--f9b-muted);
+    font-family: var(--f9b-sans);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.tpl-f9b .tab-btn.active, .Tpl-F9b .tab-btn.active {
+    color: var(--f9b-gold);
+    border-bottom: 2px solid var(--f9b-gold);
+}
+
+.tpl-f9b #master-reg-form input[type="text"], .Tpl-F9b #master-reg-form input[type="text"],
+.tpl-f9b #master-reg-form input[type="tel"], .Tpl-F9b #master-reg-form input[type="tel"],
+.tpl-f9b #form-ya input[type="text"], .Tpl-F9b #form-ya input[type="text"] {
+    width: 100% !important;
+    padding: 1.1rem 1.2rem !important;
+    margin-bottom: 1.2rem !important;
+    background-color: rgba(243, 243, 241, 0.03) !important;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    color: var(--f9b-text) !important;
+    font-family: var(--f9b-sans);
+    font-size: 0.92rem;
+}
+
+.tpl-f9b #master-reg-form input[type="text"]:focus, .Tpl-F9b #master-reg-form input[type="text"]:focus,
+.tpl-f9b #master-reg-form input[type="tel"]:focus, .Tpl-F9b #master-reg-form input[type="tel"]:focus,
+.tpl-f9b #form-ya input[type="text"]:focus, .Tpl-F9b #form-ya input[type="text"]:focus {
+    outline: none;
+    border-color: var(--f9b-gold) !important;
+}
+
+.tpl-f9b #master-reg-form input::placeholder, .Tpl-F9b #master-reg-form input::placeholder,
+.tpl-f9b #form-ya input::placeholder, .Tpl-F9b #form-ya input::placeholder {
+    color: rgba(168, 159, 145, 0.7);
+}
+
+.tpl-f9b #reg-unir-comunidad-wrap, .Tpl-F9b #reg-unir-comunidad-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin-bottom: 1.4rem !important;
+    padding: 1rem 1.1rem !important;
+    background-color: rgba(212, 175, 55, 0.05) !important;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+    color: var(--f9b-muted) !important;
+    font-size: 0.86rem !important;
+    cursor: pointer;
+}
+
+/* El kernel escribe width/height de 17px en el estilo INLINE de este checkbox,
+   y lo que va en linea gana a cualquier regla del silo salvo !important. Con
+   17px el objetivo de toque se queda por debajo del minimo de 24px (WCAG 2.2
+   AA, 2.5.8) y el anillo de :focus-visible queda ilegible al redimensionarlo.
+   Se sube el cuadro a 24px; los 48px de la banda movil los aporta la fila
+   #reg-unir-comunidad-wrap, que es la superficie que el dedo puede tocar entera. */
+.tpl-f9b #reg-unir-comunidad, .Tpl-F9b #reg-unir-comunidad {
+    width: 24px !important;
+    height: 24px !important;
+    accent-color: var(--f9b-gold) !important;
+}
+
+.tpl-f9b #reg-comunidad-msg, .Tpl-F9b #reg-comunidad-msg {
+    color: var(--f9b-text) !important;
+    background-color: rgba(212, 175, 55, 0.08) !important;
+    border: 1px solid var(--f9b-border) !important;
+    border-radius: 0 !important;
+}
+
+.tpl-f9b #master-reg-form button[type="submit"], .Tpl-F9b #master-reg-form button[type="submit"] {
+    width: 100% !important;
+    padding: 1.2rem !important;
+    background-color: var(--f9b-gold) !important;
+    color: var(--f9b-bg) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: var(--f9b-sans);
+    font-weight: 800 !important;
+    font-size: 0.82rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.tpl-f9b #master-reg-form button[type="submit"]:hover, .Tpl-F9b #master-reg-form button[type="submit"]:hover {
+    background-color: #e8cf74 !important;
+}
+
+.tpl-f9b #form-ya .btn-submit, .Tpl-F9b #form-ya .btn-submit {
+    background-color: transparent !important;
+    color: var(--f9b-gold) !important;
+    border: 1px solid var(--f9b-gold) !important;
+    border-radius: 0 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.tpl-f9b #form-ya .btn-submit:hover, .Tpl-F9b #form-ya .btn-submit:hover {
+    background-color: var(--f9b-gold) !important;
+    color: var(--f9b-bg) !important;
+}
+
+/* ==========================================================================
+   24. FOOTER - #mod-footer (base f8 adaptada a la paleta dorada de f9b)
+   f9b NO muestra el footer de columnas tipo campana: .footer-inner queda
+   oculto (Cero Borrado: el nodo se conserva intacto en el DOM) y solo se
+   pinta la franja inferior centrada con el sello "- rastro mc" en dorado.
+   ========================================================================== */
+.tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {
+    display: block !important;
+    padding: 2.8rem 1.5rem 2rem 1.5rem;
+    background-color: var(--f9b-bg);
+    /* PARALLAX 3 DE 3 - seccion de CIERRE. Mismo orden canonico de 4 capas que
+       el hero. El asset propio del footer es --f9b-asset-textura, y debajo
+       queda --f9b-tex-deep como respaldo, asi que el cierre se ve completo
+       aunque la textura real todavia no exista. Solo 3 superficies del silo
+       llevan parallax a proposito: fijarlo en todas seria caro, y en
+       iPhone/iPad degrada a scroll (TSK-067, deuda abierta y correcta). */
+    background-image:
+        var(--f9b-tex-veil),
+        var(--f9b-asset-textura),
+        var(--f9b-tex-deep),
+        var(--f9b-grain);
+    background-size: cover, cover, cover, 160px 160px;
+    background-position: center center, center center, center center, 0 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    background-attachment:
+        var(--f9b-parallax-attachment),
+        var(--f9b-parallax-attachment),
+        var(--f9b-parallax-attachment),
+        scroll;
+    border-top: 1px solid var(--f9b-border);
+}
+
+.tpl-f9b #mod-footer .footer-inner, .Tpl-F9b #mod-footer .footer-inner {
+    display: none !important;
+}
+
+.tpl-f9b #mod-footer .footer-bottom, .Tpl-F9b #mod-footer .footer-bottom {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0;
+    border-top: none;
+    text-align: center;
+}
+
+.tpl-f9b #footer-copy, .Tpl-F9b #footer-copy {
+    color: var(--f9b-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+/* Marca de silo: "-- rastro mc" al final del copyright. */
+.tpl-f9b #footer-copy::after, .Tpl-F9b #footer-copy::after {
+    content: " - rastro mc";
+    color: var(--f9b-gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.tpl-f9b .htz-powered, .Tpl-F9b .htz-powered {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--f9b-muted);
+    font-size: 0.68rem;
+    opacity: 0.55;
+}
+
+/* ==========================================================================
+   25. BREAKPOINTS RESPONSIVE
+   Capa portada de f8: 1279 / 991 / 767 / 640. La base es columna unica y el
+   grid de 2 columnas entra desde 992px (seccion 3). El lineup de escritorio
+   (headliner grande a la izquierda + 6 artistas en 3x2 a la derecha) tambien
+   arranca en 992px; por debajo, columna unica sin desbordes horizontales.
+   ========================================================================== */
+
+/* --- Laptop chico / tablet ancha: hasta 1279px. --- */
+@media (max-width: 1279px) {
+    .tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+        min-height: 68vh;
+        padding: 6rem 1.5rem 3.5rem 1.5rem;
+    }
+
+    .tpl-f9b #event-title, .Tpl-F9b #event-title {
+        /* Misma salvaguarda por altura que en la base, con el 13vh de esta
+           banda: aqui el tope es 4rem y 13vh todavia no manda en escritorio. */
+        font-size: min(clamp(2.2rem, 7vw, 4rem), 13vh) !important;
+    }
+
+    .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
+        max-width: 520px !important;
+    }
+}
+
+/* --- Escritorio y tablet ancha (>=992px): lineup headliner + 3x2. --- */
+@media (min-width: 992px) {
+    .tpl-f9b #db-lineup, .Tpl-F9b #db-lineup {
+        grid-template-columns: 1.3fr repeat(3, 1fr);
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
+        font-size: clamp(2.1rem, 3.2vw, 3.4rem);
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
+        padding: 3.2rem 1.8rem 1.8rem 1.8rem;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
+        top: 1.8rem;
+        left: 1.8rem;
+    }
+}
+
+/* --- Columna unica: hasta 991px. --- */
+@media (max-width: 991px) {
+    .tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+        min-height: 62vh;
+        padding: 5.5rem 1.4rem 3.2rem 1.4rem;
+    }
+
+    .tpl-f9b #db-lineup, .Tpl-F9b #db-lineup {
+        grid-template-columns: 1fr;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
+        grid-column: 1 / -1;
+        min-height: 52vh;
+    }
+
+    /* Tope de ancho para las tarjetas de artista: en columna unica una foto
+       3/4 a sangre daria tarjetas de ~900px de alto en tablet. El headliner
+       (la foto protagonista) si va a sangre. */
+    .tpl-f9b #db-lineup .artist-card:not(.headliner), .Tpl-F9b #db-lineup .artist-card:not(.headliner) {
+        justify-self: center;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
+        padding: 3rem 1.6rem 1.6rem 1.6rem;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
+        top: 1.5rem;
+        left: 1.6rem;
+    }
+
+    .tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {
+        padding: 2.2rem 1.4rem;
+        gap: 0.9rem 1rem;
+    }
+
+    .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
+        max-width: 92% !important;
+    }
+}
+
+/* --- Movil grande: hasta 767px. --- */
+@media (max-width: 767px) {
+    .tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+        min-height: 56vh;
+        padding: 4.6rem 1.1rem 2.6rem 1.1rem;
+    }
+
+    .tpl-f9b #event-title, .Tpl-F9b #event-title {
+        font-size: clamp(1.9rem, 9.5vw, 3rem) !important;
+        letter-spacing: 0.05em !important;
+    }
+
+    .tpl-f9b #org-name-badge, .Tpl-F9b #org-name-badge {
+        font-size: 0.6rem !important;
+        letter-spacing: 0.3em !important;
+    }
+
+    /* v1.1.0: en movil el hero cambia de asset. Mismo orden canonico de capas
+       y misma estructura de respaldo, solo cambia la foto: si
+       --f9b-asset-hero-mobile sigue vacio, el fondo se ve igual que en
+       escritorio. La foto movil es la UNICA diferencia de esta banda. */
+    .tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+        background-image:
+            var(--f9b-tex-veil),
+            var(--f9b-asset-hero-mobile),
+            var(--f9b-tex-deep),
+            var(--f9b-grain);
+    }
+
+    .tpl-f9b #unified-frame, .Tpl-F9b #unified-frame {
+        padding: 1.8rem 0.6rem;
+        gap: 0.4rem;
+    }
+
+    .tpl-f9b .cd-block, .Tpl-F9b .cd-block {
+        min-width: 66px;
+        padding: 0 0.6rem;
+    }
+
+    .tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1.8rem 1.1rem;
+        gap: 0.6rem;
+    }
+
+    .tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
+        width: 100%;
+        justify-content: flex-start;
+        font-size: 0.72rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .tpl-f9b #mod-descripcion, .Tpl-F9b #mod-descripcion,
+    .tpl-f9b #mod-video, .Tpl-F9b #mod-video,
+    .tpl-f9b #mod-cartel, .Tpl-F9b #mod-cartel,
+    .tpl-f9b #mod-playlist, .Tpl-F9b #mod-playlist,
+    .tpl-f9b #mod-boletos, .Tpl-F9b #mod-boletos,
+    .tpl-f9b #mod-experiencias, .Tpl-F9b #mod-experiencias,
+    .tpl-f9b #mod-faq, .Tpl-F9b #mod-faq,
+    .tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion {
+        padding-left: 1.1rem;
+        padding-right: 1.1rem;
+    }
+
+    .tpl-f9b #mod-lineup, .Tpl-F9b #mod-lineup {
+        padding: 3.5rem 1.1rem;
+    }
+
+    .tpl-f9b #db-lineup, .Tpl-F9b #db-lineup {
+        grid-template-columns: 1fr;
+        gap: 1rem !important;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
+        min-height: 46vh;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
+        padding: 2.8rem 1.4rem 1.4rem 1.4rem;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
+        top: 1.2rem;
+        left: 1.4rem;
+        font-size: 0.56rem;
+    }
+
+    .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
+        padding: 1.8rem !important;
+    }
+
+    .tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {
+        padding: 2.4rem 1.1rem 1.6rem 1.1rem;
+    }
+}
+
+/* --- Movil chico: hasta 640px. --- */
+@media (max-width: 640px) {
+    .tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+        min-height: 50vh;
+        padding: 4rem 0.9rem 2.2rem 0.9rem;
+    }
+
+    .tpl-f9b #org-name-badge, .Tpl-F9b #org-name-badge {
+        letter-spacing: 0.24em !important;
+        padding: 0.4rem 0.9rem !important;
+    }
+
+    .tpl-f9b #unified-frame, .Tpl-F9b #unified-frame {
+        padding: 1.4rem 0.5rem;
+    }
+
+    .tpl-f9b .cd-block, .Tpl-F9b .cd-block {
+        min-width: 54px;
+        padding: 0 0.4rem;
+    }
+
+    .tpl-f9b [id^="cd-"], .Tpl-F9b [id^="cd-"] {
+        font-size: 1.6rem !important;
+    }
+
+    .tpl-f9b .cd-block small, .Tpl-F9b .cd-block small {
+        letter-spacing: 0.16em;
+        font-size: 0.5rem;
+    }
+
+    .tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
+        font-size: 0.68rem;
+        padding: 0.65rem 0.85rem;
+    }
+
+    .tpl-f9b #mod-hero-meta .meta-svg, .Tpl-F9b #mod-hero-meta .meta-svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .tpl-f9b #mod-hero-ctas .hero-cta-btn, .Tpl-F9b #mod-hero-ctas .hero-cta-btn {
+        width: 100%;
+        padding: 0.95rem 1.1rem;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
+        min-height: 40vh;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
+        font-size: clamp(1.8rem, 10vw, 2.6rem);
+    }
+
+    .tpl-f9b #db-gallery-grid, .Tpl-F9b #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+
+    .tpl-f9b #db-sponsors-list, .Tpl-F9b #db-sponsors-list {
+        gap: 1.4rem;
+    }
+
+    .tpl-f9b .sponsor-img, .Tpl-F9b .sponsor-img {
+        height: 32px;
+    }
+
+    .tpl-f9b #db-whatsapp-btn, .Tpl-F9b #db-whatsapp-btn {
+        width: 100%;
+        padding: 1rem 1.1rem !important;
+        font-size: 0.66rem !important;
+    }
+
+    .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
+        padding: 1.4rem !important;
+    }
+}
+
+/* --- BANDA 992-1279px: laptop chico y tablet ancha. CAP. 5 DE TEMPLATES.MD
+       PIDE TRATAMIENTO EXPLICITO, no solo el efecto de dos bloques vecinos:
+       esta banda es la mas comun en portrait de tablet y la que mas se nota
+       cuando el layout de escritorio se estira a la fuerza. Aqui el lineup
+       pasa a 2 columnas (el headliner deja de ocupar media fila), el mapa
+       baja de alto, el formulario se estrecha y el hero respira. Todas estas
+       reglas van DESPUES del bloque de 992px de arriba, asi que ganan por
+       orden y no por !important. Mobile-first: por debajo de 992px sigue el
+       estado base de una columna. --- */
+@media (min-width: 992px) and (max-width: 1279px) {
+    /* Lineup: 2 columnas en vez del 1.3fr + 3 del escritorio. */
+    .tpl-f9b #db-lineup, .Tpl-F9b #db-lineup {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        min-height: 48vh;
+    }
+
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
+        font-size: clamp(1.9rem, 4.4vw, 2.9rem);
+    }
+
+    /* El hero deja de ocupar 80vh: en una ventana de 1000px de alto se pierde
+       media pantalla de contenido real, y aqui sobra. */
+    .tpl-f9b #mod-hero, .Tpl-F9b #mod-hero {
+        min-height: 66vh;
+    }
+
+    /* Superficies: la columna es mas estrecha, asi que el mapa y el panel del
+       formulario bajan de ancho para no dejar margenes muertos. */
+    .tpl-f9b #db-mapa-container, .Tpl-F9b #db-mapa-container {
+        height: 320px;
+    }
+
+    .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
+        max-width: 500px !important;
+    }
+
+    /* Galeria: 3 columnas caben, pero la de 200px deja fotos de 100px. */
+    .tpl-f9b #db-gallery-grid, .Tpl-F9b #db-gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ==========================================================================
+   26. REFLOW - Modulos ocultos reordenan el grid de 2 columnas (>=992px)
+   Fuente unica del layout: la plantilla de la seccion 3. En lugar de repetir
+   el grid-template-areas completo por caso, el companero de una fila pareada
+   se expande a las 2 columnas con grid-column: 1 / -1 (conserva la fila que
+   le asigna su propio grid-area). Sin duplicacion de plantillas.
+   ========================================================================== */
+@media (min-width: 992px) {
+    /* --- Falta el cartel: la playlist ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist, .Tpl-F9b #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Falta la playlist: el cartel ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel, .Tpl-F9b #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Falta el FAQ: la ubicacion ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion, .Tpl-F9b #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Ubicacion vacia (sin mapa): el FAQ ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#db-mapa-container:empty) #mod-faq, .Tpl-F9b #main-content-flow:has(#db-mapa-container:empty) #mod-faq {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Faltan los sponsors: el WhatsApp ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-sponsors[data-hidden]) #mod-whatsapp,
+    .Tpl-F9b #main-content-flow:has(#mod-sponsors[data-hidden]) #mod-whatsapp {
+        grid-column: 1 / -1;
+    }
+}
+/* ============================================================================
+/* ==========================================================================
+    27. CAPA DE DISENO v1.1.0 - PROFUNDIDAD, PARALLAX, AURORA, REVEAL, FOCO
+    Las 4 subsecciones van al final a proposito: son la capa de diseno, la que
+    se lee de un vistazo al final del archivo, y ninguna regla de las anteriores
+    depende de ellas.
+    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+    27.1 PARALLAX - 3 SUPERFICIES Y SOLO 3
+    background-attachment: fixed en muchos elementos es caro de pintar y en
+    iPhone/iPad degrada a scroll (TSK-067, deuda abierta: es el comportamiento
+    esperado, no un bug). Se eligieron las 3 que aportan y las demas se dejan
+    con su fondo plano:
+      1 la raiz del silo    -- el fondo de la pagina, el que acompana el scroll
+      2 #mod-hero           -- el fondo de la portada, el mayor impacto
+      3 #mod-footer         -- el cierre, donde el ojo llega ya calmado
+    Orden de las 4 capas (de arriba hacia abajo), identico en las tres:
+      1 velo --f9b-tex-veil    2 asset --f9b-asset-*
+      3 respaldo --f9b-tex-deep    4 grano --f9b-grain
+    Las declaraciones de cada superficie viven en su seccion (1, 5 y 24): aqui
+    solo se registra el contrato, para no duplicar ningun valor.
+    El attachment NO se escribe como literal: va por --f9b-parallax-attachment,
+    que el kernel y el canal ADR-055 gobiernan con los 4 selectores de la
+    seccion 2.2. Asi el caso por defecto (.tpl-f9b:not(.fx-explicit)) y el
+    explicito (.tpl-f9b.fx-parallax) encienden el mismo efecto, y
+    .tpl-f9b.fx-explicit:not(.fx-parallax) lo apaga sin tocar estas lineas.
+    -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+    27.2 AURORA - CAPA AMBIENTAL FIJA EN LA RAIZ
+    Montada en la seccion 2.3, con sus keyframes f9bAuroraDrift. aqui solo se
+    recuerda el por que: gradientes puros en lugar de filter: blur(), porque el
+    silo no debe depender de un filtro caro, y transform en lugar de width o
+    height en los keyframes, para que el zoom no muestre bordes ni repinte
+    layout a 120 FPS (Mandato 14).
+    -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+    27.3 REVEAL AL HACER SCROLL - PROGRESIVE ENHANCEMENT, CERO JS
+    Patron canonico de f10.css:1712-1730, sin IntersectionObserver y sin una
+    sola linea de JavaScript: si el navegador no soporta animation-timeline, el
+    bloque @supports no se aplica y el contenido se ve normal.
+    CUIDADO CON LA COLISION DE ANIMACIONES: .hero-content, .artist-card,
+    .exp-card, .card-item y .impacto-card ya reciben f9bFadeUp por tiempo
+    (seccion 4) y quedan FUERA del reveal a proposito, porque el shorthand
+    animation pisa la anterior y el reveal se comeria la entrada del hero.
+    Solo entran aqui superficies que no tenian entrada animada.
+    -------------------------------------------------------------------------- */
+@supports (animation-timeline: view()) {
+    .tpl-f9b .faq-item,
+    .Tpl-F9b .faq-item,
+    .tpl-f9b .boleto-cards-wrap,
+    .Tpl-F9b .boleto-cards-wrap,
+    .tpl-f9b .sponsor-item,
+    .Tpl-F9b .sponsor-item,
+    .tpl-f9b .form-master-box,
+    .Tpl-F9b .form-master-box,
+    .tpl-f9b #db-mapa-container,
+    .Tpl-F9b #db-mapa-container,
+    .tpl-f9b #db-spotify-embed,
+    .Tpl-F9b #db-spotify-embed {
+        animation: f9bRevealUp linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+    }
+
+    /* Escalonado por posicion: cada item retrasa un poco su entrada respecto
+       del anterior, en vez de hacerlos aparecer de golpe. Solo se desplaza el
+       rango, nunca la duracion, porque en una linea de tiempo de scroll la
+       duracion la fija el recorrido y no el autor. */
+    .tpl-f9b .faq-item:nth-child(2),
+    .Tpl-F9b .faq-item:nth-child(2) {
+        animation-range: entry 0% entry 52%;
+    }
+
+    .tpl-f9b .faq-item:nth-child(3),
+    .Tpl-F9b .faq-item:nth-child(3) {
+        animation-range: entry 0% entry 60%;
+    }
+
+    .tpl-f9b .faq-item:nth-child(n+4),
+    .Tpl-F9b .faq-item:nth-child(n+4) {
+        animation-range: entry 0% entry 68%;
+    }
+
+    .tpl-f9b .sponsor-item:nth-child(2),
+    .Tpl-F9b .sponsor-item:nth-child(2) {
+        animation-range: entry 0% entry 52%;
+    }
+
+    .tpl-f9b .sponsor-item:nth-child(3),
+    .Tpl-F9b .sponsor-item:nth-child(3) {
+        animation-range: entry 0% entry 60%;
+    }
+
+    @keyframes f9bRevealUp {
+        from {
+            opacity: 0;
+            transform: translateY(22px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* --------------------------------------------------------------------------
+    27.4 ACCESIBILIDAD - FOCO VISIBLE Y TARGETS DE 48px
+    Hueco real del repo: ni f12.css ni f10.css tienen :focus-visible, y
+    TEMPLATES.md Cap. 10 punto vii lo exige. El anillo es ORO del silo, no el
+    azul por defecto del navegador, con 2px de grosor y 3px de separacion.
+    El blanco de --f9b-text hace de segunda banda de contraste sobre el oro
+    (rule 5.1 de Cap. 10), para que el anillo se lea tambien sobre el boton
+    dorado del formulario, donde el oro solo no se distinguiria.
+    Los targets de 48px se aplican SOLO en la banda <= 767px, que es donde un
+    boton de 34px es incomodo al dedo; en escritorio el padding de la seccion 8
+    ya da el alto necesario y forzar 48px descuadra el hero.
+    RECORTE DEL FOCO: #mod-hero tiene overflow: hidden, y las CTAs viven
+    dentro, asi que ahi el anillo se dibuja con outline-offset: 0 mas una
+    segunda banda por dentro. Ningun otro contenedor del silo recorta foco.
+    NOTA DE ALCANCE: el unico control de #mod-ubicacion es el iframe del mapa
+    (#db-mapa-container), y un iframe no admite :focus-visible desde este
+    documento. Se deja constancia en vez de inventar un selector.
+    -------------------------------------------------------------------------- */
+.tpl-f9b :focus-visible,
+.Tpl-F9b :focus-visible {
+    outline: 2px solid var(--f9b-gold);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 2px var(--f9b-text);
+}
+
+.tpl-f9b #mod-hero :focus-visible,
+.Tpl-F9b #mod-hero :focus-visible {
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--f9b-gold);
+}
+
+@media (max-width: 767px) {
+    .tpl-f9b #mod-hero-ctas .hero-cta-btn,
+    .Tpl-F9b #mod-hero-ctas .hero-cta-btn,
+    .tpl-f9b #db-whatsapp-btn,
+    .Tpl-F9b #db-whatsapp-btn,
+    .tpl-f9b .tab-btn,
+    .Tpl-F9b .tab-btn,
+    .tpl-f9b .faq-item > div:first-child,
+    .Tpl-F9b .faq-item > div:first-child,
+    .tpl-f9b #master-reg-form button[type="submit"],
+    .Tpl-F9b #master-reg-form button[type="submit"],
+    .tpl-f9b #form-ya .btn-submit,
+    .Tpl-F9b #form-ya .btn-submit {
+        min-height: 48px;
+    }
+
+    /* Los inputs REALES del formulario dual. No hay select, ni textarea, ni
+       radio en evento-app.html, asi que no se declaran selectores para ellos.
+       Con el padding de 1.1rem vertical estos campos ya miden mas de 48px; el
+       min-height no los arregla, los deja en contrato explicito para que un
+       ajuste futuro de padding no baje el objetivo de toque por debajo. La fila
+       del checkbox si lo necesita de verdad: por eso entra tambien aqui. */
+    .tpl-f9b #master-reg-form input[type="text"],
+    .Tpl-F9b #master-reg-form input[type="text"],
+    .tpl-f9b #master-reg-form input[type="tel"],
+    .Tpl-F9b #master-reg-form input[type="tel"],
+    .tpl-f9b #form-ya input[type="text"],
+    .Tpl-F9b #form-ya input[type="text"],
+    .tpl-f9b #reg-unir-comunidad-wrap,
+    .Tpl-F9b #reg-unir-comunidad-wrap {
+        min-height: 48px;
+    }
+
+    .tpl-f9b .tab-btn,
+    .Tpl-F9b .tab-btn {
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+/* --------------------------------------------------------------------------
+    28. PREFERENCES-REDUCED-MOTION - ULTIMA SECCION DE ANIMACION
+    Va al final del archivo, antes del log, porque es la que apaga TODO lo que
+    las secciones anteriores encienden. Cubre las 4 capas nuevas de la v1.1.0:
+      la aurora de la raiz (::before) y las scanlines (::after), porque los
+      pseudo-elementos PROPIOS del silo no los cubria la regla de descendientes
+      que se uso en la v1.0.0 (esa solo llega a .tpl-f9b *, no al elemento);
+      el reveal de la seccion 27.3, que hereda de la misma regla de todos;
+      y el parallax de las 3 superficies, que ademas se neutraliza con
+      background-attachment: scroll, porque en reduced-motion un fondo fijo es
+      movimiento aunque no haya animacion que apagar.
+    -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f9b::before,
+    .Tpl-F9b::before,
+    .tpl-f9b::after,
+    .Tpl-F9b::after,
+    .tpl-f9b *,
+    .Tpl-F9b *,
+    .tpl-f9b *::before,
+    .Tpl-F9b *::before,
+    .tpl-f9b *::after,
+    .Tpl-F9b *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .tpl-f9b,
+    .Tpl-F9b,
+    .tpl-f9b #mod-hero,
+    .Tpl-F9b #mod-hero,
+    .tpl-f9b #mod-footer,
+    .Tpl-F9b #mod-footer {
+        background-attachment: scroll !important;
+    }
+}
+
+/* ============================================================================
+   LOG DE VERSIONES - Template f9b "Mistico Nocturno"
+   Log PROPIO: este silo no comparte historial con f9. Son dos silos con
+   direccion estetica distinta (ver punto 2 de la cabecera), asi que la
+   version 1.0.0 de f9b no tiene nada que ver con la 1.1.0 de f9.
+   ============================================================================
+   |Version  |Fecha       |Autor              | Descripcion                                       |Estado  |
+   |---------|------------|-------------------|---------------------------------------------------|--------|
+   |v1.0.0   |25/09/2026  |@frontend-tpl-free | NACIMIENTO del silo f9b (ADR-054). El archivo     |[OK]    |
+   |         |            |                   | nacio como clon byte-identico de f9.css (mismo    |        |
+   |         |            |                   | SHA256) y por eso estaba 100% muerto: el kernel   |        |
+   |         |            |                   | escribe la clase del silo hermano ninguno de sus  |        |
+   |         |            |                   | 306 selectores aplicaba. 1) Rebatido de los 304   |        |
+   |         |            |                   | selectores de primer nivel a .tpl-f9b / .Tpl-F9b  |        |
+   |         |            |                   | con DOBLE notacion en las dos variantes (Cap. 8   |        |
+   |         |            |                   | p.3). 2) Tokens del clon con prefijo nuevo        |        |
+   |         |            |                   | --f9b-* (mismos valores) y puente --tpl-accent +  |        |
+   |         |            |                   | --gold conservados. 3) Keyframes con prefijo      |        |
+   |         |            |                   | f9bFadeUp. 4) Se reaparta de f9: se elimina el    |        |
+   |         |            |                   | reset de "cero brillo" y entran las escalas de    |        |
+   |         |            |                   | sombras suaves y de elevacion (3 niveles cada     |        |
+   |         |            |                   | una), el token de grano SVG y 4 tokens            |        |
+   |         |            |                   | --f9b-asset-* declarados aunque valgan vacio      |        |
+   |         |            |                   | (punto de swap de una linea). 5) OFF explicito de |        |
+   |         |            |                   | los 4 modulos de campana y verificacion OFF de    |        |
+   |         |            |                   | los 6 IDs sin diseno, con su porque escrito; IDs  |        |
+   |         |            |                   | intactos (Cero Borrado). 6) Andamiaje del canal   |        |
+   |         |            |                   | de efectos ADR-055                                |        |
+   |         |            |                   | (fx-explicit/grain/glow/vhs/parallax). 7) Brief   |        |
+   |         |            |                   | de 8 preguntas (Cap. 9-bis) en cabecera. 8)       |        |
+   |         |            |                   | f9.css NO se toco: 0 bytes de diff.               |        |
+   |---------|------------|-------------------|---------------------------------------------------|--------|
+   |v1.1.0   |25/09/2026  |@frontend-tpl-free | ONDA 2 - CAPA DE DISENO. 1) Los tokens de         |[OK]    |
+   |         |            |                   | profundidad bajan a uso real: --f9b-shadow-1/2/3  |        |
+   |         |            |                   | repartidos por progresion de superficie (mas      |        |
+   |         |            |                   | superficie, mas elevacion) en countdown, meta del |        |
+   |         |            |                   | hero, galeria, video, cartel, lineup, spotify,    |        |
+   |         |            |                   | faq, mapa, boletos, experiencias, sponsors,       |        |
+   |         |            |                   | formulario, info tecnica e impacto;               |        |
+   |         |            |                   | --f9b-elev-1/2/3 en las superficies claras;       |        |
+   |         |            |                   | --f9b-shadow-gold solo en las 2 superficies de    |        |
+   |         |            |                   | mayor relieve (headliner y .form-master-box) mas  |        |
+   |         |            |                   | el marco condicional de fx-glow en                |        |
+   |         |            |                   | #db-whatsapp-btn; --f9b-tex-card en las cajas de  |        |
+   |         |            |                   | texto. 2) PARALLAX de 4 capas (seccion 27.1) SOLO |        |
+   |         |            |                   | en 3 superficies: raiz, #mod-hero y #mod-footer,  |        |
+   |         |            |                   | las TRES con el mismo orden canonico              |        |
+   |         |            |                   | velo/asset/respaldo/grano, con el respaldo DEBAJO |        |
+   |         |            |                   | del asset (ADR-008) y el attachment por token,    |        |
+   |         |            |                   | nunca literal. Los 4 tokens --f9b-asset-* se usan |        |
+   |         |            |                   | ya; el movil toma --f9b-asset-hero-mobile en la   |        |
+   |         |            |                   | banda <= 767px. Con los assets vacios el fondo se |        |
+   |         |            |                   | ve igual: el placeholder es el gradiente. 3)      |        |
+   |         |            |                   | AURORA fija en la raiz::before (seccion 27.2),    |        |
+   |         |            |                   | gradientes puros sin filter: blur(), con zoom por |        |
+   |         |            |                   | transform en f9bAuroraDrift. 4) REVEAL con        |        |
+   |         |            |                   | @supports (animation-timeline: view()) +          |        |
+   |         |            |                   | animation-range, cero JS, sin                     |        |
+   |         |            |                   | IntersectionObserver. Fuera del reveal los        |        |
+   |         |            |                   | elementos que ya tienen f9bFadeUp por tiempo,     |        |
+   |         |            |                   | para no pisar su animacion con el shorthand. 5)   |        |
+   |         |            |                   | ACCESIBILIDAD: :focus-visible con anillo oro de   |        |
+   |         |            |                   | 2px mas banda de contraste, compensado dentro de  |        |
+   |         |            |                   | #mod-hero para que el overflow: hidden no lo      |        |
+   |         |            |                   | recorte, y targets de 48px en la banda movil para |        |
+   |         |            |                   | lo que existe de verdad: CTAs, tabs, los 3 inputs |        |
+   |         |            |                   | del formulario dual, cabecera de faq, whatsapp,   |        |
+   |         |            |                   | submits y la fila del checkbox de comunidad. Ese  |        |
+   |         |            |                   | checkbox venia con width/height de 17px en estilo |        |
+   |         |            |                   | INLINE, que gana al silo salvo !important, por    |        |
+   |         |            |                   | debajo del minimo de 24px de WCAG 2.2 AA 2.5.8:   |        |
+   |         |            |                   | su cuadro sube a 24px y los 48px los aporta la    |        |
+   |         |            |                   | fila. NO hay select, textarea, radio ni switch en |        |
+   |         |            |                   | el kernel, asi que no se declaran selectores para |        |
+   |         |            |                   | ellos. 6) CANAL DE EFECTOS MONTADO: fx-grain en   |        |
+   |         |            |                   | #mod-hero::after, fx-vhs en la raiz::after y      |        |
+   |         |            |                   | fx-glow en 3 elementos marcos. Anti-doble-grano:  |        |
+   |         |            |                   | el grano estructural y el de fx-grain viven en    |        |
+   |         |            |                   | elementos distintos. 7) PULIDO de los 3 IDs en    |        |
+   |         |            |                   | alcance: #event-subtitle como elemento vivo SIN   |        |
+   |         |            |                   | !important (respeta el toggle del kernel),        |        |
+   |         |            |                   | #org-name-badge con profundidad y compensacion de |        |
+   |         |            |                   | tracking, y #loader como velo translucido en      |        |
+   |         |            |                   | lugar de bloque opaco. 8) BREAKPOINTS: banda      |        |
+   |         |            |                   | 992-1279 con tratamiento explicito (lineup a 2    |        |
+   |         |            |                   | columnas, hero a 66vh, mapa a 320px, formulario a |        |
+   |         |            |                   | 500px) y salvaguarda por altura con min() en el   |        |
+   |         |            |                   | titulo del hero, para que no desborde en          |        |
+   |         |            |                   | pantallas bajas. Mobile-first, sin tocar los      |        |
+   |         |            |                   | heredados. 9) prefers-reduced-motion movido al    |        |
+   |         |            |                   | cierre y ampliado: aurora, scanlines, reveal y el |        |
+   |         |            |                   | parallax, que ademas se neutraliza con            |        |
+   |         |            |                   | background-attachment: scroll. 10) BORRADO UNICO  |        |
+   |         |            |                   | de la onda: las 2 reglas de .hero-title-line1/2,  |        |
+   |         |            |                   | que el kernel nunca emite para f9b (gate          |        |
+   |         |            |                   | tpl-f6/tpl-f8). Quedan documentadas con el        |        |
+   |         |            |                   | porque. 11) f9.css NO se toco: 0 bytes de diff.   |        |
+   ============================================================================ */

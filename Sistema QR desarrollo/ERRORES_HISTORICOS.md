@@ -181,5 +181,42 @@ Este documento registra el historial de fallos críticos detectados durante la e
 
 ---
 
-*Este documento constituye la memoria técnica inamovible para asegurar la fidelidad de 1px en el Sistema QR Hostal Terraza (Actualizado v1.13.0-STABLE, ADR-024).*
+## 14. Diagnostico Falso y Deriva de Valores en el Silo F9B "Mistico Nocturno" (2026-09-26 — paquete ADR-054/055/056/057)
+
+### El clon muerto por SCOPE, no por CASING (diagnostico inicial FALSO)
+* **Problema:** `css/templates/fiesta/f9b.css` nacio como clon de `f9` y, en su estado original, **no aplicaba ninguna regla**: el evento se renderizaba sin estilo de silo (modulos ocultos por el IoC global de `evento-app.html:30`/`:33`). El diagnostico inicial (documentado en la primera redaccion de ADR-054) atribuyo la causa al **casing**: afirmaba que el kernel escribia `Tpl-F9b` y que por eso `.tpl-f9`/`.Tpl-F9` no matcheaban.
+* **Causa raiz real (verificada, ADR-006):** el kernel escribe SIEMPRE `tpl-` + `template_id` tal cual + su minuscula (**`evento-app.html:998-1000`**), asi que con `template_id='f9b'` el body queda **`tpl-f9b tpl-f9b`** — **nunca `Tpl-F9b`** (grep case-sensitive `Tpl-` en `evento-app.html` = 1 coincidencia, y es un comentario en `:760`). **La causa era el SCOPE:** `.tpl-f9` **no matchea** `tpl-f9b` (no es sufijo convertible; son tokens distintos). El fallo era de cobertura de scope, no de casing.
+* **Leccion:** cuando un silo "no aplica", **lo primero es grep del scope exacto contra la clase REAL del body**, no inferir el casing. Dos consecuencias duraderas: (a) el subproducto de esta verificacion es que **toda la mitad `.Tpl-*` de los silos es codigo muerto** (ver `ADR-057` y la seccion 15); (b) la redaccion original de ADR-054 se conservo y corrigio sin reescribir (patron ADR-006).
+
+### Deriva de valores: el ADR citaba cifras y lineas que no coincidian con el archivo
+* **Problema (patron transversal, ver §7/§8/§13):** los ADR de la triada citaban valores desincronizados con el archivo real. Casos verificados y corregidos el 2026-09-26: (1) ADR-054 citaba `f9b.css` como "**339 lineas / 642 ocurrencias de scope**"; **real: 2922 lineas / 369 `.tpl-f9b` + 365 `.Tpl-F9b` = 734**. (2) Citas de `className` `:836-838` -> **`:998-1000`**; efecto `:848` -> **`:1010`**; `__esF9Meta` `:914` -> **`:1149`**; `__esFamiliaF9` `:738-740` -> **`:766-773`**; `__esSiloF9Rastro` `:747-748` -> **`:780-782`**. (3) ADR-056 decia `openEditMod` "NO EXISTE" — **SI existe** (`admin.html:5203`); lo inexistente era `editarEvento()`. (4) ADR-056 `:5071` -> **`:5203`**, `L4051` -> **`:4153`**, `L5321` -> **`L5461`**, poster `:1383` -> **`:1599`**. (5) ADR-056 daba `2026-10-24` como viernes ("Viernes 24"): es **sabado**; el formateador real (`__formatoFechaLarga`, `evento-app.html:852-862`) devuelve `{"l1":"Sabado 24","l2":"octubre de 2026"}`. (6) Citas falsas tipo "425/425" inexistente y "Tpl-F9b" que el kernel nunca emite.
+* **Causa raiz:** redactar el ADR durante/antes de la implementacion, mirando una version previa del archivo, sin re-verificar cada cita al cerrar. Es exactamente el patron que advierten §7 ("comentario que documenta una decision que el codigo no implementaba") y §8/§13 (valores documentados que el codigo real no reproduce).
+* **Blindaje:** al cerrar cualquier ADR, **re-ejecutar un `grep` por cada linea citada** contra el archivo real (ADR-006) y corregir las citas en el mismo cierre. Un ADR es baseline solo si sus citas resuelven; si no, propaga la deriva a todo el equipo.
+* **Verificacion:** corregido en `DECISIONS.md` (notas R-054-bis, R-055-bis, R-056-bis, y ADR-057 nuevo) el 2026-09-26; `TEMPLATES.md` v1.6.0 con el aviso capital-T.
+
+---
+
+## 15. IDs Duplicados de Patrocinadores y Efectos sin Consumidor en `admin.html` (2026-09-26 — paquete ADR-055/056)
+
+### IDs duplicados de patrocinadores y la premisa falsa de `getElementById`
+* **Problema:** `admin.html` tenia DOS bloques de patrocinadores con los mismos ids (`#sponsors-entries` x2, `#sponsors-add` x2: `admin.html:767-768` y `:790-791`). La premisa documentada era "solo el segundo bloque es alcanzable por `getElementById`".
+* **Causa raiz real (verificada, ADR-006):** es **FALSO que se use `getElementById`** para esos ids. La UI enlaza **ambos** botones con `querySelectorAll('#sponsors-add')` (`admin.html:3755`) y resuelve el contenedor por **consulta acotada al panel** (`addBtn.closest('[id^="ld-campo-sponsors"]')` -> `panel.querySelector('#sponsors-entries')`, `:3756-3757`). De modo que **ambos paneles son operables**; la ambiguedad real era de **seleccion por categoria** (`activeContainer(suf)`, `:3884-3893`). Tambien era FALSO que "L4159 sin sufijo pierde los datos": su valor es **sobrescrito por el spread** `...(sponsors.length ? {sponsors} : {})` (`:4195`).
+* **Correccion/blindaje:** consolidar a un unico bloque y **re-apuntar las tres claves de `modMap`** (`:3623`/`:3633`/`:3642`) al mismo contenedor + simplificar `activeContainer` **en el mismo cambio**; de lo contrario el **P0 real** es que desaparece el panel de patrocinadores de un evento de fiesta. Leccion: **no asumir que un id duplicado es inalcanzable** — verificar SIEMPRE como lo obtiene el codigo (por id global, por panel o por `closest`).
+* **Verificacion:** documentado en ADR-056 (filas 1-3 + Riesgo 1 + Justificacion 1, corregidos); `hideForeignModulesByType` re-apuntado (`admin.html:5490-5500`).
+
+### Efectos sin consumidor: defaults invertidos y `fx-explicit` siempre presente
+* **Problema:** los 4 checkboxes de efectos (`ld-fx-grain`/`glow`/`vhs`/`parallax`) se persistian pero **nadie los leia** (dato muerto). Ademas los defaults del HTML estaban **invertidos** respecto al contrato ADR-055 (glow ON / parallax OFF, cuando `f9b` exige parallax ON y el resto OFF) — hallazgo MEDIA-1 de la revision.
+* **Causa raiz:** el canal de datos->presentacion estaba a medias (solo escritura). Al cablearlo (kernel lee `effects`), el default del formulario contradecia el default del silo.
+* **Correccion/blindaje:** (a) el kernel ahora traduce `effects` a clases (`__aplicarEfectosLanding`, `evento-app.html:799-815`, aplicado en `:1010`); (b) `_aplicarPresetTheme('mistico-nocturno')` (`admin.html:3508-3515`) **fija** los 4 defaults correctos al elegir el theme (desviacion deliberada: el admin SI cambia en este punto, ver ADR-055 R8). **`_buildConfigLanding` emite siempre `effects`** (`admin.html:4230-4235`), por lo que **`fx-explicit` esta siempre presente** cuando el evento pasa por el Wizard: bajo la regla 4.1 de ADR-055, eso **anula los defaults del silo** y todo depende de las clases positivas emitidas. Leccion: al cablear un dato que estaba muerto, **auditar que el default del emisor coincida con el default esperado del consumidor**.
+* **Verificacion:** `express_check` PASS 12 / FAIL 0; smoke f9b PASS 61 / FAIL 0 (comprueba `effects = {grain:false, glow:false, vhs:false, parallax:true}` -> `fx-explicit` + `fx-parallax`); grep repo-wide de `fx-*`: **0 consumidores fuera de `f9b.css`** (solo `eventobackup.html` —contraejemplo— y el smoke).
+
+### Deuda documental detectada (comentarios inline con lineas viejas)
+* **Problema:** algunos comentarios inline de codigo arrastran citas de lineas desincronizadas: en `evento-app.html`, el comentario de `:829` cita `evento-app.html:870` (real, `__posterUrlDeEvento`) y el de `:886` cita `:906` (real, dentro de `__evDesdePreview`). Igual en `admin.html` (comentarios ADR-056).
+* **Naturaleza:** deuda **documental** (no funcional); no se edita aqui porque es codigo (dominio de `@renderer-dev`/`@admin-dev`). Registrada en `NEXT.md` para un pase de limpieza.
+* **Verificacion:** confirmado por lectura directa de `evento-app.html` (2026-09-26).
+
+---
+
+*Este documento constituye la memoria técnica inamovible para asegurar la fidelidad de 1px en el Sistema QR Hostal Terraza (Actualizado v1.14.0-STABLE, 2026-09-26).*
 *TRACE (2026-09-22, ADR-048 / Silo F12 "Kande"): subseccion nueva agregada esta fecha — colision de namespace Fiesta/Campana del preset `_THEME_MODULES['kande']` (`ld-mod-historia` en un preset de Fiesta). Historial previo intacto (Cero Borrado).*
+*TRACE (2026-09-26, paquete F9B "Mistico Nocturno" — ADR-054/055/056/057): subsecciones 14 y 15 nuevas. §14 = diagnostico falso del "clon muerto por casing" (la causa real era el SCOPE) + deriva de valores/lineas en los ADR de la triada. §15 = IDs duplicados de patrocinadores y la premisa falsa de `getElementById` + efectos sin consumidor con defaults invertidos + deuda documental de comentarios inline. Historial previo intacto (Cero Borrado).*

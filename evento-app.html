@@ -333,6 +333,13 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        // === MODO VISTA PREVIA (?preview=1) - bandera unica de sesion ===
+        // Se calcula UNA vez, antes del escudo de analytics, para que la rama de
+        // preview y los guardas de red/analitica compartan la misma lectura de la
+        // URL. Sin ?preview=1 queda false y NINGUNA rama normal cambia: cada guarda
+        // que la consulta es no-op. Vanilla puro, sin backend y sin persistencia.
+        const __HT_PREVIEW = (typeof window !== 'undefined' && window.location && new URLSearchParams(window.location.search).get('preview') === '1');
+
         // === INICIO SEGMENTO: ESCUDO ANALYTICS (v1.0.0 · landing) ===
         // Analítica de primer partido sobre Supabase (tabla page_events, ADR-032).
         // Mide: vistas del landing (pageview con visitante/sesión únicos), ingresos
@@ -359,10 +366,18 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 });
             };
 
-            let sessionId = sessionStorage.getItem(SESSION_KEY);
-            if (!sessionId) { sessionId = uid(); try { sessionStorage.setItem(SESSION_KEY, sessionId); } catch (e) {} }
-            let visitorId = localStorage.getItem(VISITOR_KEY);
-            if (!visitorId) { visitorId = uid(); try { localStorage.setItem(VISITOR_KEY, visitorId); } catch (e) {} }
+            // Vista previa: ni se lee ni se escribe identidad de analitica (cero
+            // persistencia). En runtime normal el bloque es identico al de antes.
+            let sessionId = null;
+            if (!__HT_PREVIEW) {
+                sessionId = sessionStorage.getItem(SESSION_KEY);
+                if (!sessionId) { sessionId = uid(); try { sessionStorage.setItem(SESSION_KEY, sessionId); } catch (e) {} }
+            }
+            let visitorId = null;
+            if (!__HT_PREVIEW) {
+                visitorId = localStorage.getItem(VISITOR_KEY);
+                if (!visitorId) { visitorId = uid(); try { localStorage.setItem(VISITOR_KEY, visitorId); } catch (e) {} }
+            }
 
             const slugFromUrl = () => (new URLSearchParams(window.location.search).get('slug') || '');
 
@@ -383,6 +398,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             });
 
             const track = (type, action, label, value, extra) => {
+                if (__HT_PREVIEW) return; // vista previa: cero red
                 try {
                     sbClient.from('page_events').insert(buildEvt(type, action, label, value, extra))
                         .then(() => {}).catch((e) => console.debug('[Analytics]', e.message));
@@ -391,6 +407,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 
             // keepalive: sobrevive a pagehide (cierre de pestaña o navegación).
             const trackKeepalive = (type, action, label, value, extra) => {
+                if (__HT_PREVIEW) return; // vista previa: cero red
                 try {
                     fetch(SB_URL + '/rest/v1/page_events', {
                         method: 'POST',
@@ -720,15 +737,221 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             });
         }
 
-        async function initEvento() {
-            const slug = new URLSearchParams(window.location.search).get('slug');
-            if (!slug) return;
+        // === v1.5.0 : KERNEL DE FAMILIA f9 + CANAL DE EFECTOS (ADR-054 / ADR-055) ===
+        // Tres helpers declarados a NIVEL DE SCRIPT (hoisting) = fuente unica de verdad
+        // de todo lo que la familia f9 comparte. Se declaran fuera de initEvento para que
+        // sean consultables desde cualquier punto del render sin duplicar literales ni
+        // volver a testear el className en cinco sitios distintos.
+
+        // (1) PREDICADO DE FAMILIA: ALLOWLIST DE IDENTIDADES (riesgo 2 del ADR-054, cerrado).
+        // Que hace, exactamente: mira la clase del body como una lista de TOKENS y devuelve
+        // true solo si alguno de esos tokens esta en la allowlist de identidades de la
+        // familia. No busca subcadenas y no mira prefijos.
+        // Por que allowlist y no prefijo: con busqueda por prefijo, un silo futuro f9c
+        // heredaria automaticamente las 5 subconmutaciones de la familia y el contenido
+        // editorial de RASTRO MC sin que nadie lo decida. Eso no es un refactor cosmetico,
+        // es una fuga de contenido entre eventos distintos.
+        // Dato de contexto (ADR-006, verificado): el kernel escribe 'tpl-' + template_id tal
+        // cual y ademas su version en minusculas, asi que el body lleva las dos variantes y
+        // "tpl-f9b" contiene la subcadena "tpl-f9". Por eso los gates crudos que aun usaban
+        // includes('tpl-f9') matcheaban f9b. Esa coincidencia era un accidente del prefijo,
+        // no un contrato, y por eso los 5 gates se consultan a TRAVES de este helper.
+        // RECASO: matchea en cualquiera de las dos variantes de casing porque compara el
+        // token en minusculas ('tpl-f9' y 'Tpl-F9' caen en la misma identidad).
+        // AL AGREGAR UN SILO NUEVO DE LA FAMILIA: anade su identidad a la allowlist de
+        // abajo de forma explicita (una entrada mas). No queda dentro por prefijo, y eso es
+        // a proposito: si no se anade, el silo queda fuera de la familia, sin las
+        // subconmutaciones y sin el contenido editorial heredado. La omision es la
+        // proteccion; la entrada explicita es la decision.
+        function __esFamiliaF9() {
+            const allow = ['tpl-f9', 'tpl-f9b'];
+            const toks = String(document.body.className || '').split(/\s+/);
+            for (let i = 0; i < toks.length; i++) {
+                if (allow.indexOf(String(toks[i]).toLowerCase()) !== -1) return true;
+            }
+            return false;
+        }
+
+        // (2) SILO RASTRO MC (dueno del texto editorial).
+        // El silo 'tpl-f9' LITERAL es el dueno del contenido editorial de RASTRO MC
+        // (descripcion de prelanzamiento y FAQ de 5 preguntas). Se compara como TOKEN
+        // COMPLETO, no por subcadena, para que un silo hermano (tpl-f9b) NO lo hereda:
+        // un silo no puede pintar contenido editorial de otro evento.
+        function __esSiloF9Rastro() {
+            return (' ' + String(document.body.className || '') + ' ').indexOf(' tpl-f9 ') !== -1;
+        }
+
+        // (3) CANAL DE EFECTOS (ADR-055 punto 3, capa 2 de 3).
+        // Traduce booleano -> clase de cuerpo y nada mas: no inventa clave, no inventa
+        // clase, no aplica estilos. El silo (capa 3) es el unico que estiliza las clases fx-*.
+        // Contrato literal (ADR-055 es la fuente unica e irrevocable de estos literales):
+        //     grain -> fx-grain    glow -> fx-glow
+        //     vhs   -> fx-vhs      parallax -> fx-parallax
+        // Marcador de presencia: fx-explicit. Si el body NO tiene fx-explicit, el silo
+        // aplica sus defaults (en f9b: parallax ON). Si lo tiene, el default queda
+        // ANULADO y solo rigen las clases positivas presentes (regla 4.1).
+        // Sin clases negativas: la AUSENCIA de la clase positiva es el apagado (4.2).
+        // Fail-open (4.4): si effects no es un objeto valido no se aplica NADA, ni
+        // siquiera fx-explicit, y el silo cae a sus defaults. Nunca se rompe el render.
+        // TRAMPA CENTRAL (regla 4.3): se invoca DESPUES de la reasignacion COMPLETA de
+        // document.body.className y con classList.add. Aplicado antes, className = ...
+        // lo borra y el efecto no aplica sin error.
+        function __aplicarEfectosLanding(ev) {
             try {
-                // Timeout de 8s para sbQuery (Resiliencia P4)
-                const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre, plan)').eq('slug', slug).single();
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
-                const { data: ev, error } = await Promise.race([sbPromise, timeoutPromise]);
-                if (error || !ev) throw new Error(error?.message || "Evento no hallado.");
+                const fx = ev && ev.config_landing ? ev.config_landing.effects : null;
+                if (!fx || typeof fx !== 'object' || Array.isArray(fx)) return false;
+                const b = document.body;
+                if (!b || !b.classList) return false;
+                b.classList.add('fx-explicit');
+                if (fx.grain)    b.classList.add('fx-grain');
+                if (fx.glow)     b.classList.add('fx-glow');
+                if (fx.vhs)      b.classList.add('fx-vhs');
+                if (fx.parallax) b.classList.add('fx-parallax');
+                return true;
+            } catch (e) {
+                // Fail-open silencioso: un effects corrupto no puede romper el render.
+                return false;
+            }
+        }
+
+        // (4) DERIVACION DE LA LINEA DEL HERO (ADR-056 decision 7).
+        // Normaliza un valor DERIVADO (ev.fecha / ev.hora / ubicacion) antes de pintarlo.
+        // Devuelve '' cuando no hay dato real, para que __metaSet OMITA el segmento en
+        // vez de dejar "undefined", "null", una cadena vacia o un placeholder "--".
+        // Centinela de campana: la columna fecha es NOT NULL, asi que un evento sin fecha
+        // real se guarda como 2099-12-31 (ver admin.html al guardar). Se trata como "sin
+        // fecha", con el mismo criterio de anio >= 2090 que ya usa el gate de la fase
+        // 'proximamente' mas abajo: una sola definicion de centinela en el kernel.
+        // OJO: un override explicito (content.meta.<x>.l1) NUNCA pasa por aqui. El override
+        // manda sobre la derivacion (contrato del override) y __metaSet lo consulta antes.
+        function __metaDerive(v, esFecha) {
+            if (v === null || v === undefined) return '';
+            const s = String(v).trim();
+            if (!s) return '';
+            const low = s.toLowerCase();
+            if (low === 'undefined' || low === 'null' || low === 'nan') return '';
+            if (esFecha) {
+                const m = s.match(/(\d{4})/);
+                if (m && Number(m[1]) >= 2090) return '';
+            }
+            return s;
+        }
+
+        // (4b) FORMATO LARGO DE LA FECHA DEL HERO (ADR-056 decision 7, punto 3).
+        // Convierte una fecha ISO (YYYY-MM-DD, con hora opcional) en las dos lineas
+        // localizadas del hero: l1 = dia de la semana + numero de dia ("Sabado 24"),
+        // l2 = mes + " de " + anio ("octubre de 2026").
+        // El formateo se delega en toLocaleDateString con locale 'es-ES' para que los
+        // acentos ("miercoles", "sabado") NUNCA entren al fuente: se generan en
+        // runtime y el archivo conserva ASCII puro (delta no-ASCII 0).
+        // La fecha se construye con componentes LOCALES (year, month-1, day) para que
+        // la zona horaria no desplace el dia: new Date('2026-10-24') se interpreta en
+        // UTC y en America/Bogota caeria en el 23.
+        // Devuelve null si el valor no es ISO: el llamador cae a la linea unica
+        // historica (cero regresion para fechas legacy en texto libre).
+        function __formatoFechaLarga(iso) {
+            const m = String(iso == null ? '' : iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (!m) return null;
+            const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+            if (isNaN(d.getTime())) return null;
+            const l1raw = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' }).replace(',', '').trim();
+            const l2 = d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+            if (!l1raw) return null;
+            const l1 = l1raw.charAt(0).toUpperCase() + l1raw.slice(1);
+            return { l1: l1, l2: l2 };
+        }
+
+        // (5) ORDEN DE FALLBACK DEL POSTER (ADR-056 decision 7).
+        // Orden canonico: columna poster_url, luego content.poster_url, luego imagen_url.
+        // Es el mismo orden que ya usan el admin al precargar y el index al pintar la
+        // tarjeta, para que la portada del evento sea la misma en las tres capas.
+        // `content` (no effContent) a proposito: es la clave plana que leen admin e index;
+        // la capa i18n de effContent no se inventa aqui.
+        function __posterUrlDeEvento(ev, content) {
+            return (ev && ev.poster_url)
+                || (content && content.poster_url)
+                || (ev && ev.imagen_url)
+                || '';
+        }
+
+        // (6) MODO VISTA PREVIA (?preview=1) - adaptador del borrador del wizard.
+        // Funcion PURA de lectura: toma el JSON que admin.html dejo en
+        // sessionStorage bajo 'ht_preview_payload' y lo viste con la MISMA forma
+        // que una fila de 'eventos' de Supabase, para que initEvento reutilice
+        // integro el render del kernel sin duplicar una sola linea. No consulta
+        // la red, no muta nada y no persiste nada.
+        // Contrato del payload (estable, lo escribe el admin):
+        //   { ev, content, theme, template_id, categoria_slug, effects }
+        // Devuelve { ev } si todo esta bien, o { error } con un texto en ASCII.
+        // Regla de caja: el kernel escribe 'tpl-' + template_id TAL CUAL y ademas
+        // su version minuscula. El template_id del payload se pasa SIN TOCAR (el
+        // admin persiste la forma minuscula del silo, ej. 'f9b'), de modo que la
+        // vista previa produce EXACTAMENTE la clase de produccion. injectAtomicCSS
+        // sigue bajando a minusculas para resolver la ruta css/templates/{cat}/{id}.css.
+        function __evDesdePreview() {
+            var raw = null;
+            try { raw = sessionStorage.getItem('ht_preview_payload'); } catch (e) { raw = null; }
+            if (!raw) return { error: 'No hay borrador de vista previa. Abre el wizard y pulsa Vista previa de nuevo.' };
+            var p = null;
+            try { p = JSON.parse(raw); } catch (e) { p = null; }
+            if (!p || typeof p !== 'object' || Array.isArray(p)) return { error: 'El borrador de vista previa no es un JSON valido.' };
+            if (!p.template_id || !p.categoria_slug) return { error: 'El borrador de vista previa no trae template_id o categoria_slug.' };
+            var ev = Object.assign({}, (p.ev && typeof p.ev === 'object' && !Array.isArray(p.ev)) ? p.ev : {});
+            ev.template_id = String(p.template_id);
+            ev.categoria_slug = String(p.categoria_slug);
+            ev.config_landing = {
+                content: (p.content && typeof p.content === 'object' && !Array.isArray(p.content)) ? p.content : {},
+                effects: (p.effects && typeof p.effects === 'object' && !Array.isArray(p.effects)) ? p.effects : null
+            };
+            if (p.i18n && typeof p.i18n === 'object' && !Array.isArray(p.i18n)) ev.config_landing.i18n = p.i18n;
+            if (!ev.organizaciones || typeof ev.organizaciones !== 'object') {
+                ev.organizaciones = { nombre: ev.org_nombre || '', plan: ev.plan || 'freemium' };
+            }
+            return { ev: ev };
+        }
+
+        // Estado de error de la vista previa: aviso claro, sin red y sin depender
+        // del silo (aplica igual si el CSS no llego a cargar). Se construye con
+        // createElement (no con innerHTML) para no tocar el balance de divs del
+        // documento fuente y para evitar inyeccion de markup.
+        function __renderPreviewError(msg) {
+            try {
+                document.title = 'Vista previa no disponible';
+                document.body.className = 'tpl-init';
+                var host = document.createElement('div');
+                host.style.cssText = 'min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; color:#fff; background:#0a0a0c;';
+                var box = document.createElement('p');
+                box.style.cssText = 'max-width:440px; opacity:0.85; line-height:1.6; margin:0;';
+                box.textContent = String(msg || 'Estado de vista previa no disponible.');
+                host.appendChild(box);
+                document.body.innerHTML = '';
+                document.body.appendChild(host);
+            } catch (e) {}
+        }
+
+        async function initEvento() {
+            // Parseo unico de la query. `preview` viene de la bandera de sesion
+            // (__HT_PREVIEW); sin ?preview=1 el comportamiento es el de siempre.
+            const __q = new URLSearchParams(window.location.search);
+            const slug = __q.get('slug');
+            const __preview = __HT_PREVIEW;
+            if (!slug && !__preview) return;
+            try {
+                let ev;
+                if (__preview) {
+                    // Rama NUEVA y aislada: el borrador sustituye a Supabase. Si el
+                    // payload es invalido se corta con error visible y CERO red.
+                    const __prev = __evDesdePreview();
+                    if (__prev.error) { __renderPreviewError(__prev.error); return; }
+                    ev = __prev.ev;
+                } else {
+                    // Timeout de 8s para sbQuery (Resiliencia P4)
+                    const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre, plan)').eq('slug', slug).single();
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase (8s) excedido")), 8000));
+                    const __res = await Promise.race([sbPromise, timeoutPromise]);
+                    if (__res.error || !__res.data) throw new Error(__res.error?.message || "Evento no hallado.");
+                    ev = __res.data;
+                }
 
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
                 const content = ev.config_landing?.content || {};
@@ -775,6 +998,16 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const tplNormal = `tpl-${ev.template_id || 'F3'}`;
                 const tplLower = `tpl-${(ev.template_id || 'f3').toLowerCase()}`;
                 document.body.className = `${tplNormal} ${tplLower}`;
+
+                // v1.5.0 (ADR-055 reglas 4.3 y 4.5): el canal de efectos se aplica AQUI, justo
+                // despues de la reasignacion COMPLETA de document.body.className de la linea
+                // anterior. Con classList.add, nunca con className =, y sin fetch adicional:
+                // el evento ya esta resuelto y el silo ya fue inyectado (injectAtomicCSS).
+                // Ruta de lectura real: ev.config_landing.effects, hermano de
+                // ev.config_landing.content (declarado unas lineas mas arriba), tal como lo
+                // escribe _buildConfigLanding() en admin.html. Si effects no es objeto valido
+                // el helper es no-op y el silo aplica sus defaults (fail-open, regla 4.4).
+                __aplicarEfectosLanding(ev);
 
                 // v305 · PUENTE DE GAMAS CROMÁTICAS (regla general, aplica a silos que
                 // exponen tokens de paleta derivada, ej. .tpl-f8 TropiLove). A partir del
@@ -911,28 +1144,79 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // v309 (fix H-2): las 2 lineas (.meta-line) solo tienen soporte CSS en el
                 // silo .tpl-f9. En cualquier otro silo se ignora `two` y se conserva la
                 // linea unica historica; asi content.meta no degrada el hero de f5/f6/f8.
-                const __esF9Meta = document.body.className && document.body.className.includes('tpl-f9');
-                const __metaSet = (id, one, two) => {
+                // v1.5.0 (riesgo 2 del ADR-054 cerrado): el gate pasa por la allowlist de
+                // familia. Antes era includes('tpl-f9'), un match por prefijo.
+                const __esF9Meta = __esFamiliaF9();
+                const __metaSet = (id, one, two, esFecha) => {
                     const el = document.getElementById(id);
                     if (!el) return;
+                    // El .meta-item es el padre del span: se oculta el padre para que se
+                    // vaya el icono tambien. Un icono de reloj sin hora es ruido.
+                    const item = el.parentElement;
+                    // CONTRATO DEL OVERRIDE: si hay l1, ese valor MANDA sobre la derivacion.
+                    // Se consulta antes de derivar, asi que un override nunca pasa por
+                    // __metaDerive ni se filtra por la centinela.
                     const l1 = (__esF9Meta && two && typeof two === 'object' && two.l1) ? String(two.l1) : '';
-                    if (!l1) { el.innerText = one; return; }
-                    el.textContent = '';
-                    const __l1 = document.createElement('span');
-                    __l1.className = 'meta-line';
-                    __l1.textContent = l1;
-                    el.appendChild(__l1);
-                    const l2 = two.l2 ? String(two.l2) : '';
-                    if (l2) {
-                        const __l2 = document.createElement('span');
-                        __l2.className = 'meta-line meta-line--2';
-                        __l2.textContent = l2;
-                        el.appendChild(__l2);
+                    if (l1) {
+                        if (item) item.style.display = '';
+                        el.textContent = '';
+                        const __l1 = document.createElement('span');
+                        __l1.className = 'meta-line';
+                        __l1.textContent = l1;
+                        el.appendChild(__l1);
+                        const l2 = two.l2 ? String(two.l2) : '';
+                        if (l2) {
+                            const __l2 = document.createElement('span');
+                            __l2.className = 'meta-line meta-line--2';
+                            __l2.textContent = l2;
+                            el.appendChild(__l2);
+                        }
+                        return;
                     }
+                    // Sin override: se deriva. Si la derivacion no trae dato real, el
+                    // SEGMENTO se omite en vez de pintar un placeholder. Con display none
+                    // !important gana sobre el flex del silo, igual que hace el patron de
+                    // modulos vacios (regla general v306).
+                    const d = (one === null || one === undefined) ? '' : String(one).trim();
+                    if (!d) {
+                        el.textContent = '';
+                        if (item) item.style.setProperty('display', 'none', 'important');
+                        return;
+                    }
+                    // ADR-056 decision 7 punto 3: SOLO la fecha REAL de la familia f9/f9b
+                    // se pinta en DOS lineas localizadas (l1 = "Sabado 24", l2 = "octubre
+                    // de 2026"). La centinela ya fue descartada por __metaDerive (d === ''),
+                    // asi que aqui solo llega una fecha real. Hora y lugar conservan su
+                    // linea unica y los silos fuera de la familia no entran a esta rama.
+                    // El override (two.l1) ya retorno arriba: manda sobre el formateador.
+                    if (esFecha && __esF9Meta) {
+                        const __f = __formatoFechaLarga(d);
+                        if (__f && __f.l1) {
+                            if (item) item.style.display = '';
+                            el.textContent = '';
+                            const __fl1 = document.createElement('span');
+                            __fl1.className = 'meta-line';
+                            __fl1.textContent = __f.l1;
+                            el.appendChild(__fl1);
+                            if (__f.l2) {
+                                const __fl2 = document.createElement('span');
+                                __fl2.className = 'meta-line meta-line--2';
+                                __fl2.textContent = __f.l2;
+                                el.appendChild(__fl2);
+                            }
+                            return;
+                        }
+                    }
+                    if (item) item.style.display = '';
+                    el.innerText = d;
                 };
-                __metaSet('meta-fecha', ev.fecha, __metaData.fecha);
-                __metaSet('meta-hora', `${ev.hora} ${T('landing.hrs')}`, __metaData.hora);
-                __metaSet('meta-lugar', (effUbicacion || "--").toUpperCase(), __metaData.lugar);
+                // Derivacion (ADR-056 decision 7): __metaDerive devuelve '' cuando no hay
+                // dato real, y para la fecha trata la centinela 2099-12-31 como "sin fecha".
+                // La fecha real de la familia f9/f9b se formatea en 2 lineas dentro de
+                // __metaSet (esFecha=true); hora y lugar quedan en linea unica.
+                __metaSet('meta-fecha', __metaDerive(ev.fecha, true), __metaData.fecha, true);
+                __metaSet('meta-hora', __metaDerive(ev.hora ? (ev.hora + ' ' + T('landing.hrs')) : ''), __metaData.hora);
+                __metaSet('meta-lugar', __metaDerive(effUbicacion).toUpperCase(), __metaData.lugar);
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 
                 // v302 (aditivo, solo silo .tpl-f8 TropiLove): tab del formulario
@@ -1066,8 +1350,15 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
     // ejemplo del prelanzamiento (no escribe nada, solo pinta).
     // El atomo nace oculto por el kernel: solo el CSS del silo que lo enciende
     // (#mod-descripcion en .tpl-f9) lo muestra.
-    const __f9DescTituloDef = 'MISTICO - PRELANZAMIENTO';
-    const __f9DescTextoDef = 'Rastro MC estrena en tarima los temas de Mistico antes de su lanzamiento oficial en octubre. Una sola noche para escuchar en vivo el disco completo, con banda completa, invitados sorpresa y una puesta en escena creada para el recinto. Las boletas de taquilla se entregan en puerta y el merch oficial estara disponible el mismo dia, mientras dure el inventario.';
+    // v1.5.0 (ADR-054): el par (titulo, texto) de prelanzamiento es contenido editorial
+    // de RASTRO MC y queda reservado al silo 'tpl-f9' LITERAL (__esSiloF9Rastro). Un silo
+    // hermano de la familia (tpl-f9b) usa su fallback neutral generico para no pintar
+    // contenido de otro evento. Cero Borrado: los literales de f9 no cambian, y si el
+    // evento trae descripcion propia manda esa (fuente prioritaria intacta).
+    const __f9DescTituloDef = __esSiloF9Rastro() ? 'MISTICO - PRELANZAMIENTO' : 'SOBRE EL EVENTO';
+    const __f9DescTextoDef = __esSiloF9Rastro()
+        ? 'Rastro MC estrena en tarima los temas de Mistico antes de su lanzamiento oficial en octubre. Una sola noche para escuchar en vivo el disco completo, con banda completa, invitados sorpresa y una puesta en escena creada para el recinto. Las boletas de taquilla se entregan en puerta y el merch oficial estara disponible el mismo dia, mientras dure el inventario.'
+        : 'Esta es la ficha del evento. El programa, el lineup y la informacion practica se actualizan en esta misma pagina. Escribenos por el boton de contacto para resolver dudas sobre boletas, ingresos o accesibilidad del recinto.';
     const __descRaw = effContent.descripcion || ev.descripcion;
     const __descObj = (__descRaw && typeof __descRaw === 'object') ? __descRaw : {};
     const __descTitulo = __descObj.titulo || __f9DescTituloDef;
@@ -1302,7 +1593,10 @@ if (document.getElementById('footer-copy')) {
 // === INICIO SEGMENTO: LINEUP & PÓSTER REAL (v197) ===
 // 1. Verificación de Póster [cite: 343]
 if (document.getElementById('db-poster-img')) {
-    const posterUrl = ev.poster_url || ev.imagen_url || '';
+    // v1.5.0 (riesgo 6 del ADR-056): el kernel leia ev.poster_url || ev.imagen_url y se
+    // saltaba content.poster_url, que es justo la clave que el admin precarga y que index
+    // usa. Orden corregido (columna -> content -> imagen) en __posterUrlDeEvento().
+    const posterUrl = __posterUrlDeEvento(ev, content);
     if (!posterUrl) {
         // Regla general módulos vacíos (v306): sin cartel configurado se oculta el módulo.
         __hideEmptyModule('mod-cartel', false);
@@ -1351,8 +1645,18 @@ if (document.getElementById('db-poster-img')) {
 
             // v1.4.0 (aditivo, solo silo .tpl-f9 Mistico): el headliner se marca por
             // NOMBRE (RASTRO MC), no por posicion: en los datos el artista puede venir en cualquier orden.
-            const __isHeadliner = document.body.className.indexOf('tpl-f9') !== -1
+            // v1.5.0 (ADR-054): "RASTRO MC" es contenido editorial de OTRO evento. El match
+            // por nombre queda reservado al silo 'tpl-f9' LITERAL (__esSiloF9Rastro compara
+            // por token completo, asi que tpl-f9b no lo hereda). En un silo hermano de la
+            // familia el headliner se marca por POSICION (el primero del lineup), que es la
+            // convencion del modulo y no depende de ningun nombre propio: el look de
+            // headliner se enciende igual sin arrastre de contenido ajeno. El silo tpl-f9
+            // conserva EXCLUSIVAMENTE su criterio por nombre (sin cambio de comportamiento):
+            // el criterio por posicion se apaga ahi con el !__esSiloF9Rastro().
+            const __esHeadlinerRastro = __esSiloF9Rastro()
                 && String(name || '').trim().toUpperCase().indexOf('RASTRO MC') !== -1;
+            const __esHeadlinerFamilia = __esFamiliaF9() && !__esSiloF9Rastro() && idx === 0;
+            const __isHeadliner = __esHeadlinerRastro || __esHeadlinerFamilia;
 
             return `
                 <div class="artist-card${__isHeadliner ? ' headliner' : ''}" data-idx="${idx}">
@@ -1454,7 +1758,10 @@ if (document.getElementById('db-poster-img')) {
     // módulo (regla general módulos vacíos v306) en lugar de usar contenido
     // editorial de referencia.
     // v1.4.0 (aditivo): f9 Mistico reutiliza el mismo motor de experiencias.
-    if (document.body.className.indexOf('tpl-f8') !== -1 || document.body.className.indexOf('tpl-f9') !== -1) {
+    // v1.5.0 (riesgo 2 del ADR-054 cerrado): solo la rama de la familia pasa por la
+    // allowlist (__esFamiliaF9()). La rama de f8 queda EXACTAMENTE como estaba, con su
+    // indexOf crudo y su lugar en la cadena: f8 esta en produccion y no se toca.
+    if (document.body.className.indexOf('tpl-f8') !== -1 || __esFamiliaF9()) {
         const expRaw = Array.isArray(effContent.experiencias) ? effContent.experiencias : [];
         if (expRaw.length === 0) {
             __hideEmptyModule('mod-experiencias', false);
@@ -1493,13 +1800,23 @@ if (document.getElementById('db-poster-img')) {
     // configurado se pinta un set editorial de 5 preguntas del prelanzamiento
     // en lugar de ocultar el modulo. Otros silos conservan el comportamiento
     // vigente (sin FAQ -> modulo oculto). Cero Borrado: no altera el contrato.
-    if (!effContent.faq && document.body.className.indexOf('tpl-f9') !== -1) {
-        effContent.faq = [
+    // v1.5.0 (ADR-054): el set de RASTRO MC queda reservado al silo 'tpl-f9' LITERAL
+    // (__esSiloF9Rastro). Un silo hermano de la familia (tpl-f9b) recibe un fallback
+    // neutral generico: mismo numero de preguntas, mismo motor de render, cero
+    // contenido de otro evento. Los literales de f9 NO cambian.
+    if (!effContent.faq && __esFamiliaF9()) {
+        effContent.faq = __esSiloF9Rastro() ? [
             { pregunta: 'Como compro las boletas', respuesta: 'Escribenos por WhatsApp desde el boton de esta pagina. Te confirmamos disponibilidad y te enviamos el enlace de pago el mismo dia.' },
             { pregunta: 'A que hora abren puertas', respuesta: 'Las puertas abren a las 7:00 p.m. y Rastro MC sube a tarima a las 10:00 p.m. Te recomendamos llegar temprano: el aforo es limitado.' },
             { pregunta: 'Hay edad minima', respuesta: 'El evento es para mayores de 18 anos. Presenta tu documento de identidad en la entrada; sin el no hay acceso.' },
             { pregunta: 'Hay parqueadero', respuesta: 'Si. El recinto cuenta con parqueadero vigilado y cupo limitado. Tambien puedes llegar en taxi o en transporte de aplicacion.' },
             { pregunta: 'Habra merch oficial', respuesta: 'Si. El dia del evento habra merch oficial del disco Mistico en la mesa de entrada, mientras dure el inventario.' }
+        ] : [
+            { pregunta: 'Como compro las boletas', respuesta: 'Escribenos por WhatsApp desde el boton de esta pagina. Te confirmamos disponibilidad y te enviamos el enlace de pago.' },
+            { pregunta: 'Puedo transferir mi boleta', respuesta: 'Si. Escribenos por WhatsApp con tus datos y los de quien recibe la entrada para validar el cambio de nombre.' },
+            { pregunta: 'A que hora debo llegar', respuesta: 'Te recomendamos llegar con tiempo para el ingreso. La hora de apertura de puertas y el inicio del evento estan en la tarjeta de fecha y hora de esta pagina.' },
+            { pregunta: 'Que pido para entrar', respuesta: 'Lleva tu documento de identidad. Si el evento declara edad minima o alguna restriccion de acceso, se valida en la entrada; escribenos antes si tienes dudas.' },
+            { pregunta: 'Como llego al recinto', respuesta: 'Consulta la ubicacion del evento en esta pagina. Puedes llegar en transporte publico, en taxi o en transporte de aplicacion.' }
         ];
     }
     if (effContent.faq) {
@@ -1581,7 +1898,10 @@ if (document.getElementById('db-poster-img')) {
     // aforoVal se resuelve de forma asíncrona (conteo real de registros de la
     // página solo-formulario, cuenta_aforo=true) sobre aforo_max (ADR-030).
     let aforoVal = aforoMax;
-    if (ev.aforo_max) {
+    // Vista previa: no se consulta el conteo real (cero red). Se muestra el
+    // aforo maximo configurado, sin el numerador de inscritos. Runtime normal
+    // conserva la consulta EXACTA de siempre.
+    if (ev.aforo_max && !__HT_PREVIEW) {
         try {
             const { count } = await sbClient.from('inscritos')
                 .select('id', { count: 'exact', head: true })
@@ -1681,7 +2001,9 @@ if (document.getElementById('db-poster-img')) {
     // TAQUILLA. La preventa se genera unicamente si trae un precio real (nunca
     // con el relleno "POR DEFINIR") y el modulo se oculta si no hay tarifa real
     // alguna. Los demas silos conservan su comportamiento vigente (v307).
-    const __esF9Boletos = document.body.className && document.body.className.includes('tpl-f9');
+    // v1.5.0 (riesgo 2 del ADR-054 cerrado): el gate pasa por la allowlist de familia.
+    // Antes era includes('tpl-f9'), un match por prefijo.
+    const __esF9Boletos = __esFamiliaF9();
     const __pendienteVal = T('landing.pendiente_def');
     const __hasPreventaReal = !!(boletosData.preventa && boletosData.preventa !== __pendienteVal);
     const __hasTaquillaReal = !!(boletosData.taquilla && boletosData.taquilla !== __pendienteVal);
@@ -1759,6 +2081,13 @@ if (document.getElementById('db-poster-img')) {
                         const whatsapp = (document.getElementById('reg-whatsapp')?.value || '').trim();
                         const unirComunidad = document.getElementById('reg-unir-comunidad')?.checked !== false;
                         const msgBox = document.getElementById('reg-comunidad-msg');
+                        // Vista previa: el formulario no persiste ni redirige (cero
+                        // mutaciones: nada de insert, nada de anti-duplicado, nada de
+                        // conteo freemium). Solo deja el aviso visible en pantalla.
+                        if (__HT_PREVIEW) {
+                            if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = 'Vista previa: el formulario no envia datos.'; }
+                            return;
+                        }
                         if (!nombre || !whatsapp) {
                             if (msgBox) { msgBox.style.display = 'block'; msgBox.textContent = T('landing.form_validar'); }
                             __ANALYTICS.emit('form_submit', 'form_error', 'validacion', 0);
