@@ -217,6 +217,17 @@ Este documento registra el historial de fallos críticos detectados durante la e
 
 ---
 
-*Este documento constituye la memoria técnica inamovible para asegurar la fidelidad de 1px en el Sistema QR Hostal Terraza (Actualizado v1.14.0-STABLE, 2026-09-26).*
+## 16. Errores de Gobernanza de Recursos (Sesión de banners f9b — 2026-09-27)
+
+### 🚨 Verificación Delegada que Devolvió Vacío tras 2.9 h y 3.31M Tokens (`qa-auditor-free`)
+* **Problema:** en la sesión de banners del silo `f9b`, la verificación final se delegó a `qa-auditor-free`; el subagente consumió **3.31M tokens en 50 turnos (~2.9 h de reloj, 68 tool calls)** y **devolvió un resultado VACÍO**. La verificación no quedó certificada y hubo que repetirla con otro agente, que consumió **+2.17M tokens**. Costo total del incidente: **~5.5M tokens (17% de la sesión de 32.2M)**.
+* **Causa raíz:** (1) el perfil del agente no garantiza una salida no vacía; el fallo fue silencioso (ni error de consola ni excepción: simplemente no devolvió informe). (2) El gasto se explica por el modelo real de costo — `turnos × contexto acumulado`: cada turno relee el contexto completo (`cache_read` = 91.7% del total medido) y `AGENTS.md` (8.123 tokens) se relee en cada turno. Un agente que "no converge" acumula turnos y, con ellos, `cache_read`, hasta colgarse. (3) No existía una regla que prohibiera re-despachar el mismo perfil tras un fallo, por lo que la recuperación se hizo re-despachando (otro agente, el mismo trabajo).
+* **Blindaje (Mandato 17, regla anti-colgado + Mandato 18 / ADR-058):** (a) si un subagente devuelve vacío o excede el tiempo límite, **NO se re-despacha el mismo perfil**; se cambia de estrategia (script, otro dominio o brief dirigido mínimo) y se registra el incidente; (b) **un archivo, un lector** — no releer con varios agentes lo que un brief dirigido resuelve; (c) **verificación mecánica = script, no agente** (`scripts/express_check.js`, `scripts/smoke_*.js`, 0 tokens de agente); (d) consolidar fases: máx. 1 exploración + 1 implementación por dominio + 1 verificación por sesión.
+* **Verificación:** medido con `scripts/usage_report.js` sobre `opencode.db` (16 sesiones, ~32.2M tokens, `cache_read` 91.7%, $0.0747, 5.7 h). Incidente y reglas cerradas en `DECISIONS.md` ADR-058 y `Reglas de Oro QR.md` v128-MASTER (Mandatos 17-18).
+
+---
+
+*Este documento constituye la memoria técnica inamovible para asegurar la fidelidad de 1px en el Sistema QR Hostal Terraza (Actualizado v1.15.0-STABLE, 2026-09-27).*
 *TRACE (2026-09-22, ADR-048 / Silo F12 "Kande"): subseccion nueva agregada esta fecha — colision de namespace Fiesta/Campana del preset `_THEME_MODULES['kande']` (`ld-mod-historia` en un preset de Fiesta). Historial previo intacto (Cero Borrado).*
 *TRACE (2026-09-26, paquete F9B "Mistico Nocturno" — ADR-054/055/056/057): subsecciones 14 y 15 nuevas. §14 = diagnostico falso del "clon muerto por casing" (la causa real era el SCOPE) + deriva de valores/lineas en los ADR de la triada. §15 = IDs duplicados de patrocinadores y la premisa falsa de `getElementById` + efectos sin consumidor con defaults invertidos + deuda documental de comentarios inline. Historial previo intacto (Cero Borrado).*
+*TRACE (2026-09-27, gobernanza de eficiencia de recursos — ADR-058): seccion 16 nueva — la verificacion delegada a `qa-auditor-free` devolvio vacio tras 2.9 h y 3.31M tokens, con una repeticion de +2.17M. Se registran las reglas anti-colgado y de consolidacion de fases (Mandatos 17-18 de `Reglas de Oro QR.md` v128-MASTER). Historial previo intacto (Cero Borrado).*

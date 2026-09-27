@@ -173,7 +173,7 @@ Cierran el hueco detectado el 2026-09-14: la regla transversal "Participante" de
 6. **Cierre con preguntas:** toda sesión de implementación cierra con las preguntas necesarias para completar la tarea de la mejor forma posible — nunca con afirmación de "todo listo" sin evidencia de verificación.
 7. **KPIs de delegación medibles (target):** ratio de delegación ≥ 50% en sesiones de implementación; absorciones → 0. Baseline real del mes (2026-09-07): 12081 calls, 92 task (0.76%), 5931 exploración (49.1%), 2126 delegadas, ratio 35.8%, 20 sesiones de absorción de 151. Suma de 5 logs simples: 18784 calls, 158 task (0.84%), ratio 38.6%, 43 sesiones de absorción.
 8. **Medidas anti-absorción cuando el principal supera el umbral:** si el contador de llamadas del principal supera **30 llamadas de herramienta directa** (read/grep/glob/edit/webfetch) en una sesión donde existan tareas delegables sin delegar, el principal DEBE detenerse, re-delegar las tareas pendientes y no continuar operando en su contexto.
-9. **Auditoría periódica de KPIs:** `@explore-free` audita los KPIs de delegación sobre los logs de uso (`logs/uso/`) y reporta a `@plan`/`@free-plan`; el resultado se registra en `NEXT.md` como parte del ciclo documental (AI-DOS Cap. 9.9).
+9. **Auditoría periódica de KPIs:** `@explore-free` audita los KPIs de delegación con `scripts/usage_report.js` (`--summary`, `--sessions`, `--tree`, `--since`) y reporta a `@plan`/`@free-plan`; el resultado se registra en `NEXT.md` como parte del ciclo documental (AI-DOS Cap. 9.9). Los `.md` preexistentes de `logs/uso/` (último: 2026-09-07) son de un pipeline viejo que el script nuevo NO produce: quedan como LEGADO y dejan de ser la fuente de la auditoría.
 
 ## Modo Express (xpress)
 
@@ -186,6 +186,37 @@ Cuando el usuario pida trabajar "**express**", "**xpress**" o "**rápido**", la 
 
 Comando único de verificación mínima: `node scripts/express_check.js`. Manual ampliado: `DOCUMENTOS/MODO_EXPRESS_ANALISIS.md`.
 
+## Eficiencia de recursos (v128)
+
+Operativiza los Mandatos 17 y 18 de `Sistema QR desarrollo/Reglas de Oro QR.md` (v128-MASTER). La unidad de costo real es `turnos × contexto acumulado`, no el output: en la sesión de banners del silo `f9b` el `cache_read` fue 29.5M de 32.2M tokens (91.7%), con input fresco 2.16M (6.7%), output 0.28M (0.9%) y razonamiento 0.22M (0.7%); `AGENTS.md` (8.123 tokens) se releyó en cada turno de cada agente (~6.5M tokens, ~20% del total). Métrica de control: `cache_read / turnos` (50.000 a 76.000 tokens por turno en esa sesión).
+
+1. **Consolidación de agentes:** una sesión de implementación usa MAXIMO 1 agente de exploración + 1 de implementación por dominio + 1 de verificación. Todo lo demás se resuelve con script.
+2. **Regla anti-colgado:** si un subagente devuelve vacío o excede el tiempo límite, NO se re-despacha el mismo perfil; se cambia de estrategia y se registra el incidente. (El `qa-auditor-free` devolvió vacío tras 2.9 h y 3.31M tokens; repetir la verificación costó +2.17M, ~17% de la sesión.)
+3. **Un archivo, un lector:** prohibido que varios agentes de una misma sesión relean el mismo archivo grande cuando un brief dirigido (ruta + rango de líneas + bloque `old`/`new`) basta. Prohibido leer archivos completos de más de 200 KB (`admin.html` = 633 KB): usar rangos.
+4. **Verificación mecánica = script, no agente:** `scripts/express_check.js` y los `scripts/smoke_*.js` cuestan 0 tokens de agente.
+5. **Mutation testing acotado:** 5-8 mutaciones representativas, no decenas.
+6. **Cierre medido:** toda sesión de implementación cierra midiendo con `node scripts/usage_report.js`. Presupuesto placeholder de un solo feature: no superar ~15M tokens ni ~3 h de reloj sin justificación escrita. Es un PLACEHOLDER hasta tener N >= 5 sesiones medidas (se recalibrará a ~1.5-2x la mediana); la métrica de control líder sigue siendo `cache_read / turnos`.
+
+### `scripts/usage_report.js` — contrato CONGELADO
+
+Reporte de uso de tokens y costo de la DB local de OpenCode. Interfaz congelada (no re-diseñar sin ADR):
+
+* **Modos (MUTUAMENTE EXCLUYENTES):** `--summary` (default), `--sessions`, `--tree`, `--json`, `--csv`. Se pasa uno solo por invocación (combinarlos es error). Se aceptan los nombres de modo sin guiones (`summary`, `sessions`, `tree`, `json`, `csv`).
+* **Filtros:** `--since`, `--until`, `--project`, `--agent`, `--root <sessionId>`, `--db`.
+* **Detalle:** `--detail`, `--with-content`, `--max-chars N`. `--with-content` IMPLICA `--detail`.
+* **Salida:** `--out <ruta>`, `--top N`, `-h` / `--help`. `--top N` limita la salida CSV SOLO si se pasa explícitamente.
+* **Alcance por defecto:** sin `--since`, el script mide el **DIA LOCAL ACTUAL** (`00:00` -> ahora), NO "la sesión actual"; `--since 0` recorre **todo el histórico** de la DB.
+* **Seguridad:** abre la DB en **readOnly** y NUNCA lee `account`, `control_account` ni `credential` (contienen tokens); `--with-content` redacta secretos.
+
+Ejemplos reales:
+
+```
+node scripts/usage_report.js --summary                          # medir el día local actual (default)
+node scripts/usage_report.js --summary --since 0                # todo el histórico de la DB
+node scripts/usage_report.js --tree --root <sessionId>          # listar subagentes de una raíz
+node scripts/usage_report.js --sessions --json --out uso.json   # exportar JSON para otra IA
+```
+
 ## Reglas transversales (aplican a los 39 agentes)
 
 1. **Cero Borrado (Reglas de Oro #2):** ningún agente elimina IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).
@@ -195,6 +226,7 @@ Comando único de verificación mínima: `node scripts/express_check.js`. Manual
 5. **Prioridad Estructural — Data-First (Reglas de Oro #1):** Fase I (datos/IDs/Supabase, log TRACE positivo) certificada antes de Fase II (estética Afterglow/Geist 900).
 6. **Mandato de Actualización Documental (Reglas de Oro #12):** toda actualización de `TASKS.md`/`NEXT.md`/`DECISIONS.md` (dominio de `@plan`/`@free-plan`) se entrega completa e íntegra, sin perder historial.
 7. **Modo Express (xpress):** cuando el usuario pida trabajar "express", "xpress" o "rápido", aplica la sección `## Modo Express (xpress)` de este archivo y la skill `express-mode`: briefs quirúrgicos por dominio, verificación local proporcional al riesgo y cierre documental diferido a un solo pase.
+8. **Eficiencia de recursos (Reglas de Oro #17-18):** aplica la consolidación de fases y agentes (max 1 exploración + 1 implementación por dominio + 1 verificación), la regla anti-colgado (no re-despachar un perfil que devolvió vacío o excedió el tiempo) y la métrica `cache_read / turnos`; cierra toda sesión de implementación midiendo con `node scripts/usage_report.js`.
 
 ## Flujo de delegación
 

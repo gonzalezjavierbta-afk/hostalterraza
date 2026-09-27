@@ -1,6 +1,6 @@
-# 🏆 REGLAS DE ORO DE AUDITORÍA (v127-MASTER)
+# 🏆 REGLAS DE ORO DE AUDITORÍA (v128-MASTER)
 
-Este documento representa el blindaje técnico y operativo innegociable del Sistema QR Hostal Terraza. Cualquier intervención por parte de una IA ejecutora debe ser validada contra estos 16 mandatos incondicionales bajo el framework AI-DOS v1.2.
+Este documento representa el blindaje técnico y operativo innegociable del Sistema QR Hostal Terraza. Cualquier intervención por parte de una IA ejecutora debe ser validada contra estos 18 mandatos incondicionales bajo el framework AI-DOS v1.2.
 
 ---
 
@@ -84,6 +84,25 @@ Cada vez que se solicite actualizar los documentos del proyecto, el agente debe:
 ### 16. Regla #12: Orquestador de Intención Contextual y Centinela Temporal
 * **Flujo Wizard de 4 Pasos:** La creación de eventos debe responder a un flujo orquestado de 4 pasos (Cimiento -> ADN -> Átomos -> Blindaje) que oculte dinámicamente los campos irrelevantes según la categoría del evento (Cine, Fiesta, Campaña).
 * **Fecha Centinela (2099-12-31):** En eventos de tipo Campaña, la fecha de realización es opcional. Si el usuario la omite, el orquestador inyectará internamente el centinela `2099-12-31` para desactivar el countdown público de forma automática.
+---
+
+## ⚙️ V. GOBERNANZA DE RECURSOS (v128)
+
+### 17. Mandato de Eficiencia de Recursos y Contexto (costo = turnos × contexto)
+* **Unidad de costo real:** el costo de una sesión es `turnos × contexto acumulado`, no el output. Medición real de la sesión de banners del silo `f9b`: **~32.2M tokens totales**, de los cuales el `cache_read` es **~29.5M (91.7%)**, el input fresco 2.16M (6.7%), el output 0.28M (0.9%) y el razonamiento 0.22M (0.7%); `cache_write` 0. Como el contexto completo se relee en cada turno, el `cache_read` equivale a **50.000-76.000 tokens por turno**. Optimizar el output es marginal; optimizar los turnos y el tamaño del contexto releído es lo que mueve la aguja.
+* **Regla "un archivo, un lector":** prohibido que varios agentes de una misma sesión relean el mismo archivo grande cuando un brief dirigido (ruta + rango de líneas + bloque `old`/`new`) basta. Un solo lector por archivo y por sesión.
+* **Verificación mecánica = script, no agente:** `scripts/express_check.js` y los `scripts/smoke_*.js` cuestan 0 tokens de agente. Preferirlos siempre antes de despachar un subagente para certificar lo que un script resuelve.
+* **Regla anti-colgado:** si un subagente devuelve vacío o excede el tiempo límite, NO se re-despacha el mismo perfil; se cambia de estrategia y se registra el incidente. Caso real: `qa-auditor-free` consumió 3.31M tokens en 50 turnos (~2.9 h) y devolvió un resultado vacío; repetir la verificación con otro agente costó +2.17M tokens (~17% de la sesión).
+* **Mutation testing acotado:** 5-8 mutaciones representativas, no decenas. La sesión de banners llegó a 35 mutaciones de test en una sola tarea (sobre-verificación).
+* **Prohibido leer archivos completos de más de 200 KB:** usar rangos. `admin.html` pesa 633 KB; leerlo completo se re-cobra en cada turno posterior vía `cache_read`.
+* **El orquestador no absorbe (refuerza ADR-031):** su modelo es el más caro y su gasto el más caro. Delega; no abre el archivo de la tarea delegada.
+* **Medición obligatoria de cierre:** toda sesión de implementación cierra midiendo con `node scripts/usage_report.js` y registrando el costo real en `NEXT.md` (destino explícito, el mismo donde `AGENTS.md` manda los KPIs) como parte del cierre documental. **4 campos obligatorios (auditables):** `total tokens`, `turnos`, `cache_read/turnos` y `segundos de reloj` (o su equivalente legible en horas).
+
+### 18. Mandato de Consolidación de Fases y Agentes
+* **Presupuesto de agentes por sesión:** una sesión de implementación usa MAXIMO: 1 agente de exploración, 1 agente de implementación por dominio y 1 agente de verificación. Todo lo demás se resuelve con script.
+* **Prohibido re-despachar un perfil que ya falló:** un agente que devolvió vacío o excedió el tiempo límite no se re-despacha con el mismo perfil; se cambia de estrategia (otro dominio, un script o un brief dirigido mínimo).
+* **Presupuesto de costo orientativo (PLACEHOLDER):** ninguna sesión de un solo feature debe superar ~15M tokens ni ~3 h de reloj sin justificación escrita en `NEXT.md`. Es un PLACEHOLDER hasta tener N >= 5 sesiones medidas (se recalibrará a ~1.5-2x la mediana); la métrica de control líder es `cache_read / turnos`. Referencia medida: la sesión de banners del silo `f9b` consumió 32.2M tokens y 5.7 h; una verificación duplicada y 6 pasadas de verificación sobre los mismos archivos explican el exceso.
 
 ---
+
 *Este documento constituye la Única Fuente de Verdad técnica y normativa de AI-DOS v1.2 para el Sistema QR Hostal Terraza.*

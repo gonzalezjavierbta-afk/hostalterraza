@@ -1,7 +1,7 @@
 # BRIEF DE BUILD — Lanzamiento Mistico · Atomos BANNER (1 y 2) en silo f9b
 
 > Documento autoritativo de la sesion. Una sola fuente de verdad. Si algo no esta aqui, no se implementa.
-> **Fecha:** 2026-09-27 · **Modo:** express (con gate de arquitectura, ver ADR-058) · **Ruta:** gratuita
+> **Fecha:** 2026-09-27 · **Modo:** express (con gate de arquitectura de banners, ver ADR-059 — pendiente; ADR-058 es de gobernanza de recursos) · **Ruta:** gratuita
 > **Documentacion de cierre (TASKS/NEXT/DECISIONS/ADR/ERRORES): DIFERIDA** hasta peticion explicita del usuario.
 
 ---
@@ -152,7 +152,7 @@ Cadena: `1 -> 2 -> 3 -> 4 -> 5 -> 6`. (3 en paralelo con 4 una vez 1,2 listos.)
 ## 13. Preguntas de rol que el build debe resolver antes de despachar
 
 1. **@renderer-dev-free vs @frontend-tpl-free para `evento-app.html`:** `AGENTS.md` asigna `pagina-destino.js`/`vercel.json` a renderer-dev, y `evento.html`/css a frontend-tpl. `evento-app.html` es el motor publico de landings (no `pagina-destino.js`). El render de los banners va en el `<script>` inline de `evento-app.html`. **Decision sugerida:** `@frontend-tpl-free` (es el dominio del motor publico de evento segun AGENTS.md, y ya es el dueno de `evento-app.html` segun los planes previos del silo f9). `@frontend-tpl-free` es el unico que puede tocar a la vez el silo (tarea 2) y el kernel (tarea 1) sin cambiar de contexto. **A menos que el build decida lo contrario, la tarea 1 va a @frontend-tpl-free.**
-2. **¿Se amplia la lista ON de f9b de 17 a 19?** ADR-054 d.5 lo marca como "frontera dura". Los 2 banners son ON en este silo. El build debe registrar la ampliacion explicitamente en el log del silo (v1.2.0) con la justificacion del ADR-058.
+2. **¿Se amplia la lista ON de f9b de 17 a 19?** ADR-054 d.5 lo marca como "frontera dura". Los 2 banners son ON en este silo. El build debe registrar la ampliacion explicitamente en el log del silo (v1.2.0) con la justificacion del ADR de arquitectura de banners (ADR-059, pendiente de redactar).
 3. **Editor de `f9b.css:2244`:** el build NO lo edita salvo peticion de Direccion (decision de marca). Default: no tocar, documentar en la sesion.
 
 ## 14. Handoff
