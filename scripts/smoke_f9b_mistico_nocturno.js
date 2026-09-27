@@ -1032,12 +1032,11 @@ var H5nopin = cssNoC.indexOf('db-mapa-container' + '::after') === -1;
 var H5filter = false;
 for (var h5 = 0; h5 < bRules.length; h5++) {
   if (/#db-mapa-container[^{}]*iframe/.test(bRules[h5].sel) &&
-      /filter\s*:[^;}]*sepia\(/.test(bRules[h5].body) &&
-      /!important/.test(bRules[h5].body)) { H5filter = true; }
+      /filter\s*:\s*none\s*!important/.test(bRules[h5].body)) { H5filter = true; }
 }
 check(H5nopin && H5filter,
-  'H5: sin pin CSS superpuesto (cero ::after) y el iframe del mapa retintado (filter con sepia + !important)',
-  'sinPin=' + H5nopin + ' retinte=' + H5filter);
+  'H5: sin pin CSS superpuesto (cero ::after) y el mapa SIN tinte (filter:none !important anula el inline del kernel)',
+  'sinPin=' + H5nopin + ' sinTinte=' + H5filter);
 
 /* --- H6: headliner mas alto en movil (72vh) y tablet vertical (64vh) ------ */
 var media767 = sliceBalanced(cssNoC, '@media (max-width: 767px)');
@@ -1073,19 +1072,19 @@ check(H8pos && H8base,
 
 /* --- H9: la foto del headliner baja el encuadre en >=992px ---------------- */
 /* Hay varios bloques @media (min-width: 992px): se recorren TODOS y se exige
-   que alguno traiga la regla del headliner con object-position center 62% (el
+   que alguno traiga la regla del headliner con object-position center 52% (el
    encuadre baja hacia la parte de abajo de la foto). La base conserva
    center top para mobile/tablet. */
 var H9pos = false, H9mIdx = cssNoC.indexOf('@media (min-width: 992px)');
 while (H9mIdx !== -1) {
   var H9blk = sliceBalanced(cssNoC.slice(H9mIdx), '@media (min-width: 992px)');
   if (H9blk.indexOf('#db-lineup') !== -1 &&
-      /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+62%/.test(H9blk)) { H9pos = true; break; }
+      /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+52%/.test(H9blk)) { H9pos = true; break; }
   H9mIdx = cssNoC.indexOf('@media (min-width: 992px)', H9mIdx + 1);
 }
 var H9base = /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+top/.test(cssNoC);
 check(H9pos && H9base,
-  'H9: la foto del headliner baja el encuadre a center 62% en >=992px y la base conserva center top',
+  'H9: la foto del headliner baja el encuadre a center 52% en >=992px y la base conserva center top',
   'desk=' + H9pos + ' base=' + H9base);
 
 /* --- H10: los 3 chips del meta comparten min-height en <=991px ------------ */
@@ -1114,6 +1113,23 @@ var H13rem = /classList\.remove\('map-own-pin'\)/.test(kernel);
 check(H13add && H13rem,
   'H13: el kernel agrega la clase map-own-pin cuando __mapaQuerySilo tiene valor (y la retira si no)',
   'add=' + H13add + ' remove=' + H13rem);
+
+/* --- H14: el silo lleva las coordenadas del lugar en el token -------------- */
+/* El token vive en el bloque de variables del silo; su valor debe ser
+   "lat,long" con COMA y SIN espacios (un espacio rompe el ll= del kernel)
+   o estar VACIO (entonces manda el pin nativo de Google). */
+var H14tok = /--f12-mapa-query\s*:\s*([^;}]*)/.exec(cssNoC);
+var H14val = H14tok ? H14tok[1].trim() : null;
+var H14ok = H14val !== null && (H14val === '' || /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(H14val));
+check(H14ok,
+  'H14: --f12-mapa-query tiene "lat,long" sin espacios (o vacio para usar el pin de Google)',
+  'valor=' + JSON.stringify(H14val) + ' formato=' + H14ok);
+
+/* --- H15: el kernel construye la URL con ll= (sin marcador nativo) --------- */
+var H15ll = /ll=\$\{encodeURIComponent\(__mapaQuerySilo\)\}&z=16/.test(kernel);
+check(H15ll,
+  'H15: el kernel centra con ll= y z=16 cuando hay coordenadas (Google no dibuja su pin)',
+  'll=' + H15ll);
 
 /* ---------------------------------------------------------------------------
  * Resumen

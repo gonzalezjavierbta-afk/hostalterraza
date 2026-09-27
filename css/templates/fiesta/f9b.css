@@ -245,6 +245,27 @@
     --f9b-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --f9b-ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+    /* ==========================================================================
+       >>> ESTA ES LA LINEA DEL MAPA: AQUI SE PEGAN LAS COORDENADAS <<<
+       --------------------------------------------------------------------------
+       Formato obligatorio:  latitud,longitud   (COMA y SIN espacios).
+       Ejemplo valido:       4.634472590905041,-74.07471573777842
+       Ejemplo INVALIDO:     4.634472590905041, -74.07471573777842   <- espacio
+
+       COMO CONSEGUIRLAS (10 segundos):
+         1. Abre Google Maps y busca el lugar.
+         2. Clic DERECHO justo sobre el pin del lugar.
+         3. El PRIMER renglon del menu que aparece son las coordenadas:
+            clic sobre ellas y quedan copiadas. Pegar aqui.
+
+       QUE HACE EL KERNEL CON ESTO (evento-app.html L2118-2130):
+         - CON valor  -> el mapa se centra con ll=<coordenadas> y Google NO
+           dibuja su pin: manda el pin propio de ESTE silo (dorado, mas abajo).
+         - SIN valor  -> modo anterior: el mapa se centra con q=<ubicacion> y
+           Google dibuja SU pin (el que no se puede recolorear).
+       Para volver al pin de Google: dejar esta linea VACIA o borrarla. */
+    --f12-mapa-query: 4.634472590905041,-74.07471573777842;
+
     /* Puente cromatico (contrato con el kernel y con el HTML inline de
        evento-app.html). Los DOS nombres se conservan aunque el silo se llame
        f9b, porque el motor y los estilos inline los consumen por su nombre:
@@ -1835,25 +1856,26 @@
 
     box-shadow: var(--f9b-shadow-3), var(--f9b-elev-2);}
 
-/* El pin nativo del mapa lo dibuja Google DENTRO del <iframe> (cross-origin),
-   asi que NO se puede recolorear por CSS aisladamente. La unica via in-iframe
-   es retintar el filtro del propio iframe: TODO el mapa -y con el el pin, que
-   es el elemento mas claro del embed- cae en la familia del acento y sale
-   dorado. El kernel declara el filter INLINE, por eso hace falta !important.
-   LIMITACION REAL: esto NO recolorea el pin de forma aislada; retinta el mapa
-   ENTERO (monocromo calido). Para tener SOLO el pin en acento hay que cambiar
-   de tecnologia (coordenadas + pin propio, Google Static Maps con
-   markers=color:, o Leaflet/OSM).
-   Nota: el position: relative del contenedor se retiro junto con el pseudo
-   ::after: solo existia para anclar aquel pin superpuesto; el overflow:hidden
-   + border-radius 0 del contenedor no lo necesitan (no queda ningun hijo
-   absolute). */
+/* MAPA SIN TINTE (v1.12.0). El pin nativo de Google lo dibuja DENTRO del
+   <iframe> (cross-origin) y NO se puede recolorear por CSS aisladamente. Antes
+   se disfrazaba retintando el iframe completo (sepia + hue-rotate), con el
+   costo de dejar todo el mapa en monocromo calido; se retiro por pedido y por
+   legibilidad: un mapa se usa para LLEGAR, tiene que verse real.
+   Ahora el asunto se resuelve por dato, no por filtro: el silo define las
+   coordenadas en --f12-mapa-query, Google entrega el mapa con ll= y SIN
+   marcador nativo, y el pin lo dibuja el silo (.map-own-pin::after, abajo) en
+   el color de acento. Ver la linea del token, arriba, en "1. RESET DE SILO".
+   El kernel inyecta su propio filter INLINE en el <iframe> (evento-app.html
+   L2133: grayscale + invert); un inline solo pierde ante una hoja con
+   !important, por eso el filter: none !important de aca.
+   Si algun dia se borra --f12-mapa-query volveria el pin nativo, ya sin tinte:
+   quiza convenga reponer el filtro SOLO en ese caso. */
 .tpl-f9b #db-mapa-container iframe, .Tpl-F9b #db-mapa-container iframe {
     display: block;
     width: 100%;
     height: 100%;
     border: none;
-    filter: grayscale(1) invert(1) contrast(1.15) sepia(0.85) saturate(2.4) hue-rotate(-12deg) !important;
+    filter: none !important;
 }
 
 /* Pin PROPIO del silo. Solo se dibuja cuando el kernel marca el contenedor
@@ -2429,9 +2451,15 @@
         padding: 3.2rem 1.8rem 1.8rem 1.8rem;
     }
 
-    /* Escritorio: el encuadre baja hacia la parte de abajo de la foto. */
+    /* Escritorio: el encuadre baja hacia la parte de abajo de la foto.
+       AJUSTE EN VIVO desde la consola del navegador (F12):
+         var p=document.querySelector('#db-lineup .artist-card.headliner .artist-photo');
+         p.style.objectPosition='center 52%';
+       Subir el numero = se ve mas la parte de ABAJO de la foto (la imagen sube).
+       Bajar el numero = se ve mas la parte de ARRIBA de la foto (la imagen baja).
+       Rango util aqui: 35% (arriba) .. 85% (abajo). */
     .tpl-f9b #db-lineup .artist-card.headliner .artist-photo, .Tpl-F9b #db-lineup .artist-card.headliner .artist-photo {
-        object-position: center 62%;
+        object-position: center 52%;
     }
 }
 
