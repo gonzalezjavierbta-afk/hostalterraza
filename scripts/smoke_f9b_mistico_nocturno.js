@@ -1027,13 +1027,17 @@ check(H4z && H4gate,
   'H4: banner-link con z-index:4 (clic sobre el panel de texto) y el gate + rama mp4 del video intactos',
   'z=' + H4z + ' gate=' + H4gate);
 
-/* --- H5: pin CSS superpuesto al mapa, ENCIMA del iframe, con acento ------- */
-var H5pin = cssNoC.indexOf('db-mapa-container' + '::after') !== -1;
-var H5z = /#db-mapa-container::after[\s\S]{0,400}?z-index\s*:\s*5/.test(cssNoC);
-var H5gold = /#db-mapa-container::after[\s\S]{0,400}?var\(--f9b-gold\)/.test(cssNoC);
-check(H5pin && H5z && H5gold,
-  'H5: el silo superpone el pin CSS al mapa (pseudo ::after) con z-index:5 y color var(--f9b-gold)',
-  'pin=' + H5pin + ' z5=' + H5z + ' gold=' + H5gold);
+/* --- H5: SIN pin CSS superpuesto; el iframe de Google se retinta ----------- */
+var H5nopin = cssNoC.indexOf('db-mapa-container' + '::after') === -1;
+var H5filter = false;
+for (var h5 = 0; h5 < bRules.length; h5++) {
+  if (/#db-mapa-container[^{}]*iframe/.test(bRules[h5].sel) &&
+      /filter\s*:[^;}]*sepia\(/.test(bRules[h5].body) &&
+      /!important/.test(bRules[h5].body)) { H5filter = true; }
+}
+check(H5nopin && H5filter,
+  'H5: sin pin CSS superpuesto (cero ::after) y el iframe del mapa retintado (filter con sepia + !important)',
+  'sinPin=' + H5nopin + ' retinte=' + H5filter);
 
 /* --- H6: headliner mas alto en movil (72vh) y tablet vertical (64vh) ------ */
 var media767 = sliceBalanced(cssNoC, '@media (max-width: 767px)');
@@ -1066,6 +1070,28 @@ var H8base = /#mod-hero[^{}]*\{[^{}]*background-position\s*:\s*center bottom/.te
 check(H8pos && H8base,
   'H8: el hero centra la foto en escritorio (background-position center center en >=992px) y la base conserva center bottom',
   'desk=' + H8pos + ' base=' + H8base);
+
+/* --- H9: la foto del headliner baja el encuadre en >=992px ---------------- */
+/* Hay varios bloques @media (min-width: 992px): se recorren TODOS y se exige
+   que alguno traiga la regla del headliner con object-position center 78% (el
+   encuadre baja hacia la parte de abajo de la foto). La base conserva
+   center top para mobile/tablet. */
+var H9pos = false, H9mIdx = cssNoC.indexOf('@media (min-width: 992px)');
+while (H9mIdx !== -1) {
+  var H9blk = sliceBalanced(cssNoC.slice(H9mIdx), '@media (min-width: 992px)');
+  if (H9blk.indexOf('#db-lineup') !== -1 &&
+      /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+78%/.test(H9blk)) { H9pos = true; break; }
+  H9mIdx = cssNoC.indexOf('@media (min-width: 992px)', H9mIdx + 1);
+}
+var H9base = /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+top/.test(cssNoC);
+check(H9pos && H9base,
+  'H9: la foto del headliner baja el encuadre a center 78% en >=992px y la base conserva center top',
+  'desk=' + H9pos + ' base=' + H9base);
+
+/* --- H10: los 3 chips del meta comparten min-height en <=991px ------------ */
+var H10 = /min-height\s*:\s*4\.8rem/.test(media991);
+check(H10, 'H10: los 3 chips del meta comparten min-height: 4.8rem en el bloque <=991px',
+  'min-height=' + H10);
 
 /* ---------------------------------------------------------------------------
  * Resumen

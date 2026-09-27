@@ -1606,8 +1606,9 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    /* Foto nueva del headliner: cubre el contenedor (cover) y el encuadre
-       sube al sujeto (center top); ya no quedan bandas laterales. */
+    /* Foto del headliner: cubre el contenedor (cover). Base mobile/tablet:
+       encuadre arriba (center top). En escritorio (>=992px) baja a
+       center 78% para mostrar mas la parte baja de la imagen. */
     object-fit: cover;
     object-position: center top;
 }
@@ -1834,34 +1835,25 @@
 
     box-shadow: var(--f9b-shadow-3), var(--f9b-elev-2);}
 
-/* Pin del silo sobre el mapa: se pinta ENCIMA de todo el contenido del embed
-   (los controles y las etiquetas de Google van dentro del iframe y siempre
-   quedan por debajo de un pseudo del contenedor). Google ancla su pin nativo
-   al centro del embed, asi que este pin lo cubre y toma el color de acento. */
-.tpl-f9b #db-mapa-container, .Tpl-F9b #db-mapa-container {
-    position: relative;
-}
-.tpl-f9b #db-mapa-container::after, .Tpl-F9b #db-mapa-container::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 40px;
-    height: 40px;
-    transform: translate(-50%, -100%) rotate(45deg);
-    background: var(--f9b-gold);
-    border: 2px solid #050403;
-    border-radius: 50% 50% 50% 0;
-    box-shadow: 0 8px 18px rgba(5, 4, 3, 0.65);
-    pointer-events: none;
-    z-index: 5;
-}
-
+/* El pin nativo del mapa lo dibuja Google DENTRO del <iframe> (cross-origin),
+   asi que NO se puede recolorear por CSS aisladamente. La unica via in-iframe
+   es retintar el filtro del propio iframe: TODO el mapa -y con el el pin, que
+   es el elemento mas claro del embed- cae en la familia del acento y sale
+   dorado. El kernel declara el filter INLINE, por eso hace falta !important.
+   LIMITACION REAL: esto NO recolorea el pin de forma aislada; retinta el mapa
+   ENTERO (monocromo calido). Para tener SOLO el pin en acento hay que cambiar
+   de tecnologia (coordenadas + pin propio, Google Static Maps con
+   markers=color:, o Leaflet/OSM).
+   Nota: el position: relative del contenedor se retiro junto con el pseudo
+   ::after: solo existia para anclar aquel pin superpuesto; el overflow:hidden
+   + border-radius 0 del contenedor no lo necesitan (no queda ningun hijo
+   absolute). */
 .tpl-f9b #db-mapa-container iframe, .Tpl-F9b #db-mapa-container iframe {
     display: block;
     width: 100%;
     height: 100%;
     border: none;
+    filter: grayscale(1) invert(1) contrast(1.15) sepia(0.85) saturate(2.4) hue-rotate(-12deg) !important;
 }
 
 /* ==========================================================================
@@ -2412,6 +2404,11 @@
     .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
         padding: 3.2rem 1.8rem 1.8rem 1.8rem;
     }
+
+    /* Escritorio: el encuadre baja hacia la parte de abajo de la foto. */
+    .tpl-f9b #db-lineup .artist-card.headliner .artist-photo, .Tpl-F9b #db-lineup .artist-card.headliner .artist-photo {
+        object-position: center 78%;
+    }
 }
 
 /* --- Flechas del carrusel del lineup (nodos .lineup-nav los crea el kernel,
@@ -2495,12 +2492,25 @@
     }
 
     /* Meta en UN SOLO bloque equilibrado en TODO el rango movil/tablet
-       (<=991px): los 3 chips comparten el MISMO ancho (calc(50% - 0.5rem));
-       fecha + hora llenan la fila 1 y el lugar queda centrado en la fila 2. */
+       (<=991px): los 3 chips comparten el MISMO ancho (calc(50% - 0.5rem))
+       y la MISMA altura minima (min-height 4.8rem), con el contenido
+       centrado; fecha + hora llenan la fila 1 y el lugar queda centrado en
+       la fila 2. El texto largo del lugar puede envolver (overflow-wrap),
+       nunca se recorta con nowrap. */
     .tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
         flex: 0 0 calc(50% - 0.5rem);
+        min-height: 4.8rem;
+        align-items: center;
         justify-content: center;
+        text-align: center;
         box-sizing: border-box;
+    }
+
+    /* .meta-line fija text-align:left en la base (seccion 7): sin esta regla
+       las 2 lineas del chip ignoran el centrado del contenedor. */
+    .tpl-f9b #mod-hero-meta .meta-line, .Tpl-F9b #mod-hero-meta .meta-line {
+        text-align: center;
+        overflow-wrap: break-word;
     }
 
     .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
