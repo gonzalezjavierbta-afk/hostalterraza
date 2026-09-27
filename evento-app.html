@@ -1866,6 +1866,50 @@ if (document.getElementById('db-poster-img')) {
                 </div>`;
         }).join('');
 
+        // A3 - flechas del carrusel del lineup. Aditivo y exclusivo de f9b.
+        if (document.body.className.indexOf('tpl-f9b') !== -1) {
+            var __lu = document.getElementById('db-lineup');
+            if (__lu) {
+                var __luBehavior = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth';
+                var __luNav = document.createElement('div');
+                __luNav.className = 'lineup-nav-wrap';
+                var __luPrev = document.createElement('button');
+                __luPrev.type = 'button';
+                __luPrev.className = 'lineup-nav';
+                __luPrev.setAttribute('data-dir', '-1');
+                __luPrev.setAttribute('aria-label', 'Artistas anteriores');
+                __luPrev.textContent = '<';
+                var __luNext = document.createElement('button');
+                __luNext.type = 'button';
+                __luNext.className = 'lineup-nav';
+                __luNext.setAttribute('data-dir', '1');
+                __luNext.setAttribute('aria-label', 'Artistas siguientes');
+                __luNext.textContent = '>';
+                __luNav.appendChild(__luPrev);
+                __luNav.appendChild(__luNext);
+                __lu.parentNode.insertBefore(__luNav, __lu.nextSibling);
+                var __luPaso = function () {
+                    var card = __lu.querySelector('.artist-card:not(.headliner)');
+                    var w = card ? card.getBoundingClientRect().width : 360;
+                    return Math.max(220, Math.round(w + 18));
+                };
+                var __luSync = function () {
+                    var max = __lu.scrollWidth - __lu.clientWidth - 1;
+                    __luPrev.disabled = __lu.scrollLeft <= 1;
+                    __luNext.disabled = __lu.scrollLeft >= max;
+                };
+                __luPrev.addEventListener('click', function () {
+                    __lu.scrollBy({ left: -__luPaso(), behavior: __luBehavior });
+                });
+                __luNext.addEventListener('click', function () {
+                    __lu.scrollBy({ left: __luPaso(), behavior: __luBehavior });
+                });
+                __lu.addEventListener('scroll', __luSync, { passive: true });
+                window.addEventListener('resize', __luSync, { passive: true });
+                __luSync();
+            }
+        }
+
         // Certificación Cuantitativa (Obligatorio Regla de Oro v123) [cite: 783]
     } else if (!document.body.className || document.body.className.indexOf('tpl-f8') === -1) {
         // Regla general módulos vacíos (v306): sin lineup (y sin silo f8 que lo

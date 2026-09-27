@@ -942,6 +942,43 @@ check(f3re && f3var && f3link && f3video && f3gate,
   're=' + f3re + ' var=' + f3var + ' link=' + f3link + ' video=' + f3video + ' gate=' + f3gate);
 
 /* ---------------------------------------------------------------------------
+ * 10. LINEUP CARRUSEL f9b - G1/G2/G3
+ *
+ * El headliner queda FIJO a la izquierda (~44%) y el resto de artistas va en
+ * una tira horizontal con scroll-snap; las flechas las crea el kernel de forma
+ * aditiva y exclusiva de f9b. Reusa cssNoC y el kernel (un solo Resumen).
+ * ------------------------------------------------------------------------- */
+
+/* G1: f9b.css ya NO pinta la etiqueta HEADLINER (ni su pseudo-elemento). */
+var g1content = cssNoC.indexOf('content: "HEADLINER"') === -1 &&
+                cssNoC.indexOf("content: 'HEADLINER'") === -1;
+var g1before = !/headliner::before/.test(cssNoC);
+check(g1content && g1before,
+  'G1: f9b.css sin etiqueta HEADLINER (ni content ni headliner::before)',
+  'content=' + g1content + ' before=' + g1before);
+
+/* G2: f9b.css ya NO usa el grid de 4 columnas; el layout desktop es flex con
+   scroll horizontal y el headliner es sticky. */
+var g2grid = cssNoC.indexOf('1.3fr repeat(3, 1fr)') === -1 &&
+             !/\.artist-card\.headliner\s*\{[^}]*grid-column\s*:\s*1\s*[;}]/.test(cssNoC);
+var g2flex = /#db-lineup[^}]*display:\s*flex\s*!important/.test(cssNoC) &&
+             /#db-lineup[^}]*overflow-x:\s*auto/.test(cssNoC);
+var g2sticky = /\.artist-card\.headliner[^}]*position:\s*sticky/.test(cssNoC);
+check(g2grid && g2flex && g2sticky,
+  'G2: f9b.css sin grid de 4 columnas; layout flex + overflow-x + headliner sticky',
+  'grid=' + g2grid + ' flex=' + g2flex + ' sticky=' + g2sticky);
+
+/* G3: el kernel tiene las flechas del lineup y el gate exclusivo de f9b. */
+var g3Start = kernel.indexOf("document.getElementById('db-lineup').innerHTML");
+var g3End = kernel.indexOf('// === FIN SEGMENTO: LINEUP ===', g3Start);
+var g3Lu = (g3Start >= 0 && g3End > g3Start) ? kernel.slice(g3Start, g3End) : '';
+var g3nav = g3Lu.indexOf('lineup-nav') !== -1 && g3Lu.indexOf('lineup-nav-wrap') !== -1;
+var g3gate = g3Lu.indexOf("indexOf('tpl-f9b')") !== -1;
+check(g3nav && g3gate,
+  'G3: kernel con flechas del lineup (lineup-nav) gateadas a tpl-f9b',
+  'nav=' + g3nav + ' gate=' + g3gate + ' len=' + g3Lu.length);
+
+/* ---------------------------------------------------------------------------
  * Resumen
  * ------------------------------------------------------------------------- */
 

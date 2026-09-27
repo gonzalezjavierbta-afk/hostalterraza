@@ -1650,21 +1650,6 @@
     opacity: 1;
 }
 
-/* Etiqueta "HEADLINER" sobre la foto del artista marcado por NOMBRE (RASTRO MC). */
-.tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
-    content: "HEADLINER";
-    position: absolute;
-    top: 2.2rem;
-    left: 3rem;
-    z-index: 4;
-    color: var(--f9b-gold);
-    font-family: var(--f9b-sans);
-    font-size: 0.66rem;
-    font-weight: 800;
-    letter-spacing: 0.45em;
-    text-transform: uppercase;
-}
-
 /* ==========================================================================
    15. PLAYLIST - #mod-playlist > #db-spotify-embed
    ========================================================================== */
@@ -2335,15 +2320,54 @@
     }
 }
 
-/* --- Escritorio y tablet ancha (>=992px): lineup headliner + 3x2. --- */
+/* --- Escritorio y tablet ancha (>=992px): headliner fijo + tira horizontal. --- */
 @media (min-width: 992px) {
     .tpl-f9b #db-lineup, .Tpl-F9b #db-lineup {
-        grid-template-columns: 1.3fr repeat(3, 1fr);
+        display: flex !important;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 1.1rem !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x proximity;
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
     }
 
+    /* El headliner se ancla a la izquierda: es el unico sticky. */
     .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
-        grid-column: 1;
-        grid-row: 1 / span 2;
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        flex: 0 0 clamp(340px, 44%, 580px);
+    }
+
+    .tpl-f9b #db-lineup .artist-card:not(.headliner), .Tpl-F9b #db-lineup .artist-card:not(.headliner) {
+        flex: 0 0 clamp(200px, 24%, 330px);
+        scroll-snap-align: start;
+    }
+
+    .tpl-f9b #db-lineup::-webkit-scrollbar, .Tpl-F9b #db-lineup::-webkit-scrollbar { height: 6px; }
+    .tpl-f9b #db-lineup::-webkit-scrollbar-thumb, .Tpl-F9b #db-lineup::-webkit-scrollbar-thumb {
+        background: var(--f9b-border-soft); border-radius: 99px; }
+    .tpl-f9b #db-lineup::-webkit-scrollbar-track, .Tpl-F9b #db-lineup::-webkit-scrollbar-track { background: transparent; }
+
+    /* Afordancia: degrade sutil en el borde derecho que insinua mas contenido. */
+    .tpl-f9b #mod-lineup .lineup-grid, .Tpl-F9b #mod-lineup .lineup-grid {
+        position: relative;
+    }
+    .tpl-f9b #mod-lineup .lineup-grid::after, .Tpl-F9b #mod-lineup .lineup-grid::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 6px;
+        width: 2.6rem;
+        pointer-events: none;
+        background: linear-gradient(to right, rgba(0,0,0,0), var(--f9b-bg));
+        z-index: 3;
     }
 
     .tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
@@ -2353,10 +2377,49 @@
     .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
         padding: 3.2rem 1.8rem 1.8rem 1.8rem;
     }
+}
 
-    .tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
-        top: 1.8rem;
-        left: 1.8rem;
+/* --- Flechas del carrusel del lineup (nodos .lineup-nav los crea el kernel,
+       aditivo y exclusivo de f9b). Ocultas en movil; visibles >=992px. --- */
+.tpl-f9b #mod-lineup .lineup-nav-wrap, .Tpl-F9b #mod-lineup .lineup-nav-wrap {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    .tpl-f9b #mod-lineup .lineup-nav-wrap, .Tpl-F9b #mod-lineup .lineup-nav-wrap {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 0.9rem;
+    }
+
+    .tpl-f9b #mod-lineup .lineup-nav, .Tpl-F9b #mod-lineup .lineup-nav {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 50%;
+        border: 1px solid var(--f9b-border-soft);
+        background: rgba(5, 4, 3, 0.55);
+        color: var(--f9b-gold);
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .tpl-f9b #mod-lineup .lineup-nav:hover, .Tpl-F9b #mod-lineup .lineup-nav:hover {
+        border-color: var(--f9b-gold);
+    }
+
+    .tpl-f9b #mod-lineup .lineup-nav:focus-visible, .Tpl-F9b #mod-lineup .lineup-nav:focus-visible {
+        outline: 2px solid var(--f9b-gold);
+        outline-offset: 2px;
+    }
+
+    .tpl-f9b #mod-lineup .lineup-nav[disabled], .Tpl-F9b #mod-lineup .lineup-nav[disabled] {
+        opacity: 0.35;
+        cursor: default;
     }
 }
 
@@ -2387,11 +2450,6 @@
 
     .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
         padding: 3rem 1.6rem 1.6rem 1.6rem;
-    }
-
-    .tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
-        top: 1.5rem;
-        left: 1.6rem;
     }
 
     .tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {
@@ -2484,12 +2542,6 @@
 
     .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
         padding: 2.8rem 1.4rem 1.4rem 1.4rem;
-    }
-
-    .tpl-f9b #db-lineup .artist-card.headliner::before, .Tpl-F9b #db-lineup .artist-card.headliner::before {
-        top: 1.2rem;
-        left: 1.4rem;
-        font-size: 0.56rem;
     }
 
     .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
