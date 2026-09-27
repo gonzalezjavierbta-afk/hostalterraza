@@ -20,13 +20,12 @@
 --     quedar ocultos (f9 solo pinta boletos con tarifa real).
 --
 -- FRASES (fuente: prompt cambios mistico.txt, lineas 31 y 43)
---   Las 2 frases son las que escribio el usuario en el prompt. El archivo debe
---   quedar en ASCII puro (0 bytes > 127), asi que se transliteraron las
---   tildes/dieresis al equivalente sin tilde:
---     musica  <- musica       sueno  <- sueno
---     pasion  <- pasion       guiros <- guiros
---   El kernel arma <p class="banner-frase"> con textContent, asi que cuando
---   Direccion suba el asset real se pueden reponer las tildes sin tocar render.
+--   Las 2 frases son las que escribio el usuario en el prompt, CON sus tildes
+--   y dieresis reales: "música ... sueño ... pasión ... güiros" y "Reliquias".
+--   Este .sql NO es codigo del Escudo GOLD: la regla ASCII-safety aplica a
+--   api/*.js, admin.html, pagina-destino.js e index.html, NO a los datos. La DB
+--   es UTF-8 y el kernel arma <p class="banner-frase"> con textContent sobre una
+--   pagina con <meta charset="UTF-8">, asi que las tildes se renderizan igual.
 --
 -- ESTILO
 --   Banner 1 (Indio Mestizo) -> 'dorado' (paleta ambar/dorado del prompt).
@@ -74,16 +73,16 @@ UPDATE eventos
            '{content,banners}',
            '[
              {
-               "frase": "Indio mestizo nacido finalizando 80s amante de la salsa, musica sueno que alienta, mi pasion por el tambor y el clamor que el alma alimenta... Indio mestizo.",
+               "frase": "Indio mestizo nacido finalizando 80s amante de la salsa, música sueño que alienta, mi pasión por el tambor y el clamor que el alma alimenta... Indio mestizo.",
                "autor": "Indio mestizo",
-               "etiqueta": "Mistico",
+               "etiqueta": "Místico",
                "estilo": "dorado",
                "imagen_url": "",
                "video_url": "",
                "alt": ""
              },
              {
-               "frase": "Que mano de vueltas que da la vida socio, yo sigo ringletiando esquivando guiros ficticios. Reliquias.",
+               "frase": "Que mano de vueltas que da la vida socio, yo sigo ringletiando esquivando güiros ficticios. Reliquias.",
                "autor": "",
                "etiqueta": "",
                "estilo": "monocromo",
