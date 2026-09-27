@@ -985,16 +985,16 @@ check(g3nav && g3gate,
  * bKernel) y no crean un segundo Resumen.
  * ------------------------------------------------------------------------- */
 
-/* --- H1: meta sin iconos y lugar a fila completa en movil/tablet (<=991px) */
+/* --- H1: meta sin iconos y los 3 chips con el MISMO ancho en movil (<=991px) */
 var H1svg = /\.meta-svg[^{}]*\{[^{}]*display\s*:\s*none\s*!important/.test(cssNoC);
-var H1lugar = /:has\(#meta-lugar\)[^{}]*\{[^{}]*flex-basis\s*:\s*100%/.test(cssNoC);
+var H1sin100 = /:has\(#meta-lugar\)[^{}]*\{[^{}]*flex-basis\s*:\s*100%/.test(cssNoC) === false;
 var media991 = sliceBalanced(cssNoC, '@media (max-width: 991px)');
-var H1en991 = media991.indexOf(':has(#meta-lugar)') !== -1 &&
-              /flex-basis\s*:\s*100%/.test(media991) &&
-              /flex:\s*0\s+1\s+auto/.test(media991);
-check(H1svg && H1lugar && H1en991,
-  'H1: f9b.css oculta .meta-svg y da fila completa al lugar; la regla (:has(#meta-lugar) flex-basis 100% + .meta-item flex 0 1 auto) vive en el bloque <=991px',
-  'svg=' + H1svg + ' lugar=' + H1lugar + ' en991=' + H1en991);
+var H1en991 = media991.indexOf(':has(#meta-lugar)') === -1 &&
+              /flex:\s*0\s+0\s+calc\(50%\s*-\s*0\.5rem\)/.test(media991) &&
+              /flex-basis\s*:\s*100%/.test(media991) === false;
+check(H1svg && H1sin100 && H1en991,
+  'H1: f9b.css oculta .meta-svg y da a los 3 chips el MISMO ancho (flex 0 0 calc(50% - 0.5rem)) en el bloque <=991px, sin flex-basis 100%',
+  'svg=' + H1svg + ' sin100=' + H1sin100 + ' en991=' + H1en991);
 
 /* --- H2: barra de scroll oculta y sin reglas de thumb/track -------------- */
 var H2none = /scrollbar-width\s*:\s*none/.test(cssNoC);
@@ -1027,11 +1027,13 @@ check(H4z && H4gate,
   'H4: banner-link con z-index:4 (clic sobre el panel de texto) y el gate + rama mp4 del video intactos',
   'z=' + H4z + ' gate=' + H4gate);
 
-/* --- H5: sin pin CSS superpuesto al mapa (el iframe ya dibuja el nativo) -- */
-var H5pin = cssNoC.indexOf('db-mapa-container' + '::after') === -1;
-check(H5pin,
-  'H5: el silo no superpone un pin CSS al mapa (sin pseudo-elemento after del contenedor del mapa)',
-  'pinResidual=' + !H5pin);
+/* --- H5: pin CSS superpuesto al mapa, ENCIMA del iframe, con acento ------- */
+var H5pin = cssNoC.indexOf('db-mapa-container' + '::after') !== -1;
+var H5z = /#db-mapa-container::after[\s\S]{0,400}?z-index\s*:\s*5/.test(cssNoC);
+var H5gold = /#db-mapa-container::after[\s\S]{0,400}?var\(--f9b-gold\)/.test(cssNoC);
+check(H5pin && H5z && H5gold,
+  'H5: el silo superpone el pin CSS al mapa (pseudo ::after) con z-index:5 y color var(--f9b-gold)',
+  'pin=' + H5pin + ' z5=' + H5z + ' gold=' + H5gold);
 
 /* --- H6: headliner mas alto en movil (72vh) y tablet vertical (64vh) ------ */
 var media767 = sliceBalanced(cssNoC, '@media (max-width: 767px)');
@@ -1041,6 +1043,29 @@ var H6titulo = media767.indexOf('clamp(2.5rem, 12vw, 3.4rem)') !== -1;
 check(H6tablet && H6movil && H6titulo,
   'H6: headliner mas alto en movil (min-height 72vh + titulo clamp 2.5/12vw/3.4 en <=767px) y tablet (64vh en <=991px)',
   'tablet=' + H6tablet + ' movil=' + H6movil + ' titulo=' + H6titulo);
+
+/* --- H7: el link del banner es hermano de .banner-text (sec, no media) ---- */
+var H7sec = bKernel.indexOf('sec.appendChild(link);') !== -1;
+var H7nomedia = bKernel.indexOf('media.appendChild(link);') === -1;
+check(H7sec && H7nomedia,
+  'H7: el link del banner se agrega al <section> (sec.appendChild(link)), no a .banner-media',
+  'sec=' + H7sec + ' sinMedia=' + H7nomedia);
+
+/* --- H8: el hero centra la foto en escritorio (no center bottom) ---------- */
+/* Hay varios bloques @media (min-width: 992px): se recorren TODOS y se exige
+   que alguno contenga la regla del hero con background-position center center
+   (no basta con mirar el primero, que no es el del hero). */
+var H8pos = false, H8mIdx = cssNoC.indexOf('@media (min-width: 992px)');
+while (H8mIdx !== -1) {
+  var H8blk = sliceBalanced(cssNoC.slice(H8mIdx), '@media (min-width: 992px)');
+  if (H8blk.indexOf('#mod-hero') !== -1 &&
+      /background-position\s*:\s*center center,\s*center center,\s*center center,\s*0 0/.test(H8blk)) { H8pos = true; break; }
+  H8mIdx = cssNoC.indexOf('@media (min-width: 992px)', H8mIdx + 1);
+}
+var H8base = /#mod-hero[^{}]*\{[^{}]*background-position\s*:\s*center bottom/.test(cssNoC);
+check(H8pos && H8base,
+  'H8: el hero centra la foto en escritorio (background-position center center en >=992px) y la base conserva center bottom',
+  'desk=' + H8pos + ' base=' + H8base);
 
 /* ---------------------------------------------------------------------------
  * Resumen

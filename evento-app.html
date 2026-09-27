@@ -1174,7 +1174,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                         link.setAttribute('rel', 'noopener noreferrer');
                         link.setAttribute('aria-label', altTxt || 'Ver video');
                         link.style.cssText = 'position:absolute;inset:0;z-index:4;display:block;cursor:pointer;text-decoration:none;';
-                        media.appendChild(link);
+                        // Hermano de .banner-text (z-index:3), NO hijo de .banner-media
+                        // (z-index:0): asi el overlay cubre TODO el banner, incluido el
+                        // panel de texto, y gana por stacking por ser hermano directo.
+                        sec.appendChild(link);
                     } else if (vidUrl && !__pideCalma) {
                         const vid = document.createElement('video');
                         vid.className = 'banner-video';
