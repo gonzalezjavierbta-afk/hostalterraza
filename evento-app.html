@@ -1155,11 +1155,27 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     // ---- .banner-media (siempre presente; el silo pinta su gradiente) ----
                     const media = document.createElement('div');
                     media.className = 'banner-media';
+                    // MEDIA: YouTube no se puede embeber como <video> de fondo. Si la
+                    // URL es de YouTube se crea un <a class="banner-link"> overlay que
+                    // cubre la banda y abre el video en pestana nueva (el panel de texto
+                    // va en z-index 3, asi que queda por ENCIMA y el overlay sigue
+                    // clicable salvo sobre el texto). Si NO es YouTube (mp4/webm), sigue
+                    // el <video> decorativo de fondo.
+                    const __bannerYoutube = /youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\//.test(vidUrl);
                     // VIDEO decorativo: solo si la URL es valida Y el usuario NO pidio
                     // menos movimiento. La guarda va ANTES de asignar src, de modo que
                     // con prefers-reduced-motion no se descarga ni un byte de video.
                     const __pideCalma = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-                    if (vidUrl && !__pideCalma) {
+                    if (vidUrl && __bannerYoutube) {
+                        const link = document.createElement('a');
+                        link.className = 'banner-link';
+                        link.setAttribute('href', vidUrl);
+                        link.setAttribute('target', '_blank');
+                        link.setAttribute('rel', 'noopener noreferrer');
+                        link.setAttribute('aria-label', altTxt || 'Ver video');
+                        link.style.cssText = 'position:absolute;inset:0;z-index:2;display:block;cursor:pointer;text-decoration:none;';
+                        media.appendChild(link);
+                    } else if (vidUrl && !__pideCalma) {
                         const vid = document.createElement('video');
                         vid.className = 'banner-video';
                         vid.setAttribute('autoplay', '');

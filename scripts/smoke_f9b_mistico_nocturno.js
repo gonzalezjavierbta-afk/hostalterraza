@@ -877,6 +877,71 @@ check(E1ok,
   badE1.join(' | ') + (sawE1.length ? ' :: ' + sawE1.join(' | ') : ''));
 
 /* ---------------------------------------------------------------------------
+ * 9. ORDEN DE LAYOUT DEL SILO f9b y YOUTUBE EN LA BANDA - F1/F2/F3
+ *
+ * Tres checks nuevos que reusan areaList (parser de grid-template-areas de la
+ * seccion 8) y bKernel (segmento de banners del kernel). No hay otro Resumen.
+ * ------------------------------------------------------------------------- */
+
+/* F1: las 2 plantillas declaran las areas en el ORDEN nuevo, como SECUENCIA
+   exacta (no solo presencia). Se identifica la plantilla de 1 columna (todas
+   las filas de 1 celda) y la de 2 (alguna fila de 2 celdas). */
+var EXP_BASE = ['hero', 'countdown', 'meta', 'ctas', 'descripcion', 'lineup',
+  'banner-1', 'playlist', 'cartel', 'video', 'boletos', 'whatsapp',
+  'banner-2', 'ubicacion', 'form', 'faq', 'sponsors', 'footer'];
+var EXP_WIDE = ['hero hero', 'countdown countdown', 'meta meta', 'ctas ctas',
+  'descripcion descripcion', 'lineup lineup', 'banner-1 banner-1',
+  'cartel playlist', 'video video', 'boletos whatsapp', 'banner-2 banner-2',
+  'faq ubicacion', 'sponsors sponsors', 'form form', 'footer footer'];
+var baseT = null, wideT = null;
+for (var q1 = 0; q1 < areaList.length; q1++) {
+  var qr = areaList[q1], qWide = false;
+  for (var q2 = 0; q2 < qr.length; q2++) if (qr[q2].length > 1) qWide = true;
+  if (qWide) wideT = qr; else baseT = qr;
+}
+function joinRows(rows) {
+  var out = [];
+  for (var r = 0; r < rows.length; r++) out.push(rows[r].join(' '));
+  return out.join('|');
+}
+var expBase = [], eb;
+for (eb = 0; eb < EXP_BASE.length; eb++) expBase.push([EXP_BASE[eb]]);
+var f1base = !!baseT && joinRows(baseT) === joinRows(expBase);
+var f1wide = !!wideT && joinRows(wideT) === EXP_WIDE.join('|');
+check(f1base && f1wide,
+  'F1: las 2 plantillas declaran las areas en el ORDEN nuevo (secuencia exacta 1 col y 2 col)',
+  'base=' + (f1base ? 'ok' : (baseT ? joinRows(baseT) : 'sin plantilla de 1 col')) +
+  ' wide=' + (f1wide ? 'ok' : (wideT ? joinRows(wideT) : 'sin plantilla de 2 col')));
+
+/* F2: 'experiencias' ya NO es area de ninguna plantilla y NO hay regla
+   grid-area: experiencias. El id sigue en el HTML (Cero Borrado) y el silo
+   conserva su :has(:empty) de apagado; lo que desaparece es su grid-area. */
+var f2area = true, detF2 = '';
+for (var g1 = 0; g1 < areaList.length; g1++) {
+  for (var g2 = 0; g2 < areaList[g1].length; g2++) {
+    for (var g3 = 0; g3 < areaList[g1][g2].length; g3++) {
+      if (areaList[g1][g2][g3] === 'experiencias') { f2area = false; detF2 = 'plantilla ' + (g1 + 1); }
+    }
+  }
+}
+var f2rule = !/grid-area\s*:\s*experiencias\b/.test(cssNoC);
+check(f2area && f2rule,
+  'F2: experiencias fuera de las 2 plantillas y sin regla grid-area: experiencias',
+  'area=' + f2area + ' regla=' + f2rule + (detF2 ? ' (' + detF2 + ')' : ''));
+
+/* F3: el kernel detecta YouTube con regex y crea un <a class="banner-link">
+   (overlay) en lugar de <video>; el camino <video> se conserva para mp4/webm. */
+var f3re = bKernel.indexOf('youtube\\.com\\/(?:watch\\?v=|shorts\\/|embed\\/)|youtu\\.be\\/') !== -1;
+var f3var = bKernel.indexOf('__bannerYoutube') !== -1;
+var f3link = bKernel.indexOf("link.className = 'banner-link';") !== -1;
+var f3video = bKernel.indexOf("vid.className = 'banner-video';") !== -1;
+var f3gate = bKernel.indexOf('if (vidUrl && __bannerYoutube)') !== -1 &&
+             bKernel.indexOf('} else if (vidUrl && !__pideCalma) {') !== -1;
+check(f3re && f3var && f3link && f3video && f3gate,
+  'F3: kernel detecta YouTube (regex) y crea .banner-link en lugar de <video>; el camino <video> sigue para mp4/webm',
+  're=' + f3re + ' var=' + f3var + ' link=' + f3link + ' video=' + f3video + ' gate=' + f3gate);
+
+/* ---------------------------------------------------------------------------
  * Resumen
  * ------------------------------------------------------------------------- */
 

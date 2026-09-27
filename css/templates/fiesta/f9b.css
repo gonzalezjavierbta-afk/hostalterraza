@@ -483,7 +483,6 @@
 .tpl-f9b #mod-faq, .Tpl-F9b #mod-faq,
 .tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion,
 .tpl-f9b #mod-boletos, .Tpl-F9b #mod-boletos,
-.tpl-f9b #mod-experiencias, .Tpl-F9b #mod-experiencias,
 .tpl-f9b #mod-sponsors, .Tpl-F9b #mod-sponsors {
     display: block !important;
 }
@@ -680,7 +679,7 @@
     background-repeat: repeat;
 }
 
-/* v1.1.0: fx-glow se MONTA en 3 elementos marcos y no en todo el silo. El
+/* v1.1.0: fx-glow se MONTA en 2 elementos marcos y no en todo el silo. El
    resplandor va PRIMERO en la lista para que las sombras de profundidad
   opian la suya; nunca se usa var(--f9b-fx-glow) dentro de una lista con otras
    sombras, porque vale none por defecto y la declaracion completa seria
@@ -688,9 +687,7 @@
 .tpl-f9b.fx-glow .form-master-box,
 .Tpl-F9b.fx-glow .form-master-box,
 .tpl-f9b.fx-glow .faq-icon-circle,
-.Tpl-F9b.fx-glow .faq-icon-circle,
-.tpl-f9b.fx-glow #db-whatsapp-btn,
-.Tpl-F9b.fx-glow #db-whatsapp-btn {
+.Tpl-F9b.fx-glow .faq-icon-circle {
     box-shadow: var(--f9b-fx-glow), var(--f9b-shadow-3), var(--f9b-shadow-gold);
 }
 
@@ -712,17 +709,16 @@
         "descripcion"
         "lineup"
         "banner-1"
-        "video"
-        "cartel"
         "playlist"
+        "cartel"
+        "video"
         "boletos"
-        "experiencias"
-        "faq"
-        "ubicacion"
         "whatsapp"
-        "sponsors"
         "banner-2"
+        "ubicacion"
         "form"
+        "faq"
+        "sponsors"
         "footer";
     row-gap: 0;
     column-gap: 0;
@@ -743,7 +739,6 @@
 .tpl-f9b #mod-video, .Tpl-F9b #mod-video {  grid-area: video; }
 .tpl-f9b #mod-playlist, .Tpl-F9b #mod-playlist {  grid-area: playlist; }
 .tpl-f9b #mod-boletos, .Tpl-F9b #mod-boletos {  grid-area: boletos; }
-.tpl-f9b #mod-experiencias, .Tpl-F9b #mod-experiencias {  grid-area: experiencias; }
 .tpl-f9b #mod-faq, .Tpl-F9b #mod-faq {  grid-area: faq; }
 .tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion {  grid-area: ubicacion; }
 .tpl-f9b #mod-whatsapp, .Tpl-F9b #mod-whatsapp {  grid-area: whatsapp; }
@@ -757,10 +752,11 @@
     min-width: 0;
 }
 
-/* Desktop y tablet ancha (>=992px): dos columnas con filas pareadas
-   (cartel|playlist, faq|ubicacion, whatsapp|sponsors). Descripcion, lineup y
-   video ocupan fila completa. Las filas pareadas vacias colapsan porque
-   row-gap es 0. El REFLOW (seccion 26) expande al companero cuando falta. */
+/* Desktop y tablet ancha (>=992px): dos columnas con 3 filas pareadas
+   (cartel|playlist, boletos|whatsapp, faq|ubicacion). Descripcion, lineup,
+   video, los 2 banners, sponsors, form y footer ocupan fila completa. Las
+   filas pareadas vacias colapsan porque row-gap es 0. El REFLOW (seccion 26)
+   expande al companero cuando falta. */
 @media (min-width: 992px) {
     .tpl-f9b #main-content-flow, .Tpl-F9b #main-content-flow {
         grid-template-columns: 1fr 1fr;
@@ -772,13 +768,12 @@
             "descripcion descripcion"
             "lineup lineup"
             "banner-1 banner-1"
-            "video video"
             "cartel playlist"
-            "boletos boletos"
-            "experiencias experiencias"
-            "faq ubicacion"
-            "whatsapp sponsors"
+            "video video"
+            "boletos whatsapp"
             "banner-2 banner-2"
+            "faq ubicacion"
+            "sponsors sponsors"
             "form form"
             "footer footer";
     }
@@ -1703,6 +1698,24 @@
     border-radius: 0 !important;
 }
 
+/* El kernel crea .spotify-open-link con estilos INLINE que usan var(--tpl-accent)
+   (dorado en f9b): esta regla gana al inline con !important y le da el verde
+   corporativo de Spotify, centrado y con un margen superior corto. */
+.tpl-f9b #mod-playlist .spotify-open-link, .Tpl-F9b #mod-playlist .spotify-open-link {
+    display: block !important;
+    width: fit-content !important;
+    margin: 14px auto 0 !important;
+    background: #1DB954 !important;
+    border-color: #1DB954 !important;
+    color: #ffffff !important;
+    text-align: center !important;
+}
+
+.tpl-f9b #mod-playlist .spotify-open-link:hover, .Tpl-F9b #mod-playlist .spotify-open-link:hover {
+    background: #1AA34A !important;
+    border-color: #1AA34A !important;
+}
+
 /* ==========================================================================
    16. INFO TECNICA - #mod-info-tecnica > .data-cards-container > .card-item
    ========================================================================== */
@@ -2007,9 +2020,9 @@
     justify-content: center;
     gap: 0.9rem;
     padding: 1.1rem 2.4rem !important;
-    background-color: transparent !important;
-    color: var(--f9b-gold) !important;
-    border: 1px solid var(--f9b-gold) !important;
+    background-color: #25D366 !important;
+    color: #ffffff !important;
+    border: 1px solid #25D366 !important;
     border-radius: 0 !important;
     font-family: var(--f9b-sans);
     font-weight: 800 !important;
@@ -2021,8 +2034,9 @@
 }
 
 .tpl-f9b #db-whatsapp-btn:hover, .Tpl-F9b #db-whatsapp-btn:hover {
-    background-color: var(--f9b-gold) !important;
-    color: var(--f9b-bg) !important;
+    background-color: #1EBE5A !important;
+    border-color: #1EBE5A !important;
+    color: #ffffff !important;
     transform: translateY(-2px);
 }
 
@@ -2617,6 +2631,10 @@
    el grid-template-areas completo por caso, el companero de una fila pareada
    se expande a las 2 columnas con grid-column: 1 / -1 (conserva la fila que
    le asigna su propio grid-area). Sin duplicacion de plantillas.
+   Pares vigentes de la plantilla de 2 columnas: cartel<->playlist,
+   boletos<->whatsapp y faq<->ubicacion. Los modulos que ya ocupan fila
+   completa (banner-1/2, descripcion, lineup, video, sponsors, form, footer)
+   no necesitan reflow.
    ========================================================================== */
 @media (min-width: 992px) {
     /* --- Falta el cartel: la playlist ocupa la fila completa. --- */
@@ -2634,14 +2652,23 @@
         grid-column: 1 / -1;
     }
 
+    /* --- Falta la ubicacion: el FAQ ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq, .Tpl-F9b #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq {
+        grid-column: 1 / -1;
+    }
+
     /* --- Ubicacion vacia (sin mapa): el FAQ ocupa la fila completa. --- */
     .tpl-f9b #main-content-flow:has(#db-mapa-container:empty) #mod-faq, .Tpl-F9b #main-content-flow:has(#db-mapa-container:empty) #mod-faq {
         grid-column: 1 / -1;
     }
 
-    /* --- Faltan los sponsors: el WhatsApp ocupa la fila completa. --- */
-    .tpl-f9b #main-content-flow:has(#mod-sponsors[data-hidden]) #mod-whatsapp,
-    .Tpl-F9b #main-content-flow:has(#mod-sponsors[data-hidden]) #mod-whatsapp {
+    /* --- Faltan los boletos: el WhatsApp ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-whatsapp, .Tpl-F9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-whatsapp {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Falta el WhatsApp: los boletos ocupan la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-whatsapp[data-hidden]) #mod-boletos, .Tpl-F9b #main-content-flow:has(#mod-whatsapp[data-hidden]) #mod-boletos {
         grid-column: 1 / -1;
     }
 }
@@ -2884,13 +2911,13 @@
     --f9b-bn-muted: #c9c0b1;
     /* Placa del panel: la misma masa --f9b-tex-card del silo, estirada a
        banda. */
-    --f9b-bn-placa: linear-gradient(158deg, rgba(20, 17, 14, 0.94) 0%, rgba(12, 10, 8, 0.96) 58%, rgba(5, 4, 3, 0.97) 100%);
+    --f9b-bn-placa: linear-gradient(158deg, rgba(20, 17, 14, 0.55) 0%, rgba(12, 10, 8, 0.65) 58%, rgba(5, 4, 3, 0.74) 100%);
     /* Velo medio, el que va POR ENCIMA de la foto. */
     --f9b-bn-velo: linear-gradient(180deg, rgba(5, 4, 3, 0.30) 0%, rgba(5, 4, 3, 0.50) 52%, rgba(5, 4, 3, 0.76) 100%);
     /* Velo fuerte, el que va por debajo del texto dentro del panel. Es el que
        compra el contraste AA de la frase: la foto se ve en el borde de la
        banda y el texto va sobre casi negro. */
-    --f9b-bn-velo-panel: linear-gradient(165deg, rgba(5, 4, 3, 0.66) 0%, rgba(5, 4, 3, 0.82) 46%, rgba(5, 4, 3, 0.93) 100%);
+    --f9b-bn-velo-panel: linear-gradient(165deg, rgba(5, 4, 3, 0.38) 0%, rgba(5, 4, 3, 0.52) 46%, rgba(5, 4, 3, 0.66) 100%);
     /* Fondo por defecto SIN media: no es un color plano, es la atmosfera del
        silo (un foco dorado alto) sobre la textura profunda y el grano. */
     --f9b-bn-atmosfera: radial-gradient(78% 62% at 50% 26%, rgba(240, 188, 0, 0.16) 0%, rgba(240, 188, 0, 0.05) 46%, rgba(240, 188, 0, 0) 72%);
@@ -2939,6 +2966,9 @@
         var(--f9b-grain);
     background-size: auto, auto, 160px 160px;
     background-repeat: no-repeat, no-repeat, repeat;
+    /* Parallax solo en la PRIMERA capa (la atmosfera); las otras 2 quedan en
+       scroll para no arrastrar la textura ni el grano con el viewport. */
+    background-attachment: var(--f9b-parallax-attachment), scroll, scroll;
 }
 
 /* Velo medio POR ENCIMA de la media pero DENTRO de su capa (z-index 1 de un
@@ -2967,6 +2997,26 @@
     height: 100%;
     object-fit: cover;
     filter: saturate(0.88) contrast(1.04) brightness(0.92);
+}
+
+/* Parallax scroll-driven de la foto/video: progresive enhancement puro. Sin
+   animation-timeline el bloque @supports no aplica y la media queda estatica;
+   con reduced-motion el bloque no se monta. .banner-media ya recorta con
+   overflow:hidden, asi que el sobredimensionado del scale no se desborda. */
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .tpl-f9b .banner-img, .Tpl-F9b .banner-img,
+        .tpl-f9b .banner-video, .Tpl-F9b .banner-video {
+            animation: f9bBannerPar linear both;
+            animation-timeline: view();
+            animation-range: entry 0% exit 100%;
+            will-change: transform;
+        }
+    }
+}
+@keyframes f9bBannerPar {
+    from { transform: translateY(-6%) scale(1.12); }
+    to   { transform: translateY(6%) scale(1.12); }
 }
 
 /* Capa 3: el panel. Hexagono, placa, velo fuerte y filo interior. El
@@ -3084,6 +3134,16 @@
         inset 0 0 48px rgba(5, 4, 3, 0.62);
 }
 
+/* El filtro de medios es COMPARTIDO por los 2 banners (regla base de la
+   seccion 28): la variante monocromo lo sobrescribe con mayor especificidad
+   (atributo + id + clase) para que la foto/video salga en blanco y negro. */
+.tpl-f9b #mod-banner-1[data-estilo="monocromo"] .banner-img, .Tpl-F9b #mod-banner-1[data-estilo="monocromo"] .banner-img,
+.tpl-f9b #mod-banner-2[data-estilo="monocromo"] .banner-img, .Tpl-F9b #mod-banner-2[data-estilo="monocromo"] .banner-img,
+.tpl-f9b #mod-banner-1[data-estilo="monocromo"] .banner-video, .Tpl-F9b #mod-banner-1[data-estilo="monocromo"] .banner-video,
+.tpl-f9b #mod-banner-2[data-estilo="monocromo"] .banner-video, .Tpl-F9b #mod-banner-2[data-estilo="monocromo"] .banner-video {
+    filter: grayscale(1) contrast(1.1) brightness(0.92);
+}
+
 /* --------------------------------------------------------------------------
     28.2 BANDA MOVIL (menos de 992px)
     La banda ya es de una columna por debajo de 992px porque el grid de la
@@ -3170,6 +3230,10 @@
     .tpl-f9b .banner-autor, .Tpl-F9b .banner-autor,
     .tpl-f9b .banner-img, .Tpl-F9b .banner-img {
         transform: none !important;
+    }
+
+    .tpl-f9b .banner-media, .Tpl-F9b .banner-media {
+        background-attachment: scroll !important;
     }
 
     /* El video decorativo baja a invisible. Ademas de que el movimiento esta
