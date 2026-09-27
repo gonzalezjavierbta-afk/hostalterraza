@@ -258,13 +258,24 @@
          3. El PRIMER renglon del menu que aparece son las coordenadas:
             clic sobre ellas y quedan copiadas. Pegar aqui.
 
-       QUE HACE EL KERNEL CON ESTO (evento-app.html L2118-2130):
-         - CON valor  -> el mapa se centra con ll=<coordenadas> y Google NO
-           dibuja su pin: manda el pin propio de ESTE silo (dorado, mas abajo).
-         - SIN valor  -> modo anterior: el mapa se centra con q=<ubicacion> y
-           Google dibuja SU pin (el que no se puede recolorear).
-       Para volver al pin de Google: dejar esta linea VACIA o borrarla. */
+       QUE HACE EL KERNEL CON ESTO (evento-app.html L2118-2145):
+         - CON valor  -> el mapa se centra EXACTAMENTE en estas coordenadas.
+           Como abajo se activa --mapa-pin-nativo: 1, el kernel arma
+           q=<lat>,<lng> y Google dibuja SU PROPIO PIN justo en ese punto
+           (cero overlay). El color del pin lo pone el filtro del bloque 18.
+         - SIN valor  -> modo anterior: el mapa se centra con q=<ubicacion>
+           (el texto de la direccion) y Google dibuja su pin donde su geocoder
+           decida, que no siempre cae en el punto exacto.
+       Para volver a centrar por direccion: dejar esta linea VACIA o borrarla. */
     --f12-mapa-query: 4.634472590905041,-74.07471573777842;
+
+    /* Le dice al kernel que este silo NO pinta pin propio y quiere el pin
+       NATIVO de Google sobre las coordenadas de arriba (ver el comentario del
+       bloque 18 "MAPA OSCURO CON EL PIN NATIVO DE GOOGLE").
+         1 = pin de Google exacto sobre --f12-mapa-query (f9b).
+         0 o ausente = el kernel centra con ll= y el silo pinta su propio pin
+         (es lo que hace f12 con su pin fucsia). */
+    --mapa-pin-nativo: 1;
 
     /* Puente cromatico (contrato con el kernel y con el HTML inline de
        evento-app.html). Los DOS nombres se conservan aunque el silo se llame
@@ -1856,51 +1867,67 @@
 
     box-shadow: var(--f9b-shadow-3), var(--f9b-elev-2);}
 
-/* MAPA SIN TINTE (v1.12.0). El pin nativo de Google lo dibuja DENTRO del
-   <iframe> (cross-origin) y NO se puede recolorear por CSS aisladamente. Antes
-   se disfrazaba retintando el iframe completo (sepia + hue-rotate), con el
-   costo de dejar todo el mapa en monocromo calido; se retiro por pedido y por
-   legibilidad: un mapa se usa para LLEGAR, tiene que verse real.
-   Ahora el asunto se resuelve por dato, no por filtro: el silo define las
-   coordenadas en --f12-mapa-query, Google entrega el mapa con ll= y SIN
-   marcador nativo, y el pin lo dibuja el silo (.map-own-pin::after, abajo) en
-   el color de acento. Ver la linea del token, arriba, en "1. RESET DE SILO".
+/* MAPA OSCURO CON EL PIN NATIVO DE GOOGLE EN DORADO (v1.13.0, ADR-059).
+   ---------------------------------------------------------------------------
+   Objetivo: mapa en NEGRO + el pin DE GOOGLE en DORADO, sin overlay.
+   El pin nativo lo dibuja Google DENTRO del <iframe> (cross-origin), asi que
+   no se puede recolorear de forma aislada: la unica palanca es el filter del
+   iframe completo. La posicion exacta la resuelve el dato, no el CSS: el silo
+   activa --mapa-pin-nativo y el kernel arma q=<lat>,<lng> (ver el token).
+
+   LA CLAVE (y el error del intento anterior que dejo el mapa mostaza):
+   NO usar grayscale ni sepia. El grayscale destruye el color del pin y el
+   sepia dora TODO el mapa. La cadena correcta, paso a paso, con valores
+   MEDIDOS (no estimados; ver la nota del hue-rotate):
+     invert(1)          -> el mapa claro se vuelve NEGRO (#FFFFFF -> #000000) y
+                           los rotulos oscuros pasan a claros (#333333 ->
+                           #EAEAEA): negro con letras legibles. El pin de Google
+                           #EA4335 (rojo, tono 5) se vuelve CIAN #15BCCA
+                           (tono 185).
+     hue-rotate(232deg) -> mueve el tono del pin al DORADO. OJO: 232 NO es
+                           "45 menos 185". El hue-rotate de CSS es una
+                           APROXIMACION MATRICIAL que COMPRIME el tono, asi que
+                           la cuenta mental engana (220deg daba #E49C35, ambar).
+                           El valor se calculo reproduciendo la matriz del spec
+                           con numeros: el optimo es 232deg, que entrega el pin
+                           en #D2AD3B contra el objetivo #D4AF37 del silo.
+                           El negro y los grises NO tienen tono, asi que no se
+                           mueven: el mapa sigue negro.
+     saturate(0.7) brightness(1.1) contrast(1.1)
+                        -> son los que minimizan la distancia del pin al dorado
+                           objetivo y mantienen el fondo en #000000 puro (el
+                           brightness sobre el negro se recorta a 0 por el
+                           contraste). OJO: saturate es un mando UNICO para toda
+                           la escena; subirlo dora mas el pin pero tambien
+                           satura el mapa.
+   Mapa resultante: fondo #000000, vias #1C1C1C, rotulos #EAEAEA, agua y zonas
+   verdes en tonos oscuros apagados. Es el mapa de Google INVERTIDO, no un tema
+   oscuro nativo: los pocos elementos con color quedan con tonos propios.
    El kernel inyecta su propio filter INLINE en el <iframe> (evento-app.html
    L2133: grayscale + invert); un inline solo pierde ante una hoja con
-   !important, por eso el filter: none !important de aca.
-   Si algun dia se borra --f12-mapa-query volveria el pin nativo, ya sin tinte:
-   quiza convenga reponer el filtro SOLO en ese caso. */
+   !important, por eso el !important de aca.
+
+   AJUSTE EN VIVO desde la consola del navegador (F12):
+     var f=document.querySelector('#db-mapa-container iframe');
+     var tinte=function(inv,deg,sat,bri,con){f.style.filter='invert('+inv+') hue-rotate('+deg+'deg) saturate('+sat+') brightness('+bri+') contrast('+con+')';return f.style.filter};
+     tinte(1, 232, 0.7, 1.1, 1.1)
+   Subir deg = el pin se va a amarillo/verde. Bajarlo = se va a naranja/rojo
+   (180deg = el rojo original de Google). Para volver el mapa CLARO: inv = 0. */
 .tpl-f9b #db-mapa-container iframe, .Tpl-F9b #db-mapa-container iframe {
     display: block;
     width: 100%;
     height: 100%;
     border: none;
-    filter: none !important;
+    filter: invert(1) hue-rotate(232deg) saturate(0.7) brightness(1.1) contrast(1.1) !important;
 }
 
-/* Pin PROPIO del silo. Solo se dibuja cuando el kernel marca el contenedor
-   con .map-own-pin, y eso ocurre unicamente si el silo define coordenadas en
-   --f12-mapa-query (entonces Google entrega el mapa con ll= y SIN marcador
-   nativo). Asi el pin nunca queda superpuesto: si no hay coordenadas, manda
-   el pin nativo (retintado por el filtro de arriba). */
-.tpl-f9b #db-mapa-container.map-own-pin, .Tpl-F9b #db-mapa-container.map-own-pin {
-    position: relative;
-}
-.tpl-f9b #db-mapa-container.map-own-pin::after, .Tpl-F9b #db-mapa-container.map-own-pin::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 38px;
-    height: 38px;
-    transform: translate(-50%, -100%) rotate(45deg);
-    background: var(--f9b-gold);
-    border: 2px solid #050403;
-    border-radius: 50% 50% 50% 0;
-    box-shadow: 0 8px 18px rgba(5, 4, 3, 0.65);
-    pointer-events: none;
-    z-index: 5;
-}
+/* PIN PROPIO: RETIRADO (v1.13.0, ADR-059). El pin CSS (.map-own-pin::after)
+   se elimino por pedido: al quedar centrado en el contenedor no marcaba el
+   punto exacto y ademas tapaba al pin de Google. Ahora el punto lo marca
+   Google con SU pin, exactamente sobre las coordenadas, porque el silo activa
+   --mapa-pin-nativo (el kernel arma q=<lat>,<lng> en vez de ll=).
+   Consecuencia: f9b NO declara ningun ::after sobre #db-mapa-container y la
+   clase .map-own-pin nunca se aplica en este silo. */
 
 /* ==========================================================================
    19. BOLETOS - #mod-boletos (filas compactas inyectadas por el motor)

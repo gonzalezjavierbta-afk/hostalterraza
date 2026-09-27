@@ -1027,16 +1027,26 @@ check(H4z && H4gate,
   'H4: banner-link con z-index:4 (clic sobre el panel de texto) y el gate + rama mp4 del video intactos',
   'z=' + H4z + ' gate=' + H4gate);
 
-/* --- H5: SIN pin CSS superpuesto; el iframe de Google se retinta ----------- */
+/* --- H5: sin pin CSS superpuesto; mapa oscuro con el pin dorado ------------ */
+/* El pin propio se retiro (ADR-059): el punto lo marca el pin NATIVO de Google
+   sobre las coordenadas. El filtro del iframe debe ser la cadena invert +
+   hue-rotate SIN grayscale ni sepia: esos eran los que doraban TODO el mapa y
+   destruian el color del pin. */
 var H5nopin = cssNoC.indexOf('db-mapa-container' + '::after') === -1;
-var H5filter = false;
+var H5filter = false, H5nogra = true;
 for (var h5 = 0; h5 < bRules.length; h5++) {
-  if (/#db-mapa-container[^{}]*iframe/.test(bRules[h5].sel) &&
-      /filter\s*:\s*none\s*!important/.test(bRules[h5].body)) { H5filter = true; }
+  if (/#db-mapa-container[^{}]*iframe/.test(bRules[h5].sel)) {
+    var H5b = bRules[h5].body;
+    if (/filter\s*:[^;}]*invert\(1\)/.test(H5b) &&
+        /hue-rotate\(\s*232deg\s*\)/.test(H5b) &&
+        /saturate\(0\.7\)/.test(H5b) &&
+        /!important/.test(H5b)) { H5filter = true; }
+    if (/grayscale\(/.test(H5b) || /sepia\(/.test(H5b)) { H5nogra = false; }
+  }
 }
-check(H5nopin && H5filter,
-  'H5: sin pin CSS superpuesto (cero ::after) y el mapa SIN tinte (filter:none !important anula el inline del kernel)',
-  'sinPin=' + H5nopin + ' sinTinte=' + H5filter);
+check(H5nopin && H5filter && H5nogra,
+  'H5: cero pin CSS superpuesto y el mapa con invert(1) + hue-rotate(232deg) + saturate(0.7) !important (pin #D2AD3B, sin grayscale ni sepia)',
+  'sinPin=' + H5nopin + ' oscuro=' + H5filter + ' sinGrisSepia=' + H5nogra);
 
 /* --- H6: headliner mas alto en movil (72vh) y tablet vertical (64vh) ------ */
 var media767 = sliceBalanced(cssNoC, '@media (max-width: 767px)');
@@ -1092,44 +1102,46 @@ var H10 = /min-height\s*:\s*4\.8rem/.test(media991);
 check(H10, 'H10: los 3 chips del meta comparten min-height: 4.8rem en el bloque <=991px',
   'min-height=' + H10);
 
-/* --- H11: el silo NO declara el pin "pelado" (::after sin .map-own-pin) ---- */
-/* El pin propio debe vivir SOLO bajo .map-own-pin; el selector sin la clase
-   (que pintaria un pin superpuesto al nativo) debe seguir con 0 ocurrencias. */
+/* --- H11: el silo NO declara ningun pin CSS sobre el mapa ------------------ */
+/* Ni el "pelado" ni el de .map-own-pin: el pin propio se retiro por completo
+   (ADR-059). Cualquier ::after aca volveria a superponer un pin sobre el de
+   Google y a marcar mal el punto. */
 var H11bare = cssNoC.indexOf('#db-mapa-container::after') === -1;
-check(H11bare,
-  'H11: el silo no declara #db-mapa-container::after sin la clase .map-own-pin (0 ocurrencias)',
-  'pelado=' + H11bare);
+var H11clase = /#db-mapa-container\.map-own-pin::after/.test(cssNoC);
+check(H11bare && !H11clase,
+  'H11: el silo no declara NINGUN ::after sobre #db-mapa-container (ni pelado ni con .map-own-pin)',
+  'pelado=' + H11bare + ' conClase=' + H11clase);
 
-/* --- H12: el pin propio usa el acento del silo y queda sobre el mapa ------- */
-var H12gold = /#db-mapa-container\.map-own-pin::after[^{}]*\{[^{}]*background\s*:\s*var\(--f9b-gold\)/.test(cssNoC);
-var H12z = /#db-mapa-container\.map-own-pin::after[^{}]*\{[^{}]*z-index\s*:\s*5/.test(cssNoC);
-check(H12gold && H12z,
-  'H12: existe la regla .map-own-pin::after con var(--f9b-gold) y z-index: 5',
-  'gold=' + H12gold + ' z=' + H12z);
+/* --- H12: el silo pide el pin NATIVO sobre las coordenadas ----------------- */
+var H12nativo = /--mapa-pin-nativo\s*:\s*1\s*;/.test(cssNoC);
+check(H12nativo,
+  'H12: el silo activa --mapa-pin-nativo: 1 (pin de Google exacto sobre --f12-mapa-query)',
+  'nativo=' + H12nativo);
 
-/* --- H13: el kernel marca el contenedor cuando hay coordenadas del silo ---- */
-var H13add = /if\s*\(\s*__mapaQuerySilo\s*\)\s*\{[^}]*classList\.add\('map-own-pin'\)/.test(kernel);
+/* --- H13: el kernel marca el contenedor SOLO en modo pin propio ------------ */
+var H13add = /if\s*\(\s*__mapaQuerySilo\s*&&\s*!__mapaPinNativo\s*\)\s*\{[^}]*classList\.add\('map-own-pin'\)/.test(kernel);
 var H13rem = /classList\.remove\('map-own-pin'\)/.test(kernel);
 check(H13add && H13rem,
-  'H13: el kernel agrega la clase map-own-pin cuando __mapaQuerySilo tiene valor (y la retira si no)',
+  'H13: el kernel agrega map-own-pin solo con --f12-mapa-query y SIN --mapa-pin-nativo (y la retira si no)',
   'add=' + H13add + ' remove=' + H13rem);
 
 /* --- H14: el silo lleva las coordenadas del lugar en el token -------------- */
 /* El token vive en el bloque de variables del silo; su valor debe ser
-   "lat,long" con COMA y SIN espacios (un espacio rompe el ll= del kernel)
-   o estar VACIO (entonces manda el pin nativo de Google). */
+   "lat,long" con COMA y SIN espacios (un espacio rompe la URL de Google) o
+   estar VACIO (entonces el mapa se centra por la direccion de texto). */
 var H14tok = /--f12-mapa-query\s*:\s*([^;}]*)/.exec(cssNoC);
 var H14val = H14tok ? H14tok[1].trim() : null;
 var H14ok = H14val !== null && (H14val === '' || /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(H14val));
 check(H14ok,
-  'H14: --f12-mapa-query tiene "lat,long" sin espacios (o vacio para usar el pin de Google)',
+  'H14: --f12-mapa-query tiene "lat,long" sin espacios (o vacio para centrar por direccion)',
   'valor=' + JSON.stringify(H14val) + ' formato=' + H14ok);
 
-/* --- H15: el kernel construye la URL con ll= (sin marcador nativo) --------- */
+/* --- H15: el kernel arma q=<coords> (pin nativo) y conserva ll= ------------ */
+var H15q = /q=\$\{encodeURIComponent\(__mapaQuerySilo\)\}&t=&z=16/.test(kernel);
 var H15ll = /ll=\$\{encodeURIComponent\(__mapaQuerySilo\)\}&z=16/.test(kernel);
-check(H15ll,
-  'H15: el kernel centra con ll= y z=16 cuando hay coordenadas (Google no dibuja su pin)',
-  'll=' + H15ll);
+check(H15q && H15ll,
+  'H15: el kernel usa q=<coords>&z=16 con --mapa-pin-nativo:1 (pin de Google) y mantiene ll= para el modo pin propio',
+  'q=' + H15q + ' ll=' + H15ll);
 
 /* ---------------------------------------------------------------------------
  * Resumen

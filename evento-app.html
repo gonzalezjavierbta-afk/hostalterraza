@@ -2115,15 +2115,24 @@ if (document.getElementById('db-poster-img')) {
         // v1.11.0: si el silo define --f12-mapa-query (coordenada exacta), el
         // mapa se centra con ll= SIN marcador nativo de Google: el pin fucsia
         // del silo es el unico marcador. Sin override se usa q=<ubicacion>.
+        // v1.13.0 (ADR-059): --mapa-pin-nativo: 1 le dice al kernel que el silo
+        // NO pinta pin propio y quiere el pin NATIVO de Google en las
+        // coordenadas. Se logra pasando las coordenadas como CONSULTA
+        // (q=<lat>,<lng>) en vez de ll=: el embed keyless dibuja un unico
+        // search-pin justo en ese punto. Resultado: pin de Google + posicion
+        // exacta + cero overlay. Default 0 = comportamiento anterior (ll=).
         const __mapaQuerySilo = (getComputedStyle(document.body).getPropertyValue('--f12-mapa-query') || '').trim();
+        const __mapaPinNativo = (getComputedStyle(document.body).getPropertyValue('--mapa-pin-nativo') || '').trim() === '1';
         const mapUrl = __mapaQuerySilo
-            ? `https://maps.google.com/maps?ll=${encodeURIComponent(__mapaQuerySilo)}&z=16&output=embed`
+            ? (__mapaPinNativo
+                ? `https://maps.google.com/maps?q=${encodeURIComponent(__mapaQuerySilo)}&t=&z=16&ie=UTF8&iwloc=&output=embed`
+                : `https://maps.google.com/maps?ll=${encodeURIComponent(__mapaQuerySilo)}&z=16&output=embed`)
             : `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
         const mapContainer = document.getElementById('db-mapa-container');
         
         if (mapContainer) {
             mapContainer.style.border = '1px solid var(--tpl-accent)';
-            if (__mapaQuerySilo) {
+            if (__mapaQuerySilo && !__mapaPinNativo) {
                 mapContainer.classList.add('map-own-pin');
             } else {
                 mapContainer.classList.remove('map-own-pin');
