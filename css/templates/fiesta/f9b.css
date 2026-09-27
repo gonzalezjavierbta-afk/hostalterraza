@@ -1608,7 +1608,7 @@
     height: 100%;
     /* Foto del headliner: cubre el contenedor (cover). Base mobile/tablet:
        encuadre arriba (center top). En escritorio (>=992px) baja a
-       center 78% para mostrar mas la parte baja de la imagen. */
+       center 62% para mostrar mas la parte baja de la imagen. */
     object-fit: cover;
     object-position: center top;
 }
@@ -1854,6 +1854,30 @@
     height: 100%;
     border: none;
     filter: grayscale(1) invert(1) contrast(1.15) sepia(0.85) saturate(2.4) hue-rotate(-12deg) !important;
+}
+
+/* Pin PROPIO del silo. Solo se dibuja cuando el kernel marca el contenedor
+   con .map-own-pin, y eso ocurre unicamente si el silo define coordenadas en
+   --f12-mapa-query (entonces Google entrega el mapa con ll= y SIN marcador
+   nativo). Asi el pin nunca queda superpuesto: si no hay coordenadas, manda
+   el pin nativo (retintado por el filtro de arriba). */
+.tpl-f9b #db-mapa-container.map-own-pin, .Tpl-F9b #db-mapa-container.map-own-pin {
+    position: relative;
+}
+.tpl-f9b #db-mapa-container.map-own-pin::after, .Tpl-F9b #db-mapa-container.map-own-pin::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 38px;
+    height: 38px;
+    transform: translate(-50%, -100%) rotate(45deg);
+    background: var(--f9b-gold);
+    border: 2px solid #050403;
+    border-radius: 50% 50% 50% 0;
+    box-shadow: 0 8px 18px rgba(5, 4, 3, 0.65);
+    pointer-events: none;
+    z-index: 5;
 }
 
 /* ==========================================================================
@@ -2407,7 +2431,7 @@
 
     /* Escritorio: el encuadre baja hacia la parte de abajo de la foto. */
     .tpl-f9b #db-lineup .artist-card.headliner .artist-photo, .Tpl-F9b #db-lineup .artist-card.headliner .artist-photo {
-        object-position: center 78%;
+        object-position: center 62%;
     }
 }
 

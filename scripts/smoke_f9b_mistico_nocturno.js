@@ -1073,25 +1073,47 @@ check(H8pos && H8base,
 
 /* --- H9: la foto del headliner baja el encuadre en >=992px ---------------- */
 /* Hay varios bloques @media (min-width: 992px): se recorren TODOS y se exige
-   que alguno traiga la regla del headliner con object-position center 78% (el
+   que alguno traiga la regla del headliner con object-position center 62% (el
    encuadre baja hacia la parte de abajo de la foto). La base conserva
    center top para mobile/tablet. */
 var H9pos = false, H9mIdx = cssNoC.indexOf('@media (min-width: 992px)');
 while (H9mIdx !== -1) {
   var H9blk = sliceBalanced(cssNoC.slice(H9mIdx), '@media (min-width: 992px)');
   if (H9blk.indexOf('#db-lineup') !== -1 &&
-      /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+78%/.test(H9blk)) { H9pos = true; break; }
+      /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+62%/.test(H9blk)) { H9pos = true; break; }
   H9mIdx = cssNoC.indexOf('@media (min-width: 992px)', H9mIdx + 1);
 }
 var H9base = /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+top/.test(cssNoC);
 check(H9pos && H9base,
-  'H9: la foto del headliner baja el encuadre a center 78% en >=992px y la base conserva center top',
+  'H9: la foto del headliner baja el encuadre a center 62% en >=992px y la base conserva center top',
   'desk=' + H9pos + ' base=' + H9base);
 
 /* --- H10: los 3 chips del meta comparten min-height en <=991px ------------ */
 var H10 = /min-height\s*:\s*4\.8rem/.test(media991);
 check(H10, 'H10: los 3 chips del meta comparten min-height: 4.8rem en el bloque <=991px',
   'min-height=' + H10);
+
+/* --- H11: el silo NO declara el pin "pelado" (::after sin .map-own-pin) ---- */
+/* El pin propio debe vivir SOLO bajo .map-own-pin; el selector sin la clase
+   (que pintaria un pin superpuesto al nativo) debe seguir con 0 ocurrencias. */
+var H11bare = cssNoC.indexOf('#db-mapa-container::after') === -1;
+check(H11bare,
+  'H11: el silo no declara #db-mapa-container::after sin la clase .map-own-pin (0 ocurrencias)',
+  'pelado=' + H11bare);
+
+/* --- H12: el pin propio usa el acento del silo y queda sobre el mapa ------- */
+var H12gold = /#db-mapa-container\.map-own-pin::after[^{}]*\{[^{}]*background\s*:\s*var\(--f9b-gold\)/.test(cssNoC);
+var H12z = /#db-mapa-container\.map-own-pin::after[^{}]*\{[^{}]*z-index\s*:\s*5/.test(cssNoC);
+check(H12gold && H12z,
+  'H12: existe la regla .map-own-pin::after con var(--f9b-gold) y z-index: 5',
+  'gold=' + H12gold + ' z=' + H12z);
+
+/* --- H13: el kernel marca el contenedor cuando hay coordenadas del silo ---- */
+var H13add = /if\s*\(\s*__mapaQuerySilo\s*\)\s*\{[^}]*classList\.add\('map-own-pin'\)/.test(kernel);
+var H13rem = /classList\.remove\('map-own-pin'\)/.test(kernel);
+check(H13add && H13rem,
+  'H13: el kernel agrega la clase map-own-pin cuando __mapaQuerySilo tiene valor (y la retira si no)',
+  'add=' + H13add + ' remove=' + H13rem);
 
 /* ---------------------------------------------------------------------------
  * Resumen
