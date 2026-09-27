@@ -985,12 +985,16 @@ check(g3nav && g3gate,
  * bKernel) y no crean un segundo Resumen.
  * ------------------------------------------------------------------------- */
 
-/* --- H1: meta sin iconos y lugar a fila completa en movil ---------------- */
+/* --- H1: meta sin iconos y lugar a fila completa en movil/tablet (<=991px) */
 var H1svg = /\.meta-svg[^{}]*\{[^{}]*display\s*:\s*none\s*!important/.test(cssNoC);
 var H1lugar = /:has\(#meta-lugar\)[^{}]*\{[^{}]*flex-basis\s*:\s*100%/.test(cssNoC);
-check(H1svg && H1lugar,
-  'H1: f9b.css oculta .meta-svg (display:none !important) y da fila completa al item de lugar en movil (:has(#meta-lugar) flex-basis 100%)',
-  'svg=' + H1svg + ' lugar=' + H1lugar);
+var media991 = sliceBalanced(cssNoC, '@media (max-width: 991px)');
+var H1en991 = media991.indexOf(':has(#meta-lugar)') !== -1 &&
+              /flex-basis\s*:\s*100%/.test(media991) &&
+              /flex:\s*0\s+1\s+auto/.test(media991);
+check(H1svg && H1lugar && H1en991,
+  'H1: f9b.css oculta .meta-svg y da fila completa al lugar; la regla (:has(#meta-lugar) flex-basis 100% + .meta-item flex 0 1 auto) vive en el bloque <=991px',
+  'svg=' + H1svg + ' lugar=' + H1lugar + ' en991=' + H1en991);
 
 /* --- H2: barra de scroll oculta y sin reglas de thumb/track -------------- */
 var H2none = /scrollbar-width\s*:\s*none/.test(cssNoC);
@@ -1000,17 +1004,19 @@ check(H2none && H2webkit && H2resid,
   'H2: f9b.css oculta la barra (scrollbar-width:none + ::-webkit-scrollbar display:none) y ya no declara thumb/track',
   'none=' + H2none + ' webkit=' + H2webkit + ' sinResiduos=' + H2resid);
 
-/* --- H3: headliner con object-fit contain; artistas normales con cover --- */
-var H3contain = /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-fit\s*:\s*contain/.test(cssNoC);
+/* --- H3: headliner con object-fit cover (center top); normales con cover --- */
+var H3coverHl = /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-fit\s*:\s*cover/.test(cssNoC) &&
+                /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-position\s*:\s*center\s+top/.test(cssNoC);
+var H3sinContain = !/\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-fit\s*:\s*contain/.test(cssNoC);
 var H3cover = false;
 for (var h3 = 0; h3 < bRules.length; h3++) {
   if (/\.artist-photo(?![\w-])/.test(bRules[h3].sel) &&
       bRules[h3].sel.indexOf('.headliner') === -1 &&
       /object-fit\s*:\s*cover/.test(bRules[h3].body)) { H3cover = true; }
 }
-check(H3contain && H3cover,
-  'H3: la foto del headliner usa object-fit: contain y la de los artistas normales conserva cover',
-  'contain=' + H3contain + ' coverNormal=' + H3cover);
+check(H3coverHl && H3sinContain && H3cover,
+  'H3: la foto del headliner usa object-fit: cover (center top) y la de los artistas normales conserva cover',
+  'coverHeadliner=' + H3coverHl + ' sinContain=' + H3sinContain + ' coverNormal=' + H3cover);
 
 /* --- H4: banner-link con z-index:4 y gate/rama mp4 intactos -------------- */
 var H4z = /link\.style\.cssText\s*=\s*'[^']*z-index:4/.test(bKernel);
@@ -1020,6 +1026,21 @@ var H4gate = bKernel.indexOf('if (vidUrl && __bannerYoutube)') !== -1 &&
 check(H4z && H4gate,
   'H4: banner-link con z-index:4 (clic sobre el panel de texto) y el gate + rama mp4 del video intactos',
   'z=' + H4z + ' gate=' + H4gate);
+
+/* --- H5: sin pin CSS superpuesto al mapa (el iframe ya dibuja el nativo) -- */
+var H5pin = cssNoC.indexOf('db-mapa-container' + '::after') === -1;
+check(H5pin,
+  'H5: el silo no superpone un pin CSS al mapa (sin pseudo-elemento after del contenedor del mapa)',
+  'pinResidual=' + !H5pin);
+
+/* --- H6: headliner mas alto en movil (72vh) y tablet vertical (64vh) ------ */
+var media767 = sliceBalanced(cssNoC, '@media (max-width: 767px)');
+var H6tablet = media991.indexOf('min-height: 64vh') !== -1;
+var H6movil = media767.indexOf('min-height: 72vh') !== -1;
+var H6titulo = media767.indexOf('clamp(2.5rem, 12vw, 3.4rem)') !== -1;
+check(H6tablet && H6movil && H6titulo,
+  'H6: headliner mas alto en movil (min-height 72vh + titulo clamp 2.5/12vw/3.4 en <=767px) y tablet (64vh en <=991px)',
+  'tablet=' + H6tablet + ' movil=' + H6movil + ' titulo=' + H6titulo);
 
 /* ---------------------------------------------------------------------------
  * Resumen

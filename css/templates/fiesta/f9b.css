@@ -1606,10 +1606,10 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    /* La foto del headliner se ve COMPLETA: contain en vez de cover. Las
-       bandas laterales caen sobre el fondo negro de la tarjeta (marco). */
-    object-fit: contain;
-    object-position: center center;
+    /* Foto nueva del headliner: cubre el contenedor (cover) y el encuadre
+       sube al sujeto (center top); ya no quedan bandas laterales. */
+    object-fit: cover;
+    object-position: center top;
 }
 
 .tpl-f9b #db-lineup .artist-card.headliner .artist-overlay, .Tpl-F9b #db-lineup .artist-card.headliner .artist-overlay {
@@ -1839,27 +1839,6 @@
     width: 100%;
     height: 100%;
     border: none;
-}
-
-/* Pin del silo sobre el mapa: el iframe de Google no admite recolor, asi que
-   se pinta uno propio centrado, que cubre el nativo (Google lo ancla al centro). */
-.tpl-f9b #db-mapa-container, .Tpl-F9b #db-mapa-container {
-    position: relative;
-}
-.tpl-f9b #db-mapa-container::after, .Tpl-F9b #db-mapa-container::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 34px;
-    height: 34px;
-    transform: translate(-50%, -100%) rotate(45deg);
-    background: var(--f9b-gold);
-    border: 2px solid #050403;
-    border-radius: 50% 50% 50% 0;
-    box-shadow: 0 6px 14px rgba(5, 4, 3, 0.6);
-    pointer-events: none;
-    z-index: 3;
 }
 
 /* ==========================================================================
@@ -2461,7 +2440,7 @@
 
     .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
         grid-column: 1 / -1;
-        min-height: 52vh;
+        min-height: 64vh;
     }
 
     /* Tope de ancho para las tarjetas de artista: en columna unica una foto
@@ -2480,6 +2459,19 @@
     .tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {
         padding: 2.2rem 1.4rem;
         gap: 0.9rem 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Meta en 2 lineas en TODO el rango movil/tablet (<=991px): fila 1 =
+       fecha + hora, fila 2 = lugar a fila completa y centrado. */
+    .tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
+        flex: 0 1 auto;
+    }
+
+    .tpl-f9b #mod-hero-meta .meta-item:has(#meta-lugar), .Tpl-F9b #mod-hero-meta .meta-item:has(#meta-lugar) {
+        flex-basis: 100%;
+        justify-content: center;
     }
 
     .tpl-f9b .form-master-box, .Tpl-F9b .form-master-box {
@@ -2527,15 +2519,12 @@
     }
 
     .tpl-f9b #mod-hero-meta, .Tpl-F9b #mod-hero-meta {
-        flex-direction: column;
-        align-items: stretch;
         padding: 1.8rem 1.1rem;
         gap: 0.6rem;
     }
 
     .tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
-        width: 100%;
-        justify-content: flex-start;
+        justify-content: center;
         font-size: 0.72rem;
         padding: 0.7rem 1rem;
     }
@@ -2562,7 +2551,7 @@
     }
 
     .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
-        min-height: 58vh;
+        min-height: 72vh;
     }
 
     /* v1.2.1 - Predominancia del headliner en movil. El tope de 420px de la
@@ -2571,7 +2560,7 @@
        que el headliner y RASTRO MC se veia como uno mas. Aqui las normales
        bajan a 72% del contenedor y el headliner sube de alto y de titulo. */
     .tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
-        font-size: clamp(2.2rem, 10vw, 3rem);
+        font-size: clamp(2.5rem, 12vw, 3.4rem);
     }
 
     .tpl-f9b #db-lineup .artist-card:not(.headliner), .Tpl-F9b #db-lineup .artist-card:not(.headliner) {
@@ -2630,22 +2619,21 @@
         display: none !important;
     }
 
-    /* Movil: el lugar ocupa fila completa; la fila 1 queda fecha+hora. */
-    .tpl-f9b #mod-hero-meta .meta-item:has(#meta-lugar), .Tpl-F9b #mod-hero-meta .meta-item:has(#meta-lugar) {
-        flex-basis: 100%;
-    }
-
     .tpl-f9b #mod-hero-ctas .hero-cta-btn, .Tpl-F9b #mod-hero-ctas .hero-cta-btn {
         width: 100%;
         padding: 0.95rem 1.1rem;
     }
 
+    /* v1.2.2 - El headliner NO se encoge en telefonos. Este bloque (<=640px)
+       fijaba 40vh + titulo 1.8rem y anulaba el 72vh de la banda <=767px, que es
+       justo donde vive el telefono real: el resultado era un headliner mas
+       chico que antes. Aqui se mantiene la predominancia. */
     .tpl-f9b #db-lineup .artist-card.headliner, .Tpl-F9b #db-lineup .artist-card.headliner {
-        min-height: 40vh;
+        min-height: 76vh;
     }
 
     .tpl-f9b #db-lineup .artist-card.headliner .artist-name, .Tpl-F9b #db-lineup .artist-card.headliner .artist-name {
-        font-size: clamp(1.8rem, 10vw, 2.6rem);
+        font-size: clamp(2.5rem, 12vw, 3.4rem);
     }
 
     .tpl-f9b #db-gallery-grid, .Tpl-F9b #db-gallery-grid {
