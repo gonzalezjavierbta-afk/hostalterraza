@@ -239,6 +239,33 @@ El informe debe incluir, como minimo:
 Regla: el informe se entrega al cerrar, no se difiere. Si la sesion supero el
 presupuesto (Mandato 18), el informe debe explicar por que.
 
+### Disciplina de reconocimiento (grep y lectura)
+
+La exploracion del orquestador es el rubro mas caro de una sesion: se midio un
+caso real donde 3 greps amplios costaron ~1.5M tokens frente a ~500K de un
+subagente de exploracion enfocado.
+
+1. `grep` SIEMPRE con la ruta del archivo concreto, nunca la raiz del repo.
+2. Patrones ESPECIFICOS. Prohibido alternar 5 terminos en un solo patron
+   (devuelve 100 coincidencias truncadas y quema contexto).
+3. Si no se conoce el archivo, la primera llamada es `glob`, no `grep`.
+4. Reconocimiento amplio = subagente de exploracion (modelo economico), no el
+   orquestador.
+5. Antes de abrir un archivo grande, un `grep` que devuelva la linea exacta.
+
+### Diagnostico: "mi CSS no se aplica" (orden obligatorio)
+
+Ante un cambio de CSS que no surte efecto, NO se audita primero la cascada.
+El kernel `evento-app.html` emite nodos de inyeccion con `style="..."` INLINE
+(verificado: `#db-lineup` nace con `display:flex; flex-direction:column;
+gap:2.5rem`), y un inline SIN `!important` pierde contra una hoja CON
+`!important` pero GANA contra una hoja SIN el.
+
+Orden obligatorio:
+1. `grep -n 'id="<nodo>"' evento-app.html` para ver el `style=` inline.
+2. Declarar en el silo con `!important` toda propiedad que el kernel fije inline.
+3. Solo despues, auditar cascada y orden de bloques.
+
 ## Reglas transversales (aplican a los 39 agentes)
 
 1. **Cero Borrado (Reglas de Oro #2):** ningún agente elimina IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).

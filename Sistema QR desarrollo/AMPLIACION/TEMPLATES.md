@@ -224,6 +224,16 @@ Moléculas que cada silo puede declarar (y las clases kernel reales que estiliza
 7. **Prohibido:** iframe de YouTube (ADR-005); `<img>` sin `onerror` fallback (ADR-008); `invert`/`brightness` en logos sin alfa.
 8. **VISTA PREVIA (`?preview=1`) — CONTRATO (ADR-056, 2026-09-26).** El wizard de `admin.html` puede renderizar el silo elegido **sin publicar y sin tocar Supabase**: escribe el borrador en `sessionStorage['ht_preview_payload']` (`admin.html:5694`) y monta `evento-app.html?preview=1` en un iframe (`admin.html:5713`) o en una pestaña (`:5721`). El kernel lo lee con `__evDesdePreview()` (`evento-app.html:891-911`), una funcion **pura de lectura** que viste el JSON con la MISMA forma de una fila de `eventos` y reutiliza integro el render. **Contrato del payload (estable):** `{ ev, content, theme, template_id, categoria_slug, effects }`. **REGLA DE FIDELIDAD (ADR-057): `preview == produccion`.** El adaptador pasa el `template_id` **SIN capitalizar**; el body del preview lleva **exactamente** la misma clase que produccion (`tpl-f9b tpl-f9b`). Prohibido reintroducir un override de casing `Tpl-` en el preview: introduciria una divergencia preview≠produccion. El fallback de error (`__renderPreviewError`, `evento-app.html:917-930`) usa `createElement` (no `innerHTML`) para no tocar el balance de divs y evitar inyeccion.
 
+### Trampa: el kernel inyecta estilos INLINE
+
+Los nodos de inyección de `evento-app.html` traen `style` inline propio
+(p.ej. `#db-lineup` = `display:flex; flex-direction:column; gap:2.5rem`).
+Regla: cualquier propiedad que el kernel declare inline y que el silo quiera
+cambiar DEBE ir con `!important`, o el inline gana. Caso real: la tira
+horizontal del lineup se veía apilada (como móvil) porque el silo declaraba
+`flex-direction: row` sin `!important`.
+Verificación previa obligatoria: `grep -n 'id="<nodo>"' evento-app.html`.
+
 **ADRs citados:** ADR-005, ADR-008, ADR-006, ADR-010, **ADR-056 (lectura con fallback + preview), ADR-057 (capital-T / preview == produccion)**. **Reglas citadas:** Mandato 4 (Escudo GOLD), Mandato 13 (armonía HSL).
 
 ---
