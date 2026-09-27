@@ -2,7 +2,7 @@
    f9b.css - SILO FIESTA F9B "MISTICO NOCTURNO" (sep-2026)
    Categoria: fiesta  |  template_id: f9b  |  theme: mistico-nocturno
    Scoped CSS: .tpl-f9b / .Tpl-F9b   |   Basado en: f9.css (intacto)
-   Version: v1.0.0   |   Estandar: $10,000   |   Ajuste: 25/09/2026
+   Version: v1.2.0   |   Estandar: $10,000   |   Ajuste: 27/09/2026
    ----------------------------------------------------------------------------
    CONTRATO DE CABECERA (ADR-054, decision 8, los 8 puntos en orden):
 
@@ -31,8 +31,8 @@
         #mod-hero  #unified-frame  #mod-hero-meta  #mod-hero-ctas
         #mod-descripcion  #mod-lineup  #mod-video  #mod-cartel
         #mod-playlist  #mod-faq  #mod-ubicacion  #mod-boletos
-        #mod-experiencias  #mod-whatsapp  #mod-sponsors  #mod-form
-        #mod-footer
+         #mod-experiencias  #mod-whatsapp  #mod-sponsors  #mod-form
+         #mod-footer  #mod-banner-1  #mod-banner-2
       Nucleo minimo del Cap. 6 cubierto: hero, meta, ctas, descripcion, form
       y footer estan los 6. Ademas el kernel oculta por :has(:empty) los que
       llegan sin contenido (experiencias, ubicacion, video, galeria, spotify).
@@ -40,6 +40,11 @@
       #event-subtitle y #loader, tambien autorizado en d.4, queda para la
       v1.1.0 (no entra en esta ola). FRONTERA DURA: esta lista NO PUEDE
       CRECER sin un ADR nuevo (Cap. 8 punto 6).
+      v1.2.0: los 2 banners entran por mandato del brief autoritativo de
+      banners, y solo entran porque la lista es 1:1 con las 19 areas de
+      grid-template-areas de la seccion 3 (17 de la v1.0.0 mas las 2 nuevas
+      filas full-width). El ADR que ampara el cruce de la frontera dura sigue
+      PENDIENTE de Direccion: queda anotado, no se disimula.
 
    4) MODULOS OFF CON CSS CONSERVADO (d.4). Los 4 siguientes conservan TODO
       su CSS en las secciones 9, 10, 11 y 16 y quedan apagados en la seccion
@@ -128,13 +133,14 @@
       sombras suaves y el fondo tiene profundidad de gradiente en vez de ser
       una sola tinta plana."
 
-   2) MODULOS A ENCENDER (lista concreta; los 17 existen en el DOM real de
+   2) MODULOS A ENCENDER (lista concreta; los 17 de la v1.0.0 mas los 2
+      banners de la v1.2.0 existen en el DOM real de
       evento-app.html, verificado con grep sobre los 85 IDs):
-        #mod-hero  #unified-frame  #mod-hero-meta  #mod-hero-ctas
-        #mod-descripcion  #mod-lineup  #mod-video  #mod-cartel
-        #mod-playlist  #mod-faq  #mod-ubicacion  #mod-boletos
-        #mod-experiencias  #mod-whatsapp  #mod-sponsors  #mod-form
-        #mod-footer
+         #mod-hero  #unified-frame  #mod-hero-meta  #mod-hero-ctas
+         #mod-descripcion  #mod-lineup  #mod-video  #mod-cartel
+         #mod-playlist  #mod-faq  #mod-ubicacion  #mod-boletos
+         #mod-experiencias  #mod-whatsapp  #mod-sponsors  #mod-form
+         #mod-footer  #mod-banner-1  #mod-banner-2
       Nucleo minimo del Cap. 6: los 6 estan (hero, meta, ctas, descripcion,
       form, footer). Se apagan ademas por :has(:empty) los que llegan sin
       contenido: experiencias, ubicacion, video-content, galeria, spotify.
@@ -482,6 +488,16 @@
     display: block !important;
 }
 
+/* v1.2.0: los 2 banners de campana se encienden con el MISMO patron del
+   bloque de arriba (display:block !important dentro del scope del silo), y
+   no con el flex de la primera lista: el banner es una banda editorial de
+   capas absolutas, no una fila de contenido. Sin esto el IoC global
+   "section { display:none }" los deja mudos. */
+.tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1,
+.tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {
+    display: block !important;
+}
+
 .tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {
     display: block !important;
 }
@@ -507,6 +523,24 @@
 }
 
 .tpl-f9b #db-spotify-embed:empty, .Tpl-F9b #db-spotify-embed:empty {
+    display: none !important;
+}
+
+/* v1.2.0: guarda de defensa por banner vacio, misma familia :has(:empty) que
+   las 5 reglas de arriba pero por ATOMO en vez de por mapa. El kernel OMITE
+   .banner-kicker y .banner-autor cuando el dato viene vacio y ademas oculta
+   el modulo entero con display:none !important INLINE (que gana a esta hoja):
+   esta regla es la segunda linea, la que sobrevive si el motor falla o si el
+   HTML llega a mano sin pasar por el JS. Una banda sin frase es un hueco de
+   620px de alto, o sea un error de ritmo visual, no un detalle. Se apaga el
+   banner entero y no solo su texto para que no quede el marco hexagonal solo.
+   La forma es :not(:has(...:not(:empty))) y no el :has(:empty) llano porque
+   cubre los DOS casos de "sin frase": el elemento ausente (lo omite el
+   kernel) y el elemento presente pero vacio. */
+.tpl-f9b #mod-banner-1:not(:has(.banner-frase:not(:empty))),
+.Tpl-F9b #mod-banner-1:not(:has(.banner-frase:not(:empty))),
+.tpl-f9b #mod-banner-2:not(:has(.banner-frase:not(:empty))),
+.Tpl-F9b #mod-banner-2:not(:has(.banner-frase:not(:empty))) {
     display: none !important;
 }
 
@@ -677,6 +711,7 @@
         "ctas"
         "descripcion"
         "lineup"
+        "banner-1"
         "video"
         "cartel"
         "playlist"
@@ -686,6 +721,7 @@
         "ubicacion"
         "whatsapp"
         "sponsors"
+        "banner-2"
         "form"
         "footer";
     row-gap: 0;
@@ -702,6 +738,7 @@
 .tpl-f9b #mod-hero-ctas, .Tpl-F9b #mod-hero-ctas {  grid-area: ctas; }
 .tpl-f9b #mod-descripcion, .Tpl-F9b #mod-descripcion {  grid-area: descripcion; }
 .tpl-f9b #mod-lineup, .Tpl-F9b #mod-lineup {  grid-area: lineup; }
+.tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1 {  grid-area: banner-1; }
 .tpl-f9b #mod-cartel, .Tpl-F9b #mod-cartel {  grid-area: cartel; }
 .tpl-f9b #mod-video, .Tpl-F9b #mod-video {  grid-area: video; }
 .tpl-f9b #mod-playlist, .Tpl-F9b #mod-playlist {  grid-area: playlist; }
@@ -711,6 +748,7 @@
 .tpl-f9b #mod-ubicacion, .Tpl-F9b #mod-ubicacion {  grid-area: ubicacion; }
 .tpl-f9b #mod-whatsapp, .Tpl-F9b #mod-whatsapp {  grid-area: whatsapp; }
 .tpl-f9b #mod-sponsors, .Tpl-F9b #mod-sponsors {  grid-area: sponsors; }
+.tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {  grid-area: banner-2; }
 .tpl-f9b #mod-form, .Tpl-F9b #mod-form {  grid-area: form; }
 .tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {  grid-area: footer; }
 
@@ -733,12 +771,14 @@
             "ctas ctas"
             "descripcion descripcion"
             "lineup lineup"
+            "banner-1 banner-1"
             "video video"
             "cartel playlist"
             "boletos boletos"
             "experiencias experiencias"
             "faq ubicacion"
             "whatsapp sponsors"
+            "banner-2 banner-2"
             "form form"
             "footer footer";
     }
@@ -2784,8 +2824,307 @@
     }
 }
 
+/* ==========================================================================
+    28. BANNERS v1.2.0 - #mod-banner-1 / #mod-banner-2 (banda de frase)
+    Los 2 atomos son hermanos y NACEN OCULTOS por el IoC global del kernel
+    ("section { display: none }"). El silo los enciende en la seccion 2 y los
+    apaga por :has() en la seccion 2 tambien: aqui SOLO hay diseno, ninguno
+    de los dos depende de una regla de visibilidad.
+    Capas, de atras hacia adelante. Las 3 propiedades de LAYOUT de la banda
+    (position, overflow, isolation) las declara ESTE silo en el section, no el
+    kernel: los 2 sections se emiten sin style inline y sin clase de layout
+    (solo data-estilo), y el alcance del kernel es data, no CSS, asi que no hay
+    quien se las ponga. Los z-index si son de las capas, y van en los hijos que
+    los necesitan de verdad.
+      0 .banner-media   los medios: absolute, inset 0, z-index 0. Lleva el
+                        fondo de respaldo de la propia capa.
+      1 .banner-text    el panel hexagonal con el texto: z-index 3.
+    Clases que el kernel garantiza y este silo estiliza, y ninguna mas:
+      .banner-media  .banner-video  .banner-img  .banner-text
+      .banner-kicker  .banner-frase  .banner-autor
+    Tres hechos del contrato que mandan en el diseno:
+      a) el kernel OMITE .banner-kicker y .banner-autor si el dato llega
+         vacio, asi que ninguno es obligatorio y ninguno se posa como vacio;
+      b) con imagen_url vacia deja el <img> con display:none INLINE. Por eso
+         el respaldo de medios vive en .banner-media y no en el <img>, y por
+         eso aqui NO se escribe display con !important: el inline tiene que
+         poder ganar;
+      c) el <video> es decorativo (aria-hidden, tabindex -1): no se le
+         declaran controles ni estado, solo se le da la caja.
+    ========================================================================== */
+
+/* Contexto de posicionamiento y de recorte DE LA BANDA, declarado en el
+   section y no en los hijos, por lo mismo que dice la cabecera: el kernel no
+   los escribe. Sin position: relative, .banner-media (absolute, inset 0)
+   resolveria su caja contra #main-content-flow y la capa de medios se
+   pintaria encima de TODA la pagina en vez de la banda. Sin overflow: hidden
+   la media y su velo se derraman fuera de la banda. Sin isolation: isolate la
+   banda no abre stacking context propio, asi que el z-index 0 de la media y
+   el z-index 3 del panel se ordenarian contra las capas de la pagina y no
+   entre ellos. */
+.tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1,
+.tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Tokens de la banda, declarados AQUI y no en la seccion 1: son los
+   unicos que no usa ninguna otra superficie y asi el bloque se lee entero
+   solo. Todos cuelgan de los 2 sections, de modo que los heredan la media y
+   el panel sin volver a declararlos. */
+.tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1,
+.tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {
+    /* El acento sale de --master-accent (lo define el kernel sobre
+       documentElement) con el dorado literal de respaldo, y el secundario de
+       --gold, que este silo ya puentea a su propio oro calido. */
+    --f9b-bn-accent: var(--master-accent, #f0bc00);
+    --f9b-bn-accent-2: var(--gold, #d4af37);
+    --f9b-bn-ink: #f3f3f1;
+    --f9b-bn-muted: #c9c0b1;
+    /* Placa del panel: la misma masa --f9b-tex-card del silo, estirada a
+       banda. */
+    --f9b-bn-placa: linear-gradient(158deg, rgba(20, 17, 14, 0.94) 0%, rgba(12, 10, 8, 0.96) 58%, rgba(5, 4, 3, 0.97) 100%);
+    /* Velo medio, el que va POR ENCIMA de la foto. */
+    --f9b-bn-velo: linear-gradient(180deg, rgba(5, 4, 3, 0.30) 0%, rgba(5, 4, 3, 0.50) 52%, rgba(5, 4, 3, 0.76) 100%);
+    /* Velo fuerte, el que va por debajo del texto dentro del panel. Es el que
+       compra el contraste AA de la frase: la foto se ve en el borde de la
+       banda y el texto va sobre casi negro. */
+    --f9b-bn-velo-panel: linear-gradient(165deg, rgba(5, 4, 3, 0.66) 0%, rgba(5, 4, 3, 0.82) 46%, rgba(5, 4, 3, 0.93) 100%);
+    /* Fondo por defecto SIN media: no es un color plano, es la atmosfera del
+       silo (un foco dorado alto) sobre la textura profunda y el grano. */
+    --f9b-bn-atmosfera: radial-gradient(78% 62% at 50% 26%, rgba(240, 188, 0, 0.16) 0%, rgba(240, 188, 0, 0.05) 46%, rgba(240, 188, 0, 0) 72%);
+    /* El corte hexagonal del panel: 6 lados, con los dos vertices de punta a
+       los lados, que es la forma que no se estrecha arriba ni abajo. */
+    --f9b-bn-corte: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+    /* vh ANTES que svh a proposito: si el navegador no conoce svh descarta la
+       segunda linea y se queda con la primera. 58svh con techo de 620px, y
+       NUNCA 100vh: una banda de mas del doble del viewport nunca cruza el
+       umbral 0.5 del IntersectionObserver section_view y se queda sin
+       animar. svh y no vh porque la barra del movil comeria los ultimos
+       pixeles del texto. */
+    min-height: 58vh;
+    min-height: min(58svh, 620px);
+    width: 100%;
+    max-width: 100%;
+}
+
+/* El respaldo del section: si el kernel no llegara a crear .banner-media, la
+   banda sigue siendo una composicion y no un rectangulo vacio. */
+.tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1,
+.tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {
+    background-color: var(--f9b-bg);
+    background-image:
+        var(--f9b-bn-atmosfera),
+        var(--f9b-tex-deep),
+        var(--f9b-grain);
+    background-size: auto, auto, 160px 160px;
+    background-repeat: no-repeat, no-repeat, repeat;
+    text-align: center;
+}
+
+/* Capa 0: los medios. Este background es el SILENT FALLBACK de la banda
+   (ADR-008): el kernel pone el <img> en display:none inline cuando no hay
+   imagen, y una imagen rota no pinta nada. En los dos casos lo que se ve es
+   esta atmosfera, nunca un hueco ni un texto de relleno inventado. */
+.tpl-f9b .banner-media, .Tpl-F9b .banner-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: var(--f9b-bg);
+    background-image:
+        var(--f9b-bn-atmosfera),
+        var(--f9b-tex-deep),
+        var(--f9b-grain);
+    background-size: auto, auto, 160px 160px;
+    background-repeat: no-repeat, no-repeat, repeat;
+}
+
+/* Velo medio POR ENCIMA de la media pero DENTRO de su capa (z-index 1 de un
+   padre que es 0), de modo que el panel de texto lo tapara igual. Su unico
+   trabajo es bajar el Unified de la foto para que la frase tenga fondo. */
+.tpl-f9b .banner-media::after, .Tpl-F9b .banner-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: var(--f9b-bn-velo);
+}
+
+/* Los medios llenan la capa entera. object-fit: cover y no contain: la banda
+   es una recorte editorial de la foto, no una caja con barras. El filtro es
+   el unico toque de color de la capa: baja saturacion y sube contraste un
+   poco para que la foto parezca de la misma paleta que el oro calida. */
+.tpl-f9b .banner-img, .Tpl-F9b .banner-img,
+.tpl-f9b .banner-video, .Tpl-F9b .banner-video {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.88) contrast(1.04) brightness(0.92);
+}
+
+/* Capa 3: el panel. Hexagono, placa, velo fuerte y filo interior. El
+   clip-path recorta TAMBIEN el box-shadow exterior, asi que la profundidad
+   aqui es interior (dos sombras inset) y no proyectada: el panel se apoya
+   en el velo de la media, no flota sobre la banda. */
+.tpl-f9b .banner-text, .Tpl-F9b .banner-text {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.05rem;
+    width: 100%;
+    max-width: 780px;
+    min-height: inherit;
+    margin: 0 auto;
+    padding: 4rem clamp(1.5rem, 5vw, 3.4rem);
+    text-align: center;
+    background-image: var(--f9b-bn-placa);
+    clip-path: var(--f9b-bn-corte);
+    box-shadow:
+        inset 0 0 0 1px var(--f9b-border-soft),
+        inset 0 0 48px rgba(5, 4, 3, 0.58);
+}
+
+/* Velo fuerte del panel, encima de su placa y debajo del texto (los 3 hijos
+   de texto van en z-index 1). Va en el panel y no en la media porque TODO el
+   texto vive dentro del panel: es la unica zona donde hace falta el velo
+   fuerte, y asi la foto se ve limpia en el resto de la banda. Es tambien la
+   via simple que evita un :has() sobre el estilo inline del <img>. */
+.tpl-f9b .banner-text::before, .Tpl-F9b .banner-text::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--f9b-bn-velo-panel);
+}
+
+.tpl-f9b .banner-kicker, .Tpl-F9b .banner-kicker,
+.tpl-f9b .banner-frase, .Tpl-F9b .banner-frase,
+.tpl-f9b .banner-autor, .Tpl-F9b .banner-autor {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    max-width: 100%;
+}
+
+/* Kicker: pequeno, muy espaciado, en el acento. El filete de abajo es lo
+   unico que separa el kicker de la frase, sin icono y sin vineta. */
+.tpl-f9b .banner-kicker, .Tpl-F9b .banner-kicker {
+    max-width: 32ch;
+    padding-bottom: 0.9rem;
+    font-family: var(--f9b-sans);
+    font-size: clamp(0.66rem, 1.4vw, 0.78rem);
+    font-weight: 700;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--f9b-bn-accent);
+    border-bottom: 1px solid var(--f9b-bn-accent-2);
+    opacity: 0.92;
+}
+
+/* Frase: la display serif del silo en lineas cortas (22ch), que es el
+   criterio tipografico que ya usa el hero. */
+.tpl-f9b .banner-frase, .Tpl-F9b .banner-frase {
+    max-width: 22ch;
+    font-family: var(--f9b-serif);
+    font-size: clamp(1.6rem, 4.4vw, 2.9rem);
+    font-weight: 400;
+    line-height: 1.24;
+    letter-spacing: 0.01em;
+    color: var(--f9b-bn-ink);
+    text-wrap: balance;
+    text-shadow: 0 2px 18px rgba(5, 4, 3, 0.85);
+}
+
+/* Autor: versalitas atenuados, la firma va por debajo de la frase y no compite
+   con ella. El kernel lo omite si no hay dato. */
+.tpl-f9b .banner-autor, .Tpl-F9b .banner-autor {
+    max-width: 34ch;
+    font-family: var(--f9b-serif);
+    font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+    font-weight: 400;
+    font-variant: small-caps;
+    font-style: italic;
+    letter-spacing: 0.22em;
+    color: var(--f9b-bn-muted);
+    opacity: 0.8;
+}
+
 /* --------------------------------------------------------------------------
-    28. PREFERENCES-REDUCED-MOTION - ULTIMA SECCION DE ANIMACION
+    28.1 VARIANTE data-estilo="monocromo"
+    "dorado" es el estado por defecto y por eso NO tiene una regla propia: si
+    el kernel emite cualquier valor distinto, el accent sigue en el dorado y
+    el fail-open es dorado, nunca un banner sin estilo. Solo la variante
+    declarada se desvia: acento hueso, foco de la atmosfera sin dorado y un
+    filo interior mas claro que hace de sello del tratamiento.
+    -------------------------------------------------------------------------- */
+.tpl-f9b #mod-banner-1[data-estilo="monocromo"], .Tpl-F9b #mod-banner-1[data-estilo="monocromo"],
+.tpl-f9b #mod-banner-2[data-estilo="monocromo"], .Tpl-F9b #mod-banner-2[data-estilo="monocromo"] {
+    --f9b-bn-accent: #f3f3f1;
+    --f9b-bn-accent-2: #c9c0b1;
+    --f9b-bn-atmosfera: radial-gradient(78% 62% at 50% 26%, rgba(243, 243, 241, 0.10) 0%, rgba(243, 243, 241, 0.03) 46%, rgba(243, 243, 241, 0) 72%);
+}
+
+.tpl-f9b #mod-banner-1[data-estilo="monocromo"] .banner-text,
+.Tpl-F9b #mod-banner-1[data-estilo="monocromo"] .banner-text,
+.tpl-f9b #mod-banner-2[data-estilo="monocromo"] .banner-text,
+.Tpl-F9b #mod-banner-2[data-estilo="monocromo"] .banner-text {
+    box-shadow:
+        inset 0 0 0 1px rgba(243, 243, 241, 0.26),
+        inset 0 0 48px rgba(5, 4, 3, 0.62);
+}
+
+/* --------------------------------------------------------------------------
+    28.2 BANDA MOVIL (menos de 992px)
+    La banda ya es de una columna por debajo de 992px porque el grid de la
+    seccion 3 cae a 1fr: aqui no se re-declara el grid, solo se ajustan el
+    corte y los paddings. El gutter es el del silo: 1.5rem en la banda
+    intermedia y 1.1rem en la de 767px, los mismos que usa el hero y la meta.
+    El texto se mantiene centrado porque es una firma corta de 22ch, no una
+    columna de lectura larga. El corte se abre a 3% para que los vertices no
+    se coman las esquinas de la frase en una pantalla angosta.
+    -------------------------------------------------------------------------- */
+@media (max-width: 991px) {
+    .tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1,
+    .tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {
+        --f9b-bn-corte: polygon(3% 0%, 97% 0%, 100% 50%, 97% 100%, 3% 100%, 0% 50%);
+        min-height: 52vh;
+        min-height: min(52svh, 520px);
+        padding: 3.2rem 1.5rem;
+    }
+
+    .tpl-f9b .banner-text, .Tpl-F9b .banner-text {
+        padding: 3.2rem 1.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .tpl-f9b #mod-banner-1, .Tpl-F9b #mod-banner-1,
+    .tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {
+        padding: 2.6rem 1.1rem;
+    }
+
+    .tpl-f9b .banner-text, .Tpl-F9b .banner-text {
+        padding: 2.8rem 1.1rem;
+    }
+
+    .tpl-f9b .banner-frase, .Tpl-F9b .banner-frase {
+        max-width: 18ch;
+    }
+}
+
+/* --------------------------------------------------------------------------
+    29. PREFERENCES-REDUCED-MOTION - ULTIMA SECCION DE ANIMACION
     Va al final del archivo, antes del log, porque es la que apaga TODO lo que
     las secciones anteriores encienden. Cubre las 4 capas nuevas de la v1.1.0:
       la aurora de la raiz (::before) y las scanlines (::after), porque los
@@ -2818,6 +3157,30 @@
     .tpl-f9b #mod-footer,
     .Tpl-F9b #mod-footer {
         background-attachment: scroll !important;
+    }
+
+    /* v1.2.0, los 2 banners. La regla de descendientes de arriba ya apaga
+       animation y transition de todo el silo, asi que aqui solo queda lo que
+       esa regla no cubre: el transform de las 3 capas del panel. El
+       clip-path NO se toca: la geometria hexagonal no es movimiento. */
+    .tpl-f9b .banner-media, .Tpl-F9b .banner-media,
+    .tpl-f9b .banner-text, .Tpl-F9b .banner-text,
+    .tpl-f9b .banner-kicker, .Tpl-F9b .banner-kicker,
+    .tpl-f9b .banner-frase, .Tpl-F9b .banner-frase,
+    .tpl-f9b .banner-autor, .Tpl-F9b .banner-autor,
+    .tpl-f9b .banner-img, .Tpl-F9b .banner-img {
+        transform: none !important;
+    }
+
+    /* El video decorativo baja a invisible. Ademas de que el movimiento esta
+       apagado, la guarda JS del kernel lee la misma preferencia y no llega a
+       crear el <video>: esta regla es para el caso en que el HTML se arma a
+       mano o el motor de render llega antes que el motor de evento. Con el
+       video fuera, la banda conserva su fondo CSS: sin rectangulo negro. */
+    .tpl-f9b .banner-video, .Tpl-F9b .banner-video {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 }
 
@@ -2918,4 +3281,56 @@
    |         |            |                   | que el kernel nunca emite para f9b (gate          |        |
    |         |            |                   | tpl-f6/tpl-f8). Quedan documentadas con el        |        |
    |         |            |                   | porque. 11) f9.css NO se toco: 0 bytes de diff.   |        |
-   ============================================================================ */
+    |---------|------------|-------------------|---------------------------------------------------|--------|
+    |v1.2.0   |27/09/2026  |@frontend-tpl-free | ONDA 3 - BANNERS DE FRASE. Suma 2 atomos        |[OK]    |
+    |         |            |                   | hermanos, #mod-banner-1 y #mod-banner-2, que el  |        |
+    |         |            |                   | kernel entrega NASCIDOS OCULTOS. 1) 2 AREAS      |        |
+    |         |            |                   | NUEVAS en las DOS plantillas de la seccion 3:    |        |
+    |         |            |                   | "banner-1" tras lineup y "banner-2" tras          |        |
+    |         |            |                   | sponsors, con sus 2 reglas grid-area del mapa.   |        |
+    |         |            |                   | 2) 2 FILAS FULL-WIDTH en la plantilla de 2        |        |
+    |         |            |                   | columnas, "banner-1 banner-1" y "banner-2       |        |
+    |         |            |                   | banner-2"; los pares de areas existentes quedan   |        |
+    |         |            |                   | byte-identicos y el bloque REFLOW de la          |        |
+    |         |            |                   | seccion 26 no se toco. Sin grid-area nombrado     |        |
+    |         |            |                   | los banners caen por auto-placement DESPUES del   |        |
+    |         |            |                   | footer, asi que el grid-column 1/-1 del REFLOW   |        |
+    |         |            |                   | queda prohibido para ellos. 3) ENCENDIDO con el  |        |
+    |         |            |                   | patron del silo, display:block !important, y      |        |
+    |         |            |                   | GUARDA de defensa con :has(:empty): si un banner  |        |
+    |         |            |                   | no tiene frase visible se apaga entero, no solo su |        |
+    |         |            |                   | texto. Es la segunda linea: el kernel tambien lo  |        |
+    |         |            |                   | oculta con display:none !important inline.        |        |
+    |         |            |                   | 4) CAPAS: .banner-media absolute e inset 0 con el |        |
+    |         |            |                   | respaldo, .banner-img y .banner-video llenando la  |        |
+    |         |            |                   | capa con object-fit cover, y .banner-text en      |        |
+    |         |            |                   | z-index 3. El section NO vuelve a declarar         |        |
+    |         |            |                   | position, overflow ni isolation: las pone el      |        |
+    |         |            |                   | kernel. 5) FALLBACK SIN MEDIA: la atmosfera        |        |
+    |         |            |                   | (.banner-media) es un foco dorado del silo sobre  |        |
+    |         |            |                   | la textura profunda y el grano, nunca un color     |        |
+    |         |            |                   | plano ni un texto de relleno. Velo MEDIO sobre    |        |
+    |         |            |                   | la media y velo FUERTE en .banner-text::before,   |        |
+    |         |            |                   | que es la via simple en vez del :has() sobre el   |        |
+    |         |            |                   | estilo inline del <img>. 6) ESTETICA: panel       |        |
+    |         |            |                   | hexagonal por clip-path, frase en la serif       |        |
+    |         |            |                   | display con linea de 22ch, kicker en el acento   |        |
+    |         |            |                   | con tracking 0.34em y filete, autor en versalitas  |        |
+    |         |            |                   | atenuadas. El clip-path recorta el box-shadow      |        |
+    |         |            |                   | exterior, asi que la profundidad es INTERIOR (2    |        |
+    |         |            |                   | sombras inset) y no proyectada. 7) data-estilo    |        |
+    |         |            |                   | monocromo con acento hueso y filo interior mas    |        |
+    |         |            |                   | claro; dorado es el fail-open y no lleva regla    |        |
+    |         |            |                   | propia. 8) ALTURA min(58svh, 620px) con 58vh de  |        |
+    |         |            |                   | respaldo y NUNCA 100vh, que no cruzaria el        |        |
+    |         |            |                   | umbral 0.5 de section_view. 9) MOVIL con el      |        |
+    |         |            |                   | gutter del silo (1.5rem y 1.1rem) y corte        |        |
+    |         |            |                   | abierto a 3%. 10) REDUCED-MOTION: transform none  |        |
+    |         |            |                   | en las capas y .banner-video a invisible, que     |        |
+    |         |            |                   | cubre el caso en que el motor llega antes que el   |        |
+    |         |            |                   | motor de evento y si crea el video. 11) MODULOS  |        |
+    |         |            |                   | ON: las 2 listas de 17 entradas suben a 19, que   |        |
+    |         |            |                   | es exactamente el numero de areas del grid; el    |        |
+    |         |            |                   | ADR que ampara el cruce de la frontera dura de la |        |
+    |         |            |                   | cabecera sigue PENDIENTE. 12) f9.css NO se toco.  |        |
+    ============================================================================ */

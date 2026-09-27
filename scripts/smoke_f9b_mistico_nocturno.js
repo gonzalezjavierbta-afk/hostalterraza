@@ -245,6 +245,638 @@ if (seed) {
 }
 
 /* ---------------------------------------------------------------------------
+ * 8. BANNERS EDITORIALES f9b (TAREA 4 del brief de banners)
+ *
+ * Este bloque NO crea un segundo framework: reusa check()/ok()/fail()/lines del
+ * encabezado y deja el unico "Resumen" del final intacto. Un check por punto
+ * numerado del brief: A1..A7 (kernel), B8..B10 (contrato de datos), C11..C18
+ * (silo f9b.css), D19..D20 (regresiones de robustez fijadas hoy) y E1
+ * (anidamiento real de los 2 slots de banner).
+ *
+ * Helpers locales, todos ASCII y sin backticks:
+ *   - cssNoC  : f9b.css sin comentarios, para no contar texto de comentario.
+ *   - cssRules : lista {sel, body} de reglas planas (no anida at-rules).
+ *   - sliceBalanced : extrae una declaracion/funcion por conteo de llaves.
+ *   - countOf : ocurrencias de una subcadena.
+ *   - tagEnd / anidar : tokenizer de tags con pila para E1 (anidamiento real).
+ * Los checks D19 y D20 son de EJECUCION REAL: extraen del kernel el codigo
+ * fuente de __bannerVacio y de la normalizacion de estilo y lo evaluan en un
+ * contexto vm con stubs minimos. No hay reimplementacion de la formula.
+ * ------------------------------------------------------------------------- */
+
+var BK_OPEN = '// === INICIO SEGMENTO: BANNERS EDITORIALES (f9b) ===';
+var BK_CLOSE = '// === FIN SEGMENTO: BANNERS EDITORIALES (f9b) ===';
+var bkS = kernel.indexOf(BK_OPEN);
+var bkE = kernel.indexOf(BK_CLOSE);
+var bKernel = (bkS >= 0 && bkE > bkS) ? kernel.slice(bkS, bkE) : '';
+
+var cssSrc = css || '';
+var cssNoC = cssSrc.replace(/\/\*[\s\S]*?\*\//g, '');
+
+function cssRules(src) {
+  var out = [];
+  var re = /([^{}]+)\{([^{}]*)\}/g;
+  var m;
+  while ((m = re.exec(src)) !== null) {
+    out.push({ sel: m[1].replace(/@[^{}]*?/g, ' ').replace(/\s+/g, ' ').trim(), body: m[2] });
+  }
+  return out;
+}
+function sliceBalanced(src, marker) {
+  var i = src.indexOf(marker);
+  if (i < 0) return '';
+  var b = src.indexOf('{', i);
+  if (b < 0) return '';
+  var depth = 0, j = b;
+  for (; j < src.length; j++) {
+    var ch = src.charAt(j);
+    if (ch === '{') { depth += 1; }
+    else if (ch === '}') { depth -= 1; if (depth === 0) return src.slice(i, j + 1); }
+  }
+  return '';
+}
+function countOf(src, needle) {
+  var n = 0, i = 0;
+  while ((i = src.indexOf(needle, i)) !== -1) { n += 1; i += needle.length; }
+  return n;
+}
+
+/* --- parser de anidamiento para E1 (pila de tags, NO regex ingenuo) --------
+ * Por que existe: A1 usa un regex sobre el texto del <section> y A4 usa
+ * indexOf de offsets. NINGUNO de los dos ve la PROFUNDIDAD. Si alguien envuelve
+ * un banner dentro de un <div class="mod-..."> o de otro <section>, el
+ * grid-area: banner-1 del silo deja de aplicar (el grid item pasa a ser el
+ * padre) y la banda se rompe en runtime con el smoke en verde. Este helper
+ * apila los tags que ABREN scope y devuelve el padre inmediato real.
+ *
+ * Decisiones (las 3 trampas del parser):
+ *   1. VOIDS: <img>/<meta>/<br>/<input>/<hr>/... NUNCA se apilan. Si se
+ *      apilaran, el "padre inmediato" de un <section> seria un <img> y el
+ *      check daria un falso padre. Los self-closing (X />) tampoco.
+ *   2. QUOTES: un '>' dentro de un atributo entrecomillado NO cierra el tag.
+ *      tagEnd() lleva el estado de comilla; ademas cuenta esos '>' en QTAGS
+ *      para poder reportar que el tokenizer aguanta el caso.
+ *   3. SALTOS: <script>, <style> y comentarios se saltan enteros (el kernel
+ *      esta lleno de strings '<div>' y de comentarios que nombran ids).
+ * ------------------------------------------------------------------------ */
+
+/* Tags que abren y cierran sin tener scope: NO entran en la pila. */
+var VOID_TAGS = {
+  area: 1, base: 1, br: 1, col: 1, embed: 1, hr: 1, img: 1, input: 1,
+  keygen: 1, link: 1, meta: 1, param: 1, source: 1, track: 1, wbr: 1
+};
+/* Tags cuyo contenido no es HTML: se salta hasta su cierre. */
+var SKIP_TAGS = { script: 1, style: 1 };
+/* Cuantos '>' vivian dentro de comillas: si es > 0, el tokenizer fue
+   consciente de atributos (se reporta en el detalle de E1). */
+var QTAGS = 0;
+
+/* Indice del '>' que REALMENTE cierra el tag que arranca en 'from', ignorando
+   los '>' que caen dentro de comillas de atributo. Devuelve -1 si no cierra. */
+function tagEnd(src, from) {
+  var q = '', i = from + 1;
+  for (; i < src.length; i++) {
+    var ch = src.charAt(i);
+    if (q) {
+      if (ch === q) { q = ''; }
+      else if (ch === '>') { QTAGS += 1; }
+      continue;
+    }
+    if (ch === '"' || ch === "'") { q = ch; continue; }
+    if (ch === '>') { return i; }
+  }
+  return -1;
+}
+
+/* Valor de un atributo (id / class) del texto interno de un tag. */
+function attrDe(raw, name) {
+  var re = new RegExp('\\b' + name + '\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s"\'>]+))', 'i');
+  var m = raw.match(re);
+  if (!m) return '';
+  return m[1] || m[2] || m[3] || '';
+}
+
+/* Parsea 'html' con pila de tags y devuelve los datos de anidamiento del
+   primer <tagName id="targetId"> que halle:
+ *   { found, parent, parentId, parentCls, depth, chain, inner, closed, quoted,
+ *     at, stack }
+ * - parent  : nombre del padre inmediato (el ultimo de la pila al abrir el tag)
+ * - depth   : cuantos tags estaban abiertos al abrirlo (incluye html y body,
+ *             por eso NO es 1: E1.2 se mide aparte con abiertosEnTramo)
+ * - chain   : la pila completa como "html > body > main#main-content-flow"
+ * - inner   : cuantos <tagName> se abrieron DENTRO (0 = su </> cierra el suyo)
+ * - closed  : su cierre propio llego (el pop que lo saca es el suyo)
+ * - quoted  : el tag de apertura traia un '>' dentro de comillas de atributo
+ * - at      : indice del '<' del tag buscado
+ * - stack   : COPIA de la pila al abrirlo (frames con name/id/cls/end), para
+ *             que E1.2 mida el tramo desde el frame del CONTENEDOR y no desde
+ *             el padre inmediato */
+function anidar(html, tagName, targetId) {
+  var want = String(tagName).toLowerCase();
+  var stack = [];
+  var res = { found: false, parent: '', parentId: '', parentCls: '', depth: -1,
+              chain: '', inner: 0, closed: false, quoted: false,
+              at: -1, stack: [] };
+  var inTarget = false, inner = 0, i = 0;
+  while (i < html.length) {
+    var lt = html.indexOf('<', i);
+    if (lt < 0) break;
+    /* Comentario: se salta entero. */
+    if (html.substr(lt, 4) === '<!--') {
+      var ce = html.indexOf('-->', lt);
+      i = ce < 0 ? html.length : ce + 3;
+      continue;
+    }
+    /* Doctype (<!...) o procesamiento (<?...): no son tags. */
+    var c1 = html.charAt(lt + 1);
+    if (c1 === '!' || c1 === '?') {
+      var de = html.indexOf('>', lt);
+      i = de < 0 ? html.length : de + 1;
+      continue;
+    }
+    var gt = tagEnd(html, lt);
+    if (gt < 0) break;
+    var body = html.slice(lt + 1, gt);
+    var closing = body.charAt(0) === '/';
+    if (closing) body = body.slice(1);
+    var selfClose = !closing && body.charAt(body.length - 1) === '/';
+    if (selfClose) body = body.slice(0, -1);
+    var mName = body.match(/^\s*([A-Za-z][-\w]*)/);
+    if (!mName) { i = gt + 1; continue; }
+    var name = mName[1].toLowerCase();
+    /* Cierre: pops hasta el ultimo frame del mismo nombre (tolerante a
+       cierres sueltos) y avisa si el frame que sale es el target. */
+    if (closing) {
+      for (var k = stack.length - 1; k >= 0; k--) {
+        if (stack[k].name === name) {
+          if (stack[k].isTarget) { res.closed = true; inTarget = false; }
+          stack.length = k;
+          break;
+        }
+      }
+      i = gt + 1;
+      continue;
+    }
+    var tid = attrDe(body, 'id');
+    var isTarget = (name === want && tid === targetId);
+    if (inTarget && name === want) { inner += 1; }
+    if (isTarget) {
+      inTarget = true;
+      res.found = true;
+      res.at = lt;
+      res.depth = stack.length;
+      var par = stack.length ? stack[stack.length - 1] : null;
+      res.parent = par ? par.name : '';
+      res.parentId = par ? par.id : '';
+      res.parentCls = par ? par.cls : '';
+      var parts = [];
+      for (var k2 = 0; k2 < stack.length; k2++) {
+        parts.push(stack[k2].name + (stack[k2].id ? '#' + stack[k2].id : ''));
+        res.stack.push({ name: stack[k2].name, id: stack[k2].id,
+                         cls: stack[k2].cls, end: stack[k2].end });
+      }
+      res.chain = parts.join(' > ');
+      /* '>' dentro de comillas en ESTE tag: el cierre ingenuo seria otro. */
+      res.quoted = html.indexOf('>', lt) !== gt;
+    }
+    /* Voids y self-closing: no abren scope, no se apilan. */
+    if (VOID_TAGS[name] || selfClose) { i = gt + 1; continue; }
+    /* script/style: se salta su contenido sin apilar nada. */
+    if (SKIP_TAGS[name]) {
+      var rest = html.slice(gt + 1);
+      var mm = new RegExp('</\\s*' + name + '\\s*>', 'i').exec(rest);
+      i = mm ? gt + 1 + mm.index + mm[0].length : html.length;
+      continue;
+    }
+    stack.push({ name: name, id: tid, cls: attrDe(body, 'class'),
+                 end: gt + 1, isTarget: isTarget });
+    i = gt + 1;
+  }
+  res.inner = inner;
+  return res;
+}
+
+/* E1.2, medido de forma INDEPENDIENTE del parseo por pila: recorre el tramo
+   de texto [desde, hasta) - desde = justo despues del '>' que abre el
+   contenedor, hasta = el '<' del banner - y cuenta que tags de scope quedan
+   ABIERTOS (neto) ahi. Los tags que abren y cierran dentro del tramo no
+   cuentan; solo importa lo que quede sin cerrar. Debe dar 0. */
+function abiertosEnTramo(src, desde, hasta) {
+  var pila = [], i = desde;
+  while (i < hasta && i < src.length) {
+    var lt = src.indexOf('<', i);
+    if (lt < 0 || lt >= hasta) break;
+    if (src.substr(lt, 4) === '<!--') {
+      var ce = src.indexOf('-->', lt);
+      i = ce < 0 ? hasta : ce + 3;
+      continue;
+    }
+    var c1 = src.charAt(lt + 1);
+    if (c1 === '!' || c1 === '?') {
+      var de = src.indexOf('>', lt);
+      i = de < 0 ? hasta : de + 1;
+      continue;
+    }
+    var gt = tagEnd(src, lt);
+    if (gt < 0) break;
+    var body = src.slice(lt + 1, gt);
+    var closing = body.charAt(0) === '/';
+    if (closing) body = body.slice(1);
+    var selfClose = !closing && body.charAt(body.length - 1) === '/';
+    if (selfClose) body = body.slice(0, -1);
+    var mName = body.match(/^\s*([A-Za-z][-\w]*)/);
+    if (!mName) { i = gt + 1; continue; }
+    var name = mName[1].toLowerCase();
+    if (closing) {
+      for (var k = pila.length - 1; k >= 0; k--) {
+        if (pila[k].name === name) { pila.length = k; break; }
+      }
+      i = gt + 1;
+      continue;
+    }
+    if (VOID_TAGS[name] || selfClose) { i = gt + 1; continue; }
+    if (SKIP_TAGS[name]) {
+      var rest2 = src.slice(gt + 1, hasta);
+      var mm2 = new RegExp('</\\s*' + name + '\\s*>', 'i').exec(rest2);
+      i = mm2 ? gt + 1 + mm2.index + mm2[0].length : hasta;
+      continue;
+    }
+    var cls0 = attrDe(body, 'class').split(/\s+/)[0];
+    pila.push({ name: name, id: attrDe(body, 'id'), cls: cls0 });
+    i = gt + 1;
+  }
+  var out = [];
+  for (var k2 = 0; k2 < pila.length; k2++) {
+    out.push(pila[k2].name + (pila[k2].id ? '#' + pila[k2].id : '') +
+             (pila[k2].cls ? '.' + pila[k2].cls : ''));
+  }
+  return { net: pila.length, abiertos: out };
+}
+
+var bRules = cssRules(cssNoC);
+/* Enganche de un id de atomo con FRONTERA: '#mod-banner-2' no puede dar por
+   enganchado un '#mod-banner-2-x' (substring) ni '#mod-banner-20'. Acepta el
+   id con o sin '#'. */
+function idHook(sel, id) {
+  return new RegExp('#' + String(id).replace(/^#/, '') + '(?![-\\w])').test(sel);
+}
+/* Regla cuyo selector engancha LOS DOS atomos y cuyo texto cumple /re/. */
+function ruleBothIds(re) {
+  for (var i = 0; i < bRules.length; i++) {
+    var s = bRules[i].sel;
+    if (idHook(s, 'mod-banner-1') && idHook(s, 'mod-banner-2') && re.test(s + ' || ' + bRules[i].body)) return bRules[i];
+  }
+  return null;
+}
+/* Regla cuyo selector engancha un atomo concreto y cuyo texto cumple /re/. */
+function ruleOneId(id, re) {
+  for (var i = 0; i < bRules.length; i++) {
+    if (idHook(bRules[i].sel, id) && re.test(bRules[i].sel + ' || ' + bRules[i].body)) return bRules[i];
+  }
+  return null;
+}
+
+/* --- A1: los 2 slots existen en el DOM estatico, vacios por el kernel ----- */
+var A1a = /<section id="mod-banner-1"[^>]*><\/section>/.test(kernel);
+var A1b = /<section id="mod-banner-2"[^>]*><\/section>/.test(kernel);
+var A1c = countOf(kernel, 'id="mod-banner-1" class="mod-banner" data-estilo="dorado"') === 1 &&
+          countOf(kernel, 'id="mod-banner-2" class="mod-banner" data-estilo="dorado"') === 1;
+check(bKernel.length > 0 && A1a && A1b && A1c,
+  'A1: los 2 sections #mod-banner-1 y #mod-banner-2 existen en el DOM estatico (vacias, data-estilo dorado de arranque)',
+  'segmento o sections estaticos no halls; slot1=' + A1a + ' slot2=' + A1b + ' arranque=' + A1c);
+
+/* --- A2: __renderBanner definido y llamado 2 veces, __bannerVacio existe --- */
+var A2def = countOf(bKernel, 'const __renderBanner = function (slotId, it) {') === 1;
+var A2calls = countOf(bKernel, "__renderBanner('mod-banner-");
+var A2v = countOf(bKernel, 'const __bannerVacio = function (it) {') === 1;
+check(A2def && A2calls === 2 && A2v,
+  'A2: __renderBanner definido y llamado 2 veces (1 por atomo) y __bannerVacio existe',
+  'def=' + A2def + ' calls=' + A2calls + ' vacio=' + A2v);
+
+/* --- A3: __hideEmptyModule por cada atomo -------------------------------- */
+var A3 = countOf(bKernel, "__hideEmptyModule('mod-banner-1'") === 1 &&
+        countOf(bKernel, "__hideEmptyModule('mod-banner-2'") === 1;
+check(A3, 'A3: __hideEmptyModule invocado con mod-banner-1 y con mod-banner-2', 'llamadas incompletas');
+
+/* --- A4: orden de hermanos en el DOM estatico ---------------------------- */
+var pLineup = kernel.indexOf('<section id="mod-lineup"');
+var pBan1 = kernel.indexOf('<section id="mod-banner-1"');
+var pPlaylist = kernel.indexOf('<section id="mod-playlist"');
+var pWa = kernel.indexOf('<section id="mod-whatsapp"');
+var pBan2 = kernel.indexOf('<section id="mod-banner-2"');
+var pSpons = kernel.indexOf('<section id="mod-sponsors"');
+var A4 = pLineup > 0 && pLineup < pBan1 && pBan1 < pPlaylist &&
+         pWa > 0 && pWa < pBan2 && pBan2 < pSpons;
+check(A4, 'A4: orden de hermanos correcto (lineup < banner-1 < playlist; whatsapp < banner-2 < sponsors)',
+  'posiciones lineup=' + pLineup + ' b1=' + pBan1 + ' playlist=' + pPlaylist + ' wa=' + pWa + ' b2=' + pBan2 + ' sponsors=' + pSpons);
+
+/* --- A5: el silo declara position/overflow/isolation en el <section> ------- */
+/* Las 3 propiedades viven YA en el silo (se movieron alli): si desaparecen,
+   .banner-media (absolute, inset 0) se resuelve contra #main-content-flow. */
+var A5 = !!ruleBothIds(/position\s*:\s*relative/) &&
+         !!ruleBothIds(/overflow\s*:\s*hidden/) &&
+         !!ruleBothIds(/isolation\s*:\s*isolate/);
+check(A5, 'A5: el silo declara position:relative + overflow:hidden + isolation:isolate sobre los 2 sections (moved out del kernel)',
+  'falta alguna de las 3 declaraciones en el selector de los banners');
+
+/* --- A6: construccion DOM, cero innerHTML / onerror= / lightbox ---------- */
+/* Se buscan las FORMAS DE CODIGO (con = o con comilla de cierre), no la
+   palabra suelta: los comentarios del propio segmento nombran innerHTML,
+   onerror, .lightbox-trigger y data-lightbox al explicar que NO se usan. */
+var A6inner = !/\.innerHTML\s*=/.test(bKernel);
+var A6bt = bKernel.indexOf(String.fromCharCode(96)) === -1;   /* sin template literal */
+var A6on = !/\bonerror\s*=/.test(bKernel) && !/['"]onerror['"]/.test(bKernel);
+var A6lb = !/lightbox-trigger\s*['"]/.test(bKernel) && !/data-lightbox\s*['"]/.test(bKernel);
+var A6dom = /document\.createElement\(/.test(bKernel) && /\.textContent\s*=/.test(bKernel) &&
+            /img\.className\s*=\s*'banner-img';/.test(bKernel);
+check(A6inner && A6bt && A6on && A6lb && A6dom,
+  'A6: banners construidos con createElement + textContent; cero innerHTML, cero onerror= inline, cero lightbox en .banner-img',
+  'innerHTML=' + A6inner + ' sinTemplateLiteral=' + A6bt + ' onerror=' + A6on + ' lightbox=' + A6lb + ' dom=' + A6dom);
+
+/* --- A7: nunca se emite src="" ni poster="" ----------------------------- */
+var A7src = !/\.src\s*=\s*['"]['"]/.test(bKernel) && !/setAttribute\(\s*['"]src['"]\s*,\s*['"]['"]/.test(bKernel);
+var A7post = !/\.poster\s*=\s*['"]['"]/.test(bKernel) && !/setAttribute\(\s*['"]poster['"]\s*,\s*['"]['"]/.test(bKernel);
+var A7off = /img\.style\.display\s*=\s*'none';/.test(bKernel) &&
+            /vid\.setAttribute\('poster', imgUrl \|\| __BANNER_AVATAR\);/.test(bKernel);
+check(A7src && A7post && A7off, 'A7: cero src="" y cero poster="" emitidos; sin imagen_url el <img> queda display:none y el poster cae al avatar',
+  'srcVacio=' + A7src + ' posterVacio=' + A7post + ' caminoOffline=' + A7off);
+
+/* --- B8: banners[0] y [1] mapeados, [2+] ignorado ----------------------- */
+var B8 = /const __banner1 = __banners\[0\];/.test(bKernel) &&
+        /const __banner2 = __banners\[1\];/.test(bKernel) &&
+        /__renderBanner\('mod-banner-1', __banner1\);/.test(bKernel) &&
+        /__renderBanner\('mod-banner-2', __banner2\);/.test(bKernel) &&
+        /__hideEmptyModule\('mod-banner-1', !__bannerVacio\(__banner1\)\);/.test(bKernel) &&
+        /__hideEmptyModule\('mod-banner-2', !__bannerVacio\(__banner2\)\);/.test(bKernel) &&
+        bKernel.indexOf('__banners[2') === -1 && bKernel.indexOf('banners[2]') === -1 &&
+        /Array\.isArray\(__bannersRaw\)/.test(bKernel);
+check(B8, 'B8: banners[0]->mod-banner-1 y banners[1]->mod-banner-2; banners[2+] se ignora en silencio',
+  'mapeo o guardia de array incorrectos');
+
+/* --- B9: lee estilo, NO lee tema ---------------------------------------- */
+/* La prohibicion es sobre el BANNER: config_landing.theme vive fuera del
+   segmento y no se toca. Dentro del segmento no puede aparecer it.tema. */
+var B9 = /it\.estilo/.test(bKernel) && !/it\s*\.\s*tema/.test(bKernel) &&
+        /__BANNER_ESTILOS\[__est\] \? __est : 'dorado'/.test(bKernel);
+check(B9, 'B9: el banner lee estilo y jamas tema como campo de estilo', 'lectura de estilo/tema incorrecta');
+
+/* --- B10: el prefijo del avatar coincide con la fuente unica -------------- */
+var og = read('api/evento-og.js');
+var ogUrl = '';
+if (og) { var mOg = og.match(/'(https?:\/\/[^']+avatar-default\.png)'/); ogUrl = mOg ? mOg[1] : ''; }
+var mBk = bKernel.match(/const __BANNER_AVATAR = '([^']+)';/);
+var bkUrl = mBk ? mBk[1] : '';
+var ogPre = ogUrl ? ogUrl.slice(0, ogUrl.lastIndexOf('/') + 1) : '';
+var B10 = !!og && ogUrl !== '' && bkUrl !== '' && ogPre !== '' &&
+          bkUrl.slice(0, ogPre.length) === ogPre && bkUrl.slice(ogPre.length) === ogUrl.slice(ogPre.length);
+check(B10, 'B10: el prefijo de la URL del avatar del kernel coincide con la fuente unica de api/evento-og.js',
+  'og=' + ogUrl + ' kernel=' + bkUrl);
+
+/* --- C11: las 2 plantillas de grid-template-areas declaran las 2 areas ----- */
+var areaList = [];
+var mA, reA = /grid-template-areas\s*:\s*([^;}]+);/g;
+while ((mA = reA.exec(cssNoC)) !== null) {
+  var rows = [], mR, reR = /"([^"]*)"/g;
+  while ((mR = reR.exec(mA[1])) !== null) rows.push(mR[1].trim().split(/\s+/));
+  areaList.push(rows);
+}
+/* Fila ="area" cuando TODAS sus celdas repiten ese nombre. Asi la misma
+   funcion vale para la plantilla de 1 columna ("banner-1") y para la de 2
+   ("banner-1 banner-1"), donde comparar la fila joinada no serviria. */
+function rowIsArea(r, name) {
+  if (!r.length) return false;
+  for (var k = 0; k < r.length; k++) if (r[k] !== name) return false;
+  return true;
+}
+function tmplHas(rows, name) {
+  for (var k = 0; k < rows.length; k++) if (rowIsArea(rows[k], name)) return true;
+  return false;
+}
+var C11 = areaList.length >= 2, off11 = '';
+for (var i = 0; i < areaList.length; i++) {
+  if (!tmplHas(areaList[i], 'banner-1') || !tmplHas(areaList[i], 'banner-2')) {
+    C11 = false; off11 = 'plantilla ' + (i + 1) + ' sin las 2 areas';
+  }
+}
+check(C11, 'C11: las 2 plantillas de grid-template-areas contienen banner-1 y banner-2',
+  'plantillas halladas=' + areaList.length + ' (se esperaban 2, ambas con las 2 areas) ' + off11);
+
+/* --- C12: validez de la plantilla de 2 columnas ------------------------- */
+var C12 = false, det12 = 'no se hallo plantilla de 2 columnas';
+for (var i = 0; i < areaList.length; i++) {
+  var wide = false;
+  for (var j = 0; j < areaList[i].length; j++) if (areaList[i][j].length > 1) wide = true;
+  if (!wide) continue;
+  var allEven = true, b1cells = 0, b2cells = 0;
+  for (var j = 0; j < areaList[i].length; j++) {
+    var n = areaList[i][j].length;
+    if (n % 2 !== 0) allEven = false;
+    if (rowIsArea(areaList[i][j], 'banner-1')) b1cells = n;
+    if (rowIsArea(areaList[i][j], 'banner-2')) b2cells = n;
+  }
+  C12 = allEven && b1cells === 2 && b2cells === 2;
+  det12 = 'filasPares=' + allEven + ' banner-1=' + b1cells + ' celdas banner-2=' + b2cells + ' celdas';
+  break;
+}
+check(C12, 'C12: en la plantilla de 2 columnas toda fila tiene un numero PAR de celdas y cada area nueva ocupa 2 celdas', det12);
+
+/* --- C13: grid-area: banner-1 / banner-2 -------------------------------- */
+var C13 = !!ruleOneId('#mod-banner-1', /grid-area\s*:\s*banner-1/) &&
+          !!ruleOneId('#mod-banner-2', /grid-area\s*:\s*banner-2/);
+check(C13, 'C13: existen las reglas grid-area: banner-1 y grid-area: banner-2', 'falta algun grid-area');
+
+/* --- C14: los banners NO usan grid-column: 1 / -1 (auto-placement bug) ---- */
+var C14 = true, off14 = '';
+for (var i = 0; i < bRules.length; i++) {
+  var s = bRules[i].sel;
+  if (idHook(s, 'mod-banner-1') || idHook(s, 'mod-banner-2')) {
+    if (/grid-column\s*:\s*1\s*\/\s*-1/.test(bRules[i].body)) { C14 = false; off14 = s; }
+  }
+}
+check(C14, 'C14: #mod-banner-1 y #mod-banner-2 no declaran grid-column: 1 / -1', off14);
+
+/* --- C15: encendido display:block !important + guarda :has(.banner-frase) - */
+var C15on = !!ruleBothIds(/display\s*:\s*block\s*!important/);
+var C15g1 = !!ruleOneId('#mod-banner-1', /:has\(\.banner-frase:not\(:empty\)\)/);
+var C15g2 = !!ruleOneId('#mod-banner-2', /:has\(\.banner-frase:not\(:empty\)\)/);
+check(C15on && C15g1 && C15g2, 'C15: encendido display: block !important y guarda de vacio :has(.banner-frase:not(:empty)) para los 2 banners',
+  'on=' + C15on + ' guarda1=' + C15g1 + ' guarda2=' + C15g2);
+
+/* --- C16: .banner-img NO declara display con !important ------------------ */
+/* Con !important en la hoja, el display:none inline del kernel no podria
+   ganar cuando imagen_url viene vacia y la banda pinta la imagen rota. */
+var C16 = true, off16 = '';
+for (var i = 0; i < bRules.length; i++) {
+  if (/\.banner-img(?![\w-])/.test(bRules[i].sel) && /display\s*:[^;}]*!important/.test(bRules[i].body)) {
+    C16 = false; off16 = bRules[i].sel;
+  }
+}
+check(C16, 'C16: .banner-img no declara display con !important (el inline display:none del kernel puede ganar)', off16);
+
+/* --- C17: los .banner-* viven dentro de .tpl-f9b/.Tpl-F9b, nada en :root -- */
+var C17a = true, off17 = '';
+for (var i = 0; i < bRules.length; i++) {
+  var parts = bRules[i].sel.split(',');
+  for (var j = 0; j < parts.length; j++) {
+    var p = parts[j].trim();
+    if (p.indexOf('.banner-') !== -1 && p.indexOf('.tpl-f9b') === -1 && p.indexOf('.Tpl-F9b') === -1) {
+      C17a = false; off17 = p;
+    }
+  }
+}
+/* La banda declara sus tokens como --f9b-bn-*: se busca ese prefijo y no la
+   palabra 'banner', que el nombre del token no lleva. */
+var C17b = true, off17b = '';
+for (var i = 0; i < bRules.length; i++) {
+  if (/^:root(\s|$|,)/.test(bRules[i].sel) && /banner|--f9b-bn-/.test(bRules[i].body)) {
+    C17b = false; off17b = bRules[i].sel;
+  }
+}
+check(C17a && C17b, 'C17: cero selectores .banner-* fuera de .tpl-f9b/.Tpl-F9b y cero declaraciones de banner en :root',
+  'fueraDeScope=' + off17 + ' enRoot=' + off17b);
+
+/* --- C18: la banda no usa 100vh (umbral 0.5 del IoC section_view) ------- */
+var secI = cssSrc.indexOf('28. BANNERS v1.2.0');
+var secJ = cssSrc.indexOf('29. PREFERENCES-REDUCED-MOTION');
+var bnSec = (secI >= 0 && secJ > secI) ? cssSrc.slice(secI, secJ).replace(/\/\*[\s\S]*?\*\//g, '') : '';
+check(bnSec.length > 0 && bnSec.indexOf('100vh') === -1 && /[0-9]+svh/.test(bnSec),
+  'C18: la banda no usa 100vh (altura acotada con svh/px, cruza el umbral 0.5 de section_view)',
+  'seccion de banners no aislada o usa 100vh');
+
+/* --- D19: CASO H - ejecucion REAL de __bannerVacio ------------------------ */
+/* ESTE ES UN CHECK DE EJECUCION, NO ESTRUCTURAL: se extrae del kernel el
+   codigo fuente de __bannerVacio (con su helper __bannerCampo incluido, por
+   conteo de llaves) y se evalua tal cual en un contexto vm. Los 3 casos son
+   los del fix de la banda vacia de 58vh: una frase de solo espacios NO es
+   contenido, y la media sola tampoco enciende el atomo. Ademas se verifica
+   que la formula solo mira frase/autor/etiqueta (ni urls ni estilo). */
+var vDecl = sliceBalanced(bKernel, 'const __bannerVacio = function (it) {');
+var vFn = null, vErr = '';
+try {
+  var c19 = {};
+  vm.createContext(c19);
+  vm.runInContext('var __bv = (' + vDecl.replace(/^const\s+__bannerVacio\s*=\s*/, '') + ');', c19, { filename: 'kernel-banner-vacio.js' });
+  vFn = c19.__bv;
+} catch (e) { vErr = e && e.message ? e.message : String(e); }
+var d19scope = /__bannerCampo/.test(vDecl) && /trim\(\)/.test(vDecl) &&
+                vDecl.indexOf('imagen_url') === -1 && vDecl.indexOf('video_url') === -1 &&
+                vDecl.indexOf('estilo') === -1;
+var d19r = false, det19 = 'no evaluable';
+if (typeof vFn === 'function' && d19scope) {
+  var r1 = vFn({ frase: 'Frase' }) === false;
+  var r2 = vFn({ frase: '   ' }) === true;
+  var r3 = vFn({ imagen_url: 'x' }) === true;
+  d19r = r1 && r2 && r3;
+  det19 = 'fraseLlena(no vacio)=' + r1 + ' fraseSoloEspacios(vacio)=' + r2 + ' soloImagenUrl(vacio)=' + r3;
+} else if (vErr) { det19 = 'error de extraccion/evaluacion: ' + vErr; }
+check(d19r, 'D19: __bannerVacio trimea (ejecucion real en vm): "Frase"->no vacio, "   "->vacio, imagen_url sola->vacio', det19);
+
+/* --- D20: estilo normalizado a dorado|monocromo con fail-open dorado ----- */
+/* Tambien EJECUCION REAL: se extraen del kernel la tabla __BANNER_ESTILOS, la
+   derivacion de __est (trim + lowercase) y la expresion que se emite, y se
+   corre el codigo real con un sec stub que registra el atributo. */
+var eDecl = sliceBalanced(bKernel, 'const __BANNER_ESTILOS =');
+var mEstDer = bKernel.match(/const __est = [^;]+;/);
+var mEstSet = bKernel.match(/sec\.setAttribute\('data-estilo',[^\n]*\);/);
+var eCode = (eDecl && mEstDer && mEstSet) ? eDecl + '\n' + mEstDer[0] + '\n' + mEstSet[0] + '\n' : '';
+var ALLOWED = { 'dorado': 1, 'monocromo': 1 };
+/* it es el ITEM del banner, no el valor crudo: el codigo real lee it.estilo. */
+function normEstilo(valor) {
+  if (!eCode) return 'ERR:no-codigo';
+  var c = {
+    it: { estilo: valor },
+    sec: { attrs: {}, setAttribute: function (k, v) { this.attrs[k] = v; } }
+  };
+  vm.createContext(c);
+  try { vm.runInContext(eCode, c, { filename: 'kernel-banner-estilo.js' }); }
+  catch (e) { return 'ERR:' + (e && e.message ? e.message : String(e)); }
+  return String(c.sec.attrs['data-estilo']);
+}
+var casos20 = [
+  { in: 'dorado', want: 'dorado' },
+  { in: 'Monocromo', want: 'monocromo' },
+  { in: ' Monocromo ', want: 'monocromo' },
+  { in: 'neon', want: 'dorado' },
+  { in: '', want: 'dorado' },
+  { in: null, want: 'dorado' },
+  { in: 'tema', want: 'dorado' }
+];
+var d20r = eCode !== '', det20 = eCode === '' ? 'no se extrajo el codigo de estilo' : '';
+for (var i = 0; d20r && i < casos20.length; i++) {
+  var got = normEstilo(casos20[i].in);
+  if (got !== casos20[i].want || !ALLOWED[got]) { d20r = false; det20 = 'entrada ' + JSON.stringify(casos20[i].in) + ' -> ' + got + ' (se esperaba ' + casos20[i].want + ')'; }
+}
+check(d20r, 'D20: estilo normalizado a dorado|monocromo con fail-open dorado, nunca un tercer valor (ejecucion real en vm)', det20);
+
+/* --- E1: los 2 slots de banner son HIJOS DIRECTOS del contenedor ------------
+ * Cierra el gap de cobertura de A1 (regex) y A4 (indexOf): ninguno de los dos
+ * ve la profundidad. Este check parsea el anidamiento REAL de evento-app.html
+ * con la pila de anidar() y exige, para los 2 banners:
+ *   E1.1 el padre inmediato es <main id="main-content-flow"> (contenedor real,
+ *        verificado en el archivo: es el unico <main> del documento);
+ *   E1.2 profundidad 1: entre la apertura del contenedor y el <section> del
+ *        banner no hay ningun otro tag abierto sin cerrar;
+ *   E1.3 el </section> cierra el suyo: cero <section> anidados dentro.
+ * Si alguien mete el banner en un <div class="mod-..."> o en otro <section>,
+ * el grid-area: banner-N del silo deja de aplicar (el grid item pasa a ser el
+ * padre), la banda se rompe en runtime y A1/A4 seguirian en verde.
+ * ------------------------------------------------------------------------ */
+var E1ok = true, badE1 = [], sawE1 = [];
+/* El contenedor esperado se toma del archivo, no se asume: si el unico <main>
+   deja de existir o deja de llamarse asi, el check falla y lo dice. */
+var E1contReal = /<main\b[^>]*\bid\s*=\s*["']main-content-flow["']/.test(kernel);
+var E1mains = countOf(kernel, '<main');
+if (!E1contReal) {
+  E1ok = false;
+  badE1.push('E1.1 el contenedor <main id="main-content-flow"> no existe en evento-app.html');
+} else if (E1mains !== 1) {
+  E1ok = false;
+  badE1.push('E1.1 se esperaba 1 <main> en el documento, hay ' + E1mains);
+}
+var E1slots = ['mod-banner-1', 'mod-banner-2'];
+for (var i = 0; i < E1slots.length; i++) {
+  var bid = E1slots[i];
+  var r = anidar(kernel, 'section', bid);
+  if (!r.found) { E1ok = false; badE1.push(bid + ': no se hallo el <section> estatico'); continue; }
+  var padre = r.parent ? r.parent + (r.parentId ? '#' + r.parentId : '') : '(sin padre)';
+  sawE1.push(bid + ' -> padre=' + padre + ' pila=' + r.depth +
+             ' cadena=[' + (r.chain || 'vacia') + ']' +
+             (r.quoted ? ' (atributo con > entrecomillado: cierre por estado de comilla)' : ''));
+  if (r.parent !== 'main' || r.parentId !== 'main-content-flow') {
+    E1ok = false;
+    badE1.push('E1.1 ' + bid + ': padre inmediato ' + padre + ' (se esperaba main#main-content-flow)');
+  }
+  /* E1.2 se mide sobre el TRAMO de texto y desde el frame del CONTENEDOR
+     (main#main-content-flow), no desde el padre inmediato: todo tag de scope
+     que quede abierto entre el '>' del contenedor y el '<' del banner. */
+  var cont = null;
+  for (var k3 = r.stack.length - 1; k3 >= 0; k3--) {
+    if (r.stack[k3].name === 'main' && r.stack[k3].id === 'main-content-flow') { cont = r.stack[k3]; break; }
+  }
+  if (!cont) {
+    E1ok = false;
+    badE1.push('E1.2 ' + bid + ': el contenedor main#main-content-flow no aparece en la pila (cadena=' + r.chain + ')');
+  } else {
+    var tramo = (r.at > 0) ? abiertosEnTramo(kernel, cont.end, r.at) : { net: -1, abiertos: ['tramo no medible'] };
+    if (tramo.net !== 0) {
+      E1ok = false;
+      badE1.push('E1.2 ' + bid + ': ' + tramo.net + ' tag(s) de scope abierto(s) sin cerrar entre el contenedor y el banner: [' + tramo.abiertos.join(', ') + ']');
+    }
+  }
+  if (r.inner !== 0) {
+    E1ok = false;
+    badE1.push('E1.3 ' + bid + ': ' + r.inner + ' <section> anidado(s) DENTRO del banner (su primer </section> cierra el mas interno, no el del banner)');
+  }
+  if (!r.closed) {
+    E1ok = false;
+    badE1.push('E1.3 ' + bid + ': su </section> nunca llega (cierre cruzado o tag de apertura sin cerrar)');
+  }
+}
+check(E1ok,
+  'E1: los 2 <section> de banner son hijos DIRECTOS de <main id="main-content-flow"> (0 tags abiertos entre contenedor y banner, sin section anidado): parseo de anidamiento real, no regex',
+  badE1.join(' | ') + (sawE1.length ? ' :: ' + sawE1.join(' | ') : ''));
+
+/* ---------------------------------------------------------------------------
  * Resumen
  * ------------------------------------------------------------------------- */
 

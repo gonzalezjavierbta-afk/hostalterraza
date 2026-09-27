@@ -167,6 +167,11 @@
             </div>
         </section>
 
+        <!-- BANNER EDITORIAL 1 (f9b) - aditivo, Cero Borrado. Nace vacio y oculto por
+             el IoC global (section/header/footer); lo enciende el silo, no el kernel.
+             data-estilo lo refleja el kernel desde content.banners[0].estilo. -->
+        <section id="mod-banner-1" class="mod-banner" data-estilo="dorado"></section>
+
         <!-- MÓDULO 3B: PLAYLIST (split v1.4.6 de #mod-gallery) -->
         <section id="mod-playlist">
             <div style="max-width: 1100px; margin: 0 auto;">
@@ -254,6 +259,10 @@
             </div>
         </section>
         <!-- ==================== FIN EXTENSIÓN ADITIVA III ================ -->
+
+        <!-- BANNER EDITORIAL 2 (f9b) - aditivo, Cero Borrado. Mismas reglas que
+             #mod-banner-1; lee content.banners[1].estilo. -->
+        <section id="mod-banner-2" class="mod-banner" data-estilo="dorado"></section>
 
         <section id="mod-sponsors" style="text-align:center; padding:4rem 0;"><div id="db-sponsors-list" style="display:flex; justify-content:center; gap:4rem; flex-wrap:wrap;"></div></section>
 
@@ -1085,6 +1094,177 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     }
                     return !!hasContent;
                 };
+
+                // === INICIO SEGMENTO: BANNERS EDITORIALES (f9b) ===
+                // Contrato de datos congelado: config_landing.content.banners es un array
+                // del que se usan MAXIMO 2 elementos.
+                //     banners[0] -> #mod-banner-1
+                //     banners[1] -> #mod-banner-2
+                //     banners[2+] se IGNORA en silencio: no es error, no se renderiza y no
+                //     se emite console.error.
+                // Campos leidos: frase (unico campo que enciende el atomo), autor,
+                // etiqueta, estilo ('dorado'|'monocromo', fail-open 'dorado'),
+                // imagen_url ('' permitido), video_url ('' permitido y DISTINTO de
+                // ev.video_url), alt (obligatorio si hay imagen_url).
+                // 'tema' NO es un campo valido (fue renombrado a 'estilo'): no se lee.
+                // NUNCA se pregunta si el item tiene media. Un slot sin frase
+                // pero con autor/etiqueta tambien es contenido; y un slot con
+                // frase y sin media es valido (el silo resuelve el tipografico).
+                // (el silo resuelve el diseno tipografico).
+                // SEGURIDAD DE CONSTRUCCION: todo el contenido se arma con
+                // document.createElement + textContent + setAttribute. Cero innerHTML
+                // con datos interpolados (este archivo no tiene escapeHtml y aqui no se
+                // anade uno). Mismo criterio que el hero y que __renderPreviewError.
+                const __BANNER_AVATAR = 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+                const __BANNER_RE_HTTP = /^https?:\/\//i;
+                const __BANNER_ESTILOS = { 'dorado': 1, 'monocromo': 1 };
+                // Solo http(s):// o ruta relativa que empieza por '/'. Rechaza
+                // javascript:, data: y vbscript:. Devuelve '' si no es apta, para que el
+                // llamador NUNCA asigne src="" (URL vacia) ni dispare una descarga.
+                const __bannerSafeUrl = function (raw) {
+                    const s = String(raw == null ? '' : raw).trim();
+                    if (!s || s.length > 2000) return '';
+                    if (s.charAt(0) === '/') return s;
+                    if (__BANNER_RE_HTTP.test(s)) return s;
+                    return '';
+                };
+                // Trim + corte de longitud. Un campo que queda en blanco se trata como
+                // ausente y su elemento se omite (no queda <p> huerfano).
+                const __bannerText = function (raw, max) {
+                    const s = String(raw == null ? '' : raw).trim();
+                    return s.length > max ? s.slice(0, max) : s;
+                };
+                const __renderBanner = function (slotId, it) {
+                    const sec = document.getElementById(slotId);
+                    if (!sec) return;
+                    // Re-render idempotente: el slot se vacia antes de repoblar.
+                    while (sec.firstChild) sec.removeChild(sec.firstChild);
+                    if (!it || typeof it !== 'object') return;
+                    // data-estilo: fail-open a 'dorado'. El silo estiliza con
+                    // #mod-banner-1[data-estilo="monocromo"]; el kernel solo refleja.
+                    const __est = String(it.estilo == null ? '' : it.estilo).trim().toLowerCase();
+                    sec.setAttribute('data-estilo', __BANNER_ESTILOS[__est] ? __est : 'dorado');
+                    const frase = __bannerText(it.frase, 320);
+                    const autor = __bannerText(it.autor, 120);
+                    const etiqueta = __bannerText(it.etiqueta, 80);
+                    const imgUrl = __bannerSafeUrl(it.imagen_url);
+                    const vidUrl = __bannerSafeUrl(it.video_url);
+                    // alt: obligatorio si hay imagen_url. Nunca cadena vacia: cae a la
+                    // frase truncada a 120 y, en ultimo termino, a un texto generico.
+                    const altTxt = __bannerText(it.alt, 320) || (frase ? frase.slice(0, 120) : 'Hostal Terraza');
+                    // ---- .banner-media (siempre presente; el silo pinta su gradiente) ----
+                    const media = document.createElement('div');
+                    media.className = 'banner-media';
+                    // VIDEO decorativo: solo si la URL es valida Y el usuario NO pidio
+                    // menos movimiento. La guarda va ANTES de asignar src, de modo que
+                    // con prefers-reduced-motion no se descarga ni un byte de video.
+                    const __pideCalma = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+                    if (vidUrl && !__pideCalma) {
+                        const vid = document.createElement('video');
+                        vid.className = 'banner-video';
+                        vid.setAttribute('autoplay', '');
+                        // muted es obligatorio: sin el, el navegador bloquea el autoplay.
+                        vid.setAttribute('muted', '');
+                        vid.setAttribute('loop', '');
+                        // playsinline es obligatorio: sin el, iOS abre el video a pantalla
+                        // completa y se come la pagina.
+                        vid.setAttribute('playsinline', '');
+                        vid.setAttribute('preload', 'none');
+                        vid.setAttribute('aria-hidden', 'true');
+                        vid.setAttribute('tabindex', '-1');
+                        // poster: imagen valida o avatar. Nunca cadena vacia.
+                        vid.setAttribute('poster', imgUrl || __BANNER_AVATAR);
+                        // src al final, con el elemento ya silenciado.
+                        vid.src = vidUrl;
+                        // Fallback sin onerror inline (rompe el parseo ASCII del archivo).
+                        vid.addEventListener('error', function () {
+                            vid.style.display = 'none';
+                            media.setAttribute('data-media-empty', 'true');
+                        });
+                        media.appendChild(vid);
+                    }
+                    // IMG: siempre en el DOM. Sin src="" ni atributo que la conecte al
+                    // lightbox (sin .lightbox-trigger y sin data-lightbox: abriria el
+                    // lightbox a pantalla completa).
+                    const img = document.createElement('img');
+                    img.className = 'banner-img';
+                    if (imgUrl) {
+                        img.setAttribute('loading', 'lazy');
+                        img.setAttribute('decoding', 'async');
+                        img.setAttribute('alt', altTxt);
+                        img.src = imgUrl;
+                        // Fallback en error (patron del segmento HISTORIA, version
+                        // listener): cambia al avatar por una sola vez y marca el
+                        // contenedor para que el silo degrade a su gradiente.
+                        img.addEventListener('error', function () {
+                            if (img.getAttribute('data-fb') === '1') return;
+                            img.setAttribute('data-fb', '1');
+                            img.src = __BANNER_AVATAR;
+                            media.setAttribute('data-media-empty', 'true');
+                        });
+                    } else {
+                        // Sin URL valida no se descarga nada y no se pinta un src vacio.
+                        // El <img> queda en el DOM (contrato) pero display:none; el silo
+                        // pinta el gradiente sobre .banner-media.
+                        img.style.display = 'none';
+                        img.setAttribute('alt', '');
+                        media.setAttribute('data-media-empty', 'true');
+                    }
+                    media.appendChild(img);
+                    sec.appendChild(media);
+                    // ---- .banner-text: se OMITE cada elemento cuyo campo viene vacio ----
+                    const txt = document.createElement('div');
+                    txt.className = 'banner-text';
+                    if (etiqueta) {
+                        const n = document.createElement('p');
+                        n.className = 'banner-kicker';
+                        n.textContent = etiqueta;
+                        txt.appendChild(n);
+                    }
+                    if (frase) {
+                        const n = document.createElement('p');
+                        n.className = 'banner-frase';
+                        n.textContent = frase;
+                        txt.appendChild(n);
+                    }
+                    if (autor) {
+                        const n = document.createElement('p');
+                        n.className = 'banner-autor';
+                        n.textContent = autor;
+                        txt.appendChild(n);
+                    }
+                    sec.appendChild(txt);
+                };
+                // Item vacio := sin frase, sin autor y sin etiqueta, medido sobre valores
+                // TRIMEADOS (no sobre la verdad cruda del valor). Razon: una cadena que
+                // solo contiene espacios es truthy en JS pero NO aporta texto, asi que la
+                // formula cruda daba "hay contenido", __hideEmptyModule(...) recibia
+                // hasContent=true y el silo encendia el slot con su display:block
+                // !important, dejando una BANDA VACIA a pantalla completa (min-height 58vh)
+                // sin texto visible. La guarda CSS
+                // :not(:has(.banner-frase:not(:empty))) tampoco salva este caso: :empty no
+                // matchea un elemento cuyo unico hijo es un nodo de texto de espacios.
+                // El trim NO se aplica al resto del contrato: nunca se pregunta por la
+                // media para decidir si el slot se enciende; estilo/imagen_url/video_url/alt
+                // NO encienden el atomo; y 'tema' se sigue ignorando en favor de 'estilo'.
+                const __bannerVacio = function (it) {
+                    if (!it || typeof it !== 'object') return true;
+                    const __bannerCampo = function (raw) { return String(raw == null ? '' : raw).trim().length > 0; };
+                    return !(__bannerCampo(it.frase) || __bannerCampo(it.autor) || __bannerCampo(it.etiqueta));
+                };
+                const __bannersRaw = effContent.banners;
+                const __banners = Array.isArray(__bannersRaw) ? __bannersRaw : [];
+                const __banner1 = __banners[0];
+                const __banner2 = __banners[1];
+                __renderBanner('mod-banner-1', __banner1);
+                __renderBanner('mod-banner-2', __banner2);
+                // VISIBILIDAD data-first: con frase el silo enciende el slot (esta llamada
+                // solo quita data-hidden y NO pone display); sin frase queda inline
+                // display:none !important, que gana al !important de la hoja. El kernel no
+                // lucha contra ese inline ni lo quita a mano.
+                __hideEmptyModule('mod-banner-1', !__bannerVacio(__banner1));
+                __hideEmptyModule('mod-banner-2', !__bannerVacio(__banner2));
+                // === FIN SEGMENTO: BANNERS EDITORIALES (f9b) ===
 
                 // Nota v1.4.8: el bloque "VINCULACIÓN DE VIDEO (v202)" que vivía aquí se retiró —
                 // era 100% redundante: escribía sobre el mismo #db-video-content que el segmento
