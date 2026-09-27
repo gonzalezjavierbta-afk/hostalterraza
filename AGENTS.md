@@ -217,6 +217,28 @@ node scripts/usage_report.js --tree --root <sessionId>          # listar subagen
 node scripts/usage_report.js --sessions --json --out uso.json   # exportar JSON para otra IA
 ```
 
+### Informe de cierre de sesion (obligatorio)
+
+Toda sesion de implementacion cierra con un informe de gasto y aprendizaje.
+Se levanta con la herramienta existente, sin agente:
+
+    node scripts/usage_report.js --summary          # dia local (default)
+    node scripts/usage_report.js --tree --root <id> # desglose por subagente
+
+El informe debe incluir, como minimo:
+
+| Campo | De donde sale |
+|---|---|
+| total_tokens | `totals.total` del reporte |
+| turnos | suma de `turns` |
+| cache_read / turnos | metrica de control (mide el contexto por turno) |
+| segundos | suma de `seg` (reloj) |
+| desglose por agente | `--tree` (quien gasto que) |
+| 1-3 aprendizajes | accionables: que se releo de mas, que agente fallo, que brief falto |
+
+Regla: el informe se entrega al cerrar, no se difiere. Si la sesion supero el
+presupuesto (Mandato 18), el informe debe explicar por que.
+
 ## Reglas transversales (aplican a los 39 agentes)
 
 1. **Cero Borrado (Reglas de Oro #2):** ningún agente elimina IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).
