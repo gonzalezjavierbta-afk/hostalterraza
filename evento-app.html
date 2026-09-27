@@ -1173,7 +1173,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                         link.setAttribute('target', '_blank');
                         link.setAttribute('rel', 'noopener noreferrer');
                         link.setAttribute('aria-label', altTxt || 'Ver video');
-                        link.style.cssText = 'position:absolute;inset:0;z-index:2;display:block;cursor:pointer;text-decoration:none;';
+                        link.style.cssText = 'position:absolute;inset:0;z-index:4;display:block;cursor:pointer;text-decoration:none;';
                         media.appendChild(link);
                     } else if (vidUrl && !__pideCalma) {
                         const vid = document.createElement('video');
@@ -1756,9 +1756,13 @@ if (document.getElementById('footer-copy')) {
         // v302 (aditivo, solo silo .tpl-f8 TropiLove): footer muestra "Chokoflow" en
         // lugar de "Chongotronik". Los demás silos conservan el copyright original.
         const __esF8Footer = document.body.className && document.body.className.includes('tpl-f8');
+        // v303 (aditivo, solo silo .tpl-f9b Mistico Nocturno): footer sin el
+        // copyright de Chongotronik; queda solo el sello visual del silo
+        // (#footer-copy::after en f9b.css). Los demas silos lo conservan.
+        const __esF9bFooter = document.body.className && document.body.className.includes('tpl-f9b');
         document.getElementById('footer-copy').innerText = __esF8Footer
             ? T('landing.copy_choko')
-            : T('landing.copy_chongo');
+            : (__esF9bFooter ? '' : T('landing.copy_chongo'));
     }
     // v216 · BADGE "Powered by Hostal Terraza QR": marca de agua discreta bajo el
     // copyright, SOLO para plan 'freemium'. pass_evento / pro_mensual no la crean.

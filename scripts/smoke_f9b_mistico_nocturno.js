@@ -979,6 +979,49 @@ check(g3nav && g3gate,
   'nav=' + g3nav + ' gate=' + g3gate + ' len=' + g3Lu.length);
 
 /* ---------------------------------------------------------------------------
+ * 11. FIXES DE PRESENTACION f9b - H1/H2/H3/H4
+ *
+ * Cuatro checks que reusan la infraestructura del encabezado (cssNoC, bRules,
+ * bKernel) y no crean un segundo Resumen.
+ * ------------------------------------------------------------------------- */
+
+/* --- H1: meta sin iconos y lugar a fila completa en movil ---------------- */
+var H1svg = /\.meta-svg[^{}]*\{[^{}]*display\s*:\s*none\s*!important/.test(cssNoC);
+var H1lugar = /:has\(#meta-lugar\)[^{}]*\{[^{}]*flex-basis\s*:\s*100%/.test(cssNoC);
+check(H1svg && H1lugar,
+  'H1: f9b.css oculta .meta-svg (display:none !important) y da fila completa al item de lugar en movil (:has(#meta-lugar) flex-basis 100%)',
+  'svg=' + H1svg + ' lugar=' + H1lugar);
+
+/* --- H2: barra de scroll oculta y sin reglas de thumb/track -------------- */
+var H2none = /scrollbar-width\s*:\s*none/.test(cssNoC);
+var H2webkit = /::-webkit-scrollbar[^{}]*\{[^{}]*display\s*:\s*none/.test(cssNoC);
+var H2resid = cssNoC.indexOf('scrollbar-thumb') === -1 && cssNoC.indexOf('scrollbar-track') === -1;
+check(H2none && H2webkit && H2resid,
+  'H2: f9b.css oculta la barra (scrollbar-width:none + ::-webkit-scrollbar display:none) y ya no declara thumb/track',
+  'none=' + H2none + ' webkit=' + H2webkit + ' sinResiduos=' + H2resid);
+
+/* --- H3: headliner con object-fit contain; artistas normales con cover --- */
+var H3contain = /\.artist-card\.headliner\s+\.artist-photo[^{}]*\{[^{}]*object-fit\s*:\s*contain/.test(cssNoC);
+var H3cover = false;
+for (var h3 = 0; h3 < bRules.length; h3++) {
+  if (/\.artist-photo(?![\w-])/.test(bRules[h3].sel) &&
+      bRules[h3].sel.indexOf('.headliner') === -1 &&
+      /object-fit\s*:\s*cover/.test(bRules[h3].body)) { H3cover = true; }
+}
+check(H3contain && H3cover,
+  'H3: la foto del headliner usa object-fit: contain y la de los artistas normales conserva cover',
+  'contain=' + H3contain + ' coverNormal=' + H3cover);
+
+/* --- H4: banner-link con z-index:4 y gate/rama mp4 intactos -------------- */
+var H4z = /link\.style\.cssText\s*=\s*'[^']*z-index:4/.test(bKernel);
+var H4gate = bKernel.indexOf('if (vidUrl && __bannerYoutube)') !== -1 &&
+             bKernel.indexOf('} else if (vidUrl && !__pideCalma) {') !== -1 &&
+             bKernel.indexOf("vid.className = 'banner-video';") !== -1;
+check(H4z && H4gate,
+  'H4: banner-link con z-index:4 (clic sobre el panel de texto) y el gate + rama mp4 del video intactos',
+  'z=' + H4z + ' gate=' + H4gate);
+
+/* ---------------------------------------------------------------------------
  * Resumen
  * ------------------------------------------------------------------------- */
 
