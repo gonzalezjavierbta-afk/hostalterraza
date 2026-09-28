@@ -1,5 +1,6 @@
 ---
-description: Lead Developer del panel de administración (admin.html) de HostalTerraza. Implementa sub-tabs por categoría (especifico-sitio/hostal/comida/evento), registra campos en el motor genérico CATEGORY_TAG_FIELDS/CATEGORY_TAG_LISTS, corrige loadForm() y mantiene balance de divs. Úsalo para toda tarea sobre admin.html o el formulario de publicar-lugar.js.
+name: admin-dev
+description: Lead de admin.html y scanner.html - sub-tabs por categoría, motor CATEGORY_TAG_FIELDS, loadForm() y balance de divs.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

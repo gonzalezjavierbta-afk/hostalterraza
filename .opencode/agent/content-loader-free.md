@@ -1,10 +1,6 @@
 ---
-description: >
-  Agente GRATUITO especializado en crear páginas dinámicas de ExploraCO.
-  Versión open-source (big-pickle) de content-loader. Genera el triple de
-  archivos (seed + loader + smoke) siguiendo el patrón Fase 9, ejecuta el
-  Escudo GOLD y carga a producción. Úsalo para crear cualquier página
-  dinámica de destino (sitio, hostal, comida, evento, blog).
+name: content-loader-free
+description: Triple seed + loader + smoke de páginas dinámicas de ExploraCO siguiendo el patrón Fase 9, con Escudo GOLD y carga a producción.
 mode: subagent
 model: opencode/big-pickle
 permission:

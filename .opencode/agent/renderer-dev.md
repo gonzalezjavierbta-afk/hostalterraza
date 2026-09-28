@@ -1,5 +1,6 @@
 ---
-description: Lead Developer del motor de renderizado público (pagina-destino.js) de ExploraCO. Implementa secciones condicionales por categoría mediante concatenación de strings server-side, helpers de formato y smoke tests de buildHTML(). Úsalo para toda tarea sobre pagina-destino.js, vercel.json o los rewrites de slugs.
+name: renderer-dev
+description: Lead del motor de render publico de ExploraCO - secciones condicionales por categoría, helpers de formato y rewrites de slugs de paginas de destino.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

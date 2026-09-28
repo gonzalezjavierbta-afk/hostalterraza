@@ -1,10 +1,6 @@
 ---
-description: >
-  Agente especializado en crear páginas dinámicas de ExploraCO.
-  Genera el triple de archivos (seed + loader + smoke) siguiendo
-  el patrón Fase 9, ejecuta el Escudo GOLD y carga a producción.
-  Úsalo para crear cualquier página dinámica de destino (sitio,
-  hostal, comida, evento, blog).
+name: content-loader
+description: Creador de páginas dinámicas de destino de ExploraCO - genera el triple seed + loader + smoke de la Fase 9, ejecuta el Escudo GOLD y carga a producción.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

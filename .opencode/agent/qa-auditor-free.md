@@ -1,5 +1,6 @@
 ---
-description: QA Specialist / Auditor GRATUITO de HostalTerraza. Ejecuta el Escudo GOLD (node --check, ASCII-safety, balance de divs), smoke tests de buildHTML(), verificacion de integracion con Node vm y valida contra ERRORES_HISTORICOS.md. Solo audita y reporta; no corrige codigo. Usalo antes de desplegar cualquier cambio en api/*.js, admin.html, pagina-destino.js o index.html.
+name: qa-auditor-free
+description: Auditoría de calidad repetitiva de ExploraCO - Escudo GOLD, smoke de buildHTML() y validación contra ERRORES_HISTORICOS.md, solo reporta.
 mode: subagent
 model: opencode/big-pickle
 permission:

@@ -1,5 +1,6 @@
 ---
-description: Agente GRATUITO de revisión de arquitectura y aprobación de decisiones de HostalTerraza. Versión open-source (big-pickle) de architect-review. Revisa diseños antes de implementar, valida ADRs, audita el impacto de cambios en el motor de renderizado/backend y aprueba planes técnicos. Complementa a architect-free para la segunda opinión.
+name: architect-review-free
+description: Segunda opinión de arquitectura - revisa ADRs y planes técnicos, y audita el impacto en el motor de render de forma rutinaria.
 mode: subagent
 model: opencode/big-pickle
 permission:

@@ -1,10 +1,6 @@
 ---
-description: >
-  Agente GRATUITO especializado en operaciones de base de datos, migraciones
-  de esquema, limpieza de datos y seeds masivos para ExploraCO. Versión
-  open-source (big-pickle) de data-migration. Maneja Neon PostgreSQL con
-  seguridad y trazabilidad. Operaciones críticas se escalan a sql-security-free
-  solo si son de seguridad; este agente no gestiona RLS/claves en modelo gratuito.
+name: data-migration-free
+description: Limpieza de datos, seeds masivos y migraciones de esquema de riesgo bajo en Neon PostgreSQL, con trazabilidad y sin tocar RLS ni claves.
 mode: subagent
 model: opencode/big-pickle
 permission:

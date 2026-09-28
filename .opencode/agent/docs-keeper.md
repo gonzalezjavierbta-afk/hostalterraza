@@ -1,5 +1,6 @@
 ---
-description: Documentation Specialist del AI-DOS Core de HostalTerraza. Mantiene PROJECT.md, NEXT.md, TASKS.md, BLUEPRINT.md, DECISIONS.md y BUGS_HISTORICOS.md; cierra tareas, redacta handoffs y registra bugs y ADRs. Úsalo al completar una tarea, al detectar un bug, al tomar una decisión de arquitectura o al preparar el relevo para la siguiente sesión.
+name: docs-keeper
+description: Documentation Specialist del AI-DOS Core de HostalTerraza - mantiene PROJECT.md, NEXT.md, TASKS.md, BLUEPRINT.md, DECISIONS.md y ERRORES_HISTORICOS.md.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

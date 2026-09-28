@@ -1,90 +1,50 @@
-# AGENTS.md — Sistema QR Hostal Terraza (HostalTerraza)
+# AGENTS.md — Sistema QR Hostal Terraza
 
-Enrutamiento de agentes para OpenCode. Sistema QR Hostal Terraza: plataforma de eventos con contrato de datos atómico, silos CSS por template y operación delegada a agentes especializados. Este archivo es el **índice operativo delgado**; el detalle vive en `.opencode/skills/` y se carga **bajo demanda** (ver índice final). Fuentes normativas: `Sistema QR desarrollo/BLUEPRINT.md`, `Sistema QR desarrollo/Reglas de Oro QR.md` (v128-MASTER) y `Sistema QR desarrollo/PROJECT.md` (v1.6.4-FIX). Última actualización: 2026-09-24 (`default_agent: free-build`, ADR-052).
+Índice operativo delgado de enrutamiento; el detalle vive en `.opencode/agent/*.md` y `.opencode/skills/` y se carga **bajo demanda**. Normativa: `Sistema QR desarrollo/BLUEPRINT.md`, `Reglas de Oro QR.md` (v128-MASTER), `PROJECT.md` (v1.6.4-FIX). Actualizado 2026-09-28 (poda ADR-059; `default_agent: free-build`, ADR-052).
 
-## 1. Matriz de enrutamiento compacta (esquema TRIPARTITO)
+## 1. Matriz de enrutamiento (esquema TRIPARTITO)
 
-Existen **tres rutas completas**: GRATUITA (default, agentes `*-free`, costo 0), HYBRID (mezcla PRO/FREE por riesgo) y de PAGO (agentes pro `opencode-go/*`). Los agentes gratuitos se identifican con el sufijo `-free`. **Antes de procesar código, el orquestador delega al dominio** (fuente de verdad operativa: ADR-006).
+Tres rutas: GRATUITA (default, `*-free`, costo 0), HYBRID (PRO/FREE) y de PAGO (`opencode-go/*`). **La tabla ES el flujo de delegación**: cada build delega al dominio de su fila (ADR-006).
 
-| Dominio | Agente pro | Agente free |
+| Dominio | pro | free |
 |---|---|---|
-| CSS de silo / `evento.html` | `@frontend-tpl` | `@frontend-tpl-free` |
+| CSS de silo | `@frontend-tpl` | `@frontend-tpl-free` |
 | `admin.html` / `scanner.html` | `@admin-dev` | `@admin-dev-free` |
-| endpoints / lógica QR / tickets | `@backend-dev` | `@backend-dev-free` |
-| RLS / seguridad de esquema | `@sql-security` | `@sql-security-free` |
-| JS/TS rutinario | `@js-silo-dev` | `@js-silo-dev-free` |
-| seed+loader+smoke (páginas dinámicas) | `@content-loader` | `@content-loader-free` |
+| endpoints / QR / tickets | `@backend-dev` | `@backend-dev-free` |
+| RLS / esquema | `@sql-security` | `@sql-security-free` |
+| JS/TS rutinario y soporte mecánico | `@js-silo-dev` | `@js-silo-dev-free` |
+| seed + loader + smoke | `@content-loader` | `@content-loader-free` |
 | migraciones / seeds | `@data-migration` | `@data-migration-free` |
-| motor de render (`pagina-destino.js`) | `@renderer-dev` | `@renderer-dev-free` |
+| motor de render | `@renderer-dev` | `@renderer-dev-free` |
 | SEO | `@seo-dev` | `@seo-dev-free` |
-| arquitectura / ADR | `@architect` (+ `@architect-review`) | `@architect-free` (+ `@architect-review-free`) |
+| arquitectura / ADR | `@architect` + `@architect-review` | `@architect-free` + `@architect-review-free` |
 | multimedia | `@media-reader` | `@media-reader-free` |
 | investigación de destinos | `@research-agent` | `@research-agent-free` |
-| exploración masiva del repo | `@explore` | `@explore-free` |
+| exploración masiva | `@explore` | `@explore-free` |
 | cierre documental | `@docs-keeper` | `@docs-keeper-free` |
 | certificación / auditoría | `@qa-auditor` | `@qa-auditor-free` |
-| soporte mecánico (linter/smoke) | — | `@exp-pickle-free` |
 
-**Orquestadores primarios** (`mode: primary`, 6; único punto de entrada): `@plan`/`@build` (pago), `@free-plan`/`@free-build` (gratuito, default), `@hybrid-plan`/`@hybrid-build` (hybrid). Los primarios delegan SIEMPRE por su ruta; prohibido mezclar rutas salvo escalar seguridad crítica (`sql-security-free` -> `sql-security`). `@plan`/`@free-plan`/`@hybrid-plan` NO implementan, solo orquestan. El par pro sustituye al `*-free` cuando la tarea exige calidad máxima o el modelo free no aplica (p.ej. `@seo-dev`, `@media-reader` con visión).
+**Primarios** (`mode: primary`, único punto de entrada): `@plan`/`@build`, `@free-plan`/`@free-build` (default), `@hybrid-plan`/`@hybrid-build`. No implementan: orquestan y delegan. Prohibido mezclar rutas salvo escalar seguridad crítica (`sql-security-free` → `@sql-security`).
 
-Detalle de los 39 agentes (dominios, permisos, modelos, rutas hybrid/pago, regla de `model:` explícito, decisiones de reconciliación v112, discrepancia conocida de `evento.html`, ADR-040, instalación y fuentes) -> cargar skill **`agentes-roster`**.
+`exp-pickle-free` fue **retirado** (ADR-031 Addendum A / ADR-059); su cobertura mecánica la hereda `@js-silo-dev-free`. El conteo de agentes se deriva de `ls .opencode/agent/` (ADR-006); detalle por agente (dominio, permisos, modelo, v112, discrepancia, fuentes) → skill **`agentes-roster`**.
 
-## 2. Reglas transversales (aplican a los 39 agentes)
+## 2. Regla de desambiguación PRO/FREE
 
-1. **Cero Borrado (Reglas de Oro #2):** ningún agente elimina IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).
+Ante un par de agentes gemelos (`nombre` y `nombre-free`): la variante **sin sufijo** es la **ruta PRO** (criterio, riesgo de runtime, seguridad, arquitectura) y la variante `-free` es la **ruta gratuita** para trabajo mecánico, repetitivo y de bajo riesgo. **La elección se hace por riesgo, nunca por preferencia.** Esta regla es la fuente de verdad del ruteo PRO/FREE; ninguna `description:` de agente la reitera.
+
+## 3. Reglas transversales (aplican a todos los agentes)
+
+1. **Cero Borrado (Oro #2):** nunca eliminar IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).
 2. **Vanilla JS puro (ADR-001):** prohibido Node.js en runtime cliente, React o build tools.
-3. **Aislamiento Atómico (Reglas de Oro #9):** CSS de silo encapsulado bajo `.tpl-{template_id}`; nada suelto en `:root` global.
+3. **Aislamiento Atómico (Oro #9):** CSS de silo encapsulado bajo `.tpl-{template_id}`; nada suelto en `:root` global.
 4. **Silent Fallback (ADR-008):** todo `<img>` dinámico lleva `onerror="this.src='path/to/fallback.png';"`.
-5. **Prioridad Estructural — Data-First (Reglas de Oro #1):** Fase I (datos/IDs/Supabase, log TRACE positivo) certificada antes de Fase II (estética Afterglow/Geist 900).
-6. **Mandato de Actualización Documental (Reglas de Oro #12):** toda actualización de `TASKS.md`/`NEXT.md`/`DECISIONS.md` (dominio de `@plan`/`@free-plan`) se entrega completa e íntegra, sin perder historial.
-7. **Modo Express (xpress):** cuando el usuario pida "express", "xpress" o "rápido", aplica la sección 4 de este archivo y la skill `express-mode`.
-8. **Eficiencia de recursos (Reglas de Oro #17-18):** consolidación de fases/agentes, regla anti-colgado y métrica `cache_read / turnos`; cierra toda sesión de implementación midiendo con `node scripts/usage_report.js`. Detalle en la sección 5.
+5. **Data-First (Oro #1):** Fase I (datos/IDs/Supabase, TRACE positivo) certificada antes de Fase II (estética).
+6. **Escudo GOLD:** antes de desplegar `api/*.js`, `admin.html`, `index.html` o el motor de render → skill `gold-shield`.
+7. **Mandato documental (Oro #12):** toda actualización de `TASKS.md`/`NEXT.md`/`DECISIONS.md` se entrega completa e íntegra, sin perder historial.
+8. **Eficiencia de recursos (Oro #17-18):** costo = turnos × contexto; 1 agente de exploración + 1 de implementación por dominio + 1 verificación (**por script, no por agente**); cerrar con `node scripts/usage_report.js` → skill `eficiencia-recursos`.
+9. **Lectura por rango:** prohibido leer completos archivos > 200 KB (p. ej. `admin.html` ~628 KB, `DECISIONS.md` ~375 KB). Usar `grep` para localizar la línea y `Read` con `offset`/`limit`: un read completo envenena el `cache_read` de todos los turnos siguientes.
+10. **Express (xpress):** ante "express", "xpress" o "rápido" rige la skill `express-mode` (transversal): cambia el orden y la profundidad de los controles, no los elimina; escala a modo normal en arquitectura, RLS/seguridad, migraciones o > 3 archivos críticos.
 
-## 3. Flujo de delegación
+## 4. Índice de skills (bajo demanda)
 
-```
-usuario → @free-plan (gratuito)  ·  @plan (pago, respaldo)  ·  @hybrid-plan (hybrid)
-            │
-            ├─ plan aprobado
-            ↓
-        @free-build (@build pro como respaldo)  ·  @hybrid-build (ruteo PRO/FREE por riesgo)
-            │
-            ├─ CSS de silo ──────────────────────→ @frontend-tpl-free
-            ├─ admin.html / scanner.html ────────→ @admin-dev-free
-            ├─ endpoints / QR / tickets ─────────→ @backend-dev-free
-            ├─ RLS / seguridad de esquema ───────→ @sql-security-free
-            ├─ JS/TS rutinario ──────────────────→ @js-silo-dev-free
-            ├─ seed+loader+smoke ────────────────→ @content-loader-free
-            ├─ migraciones / seeds ──────────────→ @data-migration-free
-            ├─ motor de render ──────────────────→ @renderer-dev-free
-            ├─ SEO ──────────────────────────────→ @seo-dev-free
-            ├─ arquitectura / ADR ───────────────→ @architect-free (+ @architect-review-free)
-            ├─ multimedia ───────────────────────→ @media-reader-free
-            ├─ investigación de destinos ────────→ @research-agent-free
-            ├─ exploración masiva ───────────────→ @explore-free
-            ├─ cierre documental ────────────────→ @docs-keeper-free
-            ├─ modo express (xpress) ────────────→ skill express-mode (transversal)
-            └─ certificación de una entrega ─────→ @qa-auditor (solo lectura, reporta al build de la ruta)
-```
-
-## 4. Modo Express (xpress)
-
-Cuando el usuario pida "**express**", "**xpress**" o "**rápido**", la skill `.opencode/skills/express-mode/SKILL.md` rige toda la sesión como skill **transversal** a cualquier dominio y ruta. Cambia el **orden** y la **profundidad** de los controles, no los elimina: briefs quirúrgicos por dominio, verificación local proporcional al riesgo y documentación diferida a un único cierre. Escalado obligatorio a modo normal en arquitectura, esquema/RLS/seguridad (siempre `@sql-security`, nunca `sql-security-free`), migraciones de datos, refactors compartidos o > 3 archivos críticos. Comando de verificación mínima: `node scripts/express_check.js`. Manual ampliado: `DOCUMENTOS/MODO_EXPRESS_ANALISIS.md`.
-
-## 5. Eficiencia de recursos (v128)
-
-Operativiza los Mandatos 17-18. La unidad de costo real es `turnos × contexto acumulado`, no el output: la métrica de control líder es **`cache_read / turnos`**. Una sesión usa máximo 1 agente de exploración + 1 de implementación por dominio + 1 de verificación; la verificación mecánica es script (`scripts/express_check.js`, `scripts/smoke_*.js`), no agente; prohibido releer archivos > 200 KB completos; y **toda sesión de implementación cierra con el informe obligatorio** (`node scripts/usage_report.js --summary` + `--tree --root <id>`). El detalle completo (contrato congelado de `usage_report.js`, tabla del informe de cierre, disciplina de grep y el diagnóstico del CSS inline del kernel) -> cargar skill **`eficiencia-recursos`**.
-
-## Índice de skills
-
-| Skill | Cuándo cargarla |
-|---|---|
-| `agentes-roster` | Detalle de un agente (dominio, permisos, modelo), rutas hybrid/pago, decisiones de reconciliación, discrepancia v112, instalación y fuentes. |
-| `modelos-verificados` | Elegir/asignar modelo, depurar un `403`, crear un agente nuevo (gatekeeper del tier gratuito). |
-| `eficiencia-recursos` | Sesiones largas u optimización de consumo: costo/turnos, grep, CSS inline, informe de cierre, `usage_report.js`. |
-| `anti-absorcion` | Planificar una sesión con subagentes (ADR-031) y KPIs de delegación. |
-| `reglas-de-oro` | Antes de una entrega formal o una auditoría: puente y resumen de los Mandatos 1-18 de `Reglas de Oro QR.md` (v128-MASTER). |
-| `express-mode` | Cuando el usuario pida express/xpress/rápido (transversal). |
-| `templates` | Crear/editar/auditar un silo CSS de `evento.html` (hub en `AMPLIACION/TEMPLATES.md`). |
-| `gold-shield` | Verificación de `api/*.js`, `admin.html`, `pagina-destino.js`, `index.html` antes de desplegar. |
-| `create-dynamic-page` / `batch-create` / `gemini-research` / `ingest-eventos` / `research-destination` | Pipelines de páginas dinámicas, eventos y destinos. |
+`agentes-roster` (detalle de agente y v112) · `modelos-verificados` (modelo, `403`, crear agente) · `eficiencia-recursos` (costo/turnos, grep, CSS inline, `usage_report.js`) · `anti-absorcion` (sesión con subagentes, ADR-031) · `reglas-de-oro` (entrega formal o auditoría, Mandatos 1-18) · `express-mode` (express/xpress/rápido) · `templates` (silo CSS de `evento.html`; hub `AMPLIACION/TEMPLATES.md`) · `gold-shield` (verificación mecánica pre-despliegue) · `create-dynamic-page` · `batch-create` · `gemini-research` · `ingest-eventos` · `research-destination` (pipelines de páginas, eventos y destinos).

@@ -1,5 +1,6 @@
 ---
-description: Planificador GRATUITO de HostalTerraza (esquema Free/Open-Source). Produce un plan estructurado de tareas por dominio -- nunca ejecuta ni implementa codigo. Solo puede invocar subagentes de SOLO LECTURA (@explore-free, @research-agent-free) para reunir contexto. Los subagentes de implementacion (*-dev-free, sql-security-free, data-migration-free, etc.) se asignan por nombre en el plan, nunca se invocan aqui -- quedan para que @free-build los ejecute en una sesion posterior.
+name: free-plan
+description: Planificador de HostalTerraza en ruta gratuita - produce un plan por dominio, solo delega lectura y nunca implementa código.
 mode: primary
 model: opencode/big-pickle
 permission:

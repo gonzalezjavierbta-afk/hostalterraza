@@ -28,6 +28,23 @@
  *     data:...;base64, y rutas de usuario
  *     (C:\Users\<n>, C:/Users/<n>, ~).
  *
+ * MODOS: --summary (default), --sessions, --tree, --json, --csv, --overhead.
+ *   --overhead mide desde el DISCO el overhead fijo del system prompt:
+ *   AGENTS.md, los campos description: de .opencode/agent/*.md y de
+ *   .opencode/skills/<skill>/SKILL.md. Estima tokens con chars / 3.5 y
+ *   multiplica el overhead por turno por los turnos del periodo (usa los
+ *   filtros --since/--until y la DB solo para contar turnos). En --overhead,
+ *   sin filtros se mide TODO el historico (los demas modos usan el dia local
+ *   actual). Si la DB no responde, reporta solo el overhead por turno.
+ *
+ * RENDIMIENTO / CONFIGURACION:
+ *   --max-sessions <N>  Limite de sesiones cargadas (default 5000; 0 = sin
+ *   limite). Protege el historico completo. Ademas, los modos que muestran
+ *   pocas filas (--summary/--tree/--csv con --top) cuentan las herramientas
+ *   (part.data) SOLO de las sesiones que se van a mostrar, no de todo el
+ *   historico: el costo dominante era releer cada part.data. El tope no
+ *   aplica con --root. Si recorta el conjunto, avisa por stderr.
+ *
  * Uso: node scripts/usage_report.js [modo] [opciones]
  * Ver: node scripts/usage_report.js --help
  * ---------------------------------------------------------------------------
@@ -39,6 +56,17 @@ var path = require('node:path');
 
 var SQLITE = null;
 try { SQLITE = require('node:sqlite'); } catch (e) { SQLITE = null; }
+
+/* ------------------------------ constantes ------------------------------ */
+
+/* Cap de sesiones cargadas por defecto (0 = sin limite). Ver header. */
+var MAX_SESSIONS_DEFAULT = 5000;
+/* Estimador de tokens usado por --overhead (sin tokenizer real). */
+var CHARS_PER_TOKEN = 3.5;
+/* Umbral de la convencion v2 para description: de agentes/skills. */
+var DESC_LIMIT = 175;
+/* Contador de herramientas en part.data. */
+var TOOL_SQL_EXTRA = " AND json_extract(data,'$.type')='tool'";
 
 /* ----------------------------- utilidades ------------------------------- */
 
@@ -114,6 +142,72 @@ function truncate(s, max) {
   s = (s == null) ? '' : String(s);
   if (max <= 0 || s.length <= max) return s;
   return s.slice(0, max) + '...[truncated]';
+}
+
+/* Estimacion de tokens usada por --overhead (aprox; sin tokenizer real). */
+function estTokens(chars) { return Math.round(num(chars) / CHARS_PER_TOKEN); }
+
+function byteLen(s) { return Buffer.byteLength(String(s == null ? '' : s), 'utf8'); }
+
+function countLines(s) {
+  s = String(s == null ? '' : s);
+  if (!s.length) return 0;
+  return s.split(/\r\n|\r|\n/).length;
+}
+
+function readTextSafe(p) {
+  try { return fs.readFileSync(p, 'utf8'); } catch (e) { return null; }
+}
+
+/* Lista recursiva de archivos con nombre exacto (p. ej. SKILL.md). */
+function findNamed(root, filename) {
+  var out = [];
+  function walk(dir) {
+    var entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return; }
+    for (var i = 0; i < entries.length; i++) {
+      var e = entries[i];
+      var full = path.join(dir, e.name);
+      if (e.isDirectory()) walk(full);
+      else if (e.isFile() && e.name === filename) out.push(full);
+    }
+  }
+  walk(root);
+  return out;
+}
+
+/*
+ * Extrae el valor de "description:" del frontmatter YAML. Soporta valor en
+ * la misma linea y bloque escalar ("description: >" seguido de lineas
+ * indentadas). Devuelve null si no hay frontmatter o description.
+ */
+function extractDescription(text) {
+  if (text == null) return null;
+  var lines = String(text).split(/\r\n|\r|\n/);
+  var start = -1, end = -1;
+  for (var i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === '---') { if (start === -1) start = i; else { end = i; break; } }
+  }
+  if (start === -1) return null;
+  var fm = lines.slice(start + 1, (end === -1 ? lines.length : end));
+  for (var j = 0; j < fm.length; j++) {
+    var m = fm[j].match(/^description:\s*(.*)$/);
+    if (!m) continue;
+    var first = m[1].trim();
+    if (first && first !== '>' && first !== '|' && first !== '>-' && first !== '|-' &&
+      first !== '>+' && first !== '|+') {
+      return first;
+    }
+    var buf = [];
+    for (var k = j + 1; k < fm.length; k++) {
+      var ln = fm[k];
+      if (/^\s+\S/.test(ln)) buf.push(ln.trim());
+      else if (/^\s*$/.test(ln)) { /* linea en blanco dentro del bloque */ }
+      else break;
+    }
+    return buf.join(' ').trim();
+  }
+  return null;
 }
 
 /* ------------------------------- redact --------------------------------- */
@@ -214,7 +308,20 @@ function loadSessions(db, opts) {
     'tokens_input,tokens_output,tokens_reasoning,tokens_cache_read,tokens_cache_write,' +
     'time_created,time_updated FROM session';
   if (w.length) sql += ' WHERE ' + w.join(' AND ');
-  var rows = all(db, sql, p);
+
+  /* Cap de sesiones (no aplica con --root: ese alcance es explicito).
+     Se pide cap+1 para saber si de verdad hubo recorte. */
+  var cap = num(opts.maxSessions);
+  var capActive = (cap > 0 && !opts.root);
+  var params = p;
+  if (capActive) {
+    sql += ' ORDER BY time_created DESC LIMIT ?';
+    params = p.concat([cap + 1]);
+  }
+  var rows = all(db, sql, params);
+  var capped = false;
+  if (capActive && rows.length > cap) { rows = rows.slice(0, cap); capped = true; }
+
   var rootInfo = null;
   if (opts.root) {
     var map = all(db, 'SELECT id,parent_id FROM session', []);
@@ -223,7 +330,7 @@ function loadSessions(db, opts) {
     rootInfo.ids.forEach(function (id) { set[id] = true; });
     rows = rows.filter(function (r) { return set[r.id]; });
   }
-  return { rows: rows, rootInfo: rootInfo };
+  return { rows: rows, rootInfo: rootInfo, capped: capped, cap: cap };
 }
 
 function countsBySession(db, table, ids, extra) {
@@ -293,7 +400,7 @@ function buildMetrics(rows, turnsMap, toolsMap) {
     var tcr = num(r.tokens_cache_read), tcw = num(r.tokens_cache_write);
     var total = ti + to + tr + tcr + tcw;
     var turns = turnsMap[r.id] || 0;
-    var tools = toolsMap[r.id] || 0;
+    var tools = toolsMap ? (toolsMap[r.id] || 0) : 0;
     var seg = (r.time_updated && r.time_created) ? r1((num(r.time_updated) - num(r.time_created)) / 1000) : 0;
     return {
       id: r.id,
@@ -466,7 +573,12 @@ function renderSessions(list, opts) {
   return out;
 }
 
-function renderTree(list, opts) {
+/*
+ * Recorrido unico del arbol raiz -> subagentes, respetando --top. visit()
+ * recibe (sesion, prefix, last). Lo usan renderTree y treeEmittedIds para
+ * garantizar EXACTAMENTE el mismo conjunto de nodos emitidos.
+ */
+function walkTree(list, top, visit) {
   var byId = {};
   list.forEach(function (s) { byId[s.id] = s; });
   var children = {};
@@ -479,12 +591,36 @@ function renderTree(list, opts) {
     children[k].sort(function (a, b) { return b.total - a.total; });
   });
   var roots = children['__root__'] || [];
-  var top = (opts.top > 0) ? opts.top : 0;
   var printed = 0;
   var seen = {};
-  var lines = [];
+  function walk(s, prefix, last) {
+    if (top > 0 && printed >= top) return;
+    if (seen[s.id]) return;
+    seen[s.id] = true;
+    printed++;
+    visit(s, prefix, last);
+    var ch = children[s.id] || [];
+    for (var i = 0; i < ch.length; i++) {
+      if (top > 0 && printed >= top) break;
+      walk(ch[i], prefix + (last ? '    ' : '|   '), i === ch.length - 1);
+    }
+  }
+  for (var i = 0; i < roots.length; i++) {
+    if (top > 0 && printed >= top) break;
+    walk(roots[i], '', i === roots.length - 1);
+  }
+}
 
-  function emit(s, prefix, last) {
+function treeEmittedIds(list, top) {
+  var ids = [];
+  walkTree(list, top, function (s) { ids.push(s.id); });
+  return ids;
+}
+
+function renderTree(list, opts) {
+  var top = (opts.top > 0) ? opts.top : 0;
+  var lines = [];
+  walkTree(list, top, function (s, prefix, last) {
     lines.push(prefix + (last ? '+-- ' : '|-- ') + s.id + '  [' + (s.agent || '?') + ']' +
       '  total=' + fmtInt(s.total) +
       '  cost=' + fmtCost(s.cost) +
@@ -493,27 +629,40 @@ function renderTree(list, opts) {
       '  cache/turn=' + fmtInt(s.cache_por_turno) +
       '  seg=' + fmtNum1(s.seg) +
       (s.es_raiz ? '  (raiz)' : ''));
-  }
-
-  function walk(s, prefix, last) {
-    if (top > 0 && printed >= top) return;
-    if (seen[s.id]) return;
-    seen[s.id] = true;
-    printed++;
-    emit(s, prefix, last);
-    var ch = children[s.id] || [];
-    for (var i = 0; i < ch.length; i++) {
-      if (top > 0 && printed >= top) break;
-      walk(ch[i], prefix + (last ? '    ' : '|   '), i === ch.length - 1);
-    }
-  }
-
-  for (var i = 0; i < roots.length; i++) {
-    if (top > 0 && printed >= top) break;
-    walk(roots[i], '', i === roots.length - 1);
-  }
+  });
   if (!lines.length) return '(sin sesiones para el filtro)';
   return lines.join('\n');
+}
+
+/*
+ * Ids que realmente se muestran: solo de esos se cuenta tools (part.data),
+ * que es la consulta dominante (lee todo el contenido de cada part). Los
+ * modos que exportan TODO (--json, --csv sin --top) siguen contando todo.
+ */
+function planToolIds(opts, list) {
+  if (opts.mode === 'sessions') return [];
+  if (opts.mode === 'summary') {
+    var rows = list.slice().sort(function (a, b) { return b.time_created - a.time_created; });
+    var shown = (opts.top > 0) ? rows.slice(0, opts.top) : rows;
+    return shown.map(function (s) { return s.id; });
+  }
+  if (opts.mode === 'tree') {
+    return treeEmittedIds(list, (opts.top > 0) ? opts.top : 0);
+  }
+  if (opts.mode === 'csv') {
+    var rows2 = list.slice().sort(function (a, b) { return b.total - a.total; });
+    var limit = opts.topExplicit ? (opts.top > 0 ? opts.top : 0) : 0;
+    var shown2 = (limit > 0) ? rows2.slice(0, limit) : rows2;
+    return shown2.map(function (s) { return s.id; });
+  }
+  return list.map(function (s) { return s.id; });
+}
+
+function applyTools(list, toolsMap) {
+  for (var i = 0; i < list.length; i++) {
+    var s = list[i];
+    s.tools = toolsMap[s.id] || 0;
+  }
 }
 
 function csvCell(v) {
@@ -650,13 +799,195 @@ function makeJson(opts, dbPath, totals, list, byAg, detailEntries) {
   };
 }
 
+/* ------------------------------ overhead -------------------------------- */
+
+function measureAgentsMd(p) {
+  var text = readTextSafe(p);
+  if (text == null) return { path: p, exists: false, bytes: 0, chars: 0, lines: 0, tokens: 0 };
+  return {
+    path: p, exists: true, bytes: byteLen(text), chars: text.length,
+    lines: countLines(text), tokens: estTokens(text.length)
+  };
+}
+
+function measureAgents(dir) {
+  var out = { dir: dir, files: 0, withDesc: 0, chars: 0, bytes: 0, over: 0, tokens: 0, longest: null };
+  var names;
+  try { names = fs.readdirSync(dir); } catch (e) { names = []; }
+  for (var i = 0; i < names.length; i++) {
+    if (!/\.md$/i.test(names[i])) continue;
+    var full = path.join(dir, names[i]);
+    var st = null;
+    try { st = fs.statSync(full); } catch (e2) { st = null; }
+    if (!st || !st.isFile()) continue;
+    out.files++;
+    var desc = extractDescription(readTextSafe(full));
+    if (!desc) continue;
+    out.withDesc++;
+    out.chars += desc.length;
+    out.bytes += byteLen(desc);
+    if (desc.length > DESC_LIMIT) out.over++;
+    if (!out.longest || desc.length > out.longest.chars) {
+      out.longest = { chars: desc.length, file: names[i] };
+    }
+  }
+  out.tokens = estTokens(out.chars);
+  return out;
+}
+
+function measureSkills(dir) {
+  var out = { dir: dir, files: 0, withDesc: 0, chars: 0, bytes: 0, over: 0, tokens: 0, longest: null };
+  var files = findNamed(dir, 'SKILL.md');
+  for (var i = 0; i < files.length; i++) {
+    out.files++;
+    var desc = extractDescription(readTextSafe(files[i]));
+    if (!desc) continue;
+    out.withDesc++;
+    out.chars += desc.length;
+    out.bytes += byteLen(desc);
+    if (desc.length > DESC_LIMIT) out.over++;
+    var rel = path.relative(dir, files[i]).replace(/\\/g, '/');
+    if (!out.longest || desc.length > out.longest.chars) out.longest = { chars: desc.length, file: rel };
+  }
+  out.tokens = estTokens(out.chars);
+  return out;
+}
+
+function resolveDbPath(opts) {
+  return opts.db
+    ? path.resolve(opts.db)
+    : path.join(os.homedir(), '.local', 'share', 'opencode', 'opencode.db');
+}
+
+function countTurns(db, opts) {
+  var loaded = loadSessions(db, opts);
+  var ids = loaded.rows.map(function (r) { return r.id; });
+  var turnsMap = countsBySession(db, 'message', ids, '');
+  var total = 0;
+  ids.forEach(function (id) { total += turnsMap[id] || 0; });
+  return { turns: total, sessions: ids.length, capped: loaded.capped };
+}
+
+function renderOverhead(fx, period) {
+  var L = [];
+  L.push('OVERHEAD FIJO DEL SYSTEM PROMPT (desde disco; tokens ~ chars / ' + CHARS_PER_TOKEN + ')');
+  L.push('Raiz del repo: ' + fx.root);
+  L.push('');
+  var rows = [
+    {
+      concepto: 'AGENTS.md', archivos: (fx.agentsMd.exists ? 1 : 0),
+      bytes: fx.agentsMd.bytes, chars: fx.agentsMd.chars, tokens: fx.agentsMd.tokens
+    },
+    {
+      concepto: 'desc agentes (.opencode/agent)', archivos: fx.agents.withDesc,
+      bytes: fx.agents.bytes, chars: fx.agents.chars, tokens: fx.agents.tokens
+    },
+    {
+      concepto: 'desc skills (.opencode/skills)', archivos: fx.skills.withDesc,
+      bytes: fx.skills.bytes, chars: fx.skills.chars, tokens: fx.skills.tokens
+    },
+    {
+      concepto: 'OVERHEAD FIJO / TURNO', archivos: 0,
+      bytes: fx.perTurn.bytes, chars: fx.perTurn.chars, tokens: fx.perTurn.tokens
+    }
+  ];
+  L.push(renderGrid([
+    { h: 'CONCEPTO', get: function (r) { return r.concepto; } },
+    { h: 'ARCHIVOS', right: true, get: function (r) { return fmtInt(r.archivos); } },
+    { h: 'BYTES', right: true, get: function (r) { return fmtInt(r.bytes); } },
+    { h: 'CHARS', right: true, get: function (r) { return fmtInt(r.chars); } },
+    { h: 'TOKENS/ST', right: true, get: function (r) { return fmtInt(r.tokens); } }
+  ], rows));
+  L.push('');
+  L.push('AGENTS.md: ' + fmtInt(fx.agentsMd.lines) + ' lineas' +
+    (fx.agentsMd.exists ? '' : ' (NO ENCONTRADO)') + '.');
+  L.push('Roster agentes: ' + fmtInt(fx.agents.files) + ' archivos .md; ' +
+    fmtInt(fx.agents.withDesc) + ' con description; ' + fmtInt(fx.agents.over) +
+    ' superan ' + DESC_LIMIT + ' chars.');
+  if (fx.agents.longest) {
+    L.push('  description mas larga: ' + fmtInt(fx.agents.longest.chars) +
+      ' chars -> ' + fx.agents.longest.file);
+  }
+  L.push('Skills: ' + fmtInt(fx.skills.files) + ' SKILL.md; ' +
+    fmtInt(fx.skills.withDesc) + ' con description; ' + fmtInt(fx.skills.over) +
+    ' superan ' + DESC_LIMIT + ' chars.');
+  if (fx.skills.longest) {
+    L.push('  description mas larga: ' + fmtInt(fx.skills.longest.chars) +
+      ' chars -> ' + fx.skills.longest.file);
+  }
+  L.push('');
+  if (period && period.ok) {
+    L.push('PERIODO: ' + period.label);
+    L.push('  sesiones en el periodo          : ' + fmtInt(period.sessions) +
+      (period.capped ? ' (recortado por --max-sessions)' : ''));
+    L.push('  turnos (message) en el periodo  : ' + fmtInt(period.turns));
+    L.push('  overhead fijo por turno         : ' + fmtInt(fx.perTurn.tokens) +
+      ' tokens (' + fmtInt(fx.perTurn.bytes) + ' bytes)');
+    L.push('  OVERHEAD TOTAL DEL PERIODO      : ' + fmtInt(period.turns) + ' turnos x ' +
+      fmtInt(fx.perTurn.tokens) + ' = ' + fmtInt(period.turns * fx.perTurn.tokens) + ' tokens');
+  } else {
+    L.push('PERIODO: no disponible (DB no consultable).');
+    L.push('  overhead fijo por turno         : ' + fmtInt(fx.perTurn.tokens) +
+      ' tokens (' + fmtInt(fx.perTurn.bytes) + ' bytes)');
+    if (period && period.err) L.push('  motivo: ' + period.err);
+  }
+  return L.join('\n');
+}
+
+function runOverhead(opts) {
+  var root = path.resolve(__dirname, '..');
+  var fx = {
+    root: root,
+    agentsMd: measureAgentsMd(path.join(root, 'AGENTS.md')),
+    agents: measureAgents(path.join(root, '.opencode', 'agent')),
+    skills: measureSkills(path.join(root, '.opencode', 'skills'))
+  };
+  fx.perTurn = {
+    chars: fx.agentsMd.chars + fx.agents.chars + fx.skills.chars,
+    bytes: fx.agentsMd.bytes + fx.agents.bytes + fx.skills.bytes
+  };
+  fx.perTurn.tokens = estTokens(fx.perTurn.chars);
+
+  var segs = [];
+  if (opts.effSince != null && num(opts.effSince) > 0) segs.push('desde ' + fmtDate(opts.effSince));
+  if (opts.effUntil != null) segs.push('hasta ' + fmtDate(opts.effUntil));
+  var period = {
+    ok: false, err: null, turns: null, sessions: null, capped: false,
+    label: segs.length ? segs.join(' ') : 'TODO el historico'
+  };
+
+  if (!SQLITE || !SQLITE.DatabaseSync) {
+    period.err = 'node:sqlite no disponible';
+  } else {
+    var dbPath = resolveDbPath(opts);
+    if (!fs.existsSync(dbPath)) {
+      period.err = 'no existe la base: ' + dbPath;
+    } else {
+      var db = null;
+      try {
+        db = new SQLITE.DatabaseSync(dbPath, { readOnly: true });
+        var t = countTurns(db, opts);
+        period.ok = true;
+        period.turns = t.turns;
+        period.sessions = t.sessions;
+        period.capped = t.capped;
+      } catch (e) {
+        period.err = (e && e.message) ? e.message : String(e);
+      } finally {
+        if (db) { try { db.close(); } catch (e2) { /* noop */ } }
+      }
+    }
+  }
+  return renderOverhead(fx, period);
+}
+
 /* -------------------------------- CLI ----------------------------------- */
 
 function parseArgs(argv) {
   var o = {
     modes: [], sinceRaw: null, untilRaw: null, project: null, agent: null, root: null,
     db: null, detail: false, withContent: false, maxChars: 2000, out: null,
-    top: 50, topExplicit: false, help: false
+    top: 50, topExplicit: false, help: false, maxSessions: MAX_SESSIONS_DEFAULT
   };
   var i = 0;
   function needValue(flag) {
@@ -677,6 +1008,7 @@ function parseArgs(argv) {
       case '--tree': case 'tree': o.modes.push('tree'); break;
       case '--json': case 'json': o.modes.push('json'); break;
       case '--csv': case 'csv': o.modes.push('csv'); break;
+      case '--overhead': case 'overhead': o.modes.push('overhead'); break;
       case '--detail': o.detail = true; break;
       case '--with-content': o.withContent = true; break;
       case '--help': case '-h': case 'help': o.help = true; break;
@@ -688,6 +1020,7 @@ function parseArgs(argv) {
       case '--db': o.db = (val !== null ? val : needValue('--db')); break;
       case '--out': o.out = (val !== null ? val : needValue('--out')); break;
       case '--max-chars': o.maxChars = parseInt(val !== null ? val : needValue('--max-chars'), 10); break;
+      case '--max-sessions': o.maxSessions = parseInt(val !== null ? val : needValue('--max-sessions'), 10); break;
       case '--top': o.top = parseInt(val !== null ? val : needValue('--top'), 10); o.topExplicit = true; break;
       default: fail('Opcion desconocida: ' + a + ' (usa --help)');
     }
@@ -696,6 +1029,7 @@ function parseArgs(argv) {
   o.mode = o.modes.length ? o.modes[0] : 'summary';
   if (!isFinite(o.maxChars) || o.maxChars < 0) fail('--max-chars invalido');
   if (!isFinite(o.top)) fail('--top invalido');
+  if (!isFinite(o.maxSessions) || o.maxSessions < 0) fail('--max-sessions invalido');
   if (o.withContent && !o.detail) o.detail = true;
 
   o.since = (o.sinceRaw != null) ? parseTime(o.sinceRaw, '--since') : null;
@@ -706,6 +1040,8 @@ function parseArgs(argv) {
   o.effSince = o.since;
   o.effUntil = o.until;
   if (o.implicitToday) o.effSince = todayStartMs();
+  /* --overhead mide el roster; sin filtros usa TODO el historico. */
+  if (o.mode === 'overhead' && o.implicitToday) { o.effSince = null; o.effUntil = null; }
   return o;
 }
 
@@ -722,11 +1058,16 @@ function helpText() {
   L.push('  --tree           Arbol raiz -> subagentes usando parent_id.');
   L.push('  --json           Export JSON autodescriptivo.');
   L.push('  --csv            Export CSV (una fila por sesion).');
+  L.push('  --overhead       Overhead fijo del system prompt medido desde disco');
+  L.push('                   (AGENTS.md + description: de agentes y skills),');
+  L.push('                   multiplicado por los turnos del periodo.');
   L.push('');
   L.push('ALCANCE POR DEFECTO:');
   L.push('  Sin filtros se reporta el DIA LOCAL actual (00:00 -> ahora).');
   L.push('  Al pasar --since/--until/--project/--agent/--root manda ese filtro.');
   L.push('  Usa --since 0 para recorrer TODO el historico.');
+  L.push('  EXCEPCION: --overhead sin filtros mide TODO el historico (su base');
+  L.push('  es estatica). Pasa --since/--until para acotar el periodo.');
   L.push('');
   L.push('FILTROS:');
   L.push('  --since <ISO|epoch_ms>   time_created >= valor.');
@@ -745,6 +1086,9 @@ function helpText() {
   L.push('  --out <ruta>             Escribe a archivo en vez de stdout.');
   L.push('  --top <N>                Limita filas en --summary/--tree/--sessions (default 50).');
   L.push('                           En --csv limita solo si se pasa explicitamente.');
+  L.push('  --max-sessions <N>       Limite de sesiones cargadas (default 5000; 0 = sin');
+  L.push('                           limite). No aplica con --root. Avisa por stderr si');
+  L.push('                           recorta el conjunto.');
   L.push('  -h, --help               Esta ayuda.');
   L.push('');
   L.push('SEGURIDAD:');
@@ -762,10 +1106,28 @@ function helpText() {
   L.push('  node scripts/usage_report.js --json --detail --with-content --max-chars 200');
   L.push('  node scripts/usage_report.js --csv --top 3');
   L.push('  node scripts/usage_report.js --summary --agent build --since 0');
+  L.push('  node scripts/usage_report.js --overhead');
+  L.push('  node scripts/usage_report.js --overhead --since 0');
+  L.push('  node scripts/usage_report.js --summary --since 0 --max-sessions 200');
   return L.join('\n');
 }
 
 /* --------------------------------- main --------------------------------- */
+
+function emitOutput(opts, text) {
+  if (opts.out) {
+    var outPath = path.resolve(opts.out);
+    try {
+      fs.mkdirSync(path.dirname(outPath), { recursive: true });
+      fs.writeFileSync(outPath, text + '\n', 'utf8');
+    } catch (e) {
+      fail('No se pudo escribir ' + outPath + ': ' + (e && e.message ? e.message : e), 1);
+    }
+    process.stderr.write('[ok] escrito: ' + outPath + '\n');
+  } else {
+    process.stdout.write(text + '\n');
+  }
+}
 
 function main() {
   var opts = parseArgs(process.argv.slice(2));
@@ -774,14 +1136,23 @@ function main() {
     return;
   }
 
+  /* --overhead mide su base desde disco; la DB solo aporta el conteo de
+     turnos, asi que degrada a "solo overhead por turno" si no responde. */
+  if (opts.mode === 'overhead') {
+    try {
+      emitOutput(opts, runOverhead(opts));
+    } catch (e) {
+      fail((e && e.message ? e.message : String(e)), 1);
+    }
+    return;
+  }
+
   if (!SQLITE || !SQLITE.DatabaseSync) {
     fail('node:sqlite no disponible. Se requiere Node 22+ (recomendado Node 24) ' +
       'con el modulo built-in node:sqlite.', 1);
   }
 
-  var dbPath = opts.db
-    ? path.resolve(opts.db)
-    : path.join(os.homedir(), '.local', 'share', 'opencode', 'opencode.db');
+  var dbPath = resolveDbPath(opts);
 
   if (!fs.existsSync(dbPath)) {
     fail('No existe la base de datos: ' + dbPath +
@@ -800,11 +1171,22 @@ function main() {
     if (opts.root && loaded.rootInfo && !loaded.rootInfo.exists) {
       process.stderr.write('AVISO: no existe la sesion raiz indicada: ' + opts.root + '\n');
     }
+    if (loaded.capped) {
+      process.stderr.write('[AVISO] --max-sessions=' + opts.maxSessions +
+        ': recortado a las ' + loaded.rows.length + ' sesiones mas recientes ' +
+        '(usa --max-sessions 0 para todo el historico).\n');
+    }
 
     var ids = loaded.rows.map(function (r) { return r.id; });
     var turnsMap = countsBySession(db, 'message', ids, '');
-    var toolsMap = countsBySession(db, 'part', ids, " AND json_extract(data,'$.type')='tool'");
-    var list = buildMetrics(loaded.rows, turnsMap, toolsMap);
+    var list = buildMetrics(loaded.rows, turnsMap, null);
+
+    /* Conteo dirigido: part.data es lo caro, solo se lee para las sesiones
+       que se van a mostrar (--summary/--tree/--csv con --top y --sessions). */
+    var toolIds = planToolIds(opts, list);
+    var toolsMap = toolIds.length ? countsBySession(db, 'part', toolIds, TOOL_SQL_EXTRA) : {};
+    applyTools(list, toolsMap);
+
     var totals = computeTotals(list);
     var byAg = byAgent(list);
     var detailEntries = opts.detail ? loadDetail(db, ids, opts) : null;
@@ -825,18 +1207,7 @@ function main() {
       text = JSON.stringify(makeJson(opts, dbPath, totals, list, byAg, detailEntries), null, 2);
     }
 
-    if (opts.out) {
-      var outPath = path.resolve(opts.out);
-      try {
-        fs.mkdirSync(path.dirname(outPath), { recursive: true });
-        fs.writeFileSync(outPath, text + '\n', 'utf8');
-      } catch (e) {
-        fail('No se pudo escribir ' + outPath + ': ' + (e && e.message ? e.message : e), 1);
-      }
-      process.stderr.write('[ok] escrito: ' + outPath + '\n');
-    } else {
-      process.stdout.write(text + '\n');
-    }
+    emitOutput(opts, text);
   } catch (e) {
     fail((e && e.message ? e.message : String(e)), 1);
   } finally {

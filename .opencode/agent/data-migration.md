@@ -1,8 +1,6 @@
 ---
-description: >
-  Agente especializado en operaciones de base de datos, migraciones
-  de esquema, limpieza de datos y seeds masivos para ExploraCO.
-  Maneja Neon PostgreSQL con seguridad y trazabilidad.
+name: data-migration
+description: Operaciones de base de datos de ExploraCO - migraciones de esquema, limpieza de datos y seeds masivos en Neon PostgreSQL con trazabilidad.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

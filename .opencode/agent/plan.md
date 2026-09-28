@@ -1,5 +1,6 @@
 ---
-description: Planificador y orquestador de HostalTerraza. En modo plan actua como coordinador de subagentes: delega exploracion masiva a @explore, investigacion web a @research-agent (o skill gemini-research), y deriva toda implementacion al subagente especializado por dominio. No absorbe trabajo operativo ni exploracion en su contexto.
+name: plan
+description: Planificador y orquestador de HostalTerraza - delega exploración e investigación, y deriva toda implementación al subagente del dominio.
 mode: primary
 model: opencode-go/deepseek-v4.1-flash
 permission:

@@ -1,5 +1,6 @@
 ---
-description: Agente especializado en frontend y est\u00e9tica visual de HostalTerraza (CSS/HTML/React). \u00dasalo para toda tarea de UI/UX: paletas de color, tipograf\u00edas, layouts responsive, micro-interacciones y consistencia visual en index.html, admin.html, directorios y p\u00e1ginas p\u00fablicas.
+name: frontend-tpl
+description: Frontend y estética visual de ExploraCO - paletas, tipografías, layouts responsive y consistencia UI en index.html, admin.html y páginas públicas.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

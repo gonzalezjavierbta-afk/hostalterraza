@@ -1,5 +1,6 @@
 ---
-description: Agente de revisi\u00f3n de arquitectura y aprobaci\u00f3n de decisiones de HostalTerraza. Revisa dise\u00f1os antes de implementar, valida ADRs, audita el impacto de cambios en el motor de renderizado/backend y aprueba planes t\u00e9cnicos. Complementa a architect para la segunda opini\u00f3n.
+name: architect-review
+description: Revisor de arquitectura y aprobación de decisiones - audita el impacto de cambios en el motor de render y backend, y valida planes técnicos.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

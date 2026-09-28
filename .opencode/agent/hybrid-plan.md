@@ -1,5 +1,6 @@
 ---
-description: Planificador HIBRIDO de HostalTerraza (esquema Hybrid). Combina razonamiento PRO para arquitectura/decisiones con subagentes gratuitos para tareas rutinarias, repetitivas y dispendiosas. Produce un plan estructurado de tareas por dominio -- nunca ejecuta ni implementa codigo. Solo invoca subagentes de SOLO LECTURA (@explore-free, @research-agent-free) para reunir contexto. Los subagentes de implementacion (PRO o FREE segun matriz de riesgo) se asignan por nombre en el plan, nunca se invocan aqui -- quedan para que @hybrid-build los ejecute en una sesion posterior.
+name: hybrid-plan
+description: Planificador de HostalTerraza en ruta mixta - combina criterio de arquitectura con apoyo mecánico, produce plan por dominio y nunca implementa código.
 mode: primary
 model: opencode-go/deepseek-v4.1-flash
 permission:
@@ -51,7 +52,7 @@ Ningun otro subagente puede invocarse con `task` en esta sesion: todos los de im
 | :--- | :--- |
 | Exploracion masiva / lectura del repo | `@explore-free` |
 | Paginas dinamicas (seed+loader+smoke) | `@content-loader-free` |
-| JS/TS rutinario y refactor menor | `@js-silo-dev-free` / `@exp-pickle-free` |
+| JS/TS rutinario y refactor menor | `@js-silo-dev-free` |
 | Migraciones/seeds masivos (no RLS) | `@data-migration-free` |
 | SEO (sitemap/meta/OG/redirects) | `@seo-dev-free` |
 | Auditoria/Escudo GOLD (verificacion mecanica) | `@qa-auditor-free` |

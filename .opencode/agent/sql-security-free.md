@@ -1,5 +1,6 @@
 ---
-description: Agente GRATUITO para seguridad y persistencia SQL de ExploraCO. Versión open-source (big-pickle) de sql-security para tareas de bajo riesgo en Neon PostgreSQL. PARA SEGURIDAD CRÍTICA, RLS o claves usa SIEMPRE la versión oficial sql-security (modelo pro): este agente free NO gestiona RLS, autenticación, claves ni integridad de datos crítica.
+name: sql-security-free
+description: Persistencia SQL de bajo riesgo en Neon PostgreSQL - consultas, índices y seeds que no tocan RLS, autenticación ni claves privadas.
 mode: subagent
 model: opencode/big-pickle
 permission:

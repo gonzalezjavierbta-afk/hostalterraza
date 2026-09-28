@@ -1,5 +1,6 @@
 ---
-description: Lead Developer GRATUITO del motor de renderizado público (pagina-destino.js) de ExploraCO. Versión open-source (big-pickle) de renderer-dev. Implementa secciones condicionales por categoría mediante concatenación de strings server-side, helpers de formato y smoke tests de buildHTML(). Úsalo para toda tarea sobre pagina-destino.js, vercel.json o los rewrites de slugs.
+name: renderer-dev-free
+description: Motor de render de ExploraCO - cambios mecanicos en el render publico, secciones condicionales, helpers de formato y smoke de buildHTML().
 mode: subagent
 model: opencode/big-pickle
 permission:

@@ -1,5 +1,6 @@
 ---
-description: Subagente de bajo coste para desarrollo Javascript/Typescript rutinario de ExploraCO. Tareas mec\u00e1nicas, refactor menor, correcciones de l\u00f3gica simple y ajustes en scripts. NO usar para SQL/RLS/seguridad cr\u00edtica (ver sql-security) ni para decisiones de arquitectura.
+name: js-silo-dev
+description: Desarrollo JS/TS de ExploraCO con criterio de diseño - refactors y correcciones de lógica cuando la estructura o el riesgo de runtime importan.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

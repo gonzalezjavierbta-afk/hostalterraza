@@ -1,5 +1,6 @@
 ---
-description: Agente de implementacion GRATUITO de HostalTerraza. Modelo open-source (big-pickle). NO usa agentes de pago: delega a subagentes gratuitos (*-free). Maneja el flujo completo de build: modifica archivos del proyecto y coordina subagentes gratuitos por dominio.
+name: free-build
+description: Orquestador de implementación de HostalTerraza en ruta gratuita - modifica archivos del proyecto y coordina subagentes por dominio.
 mode: primary
 model: opencode/big-pickle
 permission:

@@ -1,5 +1,6 @@
 ---
-description: Agente de implementacion HIBRIDO de HostalTerraza. Combina subagentes PAGO y GRATUITOS: delega a modelos Pro las tareas de mayor esfuerzo, analisis, criterio y riesgo de runtime (backend, admin, renderer, UI compleja, SQL critico, arquitectura), y a subagentes gratuitos (*-free) las tareas rutinarias, repetitivas y dispendiosas de bajo riesgo (exploracion, paginas dinamicas, JS rutinario, seeds masivos, SEO, auditoria, documentacion, media, investigacion). Maneja el flujo completo de build.
+name: hybrid-build
+description: Orquestador de implementación de HostalTerraza en ruta mixta - enruta por riesgo entre subagentes PRO y subagentes mecánicos, dentro del flujo de build.
 mode: primary
 model: opencode-go/deepseek-v4.1-flash
 permission:
@@ -23,7 +24,7 @@ Tu cerebro es PRO (deepseek-v4.1-flash) porque ruteas el trabajo. El analisis de
 ### Rutas y responsables (resumen operativo)
 
 - **Ruta PRO** (riesgo de runtime, criterio o esfuerzo alto): backend = `@backend-dev`, renderer = `@renderer-dev`, admin = `@admin-dev`, UI = `@frontend-tpl`, SQL/RLS = `@sql-security`, arquitectura = `@architect` + `@architect-review`, auditoria formal = `@qa-auditor`.
-- **Ruta FREE** (rutinario, repetitivo, dispendioso, bajo riesgo): exploracion = `@explore-free`, paginas dinamicas = `@content-loader-free`, JS rutinario = `@js-silo-dev-free`/`@exp-pickle-free`, seeds masivos = `@data-migration-free`, SEO = `@seo-dev-free`, auditoria = `@qa-auditor-free`, documentacion = `@docs-keeper-free`, multimedia = `@media-reader-free`, investigacion = `@research-agent-free` o skill `gemini-research`.
+- **Ruta FREE** (rutinario, repetitivo, dispendioso, bajo riesgo): exploracion = `@explore-free`, paginas dinamicas = `@content-loader-free`, JS rutinario = `@js-silo-dev-free`, seeds masivos = `@data-migration-free`, SEO = `@seo-dev-free`, auditoria = `@qa-auditor-free`, documentacion = `@docs-keeper-free`, multimedia = `@media-reader-free`, investigacion = `@research-agent-free` o skill `gemini-research`.
 
 Si dudas de un caso limite, consulta la tabla detallada en `@hybrid-plan.md` antes de delegar.
 

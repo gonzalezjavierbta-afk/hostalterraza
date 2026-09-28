@@ -1,5 +1,6 @@
 ---
-description: Lead Developer GRATUITO del backend serverless (api/*.js) de HostalTerraza. Versión open-source (big-pickle) de backend-dev. Escribe y mantiene funciones Node.js CommonJS para Vercel Hobby con Neon PostgreSQL, merge JSONB y ASCII-safety estricto. Úsalo para toda tarea sobre los 8 endpoints (destinos, usuarios, interacciones, admin-destinos, publicar-lugar, pagina-destino, admin, utilidades) o sobre index-api-connector.js.
+name: backend-dev-free
+description: Mantenimiento mecánico de endpoints en api/*.js - handlers, merge JSONB y consultas a Neon PostgreSQL de riesgo bajo.
 mode: subagent
 model: opencode/big-pickle
 permission:

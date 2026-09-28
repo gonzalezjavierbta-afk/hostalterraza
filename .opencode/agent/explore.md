@@ -1,5 +1,6 @@
 ---
-description: Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns, search code for keywords, or answer questions about the codebase. Specify desired thoroughness level (quick/medium/very thorough). Model economico: exploracion masiva no requiere el modelo principal.
+name: explore
+description: Exploración profunda del repo - mapea archivos y flujos entre módulos, responde preguntas de estructura y justifica el impacto de un cambio.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

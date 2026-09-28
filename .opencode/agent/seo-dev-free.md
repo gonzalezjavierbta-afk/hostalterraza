@@ -1,5 +1,6 @@
 ---
-description: SEO Specialist GRATUITO de ExploraCO. Versión open-source (big-pickle) de seo-dev. Configura sitemap.xml, meta tags y Open Graph, robots.txt, redirects y páginas indexables server-side (TASK-005/008). Úsalo para tareas de SEO en index.html, las páginas de destino, utilidades.js (sitemap), vercel.json, _redirects, _headers y Search Console.
+name: seo-dev-free
+description: SEO server-side repetitivo de ExploraCO - sitemap.xml, meta tags, Open Graph, robots.txt, redirects y páginas indexables.
 mode: subagent
 model: opencode/big-pickle
 permission:

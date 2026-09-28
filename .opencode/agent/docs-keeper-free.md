@@ -1,5 +1,6 @@
 ---
-description: Documentation Specialist GRATUITO del AI-DOS Core de HostalTerraza. Versión open-source (big-pickle) de docs-keeper. Mantiene PROJECT.md, NEXT.md, TASKS.md, BLUEPRINT.md, DECISIONS.md y BUGS_HISTORICOS.md; cierra tareas, redacta handoffs y registra bugs y ADRs. Úsalo al completar una tarea, al detectar un bug, al tomar una decisión de arquitectura o al preparar el relevo para la siguiente sesión.
+name: docs-keeper-free
+description: Cierre documental rutinario de HostalTerraza - actualiza PROJECT.md, NEXT.md, TASKS.md, DECISIONS.md y ERRORES_HISTORICOS.md, y redacta handoffs.
 mode: subagent
 model: opencode/big-pickle
 permission:

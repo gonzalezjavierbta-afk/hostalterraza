@@ -1,5 +1,6 @@
 ---
-description: Fast agent GRATUITO specialized for exploring codebases. Versión open-source (big-pickle) de explore. Use this when you need to quickly find files by patterns, search code for keywords, or answer questions about the codebase. Specify desired thoroughness level (quick/medium/very thorough). Modelo open-source: exploracion masiva sin costo.
+name: explore-free
+description: Exploración masiva del repo - encuentra archivos por patrón, busca palabras clave y responde preguntas de estructura con exhaustividad listada.
 mode: subagent
 model: opencode/big-pickle
 permission:

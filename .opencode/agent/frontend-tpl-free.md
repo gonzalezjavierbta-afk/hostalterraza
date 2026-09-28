@@ -1,5 +1,6 @@
 ---
-description: Agente GRATUITO especializado en frontend y estética visual de HostalTerraza (CSS/HTML/React). Versión open-source (big-pickle) de frontend-tpl. Úsalo para toda tarea de UI/UX: paletas de color, tipografías, layouts responsive, micro-interacciones y consistencia visual en index.html, admin.html, directorios y páginas públicas.
+name: frontend-tpl-free
+description: Ajustes visuales mecánicos de CSS en ExploraCO - paletas, tipografías, layouts responsive y consistencia en index.html y directorios públicos.
 mode: subagent
 model: opencode/big-pickle
 permission:

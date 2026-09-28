@@ -1,5 +1,6 @@
 ---
-description: Lead Developer GRATUITO del panel de administración (admin.html) de HostalTerraza. Versión open-source (big-pickle) de admin-dev. Implementa sub-tabs por categoría (especifico-sitio/hostal/comida/evento), registra campos en el motor genérico CATEGORY_TAG_FIELDS/CATEGORY_TAG_LISTS, corrige loadForm() y mantiene balance de divs. Úsalo para toda tarea sobre admin.html o el formulario de publicar-lugar.js.
+name: admin-dev-free
+description: Ediciones mecánicas y repetitivas en admin.html y scanner.html - campos de formulario, listas y ajustes menores.
 mode: subagent
 model: opencode/big-pickle
 permission:

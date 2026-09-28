@@ -1,5 +1,6 @@
 ---
-description: Agente multimodal de ExploraCO que lee y analiza imagenes, audio, video y PDFs. Usalo cuando una tarea requiera interpretar contenido visual o multimedia: fotos de destinos, capturas de UI, planos, escaneos, material audiovisual o documentos con imagenes. Modelo economico multimodal: no requiere el modelo principal.
+name: media-reader
+description: Analista multimodal de ExploraCO - interpreta imágenes, audio, video y PDFs cuando el criterio visual decide entre lecturas del mismo material.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:

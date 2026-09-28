@@ -1,5 +1,6 @@
 ---
-description: Lead Developer del backend serverless (api/*.js) de HostalTerraza. Escribe y mantiene funciones Node.js CommonJS para Vercel Hobby con Neon PostgreSQL, merge JSONB y ASCII-safety estricto. Úsalo para toda tarea sobre los 8 endpoints (destinos, usuarios, interacciones, admin-destinos, publicar-lugar, pagina-destino, admin, utilidades) o sobre index-api-connector.js.
+name: backend-dev
+description: Lead del backend serverless de ExploraCO - endpoints api/*.js, funciones CommonJS para Vercel Hobby, merge JSONB y ASCII-safety estricto.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:
