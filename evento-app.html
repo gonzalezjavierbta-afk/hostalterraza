@@ -1433,6 +1433,22 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
   // la silo lo reutiliza como contenedor de la galería; ocultarlo la rompería).
   const galeriaList = Array.isArray(content.gallery) ? content.gallery.filter(Boolean) : []; 
 
+  // v30x (aditivo, solo silo f9b): click-to-play youtube-nocookie (ADR nuevo) + fallback externo
+  // Reemplaza el contenido del contenedor por un iframe youtube-nocookie diferido al clic.
+  // Es una propiedad global (window.__ytInlinePlay) porque el placeholder la invoca desde su
+  // atributo onclick, que se evalua en el scope global. ASCII puro y comillas simples.
+  window.__ytInlinePlay = function (container, videoId, fallbackUrl) {
+      if (!container || !videoId) return;
+      container.style.position = 'relative';
+      // R-060 O-1: el badge "Ver en YouTube" se RE-INYECTA junto al iframe para que el
+      // fallback externo sobreviva al clic (en in-app IG/FB el Error 153 puede aparecer
+      // justo al cargar el embed; sin esto, la mitigacion obligatoria desaparecia).
+      var __badgeFallback = fallbackUrl
+          ? '<a href="' + fallbackUrl + '" target="_blank" rel="noopener" style="position:absolute; bottom:15px; right:20px; z-index:2; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px; text-decoration:none;">' + T('landing.ver_youtube') + '</a>'
+          : '';
+      container.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:none;"></iframe>' + __badgeFallback;
+  };
+
   if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
       // Extracción limpia de ID de YouTube neutralizando ?si=, &list= y anchors
       let videoId = "";
@@ -1445,14 +1461,32 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
       const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : "";
 
       if (thumbUrl) {
-          // Inyección de Miniatura con dimensiones forzadas a 100% y object-fit para p5.css
-          videoContainer.innerHTML = `
+          // v30x (aditivo, solo silo f9b): click-to-play youtube-nocookie (ADR nuevo) + fallback externo
+          // Gate por identidad de silo: solo 'tpl-f9b'. Cualquier otro silo y los clones
+          // conservan EXACTAMENTE el comportamiento historico (window.open, ADR-005).
+          const __esF9bInline = /(^|\s)tpl-f9b(\s|$)/.test(document.body.className || '');
+          if (__esF9bInline && videoId) {
+              // Mismo .video-placeholder (misma miniatura y mismo .play-button); el clic
+              // reproduce inline con youtube-nocookie. El badge inferior derecho deja de ser
+              // <div> y pasa a <a> externo: FALLBACK obligatorio para navegadores in-app
+              // (IG/FB) donde el embed puede fallar con Error 153.
+              videoContainer.innerHTML = `
+              <div class="video-placeholder" style="background-image:url('${thumbUrl}'); background-size:cover; background-position:center; width:100%; height:100%; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="__ytInlinePlay(document.getElementById('db-video-content'), '${videoId}', '${videoUrl}')">
+                  <div class="play-button" style="width:80px; height:80px; background:rgba(0,0,0,0.7); border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--tpl-accent); box-shadow: 0 0 25px var(--tpl-accent);">
+                      <span style="color:var(--tpl-accent); font-size:2.5rem; margin-left:5px;">▶</span>
+                  </div>
+                  <a href="${videoUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px; text-decoration:none;">${T('landing.ver_youtube')}</a>
+              </div>`;
+          } else {
+              // Inyección de Miniatura con dimensiones forzadas a 100% y object-fit para p5.css
+              videoContainer.innerHTML = `
               <div class="video-placeholder" style="background-image:url('${thumbUrl}'); background-size:cover; background-position:center; width:100%; height:100%; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="window.open('${videoUrl}', '_blank')">
                   <div class="play-button" style="width:80px; height:80px; background:rgba(0,0,0,0.7); border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--tpl-accent); box-shadow: 0 0 25px var(--tpl-accent);">
                       <span style="color:var(--tpl-accent); font-size:2.5rem; margin-left:5px;">▶</span>
                   </div>
                   <div style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:8px; font-size:0.7rem; color:white; font-family:var(--p5-font-sans); font-weight:900; letter-spacing:1px;">${T('landing.ver_youtube')}</div>
               </div>`;
+          }
       } else {
           // Regla general módulos vacíos (v306): URL de YouTube inválida → ocultar módulo.
           if (galeriaList.length === 0) __hideEmptyModule('mod-video', false);

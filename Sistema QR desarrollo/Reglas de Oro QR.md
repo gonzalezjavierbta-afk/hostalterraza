@@ -34,7 +34,7 @@ El sistema debe emitir obligatoriamente estos latidos en consola para certificar
 La playlist de Spotify debe cubrir siempre el 100% de la altura del video (aspecto 16:9), independientemente de la diagramación del template.
 
 ### 6. Protocolo de Video YouTube (ADR-005)
-Prohibido el uso de `<iframe>` para YouTube en páginas públicas. Se debe extraer el ID y generar una miniatura HD con link externo para evitar el "Error 153" en móviles.
+Prohibido el uso de `<iframe>` para YouTube en páginas públicas. Se debe extraer el ID y generar una miniatura HD con link externo para evitar el "Error 153" en móviles. **(Excepto la excepción acotada ADR-060, solo silo `f9b`: click-to-play `youtube-nocookie` con fallback externo "Ver en YouTube" obligatorio; la norma sigue vigente para todos los demás silos y clones.)**
 
 ### 7. Silent Fallback y Transparencia Real (ADR-008)
 * Toda etiqueta `<img>` dinámica debe incluir `onerror="this.src='path/to/fallback.png';"`.

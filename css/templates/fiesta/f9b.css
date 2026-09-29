@@ -2,7 +2,7 @@
    f9b.css - SILO FIESTA F9B "MISTICO NOCTURNO" (sep-2026)
    Categoria: fiesta  |  template_id: f9b  |  theme: mistico-nocturno
    Scoped CSS: .tpl-f9b / .Tpl-F9b   |   Basado en: f9.css (intacto)
-   Version: v1.2.0   |   Estandar: $10,000   |   Ajuste: 27/09/2026
+   Version: v1.3.0   |   Estandar: $10,000   |   Ajuste: 29/09/2026
    ----------------------------------------------------------------------------
    CONTRATO DE CABECERA (ADR-054, decision 8, los 8 puntos en orden):
 
@@ -1067,6 +1067,8 @@
 .tpl-f9b #mod-hero-meta .meta-item, .Tpl-F9b #mod-hero-meta .meta-item {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     gap: 0;
     padding: 0.8rem 0.9rem;
     background-color: var(--f9b-card-bg);
@@ -1091,9 +1093,12 @@
 
 /* Metadata en 2 lineas por tarjeta (config_landing.content.meta.*.l1/l2). El
    fallback historico de una sola linea no se altera: sin .meta-line, identico. */
+/* v1.3.0: centrado en TODOS los breakpoints (antes solo dentro de
+   @media <=991px). El chip ya se centra; aqui se centran las 2 lineas
+   entre si tomando como caja comun la linea mas ancha. */
 .tpl-f9b #mod-hero-meta .meta-line, .Tpl-F9b #mod-hero-meta .meta-line {
     display: block;
-    text-align: left;
+    text-align: center;
     line-height: 1.35;
 }
 
@@ -1391,6 +1396,18 @@
     border-top: 1px solid var(--f9b-border-soft);
 }
 
+/* v1.3.0 - El kernel envuelve #db-video-content en un div con
+   max-width:1100px INLINE (evento-app.html L150). Se neutraliza con :has()
+   (misma tecnica de f12.css) y !important para ganarle al estilo inline,
+   porque inline gana a la hoja. Solo toca al hijo DIRECTO que contiene el
+   video: #db-gallery-grid queda intacta (sigue con su max-width:1100px). */
+.tpl-f9b #mod-video > div:has(#db-video-content),
+.Tpl-F9b #mod-video > div:has(#db-video-content) {
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+
 .tpl-f9b #db-gallery-grid, .Tpl-F9b #db-gallery-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1424,10 +1441,17 @@
     transform: scale(1.04);
 }
 
+/* v1.3.0 - Banda full-bleed: escapa el gutter lateral de #mod-video (1.5rem
+   por lado) y toma altura de banner medio en vez del 16:9 de caja. La
+   miniatura que inyecta el kernel usa background-size:cover, asi que se
+   recorta como banner. La compensacion de ancho debe replicar SIEMPRE el
+   gutter lateral de #mod-video: ver la banda <=767px (1.1rem). */
 .tpl-f9b #db-video-content, .Tpl-F9b #db-video-content {
-    max-width: 1000px;
-    margin: 0 auto;
-    aspect-ratio: 16 / 9;
+    max-width: none;
+    width: calc(100% + 3rem);
+    margin-left: -1.5rem;
+    aspect-ratio: auto;
+    height: clamp(240px, 30vw, 380px);
     background-color: #000;
     border: 1px solid var(--f9b-border);
     border-radius: 0 !important;
@@ -2659,6 +2683,13 @@
         padding-right: 1.1rem;
     }
 
+    /* v1.3.0 - Replica la compensacion full-bleed con el gutter movil de
+       1.1rem de #mod-video en esta misma banda (ver seccion 12). */
+    .tpl-f9b #db-video-content, .Tpl-F9b #db-video-content {
+        width: calc(100% + 2.2rem);
+        margin-left: -1.1rem;
+    }
+
     .tpl-f9b #mod-lineup, .Tpl-F9b #mod-lineup {
         padding: 3.5rem 1.1rem;
     }
@@ -3554,47 +3585,74 @@
     |         |            |                   | sponsors, con sus 2 reglas grid-area del mapa.   |        |
     |         |            |                   | 2) 2 FILAS FULL-WIDTH en la plantilla de 2        |        |
     |         |            |                   | columnas, "banner-1 banner-1" y "banner-2       |        |
-    |         |            |                   | banner-2"; los pares de areas existentes quedan   |        |
-    |         |            |                   | byte-identicos y el bloque REFLOW de la          |        |
-    |         |            |                   | seccion 26 no se toco. Sin grid-area nombrado     |        |
-    |         |            |                   | los banners caen por auto-placement DESPUES del   |        |
-    |         |            |                   | footer, asi que el grid-column 1/-1 del REFLOW   |        |
-    |         |            |                   | queda prohibido para ellos. 3) ENCENDIDO con el  |        |
-    |         |            |                   | patron del silo, display:block !important, y      |        |
-    |         |            |                   | GUARDA de defensa con :has(:empty): si un banner  |        |
-    |         |            |                   | no tiene frase visible se apaga entero, no solo su |        |
-    |         |            |                   | texto. Es la segunda linea: el kernel tambien lo  |        |
-    |         |            |                   | oculta con display:none !important inline.        |        |
-    |         |            |                   | 4) CAPAS: .banner-media absolute e inset 0 con el |        |
-    |         |            |                   | respaldo, .banner-img y .banner-video llenando la  |        |
-    |         |            |                   | capa con object-fit cover, y .banner-text en      |        |
-    |         |            |                   | z-index 3. El section NO vuelve a declarar         |        |
-    |         |            |                   | position, overflow ni isolation: las pone el      |        |
-    |         |            |                   | kernel. 5) FALLBACK SIN MEDIA: la atmosfera        |        |
-    |         |            |                   | (.banner-media) es un foco dorado del silo sobre  |        |
-    |         |            |                   | la textura profunda y el grano, nunca un color     |        |
-    |         |            |                   | plano ni un texto de relleno. Velo MEDIO sobre    |        |
-    |         |            |                   | la media y velo FUERTE en .banner-text::before,   |        |
-    |         |            |                   | que es la via simple en vez del :has() sobre el   |        |
-    |         |            |                   | estilo inline del <img>. 6) ESTETICA: panel       |        |
-    |         |            |                   | hexagonal por clip-path, frase en la serif       |        |
-    |         |            |                   | display con linea de 22ch, kicker en el acento   |        |
-    |         |            |                   | con tracking 0.34em y filete, autor en versalitas  |        |
-    |         |            |                   | atenuadas. El clip-path recorta el box-shadow      |        |
-    |         |            |                   | exterior, asi que la profundidad es INTERIOR (2    |        |
-    |         |            |                   | sombras inset) y no proyectada. 7) data-estilo    |        |
-    |         |            |                   | monocromo con acento hueso y filo interior mas    |        |
-    |         |            |                   | claro; dorado es el fail-open y no lleva regla    |        |
-    |         |            |                   | propia. 8) ALTURA min(58svh, 620px) con 58vh de  |        |
-    |         |            |                   | respaldo y NUNCA 100vh, que no cruzaria el        |        |
-    |         |            |                   | umbral 0.5 de section_view. 9) MOVIL con el      |        |
-    |         |            |                   | gutter del silo (1.5rem y 1.1rem) y corte        |        |
-    |         |            |                   | abierto a 3%. 10) REDUCED-MOTION: transform none  |        |
-    |         |            |                   | en las capas y .banner-video a invisible, que     |        |
-    |         |            |                   | cubre el caso en que el motor llega antes que el   |        |
-    |         |            |                   | motor de evento y si crea el video. 11) MODULOS  |        |
-    |         |            |                   | ON: las 2 listas de 17 entradas suben a 19, que   |        |
-    |         |            |                   | es exactamente el numero de areas del grid; el    |        |
-    |         |            |                   | ADR que ampara el cruce de la frontera dura de la |        |
-    |         |            |                   | cabecera sigue PENDIENTE. 12) f9.css NO se toco.  |        |
-    ============================================================================ */
+     |         |            |                   | banner-2"; los pares de areas existentes quedan   |        |
+     |         |            |                   | byte-identicos y el bloque REFLOW de la          |        |
+     |         |            |                   | seccion 26 no se toco. Sin grid-area nombrado     |        |
+     |         |            |                   | los banners caen por auto-placement DESPUES del   |        |
+     |         |            |                   | footer, asi que el grid-column 1/-1 del REFLOW   |        |
+     |         |            |                   | queda prohibido para ellos. 3) ENCENDIDO con el  |        |
+     |         |            |                   | patron del silo, display:block !important, y      |        |
+     |         |            |                   | GUARDA de defensa con :has(:empty): si un banner  |        |
+     |         |            |                   | no tiene frase visible se apaga entero, no solo su |        |
+     |         |            |                   | texto. Es la segunda linea: el kernel tambien lo  |        |
+     |         |            |                   | oculta con display:none !important inline.        |        |
+     |         |            |                   | 4) CAPAS: .banner-media absolute e inset 0 con el |        |
+     |         |            |                   | respaldo, .banner-img y .banner-video llenando la  |        |
+     |         |            |                   | capa con object-fit cover, y .banner-text en      |        |
+     |         |            |                   | z-index 3. El section NO vuelve a declarar         |        |
+     |         |            |                   | position, overflow ni isolation: las pone el      |        |
+     |         |            |                   | kernel. 5) FALLBACK SIN MEDIA: la atmosfera        |        |
+     |         |            |                   | (.banner-media) es un foco dorado del silo sobre  |        |
+     |         |            |                   | la textura profunda y el grano, nunca un color    |        |
+     |         |            |                   | plano ni un texto de relleno. Velo MEDIO sobre    |        |
+     |         |            |                   | la media y velo FUERTE en .banner-text::before,   |        |
+     |         |            |                   | que es la via simple en vez del :has() sobre el   |        |
+     |         |            |                   | estilo inline del <img>. 6) ESTETICA: panel       |        |
+     |         |            |                   | hexagonal por clip-path, frase en la serif       |        |
+     |         |            |                   | display con linea de 22ch, kicker en el acento   |        |
+     |         |            |                   | con tracking 0.34em y filete, autor en versalitas  |        |
+     |         |            |                   | atenuadas. El clip-path recorta el box-shadow      |        |
+     |         |            |                   | exterior, asi que la profundidad es INTERIOR (2    |        |
+     |         |            |                   | sombras inset) y no proyectada. 7) data-estilo    |        |
+     |         |            |                   | monocromo con acento hueso y filo interior mas    |        |
+     |         |            |                   | claro; dorado es el fail-open y no lleva regla    |        |
+     |         |            |                   | propia. 8) ALTURA min(58svh, 620px) con 58vh de  |        |
+     |         |            |                   | respaldo y NUNCA 100vh, que no cruzaria el        |        |
+     |         |            |                   | umbral 0.5 de section_view. 9) MOVIL con el      |        |
+     |         |            |                   | gutter del silo (1.5rem y 1.1rem) y corte        |        |
+     |         |            |                   | abierto a 3%. 10) REDUCED-MOTION: transform none  |        |
+     |         |            |                   | en las capas y .banner-video a invisible, que     |        |
+     |         |            |                   | cubre el caso en que el motor llega antes que el   |        |
+     |         |            |                   | motor de evento y si crea el video. 11) MODULOS  |        |
+     |         |            |                   | ON: las 2 listas de 17 entradas suben a 19, que   |        |
+     |         |            |                   | es exactamente el numero de areas del grid; el    |        |
+     |         |            |                   | ADR que ampara el cruce de la frontera dura de la |        |
+     |         |            |                   | cabecera sigue PENDIENTE. 12) f9.css NO se toco.  |        |
+     |---------|------------|-------------------|---------------------------------------------------|--------|
+     |v1.3.0   |29/09/2026  |@frontend-tpl      | VIDEO FULL-BLEED BANNER + META CENTRADA. 1) El    |[OK]    |
+     |         |            |                   | wrapper inline de 1100px que el kernel pone       |        |
+     |         |            |                   | alrededor de #db-video-content se neutraliza con  |        |
+     |         |            |                   | :has() y !important (misma tecnica de f12.css).   |        |
+     |         |            |                   | 2) #db-video-content pasa a banda a sangre:       |        |
+     |         |            |                   | max-width:none, width calc(100% + 3rem) y         |        |
+     |         |            |                   | margin-left -1.5rem para escapar el gutter de     |        |
+     |         |            |                   | #mod-video, aspect-ratio:auto y alto de banner    |        |
+     |         |            |                   | medio clamp(240px,30vw,380px); conserva fondo     |        |
+     |         |            |                   | negro, borde, radius 0 y sombras. 3) La miniatura |        |
+     |         |            |                   | que inyecta el kernel (background-size:cover) se  |        |
+     |         |            |                   | recorta como banner horizontal. 4) Compensacion   |        |
+     |         |            |                   | replicada en la banda <=767px con el gutter movil |        |
+     |         |            |                   | 1.1rem: calc(100% + 2.2rem) y margin-left -1.1rem;|        |
+     |         |            |                   | la banda <=640px NO cambia el gutter lateral de   |        |
+     |         |            |                   | #mod-video, no necesita replica. 5) #db-gallery-   |        |
+     |         |            |                   | grid NO se toca: conserva max-width:1100px y su   |        |
+     |         |            |                   | grid propio. 6) META CENTRADA: .meta-line base    |        |
+     |         |            |                   | pasa de text-align:left a center y .meta-item     |        |
+     |         |            |                   | base suma justify-content:center +                |        |
+     |         |            |                   | text-align:center, para centrar los 3 chips en    |        |
+     |         |            |                   | TODOS los breakpoints; la regla de <=991px que lo |        |
+     |         |            |                   | forzaba queda redundante y se conserva. 7) Sin    |        |
+     |         |            |                   | riesgo de scroll horizontal: #main-content-flow   |        |
+     |         |            |                   | mantiene overflow-x:hidden y max-width:100vw      |        |
+     |         |            |                   | (L757-759). f9.css sin tocar en ningun byte.      |        |
+     ============================================================================ */

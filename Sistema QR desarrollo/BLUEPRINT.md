@@ -119,7 +119,7 @@ Implementado en plantillas de alta fricción o emergencia (ej. `eventovenezuela.
 * **Aisleamiento CSS (Scoped):** Todo selector DEBE empezar con el prefijo `.tpl-{id}` (ej: `.tpl-f1 #mod-hero`, `.tpl-b5 #mod-mapa-crisis`).
 
 ### 🛡️ Salvaguarda de Activos y Media
-* **YouTube Protocol (ADR-005):** Prohibido el uso de `<iframe>` para YouTube. Extraer ID y generar miniatura HD con link externo para evitar el **Error 153** en móviles.
+* **YouTube Protocol (ADR-005):** Prohibido el uso de `<iframe>` para YouTube. Extraer ID y generar miniatura HD con link externo para evitar el **Error 153** en móviles. **(Excepto la excepción acotada ADR-060, solo silo `f9b`: click-to-play `youtube-nocookie` con fallback externo "Ver en YouTube" obligatorio; la norma sigue vigente para todos los demás silos y clones.)**
 * **Silent Fallback de Imágenes (ADR-008):** Todo `<img>` generado dinámicamente debe incluir el atributo `onerror="this.src='path/to/fallback.png';"` para conmutar al activo por defecto si falla Supabase.
 * **Preservación de SVGs:** Prohibido usar fuentes de iconos externas; usar etiquetas `<svg>` íntegras para mantener transparencia real y efectos Afterglow.
 * **Integración de Proximidad (ADR-010):** El módulo de video debe declararse con `padding-top: 0 !important` en el silo CSS para eliminar respiros visuales con el countdown.
