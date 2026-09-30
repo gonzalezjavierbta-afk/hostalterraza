@@ -720,6 +720,19 @@ function esCampanaAbierta(e){
   const f = parseFecha(e.fecha);
   return !!f && f.getFullYear() > new Date().getFullYear() + 3;
 }
+// ADR-033 — Un evento en modo "solo formulario" no tiene landing pública, así que
+// no debe aparecer en la cartelera del index (tarjetas, ticker, stats y filtros
+// derivan todos de state.events). Replica la derivación de admin._deriveModoPublico
+// para que los eventos legacy (sin columna modo_publico) se comporten igual.
+function esSoloFormulario(e){
+  if (!e) return false;
+  if (e.modo_publico) return e.modo_publico === 'formulario';
+  const cfg = e.config_landing || {};
+  const content = cfg.content || {};
+  const hasLanding = !!(cfg.theme || cfg.modules);
+  const hasForm = !!(content.form_solo && content.form_solo.activo === true);
+  return hasForm && !hasLanding;
+}
 function normalizarEvento(e){
   const cat = CATS[e.categoria_slug] || { label: 'index.cat.evento', color: e.color_primario || '#00E5D5' };
   const org = e.organizaciones || {};
@@ -993,8 +1006,9 @@ async function cargarEventos(){
       .order('fecha', { ascending: false });
     GOLD.timeEnd('fetch-eventos');
     if (error) throw new Error(error.message);
-    state.events = (data || []).filter(e => e.slug).map(normalizarEvento);
-    GOLD.trace('Eventos con slug: ' + state.events.length + '/total DB: ' + ((data||[]).length) + ' (' + ((performance.now()-t0)/1000).toFixed(2) + 's)');
+    state.events = (data || []).filter(e => e.slug && !esSoloFormulario(e)).map(normalizarEvento);
+    const soloForm = (data || []).filter(e => e.slug && esSoloFormulario(e)).length;
+    GOLD.trace('Eventos con slug: ' + state.events.length + '/total DB: ' + ((data||[]).length) + ' | solo-formulario ocultos: ' + soloForm + ' (' + ((performance.now()-t0)/1000).toFixed(2) + 's)');
     renderTicker(); renderStats(); contarFiltros(); renderGrid();
   } catch(e){
     GOLD.err('No se pudieron cargar los eventos: ' + e.message);
