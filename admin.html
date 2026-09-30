@@ -6875,7 +6875,11 @@ async function generarLinkInvitador() {
           .eq('codigo', codigo).eq('link_generado', link).select('id');
         if (e2) { alert('Error: ' + e2.message + ' (' + (e2.code || '') + ')'); return; }
         if (!upd || !upd.length) {
-          alert('El link ya existe en la base pero tu sesión no puede verlo/actualizarlo (política RLS). Pide al administrador que lo revise.');
+          // Si sigue chocando aqui, lo mas probable es que la migracion ADR-062
+          // (UNIQUE compuesto codigo+link_generado) NO este aplicada en la base:
+          // el constraint viejo `invitadores_codigo_key` (UNIQUE solo de codigo)
+          // impide un segundo link por invitador.
+          alert('No se pudo guardar un segundo link para el invitador. Causa mas probable: falta aplicar en Supabase la migracion "adr062_invitadores_multi_link.sql" (reemplaza el UNIQUE de codigo por UNIQUE de codigo+link_generado). Ejecutala en Supabase SQL Editor y reintenta. Detalle: ' + (error.message || '') + ' (' + (error.code || '') + ')');
           return;
         }
       } else {
