@@ -938,6 +938,19 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             } catch (e) {}
         }
 
+        // ADR-033 - Derivacion "solo formulario" (copia intencional de
+        // index.html:esSoloFormulario; dos paginas publicas distintas, sin modulo
+        // compartido posible sin tocar el kernel de carga). Un evento guardado en ese
+        // modo no tiene landing publica: su deep-link entrega la pagina de registro.
+        function __esSoloFormulario(ev) {
+            if (!ev) return false;
+            if (ev.modo_publico) return ev.modo_publico === 'formulario';
+            const cfg = ev.config_landing || {};
+            const hasLanding = !!(cfg.theme || cfg.modules);
+            const hasForm = !!(cfg.content && cfg.content.form_solo && cfg.content.form_solo.activo === true);
+            return hasForm && !hasLanding;
+        }
+
         async function initEvento() {
             // Parseo unico de la query. `preview` viene de la bandera de sesion
             // (__HT_PREVIEW); sin ?preview=1 el comportamiento es el de siempre.
@@ -960,6 +973,16 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     const __res = await Promise.race([sbPromise, timeoutPromise]);
                     if (__res.error || !__res.data) throw new Error(__res.error?.message || "Evento no hallado.");
                     ev = __res.data;
+                }
+
+                // ADR-033 - Un evento en modo "solo formulario" no tiene landing publica:
+                // si alguien abre su deep-link /evento.html?slug=<slug> se entrega la pagina
+                // de registro en vez de una landing vacia. Fail-open: si el evento no esta
+                // en ese modo, el render sigue igual. Misma derivacion que
+                // index.html:esSoloFormulario (para eventos legacy sin modo_publico).
+                if (!__preview && __esSoloFormulario(ev)) {
+                    window.location.replace('/registroaforo.html?slug=' + encodeURIComponent(slug));
+                    return;
                 }
 
                 // DECLARACIÓN ÚNICA DEL CONTEXTO (Solución al SyntaxError) [cite: 12]
