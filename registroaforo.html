@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
     <!-- Kernel SaaS agnóstico (espejo del landing: reset + grano + IoC) -->
     <style>
         html, body { margin: 0; padding: 0; min-height: 100%; background-color: #050505; color: #ffffff; font-family: 'Geist', sans-serif; overflow-x: hidden; }
@@ -47,6 +48,17 @@
         body.page-registro .wa-code { flex: 0 0 128px; width: auto; margin-bottom: 0; min-width: 0; }
         body.page-registro .wa-number { flex: 1; min-width: 0; margin-bottom: 0; }
         body.page-registro .wa-code option { background: #14032C; color: #fff; }
+        /* Ticket QR (solo eventos con captura_pura=false) */
+        body.page-registro #ticket-wrap { display: none; margin-top: 1.25rem; text-align: center; }
+        body.page-registro #ticket-card { background: #0F0F0F; border-radius: 16px; overflow: hidden; max-width: 340px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+        body.page-registro #ticket-card .tk-top { height: 6px; background: var(--gold, #ff9f1c); }
+        body.page-registro #ticket-card .tk-body { padding: 1.25rem; }
+        body.page-registro #ticket-card .tk-brand { font-weight: 700; font-size: 13px; color: var(--gold, #ff9f1c); letter-spacing: .06em; }
+        body.page-registro #ticket-card .tk-event { font-size: 12px; color: rgba(255,255,255,.55); margin: 2px 0 1rem; }
+        body.page-registro #ticket-card #reg-qr { display: inline-block; background: #fff; padding: 10px; border-radius: 10px; }
+        body.page-registro #ticket-card .tk-name { margin-top: .9rem; font-size: 15px; font-weight: 600; color: #fff; }
+        body.page-registro #ticket-card .tk-code { margin-top: .35rem; font-size: 11px; letter-spacing: .14em; color: rgba(255,255,255,.5); }
+        body.page-registro #ticket-card .tk-note { margin-top: .9rem; font-size: 11px; color: rgba(255,255,255,.35); }
     </style>
 </head>
 <body class="tpl-init page-registro">
@@ -104,6 +116,19 @@
                     <button type="submit" class="btn-submit" data-i18n="reg.registrarme_btn">Registrarme →</button>
                 </form>
                 <p class="inv-badge" id="form-success-msg" style="display:none"></p>
+                <div id="ticket-wrap">
+                    <div id="ticket-card">
+                        <div class="tk-top"></div>
+                        <div class="tk-body">
+                            <div class="tk-brand">HOSTAL TERRAZA</div>
+                            <div class="tk-event" id="tk-ev"></div>
+                            <div id="reg-qr"></div>
+                            <div class="tk-name" id="tk-name"></div>
+                            <div class="tk-code" id="tk-code"></div>
+                            <div class="tk-note">Muestra este QR en la puerta · Uso único y personal</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -128,6 +153,9 @@
 
         function TODAY() { return new Date().toLocaleDateString('es-CO'); }
         function NOW()   { return new Date().toLocaleTimeString('es-CO'); }
+
+        // ADR-0xx: identificador unico del QR (mismo patron que serie.html)
+        function UID() { return Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase(); }
 
         // Reutiliza el MISMO mecanismo de inyección de CSS del landing (Data-First).
         function injectAtomicCSS(cat, tplId) {
@@ -217,6 +245,8 @@
                 window.__ctxOrgId = ev.org_id || null;
                 window.__ctxEv = ev;
                 window.__ctxRol = rol;
+                // captura_pura=false => el evento entrega QR; true => solo agradecimiento.
+                window.__ctxCapturaPura = (ev.captura_pura === true);
 
                 // Atribucion de invitador (?ref=<codigo>), fail-open: si falla, el registro
                 // continua sin atribucion (mismo patron que evento-app.html:985-989).
@@ -293,6 +323,9 @@
             try {
                 const { data: dup } = await getClient().from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
                 if (dup) { showBadge('form-alert-badge', T('reg.ya_registrada'), 'err'); btn.disabled = false; btn.textContent = T('reg.registrarme_btn'); return; }
+                // captura_pura=false => se genera QR de entrada; true => sin QR (Cero Borrado: no se altera si ya hay logica futura).
+                const entregaQR = (window.__ctxCapturaPura === false);
+                const qrCode = entregaQR ? ('QR-' + UID()) : null;
                 const payload = {
                     evento_id: ev.id,
                     org_id: window.__ctxOrgId,
@@ -306,6 +339,7 @@
                     tipo_ayuda: rol,
                     cuenta_aforo: true,
                     used: false,
+                    qr_code: qrCode,
                     fecha_inscripcion: TODAY(),
                     hora_inscripcion: NOW(),
                     respuestas_custom: { rol, origen: 'pagina-registro' },
@@ -317,16 +351,38 @@
                 log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ", whatsapp=" + whatsapp + ").", "INFO");
                 btn.disabled = false; btn.textContent = T('reg.registrarme_btn');
                 document.getElementById('master-reg-form').style.display = 'none';
-                const ok = document.getElementById('form-success-msg');
-                ok.style.display = 'block';
-                ok.style.color = '#25d366';
-                ok.textContent = T('reg.ok_guardado', { nombre: nombre });
-                setTimeout(() => {
-                    document.getElementById('master-reg-form').reset();
-                    document.getElementById('reg-whatsapp-custom-code').style.display = 'none';
-                    ok.style.display = 'none';
-                    document.getElementById('master-reg-form').style.display = 'block';
-                }, 2500);
+                if (entregaQR) {
+                    // Ticket con QR (evento captura_pura=false)
+                    const tkEv = document.getElementById('tk-ev');
+                    const tkName = document.getElementById('tk-name');
+                    const tkCode = document.getElementById('tk-code');
+                    if (tkEv) tkEv.textContent = (ev.nombre || '') + (ev.fecha ? ' · ' + ev.fecha : '');
+                    if (tkName) tkName.textContent = nombre;
+                    if (tkCode) tkCode.textContent = qrCode;
+                    const qrBox = document.getElementById('reg-qr');
+                    if (qrBox && typeof QRCode !== 'undefined') {
+                        qrBox.innerHTML = '';
+                        try {
+                            new QRCode(qrBox, { text: qrCode, width: 180, height: 180, colorDark: '#0F0F0F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+                        } catch (e) { qrBox.textContent = qrCode; }
+                    } else if (qrBox) {
+                        qrBox.textContent = qrCode;
+                    }
+                    const tw = document.getElementById('ticket-wrap');
+                    if (tw) tw.style.display = 'block';
+                    log("INFO: QR generado y ticket mostrado (" + qrCode + ").", "INFO");
+                } else {
+                    const ok = document.getElementById('form-success-msg');
+                    ok.style.display = 'block';
+                    ok.style.color = '#25d366';
+                    ok.textContent = T('reg.ok_guardado', { nombre: nombre });
+                    setTimeout(() => {
+                        document.getElementById('master-reg-form').reset();
+                        document.getElementById('reg-whatsapp-custom-code').style.display = 'none';
+                        ok.style.display = 'none';
+                        document.getElementById('master-reg-form').style.display = 'block';
+                    }, 2500);
+                }
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
                 btn.disabled = false; btn.textContent = T('reg.registrarme_btn');

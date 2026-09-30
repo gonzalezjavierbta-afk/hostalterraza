@@ -997,7 +997,8 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 if (!__preview && __esSoloFormulario(ev)) {
                     const __refQ  = refParam ? '&ref=' + encodeURIComponent(refParam) : '';
                     const __tipoQ = __q.get('tipo') ? '&tipo=' + encodeURIComponent(__q.get('tipo')) : '';
-                    window.location.replace('/registroaforo.html?slug=' + encodeURIComponent(slug) + __refQ + __tipoQ);
+                    const __cpQ   = '&captura_pura=' + (ev.captura_pura === true ? '1' : '0');
+                    window.location.replace('/registroaforo.html?slug=' + encodeURIComponent(slug) + __refQ + __tipoQ + __cpQ);
                     return;
                 }
 
