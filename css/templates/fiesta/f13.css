@@ -1,0 +1,1459 @@
+/* ============================================================================
+   f13.css — SILO FIESTA F13 "AVALON" (evento avalon-duz4 · oct-2026)
+   v1.0.0-avalon · NOCHE AVALON — derivative de F6 "Afromango Editor".
+   DELTA: re-scope de los selectores del clon (`.tpl-F6` → `.tpl-F13`) + paleta
+   propia de 7 colores. El clon heredaba los selectores del silo hermano, así
+   que `document.body.className = 'tpl-F13 tpl-f13 page-registro'` no matcheaba
+   nada y el silo NO se aplicaba. Este archivo es el que sí aplica.
+   Dirección estética: "NOCHE AVALON" — base Negro Abismo, superficies Verde
+   Bosque, acento neón Verde Avalon, glows Morado Psicodélico y Magenta
+   Profundo. HERO sobre Verde Bosque, countdown en recuadros Negro Abismo con
+   borde Verde Musgo, meta sobre Negro Abismo y CTA neón con sombra dura Morada.
+   Paleta canónica (7 colores):
+     Negro Abismo         #050709  fondo principal
+     Verde Avalon         #32E875  CTA, títulos, acentos
+     Verde Bosque         #0D3B2A  secciones y superficies
+     Verde Musgo          #486B46  detalles y textura (decorativo)
+     Blanco Niebla        #F2F2E8  texto principal
+     Morado Psicodélico   #4C236F  glow, fondos y transiciones (decorativo)
+     Magenta Profundo     #8E216C  acentos psicodélicos (decorativo)
+   Derivado de F6 (Tropical Brutalism) recoloreado; layout, grid, IDs, orden de
+   módulos y breakpoints intactos. Morado y Magenta son decorativos: nunca texto
+   ni fondo de texto. Verde Musgo solo en detalles y bordes de 2px.
+   Layout: 1 sola columna en TODOS los breakpoints. Nada de fixed/split 40vw|60vw.
+   Tipografía editorial: Geist 900 display MAYÚSCULAS tracking apretado,
+   micro-etiquetas versales (tracking ancho, 0.3em) estilo "THE PROGRAMME".
+   Efectos: aurora animada de fondo, grano cinematográfico, glow pulsante,
+   reveal al hacer scroll (scroll-driven, progressive enhancement).
+   Respeto prefers-reduced-motion.
+    Breakpoints (mobile-first): BASE (<480) / 480 / 640 / 899 / 1024+.
+   ============================================================================ */
+
+/* Geist se carga de forma asíncrona por el kernel (evento.html preload);
+   se eliminó el @import bloqueante de Google Fonts para acelerar el silo. */
+
+/* ==========================================================================
+   1. RESETEO DE SILO + PUENTE CROMÁTICO + VARIABLES
+   ========================================================================== */
+.tpl-f13, .tpl-F13 {
+    /* ===== Paleta canónica "Noche Avalon" (7 colores) ===== */
+    --f13-negro-abismo: #050709;       /* fondo principal */
+    --f13-verde-avalon: #32E875;       /* CTA, títulos, acentos */
+    --f13-verde-bosque: #0D3B2A;      /* secciones y superficies */
+    --f13-verde-musgo: #486B46;       /* detalles y textura (decorativo) */
+    --f13-blanco-niebla: #F2F2E8;     /* texto principal */
+    --f13-morado-psico: #4C236F;      /* glow y transiciones (decorativo) */
+    --f13-magenta-profundo: #8E216C;  /* acentos psicodélicos (decorativo) */
+    /* ===== Derivados que consume el resto del silo ===== */
+    --f13-verde-avalon-claro: #7FF5AC; /* tinte claro del acento, para glow */
+    --f13-verde-oscuro: #0A2018;        /* superficie verde apagada */
+    --f13-verde-abismo: #071A12;        /* negro con matiz verde */
+    --f13-text-muted: #9FBCAC;          /* texto secundario (compartido) */
+    --f13-text-soft: #DCE9E0;            /* texto suave */
+    /* ===== Tripletas RGB para componer rgba() sin repetir literales ===== */
+    --f13-avalon-rgb: 50, 232, 117;
+    --f13-bosque-rgb: 13, 59, 42;
+    --f13-musgo-rgb: 72, 107, 70;
+    --f13-niebla-rgb: 242, 242, 232;
+    --f13-morado-rgb: 76, 35, 111;
+    --f13-magenta-rgb: 142, 33, 108;
+    /* ===== Puente cromático del silo (obligatorio) ===== */
+    --tpl-accent: var(--master-accent, #32E875);
+    --gold: var(--tpl-accent, #32E875);
+    /* ===== Superficies, texto, líneas y glow (valores canónicos arriba) ===== */
+    --f13-bg-deep: var(--f13-negro-abismo);
+    --f13-bg-ink: var(--f13-verde-abismo);
+    --f13-bg-soft: var(--f13-verde-oscuro);
+    --f13-card-bg: rgba(var(--f13-bosque-rgb), 0.66);
+    --f13-text-main: var(--f13-blanco-niebla);
+    --f13-text-cream: var(--f13-text-soft);
+    --f13-accent-ember: var(--f13-verde-avalon);
+    --f13-accent-glow: var(--f13-verde-avalon-claro);
+    --f13-line: rgba(var(--f13-niebla-rgb), 0.12);
+    --f13-line-soft: rgba(var(--f13-niebla-rgb), 0.07);
+    --f13-glow-soft: 0 0 18px rgba(var(--f13-avalon-rgb), 0.28);
+    --f13-glow-strong: 0 0 28px rgba(var(--f13-avalon-rgb), 0.5), 0 0 70px rgba(var(--f13-morado-rgb), 0.35);
+    --f13-font: 'Geist', system-ui, -apple-system, sans-serif;
+    /* ===== Mapa de alias: reutiliza los ~40 usos de --tpl-* ya presentes =====
+       Los alias se conservan para no reescribir el resto del silo; lo que
+       cambia es a qué color de Avalon apuntan. */
+    --tpl-yellow: var(--f13-verde-bosque);      /* bloque dominante (antes amarillo tropical) */
+    --tpl-yellow-bright: var(--f13-verde-avalon);
+    --tpl-orange: var(--f13-verde-avalon);      /* acentos (antes naranja) */
+    --tpl-purple: var(--f13-morado-psico);
+    --tpl-purple-electric: var(--f13-magenta-profundo);
+    --tpl-warm: var(--f13-blanco-niebla);
+    --tpl-black: var(--f13-negro-abismo);
+    --tpl-white: var(--f13-blanco-niebla);
+    --tpl-green: var(--f13-verde-avalon);
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(120% 90% at 18% 4%, var(--f13-verde-bosque) 0%, var(--f13-verde-abismo) 46%, var(--f13-negro-abismo) 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--f13-text-main);
+    font-family: var(--f13-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Box-sizing global dentro del silo (ADR-019) */
+.tpl-f13 *, .tpl-F13 * {
+    box-sizing: border-box !important;
+}
+
+.tpl-f13 *::before, .tpl-F13 *::before,
+.tpl-f13 *::after, .tpl-F13 *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1.1. AURORA ANIMADA — Capa de fondo fija (blobs de luz en deriva)
+   ========================================================================== */
+.tpl-f13::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(46% 34% at 12% 18%, rgba(76, 35, 111, 0.28) 0%, transparent 70%),
+        radial-gradient(40% 30% at 86% 72%, rgba(72, 107, 70, 0.22) 0%, transparent 70%),
+        radial-gradient(34% 26% at 68% 12%, rgba(142, 33, 108, 0.24) 0%, transparent 70%),
+        radial-gradient(42% 40% at 28% 88%, rgba(50, 232, 117, 0.10) 0%, transparent 72%);
+    animation: f13AuroraDrift 24s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes f13AuroraDrift {
+    0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.9; }
+    50%  { transform: translate3d(-2.5%, 1.8%, 0) scale(1.06); opacity: 1; }
+    100% { transform: translate3d(2.2%, -1.6%, 0) scale(1.1); opacity: 0.85; }
+}
+
+/* ==========================================================================
+   1.2. GRANO CINEMATOGRÁFICO — Textura de ruido sutil fija
+   ========================================================================== */
+.tpl-f13::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: f13GrainShift 0.9s steps(4) infinite;
+}
+
+@keyframes f13GrainShift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1%); }
+    50%  { transform: translate(1%, -2%); }
+    75%  { transform: translate(-1%, 2%); }
+    100% { transform: translate(2%, -1%); }
+}
+
+/* ==========================================================================
+   2. ACTIVACIÓN ATÓMICA — display explícito (kernel IoC oculta todo por defecto)
+   ========================================================================== */
+.tpl-f13 #main-content-flow,
+.tpl-F13 #main-content-flow {
+    position: relative;
+    z-index: 1;
+}
+
+.tpl-f13 #mod-hero, .tpl-F13 #mod-hero,
+.tpl-f13 #mod-form, .tpl-F13 #mod-form,
+.tpl-f13 #mod-cartel, .tpl-F13 #mod-cartel,
+.tpl-f13 #mod-lineup, .tpl-F13 #mod-lineup,
+.tpl-f13 #mod-playlist, .tpl-F13 #mod-playlist,
+.tpl-f13 #unified-frame, .tpl-F13 #unified-frame {
+    display: flex !important;
+}
+
+.tpl-f13 #mod-hero-ctas, .tpl-F13 #mod-hero-ctas {
+    display: flex !important;
+}
+
+.tpl-f13 #mod-hero-meta, .tpl-F13 #mod-hero-meta,
+.tpl-f13 #mod-video, .tpl-F13 #mod-video,
+.tpl-f13 #mod-boletos, .tpl-F13 #mod-boletos,
+.tpl-f13 #mod-faq, .tpl-F13 #mod-faq,
+.tpl-f13 #mod-ubicacion, .tpl-F13 #mod-ubicacion,
+.tpl-f13 #mod-sponsors, .tpl-F13 #mod-sponsors,
+.tpl-f13 #mod-whatsapp, .tpl-F13 #mod-whatsapp {
+    display: block !important;
+}
+
+.tpl-f13 #mod-footer, .tpl-F13 #mod-footer {
+    display: block !important;
+}
+
+/* ==========================================================================
+   3. GRID ATÓMICO — Una sola columna en TODOS los breakpoints (v1.1.0)
+      Se eliminó el split 40vw|60vw y el hero fixed: el hero es un bloque
+      normal de ancho completo y el resto de secciones fluye debajo.
+   ========================================================================== */
+.tpl-f13 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "hero hero"
+        "countdown countdown"
+        "meta meta"
+        "ctas ctas"
+        "lineup lineup"
+        "cartel playlist"
+        "boletos form"
+        "whatsapp whatsapp"
+        "video video"
+        "ubicacion ubicacion"
+        "faq faq"
+        "sponsors sponsors"
+        "footer footer";
+    width: 100%;
+}
+
+.tpl-f13 #mod-hero         { grid-area: hero; }
+.tpl-f13 #unified-frame    { grid-area: countdown; }
+.tpl-f13 #mod-hero-meta    { grid-area: meta; }
+.tpl-f13 #mod-hero-ctas    { grid-area: ctas; }
+.tpl-f13 #mod-cartel       { grid-area: cartel; }
+.tpl-f13 #mod-video        { grid-area: video; }
+.tpl-f13 #mod-lineup       { grid-area: lineup; }
+.tpl-f13 #mod-playlist     { grid-area: playlist; }
+.tpl-f13 #mod-faq          { grid-area: faq; }
+.tpl-f13 #mod-ubicacion    { grid-area: ubicacion; }
+.tpl-f13 #mod-sponsors     { grid-area: sponsors; }
+.tpl-f13 #mod-form         { grid-area: form; }
+.tpl-f13 #mod-footer       { grid-area: footer; }
+.tpl-f13 #mod-boletos      { grid-area: boletos; }
+.tpl-f13 #mod-whatsapp     { grid-area: whatsapp; }
+
+/* ==========================================================================
+   4. TIPOGRAFÍA EDITORIAL — Eyebrows versales, encabezados de sección
+   ========================================================================== */
+.tpl-f13 h2, .tpl-F13 h2 {
+    color: var(--f13-text-cream);
+    font-family: var(--f13-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.42em;
+    font-weight: 800;
+    margin-bottom: 2.6rem;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 0;
+}
+
+.tpl-f13 h2::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 1px;
+    background: var(--f13-accent-ember);
+    margin-right: 1rem;
+    vertical-align: middle;
+    box-shadow: var(--f13-glow-soft);
+}
+
+.tpl-f13 section {
+    padding: 4.5rem 8%;
+    border-bottom: 1px solid var(--f13-line-soft);
+}
+
+/* ==========================================================================
+   5. #MOD-HERO — Hero Noche Avalon
+      Bloque normal full-width: base Verde Bosque + opcional imagen de fondo.
+      Contenido: badge organizador sobre el título, título en 2 líneas.
+   ========================================================================== */
+.tpl-f13 #mod-hero {
+    position: relative;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4.5rem 8% 1.4rem;
+    min-height: 0;
+    color: var(--f13-blanco-niebla);
+    background-color: var(--tpl-yellow);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 4px solid var(--tpl-black);
+}
+
+/* Capa de resplandor sobre la imagen de fondo (si el maestro inyecta imagen
+   via style.backgroundImage), mantiene legibilidad sobre Verde Bosque. */
+.tpl-f13 #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(180deg, rgba(13, 59, 42, 0.88) 0%, rgba(5, 7, 9, 0.72) 55%, rgba(13, 59, 42, 0.94) 100%);
+    pointer-events: none;
+}
+
+/* Organizador — texto plano, sin caja (v1.2.0, ref: hero.jpg) */
+.tpl-f13 #org-name-badge {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 1;
+    display: block;
+    margin-bottom: 10px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--f13-blanco-niebla);
+    opacity: 0.7;
+}
+
+.tpl-f13 #mod-hero .hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==========================================================================
+   6. #EVENT-TITLE — Display gigante en 2 líneas
+      Línea 1: Blanco Niebla / Línea 2: neón Verde Avalon con sombra Magenta
+   ========================================================================== */
+.tpl-f13 #event-title {
+    margin: 0 0 1.6rem;
+    font-family: var(--f13-font);
+    font-weight: 900 !important;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+    color: var(--f13-blanco-niebla);
+    font-size: clamp(3rem, 13vw, 7rem) !important;
+    max-width: 100%;
+}
+
+.tpl-f13 #event-title .hero-title-line1 {
+    display: block;
+    color: var(--f13-blanco-niebla);
+    line-height: 1;
+}
+
+.tpl-f13 #event-title .hero-title-line2 {
+    display: block;
+    color: var(--f13-verde-avalon);
+    font-style: italic;
+    text-shadow: 3px 3px 0 var(--f13-magenta-profundo);
+    line-height: 1;
+    font-size: 0.65em;
+}
+
+/* ==========================================================================
+   7. #MOD-FORM — Normal flow (v1.1.0: sin overlay fixed; fluye bajo el hero)
+   ========================================================================== */
+.tpl-f13 .form-master-box {
+    background: var(--f13-card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--f13-line);
+    border-top: 2px solid var(--f13-accent-ember);
+    border-radius: 2px;
+    padding: 2.6rem 2.4rem;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+    max-width: 520px;
+    margin: 2rem auto 0;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tpl-f13 .form-master-box:hover {
+    border-color: rgba(50, 232, 117, 0.5);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55), var(--f13-glow-soft);
+}
+
+@media (max-width: 1023px) {
+    .tpl-f13 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f13 .form-master-box {
+        max-width: 94vw;
+        padding: 2.2rem 1.8rem !important;
+    }
+}
+
+/* ==========================================================================
+   8. FORMULARIO — Inputs editoriales, Botones, Tabs
+   ========================================================================== */
+.tpl-f13 .form-input, .tpl-f13 #reg-nombre,
+.tpl-f13 #reg-cedula, .tpl-f13 #rec-cedula {
+    width: 100%;
+    padding: 1.1rem 1rem;
+    margin-bottom: 1.1rem;
+    background: rgba(5, 7, 9, 0.85);
+    border: 1px solid var(--f13-line);
+    border-radius: 1px;
+    color: var(--f13-text-main);
+    font-family: var(--f13-font);
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tpl-f13 .form-input:focus, .tpl-f13 #reg-nombre:focus,
+.tpl-f13 #reg-cedula:focus, .tpl-f13 #rec-cedula:focus {
+    outline: none;
+    border-color: var(--f13-accent-ember);
+    box-shadow: 0 0 0 1px var(--f13-accent-ember), var(--f13-glow-soft);
+}
+
+.tpl-f13 .form-tabs {
+    display: flex;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--f13-line);
+}
+
+.tpl-f13 .form-tabs .tab-btn,
+.tpl-f13 .tab-btn {
+    flex: 1;
+    padding: 0.9rem 0.4rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--f13-text-muted);
+    font-family: var(--f13-font);
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f13 .form-tabs .tab-btn.active,
+.tpl-f13 .tab-btn.active,
+.tpl-f13 .form-tabs .tab-btn:hover,
+.tpl-f13 .tab-btn:hover {
+    color: var(--f13-accent-glow);
+    border-bottom-color: var(--f13-accent-ember);
+}
+
+.tpl-f13 .btn-submit {
+    display: block;
+    width: 100%;
+    padding: 1.2rem;
+    margin-top: 1.2rem;
+    background: transparent;
+    border: 1px solid var(--f13-accent-ember);
+    border-radius: 1px;
+    color: var(--f13-verde-avalon);
+    font-family: var(--f13-font);
+    font-weight: 900;
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tpl-f13 .btn-submit:hover {
+    background: var(--f13-accent-ember);
+    color: var(--f13-negro-abismo);
+    box-shadow: var(--f13-glow-strong);
+}
+
+/* ==========================================================================
+   9. COUNTDOWN — Recuadros Negro Abismo con borde Verde Musgo sobre Verde Bosque
+   ========================================================================== */
+.tpl-f13 #unified-frame {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 10px;
+    padding: 2rem 6% 1.4rem;
+    margin-top: 0 !important;
+    background: var(--tpl-yellow);
+    border-bottom: 4px solid var(--tpl-black);
+}
+
+.tpl-f13 #unified-frame .cd-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    padding: 12px 10px;
+    position: relative;
+    background: var(--f13-negro-abismo);
+    border: 2px solid var(--f13-verde-musgo);
+    min-width: 96px;
+    flex: 1;
+    max-width: 150px;
+}
+
+.tpl-f13 #unified-frame .cd-block::after {
+    content: none;
+}
+
+.tpl-f13 #unified-frame .cd-block:last-child::after {
+    content: "";
+}
+
+.tpl-f13 #unified-frame .cd-block > span {
+    display: block;
+    font-size: clamp(1.9rem, 6vw, 3rem) !important;
+    font-weight: 900 !important;
+    font-variant-numeric: tabular-nums;
+    color: var(--f13-blanco-niebla);
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 18px rgba(50, 232, 117, 0.35);
+    line-height: 1;
+}
+
+.tpl-f13 #unified-frame .cd-block small {
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--f13-verde-avalon);
+    margin-top: 0.4rem;
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   10. METADATOS — Texto simple con separadores (ref: hero.jpg)
+   ========================================================================== */
+.tpl-f13 #mod-hero-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem 2.2rem;
+    padding: 1.6rem 6% 2.2rem;
+    background: var(--tpl-yellow);
+    border-bottom: 4px solid var(--tpl-black);
+}
+
+.tpl-f13 #mod-hero-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: var(--tpl-black);
+    color: var(--f13-verde-avalon);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+    position: relative;
+}
+
+.tpl-f13 #mod-hero-meta .meta-item:not(:last-child)::after {
+    content: none;
+}
+
+.tpl-f13 #mod-hero-meta .meta-item span {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Iconos antes de cada dato de la meta (v224) — antes ocultos, ahora visibles */
+.tpl-f13 #mod-hero-meta .meta-svg {
+    display: block;
+    flex-shrink: 0;
+    fill: var(--f13-verde-avalon);
+    width: 22px;
+    height: 22px;
+}
+
+@media (max-width: 480px) {
+    .tpl-f13 #mod-hero-meta {
+        gap: 0.6rem 1rem;
+        padding: 1.2rem 4% 1.8rem;
+    }
+    .tpl-f13 #mod-hero-meta .meta-item {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.85rem;
+        letter-spacing: 0.06em;
+    }
+    .tpl-f13 #mod-hero-meta .meta-svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* ==========================================================================
+   10B. HERO CTAs — Botón neón Verde Avalon (v224: se retira el botón de lineup)
+   ========================================================================== */
+.tpl-f13 #mod-hero-ctas {
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 6% 2.8rem;
+    background: var(--tpl-yellow);
+    border-bottom: 4px solid var(--tpl-black);
+}
+
+.tpl-f13 #mod-hero-ctas .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 16px 26px;
+    border: 2px solid transparent;
+    transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.tpl-f13 #mod-hero-ctas .hero-cta-btn:hover { transform: translate(-2px, -2px); }
+
+.tpl-f13 #mod-hero-ctas .hero-cta-btn--wa {
+    background: var(--f13-verde-avalon);
+    color: var(--f13-negro-abismo);
+    border-color: var(--f13-negro-abismo);
+    box-shadow: 4px 4px 0 var(--f13-morado-psico);
+}
+
+.tpl-f13 #mod-hero-ctas .hero-cta-btn--wa:hover {
+    background: var(--f13-negro-abismo);
+    color: var(--f13-blanco-niebla);
+    box-shadow: 6px 6px 0 var(--f13-magenta-profundo);
+    transform: translate(1px, 1px);
+}
+
+/* v224 — botón "VER LINE UP COMPLETO" oculto (Cero Borrado: display:none, no se elimina) */
+.tpl-f13 #mod-hero-ctas .hero-cta-btn--lineup {
+    display: none !important;
+}
+
+/* ==========================================================================
+   11. CARTEL — Póster editorial flotante con glow pulsante
+   ========================================================================== */
+.tpl-f13 #mod-cartel {
+    padding: 1.6rem 8% 3.4rem;
+}
+
+.tpl-f13 #mod-cartel .cartel-inner {
+    display: flex !important;
+    justify-content: center;
+}
+
+.tpl-f13 #db-poster-img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 430px;
+    border-radius: 2px;
+    border: 1px solid var(--f13-line);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f13-glow-soft);
+    object-fit: cover;
+    animation: f13PosterFloat 7s ease-in-out infinite;
+    transition: box-shadow 0.5s ease;
+}
+
+@keyframes f13PosterFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-10px) scale(1.015); }
+}
+
+.tpl-f13 #mod-cartel:hover #db-poster-img {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), var(--f13-glow-strong);
+}
+
+@media (max-width: 640px) {
+    .tpl-f13 #db-poster-img {
+        max-width: 100%;
+        border-radius: 1px !important;
+    }
+}
+
+/* ==========================================================================
+   12. LINEUP — Tarjetas con foto grande y overlay
+   v224: sección sobre superficie Verde Bosque para romper el diseño (retoma en footer)
+   ========================================================================== */
+.tpl-f13 #mod-lineup {
+    padding: 4.5rem 8%;
+    background: var(--tpl-yellow);
+    border-top: 4px solid var(--tpl-black);
+    border-bottom: 4px solid var(--tpl-black);
+}
+
+.tpl-f13 #mod-lineup > div {
+    max-width: 1200px !important;
+    margin: 0 auto;
+}
+
+.tpl-f13 #db-lineup {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem;
+}
+
+/* Tarjeta individual */
+.tpl-f13 .artist-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+}
+
+.tpl-f13 .artist-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(50, 232, 117, 0.22);
+}
+
+/* Foto grande — prioridad visual */
+.tpl-f13 .artist-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(40%) brightness(0.7);
+    transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+.tpl-f13 .artist-card:hover .artist-photo {
+    filter: grayscale(0%) brightness(0.85);
+    transform: scale(1.05);
+}
+
+/* Overlay inferior con información */
+.tpl-f13 .artist-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.6rem;
+    background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+/* Hora */
+.tpl-f13 .artist-hora {
+    font-family: var(--f13-font);
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--f13-verde-avalon);
+    text-shadow: 0 0 10px rgba(50, 232, 117, 0.55);
+}
+
+/* Nombre del DJ */
+.tpl-f13 .artist-name {
+    font-family: var(--f13-font);
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+    color: var(--tpl-white);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    line-height: 1.1;
+}
+
+/* Reseña */
+.tpl-f13 .artist-resena {
+    font-size: 0.8rem;
+    color: rgba(242, 242, 232, 0.78);
+    line-height: 1.5;
+    margin-top: 0.3rem;
+}
+
+/* Redes sociales */
+.tpl-f13 .artist-social {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 0.6rem;
+}
+
+.tpl-f13 .artist-social-icon {
+    color: rgba(242, 242, 232, 0.62);
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tpl-f13 .artist-social-icon:hover {
+    color: var(--tpl-white);
+    transform: scale(1.15);
+}
+
+/* ==========================================================================
+   13. PLAYLIST
+   ========================================================================== */
+
+/* ==========================================================================
+   14. WHATSAPP — Franja editorial con botón "ember"
+   ========================================================================== */
+.tpl-f13 #mod-whatsapp {
+    padding: 2.6rem 8%;
+}
+
+.tpl-f13 .whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.15rem 2.8rem;
+    background: linear-gradient(120deg, #1f7a48, #25d366);
+    color: #ffffff;
+    font-family: var(--f13-font);
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 14px 40px rgba(37, 211, 102, 0.3);
+    transition: all 0.3s ease;
+}
+
+.tpl-f13 .whatsapp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 50px rgba(37, 211, 102, 0.42), 0 0 30px rgba(37, 211, 102, 0.25);
+    filter: brightness(1.08);
+}
+
+.tpl-f13 .whatsapp-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
+}
+
+/* ==========================================================================
+   14. BOLETOS — Pestañas preventa/taquilla editoriales + tarjetas precio
+   ========================================================================== */
+/* ==========================================================================
+   11. BOLETOS — Diseño compacto vertical (ref: boleteria.jpg, v223)
+   ========================================================================== */
+.tpl-f13 #mod-boletos {
+    padding: 3.5rem 8%;
+}
+
+.tpl-f13 .boleto-subtitle {
+    font-size: 0.8rem;
+    color: var(--f13-text-muted);
+    letter-spacing: 0.08em;
+    margin-top: -1.8rem;
+    margin-bottom: 2rem;
+}
+
+.tpl-f13 .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    max-width: 420px;
+    margin: 0 auto;
+    border: 1px solid var(--f13-line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(242, 242, 232, 0.03);
+}
+
+/* Fila de boleto */
+.tpl-f13 .boleto-card-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--f13-line);
+    transition: background 0.2s ease;
+}
+
+.tpl-f13 .boleto-card-row:last-child {
+    border-bottom: none;
+}
+
+.tpl-f13 .boleto-card-row:hover {
+    background: rgba(242, 242, 232, 0.045);
+}
+
+/* Icono de boleto */
+.tpl-f13 .boleto-icon {
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
+/* Etiqueta de tipo */
+.tpl-f13 .boleto-tipo {
+    font-family: var(--f13-font);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--f13-verde-avalon);
+}
+
+/* Precio */
+.tpl-f13 .boleto-precio {
+    font-family: var(--f13-font);
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--tpl-white);
+}
+
+/* Flecha */
+.tpl-f13 .boleto-arrow {
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tpl-f13 .boleto-card-row:hover .boleto-arrow {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+/* Mensaje de confianza */
+.tpl-f13 .boleto-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--tpl-white);
+    opacity: 0.7;
+}
+
+.tpl-f13 .boleto-trust svg {
+    color: var(--f13-verde-avalon);
+}
+
+/* ==========================================================================
+   15. PLAYLIST
+   ========================================================================== */
+.tpl-f13 #mod-playlist {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f13 #db-spotify-embed {
+    border-radius: 1px;
+    border: 1px solid var(--f13-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.tpl-f13 #db-spotify-embed iframe {
+    width: 100% !important;
+    min-height: 500px !important;
+}
+
+/* ==========================================================================
+   16. GALERÍA — Grid editorial de imágenes (video OFF, solitario)
+   ========================================================================== */
+.tpl-f13 #mod-video {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f13 #mod-video > div:not(#db-gallery-grid),
+.tpl-F13 #mod-video > div:not(#db-gallery-grid) {
+    display: none !important;
+}
+
+.tpl-f13 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+    gap: 0.7rem;
+}
+
+.tpl-f13 #db-gallery-grid img {
+    width: 100%;
+    border-radius: 1px;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--f13-line-soft);
+    filter: grayscale(45%);
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.tpl-f13 #db-gallery-grid img:hover {
+    border-color: var(--f13-accent-ember);
+    filter: grayscale(0%);
+    transform: scale(1.02);
+    box-shadow: var(--f13-glow-soft);
+    z-index: 2;
+}
+
+@media (max-width: 640px) {
+    .tpl-f13 #db-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+}
+
+/* ==========================================================================
+   17. FAQ — Acordeón editorial
+   ========================================================================== */
+.tpl-f13 #mod-faq {
+    padding: 4.5rem 8%;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tpl-f13 .faq-item {
+    border-bottom: 1px solid var(--f13-line);
+    padding: 1.4rem 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.tpl-f13 .faq-q {
+    font-family: var(--f13-font);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--f13-text-cream);
+    transition: color 0.3s ease;
+}
+
+.tpl-f13 .faq-item:hover .faq-q {
+    color: var(--f13-accent-glow);
+}
+
+.tpl-f13 .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--f13-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.tpl-f13 .faq-item.active .faq-answer {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    padding-top: 1rem !important;
+}
+
+/* ==========================================================================
+   18. UBICACIÓN — Mapa editorial
+   ========================================================================== */
+.tpl-f13 #mod-ubicacion {
+    padding: 4.5rem 8%;
+}
+
+.tpl-f13 #db-mapa-container {
+    border-radius: 1px;
+    overflow: hidden;
+    border: 1px solid var(--f13-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   19. PATROCINADORES — Logos en BLANCO, franja equilibrada (v223)
+   Los logos se renderizan en blanco puro mediante filtro CSS (invert+brightness).
+   ========================================================================== */
+.tpl-f13 #mod-sponsors {
+    padding: 3.2rem 8%;
+}
+
+.tpl-f13 #db-sponsors-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem 3rem;
+    padding: 1rem 0;
+}
+
+.tpl-f13 .sponsor-item {
+    padding: 0.1rem 0;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tpl-f13 .sponsor-item:hover {
+    opacity: 1;
+}
+
+/* Filtro blanco: fuerza logos a blanco puro independiente de su color original.
+   Se aplica invert(1) + sepia + saturate + hue-rotate para lograr el blanco.
+   brightness(0) + invert(1) da blanco puro para cualquier logo monocromo. */
+.tpl-f13 .sponsor-img {
+    height: 40px;
+    max-width: 160px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1) grayscale(1);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.tpl-f13 .sponsor-item:hover .sponsor-img {
+    transform: translateY(-3px);
+    opacity: 0.95;
+}
+
+/* ==========================================================================
+   20. FOOTER — Solo copyright sobre Verde Bosque (retoma el acento del lineup)
+   ========================================================================== */
+.tpl-f13 #mod-footer {
+    background: var(--tpl-yellow) !important;
+    border-top: 4px solid var(--tpl-black);
+}
+
+.tpl-f13 #mod-footer .footer-inner,
+.tpl-F13 #mod-footer .footer-inner {
+    display: none !important;
+}
+
+.tpl-f13 #mod-footer .footer-bottom {
+    text-align: center;
+    padding: 1.6rem 2rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    color: var(--f13-blanco-niebla);
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   21. CONTRATO DE DATOS — Protección de módulos invisibles
+   ========================================================================== */
+.tpl-f13 #db-poster-img[style*="display:none"],
+.tpl-f13 #db-faq-list[style*="display:none"],
+.tpl-f13 #db-mapa-container[style*="display:none"],
+.tpl-f13 #db-sponsors-list[style*="display:none"],
+.tpl-f13 #db-gallery-grid[style*="display:none"] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   22. RESPONSIVE — Móvil/tablet. El grid ya es 1 columna por defecto; aquí se
+       apila en una sola columna por debajo de 768px. Los pares lado a lado
+       ([cartel|playlist] y [boletos|form]) aplican desde 768px (tablet+).
+    ========================================================================== */
+@media (max-width: 1023px) {
+    .tpl-f13 #main-content-flow {
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+        row-gap: 0 !important;
+        width: 100% !important;
+    }
+    .tpl-f13 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f13 section {
+        padding: 3.4rem 5%;
+    }
+    .tpl-f13 .form-master-box {
+        max-width: 480px;
+    }
+    .tpl-f13 .boleto-cards-wrap {
+        max-width: 100%;
+    }
+    .tpl-f13 #db-spotify-embed {
+        min-height: 360px;
+    }
+    .tpl-f13 h2 {
+        letter-spacing: 0.32em;
+    }
+    .tpl-f13 #mod-hero {
+        padding: 3.4rem 6% 1rem;
+    }
+    .tpl-f13 #org-name-badge {
+        padding: 0;
+        margin-bottom: 12px;
+    }
+    .tpl-f13 #event-title {
+        font-size: clamp(2.6rem, 12vw, 4.4rem) !important;
+    }
+    .tpl-f13 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .tpl-f13 #main-content-flow {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "hero"
+            "countdown"
+            "meta"
+            "ctas"
+            "form"
+            "cartel"
+            "lineup"
+            "whatsapp"
+            "boletos"
+            "playlist"
+            "video"
+            "faq"
+            "ubicacion"
+            "sponsors"
+            "footer" !important;
+    }
+    .tpl-f13 #mod-form {
+        z-index: 50 !important;
+    }
+    .tpl-f13 section {
+        padding: 3.4rem 6%;
+    }
+    .tpl-f13 .form-master-box {
+        max-width: 94vw;
+    }
+    .tpl-f13 h2 {
+        letter-spacing: 0.32em;
+    }
+    .tpl-f13 #mod-hero {
+        padding: 3.4rem 6% 1rem;
+    }
+    .tpl-f13 #org-name-badge {
+        padding: 0;
+        margin-bottom: 12px;
+    }
+    .tpl-f13 #event-title {
+        font-size: clamp(2.6rem, 12vw, 4.4rem) !important;
+    }
+    .tpl-f13 #unified-frame .cd-block {
+        min-width: 0;
+        max-width: none;
+        flex: 1 1 40%;
+        padding: 10px 8px;
+    }
+    .tpl-f13 #unified-frame .cd-block::after {
+        display: none;
+    }
+    .tpl-f13 #mod-hero-ctas .hero-cta-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .tpl-f13 #db-lineup {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .tpl-f13 #db-lineup {
+        grid-template-columns: 1fr !important;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .tpl-f13 .artist-card {
+        aspect-ratio: 3/4;
+    }
+    .tpl-f13 .artist-name {
+        font-size: 1.1rem;
+    }
+    .tpl-f13 .artist-resena {
+        font-size: 0.75rem;
+    }
+}
+
+/* ==========================================================================
+   23. REVEAL AL HACER SCROLL — scroll-driven animation (progressive enhancement)
+       Solamente navegadores con soporte; resto queda visible sin animación.
+   ========================================================================== */
+@supports (animation-timeline: view()) {
+    .tpl-f13 section,
+    .tpl-f13 #unified-frame,
+    .tpl-f13 #mod-hero-meta,
+    .tpl-f13 #mod-hero-ctas {
+        animation: f13RevealUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+    }
+
+    @keyframes f13RevealUp {
+        from { opacity: 0; transform: translateY(22px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ==========================================================================
+   24. ACCESIBILIDAD — prefers-reduced-motion: apaga efectos
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f13::before,
+    .tpl-f13::after,
+    .tpl-f13 #event-title,
+    .tpl-f13 #db-poster-img,
+    .tpl-f13 #unified-frame .cd-block {
+        animation: none !important;
+    }
+    .tpl-f13 section,
+    .tpl-f13 #unified-frame,
+    .tpl-f13 #mod-hero-meta,
+    .tpl-f13 #mod-hero-ctas {
+        animation: none !important;
+    }
+}
+
+/* ==========================================================================
+   25. OVERRIDE DE PÁGINA DE REGISTRO (v1.0.0-avalon)
+       registroaforo.html fija en su <style> interno `.wa-code option` con
+       fondo morado (#14032C) y texto blanco, heredado de otra paleta. Aquí se
+       re-pinta a Verde Bosque + Blanco Niebla sin tocar producción: la
+       especificidad (0,3,1) supera a la de la página (0,2,2) y el silo se
+       inyecta después, así que gana en cascada.
+   ========================================================================== */
+.tpl-f13.page-registro .wa-code option {
+    background: var(--f13-verde-bosque);
+    color: var(--f13-blanco-niebla);
+}
+
+.tpl-f13.page-registro .wa-row {
+    border-radius: 2px;
+}
+
+/* ============================================================================
+   LOG DE VERSIONES — Template f13 "Avalon"
+   ============================================================================
+| Versión  | Fecha      | Cambio                                                             | Estado |
+|----------|------------|--------------------------------------------------------------------|--------|
+| v1.0.0   | 01/10/2026 | Silo Afromango Editor (P10). Dirección "noche editorial oscura".  | [OK]   |
+|          |            | Base tinta/espresso + texto champán + acento mango ember.         |        |
+|          |            | Eyebrows versales (THE PROGRAMME), grid-order mobile = f5.        |        |
+|          |            | Efectos: aurora animada, grano cinematográfico, shimmer título,   |        |
+|          |            | float póster, countdown flotante "00:00:00:00", reveal scroll.    |        |
+|          |            | Betos editoriales 1px, footer solo copyright, video/info ocultos. |        |
+| v1.1.0   | 02/09/2026 | Hero Tropical Brutalism (espejo F7). Se eliminó el split de       | [OK]   |
+|          |            | escritorio (40vw|60vw): el hero es un bloque normal full-width y  |        |
+|          |            | las secciones fluyen debajo en 1 columna (todos los breakpoints). |        |
+|          |            | #mod-hero fondo amarillo + glow nacional, #org-name-badge const  |        |
+|          |            | negro/naranja/morado arriba del título, título en 2 líneas        |        |
+|          |            | (negro / blanco con sombra). Countdown sobre recuadros negros     |        |
+|          |            | (números blancos, labels verdes), meta con separadores morados.   |        |
+|          |            | Nuevo módulo aditivo #mod-hero-ctas (v222): botón naranja WhatsApp                |        |
+|          |            | + botón negro "VER LINE UP COMPLETO" (ancla #mod-lineup).         |        |
+|          |            | #mod-form sin overlay fixed: fluye como sección normal.           |        |
+|          |            | Requiere maestro evento.html v222 (kernel: #mod-hero-ctas oculto |        |
+|          |            | por defecto; JS: split título 2 líneas solo .tpl-f13 + wa.me hero).|        |
+| v1.1.1   | 02/09/2026 | v224 — Ajustes hero/lineup/footer: meta más grande con cajas negras| [OK]   |
+|          |            | + iconos visibles (fecha/hora/lugar) en naranja, botón "VER LINE  |        |
+|          |            | UP COMPLETO" oculto (display:none, Cero Borrado). #mod-lineup y   |        |
+|          |            | #mod-footer pasan a fondo amarillo (roma el diseño y se retoma).  |        |
+|          |            | Footer: copyright negro sobre amarillo con borde superior negro.  |        |
+| v1.2.0   | 03/09/2026 | Reorden de escritorio/tablet (≥768px): hero → lineup → pares      | [OK]   |
+|          |            | [cartel|playlist] y [boletos|form] lado a lado → video (galería)  |        |
+|          |            | → ubicación → faq → sponsors → footer. Se agrega display:grid     |        |
+|          |            | al base (#main-content-flow) que faltaba para aplicar grid-areas   |        |
+|          |            | en desktop. Mobile (<768px) CONSERVA el orden original sin cambios |        |
+|          |            | (hero→ctas→form→cartel→lineup→whatsapp→boletos→playlist→video→   |        |
+|          |            | faq→ubicacion→sponsors→footer). Módulos extra (info-técnica,      |        |
+|          |            | historia/objetivo/impacto, equipo, cta-final) permanecen ocultos.  |        |
+| v1.0.0-avalon | 29/09/2026 | Silo F13 "Avalon": re-scope de selectores .tpl-F6 -> .tpl-F13 (el clon | [OK]   |
+|          |            | no aplicaba: bodyClass = tpl-F13 tpl-f13 no matcheaba .tpl-F6) +   |        |
+|          |            | paleta Avalon de 7 colores (Negro Abismo #050709 / Verde Avalon   |        |
+|          |            | #32E875 / Verde Bosque #0D3B2A / Verde Musgo #486B46 / Blanco      |        |
+|          |            | Niebla #F2F2E8 / Morado Psicodélico #4C236F / Magenta Profundo    |        |
+|          |            | #8E216C). Derivative de F6 (Tropical Brutalism) recoloreado; layout, |        |
+|          |            | grid, IDs y breakpoints intactos (0 borrados).                     |        |
+|          |            | Puente --tpl-accent/--gold obligatorio, tripletas RGB nuevas y     |        |
+|          |            | alias --tpl-* remapeados a Avalon (diff mínimo).                   |        |
+|          |            | Countdown: borde Verde Musgo sobre Negro Abismo (antes invisible). |        |
+|          |            | Override .page-registro para .wa-code option (morado de la pagina). |        |
+|          |            | Las entradas v1.0.0-v1.2.0 son historial heredado de F6 y describen |        |
+|          |            | la paleta Tropical; la vigente es "Noche Avalon".                 |        |
+   ============================================================================ */
+
+/* ==========================================================================
+   23. REFLOW (v307) — Módulos ocultos reordenan el grid de 2 columnas
+       Pares [cartel|playlist] y [boletos|form]: si uno queda oculto
+       ([data-hidden]), el compañero se expande a la fila completa.
+       El :has() (especificidad 2 IDs + !important) vence los templates
+       que usan !important. Móvil (≤767px) intacto: columna única.
+   ========================================================================== */
+@media (min-width: 768px) {
+    .tpl-f13 #main-content-flow:has(#mod-cartel[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "playlist playlist"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f13 #main-content-flow:has(#mod-playlist[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel cartel"
+            "boletos form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f13 #main-content-flow:has(#mod-boletos[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "form form"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+    .tpl-f13 #main-content-flow:has(#mod-form[data-hidden]) {
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos boletos"
+            "whatsapp whatsapp"
+            "video video"
+            "ubicacion ubicacion"
+            "faq faq"
+            "sponsors sponsors"
+            "footer footer" !important;
+    }
+}
