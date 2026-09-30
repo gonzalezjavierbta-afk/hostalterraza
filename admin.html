@@ -1271,6 +1271,7 @@ tr:hover td{background:var(--surface)}
                 <option value="artista">🎵 Artista</option>
                 <option value="produccion">🎬 Producción</option>
                 <option value="pago">💳 Por pago</option>
+                <option value="comunidad">💬 Comunidad WhatsApp</option>
               </select>
             </div>
           </div>
@@ -1532,6 +1533,7 @@ tr:hover td{background:var(--surface)}
       <button class="adm-tab" data-pnl-pill="tendencias" onclick="pnlGoTab('tendencias')">📈 Tendencias</button>
       <button class="adm-tab" data-pnl-pill="rankings" onclick="pnlGoTab('rankings')">🏆 Rankings</button>
       <button class="adm-tab" data-pnl-pill="asistentes" onclick="pnlGoTab('asistentes')">👥 Asistentes <span class="adm-tab-badge" id="pnl-badge-asistentes">0</span></button>
+      <button class="adm-tab" data-pnl-pill="comunidad" onclick="pnlGoTab('comunidad')">💬 Comunidad WhatsApp <span class="adm-tab-badge" id="pnl-badge-comunidad">0</span></button>
       <button class="adm-tab" data-pnl-pill="landing" onclick="pnlGoTab('landing')">🌐 Landing</button>
     </div>
 
@@ -1752,6 +1754,37 @@ tr:hover td{background:var(--surface)}
       <div id="pn-log"><div class="empty">Sin actividad</div></div>
     </div>
     </div><!-- /data-pnl-tab="asistentes" -->
+
+    <!-- ══ Sub-tab Comunidad WhatsApp (interesados desde la landing) ══ -->
+    <div data-pnl-tab="comunidad">
+    <div class="card">
+      <div class="ch">Comunidad WhatsApp</div>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:.75rem;max-width:760px">
+        Personas interesadas que se registraron desde la landing para unirse al grupo de WhatsApp (métrica de interés, distinta de asistentes con QR).
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem">
+        <input id="pn-com-search" placeholder="Nombre, WhatsApp, evento o inscriptor…" oninput="filtrarComunidadTabla()"
+          style="font-size:12px;padding:5px 10px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper);width:240px;outline:none">
+        <select id="pn-com-estado-filter" onchange="filtrarComunidadTabla()"
+          style="font-size:12px;padding:5px 8px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper)">
+          <option value="">Todos</option>
+          <option value="ingreso">✓ Ingresaron</option>
+          <option value="pendiente">⏳ Pendientes</option>
+        </select>
+        <span style="width:1px;height:20px;background:var(--border);align-self:center"></span>
+        <button class="btn btn-ghost btn-sm" title="Exportar comunidad a Excel" onclick="exportarComunidad('xlsx')">Excel</button>
+        <button class="btn btn-ghost btn-sm" title="Exportar comunidad a PDF" onclick="exportarComunidad('pdf')">PDF</button>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Nombre</th><th>WhatsApp</th><th>Evento</th><th>Inscriptor / ref</th><th>Registro</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="pn-com-table"><tr><td colspan="7" class="empty">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:.5rem" id="pn-com-count"></div>
+    </div>
+    </div><!-- /data-pnl-tab="comunidad" -->
+
     <div data-pnl-tab="landing">
     <!-- KPIs de telemetria del landing (ADR-032/050) -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:1.25rem">
@@ -2507,6 +2540,7 @@ tr:hover td{background:var(--surface)}
           <option value="artista">🎵 Artista</option>
           <option value="produccion">🎬 Producción</option>
           <option value="pago">💳 Por pago</option>
+          <option value="interesado">💬 Comunidad</option>
         </select>
       </div>
       <div class="fg" style="grid-column:1/-1"><label>Nota interna</label>
@@ -6713,7 +6747,7 @@ async function abrirPerfilInvitador(codigo) {
   } else {
     linksEl.innerHTML = (grupo.links||[]).map(l => {
       const ev = _eventos.find(e => e.id === l.evento_id);
-      const tipoLabels = {invitado:'◎',frecuente:'★',artista:'🎵',produccion:'🎬',pago:'💳'};
+      const tipoLabels = {invitado:'◎',frecuente:'★',artista:'🎵',produccion:'🎬',pago:'💳',comunidad:'💬'};
       const evNombre = ev?.nombre || (l.link_generado||'').split('slug=')[1]?.split('&')[0] || '—';
       const nIns = inscritos.filter(i => i.evento_nombre === ev?.nombre).length;
       return `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--rsm);padding:.6rem .9rem;display:flex;align-items:center;gap:10px">
@@ -6807,12 +6841,20 @@ async function generarLinkInvitador() {
   const nombre = _perfilInvActivo.nombre;
 
   let link = '';
-  if (refTipo === 'serie_all') {
+  // tipo 'comunidad' => link a la LANDING del evento (formulario -> grupo WhatsApp).
+  // El resto de tipos apunta a los formularios de registro; las series conservan serie.html.
+  const esComunidad = (tipo === 'comunidad');
+  if (refTipo === 'serie_all' && !esComunidad) {
     const serie = _series.find(s => s.id === refId);
     link = window.location.origin + '/serie.html?slug=' + (serie?.slug||refId) + '&tipo=' + tipo + '&ref=' + codigo;
   } else {
-    const ev = _eventos.find(e => e.id === refId);
-    link = window.location.origin + '/evento.html?' + (ev?.slug ? 'slug='+ev.slug : 'id='+refId) + '&tipo=' + tipo + '&ref=' + codigo;
+    // comunidad sobre una serie: usar el primer evento (landing) de la serie.
+    let ev = _eventos.find(e => e.id === refId);
+    if (!ev && refTipo === 'serie_all') {
+      ev = _eventos.filter(e => e.serie_id === refId).sort((a,b)=>(a.sesion_num||0)-(b.sesion_num||0))[0];
+    }
+    const targetId = ev?.id || refId;
+    link = window.location.origin + '/evento.html?' + (ev?.slug ? 'slug='+ev.slug : 'id='+targetId) + '&tipo=' + tipo + '&ref=' + codigo;
   }
 
   // Verificar si ya existe este link para este invitador+evento
@@ -7418,7 +7460,7 @@ function renderDirectorio() {
   }
 
   const tipoLabels = { frecuente:'★ Frecuente', invitado:'◎ Invitado', artista:'🎵 Artista', produccion:'🎬 Producción', pago:'💳 Por pago' };
-  const tipoColors = { frecuente:'var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border)', invitado:'var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)', artista:'#EEEDFE;color:#534AB7;border:1px solid #AFA9EC', produccion:'#FDE8FF;color:#7B2D8B;border:1px solid #DDA0EE', pago:'var(--green-bg);color:var(--green);border:1px solid var(--green-border)' };
+  const tipoColors = { frecuente:'var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border)', invitado:'var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)', artista:'#EEEDFE;color:#534AB7;border:1px solid #AFA9EC', produccion:'#FDE8FF;color:#7B2D8B;border:1px solid #DDA0EE', pago:'var(--green-bg);color:var(--green);border:1px solid var(--green-border)', interesado:'#25D36622;color:#128C7E;border:1px solid #25D366' };
 
   cont.innerHTML = _dirFiltrados.map((p, idx) => {
     const ini = (p.nombre||'').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
@@ -7582,6 +7624,7 @@ function tipoBadge(tipo) {
     artista:     `<span class="badge" style="background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC">🎵 Artista</span>`,
     produccion:  `<span class="badge" style="background:#FDE8FF;color:#7B2D8B;border:1px solid #DDA0EE">🎬 Producción</span>`,
     pago:        `<span class="badge badge-green">💳 Por pago</span>`,
+    interesado:  `<span class="badge" style="background:#25D36622;color:#128C7E;border:1px solid #25D366">💬 Comunidad</span>`,
   };
   return map[tipo] || map.invitado;
 }
@@ -8151,7 +8194,7 @@ async function renderPanel() {
     }
 
     // ── Donut tipos ──
-    const tipoLabels = {frecuente:'Frecuente',invitado:'Invitado',artista:'Artista',produccion:'Producción',pago:'Por pago'};
+    const tipoLabels = {frecuente:'Frecuente',invitado:'Invitado',artista:'Artista',produccion:'Producción',pago:'Por pago',interesado:'Comunidad WhatsApp'};
     const tipoCounts = {};
     list.forEach(i=>{ tipoCounts[i.tipo]=(tipoCounts[i.tipo]||0)+1; });
     const tipoKeys = Object.keys(tipoCounts).sort((a,b)=>tipoCounts[b]-tipoCounts[a]);
@@ -8599,7 +8642,7 @@ async function renderPanel() {
   }
 }
 
-const tipoColors={frecuente:'#C8A96E',invitado:'#1D9E75',artista:'#534AB7',produccion:'#9B2DDB',pago:'#2D6A4F'};
+const tipoColors={frecuente:'#C8A96E',invitado:'#1D9E75',artista:'#534AB7',produccion:'#9B2DDB',pago:'#2D6A4F',interesado:'#25D366'};
 
 // ═════════════════════════════════════════════════════════════════════
 // LANDING — telemetria del landing page (ADR-032/050)
@@ -8824,6 +8867,7 @@ function catBadge(c) {
     marca:       '<span style="background:#9B2DDB22;color:#9B2DDB;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">🏷️ Marca</span>',
     voluntario:  '<span style="background:#1D9E7522;color:#1D9E75;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">🤝 Voluntario</span>',
     donacion:    '<span style="background:#C8A96E22;color:#C8A96E;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">💝 Donación</span>',
+    interesado:  '<span style="background:#25D36622;color:#128C7E;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">💬 Comunidad</span>',
   };
   return map[c] || '<span style="color:var(--ink3)">—</span>';
 }
@@ -8832,6 +8876,7 @@ function renderTabla(list) {
   _pnAllList = list;
   _pnPage = 0;
   _renderTablaPagina();
+  renderComunidadPanel();
 }
 
 // Lee los filtros visibles del tab Asistentes. Helper compartido por el render
@@ -8854,6 +8899,7 @@ function _filtrarInscritosPanel() {
   const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const qn   = norm(q);
   return (_pnAllList || []).filter(i => {
+    if (_esComunidad(i)) return false; // Comunidad WhatsApp vive en su propio sub-tab
     if (tipo   && i.tipo !== tipo) return false;
     if (cat    && (i.tipo_ayuda||i.tipo) !== cat) return false;
     if (estado === 'ingreso'   && !i.used) return false;
@@ -8877,7 +8923,7 @@ function _renderTablaPagina() {
   // ADR-023 — badge del tab Asistentes: total sin filtrar (_pnAllList es la lista completa
   // ya cargada por renderTabla(), independiente de los filtros de búsqueda/tipo/estado)
   const badgeAsist = document.getElementById('pnl-badge-asistentes');
-  if (badgeAsist) badgeAsist.textContent = _pnAllList?.length || 0;
+  if (badgeAsist) badgeAsist.textContent = (_pnAllList||[]).filter(i=>!_esComunidad(i)).length;
 
   const { q, tipo, estado, cat } = _leerFiltrosPanel();
 
@@ -8949,6 +8995,142 @@ function _renderTablaPagina() {
   // el panel se bloquee.
   const bypassCount = page.filter(i => !i.nombre || !i.evento_nombre).length;
   console.log(`[TRACE] _renderTablaPagina: ${page.length} registros renderizados` + (bypassCount ? ` (${bypassCount} con bypass de nulos activo — ver ERRORES_HISTORICOS.md §11)` : ''));
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// COMUNIDAD WHATSAPP — interesados que llegan desde la landing del evento
+// (tipo:'interesado' / tipo_ayuda:'interesado' /
+//  respuestas_custom.origen:'landing-interesado'). No generan QR: son
+//  métrica de interés, separada de la lista de Asistentes.
+// Prefijo de categoria: comunidad (Regla anti-duplicados BUG-006/018/019)
+// ═════════════════════════════════════════════════════════════════════
+// Predicado unico de "es comunidad". Debe ser EL MISMO en la exclusion de
+// Asistentes y en el sub-tab Comunidad para que ningun registro aparezca en
+// los dos lados (datos legacy con origen landing-interesado y tipo distinto).
+function _esComunidad(i) {
+  return !!(i && (i.tipo === 'interesado' || (i.respuestas_custom && i.respuestas_custom.origen === 'landing-interesado')));
+}
+
+function _filtrarComunidad() {
+  const q      = (document.getElementById('pn-com-search')?.value||'').toLowerCase().trim();
+  const estado = (document.getElementById('pn-com-estado-filter')?.value||'');
+  const norm   = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const qn     = norm(q);
+  return (_pnAllList||[])
+    .filter(_esComunidad)
+    .filter(i => {
+      if (estado === 'ingreso'   && !i.used) return false;
+      if (estado === 'pendiente' &&  i.used) return false;
+      if (q) {
+        const hay = norm(i.nombre)+' '+(i.whatsapp||'')+' '+(i.telefono||'')+' '+norm(i.evento_nombre||'')+' '+norm(i.ref_nombre||'')+' '+norm(i.ref_codigo||'');
+        if (!hay.includes(qn)) return false;
+      }
+      return true;
+    });
+}
+
+function renderComunidadPanel() {
+  const tb    = document.getElementById('pn-com-table');
+  const count = document.getElementById('pn-com-count');
+  if (!tb) return;
+  const com = (_pnAllList||[]).filter(_esComunidad);
+
+  // Badge del sub-tab = total de comunidad SIN filtrar (independiente de la busqueda)
+  const badgeCom = document.getElementById('pnl-badge-comunidad');
+  if (badgeCom) badgeCom.textContent = com.length;
+
+  const filtered = _filtrarComunidad();
+
+  if (!filtered.length) {
+    tb.innerHTML = '<tr><td colspan="7" class="empty">Sin registros de comunidad</td></tr>';
+    if (count) count.textContent = '0 registro(s)';
+    return;
+  }
+
+  tb.innerHTML = filtered.map(i => {
+    // ADR-024 Silent Fallback (ADR-008): blindar nulos antes de .replace()
+    const nombreSafe = (i.nombre||'').replace(/'/g,"\\'");
+    const wa   = i.whatsapp || i.telefono || '—';
+    const ref  = i.ref_nombre || i.ref_codigo;
+    const refCell = ref
+      ? `<span style="background:var(--gold-bg);color:var(--gold-d);border-radius:4px;padding:1px 6px;font-size:11px">👤 ${esc(ref)}</span>`
+      : '<span style="color:var(--ink3)">—</span>';
+    const refTxt = i.ref_codigo ? `<div style="font-size:10px;color:var(--ink3);font-family:monospace">${esc(i.ref_codigo)}</div>` : '';
+    const fecha = i.fecha_inscripcion
+      ? `${esc(i.fecha_inscripcion)}${i.hora_inscripcion?'<br><span style="color:var(--teal)">'+esc(i.hora_inscripcion)+'</span>':''}`
+      : (i.created_at ? `${new Date(i.created_at).toLocaleDateString('es-CO')}<br><span style="color:var(--teal)">${new Date(i.created_at).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}</span>` : '—');
+    return `<tr data-id="${i.id}">
+      <td style="font-weight:500">${esc(i.nombre)}</td>
+      <td style="font-size:12px;white-space:nowrap">${esc(wa)}</td>
+      <td style="font-size:12px">${esc(i.evento_nombre||'—')}</td>
+      <td>${refCell}${refTxt}</td>
+      <td style="font-size:11px;color:var(--ink3);white-space:nowrap">${fecha}</td>
+      <td><span class="badge ${i.used?'badge-green':'badge-amber'}">${i.used?'✓ Ingresó':'Pendiente'}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" title="Editar datos" onclick="abrirEditInscrito('${i.id}')">✏</button>
+        <button class="btn btn-ghost btn-sm btn-red" style="margin-left:4px" onclick="eliminarInscrito('${i.id}','${nombreSafe}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  if (count) count.textContent = `${filtered.length} registro(s)`;
+}
+
+function filtrarComunidadTabla() { renderComunidadPanel(); }
+
+// Exporta la comunidad (cache _pnAllList + filtros del sub-tab, sin consultas
+// nuevas a Supabase). xlsx via SheetJS; pdf via ventana imprimible (sin jsPDF).
+async function exportarComunidad(formato='xlsx') {
+  try {
+    const list = _filtrarComunidad();
+    if (!list.length) { alert('No hay registros de comunidad para exportar.'); return; }
+    const etiqueta = _etiquetaContextoPanel();
+    const nombreArchivoSafe = ('Comunidad WhatsApp ' + etiqueta).replace(/[/\\?%*:|"<>]/g,'-');
+    const filas = list.map((i, idx) => [
+      idx + 1,
+      i.nombre || '—',
+      i.whatsapp || i.telefono || '—',
+      i.evento_nombre || '—',
+      i.ref_nombre || i.ref_codigo || '—',
+      (i.fecha_inscripcion || (i.created_at ? new Date(i.created_at).toLocaleString('es-CO') : '—')),
+      i.used ? 'Ingresó' : 'Pendiente'
+    ]);
+    if (formato === 'pdf') {
+      const trs = filas.map(r => '<tr><td style="text-align:center">' + r[0] + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td><td>' + esc(r[4]) + '</td><td>' + esc(r[5]) + '</td><td>' + esc(r[6]) + '</td></tr>').join('');
+      const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>${esc(nombreArchivoSafe)}</title>
+<style>*{box-sizing:border-box} body{font-family:'DM Sans',Arial,sans-serif;color:#181815;margin:0;padding:32px}
+h1{font-size:22px;margin:0 0 2px} .green{color:#25D366} .sub{font-size:12px;color:#777;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#128C7E;color:#fff;text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:7px 10px;border-bottom:1px solid #e6e6df} tr:nth-child(even) td{background:#f7f7f2}
+.print-btn{position:fixed;bottom:18px;right:18px;background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:7px;font-size:13px;cursor:pointer;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:999}
+@media print{.print-btn{display:none}}</style></head><body>
+<button class="print-btn" onclick="window.print()">Guardar como PDF</button>
+<h1><span class="green">Hostal Terraza</span> · Comunidad WhatsApp</h1>
+<div class="sub">${esc(etiqueta)} · Generado el ${TODAY()} a las ${NOW()}</div>
+<table><thead><tr><th style="width:36px">#</th><th>Nombre</th><th>WhatsApp</th><th>Evento</th><th>Inscriptor</th><th>Registro</th><th>Estado</th></tr></thead><tbody>${trs}</tbody></table>
+</body></html>`;
+      const w = window.open('', '_blank', 'width=900,height=700');
+      if (!w) { alert('Permite las ventanas emergentes para generar el PDF.'); return; }
+      w.document.write(html); w.document.close();
+      console.log('[TRACE] Comunidad WhatsApp PDF: ' + list.length + ' registros (' + etiqueta + ')');
+    } else {
+      await _ensureXLSX();
+      if (typeof XLSX === 'undefined') { alert('No se pudo cargar la libreria de Excel. Intenta de nuevo.'); return; }
+      const rows = [['#','Nombre','WhatsApp','Evento','Inscriptor','Registro','Estado']].concat(filas);
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      _setColWidths(ws, [6,32,18,30,22,22,12]);
+      _applyXlsxRowStyle(ws, 0, 7, xlsxHeader());
+      filas.forEach((_, idx) => _applyXlsxRowStyle(ws, idx + 1, 7, xlsxAlt(idx)));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Comunidad WhatsApp');
+      XLSX.writeFile(wb, nombreArchivoSafe + '.xlsx');
+      console.log('[TRACE] Comunidad WhatsApp XLSX: ' + filas.length + ' registros (' + etiqueta + ')');
+    }
+  } catch (err) {
+    console.error('[Error exportarComunidad]', err);
+    alert('Ocurrio un error al generar la exportacion: ' + (err && err.message ? err.message : err));
+  }
 }
 
 function cambiarPagina(dir) {

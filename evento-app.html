@@ -956,6 +956,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             // (__HT_PREVIEW); sin ?preview=1 el comportamiento es el de siempre.
             const __q = new URLSearchParams(window.location.search);
             const slug = __q.get('slug');
+            const refParam = (__q.get('ref') || '').trim().toUpperCase();
+            // Atribucion de invitador (fail-open): si ?ref=<codigo> apunta a un
+            // invitador real, el registro se atribuye; si algo falla la landing sigue.
+            let refCodigo = '', refNombre = '';
             const __preview = __HT_PREVIEW;
             if (!slug && !__preview) return;
             try {
@@ -973,6 +977,16 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     const __res = await Promise.race([sbPromise, timeoutPromise]);
                     if (__res.error || !__res.data) throw new Error(__res.error?.message || "Evento no hallado.");
                     ev = __res.data;
+                }
+
+                // Resolucion del invitador (?ref=<codigo>). Fuera de la rama de
+                // vista previa: en __HT_PREVIEW hay CERO red (ADR-008). Fail-open:
+                // si la consulta falla, la landing continua sin atribucion.
+                if (refParam && !__preview) {
+                    try {
+                        const { data: inv } = await sbClient.from('invitadores').select('nombre,codigo').eq('codigo', refParam).maybeSingle();
+                        if (inv) { refCodigo = inv.codigo || ''; refNombre = inv.nombre || ''; }
+                    } catch (e) { /* fail-open: sin atribucion, la landing sigue */ }
                 }
 
                 // ADR-033 - Un evento en modo "solo formulario" no tiene landing publica:
@@ -2424,7 +2438,9 @@ if (document.getElementById('db-poster-img')) {
                             cuenta_aforo: false,
                             fecha_inscripcion: new Date().toLocaleDateString(I18N && typeof I18N.locale === 'function' ? I18N.locale() : 'es-CO'),
                             hora_inscripcion: new Date().toLocaleTimeString(I18N && typeof I18N.locale === 'function' ? I18N.locale() : 'es-CO'),
-                            respuestas_custom: { origen: 'landing-interesado' }
+                            respuestas_custom: { origen: 'landing-interesado' },
+                            ref_codigo: refCodigo || null,
+                            ref_nombre: refNombre || null
                         };
                         try {
                             // BLOQUEO FREEMIUM (v216): el plan 'freemium' admite hasta
