@@ -20,6 +20,7 @@
     * **Evidencia del cambio:** `git diff --numstat` = `admin.html` +190/-8, `evento-app.html` +17/-1, `scripts/express_check.js` +1/-1 (**208 insertions(+), 10 deletions(-)**).
     * **Sin migracion (verificado):** `inscritos.tipo` ya admite `interesado` por el CHECK de `migrations/adr031_inscritos_tipo_interesado.sql` (10 valores); `invitadores.tipo_invitado` es columna `text` **sin CHECK** -> el valor `comunidad` no requiere migracion.
     * **Naturaleza:** UI/sub-tab + rama de link + lectura/escritura de atribucion — **0 migraciones, 0 endpoints, 0 `api/*.js`, 0 cambios de esquema, 0 IDs del Contrato de Datos v112 afectados** (Cero Borrado intacto). Ver `DECISIONS.md` ADR-061, `NEXT.md` hito -27 y `ERRORES_HISTORICOS.md` §19.
+    * **Ajustes finales post-cierre (misma sesion, MODO EXPRESS):** (1) las metricas del **Resumen excluyen comunidad** (`renderPanel()`: `list = listAll.filter(i => !_esComunidad(i))`, donut incluido; `renderTabla(listAll)` mantiene la base completa); (2) el **estado del sub-tab Comunidad es "Interesado"** (badge fijo; se elimino `#pn-com-estado-filter` y su logica; el export escribe `Interesado`); (3) fix del **`duplicate key "invitadores_codigo_key"`** con **upsert por `codigo`** en `generarLinkInvitador()` (`admin.html`). Escudo GOLD PASS; `node scripts/express_check.js` -> **PASS 16 / FAIL 0**.
 
 
 **Silo F9B "Mistico Nocturno" — video banner full-bleed + meta centrada + click-to-play (ADR-060) en f9b v1.3.0 (2026-09-29)**

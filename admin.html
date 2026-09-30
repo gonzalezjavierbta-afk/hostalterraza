@@ -1765,12 +1765,6 @@ tr:hover td{background:var(--surface)}
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem">
         <input id="pn-com-search" placeholder="Nombre, WhatsApp, evento o inscriptor…" oninput="filtrarComunidadTabla()"
           style="font-size:12px;padding:5px 10px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper);width:240px;outline:none">
-        <select id="pn-com-estado-filter" onchange="filtrarComunidadTabla()"
-          style="font-size:12px;padding:5px 8px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper)">
-          <option value="">Todos</option>
-          <option value="ingreso">✓ Ingresaron</option>
-          <option value="pendiente">⏳ Pendientes</option>
-        </select>
         <span style="width:1px;height:20px;background:var(--border);align-self:center"></span>
         <button class="btn btn-ghost btn-sm" title="Exportar comunidad a Excel" onclick="exportarComunidad('xlsx')">Excel</button>
         <button class="btn btn-ghost btn-sm" title="Exportar comunidad a PDF" onclick="exportarComunidad('pdf')">PDF</button>
@@ -6857,27 +6851,24 @@ async function generarLinkInvitador() {
     link = window.location.origin + '/evento.html?' + (ev?.slug ? 'slug='+ev.slug : 'id='+targetId) + '&tipo=' + tipo + '&ref=' + codigo;
   }
 
-  // Verificar si ya existe este link para este invitador+evento
-  const existe = _invitadores.find(i => i.codigo === codigo && i.evento_id === refId && refTipo !== 'serie_all');
-  if (existe) {
-    // Actualizar el tipo si cambió
-    if (existe.tipo_invitado !== tipo) {
-      await SB.from('invitadores').update({ tipo_invitado: tipo, link_generado: link }).eq('id', existe.id);
-    }
-    _piLinkGenerado = link;
-  } else {
-    // Crear nuevo registro
-    const { error } = await SB.from('invitadores').insert({
-      nombre, codigo, tipo_invitado: tipo,
-      evento_id: (refTipo==='evento'||refTipo==='serie') ? refId : null,
-      serie_id:  refTipo==='serie_all' ? refId : null,
-      link_generado: link,
-      activo: true,
-      org_id: ORG_ID,
-    });
-    if (error) { alert('Error: ' + error.message); return; }
-    _piLinkGenerado = link;
-  }
+  // `invitadores.codigo` es UNICO en la base (constraint `invitadores_codigo_key`):
+  // un invitador = UNA fila. La fila "base" la crea crearInvitador(); aqui la
+  // ACTUALIZAMOS con el link/tipo/evento en vez de insertar otra fila con el mismo
+  // codigo (que provocaba: duplicate key value violates unique constraint
+  // "invitadores_codigo_key"). Solo se inserta si el codigo no existia.
+  const fila = {
+    tipo_invitado: tipo,
+    link_generado: link,
+    evento_id: (refTipo === 'evento' || refTipo === 'serie') ? refId : null,
+    serie_id:  (refTipo === 'serie_all') ? refId : null,
+    activo: true,
+  };
+  const existente = _invitadores.find(i => i.codigo === codigo);
+  const { error } = existente
+    ? await SB.from('invitadores').update(fila).eq('id', existente.id)
+    : await SB.from('invitadores').insert(Object.assign({ nombre, codigo, org_id: ORG_ID }, fila));
+  if (error) { alert('Error: ' + error.message); return; }
+  _piLinkGenerado = link;
 
   loadInvitadores();
   document.getElementById('pi-link-val').value = link;
@@ -8129,7 +8120,10 @@ async function renderPanel() {
 
     const { data:inscritos, error:insErr } = await sbQuery(q, 20000);
     if (insErr) { console.error('Panel query error:', insErr); return; }
-    const list = _pnAllList = inscritos || [];
+    const listAll = _pnAllList = inscritos || [];        // base completa (tablas Asistentes/Comunidad)
+    // Metricas del Panel = SOLO asistentes: la Comunidad WhatsApp (interesados de la
+    // landing) vive en su propio sub-tab y NO debe inflar asistencia/no-show/donut.
+    const list = listAll.filter(i => !_esComunidad(i));
 
     // Filter logs by event for admin_evento
     let logQuery = SB.from('logs').select('*').eq('org_id', ORG_ID).order('created_at',{ascending:false}).limit(100);
@@ -8434,7 +8428,7 @@ async function renderPanel() {
     });
 
     // ── Tabla ──
-    renderTabla(list);
+    renderTabla(listAll);
 
     // ══ NUEVOS ANÁLISIS ══
 
@@ -9012,15 +9006,12 @@ function _esComunidad(i) {
 }
 
 function _filtrarComunidad() {
-  const q      = (document.getElementById('pn-com-search')?.value||'').toLowerCase().trim();
-  const estado = (document.getElementById('pn-com-estado-filter')?.value||'');
-  const norm   = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const qn     = norm(q);
+  const q    = (document.getElementById('pn-com-search')?.value||'').toLowerCase().trim();
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const qn   = norm(q);
   return (_pnAllList||[])
     .filter(_esComunidad)
     .filter(i => {
-      if (estado === 'ingreso'   && !i.used) return false;
-      if (estado === 'pendiente' &&  i.used) return false;
       if (q) {
         const hay = norm(i.nombre)+' '+(i.whatsapp||'')+' '+(i.telefono||'')+' '+norm(i.evento_nombre||'')+' '+norm(i.ref_nombre||'')+' '+norm(i.ref_codigo||'');
         if (!hay.includes(qn)) return false;
@@ -9065,7 +9056,7 @@ function renderComunidadPanel() {
       <td style="font-size:12px">${esc(i.evento_nombre||'—')}</td>
       <td>${refCell}${refTxt}</td>
       <td style="font-size:11px;color:var(--ink3);white-space:nowrap">${fecha}</td>
-      <td><span class="badge ${i.used?'badge-green':'badge-amber'}">${i.used?'✓ Ingresó':'Pendiente'}</span></td>
+      <td><span class="badge" style="background:#25D36622;color:#128C7E;border:1px solid #25D366">💬 Interesado</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" title="Editar datos" onclick="abrirEditInscrito('${i.id}')">✏</button>
         <button class="btn btn-ghost btn-sm btn-red" style="margin-left:4px" onclick="eliminarInscrito('${i.id}','${nombreSafe}')">✕</button>
@@ -9093,7 +9084,7 @@ async function exportarComunidad(formato='xlsx') {
       i.evento_nombre || '—',
       i.ref_nombre || i.ref_codigo || '—',
       (i.fecha_inscripcion || (i.created_at ? new Date(i.created_at).toLocaleString('es-CO') : '—')),
-      i.used ? 'Ingresó' : 'Pendiente'
+      'Interesado'
     ]);
     if (formato === 'pdf') {
       const trs = filas.map(r => '<tr><td style="text-align:center">' + r[0] + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td><td>' + esc(r[4]) + '</td><td>' + esc(r[5]) + '</td><td>' + esc(r[6]) + '</td></tr>').join('');
