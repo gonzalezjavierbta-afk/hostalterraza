@@ -59,6 +59,75 @@
         body.page-registro #ticket-card .tk-name { margin-top: .9rem; font-size: 15px; font-weight: 600; color: #fff; }
         body.page-registro #ticket-card .tk-code { margin-top: .35rem; font-size: 11px; letter-spacing: .14em; color: rgba(255,255,255,.5); }
         body.page-registro #ticket-card .tk-note { margin-top: .9rem; font-size: 11px; color: rgba(255,255,255,.35); }
+        /* Modo existente: estilos propios (el silo externo no garantiza cubrir estos elementos) */
+        body.page-registro #modo-existe .form-input,
+        body.page-registro #ex-cedula,
+        body.page-registro #ex-tel {
+            width: 100%;
+            margin-bottom: .9rem;
+            padding: 11px 13px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: var(--rsm, 10px);
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        body.page-registro #modo-existe .form-input::placeholder { color: rgba(255,255,255,.4); }
+        body.page-registro #modo-existe label {
+            font-size: 12px;
+            color: rgba(255,255,255,.55);
+            margin-bottom: 4px;
+            display: block;
+        }
+        body.page-registro #modo-existe .btn-submit,
+        body.page-registro #verify-btn,
+        body.page-registro #confirm-btn {
+            width: 100%;
+            margin-bottom: .5rem;
+            padding: 13px;
+            background: var(--gold, #ff9f1c);
+            color: #fff;
+            border: none;
+            border-radius: var(--rsm, 10px);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        body.page-registro #modo-existe .btn-submit:hover,
+        body.page-registro #verify-btn:hover,
+        body.page-registro #confirm-btn:hover { filter: brightness(1.08); }
+        /* Duplicado: contenedor y acciones propias */
+        body.page-registro #s-duplicate { text-align: center; margin-top: 1.25rem; }
+        body.page-registro .dup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            max-width: 340px;
+            margin: .75rem auto 0;
+        }
+        body.page-registro .dl-btn,
+        body.page-registro .wa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+            padding: 12px;
+            border: none;
+            border-radius: var(--rsm, 10px);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        body.page-registro .dl-btn { background: var(--gold, #ff9f1c); }
+        body.page-registro .dl-btn:hover { filter: brightness(1.08); }
+        body.page-registro .wa-btn { background: #25D366; }
+        body.page-registro .wa-btn:hover { filter: brightness(1.08); }
+        body.page-registro .dl-btn svg { flex: 0 0 auto; }
     </style>
 </head>
 <body class="tpl-init page-registro">
@@ -156,6 +225,15 @@
                             <div class="tk-note">Muestra este QR en la puerta · Uso único y personal</div>
                         </div>
                     </div>
+                    <div class="dup-actions">
+                      <button type="button" class="dl-btn" onclick="descargarTicketReg()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span data-i18n="serie.descargar">Descargar mi entrada</span>
+                      </button>
+                      <button type="button" class="wa-btn" id="btn-wa-ticket-reg" onclick="enviarTicketWAReg()">
+                        <span data-i18n="serie.enviar_wa">Enviar por WhatsApp</span>
+                      </button>
+                    </div>
                 </div>
                 <div id="s-duplicate" style="display:none">
                   <div style="text-align:center;padding:1.5rem 0">
@@ -175,7 +253,13 @@
                         </div>
                         <div style="height:6px;background:var(--gold,#ff9f1c)"></div>
                       </div>
-                      <button type="button" id="dup-btn-wa" onclick="enviarDupWA()" style="display:none;width:100%;max-width:340px;margin:0 auto;padding:12px;border-radius:10px;border:none;background:#25D366;color:#fff;font-size:14px;font-weight:600;cursor:pointer" data-i18n="serie.enviar_wa">Enviar por WhatsApp</button>
+                      <div class="dup-actions">
+                        <button type="button" class="dl-btn" onclick="descargarDupReg()">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                          <span data-i18n="serie.descargar">Descargar mi entrada</span>
+                        </button>
+                        <button type="button" id="dup-btn-wa" class="wa-btn" onclick="enviarDupWA()" style="display:none" data-i18n="serie.enviar_wa">Enviar por WhatsApp</button>
+                      </div>
                       <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.6rem">Muestra el QR en la puerta · Uso único y personal</p>
                     </div>
                     <div id="dup-no-encontrado" style="display:none">
@@ -408,7 +492,7 @@
                 const tabsEl = document.getElementById('reg-tabs');
                 if (tabsEl) tabsEl.style.display = 'none';
                 if (entregaQR) {
-                    mostrarTicket(nombre, qrCode, ev);
+                    mostrarTicket(nombre, qrCode, ev, whatsapp);
                     await enviarNotificacionesReg(nombre, qrCode, null);
                 } else {
                     const ok = document.getElementById('form-success-msg');
@@ -524,7 +608,7 @@
                 document.getElementById('modo-existe').style.display = 'none';
                 const tabsIns = document.getElementById('reg-tabs');
                 if (tabsIns) tabsIns.style.display = 'none';
-                mostrarTicket(_existenteReg.nombre, qrCode, ev);
+                mostrarTicket(_existenteReg.nombre, qrCode, ev, _existenteReg.telefono);
                 await enviarNotificacionesReg(_existenteReg.nombre, qrCode, null);
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
@@ -591,7 +675,8 @@
                     }
                 }
                 const waBtn = document.getElementById('dup-btn-wa');
-                if (waBtn) waBtn.style.display = data.telefono ? 'block' : 'none';
+                // Visible SIEMPRE: si no hay telefono, el enlace wa.me/?text= sigue funcionando.
+                if (waBtn) waBtn.style.display = 'block';
                 if (wrap) wrap.style.display = 'block';
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
@@ -611,7 +696,7 @@
         }
 
         // ── Ticket (render reutilizable) ────────────────────────────────────
-        function mostrarTicket(nombre, qr, ev) {
+        function mostrarTicket(nombre, qr, ev, telefono) {
             const tkEv = document.getElementById('tk-ev');
             const tkName = document.getElementById('tk-name');
             const tkCode = document.getElementById('tk-code');
@@ -631,6 +716,7 @@
             }
             const tw = document.getElementById('ticket-wrap');
             if (tw) tw.style.display = 'block';
+            window.__ticketData = { nombre: nombre, qr: qr, ev: ev, telefono: telefono || (_existenteReg && _existenteReg.telefono) || '' };
             log("INFO: QR generado y ticket mostrado (" + qr + ").", "INFO");
         }
 
@@ -657,6 +743,173 @@
             } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
             }
+        }
+
+        // ── Descarga / WhatsApp (ticket nuevo y duplicado) ──────────────────
+        // Obtiene la imagen del QR ya pintada por qrcodejs (canvas o img).
+        function _qrSrcReg(rootSel) {
+            const root = rootSel ? document.querySelector(rootSel) : document;
+            if (!root) return null;
+            const img = root.querySelector('img');
+            if (img && img.src) return img.src;
+            const cv = root.querySelector('canvas');
+            if (cv) {
+                try { return cv.toDataURL('image/png'); }
+                catch (e) { log("ERROR: " + e.message, "ERROR"); }
+            }
+            return null;
+        }
+
+        function _roundRectReg(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function _truncarReg(s, max) {
+            s = String(s || '');
+            return s.length > max ? s.slice(0, max - 1) + '...' : s;
+        }
+
+        function _slugReg(s) {
+            return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'evento';
+        }
+
+        // Canvas 540x620 con el mismo diseno del ticket HTML (#ticket-card).
+        function _generarTicketCanvasReg(qr, nombre, ev, rootSel) {
+            return new Promise((resolve) => {
+                const GOLD = '#ff9f1c', DARK = '#0F0F0F', WHITE = '#FFFFFF';
+                const W = 540, H = 620;
+                const cv = document.createElement('canvas');
+                cv.width = W; cv.height = H;
+                const ctx = cv.getContext('2d');
+                ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = GOLD; ctx.fillRect(0, 0, W, 10); ctx.fillRect(0, H - 10, W, 10);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = GOLD; ctx.font = 'bold 20px sans-serif';
+                ctx.fillText('HOSTAL TERRAZA', W / 2, 60);
+                ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.font = '14px sans-serif';
+                const evTxt = ((ev && ev.nombre) ? ev.nombre : '') + ((ev && ev.fecha) ? ' - ' + ev.fecha : '');
+                ctx.fillText(_truncarReg(evTxt, 48), W / 2, 88);
+
+                const QS = 200, QX = (W - QS) / 2, QY = 130;
+                ctx.fillStyle = WHITE;
+                _roundRectReg(ctx, QX - 14, QY - 14, QS + 28, QS + 28, 12); ctx.fill();
+
+                const done = () => {
+                    ctx.fillStyle = WHITE; ctx.font = 'bold 24px sans-serif';
+                    ctx.fillText(_truncarReg((nombre || '').toUpperCase(), 26), W / 2, QY + QS + 72);
+                    ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.font = '12px sans-serif';
+                    ctx.fillText(_truncarReg(qr || '', 40), W / 2, QY + QS + 100);
+                    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.font = '11px sans-serif';
+                    ctx.fillText('Muestra este QR en la puerta', W / 2, H - 40);
+                    resolve(cv);
+                };
+
+                const src = _qrSrcReg(rootSel);
+                if (src) {
+                    const img = new Image();
+                    img.onload = () => { ctx.drawImage(img, QX, QY, QS, QS); done(); };
+                    img.onerror = () => {
+                        log("ERROR: No se pudo dibujar el QR en el canvas; se usa el codigo como texto.", "ERROR");
+                        ctx.fillStyle = DARK; ctx.font = '12px sans-serif';
+                        ctx.fillText(_truncarReg(qr || '', 34), W / 2, QY + QS / 2); done();
+                    };
+                    img.src = src;
+                } else {
+                    ctx.fillStyle = DARK; ctx.font = '12px sans-serif';
+                    ctx.fillText(_truncarReg(qr || '', 34), W / 2, QY + QS / 2); done();
+                }
+            });
+        }
+
+        function _descargarCanvasReg(cv, filename) {
+            const dataUrl = cv.toDataURL('image/png');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                const w = window.open();
+                if (!w) { log("ERROR: Bloqueo de ventana emergente al guardar el ticket.", "ERROR"); return; }
+                w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + dataUrl + '" style="max-width:100%;border-radius:12px"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-size:14px;font-family:sans-serif">' + T('serie.presionar_guardar') + '</p></body></html>');
+                w.document.close();
+            } else {
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = filename;
+                a.click();
+            }
+        }
+
+        async function descargarTicketReg() {
+            const d = window.__ticketData || {};
+            const qr = d.qr || '';
+            if (!qr) return;
+            const btn = document.querySelector('#ticket-wrap .dl-btn');
+            if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
+            try {
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', d.ev || window.__ctxEv || null, '#reg-qr');
+                _descargarCanvasReg(cv, 'entrada-' + _slugReg((d.ev && d.ev.nombre) || 'evento') + '.png');
+            } catch (e) {
+                log("ERROR: " + e.message, "ERROR");
+                alert(T('serie.guardar_imagen'));
+            }
+            if (btn) { btn.disabled = false; btn.textContent = T('serie.descargar'); }
+        }
+
+        async function descargarDupReg() {
+            const d = window.__dupData || {};
+            const qr = d.qr_code || '';
+            if (!qr) return;
+            const btn = document.querySelector('#s-duplicate .dl-btn');
+            if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
+            try {
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', window.__ctxEv || null, '#dup-qr-box');
+                _descargarCanvasReg(cv, 'entrada-' + _slugReg((window.__ctxEv && window.__ctxEv.nombre) || 'evento') + '.png');
+            } catch (e) {
+                log("ERROR: " + e.message, "ERROR");
+                alert(T('serie.guardar_imagen'));
+            }
+            if (btn) { btn.disabled = false; btn.textContent = T('serie.descargar'); }
+        }
+
+        async function enviarTicketWAReg() {
+            const d = window.__ticketData || {};
+            const qr = d.qr;
+            if (!qr) return;
+            const ev = d.ev || window.__ctxEv || {};
+            const btn = document.getElementById('btn-wa-ticket-reg');
+            if (btn) { btn.disabled = true; btn.textContent = T('serie.preparando'); }
+            const restore = () => { if (btn) { btn.disabled = false; btn.textContent = T('serie.enviar_wa'); } };
+            const texto = 'Entrada - ' + (ev.nombre || '') + '\n' +
+                ((ev.fecha) ? 'Fecha: ' + ev.fecha + '\n' : '') +
+                'Codigo QR: ' + qr + '\n' +
+                'Muestra este QR en la puerta.\n' +
+                '_Terraza Hostal_';
+            const tel = String(d.telefono || (window.__dupData && window.__dupData.telefono) || '').replace(/\D/g, '');
+            const waUrl = tel
+                ? 'https://wa.me/' + tel + '?text=' + encodeURIComponent(texto)
+                : 'https://wa.me/?text=' + encodeURIComponent(texto);
+            try {
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', ev, '#reg-qr');
+                const blob = await new Promise((res) => cv.toBlob(res, 'image/png'));
+                if (blob && typeof File !== 'undefined') {
+                    const file = new File([blob], 'entrada-' + _slugReg(ev.nombre) + '.png', { type: 'image/png' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try { await navigator.share({ files: [file], text: texto, title: ev.nombre || 'Entrada' }); }
+                        catch (e) { log("ERROR: " + e.message, "ERROR"); }
+                        restore();
+                        return;
+                    }
+                }
+                window.open(waUrl, '_blank');
+            } catch (e) {
+                log("ERROR: " + e.message, "ERROR");
+                window.open(waUrl, '_blank');
+            }
+            restore();
         }
 
         if (document.readyState === 'loading') {
