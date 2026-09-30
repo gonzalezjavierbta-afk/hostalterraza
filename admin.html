@@ -6834,30 +6834,21 @@ async function generarLinkInvitador() {
   const codigo = _perfilInvActivo.codigo;
   const nombre = _perfilInvActivo.nombre;
 
-  let link = '';
-  // tipo 'comunidad' => link a la LANDING del evento (formulario -> grupo WhatsApp).
-  // El resto de tipos apunta a los formularios de registro; las series conservan serie.html.
+  // ADR-062 — comunidad => LANDING del evento; el resto de tipos => FORMULARIO de registro.
+  // Para una serie se resuelve el primer evento (sesion_num asc) como destino.
   const esComunidad = (tipo === 'comunidad');
-  if (refTipo === 'serie_all' && !esComunidad) {
-    const serie = _series.find(s => s.id === refId);
-    link = window.location.origin + '/serie.html?slug=' + (serie?.slug||refId) + '&tipo=' + tipo + '&ref=' + codigo;
-  } else {
-    // comunidad sobre una serie: usar el primer evento (landing) de la serie.
-    let ev = _eventos.find(e => e.id === refId);
-    if (!ev && refTipo === 'serie_all') {
-      ev = _eventos.filter(e => e.serie_id === refId).sort((a,b)=>(a.sesion_num||0)-(b.sesion_num||0))[0];
-    }
-    const targetId = ev?.id || refId;
-    link = window.location.origin + '/evento.html?' + (ev?.slug ? 'slug='+ev.slug : 'id='+targetId) + '&tipo=' + tipo + '&ref=' + codigo;
+  let ev = _eventos.find(e => e.id === refId);
+  if (!ev && refTipo === 'serie_all') {
+    ev = _eventos.filter(e => e.serie_id === refId).sort((a,b)=>(a.sesion_num||0)-(b.sesion_num||0))[0];
   }
+  const targetId = ev?.id || refId;
+  const qs = (ev?.slug ? 'slug='+ev.slug : 'id='+targetId) + '&tipo=' + tipo + '&ref=' + codigo;
+  const link = window.location.origin + (esComunidad ? '/evento.html?' : '/registroaforo.html?') + qs;
 
-  // `invitadores.codigo` es UNICO a nivel de TABLA (constraint `invitadores_codigo_key`).
-  // NO se puede asumir que el codigo es libre NI confiar solo en `_invitadores`: esa
-  // cache esta filtrada por `org_id` (`.eq('org_id', ORG_ID)` en loadInvitadores) y puede
-  // no contener la fila que colisiona (p. ej. una fila huerfana/legacy con otro org_id o
-  // null). Por eso se consulta la fila REAL en la base por `codigo` (sin filtro de org):
-  // si existe se ACTUALIZA por id; si no, se inserta. Asi no se repite el
-  // `duplicate key value violates unique constraint "invitadores_codigo_key"`.
+  // ADR-062 — `invitadores.codigo` ya NO es unico por si solo (constraint compuesto
+  // `invitadores_codigo_link_key` = (codigo, link_generado)). Un invitador puede tener
+  // varios links (uno por evento/serie). Se busca la fila por (codigo, link_generado):
+  // si existe se ACTUALIZA por id; si no, se INSERTA. Asi no se pisa el link anterior.
   const payload = {
     nombre,
     codigo,
@@ -6868,7 +6859,8 @@ async function generarLinkInvitador() {
     activo: true,
     org_id: ORG_ID,
   };
-  const { data: dbRows, error: selErr } = await SB.from('invitadores').select('id').eq('codigo', codigo).limit(1);
+  const { data: dbRows, error: selErr } = await SB.from('invitadores')
+    .select('id').eq('codigo', codigo).eq('link_generado', link).limit(1);
   if (selErr) { alert('Error al verificar el invitador: ' + selErr.message); return; }
   if (dbRows && dbRows.length) {
     const { error } = await SB.from('invitadores').update(payload).eq('id', dbRows[0].id);
@@ -6876,12 +6868,14 @@ async function generarLinkInvitador() {
   } else {
     const { error } = await SB.from('invitadores').insert(payload);
     if (error) {
-      // 23505 = conflicto de codigo (fila no visible por RLS o carrera): reintentar UPDATE por codigo.
+      // 23505 = conflicto del constraint compuesto (fila no visible por RLS o carrera):
+      // reintentar UPDATE por (codigo, link_generado).
       if (error.code === '23505') {
-        const { data: upd, error: e2 } = await SB.from('invitadores').update(payload).eq('codigo', codigo).select('id');
+        const { data: upd, error: e2 } = await SB.from('invitadores').update(payload)
+          .eq('codigo', codigo).eq('link_generado', link).select('id');
         if (e2) { alert('Error: ' + e2.message + ' (' + (e2.code || '') + ')'); return; }
         if (!upd || !upd.length) {
-          alert('El código "' + codigo + '" ya existe en la base pero tu sesión no puede verlo/actualizarlo (política RLS). Pide al administrador que lo revise (colisión de codigo entre organizaciones).');
+          alert('El link ya existe en la base pero tu sesión no puede verlo/actualizarlo (política RLS). Pide al administrador que lo revise.');
           return;
         }
       } else {

@@ -995,7 +995,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // en ese modo, el render sigue igual. Misma derivacion que
                 // index.html:esSoloFormulario (para eventos legacy sin modo_publico).
                 if (!__preview && __esSoloFormulario(ev)) {
-                    window.location.replace('/registroaforo.html?slug=' + encodeURIComponent(slug));
+                    const __refQ  = refParam ? '&ref=' + encodeURIComponent(refParam) : '';
+                    const __tipoQ = __q.get('tipo') ? '&tipo=' + encodeURIComponent(__q.get('tipo')) : '';
+                    window.location.replace('/registroaforo.html?slug=' + encodeURIComponent(slug) + __refQ + __tipoQ);
                     return;
                 }
 

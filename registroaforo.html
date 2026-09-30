@@ -197,7 +197,10 @@
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
             const id = params.get('id');
-            const rol = (params.get('rol') || 'invitado').trim().toLowerCase();
+            // ADR-062: los links de invitador usan ?tipo=<tipo_invitado>; se usa como rol
+            // del inscrito (los tipos no-comunidad existen en inscritos_tipo_check).
+            const rol = (params.get('rol') || params.get('tipo') || 'invitado').trim().toLowerCase();
+            const refParam = (params.get('ref') || '').trim().toUpperCase();
             if (!slug && !id) {
                 document.body.innerHTML = '<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; color:#fff; background:#0a0a0c; text-align:center;"><p>' + T('reg.err_no_evento') + '</p></div>';
                 log("ERROR: Sin slug ni id.", "ERROR");
@@ -214,6 +217,15 @@
                 window.__ctxOrgId = ev.org_id || null;
                 window.__ctxEv = ev;
                 window.__ctxRol = rol;
+
+                // Atribucion de invitador (?ref=<codigo>), fail-open: si falla, el registro
+                // continua sin atribucion (mismo patron que evento-app.html:985-989).
+                if (refParam) {
+                    try {
+                        const { data: inv } = await getClient().from('invitadores').select('nombre,codigo').eq('codigo', refParam).maybeSingle();
+                        if (inv) { window.__ctxRefCodigo = inv.codigo || null; window.__ctxRefNombre = inv.nombre || null; }
+                    } catch (e) { /* fail-open: sin atribucion, el registro sigue */ }
+                }
 
                 // Cabezote responsive + WebP tan pronto se conoce la imagen del evento.
                 // ADR-034: cabezote_formulario_url tiene precedencia (imagen propia del formulario).
@@ -296,7 +308,9 @@
                     used: false,
                     fecha_inscripcion: TODAY(),
                     hora_inscripcion: NOW(),
-                    respuestas_custom: { rol, origen: 'pagina-registro' }
+                    respuestas_custom: { rol, origen: 'pagina-registro' },
+                    ref_codigo: window.__ctxRefCodigo || null,
+                    ref_nombre: window.__ctxRefNombre || null
                 };
                 const { error } = await getClient().from('inscritos').insert(payload);
                 if (error) throw error;
