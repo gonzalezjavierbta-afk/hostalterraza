@@ -82,6 +82,11 @@
         <section id="mod-form">
             <div class="form-master-box">
                 <p class="inv-badge" id="form-alert-badge" style="display:none"></p>
+                <div id="reg-tabs" style="display:flex;gap:0;margin-bottom:1.25rem;border-radius:var(--rsm);overflow:hidden;border:1px solid rgba(255,255,255,.15)">
+                  <button type="button" id="tab-nuevo" onclick="setModo('nuevo')" style="flex:1;padding:9px;border:none;font-size:13px;cursor:pointer;font-weight:500;background:var(--gold,#ff9f1c);color:#fff" data-i18n="serie.tab_nuevo">Registro nuevo</button>
+                  <button type="button" id="tab-existe" onclick="setModo('existe')" style="flex:1;padding:9px;border:none;font-size:13px;cursor:pointer;font-weight:500;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)" data-i18n="serie.tab_existe">Ya estoy registrado</button>
+                </div>
+                <div id="modo-nuevo">
                 <form id="master-reg-form" novalidate>
                     <input type="text" id="reg-nombre" class="form-input" placeholder="Nombre completo *" required data-i18n-ph="reg.f_nombre_ph">
                     <input type="text" id="reg-cedula" class="form-input" placeholder="Cédula *" required data-i18n-ph="reg.f_cedula_ph">
@@ -115,6 +120,29 @@
                     <input type="text" id="reg-whatsapp-custom-code" class="form-input" placeholder="Código de país (ej. +7)" maxlength="6" style="display:none" data-i18n-ph="reg.f_pais_codigo_ph">
                     <button type="submit" class="btn-submit" data-i18n="reg.registrarme_btn">Registrarme →</button>
                 </form>
+                </div>
+                <div id="modo-existe" style="display:none">
+                  <div id="paso-verificar">
+                    <input type="text" id="ex-cedula" class="form-input" placeholder="Cédula *" inputmode="numeric" data-i18n-ph="serie.ex_cedula_ph">
+                    <input type="tel" id="ex-tel" class="form-input" placeholder="Número de celular" inputmode="numeric" data-i18n-ph="serie.ex_tel_ph">
+                    <button type="button" id="verify-btn" class="btn-submit" onclick="verificarExistente()" data-i18n="serie.verificar_btn">Verificar mis datos →</button>
+                  </div>
+                  <div id="paso-confirmar" style="display:none">
+                    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--rsm);padding:1rem;margin-bottom:1rem">
+                      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em" data-i18n="serie.encontramos">Encontramos tu registro</div>
+                      <div id="conf-nombre" style="font-size:18px;font-weight:500"></div>
+                      <div id="conf-meta" style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px"></div>
+                    </div>
+                    <button type="button" id="confirm-btn" class="btn-submit" onclick="inscribirExistente()" data-i18n="serie.inscribir_btn">✓ Inscribirme →</button>
+                    <button type="button" onclick="resetVerif()" style="width:100%;margin-top:.5rem;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:rgba(255,255,255,.5);font-size:13px;cursor:pointer" data-i18n="serie.no_soy_yo">No soy yo</button>
+                  </div>
+                  <div id="paso-noencontrado" style="display:none;text-align:center;padding:1rem 0">
+                    <div style="font-size:24px;margin-bottom:.4rem">🔍</div>
+                    <div style="font-size:14px;font-weight:500;margin-bottom:.4rem" data-i18n="serie.no_encontrado_titulo">No encontramos tu registro</div>
+                    <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:1rem" data-i18n="serie.no_encontrado_p">Usa el formulario de registro nuevo.</p>
+                    <button type="button" onclick="setModo('nuevo')" style="padding:9px 20px;background:var(--gold,#ff9f1c);color:#fff;border:none;border-radius:var(--rsm);font-size:13px;cursor:pointer" data-i18n="serie.registrarme_btn">Registrarme →</button>
+                  </div>
+                </div>
                 <p class="inv-badge" id="form-success-msg" style="display:none"></p>
                 <div id="ticket-wrap">
                     <div id="ticket-card">
@@ -128,6 +156,32 @@
                             <div class="tk-note">Muestra este QR en la puerta · Uso único y personal</div>
                         </div>
                     </div>
+                </div>
+                <div id="s-duplicate" style="display:none">
+                  <div style="text-align:center;padding:1.5rem 0">
+                    <div style="font-size:28px;margin-bottom:.5rem">✓</div>
+                    <h3 style="font-size:20px;margin-bottom:.4rem;color:#fff" data-i18n="serie.ya_registrado">Ya estás registrado</h3>
+                    <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:1.25rem" data-i18n="serie.recuperar_p">Tu entrada ya fue generada. Puedes recuperarla aquí.</p>
+                    <div id="dup-loading" style="margin:1rem auto"><div style="width:32px;height:32px;border:3px solid rgba(200,169,110,.2);border-top-color:var(--gold,#ff9f1c);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto"></div></div>
+                    <div id="dup-ticket-wrap" style="display:none">
+                      <div style="background:#0F0F0F;border-radius:16px;overflow:hidden;max-width:340px;margin:0 auto 1rem">
+                        <div style="height:6px;background:var(--gold,#ff9f1c)"></div>
+                        <div style="padding:1.25rem">
+                          <div style="font-weight:700;font-size:13px;color:var(--gold,#ff9f1c)">HOSTAL TERRAZA</div>
+                          <div id="dup-ev-nombre" style="font-size:13px;color:rgba(255,255,255,.6);margin:4px 0 1rem"></div>
+                          <div id="dup-qr-box" style="display:inline-block;background:#fff;padding:10px;border-radius:10px"></div>
+                          <div id="dup-nombre" style="margin-top:.9rem;font-size:15px;font-weight:600;color:#fff"></div>
+                          <div id="dup-code" style="margin-top:.35rem;font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.5)"></div>
+                        </div>
+                        <div style="height:6px;background:var(--gold,#ff9f1c)"></div>
+                      </div>
+                      <button type="button" id="dup-btn-wa" onclick="enviarDupWA()" style="display:none;width:100%;max-width:340px;margin:0 auto;padding:12px;border-radius:10px;border:none;background:#25D366;color:#fff;font-size:14px;font-weight:600;cursor:pointer" data-i18n="serie.enviar_wa">Enviar por WhatsApp</button>
+                      <p style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:.6rem">Muestra el QR en la puerta · Uso único y personal</p>
+                    </div>
+                    <div id="dup-no-encontrado" style="display:none">
+                      <p style="font-size:13px;color:rgba(255,255,255,.45)">No encontramos tu registro con esos datos.</p>
+                    </div>
+                  </div>
                 </div>
             </div>
         </section>
@@ -322,7 +376,7 @@
             btn.disabled = true; btn.textContent = T('reg.registrando');
             try {
                 const { data: dup } = await getClient().from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
-                if (dup) { showBadge('form-alert-badge', T('reg.ya_registrada'), 'err'); btn.disabled = false; btn.textContent = T('reg.registrarme_btn'); return; }
+                if (dup) { btn.disabled = false; btn.textContent = T('reg.registrarme_btn'); mostrarDuplicado(cedula); return; }
                 // captura_pura=false => se genera QR de entrada; true => sin QR (Cero Borrado: no se altera si ya hay logica futura).
                 const entregaQR = (window.__ctxCapturaPura === false);
                 const qrCode = entregaQR ? ('QR-' + UID()) : null;
@@ -351,26 +405,11 @@
                 log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ", whatsapp=" + whatsapp + ").", "INFO");
                 btn.disabled = false; btn.textContent = T('reg.registrarme_btn');
                 document.getElementById('master-reg-form').style.display = 'none';
+                const tabsEl = document.getElementById('reg-tabs');
+                if (tabsEl) tabsEl.style.display = 'none';
                 if (entregaQR) {
-                    // Ticket con QR (evento captura_pura=false)
-                    const tkEv = document.getElementById('tk-ev');
-                    const tkName = document.getElementById('tk-name');
-                    const tkCode = document.getElementById('tk-code');
-                    if (tkEv) tkEv.textContent = (ev.nombre || '') + (ev.fecha ? ' · ' + ev.fecha : '');
-                    if (tkName) tkName.textContent = nombre;
-                    if (tkCode) tkCode.textContent = qrCode;
-                    const qrBox = document.getElementById('reg-qr');
-                    if (qrBox && typeof QRCode !== 'undefined') {
-                        qrBox.innerHTML = '';
-                        try {
-                            new QRCode(qrBox, { text: qrCode, width: 180, height: 180, colorDark: '#0F0F0F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
-                        } catch (e) { qrBox.textContent = qrCode; }
-                    } else if (qrBox) {
-                        qrBox.textContent = qrCode;
-                    }
-                    const tw = document.getElementById('ticket-wrap');
-                    if (tw) tw.style.display = 'block';
-                    log("INFO: QR generado y ticket mostrado (" + qrCode + ").", "INFO");
+                    mostrarTicket(nombre, qrCode, ev);
+                    await enviarNotificacionesReg(nombre, qrCode, null);
                 } else {
                     const ok = document.getElementById('form-success-msg');
                     ok.style.display = 'block';
@@ -381,6 +420,8 @@
                         document.getElementById('reg-whatsapp-custom-code').style.display = 'none';
                         ok.style.display = 'none';
                         document.getElementById('master-reg-form').style.display = 'block';
+                        const tabsReset = document.getElementById('reg-tabs');
+                        if (tabsReset) tabsReset.style.display = 'flex';
                     }, 2500);
                 }
             } catch (err) {
@@ -389,6 +430,234 @@
                 showBadge('form-alert-badge', T('reg.err_guardar'), 'err');
             }
         });
+
+        // ── Tabs nuevo / existente ──────────────────────────────────────────
+        function setModo(modo) {
+            const esNuevo = modo === 'nuevo';
+            document.getElementById('modo-nuevo').style.display = esNuevo ? 'block' : 'none';
+            document.getElementById('modo-existe').style.display = esNuevo ? 'none' : 'block';
+            document.getElementById('tab-nuevo').style.cssText = 'flex:1;padding:9px;border:none;font-size:13px;cursor:pointer;font-weight:500;background:' + (esNuevo ? 'var(--gold,#ff9f1c)' : 'rgba(255,255,255,.06)') + ';color:' + (esNuevo ? '#fff' : 'rgba(255,255,255,.5)');
+            document.getElementById('tab-existe').style.cssText = 'flex:1;padding:9px;border:none;font-size:13px;cursor:pointer;font-weight:500;background:' + (esNuevo ? 'rgba(255,255,255,.06)' : 'var(--gold,#ff9f1c)') + ';color:' + (esNuevo ? 'rgba(255,255,255,.5)' : '#fff');
+            const badge = document.getElementById('form-alert-badge');
+            if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
+        }
+
+        // Telefono completo del modo nuevo (prefijo + numero), same que serie.html.
+        function getTelCompletoReg() {
+            const codigo = (document.getElementById('reg-whatsapp-code')?.value || '+57').replace('-CA', '');
+            const numero = (document.getElementById('reg-whatsapp')?.value || '').replace(/\D/g, '');
+            return codigo + numero;
+        }
+
+        // ── Modo existente: verificar / inscribir ──────────────────────────
+        let _existenteReg = null;
+        async function verificarExistente() {
+            const cedula = (document.getElementById('ex-cedula')?.value || '').trim();
+            const telRaw = (document.getElementById('ex-tel')?.value || '').trim();
+            const prefijo = (document.getElementById('reg-whatsapp-code')?.value || '+57').replace('-CA', '');
+            const tel = prefijo + telRaw.replace(/\D/g, '');
+            if (!cedula || !telRaw) { showBadge('form-alert-badge', T('reg.completa_campos'), 'err'); return; }
+            const btn = document.getElementById('verify-btn');
+            btn.disabled = true; btn.textContent = T('serie.verificando');
+            try {
+                const { data: cli } = await getClient().from('clientes').select('*').eq('cedula', cedula).eq('telefono', tel).limit(1);
+                let persona = null;
+                if (cli && cli.length > 0) {
+                    persona = { nombre: cli[0].nombre, cedula: cedula, telefono: tel, cliente_id: cli[0].id, tipo: cli[0].tipo_default || 'frecuente' };
+                } else {
+                    const { data: ins } = await getClient().from('inscritos').select('nombre,cedula,telefono,cliente_id,tipo').eq('cedula', cedula).eq('telefono', tel).limit(1);
+                    if (ins && ins.length > 0) persona = { nombre: ins[0].nombre, cedula: cedula, telefono: tel, cliente_id: ins[0].cliente_id || null, tipo: ins[0].tipo || 'invitado' };
+                }
+                btn.disabled = false; btn.textContent = T('serie.verificar_btn');
+                if (!persona) {
+                    document.getElementById('paso-verificar').style.display = 'none';
+                    document.getElementById('paso-noencontrado').style.display = 'block';
+                    return;
+                }
+                const { data: dup } = await getClient().from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', window.__ctxEv.id);
+                if (dup && dup.length > 0) { mostrarDuplicado(cedula); return; }
+                _existenteReg = persona;
+                document.getElementById('conf-nombre').textContent = persona.nombre;
+                document.getElementById('conf-meta').textContent = cedula + ' · ' + telRaw;
+                document.getElementById('paso-verificar').style.display = 'none';
+                document.getElementById('paso-confirmar').style.display = 'block';
+            } catch (err) {
+                log("ERROR: " + err.message, "ERROR");
+                btn.disabled = false; btn.textContent = T('serie.verificar_btn');
+                showBadge('form-alert-badge', T('reg.err_cargar'), 'err');
+            }
+        }
+
+        async function inscribirExistente() {
+            const ev = window.__ctxEv;
+            if (!_existenteReg || !ev) return;
+            const btn = document.getElementById('confirm-btn');
+            btn.disabled = true; btn.textContent = T('serie.inscribiendo');
+            const rol = window.__ctxRol || 'invitado';
+            const tipoPersona = _existenteReg.tipo || rol || 'invitado';
+            const qrCode = 'QR-' + UID();
+            const payload = {
+                evento_id: ev.id,
+                org_id: window.__ctxOrgId,
+                evento_nombre: ev.nombre,
+                evento_fecha: ev.fecha,
+                nombre: _existenteReg.nombre,
+                cedula: _existenteReg.cedula,
+                telefono: _existenteReg.telefono,
+                whatsapp: _existenteReg.telefono,
+                cliente_id: _existenteReg.cliente_id || null,
+                tipo: tipoPersona,
+                tipo_ayuda: tipoPersona,
+                cuenta_aforo: true,
+                used: false,
+                qr_code: qrCode,
+                fecha_inscripcion: TODAY(),
+                hora_inscripcion: NOW(),
+                respuestas_custom: { rol: 'existente', origen: 'pagina-registro' },
+                ref_codigo: window.__ctxRefCodigo || null,
+                ref_nombre: window.__ctxRefNombre || null
+            };
+            try {
+                const { error } = await getClient().from('inscritos').insert(payload);
+                btn.disabled = false; btn.textContent = T('serie.inscribir_btn');
+                if (error) throw error;
+                document.getElementById('modo-existe').style.display = 'none';
+                const tabsIns = document.getElementById('reg-tabs');
+                if (tabsIns) tabsIns.style.display = 'none';
+                mostrarTicket(_existenteReg.nombre, qrCode, ev);
+                await enviarNotificacionesReg(_existenteReg.nombre, qrCode, null);
+            } catch (err) {
+                log("ERROR: " + err.message, "ERROR");
+                btn.disabled = false; btn.textContent = T('serie.inscribir_btn');
+                showBadge('form-alert-badge', T('reg.err_guardar'), 'err');
+            }
+        }
+
+        function resetVerif() {
+            _existenteReg = null;
+            const c = document.getElementById('ex-cedula'); if (c) c.value = '';
+            const t = document.getElementById('ex-tel'); if (t) t.value = '';
+            document.getElementById('paso-verificar').style.display = 'block';
+            document.getElementById('paso-confirmar').style.display = 'none';
+            document.getElementById('paso-noencontrado').style.display = 'none';
+        }
+
+        // ── Duplicado: recuperacion del QR ya emitido ───────────────────────
+        function mostrarDuplicado(cedula) {
+            window.__dupCedula = cedula;
+            document.getElementById('modo-nuevo').style.display = 'none';
+            document.getElementById('modo-existe').style.display = 'none';
+            document.getElementById('reg-tabs').style.display = 'none';
+            document.getElementById('ticket-wrap').style.display = 'none';
+            document.getElementById('form-success-msg').style.display = 'none';
+            document.getElementById('s-duplicate').style.display = 'block';
+            cargarQRRecuperadoReg();
+        }
+
+        async function cargarQRRecuperadoReg() {
+            const cedula = window.__dupCedula;
+            const ev = window.__ctxEv;
+            const loading = document.getElementById('dup-loading');
+            const wrap = document.getElementById('dup-ticket-wrap');
+            const noEnc = document.getElementById('dup-no-encontrado');
+            if (loading) loading.style.display = 'block';
+            if (wrap) wrap.style.display = 'none';
+            if (noEnc) noEnc.style.display = 'none';
+            if (!cedula || !ev) {
+                if (loading) loading.style.display = 'none';
+                if (noEnc) noEnc.style.display = 'block';
+                return;
+            }
+            try {
+                const { data, error } = await getClient().from('inscritos').select('*').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
+                if (loading) loading.style.display = 'none';
+                if (error || !data) { if (noEnc) noEnc.style.display = 'block'; return; }
+                window.__dupData = data;
+                const nombreEl = document.getElementById('dup-nombre');
+                const evEl = document.getElementById('dup-ev-nombre');
+                const codeEl = document.getElementById('dup-code');
+                if (nombreEl) nombreEl.textContent = (data.nombre || '').toUpperCase();
+                if (evEl) evEl.textContent = ((ev.nombre || '') + (ev.fecha ? ' · ' + ev.fecha : '')).toUpperCase();
+                if (codeEl) codeEl.textContent = T('serie.usounico_lbl', { qr: data.qr_code }) || data.qr_code;
+                const box = document.getElementById('dup-qr-box');
+                if (box) {
+                    box.innerHTML = '';
+                    if (typeof QRCode !== 'undefined') {
+                        try {
+                            new QRCode(box, { text: data.qr_code, width: 150, height: 150, colorDark: '#0F0F0F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+                        } catch (e) { box.textContent = data.qr_code; }
+                    } else {
+                        box.textContent = data.qr_code;
+                    }
+                }
+                const waBtn = document.getElementById('dup-btn-wa');
+                if (waBtn) waBtn.style.display = data.telefono ? 'block' : 'none';
+                if (wrap) wrap.style.display = 'block';
+            } catch (err) {
+                log("ERROR: " + err.message, "ERROR");
+                if (loading) loading.style.display = 'none';
+                if (noEnc) noEnc.style.display = 'block';
+            }
+        }
+
+        function enviarDupWA() {
+            const d = window.__dupData || {};
+            const qr = d.qr_code || '';
+            if (!qr) return;
+            const tel = (d.telefono || '').replace(/\D/g, '');
+            const texto = encodeURIComponent(qr);
+            const waUrl = tel ? 'https://wa.me/' + tel + '?text=' + texto : 'https://wa.me/?text=' + texto;
+            window.open(waUrl, '_blank');
+        }
+
+        // ── Ticket (render reutilizable) ────────────────────────────────────
+        function mostrarTicket(nombre, qr, ev) {
+            const tkEv = document.getElementById('tk-ev');
+            const tkName = document.getElementById('tk-name');
+            const tkCode = document.getElementById('tk-code');
+            if (tkEv) tkEv.textContent = (ev && ev.nombre ? ev.nombre : '') + (ev && ev.fecha ? ' · ' + ev.fecha : '');
+            if (tkName) tkName.textContent = nombre;
+            if (tkCode) tkCode.textContent = qr;
+            const qrBox = document.getElementById('reg-qr');
+            if (qrBox) {
+                qrBox.innerHTML = '';
+                if (typeof QRCode !== 'undefined') {
+                    try {
+                        new QRCode(qrBox, { text: qr, width: 180, height: 180, colorDark: '#0F0F0F', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+                    } catch (e) { qrBox.textContent = qr; }
+                } else {
+                    qrBox.textContent = qr;
+                }
+            }
+            const tw = document.getElementById('ticket-wrap');
+            if (tw) tw.style.display = 'block';
+            log("INFO: QR generado y ticket mostrado (" + qr + ").", "INFO");
+        }
+
+        // ── Notificaciones post-registro (correo) ───────────────────────────
+        async function enviarNotificacionesReg(nombre, qr, emailAddr) {
+            if (!emailAddr) return;
+            const ev = window.__ctxEv;
+            try {
+                const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
+                const res = await fetch(fnUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
+                    body: JSON.stringify({
+                        email: emailAddr,
+                        nombre: nombre,
+                        qrCode: qr,
+                        eventoNombre: ev ? (ev.nombre || '') : '',
+                        eventoFecha: ev ? (ev.fecha || '') : '',
+                        eventoHora: '',
+                        eventoLugar: 'Terraza Hostal'
+                    })
+                });
+                if (!res.ok) log("ERROR: Envio de confirmacion fallo (" + res.status + ").", "ERROR");
+            } catch (e) {
+                log("ERROR: " + e.message, "ERROR");
+            }
+        }
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
