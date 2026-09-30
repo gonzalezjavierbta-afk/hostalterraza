@@ -6851,23 +6851,45 @@ async function generarLinkInvitador() {
     link = window.location.origin + '/evento.html?' + (ev?.slug ? 'slug='+ev.slug : 'id='+targetId) + '&tipo=' + tipo + '&ref=' + codigo;
   }
 
-  // `invitadores.codigo` es UNICO en la base (constraint `invitadores_codigo_key`):
-  // un invitador = UNA fila. La fila "base" la crea crearInvitador(); aqui la
-  // ACTUALIZAMOS con el link/tipo/evento en vez de insertar otra fila con el mismo
-  // codigo (que provocaba: duplicate key value violates unique constraint
-  // "invitadores_codigo_key"). Solo se inserta si el codigo no existia.
-  const fila = {
+  // `invitadores.codigo` es UNICO a nivel de TABLA (constraint `invitadores_codigo_key`).
+  // NO se puede asumir que el codigo es libre NI confiar solo en `_invitadores`: esa
+  // cache esta filtrada por `org_id` (`.eq('org_id', ORG_ID)` en loadInvitadores) y puede
+  // no contener la fila que colisiona (p. ej. una fila huerfana/legacy con otro org_id o
+  // null). Por eso se consulta la fila REAL en la base por `codigo` (sin filtro de org):
+  // si existe se ACTUALIZA por id; si no, se inserta. Asi no se repite el
+  // `duplicate key value violates unique constraint "invitadores_codigo_key"`.
+  const payload = {
+    nombre,
+    codigo,
     tipo_invitado: tipo,
     link_generado: link,
     evento_id: (refTipo === 'evento' || refTipo === 'serie') ? refId : null,
     serie_id:  (refTipo === 'serie_all') ? refId : null,
     activo: true,
+    org_id: ORG_ID,
   };
-  const existente = _invitadores.find(i => i.codigo === codigo);
-  const { error } = existente
-    ? await SB.from('invitadores').update(fila).eq('id', existente.id)
-    : await SB.from('invitadores').insert(Object.assign({ nombre, codigo, org_id: ORG_ID }, fila));
-  if (error) { alert('Error: ' + error.message); return; }
+  const { data: dbRows, error: selErr } = await SB.from('invitadores').select('id').eq('codigo', codigo).limit(1);
+  if (selErr) { alert('Error al verificar el invitador: ' + selErr.message); return; }
+  if (dbRows && dbRows.length) {
+    const { error } = await SB.from('invitadores').update(payload).eq('id', dbRows[0].id);
+    if (error) { alert('Error: ' + error.message + (error.code ? ' (' + error.code + ')' : '')); return; }
+  } else {
+    const { error } = await SB.from('invitadores').insert(payload);
+    if (error) {
+      // 23505 = conflicto de codigo (fila no visible por RLS o carrera): reintentar UPDATE por codigo.
+      if (error.code === '23505') {
+        const { data: upd, error: e2 } = await SB.from('invitadores').update(payload).eq('codigo', codigo).select('id');
+        if (e2) { alert('Error: ' + e2.message + ' (' + (e2.code || '') + ')'); return; }
+        if (!upd || !upd.length) {
+          alert('El código "' + codigo + '" ya existe en la base pero tu sesión no puede verlo/actualizarlo (política RLS). Pide al administrador que lo revise (colisión de codigo entre organizaciones).');
+          return;
+        }
+      } else {
+        alert('Error: ' + error.message + (error.code ? ' (' + error.code + ')' : ''));
+        return;
+      }
+    }
+  }
   _piLinkGenerado = link;
 
   loadInvitadores();
