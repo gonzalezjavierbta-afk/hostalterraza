@@ -11175,11 +11175,18 @@ function _ticketDisenoStatus(tipo, msg, kind) {
   if (!msg) { box.style.display = 'none'; box.textContent = ''; return; }
   box.style.display = 'block';
   box.textContent = msg;
-  box.style.color = kind === 'err' ? 'var(--red)' : (kind === 'ok' ? 'var(--green)' : 'var(--ink3)');
+  // Estado inequivoco: color fuerte + fondo suave para que no quede
+  // invisible junto al preview. 'busy' usa tinta secundaria, nunca gris tenue.
+  box.style.color = kind === 'err' ? 'var(--red)' : (kind === 'ok' ? 'var(--green)' : 'var(--ink2)');
+  box.style.background = kind === 'err' ? 'var(--red-bg)' : (kind === 'ok' ? 'var(--green-bg)' : 'transparent');
+  box.style.borderRadius = '4px';
+  box.style.padding = '4px 8px';
 }
 // Escribe la URL en el campo de la fila y refresca el preview.
-// manual=true marca la fila como "URL escrita a mano": una subida que este en
-// vuelo ya no puede pisarla (prioridad de la URL manual sobre la subida).
+// manual=true marca la fila como "URL escrita a mano": si el usuario edita la
+// URL MIENTRAS una subida esta en vuelo, su cambio gana (la subida se descarta
+// por el token row.dataset.req). Elegir/soltar un archivo limpia esta marca al
+// iniciar para que la subida gane sobre una URL escrita ANTES.
 function _ticketDisenoSetUrl(tipo, url, opts) {
   const row = _ticketDisenoRow(tipo);
   if (!row) return;
@@ -11224,9 +11231,9 @@ function addTicketDisenoRow(data) {
       '<input type="file" class="ticket-diseno-file" accept="image/*" style="display:none">' +
       '<span class="ticket-diseno-drop-hint" style="font-size:11px;color:var(--ink3)">Arrastra la imagen aqui o haz clic para elegir el archivo</span>' +
     '</div>' +
-    '<div class="ticket-diseno-status" style="font-size:10px;color:var(--ink3);min-height:14px;display:none"></div>' +
+    '<div class="ticket-diseno-status" style="font-size:12px;font-weight:600;line-height:1.35;color:var(--ink2);min-height:16px;display:none"></div>' +
     '<div class="fg" style="margin:0">' +
-      '<label style="font-size:11px">URL del diseno (tiene prioridad sobre la subida)</label>' +
+      '<label style="font-size:11px">URL del diseno (alternativa a subir un archivo)</label>' +
       '<input class="ticket-diseno-url" type="url" placeholder="https://... o /imagenes/diseno.jpg" style="width:100%;font-family:monospace;font-size:11px">' +
     '</div>' +
     '<div class="ticket-diseno-preview" style="display:none">' +
@@ -11298,14 +11305,18 @@ async function handleTicketDisenoFile(tipo, file) {
   // cambia de req y el resultado de la subida se descarta.
   const req = String(++_ticketDisenoReqSeq);
   row.dataset.req = req;
+  // Elegir/soltar un archivo ES intencion de reemplazar: al iniciar la subida se
+  // limpia la marca manual para que la subida gane sobre una URL escrita ANTES.
+  // Si el usuario edita la URL MIENTRAS sube, el input cambia row.dataset.req y
+  // el guard de abajo descarta este resultado (su cambio posterior prevalece).
+  row.dataset.manual = '0';
   _ticketDisenoStatus(tipo, 'Subiendo diseno...', 'busy');
   try {
     const path = 'disenos/' + _ticketDisenoSlug() + '/' + tipo + '_' + Date.now() + '.' + _imgExtFromType(file);
     const publicUrl = await _imgSharedUpload(_TICKET_DISENO_BUCKET, path, file);
     if (row.dataset.req !== req) return;
-    if (row.dataset.manual === '1') { _ticketDisenoStatus(tipo, 'URL escrita a mano: la subida se descarto.', 'ok'); return; }
     _ticketDisenoSetUrl(tipo, publicUrl, { manual: false });
-    _ticketDisenoStatus(tipo, 'Diseno subido.', 'ok');
+    _ticketDisenoStatus(tipo, 'Diseno subido. La URL se actualizo en el campo.', 'ok');
   } catch (err) {
     if (row.dataset.req !== req) return;
     _ticketDisenoStatus(tipo, 'Error subiendo el diseno: ' + ((err && err.message) || 'revisa el bucket "eventos-imagenes"'), 'err');

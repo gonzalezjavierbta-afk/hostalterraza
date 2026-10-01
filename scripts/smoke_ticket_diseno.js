@@ -180,7 +180,7 @@ function tipoCallSites(text) {
     if (lines[i].indexOf('function _generarTicketCanvasReg(') !== -1) continue;
     var decl = null, declLine = -1;
     for (var j = i; j >= 0 && j >= i - 8; j--) {
-      if (lines[j].indexOf('const tipo =') !== -1) { decl = lines[j].trim(); declLine = j + 1; break; }
+      if (/const\s+tipo(?:Ticket)?\s*=/.test(lines[j])) { decl = lines[j].trim(); declLine = j + 1; break; }
     }
     sites.push({ fn: enclosingFn(lines, i), decl: decl, callLine: i + 1, declLine: declLine });
   }
@@ -191,8 +191,8 @@ function tipoCallSites(text) {
 function tipoWiringProblemas(text) {
   var problemas = [];
   var sites = tipoCallSites(text);
-  if (sites.length !== 3) {
-    problemas.push('se esperaban 3 call sites de _generarTicketCanvasReg, hallados ' + sites.length);
+  if (sites.length !== 4) {
+    problemas.push('se esperaban 4 call sites de _generarTicketCanvasReg, hallados ' + sites.length);
   }
   sites.forEach(function (s) {
     var tag = (s.fn || '?') + ' L' + s.callLine;
@@ -248,6 +248,10 @@ function makeCtx(ops) {
   ctx.drawImage = function () { rec('drawImage', null, A(arguments)); };
   ctx.fillText = function () {
     rec('fillText', { fillStyle: ctx.fillStyle, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }, A(arguments));
+  };
+  ctx.createLinearGradient = function () {
+    rec('createLinearGradient', null, A(arguments));
+    return { addColorStop: function () { rec('addColorStop', null, A(arguments)); } };
   };
   ['beginPath', 'moveTo', 'lineTo', 'arcTo', 'closePath', 'stroke', 'fill', 'save', 'restore',
     'translate', 'rotate', 'scale', 'setTransform', 'transform', 'clearRect', 'rect']
@@ -370,7 +374,8 @@ function loadKernel(src) {
   var consts = extractConstBlock(src);
   if (!consts) return null;
   var names = ['_truncarReg', '_qrSrcDeCajaReg', '_qrSrcReg', '_disenoTicketUrlReg',
-    '_cargarImagenTicketReg', '_drawCoverReg', '_qrNativoReg', '_generarTicketCanvasReg'];
+    '_cargarImagenTicketReg', '_drawCoverReg', '_roundRectReg', '_qrNativoReg',
+    '_pildoraTipoReg', '_generarTicketCanvasReg'];
   var parts = [consts];
   for (var i = 0; i < names.length; i++) {
     var f = extractFunction(src, names[i]);
@@ -434,68 +439,82 @@ function main() {
 
   var cblock = extractConstBlock(src);
   var g = {};
-  ['TICKET_W', 'TICKET_H', 'TICKET_FRAME_X', 'TICKET_FRAME_Y', 'TICKET_FRAME_SIZE',
-    'TICKET_PLACA_X', 'TICKET_PLACA_Y', 'TICKET_PLACA_SIZE',
+  ['TICKET_W', 'TICKET_H',
+    'TICKET_FRAME_X', 'TICKET_FRAME_Y', 'TICKET_FRAME_W', 'TICKET_FRAME_H',
+    'TICKET_PLACA_X', 'TICKET_PLACA_Y', 'TICKET_PLACA_W', 'TICKET_PLACA_H',
     'TICKET_QR_X', 'TICKET_QR_Y', 'TICKET_QR_SIZE', 'TICKET_QR_NATIVE',
-    'TICKET_QR_TEXT_Y', 'TICKET_QR_TEXT_PX', 'TICKET_QR_TEXT_COLOR', 'TICKET_DISENO_BASE']
+    'TICKET_QR_TEXT_Y', 'TICKET_QR_TEXT_PX', 'TICKET_QR_TEXT_COLOR', 'TICKET_DISENO_BASE',
+    'TICKET_PILDORA_X', 'TICKET_PILDORA_Y', 'TICKET_PILDORA_W', 'TICKET_PILDORA_H',
+    'TICKET_PILDORA_R', 'TICKET_PILDORA_TOP', 'TICKET_PILDORA_BOT', 'TICKET_PILDORA_TXT', 'TICKET_PILDORA_FONT_PX']
     .forEach(function (k) { g[k] = constVal(cblock, k); });
   var n = function (k) { return Number(g[k]); };
 
   /* ------------------------------------------------------------- S1 */
-  seccion('S1 Geometria exacta (lienzo 1080x1920)');
+  seccion('S1 Geometria exacta alineada a la caja REAL del arte');
   eq(g.TICKET_W, '1080', 'lienzo ancho = 1080');
   eq(g.TICKET_H, '1920', 'lienzo alto = 1920');
-  eq(g.TICKET_QR_SIZE, '480', 'QR lado = 480 EXACTO (no 479 ni 481)');
-  eq(g.TICKET_QR_NATIVE, '480', 'QR nativo = 480');
-  eq(g.TICKET_QR_X, '300', 'QR X = 300');
-  eq(g.TICKET_QR_Y, '760', 'QR Y = 760');
-  eq(g.TICKET_FRAME_X, '260', 'marco X = 260');
-  eq(g.TICKET_FRAME_Y, '720', 'marco Y = 720');
-  eq(g.TICKET_FRAME_SIZE, '560', 'marco lado = 560');
-  eq(g.TICKET_PLACA_X, '272', 'placa X = 272');
-  eq(g.TICKET_PLACA_Y, '732', 'placa Y = 732 (ajuste intencional por evidencia visual)');
-  eq(g.TICKET_PLACA_SIZE, '536', 'placa lado = 536');
+  eq(g.TICKET_QR_SIZE, '400', 'QR lado = 400 EXACTO');
+  eq(g.TICKET_QR_NATIVE, 'TICKET_QR_SIZE', 'QR nativo = QR lado (se genera a la medida final, sin reescalar)');
+  eq(g.TICKET_QR_X, '344', 'QR X = 344 (centrado en el marco)');
+  eq(g.TICKET_QR_Y, '712', 'QR Y = 712 (centrado en el marco)');
+  eq(g.TICKET_FRAME_X, '285', 'marco X = 285 (caja real del arte)');
+  eq(g.TICKET_FRAME_Y, '664', 'marco Y = 664 (caja real del arte)');
+  eq(g.TICKET_FRAME_W, '518', 'marco ancho = 518 (caja real del arte)');
+  eq(g.TICKET_FRAME_H, '496', 'marco alto = 496 (caja real del arte)');
+  eq(g.TICKET_PLACA_X, '303', 'placa X = 303 (marco inset 18)');
+  eq(g.TICKET_PLACA_Y, '682', 'placa Y = 682 (marco inset 18)');
+  eq(g.TICKET_PLACA_W, '482', 'placa ancho = 482');
+  eq(g.TICKET_PLACA_H, '460', 'placa alto = 460');
   eq(g.TICKET_QR_TEXT_Y, '1555', 'string del codigo Y = 1555');
   eq(g.TICKET_QR_TEXT_PX, '28', 'string del codigo = 28 px (una sola linea)');
   eq(g.TICKET_QR_TEXT_COLOR, "'rgba(253, 246, 220, .78)'", 'color del string = crema del arte');
-  eq(g.TICKET_DISENO_BASE, "'" + BASE + "'", 'semilla same-origin del fondo base');
+  eq(g.TICKET_DISENO_BASE, "'" + BASE + "'", 'el arte de Rastro se conserva como constante MUERTA (Cero Borrado)');
+  eq(g.TICKET_PILDORA_X, '234', 'pildora X = 234 (contorno cian real del arte)');
+  eq(g.TICKET_PILDORA_Y, '1166', 'pildora Y = 1166 (contorno cian real del arte)');
+  eq(g.TICKET_PILDORA_W, '616', 'pildora ancho = 616 (contorno cian real del arte)');
+  eq(g.TICKET_PILDORA_H, '130', 'pildora alto = 130 (contorno cian real del arte)');
+  eq(g.TICKET_PILDORA_FONT_PX, '64', 'pildora: el tipo se estampa a 64 px');
 
   /* ------------------------------------------------------------------
    * INVARIANTES GEOMETRICOS (no numeros absolutos).
-   * La placa y el QR se comprueban por CONTENCION y SIMETRIA. Asi, ajustar
-   * una coordenada por analisis de pixiles (TICKET_PLACA_Y 748 -> 732) no
-   * rompe el smoke, pero reintroducir el descentrado lo vuelve a cazar.
+   * Marco y placa son RECTS (la caja real del arte NO es cuadrada); el QR
+   * es CUADRADO. Se comprueba CONTENCION y SIMETRIA por eje.
    * ------------------------------------------------------------------ */
-  var R_FRAME = sq(n('TICKET_FRAME_X'), n('TICKET_FRAME_Y'), n('TICKET_FRAME_SIZE'));
-  var R_PLACA = sq(n('TICKET_PLACA_X'), n('TICKET_PLACA_Y'), n('TICKET_PLACA_SIZE'));
+  var R_FRAME = [n('TICKET_FRAME_X'), n('TICKET_FRAME_Y'), n('TICKET_FRAME_W'), n('TICKET_FRAME_H')];
+  var R_PLACA = [n('TICKET_PLACA_X'), n('TICKET_PLACA_Y'), n('TICKET_PLACA_W'), n('TICKET_PLACA_H')];
   var R_QR = sq(n('TICKET_QR_X'), n('TICKET_QR_Y'), n('TICKET_QR_SIZE'));
   var mP = margins(R_PLACA, R_FRAME);
   var mQ = margins(R_QR, R_PLACA);
 
-  ok(mP.t >= 0, 'placa: no se sale del marco por ARRIBA', 'margen sup=' + mP.t);
-  ok(mP.b >= 0, 'placa: no se sale del marco por ABAJO', 'margen inf=' + mP.b);
+  ok(mP.t >= 0 && mP.b >= 0 && mP.l >= 0 && mP.r >= 0, 'placa: contenida en el marco', JSON.stringify(mP));
   eq(mP.t, mP.b, 'placa: CENTRADA verticalmente en el marco (margen sup == margen inf)');
-  eq(mP.l, mP.r, 'placa: CENTRADA horizontalmente en el marco (margen izq == der)');
+  eq(mP.l, mP.r, 'placa: CENTRADA horizontalmente en el marco (margen izq == margen der)');
 
   ok(mQ.t >= 0, 'QR: cabe dentro de la placa por ARRIBA (quiet zone)', 'sup=' + mQ.t);
   ok(mQ.b >= 0, 'QR: cabe dentro de la placa por ABAJO (quiet zone)', 'inf=' + mQ.b);
+  ok(mQ.t >= 30 && mQ.b >= 30 && mQ.l >= 30 && mQ.r >= 30, 'QR: quiet zone suficiente (>= 30 px por lado)', JSON.stringify(mQ));
   eq(mQ.t, mQ.b, 'QR: quiet zone SIMETRICA en Y dentro de la placa');
   eq(mQ.l, mQ.r, 'QR: quiet zone SIMETRICA en X dentro de la placa');
-  eq(mQ.l, (n('TICKET_PLACA_SIZE') - n('TICKET_QR_SIZE')) / 2,
-    'QR: el quiet zone sale del contrato de tamanos ((536-480)/2)');
+  eq(mQ.l, (n('TICKET_PLACA_W') - n('TICKET_QR_SIZE')) / 2, 'QR: quiet zone X = ((placa ancho - QR) / 2)');
+  eq(mQ.t, (n('TICKET_PLACA_H') - n('TICKET_QR_SIZE')) / 2, 'QR: quiet zone Y = ((placa alto - QR) / 2)');
 
   /* El string del codigo no puede caer sobre la placa blanca. */
   ok(R_PLACA[1] + R_PLACA[3] <= n('TICKET_QR_TEXT_Y') - n('TICKET_QR_TEXT_PX'),
     'el string del codigo no se dibuja encima de la placa blanca',
     'placa termina en ' + (R_PLACA[1] + R_PLACA[3]) + ', el string arranca en ' + (n('TICKET_QR_TEXT_Y') - n('TICKET_QR_TEXT_PX')));
 
-  /* La placa no puede invadir la banda de arte de la fecha: evidencia medida
-     en el brief de E1-E6 (la fecha "SABADO 10 DE OCTUBRE 2026" ocupa el
-     lienzo Y=1278..1316). Con la placa en 732 quedan 10 px de aire. */
-  var ARTE_FECHA_Y = 1278;
+  /* La pildora del tipo va por debajo de la placa (no se pisan). */
+  ok(n('TICKET_PILDORA_Y') >= R_PLACA[1] + R_PLACA[3], 'la pildora del tipo no se solapa con la placa blanca',
+    'pildora arranca en ' + n('TICKET_PILDORA_Y') + ', placa termina en ' + (R_PLACA[1] + R_PLACA[3]));
+
+  /* La placa no puede invadir la banda de arte de la fecha (Y=1315..1481). */
+  var ARTE_FECHA_Y = 1315;
   ok(R_PLACA[1] + R_PLACA[3] < ARTE_FECHA_Y,
-    'la placa blanca no invade la banda de arte de la fecha (Y=' + ARTE_FECHA_Y + '..1316)',
+    'la placa blanca no invade la banda de arte de la fecha (Y=' + ARTE_FECHA_Y + '..)',
     'la placa termina en ' + (R_PLACA[1] + R_PLACA[3]));
+  ok(n('TICKET_PILDORA_Y') + n('TICKET_PILDORA_H') < ARTE_FECHA_Y,
+    'la pildora del tipo no invade la banda de arte de la fecha (Y=' + ARTE_FECHA_Y + '..)',
+    'la pildora termina en ' + (n('TICKET_PILDORA_Y') + n('TICKET_PILDORA_H')));
 
   ok(n('TICKET_QR_TEXT_Y') > R_QR[1] + R_QR[3], 'el string del codigo va POR DEBAJO del QR');
   ok(n('TICKET_QR_TEXT_Y') + n('TICKET_QR_TEXT_PX') < n('TICKET_H'), 'el string del codigo cabe en el lienzo');
@@ -510,6 +529,9 @@ function main() {
     eq(countIn(js, t), 0, '0 "' + t + '" en TODO el JS de registroaforo.html');
   });
   eq(countIn(region, 'imageSmoothingEnabled = false'), 1, 'imageSmoothingEnabled=false (QR sin interpolacion)');
+  eq(countIn(region, 'imageSmoothingEnabled = true'), 1, 'imageSmoothingEnabled=true (fondo suavizado, ADR-064 ANEXO B)');
+  ok(region.indexOf('imageSmoothingEnabled = true') < region.indexOf('imageSmoothingEnabled = false'),
+    'el suavizado se activa ANTES del fondo y se desactiva DESPUES, antes del QR');
   ok(countIn(js, 'rotate(360deg)') === 0, 'el unico rotate() del repo es CSS @keyframes, no JS de canvas');
 
   /* ------------------------------------------------------------- S4 */
@@ -533,7 +555,7 @@ function main() {
     ['match con activo truthy no-booleano', LISTA([{ tipo: 'invitado', diseno_url: STORAGE, activo: 1 }]), 'invitado', STORAGE],
     ['match con diseno_url en blanco', LISTA([{ tipo: 'invitado', diseno_url: '   ', activo: true }]), 'invitado', ''],
     ['match con diseno_url ausente', LISTA([{ tipo: 'invitado', activo: true }]), 'invitado', ''],
-    ['match con otro tipo', LISTA([{ tipo: 'artista', diseno_url: STORAGE, activo: true }]), 'invitado', ''],
+    ['match con otro tipo (cae a nivel 2: primer activo)', LISTA([{ tipo: 'artista', diseno_url: STORAGE, activo: true }]), 'invitado', STORAGE],
     ['entradas no-objeto se saltan', LISTA([null, 'x', 42, { tipo: 'invitado', diseno_url: STORAGE, activo: true }]), 'invitado', STORAGE],
     ['match valido', LISTA([{ tipo: 'pago', diseno_url: STORAGE, activo: true }]), 'pago', STORAGE],
     ['doble match gana el PRIMERO', LISTA([
@@ -551,8 +573,28 @@ function main() {
   ].forEach(function (c) {
     eq(F(c[1], c[2]), c[3], 'S4 ' + c[0]);
   });
-  eq(F(LISTA([{ tipo: 'Invitado', diseno_url: STORAGE, activo: true }]), 'invitado'), '',
-    'S4 el match de tipo es EXACTO (no normaliza mayusculas)');
+  /* Nivel 2 (ADR-064 ANEXO B): sin match, PRIMER diseno activo del array. */
+  [
+    ['nivel 2: primer activo de otro tipo', LISTA([{ tipo: 'artista', diseno_url: 'https://a.png', activo: true }]), 'invitado', 'https://a.png'],
+    ['nivel 2: gana el PRIMER activo del array', LISTA([
+      { tipo: 'pago', diseno_url: 'https://a.png', activo: true },
+      { tipo: 'frecuente', diseno_url: 'https://b.png', activo: true }]), 'invitado', 'https://a.png'],
+    ['nivel 2: 1er activo sin url -> 2do activo', LISTA([
+      { tipo: 'pago', diseno_url: '', activo: true },
+      { tipo: 'frecuente', diseno_url: 'https://b.png', activo: true }]), 'invitado', 'https://b.png'],
+    ['nivel 1 tiene prioridad sobre nivel 2', LISTA([
+      { tipo: 'pago', diseno_url: 'https://a.png', activo: true },
+      { tipo: 'invitado', diseno_url: 'https://i.png', activo: true }]), 'invitado', 'https://i.png'],
+    ['sin ningun activo -> sin diseno', LISTA([
+      { tipo: 'pago', diseno_url: 'https://a.png', activo: false },
+      { tipo: 'artista', diseno_url: 'https://b.png' }]), 'invitado', ''],
+    ['nivel 2 ignora entradas no-objeto', LISTA([null, 'x', { tipo: 'pago', diseno_url: 'https://a.png', activo: true }]), 'invitado', 'https://a.png']
+  ].forEach(function (c) {
+    eq(F(c[1], c[2]), c[3], 'S4 ' + c[0]);
+  });
+  eq(F(LISTA([{ tipo: 'Invitado', diseno_url: 'https://mayus.png', activo: true },
+    { tipo: 'invitado', diseno_url: 'https://exacto.png', activo: true }]), 'invitado'), 'https://exacto.png',
+    'S4 el match de tipo es EXACTO (no normaliza mayusculas; gana la coincidencia literal)');
 
   /* ------------------------------------------------------------- S6 */
   seccion('S6 Guard de proporcion: recorte centrado, nunca estirado');
@@ -585,21 +627,22 @@ function main() {
   ok(r6b === false && ops6b.length === 0, 'S6 sin dimensiones NO dibuja nada (devuelve false)');
 
   /* ------------------------------------------------------------- S5 */
-  seccion('S5 Sin match se conserva el fondo base');
-  var c5 = ctxWith(src, { urls: (function () { var m = {}; m[BASE] = { w: 941, h: 1672 }; return m; })() });
+  seccion('S5 Nivel 2: sin match se usa el PRIMER diseno activo (no el base)');
+  var c5 = ctxWith(src, { urls: (function () { var m = {}; m[STORAGE] = { w: 941, h: 1672 }; return m; })() });
   var evOtro = LISTA([{ tipo: 'pago', diseno_url: STORAGE, activo: true }]);
   return c5.K._generarTicketCanvasReg('QR-TEST01', 'Ana', evOtro, '#reg-qr', 'invitado').then(function (cv) {
-    eq(c5.env.requested[0], BASE, 'S5 sin match carga la semilla /imagenes/tiket-rastro.jpg');
-    ok(c5.env.requested.indexOf(STORAGE) === -1, 'S5 sin match NO pide el diseno de otro tipo');
+    eq(c5.env.requested[0], STORAGE, 'S5 sin match carga el PRIMER diseno activo (compartido)');
+    ok(c5.env.requested.indexOf(BASE) === -1, 'S5 sin match NO carga el arte base /imagenes/tiket-rastro.jpg');
     eq(fullRect(cv.ops).length, 0, 'S5 con fondo cargado NO se pinta el rect de respaldo');
     ok(fillOps(cv.ops, 'drawImage').some(function (o) {
       return o.args[5] === 0 && o.args[6] === 0 && o.args[7] === 1080 && o.args[8] === 1920;
-    }), 'S5 el fondo base cubre 1080x1920');
+    }), 'S5 el fondo cubre 1080x1920');
     return s5b(src);
   })
     .then(function () { return s7(src); })
     .then(function () { return s3(src); })
-    .then(function () { s8(adm); s9(src); return null; })
+    .then(function () { return s10(src); })
+    .then(function () { s11(src); s8(adm); s9(src); return null; })
     .then(finish);
 }
 
@@ -622,24 +665,23 @@ function s5b(src) {
   });
 }
 
-/* S7: payload QR nativo a 480 px. */
+/* S7: payload QR nativo a 400 px (== TICKET_QR_SIZE, sin reescalar). */
 function s7(src) {
-  seccion('S7 Payload QR nativo (480 px, sin ampliar pixeles del DOM)');
-  var c = ctxWith(src, { urls: (function () { var m = {}; m[BASE] = { w: 941, h: 1672 }; return m; })() });
-  return c.K._generarTicketCanvasReg('QR-AB12CD', 'Ana', null, '#reg-qr', null).then(function (cv) {
+  seccion('S7 Payload QR nativo (400 px, sin ampliar pixeles del DOM)');
+  var c = ctxWith(src, { urls: (function () { var m = {}; m[STORAGE] = { w: 941, h: 1672 }; return m; })() });
+  var ev = LISTA([{ tipo: 'invitado', diseno_url: STORAGE, activo: true }]);
+  return c.K._generarTicketCanvasReg('QR-AB12CD', 'Ana', ev, '#reg-qr', 'invitado').then(function (cv) {
     ok(cv.width === 1080 && cv.height === 1920, 'S7 el lienzo es 1080x1920', cv.width + 'x' + cv.height);
     var rects = fillOps(cv.ops, 'fillRect');
-    eq(rects[0].args, [260, 720, 560, 560], 'S7 marco cyan 560@(260,720)');
+    eq(rects[0].args, [285, 664, 518, 496], 'S7 marco cyan cubre la caja real (518x496)');
     eq(rects[0].fillStyle, '#00E5FF', 'S7 color del marco = TICKET_CYAN');
     eq(rects[1].fillStyle, '#FFFFFF', 'S7 color de la placa = blanco (quiet zone del QR)');
-    eq(rects[1].args[2], 536, 'S7 la placa mide 536 de lado (quiet zone del QR)');
-    eq(rects[1].args[3], 536, 'S7 la placa es cuadrada');
-    var q = fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[7] === 480 && o.args[8] === 480; });
-    eq(q.length, 1, 'S7 el QR se dibuja 480x480 en el lienzo');
+    eq([rects[1].args[2], rects[1].args[3]], [482, 460], 'S7 la placa mide 482x460 (quiet zone)');
+    var q = fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[7] === 400 && o.args[8] === 400; });
+    eq(q.length, 1, 'S7 el QR se dibuja 400x400 en el lienzo');
 
-    /* Placa y QR sobre las ops REALES del lienzo: se chequean por INVARIANTE
-       (contencion + simetria), no por la coordenada absoluta. Asi el smoke
-       sigue catching un descentrado aunque la Y se ajuste a mano. */
+    /* Marco/placa/QR sobre las ops REALES del lienzo: se chequean por INVARIANTE
+       (contencion + simetria), no por la coordenada absoluta. */
     if (rects.length >= 2 && q.length === 1) {
       var Rf = rects[0].args;
       var Rp = rects[1].args;
@@ -654,29 +696,30 @@ function s7(src) {
         'sup=' + mq.t + ' inf=' + mq.b);
       eq(mq.t, mq.b, 'S7 el QR tiene quiet zone SIMETRICA en Y dentro de la placa');
       eq(mq.l, mq.r, 'S7 el QR tiene quiet zone SIMETRICA en X dentro de la placa');
-      eq(mq.l, (Rp[2] - Rq[2]) / 2, 'S7 el quiet zone sale del contrato de tamanos ((536-480)/2)');
+      eq(mq.l, (Rp[2] - Rq[2]) / 2, 'S7 el quiet zone X sale del contrato de tamanos ((482-400)/2)');
+      eq(mq.t, (Rp[3] - Rq[3]) / 2, 'S7 el quiet zone Y sale del contrato de tamanos ((460-400)/2)');
     }
     if (q.length === 1) {
-      eq([q[0].args[5], q[0].args[6]], [300, 760], 'S7 el QR se posiciona en (300,760) [contrato]');
-      ok(q[0].args[3] >= 480 && q[0].args[4] >= 480, 'S7 la fuente del QR ya es >= 480 px (nada se amplia)',
+      eq([q[0].args[5], q[0].args[6]], [344, 712], 'S7 el QR se posiciona en (344,712) [contrato]');
+      ok(q[0].args[3] >= 400 && q[0].args[4] >= 400, 'S7 la fuente del QR ya es >= 400 px (nada se amplia)',
         JSON.stringify([q[0].args[3], q[0].args[4]]));
     }
     return s7b(src);
   });
 }
 
-/* S7b: si la fuente nativa no llega a 480, se degrada (prohibido ampliar 150/180). */
+/* S7b: si la fuente nativa no llega a 400, se degrada (prohibido ampliar 150/180). */
 function s7b(src) {
   seccion('S7b Prohibido ampliar pixeles del QR del DOM (150/180)');
   var c = ctxWith(src, { urls: (function () { var m = {}; m[BASE] = { w: 941, h: 1672 }; return m; })() });
   c.K.QRCode = undefined; /* fuerza la degradacion */
   return c.K._generarTicketCanvasReg('QR-AB12CD', 'Ana', null, '#no-existe', null).then(function (cv) {
-    var q = fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[7] === 480; });
-    eq(q.length, 0, 'S7b sin fuente >= 480 NO dibuja el QR (no amplia pixeles)');
-    var fb = fillOps(cv.ops, 'fillText').filter(function (o) { return o.args[0] === 'QR-AB12CD' && o.args[2] === 1000; });
+    var q = fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[7] === 400; });
+    eq(q.length, 0, 'S7b sin fuente >= 400 NO dibuja el QR (no amplia pixeles)');
+    var fb = fillOps(cv.ops, 'fillText').filter(function (o) { return o.args[0] === 'QR-AB12CD' && o.args[2] === 912; });
     eq(fb.length, 1, 'S7b degrada a texto con el codigo en el centro del QR',
       JSON.stringify(fillOps(cv.ops, 'fillText').map(function (o) { return [o.args[0], o.args[1], o.args[2]]; })));
-    if (fb.length === 1) eq([fb[0].args[1], fb[0].args[2]], [540, 1000], 'S7b el texto de degradacion va al centro del QR');
+    if (fb.length === 1) eq([fb[0].args[1], fb[0].args[2]], [544, 912], 'S7b el texto de degradacion va al centro del QR');
     eq(fillOps(cv.ops, 'fillText').filter(function (o) { return o.args[2] === 1555; }).length, 1,
       'S7b el string del codigo en Y=1555 se dibuja igual');
     ok(c.env.logs.length > 0, 'S7b deja rastro en log de la degradacion', JSON.stringify(c.env.logs));
@@ -700,14 +743,14 @@ function s3(src) {
     eq(last ? last.font : null, '28px sans-serif', 'S3 28 px, una sola linea');
     eq(last ? last.fillStyle : null, 'rgba(253, 246, 220, .78)', 'S3 color crema del arte');
     ok(last && last.args[0].indexOf('%') === -1, 'S3 el payload NO va URL-encoded al lienzo');
-    eq(fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[5] === 300 && o.args[6] === 760; }).length, 1,
+    eq(fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[5] === 344 && o.args[6] === 712; }).length, 1,
       'S3 el QR se dibuja UNICAMENTE como imagen (el string va aparte, en Y=1555)');
-    /* qrcodejs recibe el payload CRUDO, generado a 480. */
+    /* qrcodejs recibe el payload CRUDO, generado a 400. */
     ok(c.env.qrCalls.length >= 1, 'S3 qrcodejs recibio el texto del codigo', 'n=' + c.env.qrCalls.length);
     if (c.env.qrCalls.length) {
       var qo = c.env.qrCalls[c.env.qrCalls.length - 1].opts;
       eq(qo.text, P, 'S3 el QR encodes el qr_code crudo (sin hashear ni codificar)');
-      eq([qo.width, qo.height], [480, 480], 'S3 el QR se genera a 480 NATIVO (no 150/180 del DOM)');
+      eq([qo.width, qo.height], [400, 400], 'S3 el QR se genera a 400 NATIVO (== TICKET_QR_SIZE, no 150/180 del DOM)');
     }
     eq(c.env.body.children.length, 0, 'S3 el host temporal del QR sale del DOM (finally)');
     ok(c.env.qrCalls.every(function (x) { return !x.host.parentNode; }),
@@ -774,10 +817,10 @@ function s9(src) {
   seccion('S9 Cableado del tipo (window.__ctxRol -> render)');
 
   var sites = tipoCallSites(src);
-  eq(sites.length, 3, 'S9 hay exactamente 3 call sites de _generarTicketCanvasReg');
+  eq(sites.length, 4, 'S9 hay exactamente 4 call sites de _generarTicketCanvasReg');
   var fns = sites.map(function (s) { return s.fn; }).sort();
-  eq(fns, ['descargarDupReg', 'descargarTicketReg', 'enviarTicketWAReg'],
-    'S9 los 3 call sites son ticket nuevo, duplicado y WhatsApp');
+  eq(fns, ['descargarDupReg', 'descargarTicketReg', 'enviarTicketWAReg', 'mostrarTicket'],
+    'S9 los call sites son ticket nuevo, duplicado, WhatsApp y mostrarTicket (pantalla)');
 
   sites.forEach(function (s) {
     var tag = 'S9 ' + (s.fn || '?') + ': ';
@@ -799,6 +842,8 @@ function s9(src) {
     'S9 el duplicado prioriza la fila y cae a window.__ctxRol', byFn.descargarDupReg);
   ok(byFn.enviarTicketWAReg.indexOf('__ctxRol') !== -1 && byFn.enviarTicketWAReg.indexOf('__dupData') !== -1,
     'S9 el WhatsApp prioriza la fila y cae a window.__ctxRol', byFn.enviarTicketWAReg);
+  ok(byFn.mostrarTicket.indexOf('__ctxRol') !== -1,
+    'S9 mostrarTicket (canvas en pantalla) usa window.__ctxRol', byFn.mostrarTicket);
   eq(countIn(src, 'name="tipo"'), 0, 'S9 no queda ningun [name="tipo"] en registroaforo.html');
 
   var pp = tipPersistenciaProblemas(src);
@@ -812,6 +857,68 @@ function s9(src) {
   var mut = tipoWiringProblemas(roto);
   ok(mut.length > 0, 'S9 el guard DETECTA la regresion a [name="tipo"] (mutacion falla)', JSON.stringify(mut));
   eq(tipoWiringProblemas(src), [], 'S9 el archivo real esta SANO (el guard no dispara)');
+}
+
+/*
+ * S10: tipo estampado sobre la pildora + fondo neutro generado (ANEXO B).
+ * El arte es generico; el sistema imprime el TIPO (mayusculas) sobre la
+ * pildora, y sin diseno activo se usa el fondo neutro (NO el arte base).
+ */
+function s10(src) {
+  seccion('S10 Tipo estampado en la pildora + fondo neutro (ADR-064 ANEXO B)');
+  var c = ctxWith(src, { urls: (function () { var m = {}; m[STORAGE] = { w: 941, h: 1672 }; return m; })() });
+  var ev = LISTA([{ tipo: 'pago', diseno_url: STORAGE, activo: true }]);
+  return c.K._generarTicketCanvasReg('QR-T10', 'Ana', ev, '#reg-qr', 'invitado').then(function (cv) {
+    var t = fillOps(cv.ops, 'fillText');
+    var pill = t.filter(function (o) { return o.args[0] === 'INVITADO'; });
+    eq(pill.length, 1, 'S10 el TIPO se estampa en MAYUSCULAS sobre la pildora',
+      JSON.stringify(t.map(function (o) { return o.args[0]; })));
+    if (pill.length === 1) {
+      near(pill[0].args[1], 234 + 616 / 2, 0.001, 'S10 el tipo va centrado en X de la pildora (542)');
+      near(pill[0].args[2], 1166 + 130 / 2, 0.001, 'S10 el tipo va centrado en Y de la pildora (1231)');
+      eq(pill[0].font, 'bold 64px sans-serif', 'S10 el tipo va en negrita 64px');
+      eq(pill[0].fillStyle, '#1A1A1A', 'S10 el tipo va en texto oscuro');
+    }
+    ok(cv.ops.some(function (o) { return o.m === 'createLinearGradient'; }), 'S10 la pildora usa gradiente dorado (createLinearGradient)');
+    ok(cv.ops.some(function (o) { return o.m === 'stroke'; }), 'S10 la pildora lleva borde (stroke)');
+    ok(cv.ops.some(function (o) { return o.m === 'arcTo'; }), 'S10 la pildora es redondeada (arcTo)');
+    var draws = fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[7] === 400 && o.args[8] === 400; });
+    eq(draws.length, 1, 'S10 el QR cuadrado se dibuja dentro de la caja del arte');
+    /* tipo null -> INVITADO por defecto. */
+    return c.K._generarTicketCanvasReg('QR-T10B', 'Ana', ev, '#reg-qr', null).then(function (cv2) {
+      var t2 = fillOps(cv2.ops, 'fillText').filter(function (o) { return o.args[0] === 'INVITADO'; });
+      eq(t2.length, 1, 'S10 sin tipo explicito se estampa INVITADO');
+      /* Sin diseno activo -> fondo neutro + NO descarga ninguna imagen. */
+      var c3 = ctxWith(src, { urls: {} });
+      var evOff = LISTA([{ tipo: 'pago', diseno_url: STORAGE, activo: false }]);
+      return c3.K._generarTicketCanvasReg('QR-T10C', 'Ana', evOff, '#reg-qr', 'invitado').then(function (cv3) {
+        eq(c3.env.requested.length, 0, 'S10 sin diseno activo NO se descarga ninguna imagen');
+        var full = fullRect(cv3.ops);
+        eq(full.length, 1, 'S10 sin diseno se pinta el fondo neutro');
+        if (full.length === 1) eq(full[0].fillStyle, '#0F0F0F', 'S10 el fondo neutro es #0F0F0F');
+        var px = fillOps(cv3.ops, 'fillText').filter(function (o) { return o.args[0] === 'INVITADO'; });
+        eq(px.length, 1, 'S10 el fondo neutro tambien estampa el tipo');
+      });
+    });
+  });
+}
+
+/*
+ * S11: mostrarTicket pasa a mostrar el canvas 1080x1920 en pantalla, de forma
+ * asincrona y con fail-open (conserva el QR plano como placeholder inmediato).
+ */
+function s11(src) {
+  seccion('S11 mostrarTicket asincrono (canvas 1080x1920 en pantalla)');
+  var f = extractFunction(src, 'mostrarTicket');
+  ok(!!f, 'S11 mostrarTicket se extrajo por balance de llaves');
+  if (!f) return null;
+  ok(f.indexOf('_generarTicketCanvasReg(') !== -1, 'S11 mostrarTicket invoca el render 1080x1920');
+  ok(f.indexOf('.then(') !== -1, 'S11 mostrarTicket resuelve el canvas de forma asincrona');
+  ok(f.indexOf('toDataURL') !== -1, 'S11 usa el dataURL del canvas');
+  ok(f.indexOf("createElement('img')") !== -1, 'S11 reemplaza #reg-qr por un <img> del canvas');
+  ok(f.indexOf('reg-qr') !== -1, 'S11 opera sobre #reg-qr');
+  ok(f.indexOf('new QRCode(qrBox') !== -1, 'S11 conserva el QR plano 180x180 como placeholder inmediato (fail-open)');
+  return null;
 }
 
 function finish() {

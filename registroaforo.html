@@ -716,8 +716,37 @@
             }
             const tw = document.getElementById('ticket-wrap');
             if (tw) tw.style.display = 'block';
-            window.__ticketData = { nombre: nombre, qr: qr, ev: ev, telefono: telefono || (_existenteReg && _existenteReg.telefono) || '' };
+            const tipoTicket = window.__ctxRol || 'invitado';
+            window.__ticketData = { nombre: nombre, qr: qr, ev: ev, telefono: telefono || (_existenteReg && _existenteReg.telefono) || '', tipo: tipoTicket };
             log("INFO: QR generado y ticket mostrado (" + qr + ").", "INFO");
+            // Asincrono con fail-open (ADR-008): el QR plano 180x180 queda como
+            // placeholder inmediato; cuando el lienzo 1080x1920 esta listo, se
+            // reemplaza #reg-qr por un <img> con su dataURL. Si algo falla, el
+            // QR plano se conserva.
+            _generarTicketCanvasReg(qr, nombre, ev || window.__ctxEv || null, '#reg-qr', tipoTicket).then(function (cv) {
+                const box = document.getElementById('reg-qr');
+                if (!box || !cv) return;
+                try {
+                    const url = cv.toDataURL('image/png');
+                    const img = document.createElement('img');
+                    img.alt = 'Ticket';
+                    img.src = url;
+                    img.style.display = 'block';
+                    img.style.width = '100%';
+                    img.style.height = 'auto';
+                    img.style.borderRadius = '10px';
+                    box.innerHTML = '';
+                    box.style.background = 'transparent';
+                    box.style.padding = '0';
+                    box.style.display = 'block';
+                    box.appendChild(img);
+                    log("INFO: Ticket 1080x1920 renderizado y mostrado.", "INFO");
+                } catch (e) {
+                    log("ERROR: " + e.message, "ERROR");
+                }
+            }).catch(function (e) {
+                log("ERROR: " + e.message, "ERROR");
+            });
         }
 
         // ── Notificaciones post-registro (correo) ───────────────────────────
@@ -786,15 +815,21 @@
         }
 
         // --- Render del ticket: lienzo 1080x1920 (geometria definitiva) ---
-        // El render dibuja SOLO fondo, marco, placa, QR y el string del
-        // codigo. Sin transformaciones de lienzo (giro, escalado, inclinacion).
-        // El unico ajuste previsto es TICKET_QR_TEXT_Y (una sola linea).
+        // El render dibuja SOLO fondo, marco, placa, pildora del tipo, QR y
+        // el string del codigo. Sin transformaciones de lienzo (giro,
+        // escalado, inclinacion). El unico ajuste de texto es TICKET_QR_TEXT_Y.
         var TICKET_W = 1080;
         var TICKET_H = 1920;
-        var TICKET_FRAME_X = 260, TICKET_FRAME_Y = 720, TICKET_FRAME_SIZE = 560;
-        var TICKET_PLACA_X = 272, TICKET_PLACA_Y = 732, TICKET_PLACA_SIZE = 536;
-        var TICKET_QR_X = 300, TICKET_QR_Y = 760, TICKET_QR_SIZE = 480;
-        var TICKET_QR_NATIVE = 480;
+        // Caja REAL del arte en 1080x1920: (285,664)-(803,1160) = 518x496.
+        // NO es cuadrada: el marco la cubre completa y dentro se centran una
+        // placa blanca (quiet zone) y un QR CUADRADO.
+        var TICKET_FRAME_X = 285, TICKET_FRAME_Y = 664, TICKET_FRAME_W = 518, TICKET_FRAME_H = 496;
+        // Placa blanca = marco inset 18 en los 4 lados (482x460), centrada.
+        var TICKET_PLACA_X = 303, TICKET_PLACA_Y = 682, TICKET_PLACA_W = 482, TICKET_PLACA_H = 460;
+        // QR cuadrado de 400, centrado en la caja: centro (544,912); deja
+        // quiet zone >= 30 px por lado dentro de la placa.
+        var TICKET_QR_X = 344, TICKET_QR_Y = 712, TICKET_QR_SIZE = 400;
+        var TICKET_QR_NATIVE = TICKET_QR_SIZE;
         // 1330 queda SOLAPADO: el arte trae "7:00 PM" en 1341..1394 y la banda
         // libre de 1316..1341 (24 px) no cabe en una linea de 28 px. Ademas esa
         // franja es negro puro. Se usa la banda 1521..1589 (68 px, por debajo
@@ -804,11 +839,24 @@
         var TICKET_QR_TEXT_COLOR = 'rgba(253, 246, 220, .78)'; // crema del arte, discreto
         var TICKET_CYAN = '#00E5FF';
         var TICKET_FONDO = '#0F0F0F';
+        // Pildora del tipo: contorno cian real del arte medido por pixeles
+        // (941x1672 -> x 207..733, y 1021..1119) escalado a 1080x1920.
+        var TICKET_PILDORA_X = 234, TICKET_PILDORA_Y = 1166, TICKET_PILDORA_W = 616, TICKET_PILDORA_H = 130;
+        var TICKET_PILDORA_R = 54;
+        var TICKET_PILDORA_TOP = '#E7C56B';
+        var TICKET_PILDORA_BOT = '#CDA24A';
+        var TICKET_PILDORA_TXT = '#1A1A1A';
+        var TICKET_PILDORA_FONT_PX = 64;
+        // NO USAR como fallback global (ADR-064 ANEXO B): el arte de un evento
+        // puntual NO puede ser la imagen de TODOS. Se conserva por Cero Borrado.
         var TICKET_DISENO_BASE = '/imagenes/tiket-rastro.jpg';
 
-        // Resuelve el diseno del tipo. Contrato congelado (ADR-064):
+        // Resuelve el diseno del tipo. Contrato congelado (ADR-064) con la
+        // enmienda del ANEXO B:
         // config_landing.content.ticket_disenos = [{ tipo, diseno_url, activo }]
-        // Sin campo `default`: la ausencia de match ES el fallback.
+        // Nivel 1: coincidencia EXACTA de tipo (primera gana, solo activo:true).
+        // Nivel 2: si no hay match, el PRIMER diseno activo del array (un diseno
+        //          compartido sirve a todos los tipos). Sin activos -> ''.
         function _disenoTicketUrlReg(ev, tipo) {
             try {
                 if (!ev || !tipo) return '';
@@ -816,6 +864,7 @@
                 const content = (cfg && typeof cfg === 'object') ? cfg.content : null;
                 const lista = (content && Array.isArray(content.ticket_disenos)) ? content.ticket_disenos : null;
                 if (!lista) return '';
+                // Nivel 1: coincidencia exacta.
                 for (let i = 0; i < lista.length; i++) {
                     const d = lista[i];
                     if (!d || typeof d !== 'object') continue;
@@ -823,6 +872,14 @@
                     if (!d.activo) continue;
                     const u = String(d.diseno_url || '').trim();
                     if (u) return u; // primera coincidencia gana
+                }
+                // Nivel 2: sin match, el PRIMER diseno activo del array.
+                for (let j = 0; j < lista.length; j++) {
+                    const d2 = lista[j];
+                    if (!d2 || typeof d2 !== 'object') continue;
+                    if (!d2.activo) continue;
+                    const u2 = String(d2.diseno_url || '').trim();
+                    if (u2) return u2;
                 }
                 return '';
             } catch (e) {
@@ -917,26 +974,61 @@
             });
         }
 
+        // Pildora dorada del tipo: sobrepinta la pildora horneada del arte
+        // ("INVITADO") para que el arte sea generico y el sistema estampe el rol.
+        function _pildoraTipoReg(ctx, texto) {
+            const x = TICKET_PILDORA_X, y = TICKET_PILDORA_Y;
+            const w = TICKET_PILDORA_W, h = TICKET_PILDORA_H;
+            let relleno = TICKET_PILDORA_BOT;
+            try {
+                const g = ctx.createLinearGradient(x, y, x, y + h);
+                g.addColorStop(0, TICKET_PILDORA_TOP);
+                g.addColorStop(1, TICKET_PILDORA_BOT);
+                relleno = g;
+            } catch (e) { relleno = TICKET_PILDORA_BOT; }
+            ctx.beginPath();
+            _roundRectReg(ctx, x, y, w, h, TICKET_PILDORA_R);
+            ctx.fillStyle = relleno;
+            ctx.fill();
+            ctx.strokeStyle = TICKET_CYAN;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = TICKET_PILDORA_TXT;
+            ctx.font = 'bold ' + TICKET_PILDORA_FONT_PX + 'px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(texto, x + w / 2, y + h / 2);
+        }
+
         function _generarTicketCanvasReg(qr, nombre, ev, rootSel, tipo) {
             return new Promise((resolve) => {
                 const cv = document.createElement('canvas');
                 cv.width = TICKET_W; cv.height = TICKET_H;
                 const ctx = cv.getContext('2d');
-                // Sin suavizado: un QR reescalado con interpolacion no escanea.
-                ctx.imageSmoothingEnabled = false;
+                // Tipo estampado (MAYUSCULAS): el arte es generico y el sistema
+                // imprime el rol sobre la pildora.
+                const tipoAsist = _truncarReg(String(tipo || (window && window.__ctxRol) || 'invitado').trim().toUpperCase(), 16);
 
-                const urlDiseno = _disenoTicketUrlReg(ev, tipo) || TICKET_DISENO_BASE;
+                // Sin diseno -> fondo NEUTRO generado. NUNCA TICKET_DISENO_BASE
+                // como fallback global (ADR-064 ANEXO B).
+                const urlDiseno = _disenoTicketUrlReg(ev, tipo);
                 _cargarImagenTicketReg(urlDiseno).then((fondo) => {
+                    // El fondo SI se escala: se dibuja con suavizado.
+                    ctx.imageSmoothingEnabled = true;
                     if (!fondo || !_drawCoverReg(ctx, fondo, TICKET_W, TICKET_H)) {
                         ctx.fillStyle = TICKET_FONDO;
                         ctx.fillRect(0, 0, TICKET_W, TICKET_H);
                     }
+                    // Marco cian: cubre la caja real del arte (tapa el
+                    // placeholder "AQUI VA EL CODIGO QR" y las esquinas punteadas).
                     ctx.fillStyle = TICKET_CYAN;
-                    ctx.fillRect(TICKET_FRAME_X, TICKET_FRAME_Y, TICKET_FRAME_SIZE, TICKET_FRAME_SIZE);
+                    ctx.fillRect(TICKET_FRAME_X, TICKET_FRAME_Y, TICKET_FRAME_W, TICKET_FRAME_H);
                     // Quiet zone: qrcodejs NO dibuja zona de silencio, esta
                     // placa ES el margen del codigo. Sin ella no escanea.
                     ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(TICKET_PLACA_X, TICKET_PLACA_Y, TICKET_PLACA_SIZE, TICKET_PLACA_SIZE);
+                    ctx.fillRect(TICKET_PLACA_X, TICKET_PLACA_Y, TICKET_PLACA_W, TICKET_PLACA_H);
+                    // Estampa el TIPO sobre la pildora del arte.
+                    _pildoraTipoReg(ctx, tipoAsist);
 
                     _qrNativoReg(qr, TICKET_QR_NATIVE).then((fuente) => {
                         let cerrado = false;
@@ -945,8 +1037,11 @@
                             cerrado = true;
                             const iw = (img && (img.naturalWidth || img.width)) || 0;
                             const ih = (img && (img.naturalHeight || img.height)) || 0;
+                            // El QR SIEMPRE sin suavizado (escaneabilidad).
+                            ctx.imageSmoothingEnabled = false;
                             // Solo se dibuja si la fuente ya esta a resolucion
-                            // nativa >= 480: ampliar pixeles del DOM esta prohibido.
+                            // nativa >= TICKET_QR_SIZE: ampliar pixeles del DOM
+                            // esta prohibido.
                             if (iw >= TICKET_QR_SIZE && ih >= TICKET_QR_SIZE) {
                                 ctx.drawImage(img, 0, 0, iw, ih, TICKET_QR_X, TICKET_QR_Y, TICKET_QR_SIZE, TICKET_QR_SIZE);
                             } else {
@@ -954,9 +1049,10 @@
                                 ctx.fillStyle = '#0F0F0F';
                                 ctx.font = 'bold 40px sans-serif';
                                 ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
                                 ctx.fillText(_truncarReg(qr || '', 20), TICKET_QR_X + TICKET_QR_SIZE / 2, TICKET_QR_Y + TICKET_QR_SIZE / 2);
                             }
-                            // Unico texto del render: el string del codigo.
+                            // Unico texto del render ademas del tipo: el string del codigo.
                             ctx.fillStyle = TICKET_QR_TEXT_COLOR;
                             ctx.font = TICKET_QR_TEXT_PX + 'px sans-serif';
                             ctx.textAlign = 'center';
@@ -969,7 +1065,7 @@
                         };
 
                         if (fuente) { cerrar(fuente); return; }
-                        // Degradacion: fuente del DOM solo si ya viene >= 480 px.
+                        // Degradacion: fuente del DOM solo si ya viene >= TICKET_QR_SIZE.
                         const srcDom = _qrSrcReg(rootSel);
                         if (!srcDom) { cerrar(null); return; }
                         const imgDom = new Image();
