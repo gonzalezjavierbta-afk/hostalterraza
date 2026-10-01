@@ -1865,41 +1865,25 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             <span>${(ev.ubicacion || '--')}</span>`;
     }
 
-if (document.getElementById('footer-copy')) {
-        // v302 (aditivo, solo silo .tpl-f8 TropiLove): footer muestra "Chokoflow" en
-        // lugar de "Chongotronik". Los demás silos conservan el copyright original.
-        const __esF8Footer = document.body.className && document.body.className.includes('tpl-f8');
-        // v303 (aditivo, solo silo .tpl-f9b Mistico Nocturno): footer sin el
-        // copyright de Chongotronik; queda solo el sello visual del silo
-        // (#footer-copy::after en f9b.css). Los demas silos lo conservan.
-        const __esF9bFooter = document.body.className && document.body.className.includes('tpl-f9b');
-        document.getElementById('footer-copy').innerText = __esF8Footer
-            ? T('landing.copy_choko')
-            : (__esF9bFooter ? '' : T('landing.copy_chongo'));
-    }
-    // v216 · BADGE "Powered by Hostal Terraza QR": marca de agua discreta bajo el
-    // copyright, SOLO para plan 'freemium'. pass_evento / pro_mensual no la crean.
-    // Independiente del silo (el f8 conserva su marca Chokoflow en #footer-copy);
-    // se inyecta en .footer-bottom (padre de #footer-copy) con estilos inline
-    // minimos para no depender de css/templates/ (regla scoped del silo intacta).
-    const __footerBottom = document.getElementById('footer-copy') ? document.getElementById('footer-copy').parentElement : null;
-    if (__footerBottom) {
-        const __prevBadge = __footerBottom.querySelector('.htz-powered');
-        if (orgPlan === 'freemium' && !__prevBadge) {
-            const __htzBadge = document.createElement('span');
-            __htzBadge.className = 'htz-powered';
-            __htzBadge.textContent = 'Powered by Hostal Terraza QR';
-            __htzBadge.style.display = 'block';
-            __htzBadge.style.textAlign = 'center';
-            __htzBadge.style.fontSize = '0.68rem';
-            __htzBadge.style.opacity = '0.55';
-            __htzBadge.style.marginTop = '0.4rem';
-            __htzBadge.style.letterSpacing = '0.4px';
-            __footerBottom.appendChild(__htzBadge);
-        } else if (orgPlan !== 'freemium' && __prevBadge) {
-            // Higiene idempotente: si el plan cambio, se retira la marca propia.
-            __prevBadge.remove();
-        }
+    if (document.getElementById('footer-copy')) {
+        // FOOTER DINAMICO DE ORGANIZACION (Taquilla Directa): el copyright muestra el
+        // nombre real de la organizacion/recinto que creo el evento, con el sello de
+        // la plataforma, en TODOS los silos y para TODOS los planes (sustituye al
+        // copyright fijo "Chongotronik"/"Chokoflow" y al badge freemium v216).
+        // Se construye con nodos reales y textContent para NO inyectar HTML de la BD.
+        // Fallback 'Organización' cuando la org no trae nombre.
+        const __copyEl = document.getElementById('footer-copy');
+        const __orgNombre = (typeof effOrgNombre === 'string' && effOrgNombre.trim()) ? effOrgNombre.trim() : 'Organización';
+        const __year = new Date().getFullYear();
+        __copyEl.textContent = '';
+        __copyEl.appendChild(document.createTextNode('© ' + __year + ' '));
+        const __copyStrong = document.createElement('strong');
+        __copyStrong.textContent = __orgNombre;
+        __copyEl.appendChild(__copyStrong);
+        const __copyRest = document.createElement('span');
+        __copyRest.className = 'b2b-powered';
+        __copyRest.textContent = ' · ' + T('landing.copy_derechos') + ' Powered by Taquilla Directa';
+        __copyEl.appendChild(__copyRest);
     }
     // === FIN SEGMENTO FOOTER ===
 
