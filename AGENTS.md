@@ -1,54 +1,54 @@
 # AGENTS.md — Sistema QR Hostal Terraza
 
-Índice operativo delgado de enrutamiento; el detalle vive en `.opencode/agent/*.md` y `.opencode/skills/` y se carga **bajo demanda**. Normativa: `Sistema QR desarrollo/BLUEPRINT.md`, `Reglas de Oro QR.md` (v129-MASTER), `PROJECT.md` (v1.6.4-FIX). Actualizado 2026-10-01 (Reglas de Oro v129: Mandatos 19-20; poda ADR-059; `default_agent: free-build`, ADR-052).
+Índice de enrutamiento (detalle en `.opencode/agent/` y `.opencode/skills/`). Normativa: `Sistema QR desarrollo/BLUEPRINT.md`, `Reglas de Oro QR.md` (v129-MASTER), `PROJECT.md` (v1.6.4-FIX). Actualizado 2026-10-01 (Mandatos 19-20; poda ADR-059; `default_agent: free-build`, ADR-052).
 
-## 1. Matriz de enrutamiento (esquema TRIPARTITO)
+## 1. Matriz de enrutamiento
 
-Tres rutas: GRATUITA (default, `*-free`, costo 0), HYBRID (PRO/FREE) y de PAGO (`opencode-go/*`). **La tabla ES el flujo de delegación**: cada build delega al dominio de su fila (ADR-006).
+Tres rutas: GRATUITA (default, `*-free`, costo 0), HYBRID (PRO/FREE) y PAGO (`opencode-go/*`). **La tabla ES el flujo de delegación**: cada build delega al dominio de su fila.
 
 | Dominio | pro | free |
 |---|---|---|
 | CSS de silo | `@frontend-tpl` | `@frontend-tpl-free` |
 | `admin.html` / `scanner.html` | `@admin-dev` | `@admin-dev-free` |
-| endpoints / QR / tickets | `@backend-dev` | `@backend-dev-free` |
+| endpoints / QR | `@backend-dev` | `@backend-dev-free` |
 | RLS / esquema | `@sql-security` | `@sql-security-free` |
-| JS/TS rutinario y soporte mecánico | `@js-silo-dev` | `@js-silo-dev-free` |
+| JS/TS rutinario | `@js-silo-dev` | `@js-silo-dev-free` |
 | seed + loader + smoke | `@content-loader` | `@content-loader-free` |
-| migraciones / seeds | `@data-migration` | `@data-migration-free` |
+| migraciones | `@data-migration` | `@data-migration-free` |
 | motor de render | `@renderer-dev` | `@renderer-dev-free` |
 | SEO | `@seo-dev` | `@seo-dev-free` |
 | arquitectura / ADR | `@architect` + `@architect-review` | `@architect-free` + `@architect-review-free` |
 | multimedia | `@media-reader` | `@media-reader-free` |
-| investigación de destinos | `@research-agent` | `@research-agent-free` |
-| exploración masiva | `@explore` | `@explore-free` |
+| research de destinos | `@research-agent` | `@research-agent-free` |
+| exploración | `@explore` | `@explore-free` |
 | cierre documental | `@docs-keeper` | `@docs-keeper-free` |
-| certificación / auditoría | `@qa-auditor` | `@qa-auditor-free` |
+| certificación | `@qa-auditor` | `@qa-auditor-free` |
 
-**Primarios** (`mode: primary`, único punto de entrada): `@plan`/`@build`, `@free-plan`/`@free-build` (default), `@hybrid-plan`/`@hybrid-build`. No implementan: orquestan y delegan. Prohibido mezclar rutas salvo escalar seguridad crítica (`sql-security-free` → `@sql-security`).
+**Primarios** (`mode: primary`): `@plan`/`@build`, `@free-plan`/`@free-build` (default), `@hybrid-plan`/`@hybrid-build`. No implementan: orquestan y delegan. Prohibido mezclar rutas salvo escalar seguridad crítica (`sql-security-free` → `@sql-security`).
 
-`exp-pickle-free` fue **retirado** (ADR-031 Addendum A / ADR-059); su cobertura mecánica la hereda `@js-silo-dev-free`. El conteo de agentes se deriva de `ls .opencode/agent/` (ADR-006); detalle por agente (dominio, permisos, modelo, v112, discrepancia, fuentes) → skill **`agentes-roster`**.
+`exp-pickle-free` fue **retirado** (ADR-031/ADR-059); su cobertura la hereda `@js-silo-dev-free`. Agentes: `ls .opencode/agent/` (ADR-006); skill **`agentes-roster`**.
 
 ## 2. Regla de desambiguación PRO/FREE
 
-Ante un par de agentes gemelos (`nombre` y `nombre-free`): la variante **sin sufijo** es la **ruta PRO** (criterio, riesgo de runtime, seguridad, arquitectura) y la variante `-free` es la **ruta gratuita** para trabajo mecánico, repetitivo y de bajo riesgo. **La elección se hace por riesgo, nunca por preferencia.** Esta regla es la fuente de verdad del ruteo PRO/FREE; ninguna `description:` de agente la reitera.
+Ante gemelos (`nombre`/`nombre-free`): **sin sufijo** = **ruta PRO** (criterio, riesgo de runtime, seguridad, arquitectura); `-free` = **ruta gratuita** para trabajo mecánico y de bajo riesgo. **La elección es por riesgo, nunca por preferencia.** Fuente de verdad del ruteo; ninguna `description:` la reitera.
 
-## 3. Reglas transversales (aplican a todos los agentes)
+## 3. Reglas transversales
 
-1. **Cero Borrado (Oro #2):** nunca eliminar IDs del Contrato de Datos v112, aunque el módulo esté oculto (`display: none`).
+1. **Cero Borrado (Oro #2):** nunca eliminar IDs del Contrato v112, aunque el módulo esté oculto (`display: none`).
 2. **Vanilla JS puro (ADR-001):** prohibido Node.js en runtime cliente, React o build tools.
-3. **Aislamiento Atómico (Oro #9):** CSS de silo encapsulado bajo `.tpl-{template_id}`; nada suelto en `:root` global.
+3. **Aislamiento Atómico (Oro #9):** CSS de silo encapsulado bajo `.tpl-{template_id}`; nada suelto en `:root`.
 4. **Silent Fallback (ADR-008):** todo `<img>` dinámico lleva `onerror="this.src='path/to/fallback.png';"`.
-5. **Data-First (Oro #1):** Fase I (datos/IDs/Supabase, TRACE positivo) certificada antes de Fase II (estética).
+5. **Data-First (Oro #1):** Fase I (datos/IDs/Supabase, TRACE positivo) antes de Fase II (estética).
 6. **Escudo GOLD:** antes de desplegar `api/*.js`, `admin.html`, `index.html` o el motor de render → skill `gold-shield`.
-7. **Mandato documental (Oro #12):** toda actualización de `TASKS.md`/`NEXT.md`/`DECISIONS.md` se entrega completa e íntegra, sin perder historial.
-8. **Eficiencia de recursos (Oro #17-18):** costo = turnos × contexto; 1 agente de exploración + 1 de implementación por dominio + 1 verificación (**por script, no por agente**); cerrar con `node scripts/usage_report.js` → skill `eficiencia-recursos`.
-9. **Lectura por rango:** prohibido leer completos archivos > 200 KB (p. ej. `admin.html` ~628 KB, `DECISIONS.md` ~375 KB). Usar `grep` para localizar la línea y `Read` con `offset`/`limit`: un read completo envenena el `cache_read` de todos los turnos siguientes.
-10. **Express (xpress):** ante "express", "xpress" o "rápido" rige la skill `express-mode` (transversal): cambia el orden y la profundidad de los controles, no los elimina; escala a modo normal en arquitectura, RLS/seguridad, migraciones o > 3 archivos críticos.
-11. **Presupuesto y confirmación (Oro #19-20):** antes de ejecutar, entrega estimación de tokens y tiempo (desglose por agente); al cierre concilia estimado vs. real con `usage_report.js`; si la tarea es pesada (imágenes/video, research masivo o > ~1.5M tokens), avisa el costo antes, recomienda una IA externa (Gemini/ChatGPT/Claude), define el insumo que debe volver (ficha/JSON) y sugiere un prompt.
-12. **Contrato de retorno y orquestacion (skill `eficiencia-recursos`):** todo `task` exige retorno compacto (max ~600 tokens: STATUS, ARCHIVOS con rangos de linea, VERIFICACION con comando y resultado N/N, BLOQUEADORES, SIGUIENTE) y prohibe volcar archivos completos, diffs extensos o narrar lo leido. El orquestador trabaja con presupuesto de 25-30 turnos por sesion (una sesion = una fase; al agotarlo, emite resumen de estado y abre sesion nueva). Si supera 20-25 llamadas directas (read/grep/glob), se detiene y delega a `@explore`.
-13. **Free-first con escalado automatico:** para trabajo mecanico, repetitivo o de bajo riesgo se intenta SIEMPRE primero la ruta FREE; si el subagente falla, devuelve partial/blocked o no pasa la verificacion, se escala AUTOMATICAMENTE a la ruta PRO del dominio, sin pedir permiso. Los dominios de riesgo de runtime o seguridad (backend, renderer, admin, sql-security, arquitectura) van directo a PRO. Prohibido desdoblar pro+free en paralelo (sesiones vacias = reloj puro).
-14. **Watchdog y cierre medido:** un subagente que supere 25 turnos o 50.000 tokens/turno se aborta y se re-planifica (nunca se re-despacha el mismo perfil). Toda sesion de implementacion CIERRA con balance detallado de gasto (total, turnos, cache_read/turno, desglose por agente), contrastado estimado vs real (Mandato 19), 1-3 aprendizajes y consejos de mejora, levantado con `scripts/usage_report.js` y `scripts/session_close.js`.
+7. **Mandato documental (Oro #12):** toda actualización de `TASKS.md`/`NEXT.md`/`DECISIONS.md` se entrega completa, sin perder historial.
+8. **Eficiencia (Oro #17-18):** costo = turnos × contexto; 1 exploración + 1 implementación por dominio + 1 verificación por script; cerrar con `node scripts/usage_report.js` → skill `eficiencia-recursos`.
+9. **Lectura por rango:** prohibido leer completos archivos > 200 KB (`admin.html`, `DECISIONS.md`). Usar `grep` y `Read` con `offset`/`limit`: un read completo envenena el `cache_read` siguiente.
+10. **Express (xpress):** "express", "xpress" o "rápido" → skill `express-mode`: cambia orden y profundidad de los controles, no los elimina; escala a normal en arquitectura, RLS/seguridad, migraciones o > 3 archivos críticos.
+11. **Presupuesto (Oro #19-20):** antes de ejecutar, estima tokens y tiempo; al cierre concilia estimado vs real con `usage_report.js`; si la tarea es pesada (imágenes/video, research o > ~1.5M tokens), avisa el costo y recomienda IA externa (ficha/JSON + prompt).
+12. **Contrato de retorno (skill `eficiencia-recursos`):** todo `task` exige retorno compacto (max ~600: STATUS, ARCHIVOS con rangos, VERIFICACION N/N, BLOQUEADORES, SIGUIENTE); prohibido volcar archivos o narrar lo leido. Orquestador: 25-30 turnos por sesion; si supera 20-25 llamadas directas, delega a `@explore`.
+13. **Free-first con escalado automatico:** el trabajo mecanico o de bajo riesgo intenta SIEMPRE primero la ruta FREE; si falla o no pasa la verificacion, escala AUTOMATICAMENTE a PRO del dominio, sin pedir permiso. Los dominios de riesgo de runtime o seguridad (backend, renderer, admin, sql-security, arquitectura) van directo a PRO. Prohibido pro+free en paralelo.
+14. **Watchdog y cierre medido:** un subagente con >25 turnos o >50.000 tokens/turno se aborta y re-planifica. Toda sesion de implementacion CIERRA con balance de gasto (turnos, cache_read/turno, por agente), estimado vs real, 1-3 aprendizajes y mejoras, con `scripts/usage_report.js` y `scripts/session_close.js`.
 
-## 4. Índice de skills (bajo demanda)
+## 4. Índice de skills
 
-`agentes-roster` (detalle de agente y v112) · `modelos-verificados` (modelo, `403`, crear agente) · `eficiencia-recursos` (costo/turnos, grep, CSS inline, `usage_report.js`) · `anti-absorcion` (sesión con subagentes, ADR-031) · `reglas-de-oro` (entrega formal o auditoría, Mandatos 1-20) · `express-mode` (express/xpress/rápido) · `templates` (silo CSS de `evento.html`; hub `AMPLIACION/TEMPLATES.md`) · `gold-shield` (verificación mecánica pre-despliegue) · `create-dynamic-page` · `batch-create` · `gemini-research` · `ingest-eventos` · `research-destination` (pipelines de páginas, eventos y destinos).
+`agentes-roster`·`modelos-verificados`·`eficiencia-recursos`·`anti-absorcion`·`reglas-de-oro`·`express-mode`·`templates`·`gold-shield`·`create-dynamic-page`·`batch-create`·`gemini-research`·`ingest-eventos`·`research-destination`.

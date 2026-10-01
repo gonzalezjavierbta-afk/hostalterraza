@@ -1,6 +1,6 @@
 ---
 name: hybrid-build
-description: Orquestador de implementación de HostalTerraza en ruta mixta - enruta por riesgo entre subagentes PRO y subagentes mecánicos, dentro del flujo de build.
+description: Orquestador de implementación de HostalTerraza en ruta mixta - enruta por riesgo entre subagentes PRO y mecánicos, dentro del flujo de build.
 mode: primary
 model: opencode-go/deepseek-v4.1-flash
 permission:

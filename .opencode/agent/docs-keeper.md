@@ -1,6 +1,6 @@
 ---
 name: docs-keeper
-description: Documentation Specialist del AI-DOS Core de HostalTerraza - mantiene PROJECT.md, NEXT.md, TASKS.md, BLUEPRINT.md, DECISIONS.md y ERRORES_HISTORICOS.md.
+description: Documentation Specialist de HostalTerraza - mantiene PROJECT.md, NEXT.md, TASKS.md, BLUEPRINT.md, DECISIONS.md y ERRORES_HISTORICOS.md.
 mode: subagent
 model: opencode-go/deepseek-v4.1-flash
 permission:
