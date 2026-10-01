@@ -1,6 +1,6 @@
 ---
 name: templates
-description: Crea, edita o audita un template/silo CSS de evento.html (plantillas visuales de eventos: css/templates/{categoria}/{id}.css). Usalo cuando se pida crear un template/silo nuevo, modificar colores/tipografia/layout de un silo, registrar su theme en admin, o auditar que cumple el patron normativo. NO usar para CSS de admin.html/scanner.html ni para paginas dinamicas de destino.
+description: "Úsalo para crear, editar o auditar un template/silo CSS de evento.html (css/templates), registrar su theme en admin o validar el patrón normativo."
 ---
 
 # Templates — Silos Visuales de evento.html

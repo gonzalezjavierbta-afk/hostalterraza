@@ -1,12 +1,6 @@
 ---
 name: gemini-research
-description: >
-  Workflow de creacion de entradas de directorio de ExploraCO con
-  investigacion hecha en Google Gemini (externo). Orquesta la ingesta
-  y validacion de la ficha .md que produce Gemini (hostal, comida, sitio,
-  evento), la resolucion y verificacion de fotos en Wikimedia Commons
-  (HEAD 200, BUG-022), y el handoff al pipeline create-dynamic-page
-  (seed + loader + smoke + Escudo GOLD + produccion + docs).
+description: "Úsalo para ingerir fichas .md de Gemini (hostal, comida, sitio, evento), verificar fotos en Wikimedia y hacer handoff a create-dynamic-page."
 ---
 
 # Gemini Research (Ingesta de fichas investigadas con Gemini)

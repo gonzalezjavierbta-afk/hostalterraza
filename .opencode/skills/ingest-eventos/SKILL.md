@@ -1,11 +1,6 @@
 ---
 name: ingest-eventos
-description: >
-  Sube eventos a la agenda cultural de ExploraCO de forma automatizada:
-  investigacion en Gemini (GEMINI_EVENTOS_PROMPT.md) que entrega el lote
-  eventos/eventos.json, validacion (validate_eventos.js), carga a
-  produccion via API (upload-eventos.js) con seed versionado, y docs.
-  Usalo cuando el usuario pida agregar uno o varios eventos a la agenda.
+description: "Úsalo para agregar eventos a la agenda cultural de ExploraCO: investiga en Gemini, valida (validate_eventos.js) y carga vía API con seed versionado."
 ---
 
 # Ingest Eventos

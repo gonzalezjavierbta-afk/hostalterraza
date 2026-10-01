@@ -1,6 +1,6 @@
 ---
 name: agentes-roster
-description: Esquema de rutas de agentes (libre/hybrid/pago), decisiones de reconciliacion y discrepancia real del contrato v112. Cargar para el detalle de un agente, la eleccion de ruta o el estado del contrato de datos.
+description: "Esquema de rutas de agentes (libre/hybrid/pago), reconciliación y discrepancia v112. Cárgala para elegir ruta o revisar el contrato de datos."
 ---
 
 # Roster de Agentes — Sistema QR Hostal Terraza

@@ -1,10 +1,6 @@
 ---
 name: research-destination
-description: >
-  Investiga un destino turístico de Colombia en múltiples fuentes
-  web y genera una ficha .md estructurada con datos verificados.
-  Úsalo cuando necesites recopilar datos de un nuevo destino para
-  crear su página dinámica.
+description: "Investiga un destino turístico de Colombia en fuentes web y genera una ficha .md con datos verificados. Úsalo para preparar su página dinámica."
 ---
 
 # Research Destination

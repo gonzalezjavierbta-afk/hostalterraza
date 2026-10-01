@@ -1,10 +1,6 @@
 ---
 name: express-mode
-description: >
-  Ejecuta cambios de HostalTerraza (Sistema QR) en "modo express/xpress":
-  prioriza el cambio funcional, delega briefs quirurgicos por dominio, usa
-  verificacion minima proporcional al riesgo y difiere la documentacion al
-  cierre de sesion. Usalo cuando el usuario pida express/xpress/rapido.
+description: "Modo express/xpress de HostalTerraza: prioriza lo funcional, verificación mínima por riesgo y documentación diferida. Úsalo si piden rápido."
 ---
 
 # Express Mode (xpress)

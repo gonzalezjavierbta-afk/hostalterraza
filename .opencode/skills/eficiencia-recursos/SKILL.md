@@ -1,6 +1,6 @@
 ---
 name: eficiencia-recursos
-description: Reglas de eficiencia: costo = turnos x contexto, disciplina de grep, diagnostico de CSS inline, informe de cierre obligatorio. Incluye estimacion previa y umbral de tareas pesadas. Cargar en sesiones largas o al optimizar consumo.
+description: "Reglas de eficiencia: costo = turnos x contexto, grep, diagnóstico CSS inline, cierre medido y tareas pesadas. Cárgala en sesión larga."
 ---
 
 # Eficiencia de Recursos (v129)

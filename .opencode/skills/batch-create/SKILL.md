@@ -1,10 +1,6 @@
 ---
 name: batch-create
-description: >
-  Ejecuta operaciones en lote: múltiples páginas dinámicas,
-  verificaciones masivas o seeds grupales. Úsalo cuando necesites
-  crear varias páginas dinámicas a la vez para optimizar el uso
-  de la cuota.
+description: "Ejecuta operaciones en lote: varias páginas dinámicas, verificaciones masivas o seeds grupales. Úsalo para optimizar el uso de la cuota del plan Go."
 ---
 
 # Batch Create

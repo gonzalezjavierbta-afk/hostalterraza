@@ -1,10 +1,6 @@
 ---
 name: create-dynamic-page
-description: >
-  Orquesta el flujo completo de creación de una página dinámica de
-  ExploraCO: validación, ficha, seed, loader, smoke, Escudo GOLD,
-  carga a producción y actualización de docs. Úsalo cuando el usuario
-  pida crear una nueva página dinámica de destino.
+description: "Úsalo cuando se pida crear una página dinámica de ExploraCO: orquesta validación, ficha, seed, loader, smoke, Escudo GOLD, producción y docs."
 ---
 
 # Create Dynamic Page
