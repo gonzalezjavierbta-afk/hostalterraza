@@ -747,17 +747,23 @@
 
         // ── Descarga / WhatsApp (ticket nuevo y duplicado) ──────────────────
         // Obtiene la imagen del QR ya pintada por qrcodejs (canvas o img).
-        function _qrSrcReg(rootSel) {
-            const root = rootSel ? document.querySelector(rootSel) : document;
-            if (!root) return null;
-            const img = root.querySelector('img');
+        // Nucleo compartido: lo usan el lector por selector y el render nativo.
+        function _qrSrcDeCajaReg(caja) {
+            if (!caja || typeof caja.querySelector !== 'function') return null;
+            const img = caja.querySelector('img');
             if (img && img.src) return img.src;
-            const cv = root.querySelector('canvas');
+            const cv = caja.querySelector('canvas');
             if (cv) {
                 try { return cv.toDataURL('image/png'); }
                 catch (e) { log("ERROR: " + e.message, "ERROR"); }
             }
             return null;
+        }
+
+        function _qrSrcReg(rootSel) {
+            const root = rootSel ? document.querySelector(rootSel) : document;
+            if (!root) return null;
+            return _qrSrcDeCajaReg(root);
         }
 
         function _roundRectReg(ctx, x, y, w, h, r) {
@@ -779,51 +785,199 @@
             return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'evento';
         }
 
-        // Canvas 540x620 con el mismo diseno del ticket HTML (#ticket-card).
-        function _generarTicketCanvasReg(qr, nombre, ev, rootSel) {
-            return new Promise((resolve) => {
-                const GOLD = '#ff9f1c', DARK = '#0F0F0F', WHITE = '#FFFFFF';
-                const W = 540, H = 620;
-                const cv = document.createElement('canvas');
-                cv.width = W; cv.height = H;
-                const ctx = cv.getContext('2d');
-                ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = GOLD; ctx.fillRect(0, 0, W, 10); ctx.fillRect(0, H - 10, W, 10);
-                ctx.textAlign = 'center';
-                ctx.fillStyle = GOLD; ctx.font = 'bold 20px sans-serif';
-                ctx.fillText('HOSTAL TERRAZA', W / 2, 60);
-                ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.font = '14px sans-serif';
-                const evTxt = ((ev && ev.nombre) ? ev.nombre : '') + ((ev && ev.fecha) ? ' - ' + ev.fecha : '');
-                ctx.fillText(_truncarReg(evTxt, 48), W / 2, 88);
+        // --- Render del ticket: lienzo 1080x1920 (geometria definitiva) ---
+        // El render dibuja SOLO fondo, marco, placa, QR y el string del
+        // codigo. Sin transformaciones de lienzo (giro, escalado, inclinacion).
+        // El unico ajuste previsto es TICKET_QR_TEXT_Y (una sola linea).
+        var TICKET_W = 1080;
+        var TICKET_H = 1920;
+        var TICKET_FRAME_X = 260, TICKET_FRAME_Y = 720, TICKET_FRAME_SIZE = 560;
+        var TICKET_PLACA_X = 272, TICKET_PLACA_Y = 732, TICKET_PLACA_SIZE = 536;
+        var TICKET_QR_X = 300, TICKET_QR_Y = 760, TICKET_QR_SIZE = 480;
+        var TICKET_QR_NATIVE = 480;
+        // 1330 queda SOLAPADO: el arte trae "7:00 PM" en 1341..1394 y la banda
+        // libre de 1316..1341 (24 px) no cabe en una linea de 28 px. Ademas esa
+        // franja es negro puro. Se usa la banda 1521..1589 (68 px, por debajo
+        // del QR). Y es el CENTRO de la linea (textBaseline='middle').
+        var TICKET_QR_TEXT_Y = 1555;
+        var TICKET_QR_TEXT_PX = 28;
+        var TICKET_QR_TEXT_COLOR = 'rgba(253, 246, 220, .78)'; // crema del arte, discreto
+        var TICKET_CYAN = '#00E5FF';
+        var TICKET_FONDO = '#0F0F0F';
+        var TICKET_DISENO_BASE = '/imagenes/tiket-rastro.jpg';
 
-                const QS = 200, QX = (W - QS) / 2, QY = 130;
-                ctx.fillStyle = WHITE;
-                _roundRectReg(ctx, QX - 14, QY - 14, QS + 28, QS + 28, 12); ctx.fill();
-
-                const done = () => {
-                    ctx.fillStyle = WHITE; ctx.font = 'bold 24px sans-serif';
-                    ctx.fillText(_truncarReg((nombre || '').toUpperCase(), 26), W / 2, QY + QS + 72);
-                    ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.font = '12px sans-serif';
-                    ctx.fillText(_truncarReg(qr || '', 40), W / 2, QY + QS + 100);
-                    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.font = '11px sans-serif';
-                    ctx.fillText('Muestra este QR en la puerta', W / 2, H - 40);
-                    resolve(cv);
-                };
-
-                const src = _qrSrcReg(rootSel);
-                if (src) {
-                    const img = new Image();
-                    img.onload = () => { ctx.drawImage(img, QX, QY, QS, QS); done(); };
-                    img.onerror = () => {
-                        log("ERROR: No se pudo dibujar el QR en el canvas; se usa el codigo como texto.", "ERROR");
-                        ctx.fillStyle = DARK; ctx.font = '12px sans-serif';
-                        ctx.fillText(_truncarReg(qr || '', 34), W / 2, QY + QS / 2); done();
-                    };
-                    img.src = src;
-                } else {
-                    ctx.fillStyle = DARK; ctx.font = '12px sans-serif';
-                    ctx.fillText(_truncarReg(qr || '', 34), W / 2, QY + QS / 2); done();
+        // Resuelve el diseno del tipo. Contrato congelado (ADR-064):
+        // config_landing.content.ticket_disenos = [{ tipo, diseno_url, activo }]
+        // Sin campo `default`: la ausencia de match ES el fallback.
+        function _disenoTicketUrlReg(ev, tipo) {
+            try {
+                if (!ev || !tipo) return '';
+                const cfg = ev.config_landing;
+                const content = (cfg && typeof cfg === 'object') ? cfg.content : null;
+                const lista = (content && Array.isArray(content.ticket_disenos)) ? content.ticket_disenos : null;
+                if (!lista) return '';
+                for (let i = 0; i < lista.length; i++) {
+                    const d = lista[i];
+                    if (!d || typeof d !== 'object') continue;
+                    if (String(d.tipo || '') !== String(tipo)) continue;
+                    if (!d.activo) continue;
+                    const u = String(d.diseno_url || '').trim();
+                    if (u) return u; // primera coincidencia gana
                 }
+                return '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // Carga el diseno (ruta relativa o URL de Supabase Storage).
+        // crossOrigin SOLO si es otro origen: si el host no lo soporta,
+        // onerror cae al fondo base en vez de manchar el lienzo (un lienzo
+        // manchado rompe toDataURL/toBlob).
+        function _cargarImagenTicketReg(url) {
+            return new Promise((resolve) => {
+                if (!url) { resolve(null); return; }
+                const img = new Image();
+                let listo = false;
+                const fin = (v) => { if (!listo) { listo = true; resolve(v); } };
+                img.onload = () => fin(img);
+                img.onerror = () => {
+                    log("ERROR: No se pudo cargar el diseno del ticket; se usa el fondo base.", "ERROR");
+                    fin(null);
+                };
+                try {
+                    let mismoOrigen = false;
+                    try {
+                        mismoOrigen = (new URL(url, window.location.href).origin === window.location.origin);
+                    } catch (e2) { mismoOrigen = false; }
+                    if (!mismoOrigen) img.crossOrigin = 'anonymous';
+                    img.src = url;
+                } catch (e) {
+                    fin(null);
+                }
+            });
+        }
+
+        // Guard de proporcion: recorte CENTRADO con los 9 parametros de
+        // drawImage (sx, sy, sw, sh, dx, dy, dw, dh). Nunca estirar.
+        function _drawCoverReg(ctx, img, dw, dh) {
+            const iw = img.naturalWidth || img.width || 0;
+            const ih = img.naturalHeight || img.height || 0;
+            if (!iw || !ih) return false;
+            const objetivo = dw / dh, origen = iw / ih;
+            let sx = 0, sy = 0, sw = iw, sh = ih;
+            if (origen > objetivo) { sw = ih * objetivo; sx = (iw - sw) / 2; }
+            else { sh = iw / objetivo; sy = (ih - sh) / 2; }
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, dw, dh);
+            return true;
+        }
+
+        // QR a resolucion NATIVA en un div oculto temporal. qrcodejs pinta
+        // un <canvas> de exactamente width x height px, asi que 480 entra
+        // 480 en el lienzo sin reescalado: nunca se amplian los pixeles del
+        // DOM (150/180). El host sale del DOM en el finally.
+        function _qrNativoReg(qr, size) {
+            return new Promise((resolve) => {
+                if (!qr || typeof QRCode === 'undefined') { resolve(null); return; }
+                const host = document.createElement('div');
+                let listo = false;
+                const fin = (v) => { if (!listo) { listo = true; resolve(v); } };
+                try {
+                    host.setAttribute('aria-hidden', 'true');
+                    host.style.position = 'absolute';
+                    host.style.left = '-99999px';
+                    host.style.top = '0';
+                    host.style.width = size + 'px';
+                    host.style.height = size + 'px';
+                    host.style.pointerEvents = 'none';
+                    if (document.body) document.body.appendChild(host);
+                    new QRCode(host, {
+                        text: qr, width: size, height: size,
+                        colorDark: '#0F0F0F', colorLight: '#FFFFFF',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                    const cv = host.querySelector('canvas');
+                    if (cv && cv.width > 0 && cv.height > 0) { fin(cv); return; }
+                    const src = _qrSrcDeCajaReg(host);
+                    if (src) {
+                        const im = new Image();
+                        im.onload = () => fin(im);
+                        im.onerror = () => fin(null);
+                        im.src = src;
+                        return;
+                    }
+                    fin(null);
+                } catch (e) {
+                    log("ERROR: " + e.message, "ERROR");
+                    fin(null);
+                } finally {
+                    // drawImage funciona con nodos desmontados.
+                    if (host.parentNode) host.parentNode.removeChild(host);
+                }
+            });
+        }
+
+        function _generarTicketCanvasReg(qr, nombre, ev, rootSel, tipo) {
+            return new Promise((resolve) => {
+                const cv = document.createElement('canvas');
+                cv.width = TICKET_W; cv.height = TICKET_H;
+                const ctx = cv.getContext('2d');
+                // Sin suavizado: un QR reescalado con interpolacion no escanea.
+                ctx.imageSmoothingEnabled = false;
+
+                const urlDiseno = _disenoTicketUrlReg(ev, tipo) || TICKET_DISENO_BASE;
+                _cargarImagenTicketReg(urlDiseno).then((fondo) => {
+                    if (!fondo || !_drawCoverReg(ctx, fondo, TICKET_W, TICKET_H)) {
+                        ctx.fillStyle = TICKET_FONDO;
+                        ctx.fillRect(0, 0, TICKET_W, TICKET_H);
+                    }
+                    ctx.fillStyle = TICKET_CYAN;
+                    ctx.fillRect(TICKET_FRAME_X, TICKET_FRAME_Y, TICKET_FRAME_SIZE, TICKET_FRAME_SIZE);
+                    // Quiet zone: qrcodejs NO dibuja zona de silencio, esta
+                    // placa ES el margen del codigo. Sin ella no escanea.
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(TICKET_PLACA_X, TICKET_PLACA_Y, TICKET_PLACA_SIZE, TICKET_PLACA_SIZE);
+
+                    _qrNativoReg(qr, TICKET_QR_NATIVE).then((fuente) => {
+                        let cerrado = false;
+                        const cerrar = (img) => {
+                            if (cerrado) return;
+                            cerrado = true;
+                            const iw = (img && (img.naturalWidth || img.width)) || 0;
+                            const ih = (img && (img.naturalHeight || img.height)) || 0;
+                            // Solo se dibuja si la fuente ya esta a resolucion
+                            // nativa >= 480: ampliar pixeles del DOM esta prohibido.
+                            if (iw >= TICKET_QR_SIZE && ih >= TICKET_QR_SIZE) {
+                                ctx.drawImage(img, 0, 0, iw, ih, TICKET_QR_X, TICKET_QR_Y, TICKET_QR_SIZE, TICKET_QR_SIZE);
+                            } else {
+                                log("ERROR: No se pudo dibujar el QR en el lienzo; se usa el codigo como texto.", "ERROR");
+                                ctx.fillStyle = '#0F0F0F';
+                                ctx.font = 'bold 40px sans-serif';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(_truncarReg(qr || '', 20), TICKET_QR_X + TICKET_QR_SIZE / 2, TICKET_QR_Y + TICKET_QR_SIZE / 2);
+                            }
+                            // Unico texto del render: el string del codigo.
+                            ctx.fillStyle = TICKET_QR_TEXT_COLOR;
+                            ctx.font = TICKET_QR_TEXT_PX + 'px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(0,0,0,.75)';
+                            ctx.shadowBlur = 8;
+                            ctx.fillText(_truncarReg(qr || '', 40), TICKET_W / 2, TICKET_QR_TEXT_Y);
+                            ctx.shadowBlur = 0;
+                            resolve(cv);
+                        };
+
+                        if (fuente) { cerrar(fuente); return; }
+                        // Degradacion: fuente del DOM solo si ya viene >= 480 px.
+                        const srcDom = _qrSrcReg(rootSel);
+                        if (!srcDom) { cerrar(null); return; }
+                        const imgDom = new Image();
+                        imgDom.onload = () => cerrar(imgDom);
+                        imgDom.onerror = () => cerrar(null);
+                        imgDom.src = srcDom;
+                    });
+                });
             });
         }
 
@@ -850,7 +1004,8 @@
             const btn = document.querySelector('#ticket-wrap .dl-btn');
             if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
             try {
-                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', d.ev || window.__ctxEv || null, '#reg-qr');
+                const tipo = (document.querySelector('[name="tipo"]') || {}).value || null;
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', d.ev || window.__ctxEv || null, '#reg-qr', tipo);
                 _descargarCanvasReg(cv, 'entrada-' + _slugReg((d.ev && d.ev.nombre) || 'evento') + '.png');
             } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
@@ -866,7 +1021,8 @@
             const btn = document.querySelector('#s-duplicate .dl-btn');
             if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
             try {
-                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', window.__ctxEv || null, '#dup-qr-box');
+                const tipo = (window.__dupData || {}).tipo || null;
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', window.__ctxEv || null, '#dup-qr-box', tipo);
                 _descargarCanvasReg(cv, 'entrada-' + _slugReg((window.__ctxEv && window.__ctxEv.nombre) || 'evento') + '.png');
             } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
@@ -893,7 +1049,8 @@
                 ? 'https://wa.me/' + tel + '?text=' + encodeURIComponent(texto)
                 : 'https://wa.me/?text=' + encodeURIComponent(texto);
             try {
-                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', ev, '#reg-qr');
+                const tipo = (window.__dupData || {}).tipo || null;
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', ev, '#reg-qr', tipo);
                 const blob = await new Promise((res) => cv.toBlob(res, 'image/png'));
                 if (blob && typeof File !== 'undefined') {
                     const file = new File([blob], 'entrada-' + _slugReg(ev.nombre) + '.png', { type: 'image/png' });

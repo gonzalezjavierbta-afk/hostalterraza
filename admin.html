@@ -1082,6 +1082,22 @@ tr:hover td{background:var(--surface)}
 
       </div>
 
+      <!-- ══ Disenos de ticket por tipo (ADR-064) — Wizard paso 3 ══
+           5 filas fijas, una por tipo de asistente (invitado, frecuente,
+           artista, produccion, pago). Las filas las monta ticketDisenos
+           (window._ticketDisenosSetEntries) y se guardan en
+           config_landing.content.ticket_disenos. Contrato congelado:
+           [{ tipo, diseno_url, activo }], un objeto por tipo como maximo. -->
+      <div class="fg" style="margin-top:.75rem">
+        <label>Disenos de ticket por tipo
+          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">Una imagen por tipo de asistente · JPG, PNG o WEBP · Max. 5 MB</span>
+        </label>
+        <div style="font-size:11px;color:var(--ink3);margin:.35rem 0 .6rem;background:var(--surface);padding:8px 10px;border-radius:var(--rsm);border:1px solid var(--border)">
+          Sube el archivo o pega la URL publica del diseno. Si pegas una URL a mano, esa URL manda sobre la subida. Se guarda en <strong>config_landing.content.ticket_disenos</strong>.
+        </div>
+        <div id="ticket-disenos-rows" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+
       </div><!-- /wiz-step 3 -->
 
       <!-- ══ PASO 4 · Blindaje (aforo, campos personalizados, acceso) — ADR-021 ══ -->
@@ -4246,6 +4262,12 @@ function _buildConfigLanding(slug) {
   // ADR-056 (fila 3): lectura unica y sin sufijo (el bloque de patrocinadores
   // es uno solo). Este es el unico punto que decide si 'sponsors' se persiste.
   const sponsors = window._sponsorsGetEntries ? window._sponsorsGetEntries() : [];
+  // ADR-064 — disenos de ticket por tipo. _buildConfigLanding RECONSTRUYE content
+  // desde una whitelist literal: si la clave no se escribe aqui, guardar el evento
+  // BORRA EN SILENCIO los disenos ya subidos (bug BUG-016). Se escribe siempre,
+  // incluso vacia ([] y no null) para que la forma del JSON sea estable; el sweep
+  // de nulls de mas abajo no toca un array vacio.
+  const disenos  = window._ticketDisenosGetEntries ? window._ticketDisenosGetEntries() : [];
   const gallery  = val('ld-gallery-urls') ? val('ld-gallery-urls').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,12) : [];
   const director = (val('ld-dir-nombre') || val('ld-dir-bio')) ? {
     nombre: val('ld-dir-nombre') || null,
@@ -4382,6 +4404,11 @@ function _buildConfigLanding(slug) {
       impacto_historico: val('ld-impacto-historico-val') ? val('ld-impacto-historico-val').split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{etiqueta:p[0]?.trim(),valor:p[1]?.trim()};}) : undefined,
       impacto_historico_frase: val('ld-impacto-historico-frase') || null,
       contacto:    (val('ld-contacto-email')||val('ld-contacto-tel')) ? {email:val('ld-contacto-email'),tel:val('ld-contacto-tel'),dir:val('ld-contacto-dir')} : null,
+      // ADR-064 — ESTRUCTURA CONGELADA: [{ tipo, diseno_url, activo }].
+      // Tipos: invitado | frecuente | artista | produccion | pago. Maximo un
+      // objeto por tipo, sin campo `default`. Se escribe SIEMPRE (array vacio
+      // incluido) y ANTES de los spreads finales, que no tocan esta clave.
+      ticket_disenos: disenos,
       // ADR-030/033 — Landing + formulario: form_solo activo; landing solo: se desactiva
       // explícitamente la página de registro (registroaforo.html queda "no disponible").
       ...(hayForm ? {
@@ -5531,6 +5558,9 @@ function _limpiarWizardCompleto() {
   document.querySelectorAll('[id^="ld-campo-"]').forEach(c => { c.style.display = 'none'; });
   if (window._sponsorsSetEntries) window._sponsorsSetEntries([]);
   if (window._djLineupSetEntries) window._djLineupSetEntries([]);
+  // ADR-064 — reset de las 5 filas de disenos de ticket al estado inicial
+  // (sin URL, preview oculto, activo=true, sin subida en vuelo).
+  if (window._ticketDisenosSetEntries) window._ticketDisenosSetEntries([]);
   const comun = document.getElementById('ev-comunidad-whatsapp');
   if (comun) comun.value = '';
   const formUrl = document.getElementById('ev-form-solo-url');
@@ -5712,6 +5742,13 @@ function _poblarContenidoWizard(content, suf) {
   }
   if (content.sponsors && (Array.isArray(content.sponsors) || typeof content.sponsors === 'string')) {
     if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors);
+  }
+  // ADR-064 — read-back de content.ticket_disenos. Las 5 filas se reconstruyen
+  // siempre: SetEntries([]) deja el estado inicial y con el array guardado
+  // prellena URL, checkbox activo y preview (si la URL es alcanzable, el <img>
+  // cae al fallback de ADR-008 si no carga). Tipos fuera del dominio se ignoran.
+  if (window._ticketDisenosSetEntries) {
+    window._ticketDisenosSetEntries(Array.isArray(content.ticket_disenos) ? content.ticket_disenos : []);
   }
   // Campaña
   set('ld-historia-titulo', content.historia_titulo);
@@ -10962,13 +10999,11 @@ function handleImgUrl(url) {
 }
 
 async function handleImgFile(file) {
+  // Validador compartido con los disenos de ticket (ADR-064): un solo lugar
+  // decide tipo MIME, peso maximo y mensajes. Ver _imgValidateFile mas abajo.
   if (!file) return;
-  if (!file.type.startsWith('image/')) {
-    alrt('ev-alert', 'Solo se permiten imágenes (JPG, PNG, WEBP).', 'err'); return;
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    alrt('ev-alert', 'La imagen no puede pesar más de 5 MB.', 'err'); return;
-  }
+  const v = _imgValidateFile(file);
+  if (!v.ok) { alrt('ev-alert', v.err, 'err'); return; }
   if (!SB) { alrt('ev-alert', 'Conecta la base de datos primero.', 'err'); return; }
 
   // Show loading
@@ -10978,20 +11013,10 @@ async function handleImgFile(file) {
   document.getElementById('img-upload-loading').style.justifyContent = 'center';
 
   try {
-    // Unique filename
-    const ext = file.name.split('.').pop().toLowerCase();
+    // Nombre unico + subida: logica compartida con los disenos de ticket.
+    const ext = _imgExtFromType(file);
     const filename = `evento_${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
-
-    // Upload to Supabase Storage
-    const { data, error } = await SB.storage
-      .from('eventos-imagenes')
-      .upload(filename, file, { contentType: file.type, upsert: false });
-
-    if (error) throw error;
-
-    // Get public URL
-    const { data: urlData } = SB.storage.from('eventos-imagenes').getPublicUrl(filename);
-    const publicUrl = urlData.publicUrl;
+    const publicUrl = await _imgSharedUpload('eventos-imagenes', filename, file);
 
     // Save URL to hidden field
     document.getElementById('ev-img').value = publicUrl;
@@ -11057,6 +11082,268 @@ function clearImagen() {
   const urlInp = document.getElementById('ev-img-url-input');
   if (urlInp) urlInp.value = '';
 }
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS COMPARTIDOS DE IMAGEN (Regla de No-Duplicidad)
+// Un solo lugar decide: MIME valido, peso maximo, extension y subida a
+// Storage. Los consumen handleImgFile (imagen hero) y handleTicketDisenoFile
+// (disenos de ticket, ADR-064). Si la regla cambia, cambia aqui una vez.
+// ══════════════════════════════════════════════════════════════════
+const _IMG_MAX_BYTES = 5 * 1024 * 1024;
+const _IMG_EXT_POR_MIME = {
+  'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/pjpeg': 'jpg',
+  'image/png': 'png',  'image/apng': 'png',
+  'image/webp': 'webp', 'image/gif': 'gif',
+  'image/svg+xml': 'svg', 'image/avif': 'avif',
+};
+// Devuelve {ok:true} o {ok:false, err:'mensaje'}. El consumidor decide DONDE
+// muestra el error (handleImgFile en #ev-alert, los disenos en su fila).
+function _imgValidateFile(file) {
+  if (!file) return { ok: false, err: 'No se seleccionó ningún archivo.' };
+  if (!String(file.type || '').startsWith('image/')) return { ok: false, err: 'Solo se permiten imágenes (JPG, PNG, WEBP).' };
+  if (file.size > _IMG_MAX_BYTES) return { ok: false, err: 'La imagen no puede pesar más de 5 MB.' };
+  return { ok: true };
+}
+// La extension se toma del contentType declarado por el navegador, no del
+// nombre del archivo (un .png renombrado a .jpg llega como image/png).
+function _imgExtFromType(file) {
+  const porMime = _IMG_EXT_POR_MIME[String((file && file.type) || '').toLowerCase()];
+  if (porMime) return porMime;
+  const porNombre = String((file && file.name) || '').split('.').pop().toLowerCase();
+  return /^[a-z0-9]{2,5}$/.test(porNombre) ? porNombre : 'jpg';
+}
+// Sube a Storage y devuelve la URL publica. Lanza si Supabase devuelve error.
+async function _imgSharedUpload(bucket, path, file) {
+  const { error } = await SB.storage
+    .from(bucket)
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw error;
+  const { data: urlData } = SB.storage.from(bucket).getPublicUrl(path);
+  return (urlData && urlData.publicUrl) ? urlData.publicUrl : '';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DISENOS DE TICKET POR TIPO (ADR-064) — Wizard paso 3
+// Contrato CONGELADO (lo consumen la migracion adr064_ticket_disenos.sql y
+// el kernel del render). NO cambiar la forma:
+//   config_landing.content.ticket_disenos = [{ tipo, diseno_url, activo }]
+// Tipos validos: invitado | frecuente | artista | produccion | pago.
+// Un objeto por tipo como maximo. Sin campo `default`.
+//   - GetEntries: serializa SOLO las filas con diseno_url (array, nunca null).
+//   - SetEntries: reconstruye las 5 filas desde el dato guardado (preload).
+//   - Reset: se llama desde _limpiarWizardCompleto (mismo camino que
+//     _sponsorsSetEntries / _djLineupSetEntries, fail-open si no existe).
+// ══════════════════════════════════════════════════════════════════
+const TICKET_DISENOS_TIPOS = [
+  { tipo: 'invitado',   label: 'Invitado' },
+  { tipo: 'frecuente',  label: 'Frecuente' },
+  { tipo: 'artista',    label: 'Artista' },
+  { tipo: 'produccion', label: 'Producción' },
+  { tipo: 'pago',       label: 'Pago' },
+];
+const _TICKET_DISENO_BUCKET = 'eventos-imagenes';
+// Silueta 1x1 en data URI: fallback de ADR-008 para los <img> dinamicos (una
+// URL rota no debe dejar un cuadro vacio ni depender de un archivo externo).
+const _TICKET_DISENO_FALLBACK = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="70"><rect width="160" height="70" fill="#e8e6e1"/><text x="80" y="40" font-family="sans-serif" font-size="11" fill="#8a8578" text-anchor="middle">diseno no disponible</text></svg>'
+);
+let _ticketDisenoReqSeq = 0;
+
+function _ticketDisenoLabel(tipo) {
+  const def = TICKET_DISENOS_TIPOS.find(t => t.tipo === tipo);
+  return def ? def.label : tipo;
+}
+function _ticketDisenoRow(tipo) {
+  const cont = document.getElementById('ticket-disenos-rows');
+  if (!cont) return null;
+  return cont.querySelector('.ticket-diseno-row[data-tipo="' + tipo + '"]');
+}
+// Path de Storage: disenos/{slug}/{tipo}_{timestamp}.{ext}
+function _ticketDisenoSlug() {
+  const n = String((document.getElementById('ev-n') || {}).value || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim().replace(/\s+/g, '-');
+  return n || 'borrador';
+}
+function _ticketDisenoStatus(tipo, msg, kind) {
+  const row = _ticketDisenoRow(tipo);
+  if (!row) return;
+  const box = row.querySelector('.ticket-diseno-status');
+  if (!box) return;
+  if (!msg) { box.style.display = 'none'; box.textContent = ''; return; }
+  box.style.display = 'block';
+  box.textContent = msg;
+  box.style.color = kind === 'err' ? 'var(--red)' : (kind === 'ok' ? 'var(--green)' : 'var(--ink3)');
+}
+// Escribe la URL en el campo de la fila y refresca el preview.
+// manual=true marca la fila como "URL escrita a mano": una subida que este en
+// vuelo ya no puede pisarla (prioridad de la URL manual sobre la subida).
+function _ticketDisenoSetUrl(tipo, url, opts) {
+  const row = _ticketDisenoRow(tipo);
+  if (!row) return;
+  const o = opts || {};
+  const inp = row.querySelector('.ticket-diseno-url');
+  const wrap = row.querySelector('.ticket-diseno-preview');
+  const img = row.querySelector('.ticket-diseno-img');
+  const val = String(url || '').trim();
+  if (inp) inp.value = val;
+  row.dataset.manual = o.manual ? '1' : '0';
+  if (!val) {
+    if (wrap) wrap.style.display = 'none';
+    if (img) { img.onerror = null; img.removeAttribute('src'); }
+    return;
+  }
+  if (img) {
+    img.onerror = function () { this.onerror = null; this.src = _TICKET_DISENO_FALLBACK; };
+    img.src = val;
+  }
+  if (wrap) wrap.style.display = 'block';
+}
+// Crea una fila. Los valores NUNCA se interpolan en innerHTML (el dato viene
+// de la DB): el cascaron es estatico y los valores se escriben por propiedad.
+function addTicketDisenoRow(data) {
+  const cont = document.getElementById('ticket-disenos-rows');
+  if (!cont) return null;
+  const src = data || {};
+  const def = TICKET_DISENOS_TIPOS.find(t => t.tipo === src.tipo);
+  if (!def) return null;
+  if (cont.querySelector('.ticket-diseno-row[data-tipo="' + def.tipo + '"]')) return null;
+
+  const row = document.createElement('div');
+  row.className = 'ticket-diseno-row';
+  row.dataset.tipo = def.tipo;
+  row.style.cssText = 'display:flex;flex-direction:column;gap:8px;border:1px solid var(--border);border-radius:var(--rsm);padding:12px;background:var(--surface)';
+  row.innerHTML =
+    '<div class="ticket-diseno-head" style="display:flex;justify-content:space-between;align-items:center;gap:8px">' +
+      '<span class="ticket-diseno-label" style="font-size:11px;font-weight:600;letter-spacing:.03em;color:var(--ink3)"></span>' +
+      '<button type="button" class="ticket-diseno-remove" title="Quitar este diseno" style="background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--ink3);font-size:11px;cursor:pointer;padding:3px 8px">Quitar</button>' +
+    '</div>' +
+    '<div class="ticket-diseno-drop" style="border:1px dashed var(--border);border-radius:var(--rsm);padding:10px;text-align:center;cursor:pointer;background:var(--bg)">' +
+      '<input type="file" class="ticket-diseno-file" accept="image/*" style="display:none">' +
+      '<span class="ticket-diseno-drop-hint" style="font-size:11px;color:var(--ink3)">Arrastra la imagen aqui o haz clic para elegir el archivo</span>' +
+    '</div>' +
+    '<div class="ticket-diseno-status" style="font-size:10px;color:var(--ink3);min-height:14px;display:none"></div>' +
+    '<div class="fg" style="margin:0">' +
+      '<label style="font-size:11px">URL del diseno (tiene prioridad sobre la subida)</label>' +
+      '<input class="ticket-diseno-url" type="url" placeholder="https://... o /imagenes/diseno.jpg" style="width:100%;font-family:monospace;font-size:11px">' +
+    '</div>' +
+    '<div class="ticket-diseno-preview" style="display:none">' +
+      '<img class="ticket-diseno-img" alt="Vista previa del diseno" style="max-height:70px;max-width:100%;object-fit:contain;background:#fff;border:1px solid var(--border);border-radius:4px;padding:2px">' +
+    '</div>' +
+    '<label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ink2);cursor:pointer;margin:0">' +
+      '<input type="checkbox" class="ticket-diseno-activo" checked style="width:13px;height:13px;accent-color:var(--gold)"> Diseno activo' +
+    '</label>';
+
+  const urlInp  = row.querySelector('.ticket-diseno-url');
+  const fileInp = row.querySelector('.ticket-diseno-file');
+  const drop    = row.querySelector('.ticket-diseno-drop');
+  row.querySelector('.ticket-diseno-label').textContent = def.label.toUpperCase();
+
+  drop.addEventListener('click', () => fileInp.click());
+  drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.borderColor = 'var(--gold)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = 'var(--border)'; });
+  drop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    drop.style.borderColor = 'var(--border)';
+    handleTicketDisenoDrop(def.tipo, e);
+  });
+  fileInp.addEventListener('change', () => {
+    const f = fileInp.files && fileInp.files[0];
+    fileInp.value = '';
+    handleTicketDisenoFile(def.tipo, f);
+  });
+  urlInp.addEventListener('input', () => {
+    // La URL escrita a mano gana: se invalida cualquier subida en vuelo.
+    row.dataset.req = 'manual';
+    _ticketDisenoSetUrl(def.tipo, urlInp.value, { manual: true });
+    _ticketDisenoStatus(def.tipo, urlInp.value.trim() ? 'URL escrita a mano.' : '', urlInp.value.trim() ? 'ok' : null);
+  });
+  row.querySelector('.ticket-diseno-remove').addEventListener('click', () => ticketDisenoRemove(def.tipo));
+
+  cont.appendChild(row);
+  _ticketDisenoSetUrl(def.tipo, src.diseno_url, { manual: !!src.manual });
+  const chk = row.querySelector('.ticket-diseno-activo');
+  if (chk) chk.checked = (src.activo === false) ? false : true;
+  return row;
+}
+function ticketDisenoRemove(tipo) {
+  const row = _ticketDisenoRow(tipo);
+  if (!row) return;
+  const fileInp = row.querySelector('.ticket-diseno-file');
+  if (fileInp) fileInp.value = '';
+  const chk = row.querySelector('.ticket-diseno-activo');
+  if (chk) chk.checked = true;
+  row.dataset.manual = '0';
+  row.dataset.req = 'reset';
+  _ticketDisenoSetUrl(tipo, '', { manual: false });
+  _ticketDisenoStatus(tipo, 'Diseno quitado.', 'ok');
+}
+// Drag & drop sobre la fila: valida y sube el archivo soltado.
+function handleTicketDisenoDrop(tipo, ev) {
+  const dt = (ev && ev.dataTransfer) ? ev.dataTransfer : null;
+  const file = dt && dt.files ? dt.files[0] : null;
+  handleTicketDisenoFile(tipo, file);
+}
+// Clona el comportamiento de handleImgFile con las reglas compartidas:
+// image/*, max 5 MB, extension por contentType y path disenos/{slug}/{tipo}_{ts}.{ext}.
+async function handleTicketDisenoFile(tipo, file) {
+  const row = _ticketDisenoRow(tipo);
+  if (!row) return;
+  const v = _imgValidateFile(file);
+  if (!v.ok) { _ticketDisenoStatus(tipo, v.err, 'err'); return; }
+  if (typeof SB === 'undefined' || !SB) { _ticketDisenoStatus(tipo, 'Conecta la base de datos primero.', 'err'); return; }
+  // Token de peticion: si el usuario escribe una URL mientras sube, la fila
+  // cambia de req y el resultado de la subida se descarta.
+  const req = String(++_ticketDisenoReqSeq);
+  row.dataset.req = req;
+  _ticketDisenoStatus(tipo, 'Subiendo diseno...', 'busy');
+  try {
+    const path = 'disenos/' + _ticketDisenoSlug() + '/' + tipo + '_' + Date.now() + '.' + _imgExtFromType(file);
+    const publicUrl = await _imgSharedUpload(_TICKET_DISENO_BUCKET, path, file);
+    if (row.dataset.req !== req) return;
+    if (row.dataset.manual === '1') { _ticketDisenoStatus(tipo, 'URL escrita a mano: la subida se descarto.', 'ok'); return; }
+    _ticketDisenoSetUrl(tipo, publicUrl, { manual: false });
+    _ticketDisenoStatus(tipo, 'Diseno subido.', 'ok');
+  } catch (err) {
+    if (row.dataset.req !== req) return;
+    _ticketDisenoStatus(tipo, 'Error subiendo el diseno: ' + ((err && err.message) || 'revisa el bucket "eventos-imagenes"'), 'err');
+  }
+}
+
+// Expuestos en window para el guardado, la carga y la limpieza del wizard
+// (mismo contrato fail-open que _sponsorsGetEntries / _djLineupSetEntries).
+window._ticketDisenosGetEntries = () => {
+  const cont = document.getElementById('ticket-disenos-rows');
+  if (!cont) return [];
+  const vistos = new Set();
+  return Array.from(cont.querySelectorAll('.ticket-diseno-row')).map(row => {
+    const tipo = row.dataset.tipo || '';
+    if (!TICKET_DISENOS_TIPOS.some(t => t.tipo === tipo)) return null;
+    if (vistos.has(tipo)) return null;
+    vistos.add(tipo);
+    const inp = row.querySelector('.ticket-diseno-url');
+    const chk = row.querySelector('.ticket-diseno-activo');
+    const url = (inp && inp.value || '').trim();
+    if (!url) return null;
+    return { tipo: tipo, diseno_url: url, activo: !!(chk && chk.checked) };
+  }).filter(Boolean);
+};
+// Reconstruye SIEMPRE las 5 filas (tienen que existir aunque no haya dato):
+// arr = [{ tipo, diseno_url, activo }] o [] para el estado inicial.
+window._ticketDisenosSetEntries = (arr) => {
+  const cont = document.getElementById('ticket-disenos-rows');
+  if (!cont) return;
+  const items = Array.isArray(arr) ? arr : [];
+  cont.innerHTML = '';
+  TICKET_DISENOS_TIPOS.forEach(def => {
+    const item = items.find(x => x && x.tipo === def.tipo) || null;
+    addTicketDisenoRow({ tipo: def.tipo, diseno_url: item ? item.diseno_url : '', activo: item ? (item.activo !== false) : true });
+  });
+};
+// Montaje inicial (el script inline vive al final del body).
+if (document.getElementById('ticket-disenos-rows')) window._ticketDisenosSetEntries([]);
 </script>
 </body>
 </html>
