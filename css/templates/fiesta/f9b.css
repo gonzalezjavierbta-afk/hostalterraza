@@ -801,10 +801,11 @@
 }
 
 /* Desktop y tablet ancha (>=992px): dos columnas con 3 filas pareadas
-   (cartel|playlist, boletos|whatsapp, faq|ubicacion). Descripcion, lineup,
-   video, los 2 banners, sponsors, form y footer ocupan fila completa. Las
-   filas pareadas vacias colapsan porque row-gap es 0. El REFLOW (seccion 26)
-   expande al companero cuando falta. */
+   (cartel|playlist, boletos|guestlist, faq|ubicacion). Descripcion, lineup,
+   video, los 2 banners, sponsors, form y footer ocupan fila completa; el
+   WhatsApp tambien ocupa fila completa. Las filas pareadas vacias colapsan
+   porque row-gap es 0. El REFLOW (seccion 26) expande al companero cuando
+   falta. */
 @media (min-width: 992px) {
     .tpl-f9b #main-content-flow, .Tpl-F9b #main-content-flow {
         grid-template-columns: 1fr 1fr;
@@ -818,9 +819,9 @@
             "banner-1 banner-1"
             "cartel playlist"
             "video video"
-            "boletos whatsapp"
+            "boletos guestlist"
+            "whatsapp whatsapp"
             "banner-2 banner-2"
-            "guestlist guestlist"
             "faq ubicacion"
             "sponsors sponsors"
             "form form"
@@ -2878,7 +2879,8 @@
    se expande a las 2 columnas con grid-column: 1 / -1 (conserva la fila que
    le asigna su propio grid-area). Sin duplicacion de plantillas.
    Pares vigentes de la plantilla de 2 columnas: cartel<->playlist,
-   boletos<->whatsapp y faq<->ubicacion. Los modulos que ya ocupan fila
+   boletos<->guestlist y faq<->ubicacion. El WhatsApp ya ocupa fila completa
+   en la plantilla, asi que no necesita reflow. Los modulos que ya ocupan fila
    completa (banner-1/2, descripcion, lineup, video, sponsors, form, footer)
    no necesitan reflow.
    ========================================================================== */
@@ -2908,13 +2910,16 @@
         grid-column: 1 / -1;
     }
 
-    /* --- Faltan los boletos: el WhatsApp ocupa la fila completa. --- */
-    .tpl-f9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-whatsapp, .Tpl-F9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-whatsapp {
+    /* --- Faltan los boletos: el guest list ocupa la fila completa. --- */
+    .tpl-f9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-guestlist, .Tpl-F9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-guestlist {
         grid-column: 1 / -1;
     }
 
-    /* --- Falta el WhatsApp: los boletos ocupan la fila completa. --- */
-    .tpl-f9b #main-content-flow:has(#mod-whatsapp[data-hidden]) #mod-boletos, .Tpl-F9b #main-content-flow:has(#mod-whatsapp[data-hidden]) #mod-boletos {
+    /* --- Falta el guest list: los boletos ocupan la fila completa. ---
+       Doble selector porque el guest list se apaga por data-empty (nace "true")
+       ademas del data-hidden que pone __hideEmptyModule. */
+    .tpl-f9b #main-content-flow:has(#mod-guestlist[data-hidden]) #mod-boletos, .Tpl-F9b #main-content-flow:has(#mod-guestlist[data-hidden]) #mod-boletos,
+    .tpl-f9b #main-content-flow:has(#mod-guestlist[data-empty="true"]) #mod-boletos, .Tpl-F9b #main-content-flow:has(#mod-guestlist[data-empty="true"]) #mod-boletos {
         grid-column: 1 / -1;
     }
 }

@@ -891,8 +891,8 @@ var EXP_BASE = ['hero', 'countdown', 'meta', 'ctas', 'descripcion', 'lineup',
   'banner-2', 'guestlist', 'ubicacion', 'form', 'faq', 'sponsors', 'footer'];
 var EXP_WIDE = ['hero hero', 'countdown countdown', 'meta meta', 'ctas ctas',
   'descripcion descripcion', 'lineup lineup', 'banner-1 banner-1',
-  'cartel playlist', 'video video', 'boletos whatsapp', 'banner-2 banner-2',
-  'guestlist guestlist', 'faq ubicacion', 'sponsors sponsors', 'form form', 'footer footer'];
+  'cartel playlist', 'video video', 'boletos guestlist', 'whatsapp whatsapp',
+  'banner-2 banner-2', 'faq ubicacion', 'sponsors sponsors', 'form form', 'footer footer'];
 var baseT = null, wideT = null;
 for (var q1 = 0; q1 < areaList.length; q1++) {
   var qr = areaList[q1], qWide = false;
