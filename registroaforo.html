@@ -1004,7 +1004,7 @@
             const btn = document.querySelector('#ticket-wrap .dl-btn');
             if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
             try {
-                const tipo = (document.querySelector('[name="tipo"]') || {}).value || null;
+                const tipo = window.__ctxRol || 'invitado';
                 const cv = await _generarTicketCanvasReg(qr, d.nombre || '', d.ev || window.__ctxEv || null, '#reg-qr', tipo);
                 _descargarCanvasReg(cv, 'entrada-' + _slugReg((d.ev && d.ev.nombre) || 'evento') + '.png');
             } catch (e) {
@@ -1021,7 +1021,7 @@
             const btn = document.querySelector('#s-duplicate .dl-btn');
             if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
             try {
-                const tipo = (window.__dupData || {}).tipo || null;
+                const tipo = (window.__dupData || {}).tipo || window.__ctxRol || 'invitado';
                 const cv = await _generarTicketCanvasReg(qr, d.nombre || '', window.__ctxEv || null, '#dup-qr-box', tipo);
                 _descargarCanvasReg(cv, 'entrada-' + _slugReg((window.__ctxEv && window.__ctxEv.nombre) || 'evento') + '.png');
             } catch (e) {
@@ -1049,7 +1049,7 @@
                 ? 'https://wa.me/' + tel + '?text=' + encodeURIComponent(texto)
                 : 'https://wa.me/?text=' + encodeURIComponent(texto);
             try {
-                const tipo = (window.__dupData || {}).tipo || null;
+                const tipo = (window.__dupData || {}).tipo || window.__ctxRol || 'invitado';
                 const cv = await _generarTicketCanvasReg(qr, d.nombre || '', ev, '#reg-qr', tipo);
                 const blob = await new Promise((res) => cv.toBlob(res, 'image/png'));
                 if (blob && typeof File !== 'undefined') {

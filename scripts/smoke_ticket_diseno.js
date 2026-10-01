@@ -156,6 +156,81 @@ function countIn(text, needle) {
   return n;
 }
 
+/* ---------- cableado del tipo: fuente real -> call sites de render --------- */
+
+/* Nombre de la funcion que ENVUELVE una linea (la mas cercana hacia atras). */
+function enclosingFn(lines, idx) {
+  for (var k = idx; k >= 0; k--) {
+    var m = lines[k].match(/function\s+([A-Za-z0-9_]+)\s*\(/);
+    if (m) return m[1];
+  }
+  return '';
+}
+
+/*
+ * Extrae, por cada llamada a _generarTicketCanvasReg, la declaracion
+ * "const tipo = ..." que la alimenta. Devuelve {fn, decl, callLine, declLine}.
+ * Solo mira los call sites (excluye la definicion de la funcion).
+ */
+function tipoCallSites(text) {
+  var lines = text.split(/\r?\n/);
+  var sites = [];
+  for (var i = 0; i < lines.length; i++) {
+    if (lines[i].indexOf('_generarTicketCanvasReg(') === -1) continue;
+    if (lines[i].indexOf('function _generarTicketCanvasReg(') !== -1) continue;
+    var decl = null, declLine = -1;
+    for (var j = i; j >= 0 && j >= i - 8; j--) {
+      if (lines[j].indexOf('const tipo =') !== -1) { decl = lines[j].trim(); declLine = j + 1; break; }
+    }
+    sites.push({ fn: enclosingFn(lines, i), decl: decl, callLine: i + 1, declLine: declLine });
+  }
+  return sites;
+}
+
+/* Problemas de cableado del tipo en los call sites (vacio = sano). */
+function tipoWiringProblemas(text) {
+  var problemas = [];
+  var sites = tipoCallSites(text);
+  if (sites.length !== 3) {
+    problemas.push('se esperaban 3 call sites de _generarTicketCanvasReg, hallados ' + sites.length);
+  }
+  sites.forEach(function (s) {
+    var tag = (s.fn || '?') + ' L' + s.callLine;
+    if (!s.decl) { problemas.push(tag + ': sin "const tipo =" cercano'); return; }
+    if (s.decl.indexOf('name="tipo"') !== -1) {
+      problemas.push(tag + ': resuelve tipo desde [name="tipo"] (DOM inexistente)');
+    }
+    if (/=\s*null\s*;?\s*$/.test(s.decl)) {
+      problemas.push(tag + ': tipo queda null incondicional');
+    }
+    if (s.decl.indexOf('__ctxRol') === -1 && s.decl.indexOf('__dupData') === -1) {
+      problemas.push(tag + ': no usa __ctxRol ni __dupData');
+    }
+  });
+  return problemas;
+}
+
+/* Problemas de persistencia (window.__ctxRol -> inscritos.tipo). */
+function tipPersistenciaProblemas(text) {
+  var problemas = [];
+  if (text.indexOf('window.__ctxRol = rol') === -1) {
+    problemas.push('window.__ctxRol no se asigna desde el rol resuelto');
+  }
+  if (text.indexOf('const rol = window.__ctxRol') === -1) {
+    problemas.push('el rol de registro no deriva de window.__ctxRol');
+  }
+  if (text.indexOf('tipo: rol') === -1) {
+    problemas.push('el payload de registro no persiste "tipo: rol"');
+  }
+  if (text.indexOf('tipo: tipoPersona') === -1) {
+    problemas.push('el payload de existente no persiste "tipo: tipoPersona"');
+  }
+  if (text.indexOf('const tipoPersona = _existenteReg.tipo || rol') === -1) {
+    problemas.push('tipoPersona no prioriza la fila de inscritos y cae a rol');
+  }
+  return problemas;
+}
+
 /* ------------------------------------------------------- stubs de entorno */
 
 function makeCtx(ops) {
@@ -524,7 +599,7 @@ function main() {
   })
     .then(function () { return s7(src); })
     .then(function () { return s3(src); })
-    .then(function () { s8(adm); return null; })
+    .then(function () { s8(adm); s9(src); return null; })
     .then(finish);
 }
 
@@ -687,6 +762,56 @@ function s8(adm) {
   ok(/content\s*\.\s*ticket_disenos/.test(adm), 'S8 el lector consume content.ticket_disenos (mismo contrato)');
   var ab = countIn(adm, '<div'), ce = countIn(adm, '</div>');
   eq(ab - ce, 3, 'S8 balance de divs de admin.html = baseline preexistente (+3)');
+}
+
+/*
+ * S9: cableado del tipo. La fuente real (window.__ctxRol, persistido como
+ * inscritos.tipo) debe alimentar los 3 call sites de _generarTicketCanvasReg.
+ * Caza el defecto de integracion: el render leia [name="tipo"] (DOM que no
+ * existe) o __dupData (nulo en el flujo nuevo). Incluye prueba de mutacion.
+ */
+function s9(src) {
+  seccion('S9 Cableado del tipo (window.__ctxRol -> render)');
+
+  var sites = tipoCallSites(src);
+  eq(sites.length, 3, 'S9 hay exactamente 3 call sites de _generarTicketCanvasReg');
+  var fns = sites.map(function (s) { return s.fn; }).sort();
+  eq(fns, ['descargarDupReg', 'descargarTicketReg', 'enviarTicketWAReg'],
+    'S9 los 3 call sites son ticket nuevo, duplicado y WhatsApp');
+
+  sites.forEach(function (s) {
+    var tag = 'S9 ' + (s.fn || '?') + ': ';
+    ok(!!s.decl, tag + 'declara "const tipo =" antes de renderizar',
+      s.declLine > 0 ? ('L' + s.declLine) : 'sin declaracion');
+    ok(!!s.decl && s.decl.indexOf('name="tipo"') === -1,
+      tag + 'NO resuelve tipo desde [name="tipo"] (no existe en el DOM)', s.decl || '');
+    ok(!!s.decl && !/=\s*null\s*;?\s*$/.test(s.decl),
+      tag + 'tipo NO queda null incondicional', s.decl || '');
+    ok(!!s.decl && (s.decl.indexOf('__ctxRol') !== -1 || s.decl.indexOf('__dupData') !== -1),
+      tag + 'resuelve desde window.__ctxRol / window.__dupData', s.decl || '');
+  });
+
+  var byFn = {};
+  sites.forEach(function (s) { byFn[s.fn] = s.decl || ''; });
+  ok(byFn.descargarTicketReg.indexOf('__ctxRol') !== -1,
+    'S9 el ticket NUEVO (descargarTicketReg) usa window.__ctxRol', byFn.descargarTicketReg);
+  ok(byFn.descargarDupReg.indexOf('__ctxRol') !== -1 && byFn.descargarDupReg.indexOf('__dupData') !== -1,
+    'S9 el duplicado prioriza la fila y cae a window.__ctxRol', byFn.descargarDupReg);
+  ok(byFn.enviarTicketWAReg.indexOf('__ctxRol') !== -1 && byFn.enviarTicketWAReg.indexOf('__dupData') !== -1,
+    'S9 el WhatsApp prioriza la fila y cae a window.__ctxRol', byFn.enviarTicketWAReg);
+  eq(countIn(src, 'name="tipo"'), 0, 'S9 no queda ningun [name="tipo"] en registroaforo.html');
+
+  var pp = tipPersistenciaProblemas(src);
+  eq(pp, [], 'S9 window.__ctxRol ES lo que se persiste como inscritos.tipo', JSON.stringify(pp));
+
+  /* Prueba de mutacion: el guard DEBE cazar la regresion. Original intacto. */
+  var roto = src.replace(
+    "const tipo = window.__ctxRol || 'invitado';",
+    'const tipo = (document.querySelector(\'[name="tipo"]\') || {}).value || null;');
+  ok(roto !== src, 'S9 el patron del ticket nuevo esta presente (mutacion aplicable)');
+  var mut = tipoWiringProblemas(roto);
+  ok(mut.length > 0, 'S9 el guard DETECTA la regresion a [name="tipo"] (mutacion falla)', JSON.stringify(mut));
+  eq(tipoWiringProblemas(src), [], 'S9 el archivo real esta SANO (el guard no dispara)');
 }
 
 function finish() {
