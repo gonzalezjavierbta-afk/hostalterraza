@@ -18,6 +18,55 @@ Operativiza los Mandatos 17, 18, 19 y 20 de `Sistema QR desarrollo/Reglas de Oro
 7. **Estimación previa y confirmación (Mandato 19):** antes de ejecutar, entrega estimación de tokens y tiempo (desglose por agente); al cerrar, concilia estimado vs. real y registra la desviación (> +50%) en `NEXT.md`.
 8. **Umbral de tarea pesada (Mandato 20):** si la tarea supera ~1.5M tokens / ~30 min o implica imágenes/video, research masivo o seeds volumétricos, avisa el costo antes de gastar, recomienda una IA externa (Gemini/ChatGPT/Claude), define el insumo que debe volver (ficha/JSON) y sugiere un prompt listo.
 
+## Contrato de retorno de subagentes
+
+Todo `task` que despacha el orquestador exige un retorno COMPACTO (máximo ~600 tokens) con este schema fijo:
+
+*   **STATUS:** `ok` | `partial` | `blocked`.
+*   **ARCHIVOS:** `ruta:rango` de líneas, uno por línea (no el contenido).
+*   **VERIFICACION:** comando exacto ejecutado + resultado `pass`/`fail` con conteo N/N.
+*   **BLOQUEADORES:** nada, o la causa concreta.
+*   **SIGUIENTE:** la acción recomendada.
+
+Prohibido volcar archivos completos, diffs extensos o narrar lo leído. El orquestador NO pide "muéstrame el archivo": si necesita un dato, lo pide dentro del mismo brief de la tarea.
+
+## Presupuesto de sesión y fragmentación por fase
+
+El costo de una sesión crece de forma aproximadamente cuadrática con sus turnos: cada turno relee el contexto acumulado completo (`cache_read`). Por eso el presupuesto operativo del orquestador es de **25-30 turnos por sesión** y una sesión = una fase.
+
+*   Al agotar el presupuesto: emitir un resumen de estado y abrir una sesión nueva (no estirar la misma).
+*   Fragmentar reduce el gasto: un feature largo de 67 turnos partido en 3 sesiones de ~22 turnos baja el gasto **50-60%**.
+
+## Anti-absorción dura
+
+*   El orquestador que supere **20-25 llamadas directas** (`read`/`grep`/`glob`) se DETIENE y delega a `@explore`.
+*   El reconocimiento masivo siempre va a `@explore`, con brief de salida acotado (que devuelva `archivo:línea`, no el contenido).
+
+## Free-first con escalado automático
+
+*   Para trabajo mecánico, repetitivo o de bajo riesgo se intenta SIEMPRE primero la ruta FREE.
+*   Si el subagente FREE falla, devuelve `partial`/`blocked` o no pasa la verificación, se escala AUTOMÁTICAMENTE a la ruta PRO del dominio, sin pedir permiso.
+*   Los dominios de riesgo de runtime o seguridad (backend, renderer, admin, sql-security, arquitectura) van directo a PRO.
+*   Nunca desdoblar pro+free en paralelo (sesiones vacías = reloj puro).
+
+## Watchdog de subagentes
+
+Un subagente que supere **25 turnos** o **50.000 tokens por turno** se aborta y se re-planifica. Nunca se re-despacha el mismo perfil que falló (refuerza la regla anti-colgado): se cambia de estrategia (otro dominio, un script o un brief mínimo).
+
+## Línea base medida (2026-10-01) y objetivo de control
+
+Datos reales del feature Guest List, medidos con `scripts/usage_report.js` (prevalece el archivo, no el historial de chat):
+
+| Medida | Valor |
+|---|---|
+| Feature Guest List (total) | 6.656.144 tokens / 133 turnos |
+| Orquestador `build` | 5.196.654 tokens / 67 turnos = 77.562 tokens/turno (78,1% del feature) |
+| Subagentes | 15.000-29.000 tokens/turno |
+| `cache_read` global | 89-90% |
+| `AGENTS.md` | ~8.1k tokens releídos cada turno |
+
+Objetivo de control: bajar el `cache_read/turno` del orquestador por debajo de **~50.000**.
+
 ## `scripts/usage_report.js` — contrato CONGELADO
 
 Reporte de uso de tokens y costo de la DB local de OpenCode. Interfaz congelada (no re-diseñar sin ADR):
@@ -38,12 +87,13 @@ node scripts/usage_report.js --tree --root <sessionId>          # listar subagen
 node scripts/usage_report.js --sessions --json --out uso.json   # exportar JSON para otra IA
 ```
 
-## Informe de cierre de sesión (obligatorio)
+## Informe de cierre de sesión (OBLIGATORIO)
 
-Toda sesión de implementación cierra con un informe de gasto y aprendizaje. Se levanta con la herramienta existente, sin agente:
+Toda sesión de implementación cierra SIEMPRE con un informe de gasto y aprendizaje; no se difiere. Se levanta sin agente con:
 
     node scripts/usage_report.js --summary          # dia local (default)
     node scripts/usage_report.js --tree --root <id> # desglose por subagente
+    node scripts/session_close.js                   # wrapper de cierre (nuevo; total + turnos + cache_read/turno + segundos + --tree)
 
 El informe debe incluir, como mínimo:
 
@@ -54,10 +104,11 @@ El informe debe incluir, como mínimo:
 | cache_read / turnos | metrica de control (mide el contexto por turno) |
 | segundos | suma de `seg` (reloj) |
 | desglose por agente | `--tree` (quien gasto que) |
-| 1-3 aprendizajes | accionables: que se releo de mas, que agente fallo, que brief falto |
 | estimado vs. real | análisis previo (Mandato 19) contrastado con el total medido |
+| 1-3 aprendizajes | accionables: que se releo de mas, que agente fallo, que brief falto |
+| consejos de mejora | acciones concretas para la próxima sesión |
 
-Regla: el informe se entrega al cerrar, no se difiere. Si la sesión superó el presupuesto (Mandato 18), el informe debe explicar por qué.
+Regla: si la sesión superó el presupuesto (Mandato 18), el informe debe explicar por qué. Se apoya en `scripts/usage_report.js` y en el nuevo `scripts/session_close.js` (wrapper de cierre).
 
 ## Disciplina de reconocimiento (grep y lectura)
 
