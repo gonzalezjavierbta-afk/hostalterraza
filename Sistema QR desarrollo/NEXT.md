@@ -2,6 +2,23 @@
 
 Este documento define el punto de control estratégico y las directrices para la continuación inmediata del desarrollo. Es la hoja de ruta obligatoria para cualquier IA o agente que retome el proyecto para asegurar la fidelidad de 1px y la integridad del núcleo.
 
+#### -36. Hito Mas Reciente - Consolidacion del roster a 20 agentes, retiro de la ruta hibrida y compuerta de seleccion de tier (ADR-067) (2026-10-01)
+*   **Que se estaba haciendo:** cierre documental (Mandato 12 / Reglas de Oro #12; Regla 8: el historial de chat nunca es fuente de verdad) de la consolidacion del roster de agentes aprobada por el usuario. Todo verificado contra los archivos reales (ADR-006; prevalece el archivo).
+*   **Que se entrego (alcance REAL ejecutado):**
+    *   **(1) Roster 22 -> 20 agentes:** retiro de la ruta hibrida (`hybrid-plan.md`/`hybrid-build.md` eliminados) y realineacion de `free-plan`/`free-build` al roster unico sin referencias muertas; 4 primarios + 16 subagentes, un unico agente por dominio.
+    *   **(2) Compuerta 0 de seleccion de tier:** el orquestador pregunta UNA VEZ por tarea (herramienta `question`) si se usa FREE (costo 0) o PAGO; sin respuesta no se ejecuta; prohibida la ruta hibrida (ADR-067).
+    *   **(3) Gate de confirmacion por riesgo (`AGENTS.md` seccion 2):** RLS/esquema y migraciones, motor de produccion `evento-app.html` y arquitectura/ADR exigen confirmacion explicita del usuario antes de ejecutar, incluso en ruta PAGO.
+    *   **(4) `opencode.json`:** `default_agent=build`, `subagent_depth=1`, `permission.question=allow`.
+    *   **(5) Limpieza de referencias:** 0 refs muertas `@*-free`/`@hybrid` en `AGENTS.md`, en las skills `anti-absorcion` y `express-mode`, y en `plan.md` (sin citar la skill fantasma `gemini-research`).
+*   **Evidencia real (ADR-006):** `node scripts/express_check.js` -> **PASS 22 / FAIL 0**; `node scripts/usage_report.js --overhead`; roster real = **20** archivos `.md` en `.opencode/agent/`; **0 refs muertas** `@*-free`/`@hybrid` en la gobernanza activa; frontmatters **20/20** con `name` identico al slug y **0 descripciones >175** chars; config `default_agent=build`, `subagent_depth=1`, `permission.question=allow`.
+*   **Metrica de overhead (HONESTA, sin maquillar):** PRE **2.734 tokens/turno** (AGENTS.md 1.499 + desc agentes 876 + desc skills 359) -> POST **3.142 tokens/turno** (AGENTS.md 1.991 + desc agentes 793 + desc skills 359) = DELTA **+408 (+14,9%)**. Causa: `AGENTS.md` crecio por la compuerta 0 y el gate de riesgo; la poda de gemelos `-free` ya se habia ejecutado antes de esta sesion, por eso el ahorro de descripciones fue de solo **-83**. Registrado como deuda/opcion: podar el texto narrativo de `AGENTS.md` si se busca volver a <=2.734.
+*   **Que sigue:** (a) decidir si se comprime `AGENTS.md`; (b) las 6 skills fantasma siguen sin archivo en disco (`agentes-roster`, `modelos-verificados`, `gemini-research`, `ingest-eventos`, `batch-create`, `reglas-de-oro`) - crear o depurar referencias; (c) el indice de skills del runtime aun las expone (arranque obsoleto, se corrige al reiniciar opencode).
+*   **Riesgos activos:** (1) la consolidacion esta en el working tree, SIN commit; (2) mientras no se reinicie opencode, el indice del runtime sigue exponiendo agentes `-free` y las 6 skills fantasma inexistentes en disco; (3) los riesgos de hitos previos siguen vigentes.
+*   **Nota ADR-006:** registra que el indice de agentes/skills del sistema en el arranque mostraba agentes `-free` y skills fantasma que NO existen en disco; prevalece el archivo real.
+*   **Verificacion de cierre (por script, 0 tokens de agente):** `express_check` PASS 22/FAIL 0; `usage_report.js --overhead` (POST 3.142, AGENTS.md 1.991 + desc agentes 793 + desc skills 359); conteo de `.opencode/agent/*.md` = 20; `Select-String` de `@*-free`/`hybrid` en `AGENTS.md` y skills = 0; `plan.md` sin `gemini-research`; `opencode.json` con `default_agent=build`.
+
+---
+
 #### -35. Hito Mas Reciente - Footer dinamico de organizacion en las paginas publicas de evento (2026-10-01)
 *   **Que se estaba haciendo:** cierre documental (Mandato 12 / Reglas de Oro #12; Regla 8: el historial de chat nunca es fuente de verdad) de una entrega **IMPLEMENTADA, COMMITEADA y pusheada** (`52bbad0 footer` + `c3d95c6 Update evento-app.html`; HEAD == origin/main) y con **QA APTO**. Todo verificado contra los archivos reales (ADR-006; prevalece el archivo).
 *   **Que se entrego (alcance REAL ejecutado):**

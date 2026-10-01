@@ -7,7 +7,7 @@ description: "Modo express/xpress de HostalTerraza: prioriza lo funcional, verif
 
 Modo de trabajo **rapido, dirigido y proporcional al riesgo** para HostalTerraza: se prioriza el cambio funcional, se verifican solo los puntos que pueden romperse y se difiere todo lo no critico (documentacion, refactors, pruebas end-to-end, backfill de datos) al cierre de sesion.
 
-> Skill **transversal**: rige toda la sesion por encima de cualquier dominio y de cualquier ruta (gratuita `*-free` o de pago). No sustituye al Escudo GOLD ni a las reglas anti-absorcion (ADR-031): cambia el **orden** y la **profundidad** de los controles, no los elimina.
+> Skill **transversal**: rige toda la sesion por encima de cualquier dominio y de cualquier ruta (FREE con los primarios free o PAGO con los especialistas). No sustituye al Escudo GOLD ni a las reglas anti-absorcion (ADR-031): cambia el **orden** y la **profundidad** de los controles, no los elimina.
 
 ## Cuando usar
 
@@ -18,7 +18,7 @@ Modo de trabajo **rapido, dirigido y proporcional al riesgo** para HostalTerraza
 ## Cuando NO usar (escalar a modo normal)
 
 - Cambios de **arquitectura** (nuevos modulos, contratos entre capas).
-- **Esquema / RLS / seguridad** (permisos, autenticacion, exposicion de datos) -> escalar SIEMPRE a `@sql-security` (prohibido `@sql-security-free`).
+- **Esquema / RLS / seguridad** (permisos, autenticacion, exposicion de datos) -> escalar SIEMPRE a `@sql-security` (dominio de riesgo: exige confirmación del usuario).
 - **Migraciones de datos** o backfill destructivo.
 - **Refactors compartidos** (helpers con varios consumidores: `js/i18n.js`, `api/evento-og.js`, el motor `CATEGORY_TAG_FIELDS`/`CATEGORY_TAG_LISTS` de `admin.html`).
 - Alcance amplio: **> 3 archivos criticos** o **> 10 archivos en total**.
@@ -43,7 +43,7 @@ Modo de trabajo **rapido, dirigido y proporcional al riesgo** para HostalTerraza
 ## Flujo express paso a paso
 
 1. **Spec inline minima.** Una linea: que se cambia, en que archivo y criterio de exito.
-2. **Lectura dirigida.** `grep` del ancla + `read` con `offset`/`limit`. `@explore-free` solo si es imprescindible (p. ej. contar consumidores de un ancla).
+2. **Lectura dirigida.** `grep` del ancla + `read` con `offset`/`limit`. `@explore` solo si es imprescindible (p. ej. contar consumidores de un ancla).
 3. **Brief quirurgico de delegacion.** Un subagente por dominio con rutas + numeros de linea + bloque `old`/`new` exacto (ver plantilla).
 4. **Ejecutar cambios minimos**, de bajo riesgo primero. Reusar componentes/helpers; extraer modulo compartido en vez de duplicar (Regla de No-Duplicidad, tripwire de 5 lineas).
 5. **Paralelizar** solo tareas independientes (varios `task` en un mismo mensaje); respetar dependencias.
@@ -53,16 +53,15 @@ Modo de trabajo **rapido, dirigido y proporcional al riesgo** para HostalTerraza
 
 ## Ruteo de delegacion en express
 
-| Dominio | Subagente FREE (operacion diaria) | Par PRO (respaldo) |
-|---|---|---|
-| `admin.html`, `scanner.html` | `@admin-dev-free` | `@admin-dev` |
-| `api/*.js` | `@backend-dev-free` | `@backend-dev` |
-| CSS de silo / `eventovenezuela.html` | `@frontend-tpl-free` | `@frontend-tpl` |
-| `js/*.js` rutinario | `@js-silo-dev-free` | `@js-silo-dev` |
-| SQL / RLS / migraciones | `@data-migration-free` | `@sql-security` (obligatorio en seguridad critica) |
-| Exploracion puntual | `@explore-free` | `@explore` |
-| Cierre documental | `@docs-keeper-free` | `@docs-keeper` |
-| Certificacion (solo si rompe runtime) | - | `@qa-auditor` (solo lectura) |
+| Dominio | Agente unico |
+|---|---|
+| `admin.html`, `scanner.html` | `@admin-dev` |
+| `api/*.js` | `@backend-dev` |
+| CSS de silo / `eventovenezuela.html` | `@frontend-tpl` |
+| `js/*.js` rutinario | `@js-silo-dev` |
+| SQL / RLS / migraciones | `@sql-security` |
+| Exploracion puntual | `@explore` |
+| Cierre documental | `@docs-keeper` |
 
 ## Plantilla de "brief express"
 
