@@ -465,12 +465,12 @@ function main() {
   eq(g.TICKET_PLACA_Y, '682', 'placa Y = 682 (marco inset 18)');
   eq(g.TICKET_PLACA_W, '482', 'placa ancho = 482');
   eq(g.TICKET_PLACA_H, '460', 'placa alto = 460');
-  eq(g.TICKET_QR_TEXT_Y, '1555', 'string del codigo Y = 1555');
+  eq(g.TICKET_QR_TEXT_Y, '1240', 'string del codigo Y = 1240');
   eq(g.TICKET_QR_TEXT_PX, '28', 'string del codigo = 28 px (una sola linea)');
   eq(g.TICKET_QR_TEXT_COLOR, "'rgba(253, 246, 220, .78)'", 'color del string = crema del arte');
   eq(g.TICKET_DISENO_BASE, "'" + BASE + "'", 'el arte de Rastro se conserva como constante MUERTA (Cero Borrado)');
   eq(g.TICKET_PILDORA_X, '234', 'pildora X = 234 (contorno cian real del arte)');
-  eq(g.TICKET_PILDORA_Y, '1166', 'pildora Y = 1166 (contorno cian real del arte)');
+  eq(g.TICKET_PILDORA_Y, '1450', 'pildora Y = 1450 (al pie, bajo el codigo)');
   eq(g.TICKET_PILDORA_W, '616', 'pildora ancho = 616 (contorno cian real del arte)');
   eq(g.TICKET_PILDORA_H, '130', 'pildora alto = 130 (contorno cian real del arte)');
   eq(g.TICKET_PILDORA_FONT_PX, '64', 'pildora: el tipo se estampa a 64 px');
@@ -512,9 +512,10 @@ function main() {
   ok(R_PLACA[1] + R_PLACA[3] < ARTE_FECHA_Y,
     'la placa blanca no invade la banda de arte de la fecha (Y=' + ARTE_FECHA_Y + '..)',
     'la placa termina en ' + (R_PLACA[1] + R_PLACA[3]));
-  ok(n('TICKET_PILDORA_Y') + n('TICKET_PILDORA_H') < ARTE_FECHA_Y,
-    'la pildora del tipo no invade la banda de arte de la fecha (Y=' + ARTE_FECHA_Y + '..)',
-    'la pildora termina en ' + (n('TICKET_PILDORA_Y') + n('TICKET_PILDORA_H')));
+  ok(n('TICKET_QR_TEXT_Y') < n('TICKET_PILDORA_Y'), 'el codigo va POR ENCIMA de la pildora',
+    'codigo en ' + n('TICKET_QR_TEXT_Y') + ', pildora en ' + n('TICKET_PILDORA_Y'));
+  ok(n('TICKET_PILDORA_Y') + n('TICKET_PILDORA_H') < n('TICKET_H'), 'la pildora cabe en el lienzo (Y+H < 1920)',
+    'pildora termina en ' + (n('TICKET_PILDORA_Y') + n('TICKET_PILDORA_H')));
 
   ok(n('TICKET_QR_TEXT_Y') > R_QR[1] + R_QR[3], 'el string del codigo va POR DEBAJO del QR');
   ok(n('TICKET_QR_TEXT_Y') + n('TICKET_QR_TEXT_PX') < n('TICKET_H'), 'el string del codigo cabe en el lienzo');
@@ -720,8 +721,8 @@ function s7b(src) {
     eq(fb.length, 1, 'S7b degrada a texto con el codigo en el centro del QR',
       JSON.stringify(fillOps(cv.ops, 'fillText').map(function (o) { return [o.args[0], o.args[1], o.args[2]]; })));
     if (fb.length === 1) eq([fb[0].args[1], fb[0].args[2]], [544, 912], 'S7b el texto de degradacion va al centro del QR');
-    eq(fillOps(cv.ops, 'fillText').filter(function (o) { return o.args[2] === 1555; }).length, 1,
-      'S7b el string del codigo en Y=1555 se dibuja igual');
+    eq(fillOps(cv.ops, 'fillText').filter(function (o) { return o.args[2] === 1240; }).length, 1,
+      'S7b el string del codigo en Y=1240 se dibuja igual');
     ok(c.env.logs.length > 0, 'S7b deja rastro en log de la degradacion', JSON.stringify(c.env.logs));
   });
 }
@@ -737,14 +738,14 @@ function s3(src) {
     var last = t.length ? t[t.length - 1] : null;
     eq(last ? last.args[0] : null, P, 'S3 el texto dibujado ES el qr_code recibido, sin transformar');
     eq(last ? last.args[1] : null, 540, 'S3 el string se centra en X=540');
-    eq(last ? last.args[2] : null, 1555, 'S3 el string se dibuja en Y=1555');
+    eq(last ? last.args[2] : null, 1240, 'S3 el string se dibuja en Y=1240');
     eq(last ? last.textBaseline : null, 'middle', 'S3 textBaseline=middle (Y es el centro de linea)');
     eq(last ? last.textAlign : null, 'center', 'S3 textAlign=center');
     eq(last ? last.font : null, '28px sans-serif', 'S3 28 px, una sola linea');
     eq(last ? last.fillStyle : null, 'rgba(253, 246, 220, .78)', 'S3 color crema del arte');
     ok(last && last.args[0].indexOf('%') === -1, 'S3 el payload NO va URL-encoded al lienzo');
     eq(fillOps(cv.ops, 'drawImage').filter(function (o) { return o.args[5] === 344 && o.args[6] === 712; }).length, 1,
-      'S3 el QR se dibuja UNICAMENTE como imagen (el string va aparte, en Y=1555)');
+      'S3 el QR se dibuja UNICAMENTE como imagen (el string va aparte, en Y=1240)');
     /* qrcodejs recibe el payload CRUDO, generado a 400. */
     ok(c.env.qrCalls.length >= 1, 'S3 qrcodejs recibio el texto del codigo', 'n=' + c.env.qrCalls.length);
     if (c.env.qrCalls.length) {
@@ -875,7 +876,7 @@ function s10(src) {
       JSON.stringify(t.map(function (o) { return o.args[0]; })));
     if (pill.length === 1) {
       near(pill[0].args[1], 234 + 616 / 2, 0.001, 'S10 el tipo va centrado en X de la pildora (542)');
-      near(pill[0].args[2], 1166 + 130 / 2, 0.001, 'S10 el tipo va centrado en Y de la pildora (1231)');
+      near(pill[0].args[2], 1450 + 130 / 2, 0.001, 'S10 el tipo va centrado en Y de la pildora (1515)');
       eq(pill[0].font, 'bold 64px sans-serif', 'S10 el tipo va en negrita 64px');
       eq(pill[0].fillStyle, '#1A1A1A', 'S10 el tipo va en texto oscuro');
     }

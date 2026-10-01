@@ -815,8 +815,8 @@
         }
 
         // --- Render del ticket: lienzo 1080x1920 (geometria definitiva) ---
-        // El render dibuja SOLO fondo, marco, placa, pildora del tipo, QR y
-        // el string del codigo. Sin transformaciones de lienzo (giro,
+        // El render dibuja SOLO fondo, marco, placa, QR, string del codigo y
+        // pildora del tipo. Sin transformaciones de lienzo (giro,
         // escalado, inclinacion). El unico ajuste de texto es TICKET_QR_TEXT_Y.
         var TICKET_W = 1080;
         var TICKET_H = 1920;
@@ -830,18 +830,18 @@
         // quiet zone >= 30 px por lado dentro de la placa.
         var TICKET_QR_X = 344, TICKET_QR_Y = 712, TICKET_QR_SIZE = 400;
         var TICKET_QR_NATIVE = TICKET_QR_SIZE;
-        // 1330 queda SOLAPADO: el arte trae "7:00 PM" en 1341..1394 y la banda
-        // libre de 1316..1341 (24 px) no cabe en una linea de 28 px. Ademas esa
-        // franja es negro puro. Se usa la banda 1521..1589 (68 px, por debajo
-        // del QR). Y es el CENTRO de la linea (textBaseline='middle').
-        var TICKET_QR_TEXT_Y = 1555;
+        // Orden del ticket (2026-10-01): QR arriba, CODIGO debajo, PILDORA al
+        // pie. El codigo se centra en Y=1240 (justo bajo el marco, que termina
+        // en 1160) y la pildora va al pie (Y=1450). Y es el CENTRO de la linea
+        // (textBaseline='middle').
+        var TICKET_QR_TEXT_Y = 1240;
         var TICKET_QR_TEXT_PX = 28;
         var TICKET_QR_TEXT_COLOR = 'rgba(253, 246, 220, .78)'; // crema del arte, discreto
         var TICKET_CYAN = '#00E5FF';
         var TICKET_FONDO = '#0F0F0F';
-        // Pildora del tipo: contorno cian real del arte medido por pixeles
-        // (941x1672 -> x 207..733, y 1021..1119) escalado a 1080x1920.
-        var TICKET_PILDORA_X = 234, TICKET_PILDORA_Y = 1166, TICKET_PILDORA_W = 616, TICKET_PILDORA_H = 130;
+        // Pildora del tipo: al PIE del ticket (debajo del codigo). El arte debe
+        // encuadrar la pildora horneada en esta franja (Y=1450..1580).
+        var TICKET_PILDORA_X = 234, TICKET_PILDORA_Y = 1450, TICKET_PILDORA_W = 616, TICKET_PILDORA_H = 130;
         var TICKET_PILDORA_R = 54;
         var TICKET_PILDORA_TOP = '#E7C56B';
         var TICKET_PILDORA_BOT = '#CDA24A';
