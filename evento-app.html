@@ -1882,7 +1882,11 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         __copyEl.appendChild(__copyStrong);
         const __copyRest = document.createElement('span');
         __copyRest.className = 'b2b-powered';
-        __copyRest.textContent = ' · ' + T('landing.copy_derechos') + ' Powered by Taquilla Directa';
+        __copyRest.appendChild(document.createTextNode(' · ' + T('landing.copy_derechos') + ' Powered by '));
+        const __copyLink = document.createElement('a');
+        __copyLink.href = 'index.html';
+        __copyLink.textContent = 'Taquilla Directa';
+        __copyRest.appendChild(__copyLink);
         __copyEl.appendChild(__copyRest);
     }
     // === FIN SEGMENTO FOOTER ===
