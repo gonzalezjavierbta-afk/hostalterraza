@@ -532,6 +532,17 @@
     display: block !important;
 }
 
+/* v1.6.0 (aditivo): #mod-guestlist - card de beneficio Guest List. FRONTERA DURA
+   (Cap. 8 punto 6): esta incorporacion a la lista ON de f9b queda ANOTADA como
+   PENDIENTE de ADR de Direccion, igual que se hizo con los 2 banners en v1.2.0.
+   No se disimula. */
+.tpl-f9b #mod-guestlist, .Tpl-F9b #mod-guestlist {
+    display: block !important;
+}
+.tpl-f9b #mod-guestlist[data-empty="true"], .Tpl-F9b #mod-guestlist[data-empty="true"] {
+    display: none !important;
+}
+
 .tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {
     display: block !important;
 }
@@ -750,6 +761,7 @@
         "boletos"
         "whatsapp"
         "banner-2"
+        "guestlist"
         "ubicacion"
         "form"
         "faq"
@@ -779,6 +791,7 @@
 .tpl-f9b #mod-whatsapp, .Tpl-F9b #mod-whatsapp {  grid-area: whatsapp; }
 .tpl-f9b #mod-sponsors, .Tpl-F9b #mod-sponsors {  grid-area: sponsors; }
 .tpl-f9b #mod-banner-2, .Tpl-F9b #mod-banner-2 {  grid-area: banner-2; }
+.tpl-f9b #mod-guestlist, .Tpl-F9b #mod-guestlist {  grid-area: guestlist; }
 .tpl-f9b #mod-form, .Tpl-F9b #mod-form {  grid-area: form; }
 .tpl-f9b #mod-footer, .Tpl-F9b #mod-footer {  grid-area: footer; }
 
@@ -807,6 +820,7 @@
             "video video"
             "boletos whatsapp"
             "banner-2 banner-2"
+            "guestlist guestlist"
             "faq ubicacion"
             "sponsors sponsors"
             "form form"
@@ -3657,3 +3671,63 @@
      |         |            |                   | mantiene overflow-x:hidden y max-width:100vw      |        |
      |         |            |                   | (L757-759). f9.css sin tocar en ningun byte.      |        |
      ============================================================================ */
+
+/* ==========================================================================
+   30. GUEST LIST - CARD DE BENEFICIO (#mod-guestlist)  [v1.6.0]
+   Card opcional alimentado por config_landing.content.guestlist. El layout y el
+   espaciado usan utilidades Tailwind (cargadas en evento-app.html con preflight
+   OFF); aqui viven SOLO las clases custom que Tailwind no expresa (font-cinzel,
+   gold-border, gold-glow-hover, gold-gradient-text) mas el scoping del silo.
+   Aislamiento Atomico (Oro #9): todo bajo .tpl-f9b/.Tpl-F9b.
+   ========================================================================== */
+.tpl-f9b #mod-guestlist, .Tpl-F9b #mod-guestlist {
+    position: relative;
+    width: 100%;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+}
+.tpl-f9b #mod-guestlist .gl-card, .Tpl-F9b #mod-guestlist .gl-card {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.tpl-f9b #mod-guestlist .font-cinzel, .Tpl-F9b #mod-guestlist .font-cinzel {
+    font-family: 'Cinzel', Georgia, serif;
+}
+.tpl-f9b #mod-guestlist .gold-border, .Tpl-F9b #mod-guestlist .gold-border {
+    border: 1px solid rgba(212, 175, 55, 0.35);
+}
+.tpl-f9b #mod-guestlist .gold-glow-hover, .Tpl-F9b #mod-guestlist .gold-glow-hover {
+    transition: box-shadow 0.5s ease;
+}
+.tpl-f9b #mod-guestlist .gold-glow-hover:hover, .Tpl-F9b #mod-guestlist .gold-glow-hover:hover {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.28), 0 0 64px rgba(212, 175, 55, 0.12);
+}
+.tpl-f9b #mod-guestlist .gold-gradient-text, .Tpl-F9b #mod-guestlist .gold-gradient-text {
+    background: linear-gradient(180deg, #f5e6a8 0%, #d4af37 55%, #8c7323 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+/* El titulo es un <h2> y la base del silo (.tpl-f9b h2, seccion 1) fija
+   font-weight:500, font-size clamp y margin. Esa base tiene MAS especificidad
+   que las utilidades Tailwind (0,1,1 vs 0,1,0) y aplastaria el diseno del card.
+   Se refuerza por id (#db-gl-title) para que el titulo mande sobre la base. */
+.tpl-f9b #mod-guestlist #db-gl-title, .Tpl-F9b #mod-guestlist #db-gl-title {
+    width: 100%;
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.25;
+    font-size: clamp(1.5rem, 3.2vw, 1.875rem);
+    margin: 0 0 1rem 0;
+    color: transparent;
+}
+/* Misma razon con .tpl-f9b p (seccion 1): fija margin 0 0 1rem y color muted. */
+.tpl-f9b #mod-guestlist #db-gl-desc, .Tpl-F9b #mod-guestlist #db-gl-desc {
+    max-width: 28rem;
+    margin: 0.5rem 0 0 0;
+    color: #cfc7b8;
+    font-size: clamp(0.75rem, 1.6vw, 0.875rem);
+    line-height: 1.7;
+}

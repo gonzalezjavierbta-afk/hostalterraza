@@ -798,7 +798,25 @@ tr:hover td{background:var(--surface)}
               <button type="button" id="dj-lineup-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Artista</button>
             </div>
             <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
-            <div id="ld-campo-guest-list" style="display:none" class="fg"><label style="font-size:12px">Instrucciones Guest List</label><input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario"></div>
+            <div id="ld-campo-guest-list" style="display:none" class="fg">
+              <label style="font-size:12px">Instrucciones Guest List</label>
+              <input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario">
+              <!-- Card de beneficio Guest List (f9b) - config_landing.content.guestlist.
+                   Aditivo: content.guest_list de arriba NO se toca (Cero Borrado). -->
+              <div style="font-size:12px;color:var(--ink3);margin-top:.75rem;margin-bottom:.5rem;font-weight:500">Card de beneficio (opcional)</div>
+              <div class="grid2">
+                <div class="fg"><label style="font-size:11px">Etiqueta superior</label><input id="ld-guestlist-badge" placeholder="Ej. Beneficio Exclusivo" style="font-size:12px"></div>
+                <div class="fg"><label style="font-size:11px">Patrocina</label><input id="ld-guestlist-patrocina" placeholder="Ej. ANCESTRAL" style="font-size:12px"></div>
+              </div>
+              <div class="fg"><label style="font-size:11px">Titulo</label><input id="ld-guestlist-titulo" placeholder="Ej. COCTEL DE BIENVENIDA A LAS ENTRADAS EN PREVENTA" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Descripcion</label><textarea id="ld-guestlist-descripcion" rows="3" placeholder="Descripcion del beneficio..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+              <div class="fg"><label style="font-size:11px">URL de imagen</label><input id="ld-guestlist-imagen" type="url" placeholder="https://..." style="font-family:monospace;font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Texto alternativo (alt)</label><input id="ld-guestlist-alt" placeholder="Descripcion de la imagen" style="font-size:12px"></div>
+              <div class="grid2">
+                <div class="fg"><label style="font-size:11px">Texto CTA (opcional)</label><input id="ld-guestlist-cta-texto" placeholder="Ej. Reserva tu lugar" style="font-size:12px"></div>
+                <div class="fg"><label style="font-size:11px">URL CTA (opcional)</label><input id="ld-guestlist-cta-url" type="url" placeholder="https://..." style="font-size:12px"></div>
+              </div>
+            </div>
             <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
             <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 12)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
@@ -4340,6 +4358,18 @@ function _buildConfigLanding(slug) {
       dj_lineup:   window._djLineupGetEntries ? window._djLineupGetEntries() : undefined,
       playlist_url:val('ld-playlist-url')   || null,
       guest_list:  val('ld-guest-list-val') || null,
+      // Card de beneficio Guest List (f9b) - content.guestlist. Objeto aditivo; si
+      // todos los campos quedan vacios se emite null y el sweep de nulls lo elimina.
+      guestlist: (val('ld-guestlist-badge')||val('ld-guestlist-titulo')||val('ld-guestlist-descripcion')||val('ld-guestlist-imagen')||val('ld-guestlist-patrocina')||val('ld-guestlist-cta-texto')) ? {
+        badge:       val('ld-guestlist-badge')       || null,
+        titulo:      val('ld-guestlist-titulo')      || null,
+        descripcion: val('ld-guestlist-descripcion') || null,
+        imagen_url:  val('ld-guestlist-imagen')      || null,
+        alt:         val('ld-guestlist-alt')         || null,
+        patrocina:   val('ld-guestlist-patrocina')   || null,
+        cta_texto:   val('ld-guestlist-cta-texto')   || null,
+        cta_url:     val('ld-guestlist-cta-url')     || null,
+      } : null,
       // ADR-056 (fila 9) - 'ubicacion' NO se escribe en el JSONB. La ubicacion
       // del venue es la columna eventos.ubicacion (desde #ev-ubic). La lectura
       // legacy de content.ubicacion se conserva en _poblarContenidoWizard y en
@@ -5535,7 +5565,9 @@ function _limpiarWizardCompleto() {
     const el = document.getElementById(i); if (el) el.value = '';
   });
   ['ev-d','ld-sinopsis-text','ev-titulo-display','ev-hero-subtitulo','ld-trailer-url','ld-dresscode-val','ld-dj-lineup-val',
-   'ld-playlist-url','ld-guest-list-val','ld-ubicacion-val','ld-whatsapp-tel','ld-form-redirect','ld-boletos-preventa',
+   'ld-playlist-url','ld-guest-list-val','ld-guestlist-badge','ld-guestlist-titulo','ld-guestlist-descripcion',
+   'ld-guestlist-imagen','ld-guestlist-alt','ld-guestlist-patrocina','ld-guestlist-cta-texto','ld-guestlist-cta-url',
+   'ld-ubicacion-val','ld-whatsapp-tel','ld-form-redirect','ld-boletos-preventa',
    'ld-boletos-taquilla','ld-meta-fecha-l1','ld-meta-fecha-l2','ld-meta-hora-l1','ld-meta-hora-l2',
    'ld-meta-lugar-l1','ld-meta-lugar-l2','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
    'ld-sponsors-fiesta-val','ld-sponsors-val','ld-dir-nombre','ld-dir-rol','ld-dir-foto','ld-dir-bio',
@@ -5678,6 +5710,20 @@ function _poblarContenidoWizard(content, suf) {
   // Fiesta
   set('ld-playlist-url', content.playlist_url);
   set('ld-guest-list-val', content.guest_list);
+  if (content.guestlist && typeof content.guestlist === 'object') {
+    set('ld-guestlist-badge',       content.guestlist.badge);
+    set('ld-guestlist-titulo',      content.guestlist.titulo);
+    set('ld-guestlist-descripcion', content.guestlist.descripcion);
+    set('ld-guestlist-imagen',      content.guestlist.imagen_url);
+    set('ld-guestlist-alt',         content.guestlist.alt);
+    set('ld-guestlist-patrocina',   content.guestlist.patrocina);
+    set('ld-guestlist-cta-texto',   content.guestlist.cta_texto);
+    set('ld-guestlist-cta-url',     content.guestlist.cta_url);
+    const glChk = document.getElementById('ld-mod-guest-list');
+    if (glChk && !glChk.checked && (content.guestlist.badge || content.guestlist.titulo || content.guestlist.descripcion || content.guestlist.imagen_url || content.guestlist.patrocina)) {
+      glChk.checked = true; glChk.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
   set('ld-ubicacion-val', content.ubicacion);
   // ADR-056 (fila 9) - fallback 5.b: si #ev-ubic quedo vacio y el evento solo
   // trae content.ubicacion, se precarga el canonico para migrarlo a la columna.

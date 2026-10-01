@@ -8,6 +8,14 @@
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/i18n.js"></script>
+    <!-- Tailwind Play CDN (v1.6.0) - utilidades para el card de Guest List (f9b).
+         preflight OFF: se usan las utilidades pero NO el reset global, para no
+         alterar el runtime de la pagina existente (ADR-001 + Escudo GOLD). -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { corePlugins: { preflight: false } };</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&display=swap" rel="stylesheet">
     <!-- === INICIO SEGMENTO: KERNEL SaaS AGNOSTICO (v1.3.50) === -->
 <style>
     /* 1. RESET ESTRUCTURAL MÍNIMO */
@@ -230,6 +238,34 @@
                 <div class="boleto-trust">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
                     <span data-i18n="landing.boletos_trust">COMPRA SEGURA Y CONFIABLE</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MÓDULO EXTENDIDO: GUEST LIST / CARD DE BENEFICIO (f9b, v1.6.0)
+             Aditivo, Cero Borrado. Nace oculto por el IoC global; lo enciende el
+             silo f9b y se auto-oculta sin contenido vía
+             __hideEmptyModule('mod-guestlist', ...). Contrato:
+             content.guestlist = { badge, titulo, descripcion, imagen_url, alt,
+             patrocina, cta_texto, cta_url }. data-empty nace en "true": el CSS del
+             silo lo mantiene oculto hasta que el render lo pueble. -->
+        <section id="mod-guestlist" data-empty="true">
+            <div class="gl-card group relative w-full rounded-xl gold-border gold-glow-hover overflow-hidden p-8 md:p-12 flex flex-col justify-between text-center min-h-[580px]">
+                <img id="db-gl-img" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105" alt="" onerror="this.onerror=null;this.src='assets/hero-concert.jpg';">
+                <div class="absolute inset-0 bg-black/70" style="backdrop-filter:blur(1px);"></div>
+                <div class="absolute inset-0" style="background:linear-gradient(to top,#000 0%,rgba(0,0,0,.4) 50%,rgba(0,0,0,.8) 100%);pointer-events:none;"></div>
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full flex items-center justify-center mb-5" style="background:rgba(23,20,14,.9);border:1px solid rgba(212,175,55,.35);color:#D4AF37;">
+                        <svg class="w-6 h-6" fill="none" stroke="#D4AF37" stroke-width="1.6" viewBox="0 0 24 24"><path d="M9.75 17L9 20m0 0h6m-6 0h6m-3-3v3m-6.75-13h13.5l-6.75 7.5L5.25 7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </div>
+                    <span id="db-gl-badge" class="text-[10px] md:text-[11px] uppercase font-semibold tracking-[0.25em] px-4 py-1.5 rounded-full mb-6" style="display:none;color:rgba(212,175,55,.9);background:rgba(22,18,8,.9);border:1px solid rgba(212,175,55,.35);"></span>
+                    <h2 id="db-gl-title" class="font-cinzel text-2xl md:text-3xl font-black uppercase tracking-wider gold-gradient-text leading-snug mb-4 max-w-xl"></h2>
+                    <span class="w-16" style="height:1px;background:linear-gradient(to right,transparent,rgba(212,175,55,.6),transparent);display:block;margin:0.75rem 0;"></span>
+                    <p id="db-gl-desc" class="text-xs md:text-sm max-w-md font-light tracking-wide mt-2 leading-relaxed" style="display:none;color:#cfc7b8;"></p>
+                    <a id="db-gl-cta" class="mt-6 inline-block px-6 py-3 rounded-full font-semibold tracking-wider uppercase text-xs" style="display:none;background:#D4AF37;color:#0c0a08;" href="#" rel="noopener"></a>
+                </div>
+                <div id="db-gl-foot" class="relative z-10 w-full pt-6 mt-8" style="display:none;border-top:1px solid rgba(212,175,55,.2);">
+                    <p class="text-[11px] md:text-xs uppercase tracking-[0.3em] font-medium" style="color:#beb29c;">PATROCINA • <span id="db-gl-sponsor" class="font-bold tracking-[0.35em] gold-gradient-text"></span></p>
                 </div>
             </div>
         </section>
@@ -2354,6 +2390,56 @@ if (document.getElementById('db-poster-img')) {
         __hideEmptyModule('mod-boletos', !!(boletosData.preventa && boletosData.preventa !== T('landing.pendiente_def')) || (boletosData.taquilla && boletosData.taquilla !== T('landing.pendiente_def')) || effContent.tickets_info);
     }
     // === FIN SEGMENTO BOLETERÍA ===
+
+    // === INICIO SEGMENTO: GUEST LIST / CARD DE BENEFICIO (f9b, v1.6.0) ===
+    // Fuente: content.guestlist. Modulo aditivo; se auto-oculta si no hay
+    // contenido (data-first). Construccion con textContent/setAttribute (sin
+    // innerHTML con datos). Imagen con Silent Fallback ADR-008 en el markup.
+    (function () {
+        const gl = (effContent && typeof effContent.guestlist === 'object' && effContent.guestlist) ? effContent.guestlist : null;
+        const hasGL = !!(gl && (gl.badge || gl.titulo || gl.descripcion || gl.imagen_url || gl.patrocina || gl.cta_texto));
+        const sec = document.getElementById('mod-guestlist');
+        if (sec) sec.setAttribute('data-empty', hasGL ? 'false' : 'true');
+        __hideEmptyModule('mod-guestlist', hasGL);
+        if (!hasGL) return;
+
+        const setText = function (id, raw) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const s = String(raw == null ? '' : raw).trim();
+            if (s) { el.textContent = s; el.style.display = ''; }
+            else { el.textContent = ''; el.style.display = 'none'; }
+        };
+        setText('db-gl-badge', gl.badge);
+        setText('db-gl-title', gl.titulo);
+        setText('db-gl-desc', gl.descripcion);
+        setText('db-gl-sponsor', gl.patrocina);
+        const foot = document.getElementById('db-gl-foot');
+        if (foot) foot.style.display = String(gl.patrocina || '').trim() ? '' : 'none';
+
+        const img = document.getElementById('db-gl-img');
+        if (img) {
+            const raw = String(gl.imagen_url == null ? '' : gl.imagen_url).trim();
+            const safe = (raw.charAt(0) === '/' || /^https?:\/\//i.test(raw)) ? raw : '';
+            if (safe) {
+                img.src = safe;
+                img.alt = String(gl.alt || gl.titulo || 'Guest list').trim();
+                img.style.display = '';
+            } else {
+                img.style.display = 'none';
+            }
+        }
+
+        const cta = document.getElementById('db-gl-cta');
+        if (cta) {
+            const txt = String(gl.cta_texto || '').trim();
+            const url = String(gl.cta_url || '').trim();
+            const urlSafe = (url.charAt(0) === '/' || /^https?:\/\//i.test(url)) ? url : '';
+            if (txt && urlSafe) { cta.textContent = txt; cta.href = urlSafe; cta.style.display = ''; }
+            else { cta.style.display = 'none'; }
+        }
+    })();
+    // === FIN SEGMENTO: GUEST LIST / CARD DE BENEFICIO (f9b, v1.6.0) ===
 
     // === INICIO SEGMENTO: WHATSAPP DE CONTACTO (v221) ===
     // Fuente: content.whatsapp = número (formato internacional sin +). Mensaje opcional.
