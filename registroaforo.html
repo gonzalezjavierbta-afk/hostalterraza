@@ -492,7 +492,7 @@
                 const tabsEl = document.getElementById('reg-tabs');
                 if (tabsEl) tabsEl.style.display = 'none';
                 if (entregaQR) {
-                    mostrarTicket(nombre, qrCode, ev, whatsapp);
+                    mostrarTicket(nombre, qrCode, ev, whatsapp, cedula);
                     await enviarNotificacionesReg(nombre, qrCode, null);
                 } else {
                     const ok = document.getElementById('form-success-msg');
@@ -608,7 +608,7 @@
                 document.getElementById('modo-existe').style.display = 'none';
                 const tabsIns = document.getElementById('reg-tabs');
                 if (tabsIns) tabsIns.style.display = 'none';
-                mostrarTicket(_existenteReg.nombre, qrCode, ev, _existenteReg.telefono);
+                mostrarTicket(_existenteReg.nombre, qrCode, ev, _existenteReg.telefono, _existenteReg.cedula);
                 await enviarNotificacionesReg(_existenteReg.nombre, qrCode, null);
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
@@ -696,7 +696,7 @@
         }
 
         // ── Ticket (render reutilizable) ────────────────────────────────────
-        function mostrarTicket(nombre, qr, ev, telefono) {
+        function mostrarTicket(nombre, qr, ev, telefono, cedula) {
             const tkEv = document.getElementById('tk-ev');
             const tkName = document.getElementById('tk-name');
             const tkCode = document.getElementById('tk-code');
@@ -717,13 +717,13 @@
             const tw = document.getElementById('ticket-wrap');
             if (tw) tw.style.display = 'block';
             const tipoTicket = window.__ctxRol || 'invitado';
-            window.__ticketData = { nombre: nombre, qr: qr, ev: ev, telefono: telefono || (_existenteReg && _existenteReg.telefono) || '', tipo: tipoTicket };
+            window.__ticketData = { nombre: nombre, qr: qr, ev: ev, telefono: telefono || (_existenteReg && _existenteReg.telefono) || '', cedula: cedula || (_existenteReg && _existenteReg.cedula) || '', tipo: tipoTicket };
             log("INFO: QR generado y ticket mostrado (" + qr + ").", "INFO");
             // Asincrono con fail-open (ADR-008): el QR plano 180x180 queda como
             // placeholder inmediato; cuando el lienzo 1080x1920 esta listo, se
             // reemplaza #reg-qr por un <img> con su dataURL. Si algo falla, el
             // QR plano se conserva.
-            _generarTicketCanvasReg(qr, nombre, ev || window.__ctxEv || null, '#reg-qr', tipoTicket).then(function (cv) {
+            _generarTicketCanvasReg(qr, nombre, ev || window.__ctxEv || null, '#reg-qr', tipoTicket, cedula || (_existenteReg && _existenteReg.cedula) || '').then(function (cv) {
                 const box = document.getElementById('reg-qr');
                 if (!box || !cv) return;
                 try {
@@ -847,6 +847,12 @@
         var TICKET_PILDORA_BOT = '#CDA24A';
         var TICKET_PILDORA_TXT = '#1A1A1A';
         var TICKET_PILDORA_FONT_PX = 64;
+        // Identidad del asistente impresa ENTRE el codigo (Y=1240) y la pildora
+        // (Y=1450): nombre en Y=1320 y cedula en Y=1385.
+        var TICKET_NOMBRE_Y = 1320, TICKET_NOMBRE_PX = 40;
+        var TICKET_CEDULA_Y = 1385, TICKET_CEDULA_PX = 32;
+        var TICKET_ID_NOMBRE_COLOR = 'rgba(255, 255, 255, .95)';
+        var TICKET_ID_CEDULA_COLOR = 'rgba(253, 246, 220, .82)';
         // NO USAR como fallback global (ADR-064 ANEXO B): el arte de un evento
         // puntual NO puede ser la imagen de TODOS. Se conserva por Cero Borrado.
         var TICKET_DISENO_BASE = '/imagenes/tiket-rastro.jpg';
@@ -1000,7 +1006,30 @@
             ctx.fillText(texto, x + w / 2, y + h / 2);
         }
 
-        function _generarTicketCanvasReg(qr, nombre, ev, rootSel, tipo) {
+        // Identidad impresa del asistente (nombre + cedula) en la franja entre
+        // el codigo y la pildora. Si ambos vienen vacios no dibuja nada (fail-open).
+        function _identidadAsistenteReg(ctx, nombre, cedula) {
+            const n = _truncarReg(String(nombre || '').trim(), 28);
+            const c = _truncarReg(String(cedula || '').trim(), 20);
+            if (!n && !c) return;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,.75)';
+            ctx.shadowBlur = 8;
+            if (n) {
+                ctx.fillStyle = TICKET_ID_NOMBRE_COLOR;
+                ctx.font = 'bold ' + TICKET_NOMBRE_PX + 'px sans-serif';
+                ctx.fillText(n, TICKET_W / 2, TICKET_NOMBRE_Y);
+            }
+            if (c) {
+                ctx.fillStyle = TICKET_ID_CEDULA_COLOR;
+                ctx.font = TICKET_CEDULA_PX + 'px sans-serif';
+                ctx.fillText(c, TICKET_W / 2, TICKET_CEDULA_Y);
+            }
+            ctx.shadowBlur = 0;
+        }
+
+        function _generarTicketCanvasReg(qr, nombre, ev, rootSel, tipo, cedula) {
             return new Promise((resolve) => {
                 const cv = document.createElement('canvas');
                 cv.width = TICKET_W; cv.height = TICKET_H;
@@ -1029,6 +1058,8 @@
                     ctx.fillRect(TICKET_PLACA_X, TICKET_PLACA_Y, TICKET_PLACA_W, TICKET_PLACA_H);
                     // Estampa el TIPO sobre la pildora del arte.
                     _pildoraTipoReg(ctx, tipoAsist);
+                    // Identidad impresa ENTRE el codigo y la pildora.
+                    _identidadAsistenteReg(ctx, nombre, cedula);
 
                     _qrNativoReg(qr, TICKET_QR_NATIVE).then((fuente) => {
                         let cerrado = false;
@@ -1101,7 +1132,7 @@
             if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
             try {
                 const tipo = window.__ctxRol || 'invitado';
-                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', d.ev || window.__ctxEv || null, '#reg-qr', tipo);
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', d.ev || window.__ctxEv || null, '#reg-qr', tipo, d.cedula || '');
                 _descargarCanvasReg(cv, 'entrada-' + _slugReg((d.ev && d.ev.nombre) || 'evento') + '.png');
             } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
@@ -1118,7 +1149,7 @@
             if (btn) { btn.disabled = true; btn.textContent = T('serie.generando'); }
             try {
                 const tipo = (window.__dupData || {}).tipo || window.__ctxRol || 'invitado';
-                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', window.__ctxEv || null, '#dup-qr-box', tipo);
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', window.__ctxEv || null, '#dup-qr-box', tipo, d.cedula || '');
                 _descargarCanvasReg(cv, 'entrada-' + _slugReg((window.__ctxEv && window.__ctxEv.nombre) || 'evento') + '.png');
             } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
@@ -1146,7 +1177,7 @@
                 : 'https://wa.me/?text=' + encodeURIComponent(texto);
             try {
                 const tipo = (window.__dupData || {}).tipo || window.__ctxRol || 'invitado';
-                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', ev, '#reg-qr', tipo);
+                const cv = await _generarTicketCanvasReg(qr, d.nombre || '', ev, '#reg-qr', tipo, d.cedula || '');
                 const blob = await new Promise((res) => cv.toBlob(res, 'image/png'));
                 if (blob && typeof File !== 'undefined') {
                     const file = new File([blob], 'entrada-' + _slugReg(ev.nombre) + '.png', { type: 'image/png' });

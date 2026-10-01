@@ -375,7 +375,7 @@ function loadKernel(src) {
   if (!consts) return null;
   var names = ['_truncarReg', '_qrSrcDeCajaReg', '_qrSrcReg', '_disenoTicketUrlReg',
     '_cargarImagenTicketReg', '_drawCoverReg', '_roundRectReg', '_qrNativoReg',
-    '_pildoraTipoReg', '_generarTicketCanvasReg'];
+    '_pildoraTipoReg', '_identidadAsistenteReg', '_generarTicketCanvasReg'];
   var parts = [consts];
   for (var i = 0; i < names.length; i++) {
     var f = extractFunction(src, names[i]);
@@ -445,7 +445,8 @@ function main() {
     'TICKET_QR_X', 'TICKET_QR_Y', 'TICKET_QR_SIZE', 'TICKET_QR_NATIVE',
     'TICKET_QR_TEXT_Y', 'TICKET_QR_TEXT_PX', 'TICKET_QR_TEXT_COLOR', 'TICKET_DISENO_BASE',
     'TICKET_PILDORA_X', 'TICKET_PILDORA_Y', 'TICKET_PILDORA_W', 'TICKET_PILDORA_H',
-    'TICKET_PILDORA_R', 'TICKET_PILDORA_TOP', 'TICKET_PILDORA_BOT', 'TICKET_PILDORA_TXT', 'TICKET_PILDORA_FONT_PX']
+    'TICKET_PILDORA_R', 'TICKET_PILDORA_TOP', 'TICKET_PILDORA_BOT', 'TICKET_PILDORA_TXT', 'TICKET_PILDORA_FONT_PX',
+    'TICKET_NOMBRE_Y', 'TICKET_NOMBRE_PX', 'TICKET_CEDULA_Y', 'TICKET_CEDULA_PX']
     .forEach(function (k) { g[k] = constVal(cblock, k); });
   var n = function (k) { return Number(g[k]); };
 
@@ -474,6 +475,10 @@ function main() {
   eq(g.TICKET_PILDORA_W, '616', 'pildora ancho = 616 (contorno cian real del arte)');
   eq(g.TICKET_PILDORA_H, '130', 'pildora alto = 130 (contorno cian real del arte)');
   eq(g.TICKET_PILDORA_FONT_PX, '64', 'pildora: el tipo se estampa a 64 px');
+  eq(g.TICKET_NOMBRE_Y, '1320', 'nombre del asistente Y = 1320');
+  eq(g.TICKET_NOMBRE_PX, '40', 'nombre del asistente = 40 px');
+  eq(g.TICKET_CEDULA_Y, '1385', 'cedula del asistente Y = 1385');
+  eq(g.TICKET_CEDULA_PX, '32', 'cedula del asistente = 32 px');
 
   /* ------------------------------------------------------------------
    * INVARIANTES GEOMETRICOS (no numeros absolutos).
@@ -519,6 +524,10 @@ function main() {
 
   ok(n('TICKET_QR_TEXT_Y') > R_QR[1] + R_QR[3], 'el string del codigo va POR DEBAJO del QR');
   ok(n('TICKET_QR_TEXT_Y') + n('TICKET_QR_TEXT_PX') < n('TICKET_H'), 'el string del codigo cabe en el lienzo');
+
+  ok(n('TICKET_QR_TEXT_Y') < n('TICKET_NOMBRE_Y'), 'el nombre va POR DEBAJO del codigo');
+  ok(n('TICKET_NOMBRE_Y') < n('TICKET_CEDULA_Y'), 'la cedula va POR DEBAJO del nombre');
+  ok(n('TICKET_CEDULA_Y') < n('TICKET_PILDORA_Y'), 'la cedula va POR ENCIMA de la pildora');
 
   /* ------------------------------------------------------------- S2 */
   seccion('S2 Sin transformacion de lienzo');
@@ -643,6 +652,7 @@ function main() {
     .then(function () { return s7(src); })
     .then(function () { return s3(src); })
     .then(function () { return s10(src); })
+    .then(function () { return s12(src); })
     .then(function () { s11(src); s8(adm); s9(src); return null; })
     .then(finish);
 }
@@ -761,9 +771,14 @@ function s3(src) {
     eq(countIn(KERNEL, 'encodeURIComponent'), 0, 'S3 el kernel de render NO codifica el payload');
     eq(countIn(KERNEL, 'innerHTML'), 0, 'S3 el kernel de render NO inyecta HTML del dato');
     eq(countIn(KERNEL, 'btoa'), 0, 'S3 el kernel de render NO transforma el payload a base64');
-    /* El nombre del asistente NO se dibuja en el lienzo (solo el codigo). */
-    ok(fillOps(cv.ops, 'fillText').every(function (o) { return String(o.args[0]).indexOf('Ana') === -1; }),
-      'S3 el nombre del asistente NO se dibuja en el ticket');
+    /* El nombre del asistente SI se dibuja (identidad impresa entre codigo y pildora). */
+    var nomS3 = fillOps(cv.ops, 'fillText').filter(function (o) { return o.args[0] === 'Ana Perez'; });
+    eq(nomS3.length, 1, 'S3 el nombre del asistente SI se dibuja en el ticket');
+    if (nomS3.length === 1) {
+      eq(nomS3[0].args[1], 540, 'S3 el nombre se centra en X=540');
+      eq(nomS3[0].args[2], 1320, 'S3 el nombre se dibuja en Y=1320');
+      eq(nomS3[0].font, 'bold 40px sans-serif', 'S3 el nombre va en negrita 40px');
+    }
     /* Payload largo: se trunca a 40 con elipsis, el original NO se altera. */
     var largo = 'QR-' + new Array(60).join('X');
     return c.K._generarTicketCanvasReg(largo, 'Ana', null, '#reg-qr', null).then(function (cv2) {
@@ -920,6 +935,27 @@ function s11(src) {
   ok(f.indexOf('reg-qr') !== -1, 'S11 opera sobre #reg-qr');
   ok(f.indexOf('new QRCode(qrBox') !== -1, 'S11 conserva el QR plano 180x180 como placeholder inmediato (fail-open)');
   return null;
+}
+
+/* S12: identidad impresa (nombre + cedula) entre codigo y pildora. */
+function s12(src) {
+  seccion('S12 Identidad impresa: nombre + cedula entre codigo y pildora');
+  var c = ctxWith(src, { urls: {} });
+  return c.K._generarTicketCanvasReg('QR-ID1', 'Juan Perez', null, '#reg-qr', null, '1020304050').then(function (cv) {
+    var t = fillOps(cv.ops, 'fillText');
+    var nom = t.filter(function (o) { return o.args[0] === 'Juan Perez'; });
+    var ced = t.filter(function (o) { return o.args[0] === '1020304050'; });
+    eq(nom.length, 1, 'S12 el nombre se imprime');
+    eq(ced.length, 1, 'S12 la cedula se imprime');
+    if (nom.length === 1) eq([nom[0].args[1], nom[0].args[2]], [540, 1320], 'S12 nombre centrado en (540,1320)');
+    if (ced.length === 1) eq([ced[0].args[1], ced[0].args[2]], [540, 1385], 'S12 cedula centrada en (540,1385)');
+    /* Sin cedula: no se dibuja la linea de cedula; el nombre sigue. */
+    return c.K._generarTicketCanvasReg('QR-ID2', 'Ana', null, '#reg-qr', null, '').then(function (cv2) {
+      var t2 = fillOps(cv2.ops, 'fillText');
+      eq(t2.filter(function (o) { return o.args[2] === 1385; }).length, 0, 'S12 sin cedula no hay linea de cedula');
+      eq(t2.filter(function (o) { return o.args[2] === 1320; }).length, 1, 'S12 sin cedula el nombre sigue');
+    });
+  });
 }
 
 function finish() {
