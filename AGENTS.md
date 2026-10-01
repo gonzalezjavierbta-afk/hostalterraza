@@ -1,6 +1,6 @@
 # AGENTS.md — Sistema QR Hostal Terraza
 
-Índice operativo delgado de enrutamiento; el detalle vive en `.opencode/agent/*.md` y `.opencode/skills/` y se carga **bajo demanda**. Normativa: `Sistema QR desarrollo/BLUEPRINT.md`, `Reglas de Oro QR.md` (v128-MASTER), `PROJECT.md` (v1.6.4-FIX). Actualizado 2026-09-28 (poda ADR-059; `default_agent: free-build`, ADR-052).
+Índice operativo delgado de enrutamiento; el detalle vive en `.opencode/agent/*.md` y `.opencode/skills/` y se carga **bajo demanda**. Normativa: `Sistema QR desarrollo/BLUEPRINT.md`, `Reglas de Oro QR.md` (v129-MASTER), `PROJECT.md` (v1.6.4-FIX). Actualizado 2026-10-01 (Reglas de Oro v129: Mandatos 19-20; poda ADR-059; `default_agent: free-build`, ADR-052).
 
 ## 1. Matriz de enrutamiento (esquema TRIPARTITO)
 
@@ -44,7 +44,8 @@ Ante un par de agentes gemelos (`nombre` y `nombre-free`): la variante **sin suf
 8. **Eficiencia de recursos (Oro #17-18):** costo = turnos × contexto; 1 agente de exploración + 1 de implementación por dominio + 1 verificación (**por script, no por agente**); cerrar con `node scripts/usage_report.js` → skill `eficiencia-recursos`.
 9. **Lectura por rango:** prohibido leer completos archivos > 200 KB (p. ej. `admin.html` ~628 KB, `DECISIONS.md` ~375 KB). Usar `grep` para localizar la línea y `Read` con `offset`/`limit`: un read completo envenena el `cache_read` de todos los turnos siguientes.
 10. **Express (xpress):** ante "express", "xpress" o "rápido" rige la skill `express-mode` (transversal): cambia el orden y la profundidad de los controles, no los elimina; escala a modo normal en arquitectura, RLS/seguridad, migraciones o > 3 archivos críticos.
+11. **Presupuesto y confirmación (Oro #19-20):** antes de ejecutar, entrega estimación de tokens y tiempo (desglose por agente); al cierre concilia estimado vs. real con `usage_report.js`; si la tarea es pesada (imágenes/video, research masivo o > ~1.5M tokens), avisa el costo antes, recomienda una IA externa (Gemini/ChatGPT/Claude), define el insumo que debe volver (ficha/JSON) y sugiere un prompt.
 
 ## 4. Índice de skills (bajo demanda)
 
-`agentes-roster` (detalle de agente y v112) · `modelos-verificados` (modelo, `403`, crear agente) · `eficiencia-recursos` (costo/turnos, grep, CSS inline, `usage_report.js`) · `anti-absorcion` (sesión con subagentes, ADR-031) · `reglas-de-oro` (entrega formal o auditoría, Mandatos 1-18) · `express-mode` (express/xpress/rápido) · `templates` (silo CSS de `evento.html`; hub `AMPLIACION/TEMPLATES.md`) · `gold-shield` (verificación mecánica pre-despliegue) · `create-dynamic-page` · `batch-create` · `gemini-research` · `ingest-eventos` · `research-destination` (pipelines de páginas, eventos y destinos).
+`agentes-roster` (detalle de agente y v112) · `modelos-verificados` (modelo, `403`, crear agente) · `eficiencia-recursos` (costo/turnos, grep, CSS inline, `usage_report.js`) · `anti-absorcion` (sesión con subagentes, ADR-031) · `reglas-de-oro` (entrega formal o auditoría, Mandatos 1-20) · `express-mode` (express/xpress/rápido) · `templates` (silo CSS de `evento.html`; hub `AMPLIACION/TEMPLATES.md`) · `gold-shield` (verificación mecánica pre-despliegue) · `create-dynamic-page` · `batch-create` · `gemini-research` · `ingest-eventos` · `research-destination` (pipelines de páginas, eventos y destinos).

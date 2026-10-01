@@ -1,11 +1,11 @@
 ---
 name: eficiencia-recursos
-description: Reglas de eficiencia: costo = turnos x contexto, disciplina de grep, diagnostico de CSS inline, informe de cierre obligatorio. Cargar en sesiones largas o al optimizar consumo.
+description: Reglas de eficiencia: costo = turnos x contexto, disciplina de grep, diagnostico de CSS inline, informe de cierre obligatorio. Incluye estimacion previa y umbral de tareas pesadas. Cargar en sesiones largas o al optimizar consumo.
 ---
 
-# Eficiencia de Recursos (v128)
+# Eficiencia de Recursos (v129)
 
-Operativiza los Mandatos 17 y 18 de `Sistema QR desarrollo/Reglas de Oro QR.md` (v128-MASTER). La unidad de costo real es `turnos × contexto acumulado`, no el output: en la sesión de banners del silo `f9b` el `cache_read` fue 29.5M de 32.2M tokens (91.7%), con input fresco 2.16M (6.7%), output 0.28M (0.9%) y razonamiento 0.22M (0.7%); `AGENTS.md` (8.123 tokens) se releyó en cada turno de cada agente (~6.5M tokens, ~20% del total). Métrica de control: `cache_read / turnos` (50.000 a 76.000 tokens por turno en esa sesión).
+Operativiza los Mandatos 17, 18, 19 y 20 de `Sistema QR desarrollo/Reglas de Oro QR.md` (v129-MASTER). La unidad de costo real es `turnos × contexto acumulado`, no el output: en la sesión de banners del silo `f9b` el `cache_read` fue 29.5M de 32.2M tokens (91.7%), con input fresco 2.16M (6.7%), output 0.28M (0.9%) y razonamiento 0.22M (0.7%); `AGENTS.md` (8.123 tokens) se releyó en cada turno de cada agente (~6.5M tokens, ~20% del total). Métrica de control: `cache_read / turnos` (50.000 a 76.000 tokens por turno en esa sesión).
 
 ## Reglas de sesión
 
@@ -15,6 +15,8 @@ Operativiza los Mandatos 17 y 18 de `Sistema QR desarrollo/Reglas de Oro QR.md` 
 4. **Verificación mecánica = script, no agente:** `scripts/express_check.js` y los `scripts/smoke_*.js` cuestan 0 tokens de agente.
 5. **Mutation testing acotado:** 5-8 mutaciones representativas, no decenas.
 6. **Cierre medido:** toda sesión de implementación cierra midiendo con `node scripts/usage_report.js`. Presupuesto placeholder de un solo feature: no superar ~15M tokens ni ~3 h de reloj sin justificación escrita. Es un PLACEHOLDER hasta tener N >= 5 sesiones medidas (se recalibrará a ~1.5-2x la mediana); la métrica de control líder sigue siendo `cache_read / turnos`.
+7. **Estimación previa y confirmación (Mandato 19):** antes de ejecutar, entrega estimación de tokens y tiempo (desglose por agente); al cerrar, concilia estimado vs. real y registra la desviación (> +50%) en `NEXT.md`.
+8. **Umbral de tarea pesada (Mandato 20):** si la tarea supera ~1.5M tokens / ~30 min o implica imágenes/video, research masivo o seeds volumétricos, avisa el costo antes de gastar, recomienda una IA externa (Gemini/ChatGPT/Claude), define el insumo que debe volver (ficha/JSON) y sugiere un prompt listo.
 
 ## `scripts/usage_report.js` — contrato CONGELADO
 
@@ -53,6 +55,7 @@ El informe debe incluir, como mínimo:
 | segundos | suma de `seg` (reloj) |
 | desglose por agente | `--tree` (quien gasto que) |
 | 1-3 aprendizajes | accionables: que se releo de mas, que agente fallo, que brief falto |
+| estimado vs. real | análisis previo (Mandato 19) contrastado con el total medido |
 
 Regla: el informe se entrega al cerrar, no se difiere. Si la sesión superó el presupuesto (Mandato 18), el informe debe explicar por qué.
 

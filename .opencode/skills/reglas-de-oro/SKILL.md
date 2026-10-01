@@ -1,13 +1,13 @@
 ---
 name: reglas-de-oro
-description: Puente a las Reglas de Oro v128 (Mandatos 1-18) y resumen de una linea por mandato. Cargar antes de una entrega formal o una auditoria.
+description: Puente a las Reglas de Oro v129 (Mandatos 1-20) y resumen de una linea por mandato. Cargar antes de una entrega formal o una auditoria.
 ---
 
 # Reglas de Oro — Puente y Resumen
 
-**Fuente única de verdad:** `Sistema QR desarrollo/Reglas de Oro QR.md` (v128-MASTER). Este archivo solo orienta: la norma completa, con su redacción literal e innegociable, vive en ese documento. Leerlo íntegro antes de una entrega formal, una auditoría (`@qa-auditor`/`@qa-auditor-free`) o cualquier intervención que toque datos, IDs o estética del Sistema QR Hostal Terraza.
+**Fuente única de verdad:** `Sistema QR desarrollo/Reglas de Oro QR.md` (v129-MASTER). Este archivo solo orienta: la norma completa, con su redacción literal e innegociable, vive en ese documento. Leerlo íntegro antes de una entrega formal, una auditoría (`@qa-auditor`/`@qa-auditor-free`) o cualquier intervención que toque datos, IDs o estética del Sistema QR Hostal Terraza.
 
-Cualquier intervención de una IA ejecutora debe validarse contra los **18 mandatos incondicionales** bajo el framework AI-DOS v1.2.
+Cualquier intervención de una IA ejecutora debe validarse contra los **20 mandatos incondicionales** bajo el framework AI-DOS v1.2.
 
 ## Resumen de una línea por Mandato
 
@@ -39,9 +39,11 @@ Cualquier intervención de una IA ejecutora debe validarse contra los **18 manda
 15. **Lógica de Negocio / Captura Pura:** soportar eventos "formulario" sin QR; la pantalla final muestra agradecimiento en lugar de ticket.
 16. **Orquestador de Intención Contextual y Centinela Temporal:** creación de eventos en wizard de 4 pasos (Cimiento -> ADN -> Átomos -> Blindaje); en Campaña sin fecha se inyecta el centinela `2099-12-31` para desactivar el countdown.
 
-### V. Gobernanza de Recursos (v128)
+### V. Gobernanza de Recursos (v129)
 
 17. **Eficiencia de Recursos y Contexto:** costo = `turnos × contexto`; regla "un archivo, un lector"; verificación mecánica por script; regla anti-colgado; mutation testing acotado (5-8); prohibido leer archivos > 200 KB; el orquestador no absorbe; medición obligatoria y formato de informe de cierre. Detalle en la skill `eficiencia-recursos`.
 18. **Consolidación de Fases y Agentes:** máx 1 exploración + 1 implementación por dominio + 1 verificación por sesión; no re-despachar un perfil que falló; presupuesto placeholder ~15M tokens / ~3 h sin justificación escrita en `NEXT.md`. Detalle en la skill `eficiencia-recursos`.
+19. **Presupuesto Explícito y Confirmación Final:** análisis previo obligatorio de tokens y tiempo (con desglose por agente) antes de ejecutar; confirmación del solicitante; al cierre, conciliación estimado vs. real con `usage_report.js` (desviación > +50% se justifica en `NEXT.md`).
+20. **Umbral de Tareas Pesadas y Desvío Externo Asistido:** clasificar ligera/pesada; en pesadas, avisar el costo antes, recomendar IA externa (Gemini/ChatGPT/Claude), definir el insumo que debe volver (ficha/JSON) y sugerir un prompt listo; visión (`@media-reader`) solo en el subconjunto donde el criterio visual decide.
 
 > Este documento constituye la Única Fuente de Verdad técnica y normativa de AI-DOS v1.2 para el Sistema QR Hostal Terraza.

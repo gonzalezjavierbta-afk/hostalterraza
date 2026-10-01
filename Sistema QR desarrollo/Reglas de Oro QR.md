@@ -1,6 +1,6 @@
-# 🏆 REGLAS DE ORO DE AUDITORÍA (v128-MASTER)
+# 🏆 REGLAS DE ORO DE AUDITORÍA (v129-MASTER)
 
-Este documento representa el blindaje técnico y operativo innegociable del Sistema QR Hostal Terraza. Cualquier intervención por parte de una IA ejecutora debe ser validada contra estos 18 mandatos incondicionales bajo el framework AI-DOS v1.2.
+Este documento representa el blindaje técnico y operativo innegociable del Sistema QR Hostal Terraza. Cualquier intervención por parte de una IA ejecutora debe ser validada contra estos 20 mandatos incondicionales bajo el framework AI-DOS v1.2.
 
 ---
 
@@ -86,7 +86,7 @@ Cada vez que se solicite actualizar los documentos del proyecto, el agente debe:
 * **Fecha Centinela (2099-12-31):** En eventos de tipo Campaña, la fecha de realización es opcional. Si el usuario la omite, el orquestador inyectará internamente el centinela `2099-12-31` para desactivar el countdown público de forma automática.
 ---
 
-## ⚙️ V. GOBERNANZA DE RECURSOS (v128)
+## ⚙️ V. GOBERNANZA DE RECURSOS (v129)
 
 ### 17. Mandato de Eficiencia de Recursos y Contexto (costo = turnos × contexto)
 * **Unidad de costo real:** el costo de una sesión es `turnos × contexto acumulado`, no el output. Medición real de la sesión de banners del silo `f9b`: **~32.2M tokens totales**, de los cuales el `cache_read` es **~29.5M (91.7%)**, el input fresco 2.16M (6.7%), el output 0.28M (0.9%) y el razonamiento 0.22M (0.7%); `cache_write` 0. Como el contexto completo se relee en cada turno, el `cache_read` equivale a **50.000-76.000 tokens por turno**. Optimizar el output es marginal; optimizar los turnos y el tamaño del contexto releído es lo que mueve la aguja.
@@ -103,6 +103,20 @@ Cada vez que se solicite actualizar los documentos del proyecto, el agente debe:
 * **Presupuesto de agentes por sesión:** una sesión de implementación usa MAXIMO: 1 agente de exploración, 1 agente de implementación por dominio y 1 agente de verificación. Todo lo demás se resuelve con script.
 * **Prohibido re-despachar un perfil que ya falló:** un agente que devolvió vacío o excedió el tiempo límite no se re-despacha con el mismo perfil; se cambia de estrategia (otro dominio, un script o un brief dirigido mínimo).
 * **Presupuesto de costo orientativo (PLACEHOLDER):** ninguna sesión de un solo feature debe superar ~15M tokens ni ~3 h de reloj sin justificación escrita en `NEXT.md`. Es un PLACEHOLDER hasta tener N >= 5 sesiones medidas (se recalibrará a ~1.5-2x la mediana); la métrica de control líder es `cache_read / turnos`. Referencia medida: la sesión de banners del silo `f9b` consumió 32.2M tokens y 5.7 h; una verificación duplicada y 6 pasadas de verificación sobre los mismos archivos explican el exceso.
+
+### 19. Mandato de Presupuesto Explícito y Confirmación Final (v129)
+* **Análisis previo obligatorio:** antes de ejecutar la tarea pedida, el orquestador entrega un análisis aproximado de **tokens y tiempo**, con el desglose por agente/ruta y una justificación de una línea, basada en el histórico de `usage_report.js` y en la métrica `cache_read / turnos`. Ninguna tarea de implementación arranca sin este análisis.
+* **Confirmación del solicitante:** la ejecución inicia tras la confirmación del usuario; el modo express con autorización ya dada cuenta como confirmación, en modo normal se espera el visto bueno explícito.
+* **Conciliación estimado vs. real:** al cierre, el informe medido con `node scripts/usage_report.js` se contrasta contra la estimación previa; una desviación superior al **+50%** en tokens o en tiempo se registra con su causa en `NEXT.md`.
+* **Relación con el Mandato 17:** no lo sustituye, lo precede; el Mandato 17 mide *a posteriori*, este Mandato estima *a priori* y exige la conciliación.
+
+### 20. Mandato de Umbral de Tareas Pesadas y Desvío Externo Asistido (v129)
+* **Clasificación previa:** toda tarea se clasifica como ligera o **pesada** antes de ejecutarse. Es pesada si (a) supera ~1.5M tokens o ~30 min estimados, o (b) implica análisis de imágenes o video, websearch masivo, investigación de destinos o seeds volumétricos.
+* **Aviso antes de gastar:** ante una tarea pesada, el orquestador **informa el costo estimado antes de ejecutarla**; nunca la lanza en silencio.
+* **Desvío externo recomendado:** propone que parte del proceso conviene sacar a una IA externa (**Gemini, ChatGPT o Claude**) para agilizar y abaratar, y que parte queda acá.
+* **Contrato de entrega acá:** especifica el insumo mínimo que debe volver (ficha `.md` o JSON validado, contexto reducido), patrón ya probado en la skill `gemini-research` (la IA externa produce la ficha; acá se ingesta y se valida).
+* **Prompt sugerido:** entrega un prompt listo para copiar y pegar en la IA externa, con el objetivo, el formato de salida y los campos requeridos.
+* **Visión acotada:** el agente de visión (`@media-reader`) se reserva al subconjunto donde el criterio visual decide; prohibido pasarle el lote completo. Referencia medida: una tarea de extracción desde imágenes consumió ~1.7M tokens y $1.56 en 46 min.
 
 ---
 
