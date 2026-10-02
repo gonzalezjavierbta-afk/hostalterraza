@@ -1,0 +1,116 @@
+-- ============================================================================
+-- ADR-068 | Unicidad real de inscritura por (evento_id, cedula)
+-- ----------------------------------------------------------------------------
+-- NUMERACION: ADR-068 (no ADR-065: ese ID quedo DECLINADO de forma expresa y
+-- esta citado en DECISIONS y TASKS; reutilizarlo crearia una colision).
+-- ----------------------------------------------------------------------------
+-- ORIGEN: auditoria del formulario de registro (registroaforo.html).
+--
+-- HALLAZGO: el guard de duplicados del formulario es SOLO cliente
+--   SELECT id FROM inscritos WHERE cedula = ? AND evento_id = ?  (pre-check)
+--   INSERT INTO inscritos ...
+-- Sin restriccion UNIQUE en la base, ese pre-check no es una garantia:
+--   1) Carrera de condicion: dos pestanas (o doble submit) pasan ambas el
+--      pre-check y las dosINSERTAN -> dos filas para la misma persona.
+--   2) La anon key esta en el HTML publico, asi que el pre-check se puede
+--      saltar por completo con un POST directo a PostgREST /rest/v1/inscritos.
+-- La consecuencia no es teorica: duplica el aforo y duplica el QR de entrada.
+--
+-- DECISION DE ALCANCE (punto 4 de la peticion):
+--   Se conserva el flujo "Ya estoy registrado", que necesita LEER una fila de
+--   `inscritos` por (cedula, telefono). Pero se deja de exponer la tabla
+--   completa al rol `anon` con un GRANT por columna. Con SELECT a nivel de
+--   columna, `select *` deja de devolver qr_code / used / ref_codigo /
+--   respuestas_custom, y el flujo de verificacion sigue funcionando porque
+--   solo necesita las 6 columnas declaradas.
+--   Migrar el lookup a un RPC SECURITY DEFINER sigue siendo la evolucion
+--   correcta (oculta incluso la existencia de la fila), pero ya no es
+--   bloqueante para cerrar el problema de duplicados.
+--
+-- ESTADO: ESCRITO, NO APLICADO. Requiere confirmar el gate de riesgo de
+--   AGENTS.md seccion 2 (esquema/RLS) y ejecutarse con credenciales
+--   `service_role` desde el SQL Editor de Supabase.
+--
+-- ROLLBACK: DROP INDEX IF EXISTS inscritos_evento_cedula_uniq;
+--            (los Grants se revierten con los comandos del paso 4 listados en
+--             la seccion "COMPROBACION").
+-- ============================================================================
+
+-- ----------------------------------------------------------------------------
+-- PASO 1 (DIAGNOSTICO, no destructivo): cuantas colisiones ya existen.
+-- No se corrige nada aqui: Cero Borrado (Oro #2). Si el resultado trae filas,
+-- la migracion NO debe seguir al paso 2 sin una decision editorial de Direccion
+-- sobre que hacer con los duplicados historicos.
+-- ----------------------------------------------------------------------------
+-- SELECT evento_id, cedula, COUNT(*) AS filas,
+--        MIN(id) AS conservar_id
+-- FROM inscritos
+-- WHERE cuenta_aforo = true AND cedula IS NOT NULL AND cedula <> ''
+-- GROUP BY evento_id, cedula
+-- HAVING COUNT(*) > 1
+-- ORDER BY filas DESC;
+
+-- ----------------------------------------------------------------------------
+-- PASO 2: indice unico parcial.
+--
+-- Es PARCIAL a proposito: se limita a las filas que cuentan aforo
+-- (cuenta_aforo = true), que es la fila de "esta persona esta inscrita a este
+-- evento". Existen filas auxiliares con cuenta_aforo = false (cortesias,
+-- lista negra, registros tecnicos) que comparten cedula con leguria y NO deben
+-- entrar en la restriccion.
+--
+-- PARCIAL y no total a proposito tambien por otro motivo: un UNIQUE total sobre
+-- (evento_id, cedula) romperia los flujos que crean filas secundarias por
+-- persona y evento.
+-- ----------------------------------------------------------------------------
+-- CREATE UNIQUE INDEX IF NOT EXISTS inscritos_evento_cedula_uniq
+--     ON inscritos (evento_id, cedula)
+--     WHERE cuenta_aforo = true AND cedula IS NOT NULL AND cedula <> '';
+
+-- ----------------------------------------------------------------------------
+-- PASO 3: normalizacion previa de la cedula.
+-- El formulario ya guarda solo digitos, pero las filas historicas pueden traer
+-- "12.345.678". Dos personas con la misma cedula real pueden seguir pasando
+-- el indice si una tiene el formato sucio. Este UPDATE (NO destructivo: solo
+-- reescribe la columna a su forma canonica) debe ejecutarse ANTES de crear el
+-- indice del paso 2 y su reporte de colisiones es el que manda.
+-- ----------------------------------------------------------------------------
+-- UPDATE inscritos
+-- SET cedula = regexp_replace(cedula, '[^0-9]', '', 'g')
+-- WHERE cedula IS NOT NULL
+--   AND cedula <> ''
+--   AND cedula ~ '[^0-9]';
+
+-- ----------------------------------------------------------------------------
+-- PASO 4: cierre de la exposicion de lectura al rol anon.
+-- ANTES: el rol anon podia leer todas las columnas de inscritos (nombres,
+-- cedulas, telefonos y el QR de entrada de todos los asistentes).
+-- DESPUES: solo las columnas que el flujo de verificacion necesita.
+-- Verificacion posterior:
+--   SELECT has_table_privilege('anon', 'inscritos', 'SELECT');  -- deve ser true
+--   \d inscritos                                                       -- lista de columnas
+-- ----------------------------------------------------------------------------
+-- REVOKE SELECT ON inscritos FROM anon;
+-- GRANT  SELECT (id, evento_id, nombre, cedula, telefono, cliente_id, tipo)
+--     ON inscritos TO anon;
+
+-- ----------------------------------------------------------------------------
+-- PASO 5: anotacion de rollback del paso 4.
+-- ----------------------------------------------------------------------------
+-- GRANT SELECT ON inscritos TO anon;
+
+-- ----------------------------------------------------------------------------
+-- NOTA SOBRE RATE LIMITING (punto 5 de la peticion).
+-- Decidido NO añadir un contador por IP/IP aqui, por dos razones:
+--   1) El trigger adr038_freemium_limite_60 ya acota el crecimiento por evento
+--      a 60 filas cuenta_aforo, asi que el volum bruto ya tiene techo.
+--   2) Un limite por IP en la tabla castiga a los asistentes que comparten
+--      salida a evento (celulares en la misma carrier-grade NAT): es un falso
+--      positivo frequente en un evento de Streaming/Hostal.
+-- Lo que si se domino con este ADR: el crecimiento por COLISION (una persona
+-- muchos registros), que era el agujero real. El honeypot del formulario
+-- cubre el envio automatizado trivial sin costo de esquema.
+-- Si en produccion aparece spam de volumen, el paso correcto es una Edge
+-- Function de registro (rate limit por IP + validacion server-side), que es
+-- arquitectura y requiere su propio ADR (@backend-dev).
+-- ============================================================================

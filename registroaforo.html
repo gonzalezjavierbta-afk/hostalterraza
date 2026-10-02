@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+    <script src="js/vendor/qrcode.min.js" defer></script>
     <!-- Kernel SaaS agnóstico (espejo del landing: reset + grano + IoC) -->
     <style>
         html, body { margin: 0; padding: 0; min-height: 100%; background-color: #050505; color: #ffffff; font-family: 'Geist', sans-serif; overflow-x: hidden; }
@@ -44,10 +44,54 @@
         body.page-registro #cabezote-img { display: block; width: 100%; height: auto; }
         body.page-registro #cabezote-picture { display: block; width: 100%; }
         body.page-registro #mod-form { display: block !important; padding: 1.5rem 6% 3rem; border-bottom: none !important; }
-        body.page-registro .wa-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1.1rem; }
-        body.page-registro .wa-code { flex: 0 0 128px; width: auto; margin-bottom: 0; min-width: 0; }
-        body.page-registro .wa-number { flex: 1; min-width: 0; margin-bottom: 0; }
-        body.page-registro .wa-code option { background: #14032C; color: #fff; }
+        body.page-registro .wa-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1.1rem; flex-wrap: wrap; }
+        /* Geometria commun select+input: el silo inyecta `padding/margin/width` con
+           `!important` sobre `select` (p.ej. .tpl-f5 ... select), asi que la pagina
+           debe fijarlos con `!important` para que ambos controles midan lo mismo.
+           Sin esto el select crecia por su padding nativo y desbordaba .wa-row. */
+        body.page-registro .wa-row > .wa-code,
+        body.page-registro .wa-row > .wa-number {
+            box-sizing: border-box !important;
+            min-height: 52px !important;
+            margin: 0 !important;
+            padding: 1.1rem !important;
+            font-family: inherit !important;
+            font-size: 16px !important;
+            line-height: 1.2 !important;
+            border-radius: var(--rsm, 10px) !important;
+        }
+        /* Prefijo: ancho fijo (flex-grow 0) para que el input absorba el resto.
+           `appearance:none` quita la flecha nativa, que era la causa de la
+           desalineacion de altura contra el input vecino. */
+        body.page-registro .wa-code {
+            flex: 0 0 132px !important;
+            width: 132px !important;
+            min-width: 132px !important;
+            max-width: 132px !important;
+            padding-right: 2.4rem !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            background-image:
+                linear-gradient(45deg, transparent 50%, currentColor 50%),
+                linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position: calc(100% - 17px) calc(50% + 1px), calc(100% - 11px) calc(50% + 1px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+        }
+        body.page-registro .wa-number { flex: 1 1 auto !important; width: auto !important; min-width: 0 !important; max-width: 100% !important; }
+        /* Opciones: se retira el morado #14032C heredado de otra paleta. Ahora el
+           color lo resuelve el silo (p.ej. f13) o, en su defecto, la variable de
+           superficie del kernel. Sin `!important` para no pisar al silo (0,3,2). */
+        body.page-registro .wa-code option { background: var(--p-bg-2, #0F0F0F); color: var(--p-text, #fff); }
+        body.page-registro .wa-code:focus, body.page-registro .wa-number:focus { outline: 2px solid var(--gold, #ff9f1c); outline-offset: 1px; }
+        /* Pantallas estrechas: el prefijo cede espacio antes que desbordar. */
+        @media (max-width: 420px) {
+            body.page-registro .wa-row { flex-wrap: nowrap; }
+            body.page-registro .wa-code { flex: 0 0 108px !important; width: 108px !important; min-width: 108px !important; max-width: 108px !important; }
+        }
         /* Ticket QR (solo eventos con captura_pura=false) */
         body.page-registro #ticket-wrap { display: none; margin-top: 1.25rem; text-align: center; }
         body.page-registro #ticket-card { background: #0F0F0F; border-radius: 16px; overflow: hidden; max-width: 340px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
@@ -158,7 +202,7 @@
                 <div id="modo-nuevo">
                 <form id="master-reg-form" novalidate>
                     <input type="text" id="reg-nombre" class="form-input" placeholder="Nombre completo *" required data-i18n-ph="reg.f_nombre_ph">
-                    <input type="text" id="reg-cedula" class="form-input" placeholder="Cédula *" required data-i18n-ph="reg.f_cedula_ph">
+                    <input type="text" id="reg-cedula" class="form-input" placeholder="Cédula *" inputmode="numeric" maxlength="12" required data-i18n-ph="reg.f_cedula_ph">
                     <div class="wa-row">
                         <select id="reg-whatsapp-code" class="form-input wa-code">
                             <option value="+57" selected>🇨🇴 +57</option>
@@ -184,16 +228,24 @@
                             <option value="+53">🇨🇺 +53</option>
                             <option value="otro">🌐 <span data-i18n="common.otro">Otro…</span></option>
                         </select>
-                        <input type="tel" id="reg-whatsapp" class="form-input wa-number" placeholder="WhatsApp *" inputmode="numeric" maxlength="15" required data-i18n-ph="reg.f_wa_ph">
+                        <input type="tel" id="reg-whatsapp" class="form-input wa-number" placeholder="WhatsApp *" inputmode="numeric" maxlength="10" required data-i18n-ph="reg.f_wa_ph">
                     </div>
-                    <input type="text" id="reg-whatsapp-custom-code" class="form-input" placeholder="Código de país (ej. +7)" maxlength="6" style="display:none" data-i18n-ph="reg.f_pais_codigo_ph">
+                    <input type="tel" id="reg-whatsapp-custom-code" class="form-input" placeholder="Código de país (ej. +7)" inputmode="numeric" maxlength="5" style="display:none" data-i18n-ph="reg.f_pais_codigo_ph">
                     <button type="submit" class="btn-submit" data-i18n="reg.registrarme_btn">Registrarme →</button>
+                    <!-- Honeypot: fuera de pantalla y oculto a lectores de
+                         pantalla. Un humano nunca lo ve ni lo llena; un bot que
+                         rellena todos los campos, si. No lleva atributo `name`
+                         para no colisionar con el envonoltorio del formulario. -->
+                    <div aria-hidden="true" style="position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden;">
+                        <label for="reg-hp">No Complete este campo</label>
+                        <input type="text" id="reg-hp" tabindex="-1" autocomplete="off">
+                    </div>
                 </form>
                 </div>
                 <div id="modo-existe" style="display:none">
                   <div id="paso-verificar">
-                    <input type="text" id="ex-cedula" class="form-input" placeholder="Cédula *" inputmode="numeric" data-i18n-ph="serie.ex_cedula_ph">
-                    <input type="tel" id="ex-tel" class="form-input" placeholder="Número de celular" inputmode="numeric" data-i18n-ph="serie.ex_tel_ph">
+                    <input type="text" id="ex-cedula" class="form-input" placeholder="Cédula *" inputmode="numeric" maxlength="12" data-i18n-ph="serie.ex_cedula_ph">
+                    <input type="tel" id="ex-tel" class="form-input" placeholder="Número de celular" inputmode="numeric" maxlength="10" data-i18n-ph="serie.ex_tel_ph">
                     <button type="button" id="verify-btn" class="btn-submit" onclick="verificarExistente()" data-i18n="serie.verificar_btn">Verificar mis datos →</button>
                   </div>
                   <div id="paso-confirmar" style="display:none">
@@ -353,9 +405,79 @@
             el.style.color = tipo === 'err' ? '#ff6b6b' : 'inherit';
         }
 
-        function esTelefonoValido(num) {
-            const clean = (num || '').replace(/[\s\-().]/g, '');
-            return /^\d{6,15}$/.test(clean);
+        // ── Capa de normalizacion canonica (Data-First) ─────────────────────
+        // Regla: TODO valor que se valida, compara o persiste pasa primero por
+        // aqui. Antes se guardaba el texto crudo del input, de modo que
+        // "12.345.678" y "12345678" eran dos personas distintas y el guard de
+        // duplicados los dejaba pasar. Normalizar en un solo punto cierra ese
+        // agujero y hace que el modo "Ya estoy registrado" encuentre lo que
+        // escribio el modo nuevo.
+        const ROLES_INSCRITO = ['invitado', 'frecuente', 'artista', 'produccion', 'pago', 'espacio', 'marca', 'voluntario', 'donacion', 'interesado'];
+        const CEDULA_MIN = 5;
+        const CEDULA_MAX = 12;
+
+        // Cedula: canonico = solo digitos (puntos, guiones, espacios y letras
+        // se descartan). No se exige algoritmo de digito de control: la cedula
+        // de disminuidor y la extranjera no siguen el de la CC.
+        function normalizeCedula(raw) {
+            return String(raw == null ? '' : raw).replace(/\D/g, '');
+        }
+        function cedulaValida(ced) {
+            // Tambien exige solo digitos, no solo longitud: aunque el flujo ya
+            // normaliza antes de llamar, un validador que acepta "1234567a" no
+            // es un validador.
+            return typeof ced === 'string' && /^\d+$/.test(ced) && ced.length >= CEDULA_MIN && ced.length <= CEDULA_MAX;
+        }
+
+        // Prefijo internacional: canonico = "+" seguido de 1 a 4 digitos, sin
+        // cero inicial. Rechaza texto libre ("abc", "+", "+00").
+        function normalizePaisCode(raw) {
+            const d = String(raw == null ? '' : raw).replace(/\D/g, '');
+            if (!d || d.length > 4 || d.charAt(0) === '0') return null;
+            return '+' + d;
+        }
+
+        // Numero nacional: canonico = solo digitos.
+        function normalizeNacional(raw) {
+            return String(raw == null ? '' : raw).replace(/\D/g, '');
+        }
+
+        // Telefono completo en formato E.164 estricto. Para +57 se exige movil
+        // de 10 digitos que empieza en 3; el resto de paises siguen E.164.
+        function buildWhatsapp(codeRaw, nacRaw) {
+            const code = normalizePaisCode(codeRaw);
+            const nac = normalizeNacional(nacRaw);
+            if (!code) return { ok: false, motivo: 'reg.pais_codigo_err' };
+            if (!nac) return { ok: false, motivo: 'reg.wa_invalido' };
+            if (code === '+57' && !/^3\d{9}$/.test(nac)) return { ok: false, motivo: 'reg.wa_movil_10' };
+            const valor = code + nac;
+            if (!/^\+[1-9]\d{7,14}$/.test(valor)) return { ok: false, motivo: 'reg.wa_invalido' };
+            return { ok: true, valor: valor, code: code, nac: nac };
+        }
+
+        // Alias conservado: la firma vieja solo miraba la longitud del numero.
+        // Se delega en buildWhatsapp para que no queden dos reglas distintas.
+        function esTelefonoValido(num) { return buildWhatsapp('+57', num).ok; }
+
+        // Rol Blindado: el CHECK inscritos_tipo_check (ADR-031) rechaza con
+        // 23514 cualquier valor fuera de la lista, lo que antes se traducía en un
+        // error generico de guardado.
+        function normalizeRol(raw, fallback) {
+            const r = String(raw == null ? '' : raw).trim().toLowerCase();
+            if (ROLES_INSCRITO.indexOf(r) !== -1) return r;
+            const f = String(fallback == null ? '' : fallback).trim().toLowerCase();
+            return ROLES_INSCRITO.indexOf(f) !== -1 ? f : 'invitado';
+        }
+
+        // Reutiliza el MISMO canonicalizado que el alta nueva, para que la
+        // comparacion .eq('telefono', ...) use el mismo formato que se guardo.
+        function getTelCompletoReg() {
+            const codeSel = document.getElementById('reg-whatsapp-code');
+            const otro = codeSel && codeSel.value === 'otro';
+            const code = otro
+                ? normalizePaisCode(document.getElementById('reg-whatsapp-custom-code').value)
+                : normalizePaisCode(codeSel ? codeSel.value : '+57');
+            return (code || '') + normalizeNacional(document.getElementById('reg-whatsapp').value);
         }
 
         async function init() {
@@ -365,7 +487,10 @@
             const id = params.get('id');
             // ADR-062: los links de invitador usan ?tipo=<tipo_invitado>; se usa como rol
             // del inscrito (los tipos no-comunidad existen en inscritos_tipo_check).
-            const rol = (params.get('rol') || params.get('tipo') || 'invitado').trim().toLowerCase();
+            // El rol se depura contra la lista blanca del CHECK inscritos_tipo_check
+            // AQUI, en la frontera. Aguas abajo todos los consumidores siguen
+            // leyendo window.__ctxRol, que ya es un valor persistente.
+            const rol = normalizeRol(params.get('rol') || params.get('tipo'), 'invitado');
             const refParam = (params.get('ref') || '').trim().toUpperCase();
             if (!slug && !id) {
                 document.body.innerHTML = '<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; color:#fff; background:#0a0a0c; text-align:center;"><p>' + T('reg.err_no_evento') + '</p></div>';
@@ -440,27 +565,64 @@
             document.getElementById('reg-whatsapp-custom-code').style.display = isOtro ? 'block' : 'none';
         });
 
+        // Normalizacion en vivo: el input refleja el valor canonico que se
+        // guardara, en vez de dejar que el usuario escriba "12.345.678" y
+        // descubrir el rechazo al final. Cierra la via de evadir el guard de
+        // duplicados jugando con el formato en pantalla.
+        document.getElementById('reg-cedula').addEventListener('input', function () {
+            const canonico = normalizeCedula(this.value);
+            if (canonico !== this.value) this.value = canonico;
+        });
+        document.getElementById('reg-whatsapp').addEventListener('input', function () {
+            const canonico = normalizeNacional(this.value);
+            if (canonico !== this.value) this.value = canonico;
+        });
+        document.getElementById('reg-whatsapp-custom-code').addEventListener('input', function () {
+            const soloDigitos = normalizePaisCode(this.value);
+            const canonico = soloDigitos || '';
+            if (canonico !== this.value) this.value = canonico;
+        });
+
         document.getElementById('master-reg-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const ev = window.__ctxEv;
             if (!ev) { showBadge('form-alert-badge', T('reg.ev_no_cargado'), 'err'); return; }
+            // Honeypot: si el campo trampa viene relleno, el envio es automatizado.
+            // Se responde con la pantalla de exito sin escribir nada, para que el
+            // bot no reciba una senal que le permita reintentar con reglas.
+            const honeypot = (document.getElementById('reg-hp')?.value || '').trim();
+            if (honeypot) {
+                log("INFO: Envio descartado por honeypot (automatizado).", "INFO");
+                document.getElementById('master-reg-form').reset();
+                showBadge('form-alert-badge', T('reg.ok_guardado', { nombre: '' }), 'ok');
+                return;
+            }
             const nombre = document.getElementById('reg-nombre').value.trim();
-            const cedula = document.getElementById('reg-cedula').value.trim();
-            const phone = document.getElementById('reg-whatsapp').value.trim();
+            // Canonicaliza ANTES de validar: el valor canonico es el que se
+            // compara contra duplicados y el que se persiste, para que el
+            // formato no se convierta en una via para evadir el guard.
+            const cedula = normalizeCedula(document.getElementById('reg-cedula').value);
+            const phone = normalizeNacional(document.getElementById('reg-whatsapp').value);
             const codeSel = document.getElementById('reg-whatsapp-code');
-            let code = codeSel.value === 'otro' ? (document.getElementById('reg-whatsapp-custom-code').value || '').trim() : codeSel.value;
-            if (code && !code.startsWith('+')) code = '+' + code;
+            const codeRaw = codeSel.value === 'otro' ? document.getElementById('reg-whatsapp-custom-code').value : codeSel.value;
             const rol = window.__ctxRol || 'invitado';
             if (!nombre || !cedula || !phone) { showBadge('form-alert-badge', T('reg.completa_campos'), 'err'); return; }
-            if (!esTelefonoValido(phone)) { showBadge('form-alert-badge', T('reg.wa_invalido'), 'err'); return; }
-            if (codeSel.value === 'otro' && !code) { showBadge('form-alert-badge', T('reg.pais_codigo_err'), 'err'); return; }
-            const whatsapp = (code + phone).trim();
+            if (!cedulaValida(cedula)) { showBadge('form-alert-badge', T('reg.cedula_invalida'), 'err'); return; }
+            const tel = buildWhatsapp(codeRaw, phone);
+            if (!tel.ok) { showBadge('form-alert-badge', T(tel.motivo), 'err'); return; }
+            const whatsapp = tel.valor;
 
             const btn = document.querySelector('#master-reg-form .btn-submit');
             btn.disabled = true; btn.textContent = T('reg.registrando');
             try {
-                const { data: dup } = await getClient().from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).maybeSingle();
-                if (dup) { btn.disabled = false; btn.textContent = T('reg.registrarme_btn'); mostrarDuplicado(cedula); return; }
+                // Pre-check de duplicado. Usa .limit(1) y no maybeSingle(): este ultimo
+                // devuelve error cuando ya hay MAS de una fila con la misma
+                // cedula (estado posible mientras la UNIQUE de BD no este
+                // desplegada), y como solo se desestructuraba `data` el flujo
+                // continuaba e insertaba una tercera copia.
+                const { data: dup, error: dupErr } = await getClient().from('inscritos').select('id').eq('cedula', cedula).eq('evento_id', ev.id).limit(1);
+                if (dupErr) throw dupErr;
+                if (dup && dup.length > 0) { btn.disabled = false; btn.textContent = T('reg.registrarme_btn'); mostrarDuplicado(cedula); return; }
                 // captura_pura=false => se genera QR de entrada; true => sin QR (Cero Borrado: no se altera si ya hay logica futura).
                 const entregaQR = (window.__ctxCapturaPura === false);
                 const qrCode = entregaQR ? ('QR-' + UID()) : null;
@@ -486,7 +648,9 @@
                 };
                 const { error } = await getClient().from('inscritos').insert(payload);
                 if (error) throw error;
-                log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, cédula=" + cedula + ", whatsapp=" + whatsapp + ").", "INFO");
+                // Sin PII en el log del cliente (cedula y whatsapp son dato
+                // personal y quedaban en la consola de quien se registra).
+                log("INFO: Registro guardado (rol=" + rol + ", cuenta_aforo=true, id=" + ev.id + ").", "INFO");
                 btn.disabled = false; btn.textContent = T('reg.registrarme_btn');
                 document.getElementById('master-reg-form').style.display = 'none';
                 const tabsEl = document.getElementById('reg-tabs');
@@ -511,6 +675,15 @@
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
                 btn.disabled = false; btn.textContent = T('reg.registrarme_btn');
+                // 23505 = violacion de la UNIQUE (evento_id, cedula). El pre-check
+                // es solo cliente: dos pestanas abiertas pueden pasar ambas y
+                // ganar la segunda. Con la UNIQUE desplegada, la perdedora cae
+                // aqui y se le muestra la pantalla de duplicado en vez de un
+                // error generico de guardado.
+                if (err && (err.code === '23505' || String(err.code) === '23505')) {
+                    mostrarDuplicado(cedula);
+                    return;
+                }
                 showBadge('form-alert-badge', T('reg.err_guardar'), 'err');
             }
         });
@@ -526,21 +699,25 @@
             if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
         }
 
-        // Telefono completo del modo nuevo (prefijo + numero), same que serie.html.
-        function getTelCompletoReg() {
-            const codigo = (document.getElementById('reg-whatsapp-code')?.value || '+57').replace('-CA', '');
-            const numero = (document.getElementById('reg-whatsapp')?.value || '').replace(/\D/g, '');
-            return codigo + numero;
-        }
+        // Telefono completo del modo nuevo: vive en la capa de normalizacion
+        // (arriba) para que alta y verificacion no puedan divergir.
 
         // ── Modo existente: verificar / inscribir ──────────────────────────
         let _existenteReg = null;
         async function verificarExistente() {
-            const cedula = (document.getElementById('ex-cedula')?.value || '').trim();
-            const telRaw = (document.getElementById('ex-tel')?.value || '').trim();
-            const prefijo = (document.getElementById('reg-whatsapp-code')?.value || '+57').replace('-CA', '');
-            const tel = prefijo + telRaw.replace(/\D/g, '');
-            if (!cedula || !telRaw) { showBadge('form-alert-badge', T('reg.completa_campos'), 'err'); return; }
+            // Mismo canonicalizado que el alta nueva: cedula solo digitos y
+            // telefono en E.164. Antes se comparaba el texto crudo del input
+            // contra el valor ya normalizado en BD, por lo que este flujo jamas
+            // encontraba lo que habia escrito el alta.
+            const cedula = normalizeCedula(document.getElementById('ex-cedula')?.value);
+            const telRaw = normalizeNacional(document.getElementById('ex-tel')?.value);
+            const codeSel = document.getElementById('reg-whatsapp-code');
+            const code = codeSel && codeSel.value === 'otro'
+                ? normalizePaisCode(document.getElementById('reg-whatsapp-custom-code')?.value)
+                : normalizePaisCode(codeSel ? codeSel.value : '+57');
+            const tel = (code || '') + telRaw;
+            if (!cedula) { showBadge('form-alert-badge', T('reg.cedula_invalida'), 'err'); return; }
+            if (!tel) { showBadge('form-alert-badge', T('reg.completa_campos'), 'err'); return; }
             const btn = document.getElementById('verify-btn');
             btn.disabled = true; btn.textContent = T('serie.verificando');
             try {
@@ -578,7 +755,12 @@
             const btn = document.getElementById('confirm-btn');
             btn.disabled = true; btn.textContent = T('serie.inscribiendo');
             const rol = window.__ctxRol || 'invitado';
-            const tipoPersona = _existenteReg.tipo || rol || 'invitado';
+            // La fila puede traer un tipo legacy fuera de la lista del CHECK, que
+            // reventaria el INSERT con 23514. Se depura sin alterar la prioridad
+            // que fija el contrato: el tipo de la fila manda y el rol es el
+            // respaldo cuando esa fila no trae uno utilizable.
+            _existenteReg.tipo = normalizeRol(_existenteReg.tipo, rol);
+            const tipoPersona = _existenteReg.tipo || rol;
             const qrCode = 'QR-' + UID();
             const payload = {
                 evento_id: ev.id,
@@ -613,6 +795,10 @@
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
                 btn.disabled = false; btn.textContent = T('serie.inscribir_btn');
+                if (err && (err.code === '23505' || String(err.code) === '23505')) {
+                    mostrarDuplicado(_existenteReg.cedula);
+                    return;
+                }
                 showBadge('form-alert-badge', T('reg.err_guardar'), 'err');
             }
         }
