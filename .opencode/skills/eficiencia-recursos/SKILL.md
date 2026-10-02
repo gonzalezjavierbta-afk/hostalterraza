@@ -50,9 +50,41 @@ El costo de una sesión crece de forma aproximadamente cuadrática con sus turno
 *   Los dominios de riesgo de runtime o seguridad (backend, renderer, admin, sql-security, arquitectura) van directo a PRO.
 *   Nunca desdoblar pro+free en paralelo (sesiones vacías = reloj puro).
 
-## Watchdog de subagentes
+## Watchdog de subagentes (18 turnos con corte al 70%) — reescrito 2026-10-02
 
-Un subagente que supere **25 turnos** o **50.000 tokens por turno** se aborta y se re-planifica. Nunca se re-despacha el mismo perfil que falló (refuerza la regla anti-colgado): se cambia de estrategia (otro dominio, un script o un brief mínimo).
+**Son dos números distintos y ya no deben coincidir:**
+
+| Ámbito | Presupuesto | Qué pasa al agotarlo |
+|---|---|---|
+| Subagente | **18 turnos**, con corte al **70% (~turno 12)** | Corte SUAVE: devuelve `STATUS: partial` con lo verificado + paso exacto siguiente. El subagente sigue vivo y entrega. |
+| Orquestador / primario | **25 turnos** tope DURO (cierre práctico en el 20) | Emisión de resumen de estado y sesión nueva. No estirar. |
+
+Los **50.000 tokens por turno** se mantienen como umbral duro de abortado y re-planificación para cualquier subagente, en cualquier tier.
+
+**Por qué dejaron de ser el mismo número.** Hasta el 2026-10-02 el watchdog del subagente ("25 turnos") era idéntico al tope duro de la sesión del primario, así que mataba al subagente **justo en la frontera exacta del problema**: la sesión del 2026-10-02 despachó 7 subagentes y los 3 más caros (`qa-auditor`, `docs-keeper`, `js-silo-dev`) corrieron 21-31 turnos y se quedaron **sin turnos antes de escribir su entrega** — `qa-auditor` no escribió los asserts, `docs-keeper` no escribió ningún archivo. No fue un problema de permisos: se invocaron correctamente y devolvieron informe. El número no era un tope, era la duración natural del trabajo; los 18 turnos con corte al 70% lo corrigen dejando 3 turnos de escritura obligatoria (los últimos 3 se reservan para la entrega).
+
+Nunca se re-despacha el mismo perfil que falló (refuerza la regla anti-colgado): se cambia de estrategia (otro dominio, un script o un brief mínimo). El corte al 70% NO es motivo para re-despachar: se acepta el `partial` y se consume.
+
+## Plantilla de brief (contrato obligatorio de todo `task`)
+
+Todo `task` que despacha el orquestador incluye este bloque. Sin las 4 piezas, el subagente se queda sin pasos y gasta el presupuesto sin entregar. Plantilla especular (misma regla) en `anti-absorcion` → "Plantilla de brief".
+
+1. **Presupuesto de turnos (explícito en el prompt del subagente):**
+
+    > PRESUPUESTO: N turnos. Reserva los últimos 3 para escribir tu entrega. Si lo que falta no cabe en el presupuesto, devuelve STATUS: partial con lo verificado y el paso exacto siguiente; no sigas explorando ni releyendo.
+
+    Valor por defecto: **N = 18**. Los últimos 3 turnos son de escritura obligatoria (verificación + entrega + archivo de salida), nunca de más lectura.
+2. **Anclas ya verificadas:**
+
+    > NO abras archivos fuera de esta lista. Las rutas y rangos que te doy son reales y verificados: `<ruta:rango>`.
+
+    Si un rango está desactualizado, se reporta en BLOQUEADORES en vez de explorar el archivo.
+3. **Alcance cerrado:**
+
+    > Si la tarea no cabe en este encargo, devuelve partial; NO amplies el alcance por tu cuenta.
+
+    El subagente "mejora" lo no pedido y muere sin entregar: es el modo de fallo medido.
+4. **Contrato de retorno compacto:** el ya definido en "Contrato de retorno de subagentes" (esta misma skill): STATUS · ARCHIVOS `ruta:rango` · VERIFICACION comando + pass/fail N/N · BLOQUEADORES · SIGUIENTE, máx ~600 tokens. **No se reescribe ni se duplica**: el brief solo lo invoca por nombre.
 
 ## Línea base medida (2026-10-01) y objetivo de control
 

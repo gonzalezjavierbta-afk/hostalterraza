@@ -11,6 +11,8 @@ estructura: detalle-v1 (2026-10-01)
 
 > Detalle de [DECISIONS.md](../DECISIONS.md) · [INDEX](../INDEX.md).
 
+> **[enmendado por ADR-071, 2026-10-02]** — La allow-list de `permission.task` de esta decision fue ampliada de 7 a 16 subagentes en ruta FREE. Ver [ADR-071](ADR-071-allow-list-ampliada-a-los-16-subagentes-en-ruta-free.md). El texto original de este ADR se conserva intacto: un ADR aceptado se supersede, no se reescribe. Donde L29 y L36 describen la mitigacion vigente, manda ADR-071.
+
 ## ADR-069: Tier por herencia de modelo en subagentes
 
 **Fecha:** 2026-10-02
@@ -26,15 +28,15 @@ estructura: detalle-v1 (2026-10-01)
 **Opciones:**
 - (A) Duplicar cada subagente en version FREE y PAGO: 32 archivos, viola ADR-067 (gemelos), descartada.
 - (B) Mantener `model:` fijo en los 16 subagentes: impide el par FREE/PAGO sin duplicar, descartada.
-- (C) Omitir `model:` en los 16 subagentes (herencia del primario) + allow-list en los primarios FREE + regla de escalado en su prompt: elegida.
+- (C) Omitir `model:` en los 16 subagentes (herencia del primario) + allow-list en los primarios FREE + regla de escalado en su prompt: elegida. **(Estado vigente de la allow-list: enmendado por ADR-071, 2026-10-02 — los 16 son invocables desde FREE; ver "Enmienda" al inicio del documento.)**
 
 **Decision:** Los 16 subagentes (admin-dev, architect, architect-review, backend-dev, content-loader, data-migration, docs-keeper, explore, frontend-tpl, js-silo-dev, media-reader, qa-auditor, renderer-dev, research-agent, seo-dev, sql-security) omiten `model:` y heredan del primario invocante: `@free-plan`/`@free-build` (opencode/big-pickle) obtienen el par FREE; `@plan`/`@build` (opencode-go/deepseek-v4.1-flash) el PAGO. Los 4 primarios conservan su `model:` explicito.
 
 **Riesgo aceptado:** al quitar `model:`, los 9 dominios de riesgo (sql-security, data-migration, backend-dev, renderer-dev, admin-dev, architect, architect-review, seo-dev, research-agent) pueden correr en `opencode/big-pickle` si un humano los invoca con `@` desde una sesion FREE; opencode permite forzar por `@` aunque `permission.task` los niegue.
 
 **Mitigacion (2 capas):**
-1. `permission.task` como allow-list en `@free-plan` y `@free-build`: `"*": "deny"` seguido de `docs-keeper`, `explore`, `js-silo-dev`, `frontend-tpl`, `content-loader`, `media-reader` y `qa-auditor` en `allow`. Ademas adelgaza la descripcion del Task tool (menos contexto, ~1%).
-2. Regla de escalado en el cuerpo del prompt de ambos primarios FREE: si la tarea toca uno de los 9 dominios de riesgo, el agente DETIENE y pide confirmacion explicita de escalar a PAGO.
+1. `permission.task` como allow-list en `@free-plan` y `@free-build`: `"*": "deny"` seguido de `docs-keeper`, `explore`, `js-silo-dev`, `frontend-tpl`, `content-loader`, `media-reader` y `qa-auditor` en `allow`. Ademas adelgaza la descripcion del Task tool (menos contexto, ~1%). **[SUPEREDIDO por ADR-071, 2026-10-02: la allow-list paso de 7 a 16 subagentes; los 9 dominios de riesgo son invocables desde FREE. La redaccion original de 7 se conserva como registro historico.]**
+2. Regla de escalado en el cuerpo del prompt de ambos primarios FREE: si la tarea toca uno de los 9 dominios de riesgo, el agente DETIENE y pide confirmacion explicita de escalar a PAGO. **[ENMENDADO por ADR-071, 2026-10-02: el gate sigue vigente pero ya no es "escalar o nada"; es confirmacion explicita del usuario para ejecutar en FREE, con escalado a PAGO como opcion cuando el criterio lo exige.]**
 
 **Nota:** `@seo-dev` pierde el modelo `opencode-go/qwen3.8-flash` y pasa a heredar (decision del usuario).
 

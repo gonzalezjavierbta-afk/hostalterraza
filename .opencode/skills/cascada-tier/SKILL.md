@@ -17,15 +17,15 @@ Operativiza el ADR-069 "Tier por herencia de modelo en subagentes" y la compuert
 
 ## 2. Allow-list FREE y los 9 dominios de riesgo
 
-En ruta FREE el primario solo puede invocar estos **7** (heredan `big-pickle`):
+Desde ADR-071 (2026-10-02) el primario FREE puede invocar los **16** subagentes (los 16 heredan `big-pickle`). Los **7 de bajo riesgo** se invocan sin gate:
 
 `@docs-keeper` · `@explore` · `@js-silo-dev` · `@frontend-tpl` · `@content-loader` · `@media-reader` · `@qa-auditor`
 
-Los **9 dominios de riesgo** quedan fuera de la allow-list; exigen escalado a PAGO con confirmación explícita del usuario:
+Los **9 dominios de riesgo** también son invocables desde FREE, pero exigen el **gate de confirmación explícita del usuario** de `AGENTS.md` §2 ANTES de ejecutar: se pueden ejecutar en FREE con autorización del usuario, o escalar a PAGO (`@plan`/`@build`) si el criterio lo exige.
 
 `@sql-security` · `@data-migration` · `@backend-dev` · `@renderer-dev` · `@admin-dev` · `@architect` · `@architect-review` · `@seo-dev` · `@research-agent`
 
-**Riesgo aceptado:** opencode permite forzar por `@` a un dominio de riesgo desde una sesión FREE, y correría en `big-pickle`. **Mitigación (2 capas):** la allow-list de `permission.task` + la regla de escalado en el prompt de `@free-plan`/`@free-build`. La denegación por sí sola no basta.
+**Riesgo aceptado:** los dominios de riesgo pueden correr en `big-pickle` con menor criterio arquitectónico que en `deepseek-v4.1-flash`. **Mitigación (2 capas):** la allow-list amplia de `permission.task` (16 entradas) + el **gate de confirmación** de `AGENTS.md` §2 enunciado en el prompt de `@free-plan`/`@free-build`. El permiso es capacidad técnica; la confirmación es la regla. Ampliar la allow-list no relaja el gate.
 
 ## 3. Criterios de aceptación verificables por dominio
 
@@ -47,7 +47,7 @@ Los 9 dominios de riesgo además exigen el **gate §2**: confirmación explícit
 
 - **Trabajo mecánico: 20 pasos.** Ajustes puntuales, seeds, CSS acotado, edición de docs.
 - **Exploradores: 30 pasos.** `@explore` y reconocimiento amplio necesitan más turnos de lectura, pero devuelven solo `archivo:línea`.
-- **Watchdog:** un subagente que supere **25 turnos** o **50.000 tokens/turno** se aborta y se re-planifica; nunca se re-despacha el mismo perfil. Los 25 turnos del orquestador son tope DURO: al agotarlos, resumen de estado y sesión nueva.
+- **Watchdog (rev. 2026-10-02):** un subagente tiene tope blando de **18 turnos**, con corte al **70% (~turno 12)** devolviendo `STATUS: partial` y lo verificado; **25 turnos** es el tope DURO del **orquestador** (no del subagente); **50.000 tokens/turno** se mantiene como corte. Motivo del cambio: el watchdog viejo moría en la frontera exacta del problema (25 = el mismo umbral donde 3 subagentes se agotaron sin entregar), así que el corte tenía que caer **antes**, no en el límite.
 
 ## 5. Al escalar, PAGO rehace la tarea; no solo la revisa
 

@@ -75,7 +75,7 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-013](TASKS-DETALLE.md#tsk-013) | Creative AI | Desarrollar el módulo aditivo "08 Actualizaciones" y el desglose de tarjetas para la sección Historia de b5 | Refinamiento y UX | L232-232 |
 | [TSK-014](TASKS-DETALLE.md#tsk-014) | Documentation | Sincronizar permanentemente PROJECT.md y BLUEPRINT.md bajo el estándar v127-MASTER | Refinamiento y UX | L234-234 |
 | [TSK-039](TASKS-DETALLE.md#tsk-039) | Direccion / Lead Developer (deuda MENOR + decision futura derivada de… | (1) `#ld-form-redirect` usa `type="url"` sin normalizacion de esquema — normalizar (prefijar `https://` si… | Contratos de Configuracion Wizard/Landing (ADR-047) —… | L237-238 |
-| **TSK-099** | Lead Developer (ADM) + Chief Architect (ADR) | **Permitir invocar los 16 subagentes desde `free-plan`/`free-build` sin cambiar de tier** — pendiente para la proxima sesion | Gobernanza de tier (ADR-069) | Ver nota completa al final del documento. **Hallazgo verificado 2026-10-02:** la allow-list de `permission.task` en `.opencode/agent/free-build.md` y `free-plan.md` es IDENTICA y autoriza 7 de 16 subagentes; quedan en `deny` (via `"*": deny`) los 9 de riesgo: `admin-dev`, `architect-review`, `architect`, `backend-dev`, `data-migration`, `renderer-dev`, `research-agent`, `seo-dev`, `sql-security`. **Aclaracion importante: en la sesion del 2026-10-02 los subagentes SI se invocaron sin error de permiso** (`explore` x2, `js-silo-dev`, `frontend-tpl` x2, `qa-auditor`, `docs-keeper` = 7 despachos, 7 informes recibidos); el fallo fue de PRESUPUESTO DE TURNOS, no de permiso. La correccion sigue siendo necesaria para delegar dominios de riesgo, pero NO explica los 3 agotamientos. |
+| [TSK-099](TASKS-DETALLE.md#tsk-099) | Lead Developer (ADM) + Chief Architect (ADR) + Documentation Specialist (`@docs-keeper`) | ✅ **COMPLETADA (2026-10-02)** — Permitir invocar los 16 subagentes desde `free-plan`/`free-build` sin cambiar de tier | Gobernanza de tier (ADR-069 + ADR-071) | **Alcance REAL ejecutado (ADR-006):** (1) allow-list de `permission.task` ampliada de **7 a 16** subagentes en `.opencode/agent/free-build.md` y `free-plan.md` (`"*": deny` + 16 `allow`), config commiteada en `5cd53a0` (base `b4b4beb`); (2) los **9 dominios de riesgo** (`sql-security`, `data-migration`, `backend-dev`, `renderer-dev`, `admin-dev`, `architect`, `architect-review`, `seo-dev`, `research-agent`) son invocables en FREE pero **conservan el gate de confirmacion explicita** de `AGENTS.md` §2 — permitir invocar ≠ autorizar ejecutar; (3) ADR-071 creado en `decisiones/ADR-071-allow-list-ampliada-a-los-16-subagentes-en-ruta-free.md` + fila de indice en `DECISIONS.md:86` (working tree, SIN commit); (4) ADR-069 lleva puntero `[enmendado por ADR-071, 2026-10-02]` y su decision original se conserva INTACTA (Cero Borrado); (5) **watchdog recalibrado** por decision de Direccion: subagente = tope blando **18 turnos** con corte al 70% (~turno 12) devolviendo `STATUS: partial`; **25 turnos = tope DURO del ORQUESTADOR** (no del subagente); 50.000 tokens/turno se mantiene — reflejado en `anti-absorcion`, `eficiencia-recursos` y `cascada-tier` L50; (6) `scripts/session_close.js` ahora expone `--budget [N]` y `--umbral N` (reporte por subagente: turnos, % sobre el umbral y veredicto OK/EXCEDIDO, mismo estilo de alertas de su seccion 3) y la seccion "Estimado vs real" ya reporta Tokens/Turnos; (7) `scripts/smoke_qa_asserts.js` NUEVO -> **Resumen: PASS 49, FAIL 0**. **Sesion 14:00-hoy (medicion):** 7 sesiones, 161 turnos, 7.106.060 tokens, 37.675 cache_read/turno; subagentes **5 OK / 1 EXCEDIDO** (`js-silo-dev` 21 turnos = 117%, devolvio `partial` en vez de agotarse). Diagnostico previo que motiva el punto (5): de 22 subagentes del dia, **14 excedieron 18 turnos y 10 pasaron el tope duro de 25**; peor caso `docs-keeper` con 45 turnos (250%). **Ver nota completa y cierre al final del documento.** |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -92,7 +92,9 @@ Cerradas (50): TSK-096, TSK-090, TSK-091, TSK-092, TSK-093, TSK-094, TSK-082, TS
 
 ---
 
-## TSK-099 — Habilitar los 16 subagentes en ruta FREE (nota para la proxima sesion, 2026-10-02)
+## TSK-099 — Habilitar los 16 subagentes en ruta FREE (nota de plan, 2026-10-02) — ✅ CERRADA, ver seccion de cierre al final
+
+> **Estado: COMPLETADA (2026-10-02, ADR-071).** El texto de plan de esta seccion se conserva intacto como historial (Cero Borrado, Regla de Oro #3): describe el estado ANTES del cambio. El alcance REAL ejecutado y las cifras estan en la seccion "Cierre de TSK-099" al final del documento.
 
 ### Que hay que corregir
 
@@ -155,5 +157,26 @@ task:
 ### Advertencia honesta: esto NO arregla los 3 subagentes agotados de la sesion del 2026-10-02
 
 `qa-auditor`, `docs-keeper` y `js-silo-dev` NO fallaron por permiso: se invocaron, corrieron 21-31 turnos y devolvieron informe. Lo que fallo fue que agotaron su presupuesto de pasos antes de escribir su entrega (QA no escribio los asserts; docs-keeper no escribio ningun archivo). Ampliar la allow-list a 16 no cambia eso: el sintoma es el brief, no el permiso. Para los subagentes que deben EDITAR (no solo reportar), el brief tiene que traer `archivo:linea` verificados y un contrato de retorno compacto (Regla 12). Ver `errores/E25-stall-de-implementacion-en-un-subagente-el.md` y `errores/E24-guardian-que-falla-por-el-valor-correcto-el.md`.
+
+### Cierre de TSK-099 (2026-10-02) — COMPLETADA, alcance real ejecutado
+
+**Decision:** ADR-071 (Allow-list FREE ampliada a los 16 subagentes en ruta FREE), que **enmienda** ADR-069 sin reescribirlo (Cero Borrado documental: ADR-069 conserva su decision original y solo lleva el puntero `[enmendado por ADR-071, 2026-10-02]`).
+
+**Alcance REAL ejecutado (verificado contra los archivos reales, ADR-006 — prevalece el archivo):**
+
+1. **Allow-list FREE 7 -> 16:** `.opencode/agent/free-build.md` y `free-plan.md` llevan `permission.task` con `"*": deny` + las **16** lineas `allow` (mismo cambio en ambos archivos). Config commiteada en **`5cd53a0`** (base `b4b4beb`).
+2. **Los 9 dominios de riesgo ahora son invocables en FREE pero conservan el gate de confirmacion explicita de `AGENTS.md` §2** (`sql-security`, `data-migration`, `backend-dev`, `renderer-dev`, `admin-dev`, `architect`, `architect-review`, `seo-dev`, `research-agent`). *Permitido por configuracion NO significa autorizado a ejecutar.* El gate, no la denegacion, es la mitigacion.
+3. **ADR-071** creado: `Sistema QR desarrollo/decisiones/ADR-071-allow-list-ampliada-a-los-16-subagentes-en-ruta-free.md` (untracked) + fila de indice en `DECISIONS.md:86` (working tree, SIN commit).
+4. **Watchdog recalibrado** por decision de Direccion: **subagente = tope blando 18 turnos** con corte al **70% (~turno 12)** devolviendo `STATUS: partial`; **25 turnos = tope DURO del ORQUESTADOR** (ya no del subagente); **50.000 tokens/turno se mantiene**. Reflejado en `anti-absorcion`, `eficiencia-recursos` y `cascada-tier` L50.
+5. **Instrumentacion de cierre:** `scripts/session_close.js` ahora expone `--budget [N]` y `--umbral N` -> reporte por subagente con turnos, % sobre el umbral y veredicto **OK/EXCEDIDO** (mismo estilo de alertas de su seccion 3); la seccion "Estimado vs real" ya reporta **Tokens/Turnos**.
+6. **`scripts/smoke_qa_asserts.js` NUEVO** -> **Resumen: PASS 49, FAIL 0**. Es el paso unico de certificacion propuesto para `@qa-auditor` en vez de asserts manuales.
+
+**Metrica de la sesion 14:00-hoy (7 sesiones):** 161 turnos, **7.106.060 tokens**, 37.675 cache_read/turno. Desglose de subagentes: **5 OK / 1 EXCEDIDO** (`js-silo-dev` a 21 turnos = 117% del umbral, devolvio `partial` en vez de agotarse -> el corte al 70% funciono). Diagnostico previo que motiva la recalibracion: de **22 subagentes** del dia, **14 excedieron 18 turnos** y **10 pasaron el tope duro de 25**; peor caso **`docs-keeper` con 45 turnos (250%)**.
+
+#### 📌 BASELINE ACTUAL DE `scripts/express_check.js` = **PASS 29 / FAIL 0**
+
+**Regla de lectura para informes futuros (evita leer una regresion donde no la hay):** el baseline vigente es **PASS 29 / FAIL 0**. Antes de este ciclo era PASS 27 / FAIL 0. La diferencia es **esperada y NO es regresion**: el archivo nuevo `scripts/smoke_qa_asserts.js` entra al set por defecto de `express_check.js` y aporta **+2** asserts de sintaxis/ASCII. Si un informe futuro muestra **27**, corresponde a un baseline previo o a un estado del working tree anterior a `smoke_qa_asserts.js` — comparar contra la cifra del commit que se este revisando, nunca contra 27 como si fuera el valor vigente.
+
+**Pendiente de commit (working tree):** ADR-071 + fila de `DECISIONS.md` + recalibracion en `anti-absorcion`/`eficiencia-recursos`/`cascada-tier` + `scripts/session_close.js` + `scripts/smoke_qa_asserts.js` + este cierre documental. Ver `NEXT.md` hito -37.
 
 

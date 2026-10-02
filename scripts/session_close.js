@@ -11,12 +11,26 @@
  *
  * USO:
  *   node scripts/session_close.js [--root <sessionId>] [--since <ms|fecha>]
+ *   node scripts/session_close.js [--budget [N]] [--umbral N]
+ *       [--est-tokens N] [--est-turnos N] [--est-seg N]
  *   node scripts/session_close.js -h | --help
  *
  * ALCANCE:
  *   Sin --root ni --since mide el DIA LOCAL actual (lo resuelve usage_report).
  *   Con --root mide esa sesion + todos sus descendientes (parent_id).
  *   Con --since acota el inicio; puede combinarse con --root.
+ *
+ * ANADIDOS (2026-10-02, sin romper la interfaz previa):
+ *   --budget [N]   Seccion "Presupuesto de turnos por subagente": por cada
+ *                  subagente (sesion con es_raiz = false) turnos,
+ *                  turnos/presupuesto contra el umbral (default 18) y
+ *                  veredicto OK (<= umbral) o EXCEDIDO, con el mismo estilo
+ *                  de alerta "[!] Agente X: N turnos (> 18)" de la seccion 3.
+ *   --umbral N     Umbral de turnos por subagente (default 18).
+ *   --est-* N      Estimacion explicita para rellenar "Estimado vs real".
+ *                  Sin --est-*, con --budget se usa el presupuesto normativo
+ *                  (umbral x subagentes); si no hay data, se declara.
+ *   Ninguno de estos flags es obligatorio: sin ellos el informe es el de antes.
  *
  * FUENTES:
  *   1) node scripts/usage_report.js --json [filtros]  -> balance + por agente.
@@ -46,6 +60,10 @@ var REPORT = path.join(__dirname, 'usage_report.js');
 var TURN_ALERT = 25;          /* > 25 turnos por agente */
 var TOKENS_PER_TURN_ALERT = 50000; /* > 50000 tokens/turno por agente */
 var ORCH_CACHE_PER_TURN_OK = 50000; /* orquestador OK si cache_read/turno < 50000 */
+
+/* Presupuesto de turnos por SUBAGENTE (--budget). Tope duro del agente = 25;
+   el umbral de presupuesto por subagente es 18 (OK <= 18 / EXCEDIDO > 18). */
+var SUBAGENT_TURN_BUDGET = 18;
 
 /* ----------------------------- utilidades ------------------------------- */
 
@@ -169,6 +187,59 @@ function buildBalance(json) {
   };
 }
 
+/*
+ * Presupuesto de turnos por subagente (--budget).
+ * Un subagente = una sesion con es_raiz === false (parent_id != null).
+ * Por cada subagente: turnos, turnos/presupuesto contra el umbral y veredicto
+ * OK (turnos <= umbral) o EXCEDIDO (turnos > umbral).
+ * Tambien devuelve el rollup por agente (peor subagente + total) que es el
+ * patron de alertas ya usado en la seccion 3.
+ */
+function buildBudget(sessions, threshold) {
+  var subs = sessions.filter(function (s) { return s.es_raiz === false; });
+  var filas = subs.map(function (s) {
+    var t = num(s.turns);
+    return {
+      agent: s.agent || '(sin agente)',
+      id: s.id || '',
+      title: s.title || '',
+      turns: t,
+      umbral: threshold,
+      pct: threshold > 0 ? (t / threshold) * 100 : 0,
+      excedido: t > threshold,
+      total: num(s.total),
+      cache_read: num(s.tokens_cache_read)
+    };
+  });
+  filas.sort(function (a, b) { return b.turns - a.turns; });
+
+  var map = {};
+  var excedidos = 0;
+  for (var i = 0; i < filas.length; i++) {
+    var f = filas[i];
+    if (!map[f.agent]) {
+      map[f.agent] = { agent: f.agent, sesiones: 0, turnos: 0, max_turnos: 0, excedidas: 0, umbral: threshold };
+    }
+    var o = map[f.agent];
+    o.sesiones++;
+    o.turnos += f.turns;
+    if (f.turns > o.max_turnos) o.max_turnos = f.turns;
+    if (f.excedido) { o.excedidas++; excedidos++; }
+  }
+  var porAgente = Object.keys(map).map(function (k) { return map[k]; });
+  porAgente.sort(function (a, b) { return b.max_turnos - a.max_turnos; });
+
+  return {
+    umbral: threshold,
+    filas: filas,
+    por_agente: porAgente,
+    subagentes: filas.length,
+    excedidos: excedidos,
+    /* Tope duro: sesiones que ademas rompieron TURN_ALERT (25). */
+    topes_duros: filas.filter(function (f) { return f.turns > TURN_ALERT; }).length
+  };
+}
+
 function buildOrchestrator(balance) {
   var roots = balance.sessions.filter(function (s) { return s.es_raiz; });
   var cache = 0, turns = 0;
@@ -188,6 +259,70 @@ function buildOrchestrator(balance) {
 }
 
 /* ------------------------------- render --------------------------------- */
+
+/*
+ * Rellena la tabla "Estimado vs real" con la data DISPONIBLE en este mismo
+ * informe (regla: si la data esta, se rellena; si no, se marca el flag).
+ * Prioridad:
+ *   1) Estimacion explicita del usuario: --est-tokens / --est-turnos / --est-seg.
+ *   2) Presupuesto normativo derivado de --budget: umbral de turnos por
+ *      subagente x numero de subagentes (x umbral de tokens/turno).
+ *   3) Sin estimacion: se dice por que (no se inventa el numero).
+ */
+function estimateRow(opts, balance, budget) {
+  var r = { tokens: '', turnos: '', seg: '', tokens_dev: '', turnos_dev: '', seg_dev: '', nota: '' };
+  var src = [];
+
+  function put(n, real, esInt) {
+    if (n == null || !isFinite(num(n)) || real == null) return null;
+    var e = num(n);
+    var d = num(real) - e;
+    var f = esInt ? fmtInt : fmt1;
+    var pct = e !== 0 ? (d / Math.abs(e)) * 100 : 0;
+    return f(e) + ' | ' + f(d) + ' (' + (d >= 0 ? '+' : '') + fmt1(pct) + '%)';
+  }
+
+  if (opts.estTokens != null) src.push('--est-tokens');
+  if (opts.estTurnos != null) src.push('--est-turnos');
+  if (opts.estSeg != null) src.push('--est-seg');
+
+  var estT = put(opts.estTokens, balance ? balance.total_tokens : null, true);
+  var estTu = put(opts.estTurnos, balance ? balance.turnos : null, true);
+  var estS = put(opts.estSeg, balance ? balance.segundos : null, false);
+
+  if (!estT || !estTu) {
+    var nSubs = budget ? budget.subagentes : 0;
+    var umbral = budget ? budget.umbral : SUBAGENT_TURN_BUDGET;
+    if (nSubs > 0) {
+      var planTurnos = umbral * nSubs;
+      var planTokens = planTurnos * TOKENS_PER_TURN_ALERT;
+      if (!estTu) estTu = put(planTurnos, balance ? balance.turnos : null, true);
+      if (!estT) estT = put(planTokens, balance ? balance.total_tokens : null, true);
+      if (!src.length) {
+        src.push('presupuesto normativo: ' + umbral + ' turnos x ' + nSubs +
+          ' subagentes = ' + fmtInt(planTurnos) + ' turnos; tokens = ' +
+          fmtInt(planTurnos) + ' x ' + fmtInt(TOKENS_PER_TURN_ALERT) + ' tokens/turno');
+      }
+    }
+  }
+
+  if (estT) { r.tokens = estT.split(' | ')[0]; r.tokens_dev = estT.split(' | ')[1]; }
+  else r.tokens = '(sin estimacion)';
+  if (estTu) { r.turnos = estTu.split(' | ')[0]; r.turnos_dev = estTu.split(' | ')[1]; }
+  else r.turnos = '(sin estimacion)';
+  if (estS) { r.seg = estS.split(' | ')[0]; r.seg_dev = estS.split(' | ')[1]; }
+  else r.seg = '(sin estimacion: no hay umbral de tiempo normativo; usar --est-seg)';
+
+  r.tokens_dev = r.tokens_dev || '(sin estimacion)';
+  r.turnos_dev = r.turnos_dev || '(sin estimacion)';
+  r.seg_dev = r.seg_dev || '(sin estimacion)';
+
+  r.nota = src.length
+    ? src.join(' + ') + '. Para tokens y tiempo usa --est-tokens/--est-turnos/--est-seg.'
+    : 'sin estimacion en el reporte: usa --budget (presupuesto normativo) o --est-tokens/--est-turnos/--est-seg. ' +
+      'Aprendizajes y consejos siguen siendo humano (seccion 6-7).';
+  return r;
+}
 
 function scopeLabel(opts) {
   var L = [];
@@ -216,6 +351,9 @@ function renderReport(opts, fetched, treeText) {
   var balance = json ? buildBalance(json) : null;
   var byAgent = json ? aggregateByAgent(balance.sessions) : [];
   var orch = json ? buildOrchestrator(balance) : null;
+  var budgetForReport = (opts.budget && json)
+    ? buildBudget(balance.sessions, num(opts.umbral) > 0 ? num(opts.umbral) : SUBAGENT_TURN_BUDGET)
+    : null;
 
   /* 1. Balance de gasto */
   L.push('## 1. Balance de gasto');
@@ -293,20 +431,80 @@ function renderReport(opts, fetched, treeText) {
     L.push('');
   }
 
-  /* 4-6. Plantillas obligatorias */
-  L.push('## 4. Estimado vs real (Mandato 19)');
+  if (opts.budget && budgetForReport) {
+    var b = budgetForReport;
+    L.push('## 4. Presupuesto de turnos por subagente (umbral ' + b.umbral + ')');
+    L.push('');
+    L.push('- Subagentes en el alcance: ' + fmtInt(b.subagentes) +
+      ' (sesiones con es_raiz = false del JSON de usage_report).');
+    L.push('- Umbral: ' + b.umbral + ' turnos por subagente -> OK si <= ' + b.umbral +
+      ', EXCEDIDO si > ' + b.umbral + '. Tope duro del agente: ' + TURN_ALERT + '.');
+    L.push('- Resultado: ' + fmtInt(b.subagentes - b.excedidos) + ' OK, ' +
+      fmtInt(b.excedidos) + ' EXCEDIDO' +
+      (b.topes_duros ? ' (' + fmtInt(b.topes_duros) + ' sobre el tope duro ' + TURN_ALERT + ')' : '') + '.');
+    L.push('');
+    if (b.filas.length) {
+      L.push('| Agente | Sesion | Turnos | Presupuesto | % | Veredicto |');
+      L.push('|---|---|---|---|---|---|');
+      for (var f = 0; f < b.filas.length; f++) {
+        var r = b.filas[f];
+        L.push('| ' + (r.excedido ? '[!] ' : '') + esc(r.agent) + ' | ' + esc(r.id) + ' | ' +
+          fmtInt(r.turns) + ' | ' + fmtInt(r.umbral) + ' | ' + fmt1(r.pct) + '% | ' +
+          (r.excedido ? 'EXCEDIDO' : 'OK') + ' |');
+      }
+      L.push('');
+      L.push('| Agente | Subagentes | Turnos (suma) | Peor subagente | Turnos/presupuesto | Veredicto |');
+      L.push('|---|---|---|---|---|---|');
+      for (var g = 0; g < b.por_agente.length; g++) {
+        var pa = b.por_agente[g];
+        var excede = pa.max_turnos > pa.umbral;
+        L.push('| ' + (excede ? '[!] ' : '') + esc(pa.agent) + ' | ' + fmtInt(pa.sesiones) + ' | ' +
+          fmtInt(pa.turnos) + ' | ' + fmtInt(pa.max_turnos) + ' | ' + fmt1(pa.umbral > 0 ? (pa.max_turnos / pa.umbral) * 100 : 0) +
+          '% | ' + (excede ? 'EXCEDIDO' : 'OK') + ' |');
+      }
+      L.push('');
+    } else {
+      L.push('- Sin subagentes en el alcance (usa --root <sessionId> o --since para acotar).');
+      L.push('');
+    }
+    var bAlerts = [];
+    for (var h = 0; h < b.filas.length; h++) {
+      var w = b.filas[h];
+      if (w.excedido) {
+        bAlerts.push('- [!] Subagente "' + esc(w.agent) + '" [' + esc(w.id) + ']: ' +
+          fmtInt(w.turns) + ' turnos (> ' + w.umbral + ') -> EXCEDIDO (' +
+          fmt1(w.umbral > 0 ? w.turns / w.umbral : 0) + 'x presupuesto). Replanificar / acortar el brief.');
+      }
+    }
+    for (var m = 0; m < bAlerts.length; m++) L.push(bAlerts[m]);
+    if (!bAlerts.length) {
+      L.push('- Sin subagentes sobre el umbral de presupuesto (' + b.umbral + ' turnos).');
+    }
+    L.push('');
+  } else if (opts.budget) {
+    L.push('## 4. Presupuesto de turnos por subagente (umbral ' + SUBAGENT_TURN_BUDGET + ')');
+    L.push('');
+    L.push('- (sin datos de usage_report.js; no se puede medir el presupuesto de subagentes)');
+    L.push('');
+  }
+
+  /* 5-7. Plantillas obligatorias */
+  L.push('## 5. Estimado vs real (Mandato 19)');
   L.push('');
+  var est = estimateRow(opts, balance, budgetForReport);
   L.push('| Concepto | Estimado | Real | Desviacion |');
   L.push('|---|---|---|---|');
-  L.push('| Tokens | (completar) | ' + (balance ? fmtInt(balance.total_tokens) : '(completar)') + ' | (completar) |');
-  L.push('| Turnos | (completar) | ' + (balance ? fmtInt(balance.turnos) : '(completar)') + ' | (completar) |');
-  L.push('| Tiempo (s) | (completar) | ' + (balance ? fmt1(balance.segundos) : '(completar)') + ' | (completar) |');
+  L.push('| Tokens | ' + est.tokens + ' | ' + (balance ? fmtInt(balance.total_tokens) : '(completar)') + ' | ' + est.tokens_dev + ' |');
+  L.push('| Turnos | ' + est.turnos + ' | ' + (balance ? fmtInt(balance.turnos) : '(completar)') + ' | ' + est.turnos_dev + ' |');
+  L.push('| Tiempo (s) | ' + est.seg + ' | ' + (balance ? fmt1(balance.segundos) : '(completar)') + ' | ' + est.seg_dev + ' |');
   L.push('');
-  L.push('## 5. Aprendizajes');
+  L.push('- Base estimada: ' + est.nota);
+  L.push('');
+  L.push('## 6. Aprendizajes');
   L.push('');
   L.push('- (completar: que se releyo de mas, que agente fallo, que brief falto)');
   L.push('');
-  L.push('## 6. Consejos de mejora');
+  L.push('## 7. Consejos de mejora');
   L.push('');
   L.push('- (completar: 1-3 acciones concretas para la siguiente sesion)');
   L.push('');
@@ -317,7 +515,11 @@ function renderReport(opts, fetched, treeText) {
 /* -------------------------------- CLI ----------------------------------- */
 
 function parseArgs(argv) {
-  var o = { root: null, since: null, help: false };
+  var o = {
+    root: null, since: null, help: false,
+    budget: false, umbral: null,
+    estTokens: null, estTurnos: null, estSeg: null
+  };
   var i = 0;
   function needValue(flag) {
     if (i >= argv.length) return null;
@@ -334,6 +536,15 @@ function parseArgs(argv) {
     if (a === '--help' || a === '-h' || a === 'help') { o.help = true; }
     else if (a === '--root') { o.root = (val !== null ? val : needValue('--root')); }
     else if (a === '--since') { o.since = (val !== null ? val : needValue('--since')); }
+    else if (a === '--budget') {
+      o.budget = true;
+      if (val !== null) o.umbral = val;
+      else if (argv[i] !== undefined && /^[0-9]+$/.test(String(argv[i]))) o.umbral = needValue('--budget');
+    }
+    else if (a === '--umbral') { o.umbral = (val !== null ? val : needValue('--umbral')); }
+    else if (a === '--est-tokens') { o.estTokens = (val !== null ? val : needValue('--est-tokens')); }
+    else if (a === '--est-turnos') { o.estTurnos = (val !== null ? val : needValue('--est-turnos')); }
+    else if (a === '--est-seg') { o.estSeg = (val !== null ? val : needValue('--est-seg')); }
     else { /* opcion desconocida: se ignora para no romper la sesion */ }
   }
   return o;
@@ -345,12 +556,24 @@ function helpText() {
   L.push('');
   L.push('Uso:');
   L.push('  node scripts/session_close.js [--root <sessionId>] [--since <ms|fecha>]');
+  L.push('  node scripts/session_close.js [--budget [N]] [--umbral N]');
+  L.push('      [--est-tokens N] [--est-turnos N] [--est-seg N]');
   L.push('  node scripts/session_close.js -h | --help');
   L.push('');
   L.push('Opciones:');
   L.push('  --root <sessionId>   Mide esa sesion + sus descendientes (parent_id).');
   L.push('  --since <ms|fecha>   Acota el inicio (epoch ms o fecha ISO).');
   L.push('                       Sin filtros mide el DIA LOCAL actual.');
+  L.push('  --budget [N]         Seccion de presupuesto por SUBAGENTE: turnos,');
+  L.push('                       turnos/presupuesto y veredicto OK/EXCEDIDO.');
+  L.push('                       Umbral por defecto: ' + SUBAGENT_TURN_BUDGET +
+    ' turnos (OK <= ' + SUBAGENT_TURN_BUDGET + ').');
+  L.push('  --umbral N           Umbral de turnos por subagente (default ' + SUBAGENT_TURN_BUDGET + ').');
+  L.push('  --est-tokens N       Tokens estimados -> rellena "Estimado vs real".');
+  L.push('  --est-turnos N       Turnos estimados -> rellena "Estimado vs real".');
+  L.push('  --est-seg N          Segundos estimados -> rellena "Estimado vs real".');
+  L.push('                       Sin --est-*, con --budget se usa el presupuesto');
+  L.push('                       normativo; si no hay data, se dice (no se inventa).');
   L.push('  -h, --help           Esta ayuda.');
   L.push('');
   L.push('Delega en scripts/usage_report.js (--json y, con --root, --tree).');
