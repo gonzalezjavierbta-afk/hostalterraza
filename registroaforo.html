@@ -344,6 +344,62 @@
         function TODAY() { return new Date().toLocaleDateString('es-CO'); }
         function NOW()   { return new Date().toLocaleTimeString('es-CO'); }
 
+        // === INICIO SEGMENTO: TELEMETRIA DEL PAGEVIEW (ADR-072) ===
+        // Emite UN pageview por carga del formulario en page_events, con la
+        // atribucion del invitador (?ref=) en la nueva columna ref_codigo. Aqui NO
+        // hay escudo de telemetria (a diferencia de los silos), asi que se emite solo
+        // este evento y nada mas: reusa el MISMO cliente y credenciales que ya usa el
+        // formulario (getClient/SB_URL/SB_KEY) y el patron fail-open del resto del
+        // archivo. El valor de ref_codigo es el codigo CRUDO de la URL, NO el
+        // resultado del lookup en `invitadores`: asi el trafico no se pierde si el
+        // lookup falla. Claves de sesion/visitante propias de este archivo (no
+        // colisionan con las del escudo de los silos).
+        const REG_SESSION_KEY = 'ht_reg_analytics_session';
+        const REG_VISITOR_KEY = 'ht_reg_analytics_visitor';
+        function regUid() {
+            try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : ((r & 0x3) | 0x8);
+                return v.toString(16);
+            });
+        }
+        // Normalizacion canonica del codigo (misma regla del escudo de los silos):
+        // vacio si no hay, mayusculas, sin espacios al borde, solo [A-Z0-9-], tope 32.
+        function normRefCodigo(raw) {
+            return String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+        }
+        let regSessionId = '';
+        try { regSessionId = sessionStorage.getItem(REG_SESSION_KEY) || ''; } catch (e) {}
+        if (!regSessionId) { regSessionId = regUid(); try { sessionStorage.setItem(REG_SESSION_KEY, regSessionId); } catch (e) {} }
+        let regVisitorId = '';
+        try { regVisitorId = localStorage.getItem(REG_VISITOR_KEY) || ''; } catch (e) {}
+        if (!regVisitorId) { regVisitorId = regUid(); try { localStorage.setItem(REG_VISITOR_KEY, regVisitorId); } catch (e) {} }
+
+        function trackPageviewRegistro(ev, refCodigoCrudo) {
+            try {
+                getClient().from('page_events').insert({
+                    org_id: ev.org_id || null,
+                    evento_id: ev.id || null,
+                    evento_slug: String(ev.slug || ''),
+                    evento_nombre: String(ev.nombre || ''),
+                    page_url: String(window.location.href).slice(0, 2048),
+                    page_ref: String(document.referrer || '').slice(0, 500),
+                    ref_codigo: normRefCodigo(refCodigoCrudo),
+                    event_type: 'pageview',
+                    event_action: 'registro_view',
+                    event_label: String(ev.nombre || ev.slug || '').slice(0, 200),
+                    event_value: 1,
+                    session_id: regSessionId,
+                    visitor_id: regVisitorId,
+                    user_meta: { path: location.pathname }
+                }).then(() => {}).catch((e) => log('DEBUG: pageview de registro no emitido: ' + e.message, 'DEBUG'));
+            } catch (e) {
+                log('DEBUG: pageview de registro no emitido: ' + e.message, 'DEBUG');
+            }
+        }
+        // === FIN SEGMENTO: TELEMETRIA DEL PAGEVIEW (ADR-072) ===
+
         // ADR-0xx: identificador unico del QR (mismo patron que serie.html)
         function UID() { return Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase(); }
 
@@ -519,6 +575,11 @@
                         if (inv) { window.__ctxRefCodigo = inv.codigo || null; window.__ctxRefNombre = inv.nombre || null; }
                     } catch (e) { /* fail-open: sin atribucion, el registro sigue */ }
                 }
+
+                // ADR-072: pageview del formulario con la atribucion del invitador
+                // (page_events.ref_codigo). Se emite con el codigo crudo de la URL,
+                // independiente del lookup anterior: fail-open total.
+                trackPageviewRegistro(ev, refParam);
 
                 // Cabezote responsive + WebP tan pronto se conoce la imagen del evento.
                 // ADR-034: cabezote_formulario_url tiene precedencia (imagen propia del formulario).

@@ -1932,6 +1932,12 @@ tr:hover td{background:var(--surface)}
         <div class="ch" style="margin-bottom:.75rem">Eventos recientes</div>
         <div id="pn-ld-events"></div>
       </div>
+    <!-- ADR-072 · Llegadas por link de invitador: accesos medidos (total historico, sin filtro de periodo) -->
+    <div class="card" style="margin-bottom:1rem">
+      <div class="ch" style="margin-bottom:.25rem">Llegadas por link de invitador</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:.75rem">Personas que entraron a la web por cada link de invitador. Cifras de accesos medidos, no de inscripciones: empiezan a contar desde que se publico la medicion, el historico anterior no quedo registrado.</div>
+      <div id="pn-ld-invitadores"></div>
+    </div>
     </div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem">
       <button class="btn btn-ghost btn-sm" onclick="exportarLandingXLSX()">📥 Exportar Landing (.xlsx)</button>
@@ -9232,6 +9238,98 @@ function _renderLandingRank() {
     '<div style="margin-top:.5rem;font-size:11px;color:var(--ink3)">Último evento: ' + (rows[0]?.ultimo_evento || '—') + '</div>';
 }
 
+// ── ADR-072 · Llegadas por link de invitador (accesos desde telemetria) ──
+// Prefijo de categoria: landing. NO es el "Top invitadores" de Rankings (ese sale de
+// inscritos); aqui se cuenta trafico real atribuido por link de invitador.
+// TOTAL HISTORICO: esta excepcion NO aplica el filtro de periodo .pn-period (lo pidio la Direccion).
+let _ldInvKey  = null;   // clave (slug) de la ultima consulta OK; null = sin datos/fallo -> reintenta
+let _ldInvRows = null;   // null = vista ausente o fallo | [] = vista vacia | [..] = filas
+
+function _ldNum(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function _renderLandingInvitadores() {
+  const el = document.getElementById('pn-ld-invitadores');
+  if (!el) return;
+  // (a) la vista todavia no existe o fallo la consulta -> fail-open, no rompe el sub-tab
+  if (!_ldInvRows) {
+    el.innerHTML = '<div class="empty">La medicion de llegadas por link de invitador aun no esta disponible</div>';
+    return;
+  }
+  // (b) la vista responde vacia
+  if (!_ldInvRows.length) {
+    el.innerHTML = '<div class="empty">Aun no hay visitas atribuidas a ningun link de invitador</div>';
+    return;
+  }
+  // (c) hay filas -> tabla. Nombre del invitador cruzado en el cliente contra _invitadores.
+  const nomMap = {};
+  (_invitadores || []).forEach(i => {
+    const c = (i.codigo || '').trim();
+    if (c) nomMap[c] = i.nombre || '';
+  });
+  // Orden por personas (visitantes unicos) descendente; bigint puede venir como string o null.
+  const filas = _ldInvRows.slice().sort((a, b) => _ldNum(b.visitantes_unicos) - _ldNum(a.visitantes_unicos));
+  const totalPers = filas.reduce((a, r) => a + _ldNum(r.visitantes_unicos), 0);
+  const maxPers = Math.max(...filas.map(r => _ldNum(r.visitantes_unicos)), 1);
+  const cell = (extra) => 'font-size:11px;color:var(--ink3);text-align:right;' + (extra || '');
+  el.innerHTML =
+    '<div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">' + filas.length + ' link(s) con accesos · total historico ' + totalPers.toLocaleString('es-CO') + ' personas</div>' +
+    '<div style="display:flex;align-items:center;gap:10px;padding:.2rem 0 .4rem;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);font-weight:600">' +
+      '<span style="width:16px;text-align:right">#</span>' +
+      '<span style="flex:1;min-width:0">Invitador (nombre / codigo)</span>' +
+      '<span style="flex:1;max-width:120px"></span>' +
+      '<span style="min-width:62px;text-align:right">Personas</span>' +
+      '<span style="min-width:62px;text-align:right">Visitas</span>' +
+      '<span style="min-width:46px;text-align:right">% del total</span>' +
+      '<span style="min-width:78px;text-align:right">Ultima visita</span>' +
+    '</div>' +
+    filas.map((r, i) => {
+      const cod = String(r.ref_codigo || '');
+      const nom = nomMap[cod] || '';
+      const pers = _ldNum(r.visitantes_unicos);
+      const visitas = _ldNum(r.pageviews);
+      const pct = totalPers > 0 ? (pers / totalPers * 100) : 0;
+      const pctTxt = (pct >= 10 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
+      const ult = r.ultima_visita ? String(r.ultima_visita).slice(0, 10) : '—';
+      return '<div style="display:flex;align-items:center;gap:10px;padding:.4rem 0;border-bottom:1px solid var(--surface)">' +
+        '<span style="font-size:11px;color:var(--ink3);width:16px;text-align:right">' + (i + 1) + '</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(nom || cod || '—') + '</div>' +
+          '<div style="font-size:11px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(cod || 'sin codigo') + ' · ' + _ldNum(r.eventos).toLocaleString('es-CO') + ' eventos</div>' +
+        '</div>' +
+        '<div style="flex:1;max-width:120px;background:var(--surface);border-radius:4px;height:6px;overflow:hidden">' +
+          '<div style="height:100%;background:var(--gold);width:' + Math.round(pers / maxPers * 100) + '%;border-radius:4px"></div>' +
+        '</div>' +
+        '<span style="font-size:12px;font-weight:600;color:var(--gold-d);min-width:62px;text-align:right">' + pers.toLocaleString('es-CO') + '</span>' +
+        '<span style="' + cell() + 'min-width:62px">' + visitas.toLocaleString('es-CO') + '</span>' +
+        '<span style="' + cell() + 'min-width:46px">' + pctTxt + '</span>' +
+        '<span style="' + cell() + 'min-width:78px">' + esc(ult) + '</span>' +
+      '</div>';
+    }).join('');
+}
+
+async function renderLandingInvitadores(slug) {
+  const el = document.getElementById('pn-ld-invitadores');
+  if (!el || !SB || !ORG_ID) return;
+  const key = String(slug || '');
+  if (_ldInvKey !== key) {
+    _ldInvKey = null; _ldInvRows = null;   // estado fail-open mientras consulta
+    try {
+      let q = SB.from('v_landing_invitadores').select('*').eq('org_id', ORG_ID);
+      if (slug) q = q.eq('evento_slug', slug);
+      q = q.order('pageviews', { ascending: false });
+      const res = await sbQuery(q, 15000);
+      if (res && !res.error && res.data) { _ldInvRows = res.data || []; _ldInvKey = key; }
+    } catch (e) {
+      console.error('[renderLandingInvitadores]', e.message);
+    }
+  }
+  _renderLandingInvitadores();
+}
+
 async function renderLanding() {
   if (!SB || !ORG_ID) return;
   const wrap = document.querySelector('[data-pnl-tab="landing"]');
@@ -9359,6 +9457,9 @@ async function renderLanding() {
           }).join('');
       }
     }
+    // ADR-072 · Llegadas por link de invitador (accesos; total historico, ignora _pnPeriod)
+    await renderLandingInvitadores(slug);
+
   } catch (e) {
     console.error('[renderLanding]', e.message);
   }

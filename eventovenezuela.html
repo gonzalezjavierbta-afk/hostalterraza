@@ -590,6 +590,15 @@
 
             const slugFromUrl = () => (new URLSearchParams(window.location.search).get('slug') || '');
 
+            // ADR-072: codigo de invitador del visitante (?ref=) para la columna
+            // page_events.ref_codigo. NO es el resultado de buscarlo en la tabla
+            // `invitadores`: el lookup es asincrono (esta insignia es sincrona y no
+            // puede esperar un await) y el trafico no se debe perder si falla.
+            // Normalizacion en la frontera: vacio si no hay, mayusculas, sin espacios
+            // al borde, solo [A-Z0-9-], tope 32. Distinto de page_ref (HTTP Referer).
+            let refCodigoTel = '';
+            const normRefCodigo = (raw) => String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+
             const buildEvt = (type, action, label, value, extra) => ({
                 org_id: CTX.org_id,
                 evento_id: CTX.evento_id,
@@ -597,6 +606,7 @@
                 evento_nombre: CTX.evento_nombre,
                 page_url: String(window.location.href).slice(0, 2048),
                 page_ref: String(document.referrer || '').slice(0, 500),
+                ref_codigo: refCodigoTel,
                 event_type: type,
                 event_action: String(action || '').slice(0, 100),
                 event_label: String(label || '').slice(0, 200),
@@ -714,6 +724,10 @@
             depthOnScroll();
 
             return {
+                // Atribucion de invitador (?ref=<codigo>): guarda el codigo CRUDO
+                // de la URL para el proximo registro. Idempotente y fail-open: si
+                // nunca se llama, ref_codigo viaja en ''.
+                setRefCodigo: (raw) => { refCodigoTel = normRefCodigo(raw); },
                 // Contexto del evento: se llama dentro de initEvento cuando el landing
                 // ya cargo el evento (lanza el pageview con el silo activo en tpl).
                 setContext: (ev) => {
@@ -999,7 +1013,14 @@
 
         async function initEvento() {
             const slug = new URLSearchParams(window.location.search).get('slug');
+            const refParam = new URLSearchParams(window.location.search).get('ref') || '';
             if (!slug) return;
+            // ADR-072: la insignia de telemetria guarda el codigo crudo de ?ref=
+            // para page_events.ref_codigo, aunque despues el evento falle en cargar
+            // (mismo patron fail-open que el setContext de la linea de telemetria).
+            if (typeof __ANALYTICS !== 'undefined') {
+                try { __ANALYTICS.setRefCodigo(refParam); } catch (eR) { console.debug('[Analytics]', eR.message); }
+            }
             try {
                 // Timeout de 8s para sbQuery (Resiliencia P4)
                 const sbPromise = sbClient.from('eventos').select('*, organizaciones(nombre)').eq('slug', slug).single();

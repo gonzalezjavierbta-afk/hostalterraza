@@ -179,4 +179,19 @@ task:
 
 **Pendiente de commit (working tree):** ADR-071 + fila de `DECISIONS.md` + recalibracion en `anti-absorcion`/`eficiencia-recursos`/`cascada-tier` + `scripts/session_close.js` + `scripts/smoke_qa_asserts.js` + este cierre documental. Ver `NEXT.md` hito -37.
 
+### Cierre de TSK-100 (2026-10-02) — DECIDIDA, alcance real ejecutado (migracion ESCRITA y NO APLICADA)
+
+**Decision:** ADR-072 (Atribucion del link de invitador en la telemetria del landing). `page_events` solo guardaba `page_ref` (HTTP Referer = ruido de red), nunca el codigo de invitador: no habia forma de saber cuantas personas llegaban por cada link ni cuantas se perdian antes de registrarse.
+
+**Alcance REAL ejecutado (verificado contra los archivos reales con `git diff --numstat`, ADR-006 — prevalece el archivo):**
+
+1. **4 archivos modificados en el working tree, 201 lineas anadidas y 0 borradas** (`git diff --numstat`: `admin.html` +101 / -0, `evento-app.html` +18 / -0, `eventovenezuela.html` +21 / -0, `registroaforo.html` +61 / -0).
+2. **1 archivo nuevo:** `migrations/adr072_page_events_ref_invitador.sql`, **257 lineas**, 100% ASCII, idempotente al 100%, con bloque de verificacion comentado para Direccion y bloque de ROLLBACK documentado al final. Tres objetos: columna `ref_codigo text NOT NULL DEFAULT ''` en `page_events` (agregada al FINAL, de 15 a 16 columnas, metadata-only en PostgreSQL 17), indice PARCIAL `idx_page_events_org_ref_created (org_id, ref_codigo, created_at DESC) WHERE ref_codigo <> ''`, y vista `v_landing_invitadores` con `WITH (security_invoker = true)` + `GRANT SELECT TO authenticated` que expone `pageviews`, `visitantes_unicos`, `eventos`, `primera_visita`, `ultima_visita` agrupados por `org_id, evento_slug, ref_codigo`.
+3. **`page_ref` NO se toco** (no se renombra ni se borra; Cero Borrado) y **`page_events` sigue con EXACTAMENTE 2 politicas RLS**: este ciclo no creo RPC, ni triggers, ni politicas, ni tablas, y no modifico ninguna de las 4 vistas de ADR-050. `admin.html` lee la vista con `.eq('org_id', ORG_ID)` (`admin.html:9321`), misma mitigacion a nivel de consulta que las 4 vistas previas.
+4. **`migrations/adr072_page_events_ref_invitador.sql` esta ESCRITA pero NO APLICADA en produccion.** La aplica Direccion en el Supabase SQL Editor (gate de riesgo de `AGENTS.md` §2). El bloque de rankeo del panel debe seguir mostrando el empty state hasta entonces.
+5. **Orden de despliegue obligatorio: (1) aplicar la migracion, (2) desplegar el front.** Al reves, los 3 motores siguen mandando el INSERT sin la columna `ref_codigo` y ese INSERT **falla en silencio** (fire-and-forget): no se registra ninguna llegada y no hay error visible.
+6. **Deuda registrada `[DEUDA-EXPRESS]`:** `registroaforo.html` usa claves de sesion/visitante propias (`ht_reg_analytics_*`) mientras los silos usan `ht_analytics_*`, de modo que una misma persona que llega por link de invitador al landing y luego salta al formulario cuenta como **2 visitantes distintos** en `v_landing_invitadores`. No se unifico en este pase; queda para una sesion futura con su propio ADR.
+
+**Deuda que NO se toco (deliberado):** trafico historico por `ref` **irrecuperable** (las filas previas quedan en `ref_codigo = ''` y no se pueden atribuir sin inventar dato; la vista los excluye y el indice es parcial sobre ese mismo predicado), y el riesgo de tenancy ya conocido: `page_events_auth_read` sigue con `USING true` (barrido TSK-026) y la vista nueva, al ser `security_invoker`, **hereda esa exposicion** sin mitigacion propia.
+
 

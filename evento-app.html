@@ -426,6 +426,15 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
 
             const slugFromUrl = () => (new URLSearchParams(window.location.search).get('slug') || '');
 
+            // ADR-072: codigo de invitador del visitante (?ref=) para la columna
+            // page_events.ref_codigo. NO es el resultado de buscarlo en la tabla
+            // `invitadores`: el lookup es asincrono (esta insignia es sincrona y no
+            // puede esperar un await) y el trafico no se debe perder si falla.
+            // Normalizacion en la frontera: vacio si no hay, mayusculas, sin espacios
+            // al borde, solo [A-Z0-9-], tope 32. Distinto de page_ref (HTTP Referer).
+            let refCodigoTel = '';
+            const normRefCodigo = (raw) => String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+
             const buildEvt = (type, action, label, value, extra) => ({
                 org_id: CTX.org_id,
                 evento_id: CTX.evento_id,
@@ -433,6 +442,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 evento_nombre: CTX.evento_nombre,
                 page_url: String(window.location.href).slice(0, 2048),
                 page_ref: String(document.referrer || '').slice(0, 500),
+                ref_codigo: refCodigoTel,
                 event_type: type,
                 event_action: String(action || '').slice(0, 100),
                 event_label: String(label || '').slice(0, 200),
@@ -554,6 +564,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             depthOnScroll();
 
             return {
+                // Atribucion de invitador (?ref=<codigo>): guarda el codigo CRUDO
+                // de la URL para el proximo registro. Idempotente y fail-open: si
+                // nunca se llama (p.ej. preview), ref_codigo viaja en ''.
+                setRefCodigo: (raw) => { refCodigoTel = normRefCodigo(raw); },
                 // Contexto del evento: se llama dentro de initEvento cuando el
                 // landing ya cargó el evento (lanza el pageview).
                 setContext: (ev) => {
@@ -1027,6 +1041,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             const __q = new URLSearchParams(window.location.search);
             const slug = __q.get('slug');
             const refParam = (__q.get('ref') || '').trim().toUpperCase();
+            // ADR-072: la insignia de telemetria ya guarda el codigo crudo de ?ref=
+            // para page_events.ref_codigo (fail-open: si el lookup de `invitadores`
+            // falla, el trafico sigue atribuido al codigo de la URL).
+            __ANALYTICS.setRefCodigo(refParam);
             // Atribucion de invitador (fail-open): si ?ref=<codigo> apunta a un
             // invitador real, el registro se atribuye; si algo falla la landing sigue.
             let refCodigo = '', refNombre = '';
