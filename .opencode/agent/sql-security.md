@@ -2,7 +2,7 @@
 name: sql-security
 description: Seguridad crítica, RLS y persistencia SQL de ExploraCO - políticas de acceso, autenticación, claves, migraciones e integridad de datos.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

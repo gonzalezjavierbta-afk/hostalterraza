@@ -75,6 +75,7 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-013](TASKS-DETALLE.md#tsk-013) | Creative AI | Desarrollar el módulo aditivo "08 Actualizaciones" y el desglose de tarjetas para la sección Historia de b5 | Refinamiento y UX | L232-232 |
 | [TSK-014](TASKS-DETALLE.md#tsk-014) | Documentation | Sincronizar permanentemente PROJECT.md y BLUEPRINT.md bajo el estándar v127-MASTER | Refinamiento y UX | L234-234 |
 | [TSK-039](TASKS-DETALLE.md#tsk-039) | Direccion / Lead Developer (deuda MENOR + decision futura derivada de… | (1) `#ld-form-redirect` usa `type="url"` sin normalizacion de esquema — normalizar (prefijar `https://` si… | Contratos de Configuracion Wizard/Landing (ADR-047) —… | L237-238 |
+| **TSK-099** | Lead Developer (ADM) + Chief Architect (ADR) | **Permitir invocar los 16 subagentes desde `free-plan`/`free-build` sin cambiar de tier** — pendiente para la proxima sesion | Gobernanza de tier (ADR-069) | Ver nota completa al final del documento. **Hallazgo verificado 2026-10-02:** la allow-list de `permission.task` en `.opencode/agent/free-build.md` y `free-plan.md` es IDENTICA y autoriza 7 de 16 subagentes; quedan en `deny` (via `"*": deny`) los 9 de riesgo: `admin-dev`, `architect-review`, `architect`, `backend-dev`, `data-migration`, `renderer-dev`, `research-agent`, `seo-dev`, `sql-security`. **Aclaracion importante: en la sesion del 2026-10-02 los subagentes SI se invocaron sin error de permiso** (`explore` x2, `js-silo-dev`, `frontend-tpl` x2, `qa-auditor`, `docs-keeper` = 7 despachos, 7 informes recibidos); el fallo fue de PRESUPUESTO DE TURNOS, no de permiso. La correccion sigue siendo necesaria para delegar dominios de riesgo, pero NO explica los 3 agotamientos. |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -88,4 +89,71 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-009](TASKS-DETALLE.md#tsk-009) | QA / Chief Architect | Generación e integración de tickets digitales para Apple Wallet (.pkpass) y Google Wallet | Infraestructura SaaS (Bloqueante) | L255-256 |
 
 Cerradas (50): TSK-096, TSK-090, TSK-091, TSK-092, TSK-093, TSK-094, TSK-082, TSK-086, TSK-087, TSK-081 (a), TSK-081 (b), TSK-081, TSK-079, TSK-078, TSK-074, TSK-076, TSK-077, TSK-043, TSK-050, TSK-052, TSK-062, TSK-064, TSK-065, TSK-066, TSK-067, TSK-069, TSK-068, TSK-057, TSK-058, TSK-059, TSK-024, TSK-030, TSK-034, TSK-029, TSK-032, TSK-033, TSK-005, TSK-015, TSK-019, TSK-020, TSK-021, TSK-022, TSK-023, TSK-027, TSK-036, TSK-037, TSK-038, TSK-040, TSK-041, TSK-042 → [TASKS-ARCHIVO.md](TASKS-ARCHIVO.md).
+
+---
+
+## TSK-099 — Habilitar los 16 subagentes en ruta FREE (nota para la proxima sesion, 2026-10-02)
+
+### Que hay que corregir
+
+En `.opencode/agent/free-build.md` y `.opencode/agent/free-plan.md`, el bloque `permission.task` es IDENTICO y tiene esta forma:
+
+```yaml
+task:
+  "*": deny
+  docs-keeper: allow
+  explore: allow
+  js-silo-dev: allow
+  frontend-tpl: allow
+  content-loader: allow
+  media-reader: allow
+  qa-auditor: allow
+```
+
+Los 16 subagentes del roster son: `admin-dev`, `architect`, `architect-review`, `backend-dev`, `content-loader`, `data-migration`, `docs-keeper`, `explore`, `frontend-tpl`, `js-silo-dev`, `media-reader`, `qa-auditor`, `renderer-dev`, `research-agent`, `seo-dev`, `sql-security`. Faltan 9 en `allow`, asi que `"*": deny` los bloquea.
+
+### Correccion propuesta (2 archivos, mismo cambio en ambos)
+
+Agregar las 9 lineas al bloque `task:` de `free-build.md` y `free-plan.md`, de modo que la allow-list quede completa:
+
+```yaml
+task:
+  "*": deny
+  # 7 de bajo riesgo (invocables sin gate)
+  docs-keeper: allow
+  explore: allow
+  js-silo-dev: allow
+  frontend-tpl: allow
+  content-loader: allow
+  media-reader: allow
+  qa-auditor: allow
+  # 9 de riesgo: ahora invocables, pero el GATE de §2 sigue vigente
+  admin-dev: allow
+  architect: allow
+  architect-review: allow
+  backend-dev: allow
+  data-migration: allow
+  renderer-dev: allow
+  research-agent: allow
+  seo-dev: allow
+  sql-security: allow
+```
+
+### Lo que NO hay que tocar (y por que)
+
+1. **NO cambiar `model:` de los 16 subagentes.** ADR-069 (herencia) ya funciona: los subagentes omiten `model:` y heredan `big-pickle` desde FREE. El reporte de `usage_report.js` lo confirma: las 7 sesiones de la sesion del 2026-10-02 corrieron en `opencode/big-pickle` con `cost=0.000000`. Agregar `model:` explicito seria una regresion a la ruta hibrida que ADR-067 elimino.
+2. **NO quitar `"*": deny`.** Es la red de seguridad: si mañana se agrega un subagente nuevo y no se autoriza aqui, lo negaria en silencio. El orden `"*": deny` primero + excepciones explicas es lo correcto.
+3. **NO eliminar el gate de confirmacion de `AGENTS.md` §2.** Este cambio abre la *posibilidad tecnica* de invocar un dominio de riesgo desde FREE; el gate sigue siendo la regla que exige confirmacion explicita del usuario antes de ejecutar RLS/esquema, migraciones, el motor `evento-app.html` y arquitectura/ADR. Permitir invocar != autorizar ejecutar.
+4. **NO cambiar `subagent_depth`.** Sigue en `1` en `opencode.json`; la sesion del 2026-10-02 produjo 7 subagentes de primer nivel sin problema.
+
+### Actualizar en el mismo cambio (si no se hace, la gobernanza queda incoherentente)
+
+- `AGENTS.md` §1 y §2: el texto actual dice "Allow-list FREE (ADR-069)" y lista 7 dominios; y `free-build.md`/`free-plan.md` dicen "los 7 subagentes de tu allow-list FREE" y "Esos 9 dominios NO estan en tu allow-list de `permission.task`". Con el cambio, esas 4 frases quedan falsas. Reemplazar por "los 16 subagentes son invocables; los 9 de riesgo exigen el gate de confirmacion de §2".
+- `DECISIONS.md` + nuevo ADR: **superponer** ADR-069 y dejar el cambio trazable (no editar ADR-069 en silencio; un ADR aceptado se supersede, no se reescribe).
+- Verificacion: `node scripts/express_check.js` (debe seguir en PASS 27/FAIL 0) + confirmar que `free-build.md` y `free-plan.md` quedaron con las mismas 16 lineas `allow`.
+
+### Advertencia honesta: esto NO arregla los 3 subagentes agotados de la sesion del 2026-10-02
+
+`qa-auditor`, `docs-keeper` y `js-silo-dev` NO fallaron por permiso: se invocaron, corrieron 21-31 turnos y devolvieron informe. Lo que fallo fue que agotaron su presupuesto de pasos antes de escribir su entrega (QA no escribio los asserts; docs-keeper no escribio ningun archivo). Ampliar la allow-list a 16 no cambia eso: el sintoma es el brief, no el permiso. Para los subagentes que deben EDITAR (no solo reportar), el brief tiene que traer `archivo:linea` verificados y un contrato de retorno compacto (Regla 12). Ver `errores/E25-stall-de-implementacion-en-un-subagente-el.md` y `errores/E24-guardian-que-falla-por-el-valor-correcto-el.md`.
+
 

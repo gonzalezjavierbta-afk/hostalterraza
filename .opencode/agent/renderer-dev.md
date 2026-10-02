@@ -2,7 +2,7 @@
 name: renderer-dev
 description: Lead del motor de render publico de ExploraCO - secciones condicionales por categoría, helpers de formato y rewrites de slugs de paginas de destino.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 25
 permission:
   edit: allow
   bash: allow

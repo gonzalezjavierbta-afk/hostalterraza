@@ -2,7 +2,7 @@
 name: admin-dev
 description: Lead de admin.html y scanner.html - sub-tabs por categoría, motor CATEGORY_TAG_FIELDS, loadForm() y balance de divs.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

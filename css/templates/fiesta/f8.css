@@ -321,6 +321,12 @@ pointer-events: none;
     100% { filter: drop-shadow(0 0 22px color-mix(in srgb, var(--f8-neon-pink) 45%, transparent)) drop-shadow(0 0 45px color-mix(in srgb, var(--f8-neon-purple) 28%, transparent)); }
 }
 
+/* v1.5.0 (criterio kernel de 2 lineas): line1 = NOMBRE COMPLETO del evento y
+   line2 = SUBTITULO capturado en el admin. Estas 2 reglas quedan DETRAS del
+   display:none !important de #event-title (abajo, decision del Director: el
+   titulo va rotulado dentro de la imagen del cabezote), asi que no se ven.
+   Se dejan escritas, sin cambio de valores, para que el dia que el titulo se
+   vuelva a pintar nodepends del criterio de dos lineas. */
 .tpl-f8 #event-title .hero-title-line1 {
     display: block;
     line-height: 1;
@@ -331,6 +337,12 @@ pointer-events: none;
     line-height: 1;
     font-size: 0.65em;
 }
+
+/* f8 NO debe declararse con capacidad de 2 lineas: si el kernel metiera el
+   subtitulo en .hero-title-line2, quedaria dentro de #event-title y por tanto
+   oculto con el titulo. En f8 el subtitulo tiene que salir por
+   #event-subtitle (u otro camino FUERA de #event-title). Sin regla propia aqui
+   a proposito: una regla de bloque lo duplicaria si el kernel lo pinta doble. */
 
 /* Título oculto (Cero Borrado: display:none) — el título va integrado en la
    imagen de fondo del cabezote (dirección del Director, evento salsa-flow-nt65). */

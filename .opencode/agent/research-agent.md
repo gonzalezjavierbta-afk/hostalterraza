@@ -2,7 +2,7 @@
 name: research-agent
 description: Ingestor y validador de fichas .md de destino ya producidas por Gemini - valida estructura, fotos Wikimedia, coordenadas y ratings antes del handoff.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

@@ -2,7 +2,7 @@
 name: content-loader
 description: Creador de páginas dinámicas de destino de ExploraCO - genera seed + loader + smoke de la Fase 9, ejecuta el Escudo GOLD y carga a producción.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 25
 permission:
   edit: allow
   bash: allow

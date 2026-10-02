@@ -370,14 +370,37 @@
     word-wrap: break-word;
 }
 
-/* Lineas partidas del titulo (mismo contrato que f6/f8) - soporte defensivo. */
+/* Lineas del titulo (v1.5.0, criterio kernel de 2 lineas): line1 = NOMBRE
+   COMPLETO del evento y line2 = SUBTITULO capturado en el admin. Antes eran dos
+   fragmentos del mismo texto y por eso ambas heredaban el tamano del display;
+   ahora line2 baja a 0.65em, el mismo escalon que usan f6/f8/f10/f13, para que
+   un subtitulo no compita con el nombre. Sin cambios de paleta ni tipografia. */
 .tpl-f9 .hero-title-line1,
 .tpl-f9 .hero-title-line2 {
     display: block;
+    overflow-wrap: break-word;
+    text-wrap: balance;
 }
 
 .tpl-f9 .hero-title-line2 {
     color: var(--f9-gold);
+    font-size: 0.65em;
+    line-height: 1.25;
+}
+
+/* CAMINO UNICO DEL SUBTITULO EN f9: lo muestra .hero-title-line2 (arriba).
+    #event-subtitle NO lleva regla propia en este silo a proposito: si el kernel
+    lo encendiera tambien, el subtitulo apareceria dos veces. El apagado de
+    #event-subtitle en los silos de 2 lineas es decision del kernel, no del CSS. */
+
+/* v1.6.0: #event-subtitle queda dentro del bloque de titulo para silos de 2
+   lineas. Neutralizacion silenciosa de margenes UA y coherencia tipografica. */
+.tpl-f9 #event-subtitle {
+    margin: 0;
+    line-height: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 }
 
 /* ==========================================================================

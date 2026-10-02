@@ -2,7 +2,7 @@
 name: architect-review
 description: Revisor de arquitectura y aprobación de decisiones - audita el impacto de cambios en el motor de render y backend, y valida planes técnicos.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 25
 permission:
   edit: allow
   bash: allow

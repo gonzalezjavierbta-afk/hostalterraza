@@ -2,7 +2,7 @@
 name: architect
 description: Chief Architect de ExploraCO - esquemas de tags JSONB por categoría, ADRs, patrón de 7 pasos y aprobación de diseño antes de implementar.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 25
 permission:
   edit: allow
   bash: allow

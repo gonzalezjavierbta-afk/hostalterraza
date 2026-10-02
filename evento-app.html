@@ -817,6 +817,40 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             return false;
         }
 
+        // (2) CAPACIDAD DE TITULO EN 2 LINEAS (allowlist explicita, mismo criterio
+        // que __esFamiliaF9: token completo, nunca prefijo). Un silo entra aqui
+        // SOLO si su CSS ya tiene .hero-title-line1 / .hero-title-line2, porque esas
+        // clases son las que pintan la linea 1 y la linea 2 del bloque de titulo.
+        //   - tpl-f8  FUERA a proposito: su #event-title esta en display:none !important,
+        //     asi que la linea 2 (el subtitulo) nunca se veria: quedaria InVisible.
+        //   - tpl-f9b FUERA a proposito: ya tiene su propio bloque #event-subtitle con
+        //     estilo propio; meterlo tambien en el titulo lo duplicaria.
+        // La tabla del admin (admin.html _THEME_TITULO_2_LINEAS) y esta deben
+        // coincidir: si el admin ofrece l2 y el kernel no la pinta, el dato se
+        // pierde en silencio. Anyadir un silo aqui REQUIERE su CSS antes.
+        function __esTitulo2Lineas() {
+            const allow = ['tpl-f6', 'tpl-f9', 'tpl-f10', 'tpl-f13'];
+            const toks = String(document.body.className || '').split(/\s+/);
+            for (let i = 0; i < toks.length; i++) {
+                if (allow.indexOf(String(toks[i]).toLowerCase()) !== -1) return true;
+            }
+            return false;
+        }
+
+        // (3) CAPACIDAD DE META EN 2 LINEAS (.meta-line). Allowlist explicita y
+        // CONSERVADORA: .meta-line solo tiene CSS en .tpl-f9 y .tpl-f9b (ver f12.css:735,
+        // que lo advierte). Encenderlo en otro silo imprimiria los dos spans sin estilo
+        // (una linea cruda) y DEGRADARIA el hero, asi que la lista no crece sin CSS.
+        // Por eso el admin tampoco debe ofrecer los campos l2 de meta fuera de aqui.
+        function __esMeta2Lineas() {
+            const allow = ['tpl-f9', 'tpl-f9b'];
+            const toks = String(document.body.className || '').split(/\s+/);
+            for (let i = 0; i < toks.length; i++) {
+                if (allow.indexOf(String(toks[i]).toLowerCase()) !== -1) return true;
+            }
+            return false;
+        }
+
         // (2) SILO RASTRO MC (dueno del texto editorial).
         // El silo 'tpl-f9' LITERAL es el dueno del contenido editorial de RASTRO MC
         // (descripcion de prelanzamiento y FAQ de 5 preguntas). Se compara como TOKEN
@@ -1379,20 +1413,33 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // MAPEO DE HERO & METADATA
                 const __tituloEl = document.getElementById('event-title');
                 const __tituloRaw = String(effNombre || '').toUpperCase();
-                // v222 (aditivo, solo silo .tpl-f6 / v300 .tpl-f8): título en 2 líneas físico
-                // (contrato: #event-title sigue intacto, se añaden 2 spans hijos).
-                if (document.body.className.includes('tpl-f6') || document.body.className.includes('tpl-f8')) {
-                    const __palabras = __tituloRaw.split(' ');
-                    const __mitad = Math.ceil(__palabras.length / 2);
+                // v310 (2026-10-02, cambio de contrato): el titulo en 2 lineas YA NO se
+                // parte partiendo la lista de palabras por la mitad. La linea 1 es el
+                // nombre del evento y la linea 2 es el SUBTITULO que el admin captura en
+                // Cimientos. Razon: partir el nombre a la mitad dejaba el subtitulo
+                // huerfano y obligaba a escribirlo dos veces (admin y kernel); ahora hay
+                // una sola fuente. El smoke scripts/smoke_hero_contract.js verifica que
+                // el split no regrese.
+                // Se reutilizan las clases .hero-title-line1/.hero-title-line2 que el CSS
+                // de f6/f9/f10/f13 ya tenia para el split viejo: el path visual no cambia,
+                // solo cambia QUE TEXTO cae en cada span. Silo sin capacidad -> una linea y
+                // el subtitulo se dibuja en su propio bloque #event-subtitle (abajo).
+                const __esTitulo2L = __esTitulo2Lineas();
+                const __subtituloRaw = String(effContent.subtitulo || '').trim();
+                if (__esTitulo2L) {
                     const __l1 = document.createElement('span');
                     __l1.className = 'hero-title-line1';
-                    __l1.textContent = __palabras.slice(0, __mitad).join(' ');
-                    const __l2 = document.createElement('span');
-                    __l2.className = 'hero-title-line2';
-                    __l2.textContent = __palabras.slice(__mitad).join(' ');
+                    __l1.textContent = __tituloRaw;
                     __tituloEl.textContent = '';
                     __tituloEl.appendChild(__l1);
-                    __tituloEl.appendChild(__l2);
+                    // Sin subtitulo no hay linea 2: se deja el span fuera para no crear
+                    // una linea vacia que empuje el layout (regla de vacio, fail-open).
+                    if (__subtituloRaw) {
+                        const __l2 = document.createElement('span');
+                        __l2.className = 'hero-title-line2';
+                        __l2.textContent = __subtituloRaw;
+                        __tituloEl.appendChild(__l2);
+                    }
                 } else {
                     __tituloEl.innerText = __tituloRaw;
                 }
@@ -1402,8 +1449,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // vacio: sin texto queda oculto y no ocupa espacio. Cero Borrado.
                 const __subtituloEl = document.getElementById('event-subtitle');
                 if (__subtituloEl) {
-                    const __subtituloRaw = String(effContent.subtitulo || '').trim();
-                    if (__subtituloRaw) {
+                    // CAMINO UNICO DEL SUBTITULO: si el titulo ya lo pintó como linea 2
+                    // (.hero-title-line2), aquí se queda oculto. Si se encendiera tambien,
+                    // el mismo texto aparecería dos veces en el hero.
+                    if (__subtituloRaw && !__esTitulo2L) {
                         __subtituloEl.textContent = __subtituloRaw;
                         __subtituloEl.style.display = '';
                     } else {
@@ -1421,7 +1470,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // linea unica historica; asi content.meta no degrada el hero de f5/f6/f8.
                 // v1.5.0 (riesgo 2 del ADR-054 cerrado): el gate pasa por la allowlist de
                 // familia. Antes era includes('tpl-f9'), un match por prefijo.
-                const __esF9Meta = __esFamiliaF9();
+                const __esF9Meta = __esMeta2Lineas();
                 const __metaSet = (id, one, two, esFecha) => {
                     const el = document.getElementById(id);
                     if (!el) return;

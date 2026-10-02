@@ -302,10 +302,19 @@
     max-width: 100%;
 }
 
+/* v1.5.0 (criterio kernel de 2 lineas): line1 = NOMBRE COMPLETO del evento y
+   line2 = SUBTITULO capturado en el admin (ya no son dos fragmentos del mismo
+   texto). Ajustes minimos, sin tocar paleta ni tipografia:
+   - line1 ahora puede ser 2x mas larga: overflow-wrap + text-wrap: balance para
+     que parta por palabra y no desborde ni alinee a la izquierda al ajustar.
+   - line2 ya no es parte del nombre: se le anula el uppercase y el tracking del
+     padre (calibrados para el display de 13vw, no para un subtitulo). */
 .tpl-f6 #event-title .hero-title-line1 {
     display: block;
     color: var(--tpl-black);
     line-height: 1;
+    overflow-wrap: break-word;
+    text-wrap: balance;
 }
 
 .tpl-f6 #event-title .hero-title-line2 {
@@ -315,6 +324,25 @@
     text-shadow: 3px 3px 0 var(--tpl-black);
     line-height: 1;
     font-size: 0.65em;
+    text-transform: none;
+    letter-spacing: normal;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+}
+
+/* CAMINO UNICO DEL SUBTITULO EN f6: lo muestra .hero-title-line2 (arriba).
+    #event-subtitle NO lleva regla propia en este silo a proposito: si el kernel
+    lo encendiera tambien, el subtitulo apareceria dos veces. El apagado de
+    #event-subtitle en los silos de 2 lineas es decision del kernel, no del CSS. */
+
+/* v1.6.0: #event-subtitle queda dentro del bloque de titulo para silos de 2
+   lineas. Neutralizacion silenciosa de margenes UA y coherencia tipografica. */
+.tpl-f6 #event-subtitle {
+    margin: 0;
+    line-height: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 }
 
 /* ==========================================================================

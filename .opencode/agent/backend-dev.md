@@ -2,7 +2,7 @@
 name: backend-dev
 description: Lead del backend serverless de ExploraCO - endpoints api/*.js, funciones CommonJS para Vercel Hobby, merge JSONB y ASCII-safety estricto.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

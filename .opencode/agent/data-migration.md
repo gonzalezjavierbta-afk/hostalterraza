@@ -2,7 +2,7 @@
 name: data-migration
 description: Operaciones de base de datos de ExploraCO - migraciones de esquema, limpieza de datos y seeds masivos en Neon PostgreSQL con trazabilidad.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

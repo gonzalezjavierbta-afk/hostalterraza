@@ -2,7 +2,7 @@
 name: seo-dev
 description: SEO de ExploraCO - sitemap.xml, meta tags, Open Graph, robots.txt, redirects e indexabilidad, con websearch intensivo si el ranking está en juego.
 mode: subagent
-model: opencode-go/qwen3.8-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

@@ -42,10 +42,11 @@ El costo de una sesión crece de forma aproximadamente cuadrática con sus turno
 *   El orquestador que supere **20-25 llamadas directas** (`read`/`grep`/`glob`) se DETIENE y delega a `@explore`.
 *   El reconocimiento masivo siempre va a `@explore`, con brief de salida acotado (que devuelva `archivo:línea`, no el contenido).
 
-## Free-first con escalado automático
+## Free-first con escalado con gate (antes "automático") [supersedido por ADR-069, 2026-10-02]
 
 *   Para trabajo mecánico, repetitivo o de bajo riesgo se intenta SIEMPRE primero la ruta FREE.
 *   Si el subagente FREE falla, devuelve `partial`/`blocked` o no pasa la verificación, se escala AUTOMÁTICAMENTE a la ruta PRO del dominio, sin pedir permiso.
+    -   **[supersedido por ADR-069, 2026-10-02]** El escalado a PAGO NUNCA es automatico: exige confirmacion explicita del usuario (AGENTS.md seccion 2 / regla 13). Ademas, los 16 subagentes ya no son PAGO fijos: heredan el modelo del primario que los invoca.
 *   Los dominios de riesgo de runtime o seguridad (backend, renderer, admin, sql-security, arquitectura) van directo a PRO.
 *   Nunca desdoblar pro+free en paralelo (sesiones vacías = reloj puro).
 
@@ -67,6 +68,8 @@ Datos reales del feature Guest List, medidos con `scripts/usage_report.js` (prev
 | Feature registroaforo (2026-10-02, ruta FREE) | 10.922.712 tokens / 160 turnos = **63.994 tokens/turno**, `cache_read` 93,7%, costo $0 |
 | Subagentes en ruta FREE | **0** — el árbol `--tree` tiene 1 solo nodo; el aislamiento impide delegar, así que la única palanca es fragmentar |
 
+> **[supersedido por ADR-069, 2026-10-02]** Medicion de epoca (estado pre-ADR-069): el aislamiento ya no es norma; los 16 subagentes heredan el modelo del primario y la ruta FREE delega en el allow-list (docs-keeper, explore, js-silo-dev, frontend-tpl, content-loader, media-reader, qa-auditor), asi que fragmentar deja de ser la unica palanca. La medicion de tokens de la fila anterior (10.922.712 tokens / 160 turnos) se conserva como dato historico valido de esa sesion.
+
 Objetivo de control: bajar el `cache_read/turno` del orquestador por debajo de **~50.000**.
 
 ## Reglas duras derivadas de la medición del 2026-10-02
@@ -79,6 +82,7 @@ Estas cuatro reglas no son recomendaciones: cada una corrige una fuga medida en 
 4. **Verificación en una sola llamada `bash`.** Encadenar los `node scripts/*.js` con `;` y un solo resumen: ~5 turnos y ~2 min de reloj ahorrados por sesión.
 
 Corolario FREE: como la ruta FREE no puede delegar en `@explore` (los subagentes son PAGO), **el antidoto contra el contexto acumulado no es absorber la exploración sino abrir más sesiones cortas**.
+**[supersedido por ADR-069, 2026-10-02]** La ruta FREE SI puede delegar en el allow-list (docs-keeper, explore, js-silo-dev, frontend-tpl, content-loader, media-reader, qa-auditor) porque los subagentes heredan el modelo del primario; ya no son PAGO fijos.
 
 ## `scripts/usage_report.js` — contrato CONGELADO
 

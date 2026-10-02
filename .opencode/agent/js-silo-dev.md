@@ -2,7 +2,7 @@
 name: js-silo-dev
 description: Desarrollo JS/TS de ExploraCO con criterio de diseño - refactors y correcciones de lógica cuando la estructura o el riesgo de runtime importan.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow

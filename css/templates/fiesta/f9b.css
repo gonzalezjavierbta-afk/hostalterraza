@@ -1015,6 +1015,23 @@
    el titulo llega entero dentro de #event-title y se estiliza ahi. Eran codigo
    muerto y sostenian una promesa que el kernel no cumple. */
 
+/* v1.5.0 (criterio kernel de 2 lineas): el kernel ya no parte el titulo por la
+   mitad de palabras, asi que la nota de arriba queda superada como codigo, no
+   como historia. f9b NO declara capacidad de 2 lineas: su subtitulo ya tiene
+   bloque propio y disenado (#event-subtitle, seccion 7) y meterlo en
+   .hero-title-line2 lo mostraria dos veces y le perderia ese estilo. Estas 2
+   reglas son solo el seguro contra el error contrario: si alguien anade f9b a
+   la tabla de capacidad por error, los 2 spans/parten en bloque y no quedan
+   pegados en la misma linea. Sin color ni tamano: si f9b llegara a usar el
+   camino partido, el h1 los resuelve igual que hoy. */
+.tpl-f9b #event-title .hero-title-line1, .Tpl-F9b #event-title .hero-title-line1 {
+    display: block;
+}
+
+.tpl-f9b #event-title .hero-title-line2, .Tpl-F9b #event-title .hero-title-line2 {
+    display: block;
+}
+
 /* ==========================================================================
    6. COUNTDOWN - #unified-frame.unified-countdown-frame
    ========================================================================== */

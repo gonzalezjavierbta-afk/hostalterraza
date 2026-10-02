@@ -2,7 +2,7 @@
 name: docs-keeper
 description: Documentation Specialist de HostalTerraza - mantiene PROJECT.md, NEXT.md, TASKS.md, BLUEPRINT.md, DECISIONS.md y ERRORES_HISTORICOS.md.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 25
 permission:
   edit: allow
   bash: allow

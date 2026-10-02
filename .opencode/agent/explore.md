@@ -2,7 +2,7 @@
 name: explore
 description: Exploración profunda del repo - mapea archivos y flujos entre módulos, responde preguntas de estructura y justifica el impacto de un cambio.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 30
 permission:
   edit: deny
 ---

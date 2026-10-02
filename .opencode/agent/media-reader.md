@@ -2,7 +2,7 @@
 name: media-reader
 description: Analista multimodal de ExploraCO - interpreta imágenes, audio, video y PDFs cuando el criterio visual decide entre lecturas del mismo material.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: deny
   bash: allow

@@ -453,12 +453,14 @@ tr:hover td{background:var(--surface)}
       <div class="ch">Nuevo evento</div>
       <div id="ev-alert"></div>
 
-      <!-- ══ WIZARD INTELIGENTE (ADR-021) — Navegación de 4 pasos ══ -->
+      <!-- ══ WIZARD INTELIGENTE (ADR-021) — Navegación de 5 pasos (2026-10-02: eran 4;
+           se separó 'Registro + QR' del bloque anterior y se creo 'Blindaje') ══ -->
       <div class="wiz-nav" id="wiz-nav">
         <div class="wiz-pill active" data-pill="1" onclick="wizJump(1)"><span class="wiz-pill-n">1</span> Cimiento</div>
         <div class="wiz-pill" data-pill="2" onclick="wizJump(2)"><span class="wiz-pill-n">2</span> ADN Visual</div>
         <div class="wiz-pill" data-pill="3" onclick="wizJump(3)"><span class="wiz-pill-n">3</span> Contenido</div>
-        <div class="wiz-pill" data-pill="4" onclick="wizJump(4)"><span class="wiz-pill-n">4</span> Blindaje</div>
+        <div class="wiz-pill" data-pill="4" onclick="wizJump(4)"><span class="wiz-pill-n">4</span> Registro + QR</div>
+        <div class="wiz-pill" data-pill="5" onclick="wizJump(5)"><span class="wiz-pill-n">5</span> Blindaje</div>
         <button type="button" class="btn btn-gold" id="wiz-btn-save-top" onclick="guardarWizardRapido()" style="align-self:center;white-space:nowrap">Guardar</button>
       </div>
 
@@ -706,12 +708,14 @@ tr:hover td{background:var(--surface)}
                 <input id="ev-titulo-display" placeholder="Ej. ZZZZZ (deja vacío para usar el nombre del evento)" style="font-size:12px">
               </div>
             </div>
-            <!-- ADR-051: subtítulo del hero (opcional). Se persiste en config_landing.content.subtitulo. -->
-            <div class="fg cont-tab-panel" data-cont-tab="identidad"><label style="font-size:12px">Subtítulo del hero
-                <span style="font-size:11px;color:var(--ink3);font-weight:400"> — opcional; se muestra bajo el título (útil en la fase "Próximamente")</span>
-              </label>
-              <input id="ev-hero-subtitulo" placeholder="Ej. Muy pronto en Bogotá" style="font-size:12px">
-            </div>
+            <!-- ADR-051 / 2026-10-02: el subtitulo del hero (config_landing.content.subtitulo)
+                 y la descripcion (content.descripcion) se capturan ahora en el paso 1
+                 CIMIENTOS. Este panel SE CONSERVA en el DOM (Cero Borrado: no se borran
+                 contenedores existentes) pero queda VACIO e INERTE: ya no hay boton de
+                 pestana 'identidad' en CONT_TABS, asi que _contAplicarPaneles nunca lo
+                 activa y permanece oculto. Si alguna vez se restaura la pestana, el
+                 contenedor sigue ahi para recibir campos sin tocar el arbol. -->
+            <div class="cont-tab-panel" data-cont-tab="identidad" style="display:none"></div>
             <div id="ld-campo-trailer" class="fg cont-tab-panel" data-cont-tab="trailer" style="display:none"><label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label><input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px"></div>
             <div id="ld-campo-director" class="cont-tab-panel" data-cont-tab="director" style="display:none">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500;margin-top:.5rem">👤 Datos del director</div>
@@ -891,6 +895,30 @@ tr:hover td{background:var(--surface)}
         </div>
       </div>
 
+      <!-- ══ CAPTURA UNICA DE DATOS DEL HERO (movido aqui desde el paso 3) ══
+           Los datos del hero se capturan en un solo lugar: el paso 1 Cimiento.
+           - ev-hero-subtitulo venia del panel "identidad" del paso 3. Cuando el
+             template declara titulo2Lineas este campo es la 2a linea del titulo;
+             si no, es el subtitulo suelto que va bajo el titulo.
+           - ev-d (descripcion) venia del tab "media" del paso 3.
+           Cero Borrado: los inputs se MUEVEN, no se duplican ni se eliminan; sus
+           ids siguen siendo los unicos del DOM. Los permisos no cambian porque
+           _buildConfigLanding y _poblarContenidoWizard leen por id. -->
+      <div class="grid2" style="margin-top:.75rem">
+        <div class="fg"><label><span id="ld-ev-hero-subtitulo-label">Subtítulo del hero (opcional)</span>
+          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">— se muestra bajo el título</span>
+        </label>
+        <input id="ev-hero-subtitulo" placeholder="Ej. Muy pronto en Bogotá" style="font-size:13px">
+        </div>
+        <div class="fg"><label>Descripción
+          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">Acepta saltos de línea</span>
+        </label>
+        <textarea id="ev-d" rows="3"
+          placeholder="Ej. Música en vivo, entrada libre&#10;&#10;Descripción del evento, artistas invitados, dresscode, etc."
+          style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--ink1);resize:vertical;line-height:1.6;box-sizing:border-box;min-height:72px"></textarea>
+        </div>
+      </div>
+
       <!-- Tipo de salida tras el registro (QR o Captura Pura) — ADR-021 -->
       <div class="fg" style="margin-top:.25rem">
         <label>Tipo de salida tras el registro</label>
@@ -961,12 +989,13 @@ tr:hover td{background:var(--surface)}
           <div data-hero-meta-fields style="display:none">
             <div class="grid2" style="margin-top:.5rem">
               <div class="fg"><label style="font-size:11px">Fecha L1</label><input id="ld-meta-fecha-l1" placeholder="Ej. Sabado 15" style="font-size:12px"></div>
-              <div class="fg"><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
+              <div class="fg" data-hero-meta-l2><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
               <div class="fg"><label style="font-size:11px">Hora L1</label><input id="ld-meta-hora-l1" placeholder="Ej. Puertas 8:00 PM" style="font-size:12px"></div>
-              <div class="fg"><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
+              <div class="fg" data-hero-meta-l2><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
               <div class="fg"><label style="font-size:11px">Lugar L1</label><input id="ld-meta-lugar-l1" placeholder="Ej. Terraza Central" style="font-size:12px"></div>
-              <div class="fg"><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
+              <div class="fg" data-hero-meta-l2><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
             </div>
+            <div id="ld-hero-lineas-hint" style="font-size:11px;color:var(--ink3);margin-top:.4rem">Este template usa el hero meta a 1 linea.</div>
           </div>
         </div>
       </div>
@@ -976,15 +1005,9 @@ tr:hover td{background:var(--surface)}
       <!-- ══ Continuación PASO 3 · Contenido (descripción + media) — ADR-021 ══ -->
       <div class="wiz-step" data-wiz-step="3">
 
-      <!-- Descripción enriquecida (ancho completo) -->
-      <div class="fg cont-tab-panel" data-cont-tab="media" style="margin-top:.75rem">
-        <label>Descripción
-          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">Acepta saltos de línea y formato libre</span>
-        </label>
-        <textarea id="ev-d" rows="4"
-          placeholder="Ej. Música en vivo, entrada libre&#10;&#10;Descripción del evento, artistas invitados, dresscode, etc."
-          style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--ink1);resize:vertical;line-height:1.6;box-sizing:border-box;min-height:90px"></textarea>
-      </div>
+      <!-- Descripción enriquecida: se captura ahora en el paso 1 CIMIENTOS (captura
+           única de los datos del hero). Cero Borrado: el id #ev-d no se eliminó,
+           se movió; este tab conserva imagen, video, cabezote y diseño de ticket. -->
 
       <!-- Imagen + Video (lado a lado) -->
       <div class="grid2 cont-tab-panel" data-cont-tab="media" style="margin-top:.75rem;align-items:start">
@@ -1112,17 +1135,12 @@ tr:hover td{background:var(--surface)}
 
       </div><!-- /wiz-step 3 -->
 
-      <!-- ══ PASO 4 · Blindaje (aforo, campos personalizados, acceso) — ADR-021 ══ -->
+      <!-- ══ PASO 4 · Registro + QR (formulario, preguntas abiertas, códigos QR) ══ -->
       <div class="wiz-step" data-wiz-step="4">
 
-      <!-- Opciones y campos -->
-      <div style="margin-top:1rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="ev-wa-share" checked style="width:14px;height:14px;accent-color:var(--gold)">
-          Botón WhatsApp en la página pública
-        </label>
-      </div>
-      <div style="margin-top:.75rem;display:flex;flex-wrap:wrap;gap:10px">
+      <!-- 4a · Módulo del formulario — campos base que se piden al asistente -->
+      <div style="font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:.4rem">📝 Módulo del formulario — datos que pide</div>
+      <div style="margin-top:.25rem;display:flex;flex-wrap:wrap;gap:10px">
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--ink3)">
           <input type="checkbox" id="ev-campo-email" style="width:13px;height:13px;accent-color:var(--gold)"> Correo electrónico
         </label>
@@ -1135,6 +1153,22 @@ tr:hover td{background:var(--surface)}
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--ink3)">
           <input type="checkbox" id="ev-campo-nota" style="width:13px;height:13px;accent-color:var(--gold)"> Nota del asistente
         </label>
+      </div>
+
+      <!-- 4b · El formulario entrega código QR. Patron reveal canonico
+           (#ev-multi-acceso/#ev-puntos-wrap): casilla visible + contenedor oculto.
+           Se sincroniza con los botones "Tipo de salida" del paso 1 Cimientos
+           (setEvSalida): este checkbox es la lectura explicita del mismo dato
+           (captura_pura), nunca una bandera distinta. -->
+      <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.85rem">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;font-weight:500;color:var(--ink2)">
+          <input type="checkbox" id="ev-form-qr-toggle" checked style="width:15px;height:15px;accent-color:var(--gold)" onchange="toggleFormQR(this.checked)">
+          🎟 El formulario entrega código QR al asistente
+        </label>
+        <div style="font-size:11px;color:var(--ink3);margin-top:.35rem;padding-left:23px">
+          Apagado = el asistente solo ve un mensaje de agradecimiento y no recibe QR (captura pura).
+          Es el mismo dato que "Tipo de salida" en el paso 1: se actualizan en ambos sentidos.
+        </div>
       </div>
       <!-- ══ Registro / Aforo (sección revelable del paso 4 Blindaje) — BLOQUE 3 ══ -->
       <div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem">
@@ -1162,10 +1196,10 @@ tr:hover td{background:var(--surface)}
           </div>
         </div>
 
-      <!-- Constructor de campos personalizados -->
+      <!-- Constructor de campos personalizados = PREGUNTAS ABIERTAS del formulario -->
       <div style="margin-top:1.1rem;border-top:1px solid var(--border);padding-top:1rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-          <span style="font-size:13px;font-weight:600;color:var(--ink2)">Campos personalizados del formulario</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink2)">❓ Preguntas abiertas del formulario</span>
           <span style="font-size:11px;color:var(--ink3)">Se agregan después de los datos base</span>
         </div>
         <div id="ev-campos-custom-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:.6rem"></div>
@@ -1204,11 +1238,37 @@ tr:hover td{background:var(--surface)}
           <div style="font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:.5rem">Nombra cada punto de acceso:</div>
           <div id="ev-puntos-list"></div>
           <button type="button" class="btn btn-ghost btn-sm" onclick="addPuntoRow()" style="margin-top:.25rem">+ Agregar punto</button>
+          <!-- 4d · Segundo escaneo en el ticket. Extensión ADITIVA del bloque de
+               puntos: no cambia el contrato de getPuntosAcceso() ni los puntos ya
+               guardados; solo agrega un checkbox que añade una fila más y una
+               bandera booleana en config_landing.content.segundo_escaneo. -->
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;color:var(--ink2);margin-top:.75rem">
+            <input type="checkbox" id="ev-segundo-escaneo" style="width:14px;height:14px;accent-color:var(--gold)" onchange="toggleSegundoEscaneo(this.checked)">
+            El ticket incluye un segundo escaneo (reingreso / segunda puerta)
+          </label>
+          <div id="ev-segundo-escaneo-wrap" style="display:none;padding-left:22px">
+            <div class="fg" style="margin-top:.35rem">
+              <label style="font-size:11px">Nombre del segundo punto de escaneo</label>
+              <input id="ev-segundo-escaneo-nombre" placeholder="Ej. Reingreso / Segunda puerta" style="font-size:12px">
+            </div>
+          </div>
         </div>
       </div>
 
+      </div><!-- /wiz-step 4 · Registro + QR -->
 
-      <!-- Idiomas (FR/EN): dentro del paso 4 Blindaje, antes de Crear evento -->
+      <!-- ══ PASO 5 · Blindaje (opciones de página, idiomas, crear) — ADR-021 ══ -->
+      <div class="wiz-step" data-wiz-step="5">
+
+      <!-- Opciones de página pública -->
+      <div style="margin-top:1rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="ev-wa-share" checked style="width:14px;height:14px;accent-color:var(--gold)">
+          Botón WhatsApp en la página pública
+        </label>
+      </div>
+
+      <!-- Idiomas (FR/EN): paso 5 Blindaje, antes de Crear evento -->
         <!-- ══ Pestaña Idiomas · Overrides FR/EN (ADR-035) ══ -->
         <div id="ld-i18n-config" style="margin-top:1rem;border:1px solid var(--border);border-radius:var(--r);padding:1rem .9rem .9rem;background:var(--surface)">
           <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem">🌐 Idiomas (traducción FR / EN)</div>
@@ -1225,7 +1285,7 @@ tr:hover td{background:var(--surface)}
         <button type="button" class="btn btn-ghost" onclick="abrirVistaPrevia()">Vista previa</button>
       </div>
 
-      </div><!-- /wiz-step 4 -->
+      </div><!-- /wiz-step 5 -->
 
       <!-- Navegación inferior del Wizard (ADR-021) — siempre en el DOM, sin data-wiz-step -->
       <div style="display:flex;justify-content:space-between;margin-top:1rem;gap:8px" id="wiz-bottom-nav">
@@ -3613,6 +3673,55 @@ function toggleHeroMetaOverride(on) {
   if (fields) fields.style.display = on ? 'block' : 'none';
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CAPACIDAD DE LINEAS DEL HERO POR TEMPLATE (captura unica en Cimientos)
+// ═══════════════════════════════════════════════════════════════
+// metaDosLineas en _THEME_MODULES hasta ahora era solo metadato de catalogo y
+// no gobernaba nada (ver _aplicarPresetTheme). AHORA gobierna cuantos campos
+// muestra el paso 1: si el template declara 2 lineas se ven los 6 campos
+// (ld-meta-*-l1 y ld-meta-*-l2); si declara 1 linea, solo los 3 campos L1.
+// titulo2Lineas indica que el silo pinta el subtitulo como 2a linea del titulo
+// (.hero-title-line2) en vez de como parrafo suelto bajo el titulo.
+// Excluidos a proposito:
+//   f8  -> su CSS oculta #event-title con display:none !important; el subtitulo
+//          morria dentro del titulo.
+//   f9b -> ya tiene su propio bloque #event-subtitle; se duplicaria.
+// CRUCE CON EL KERNEL (verificado 2026-10-02): evento-app.html __esTitulo2Lineas()
+// acepta ['tpl-f6','tpl-f9','tpl-f10','tpl-f13'] y __esMeta2Lineas() acepta
+// ['tpl-f9','tpl-f9b'] (= familia F9, porque .meta-line solo tiene CSS en esos dos;
+// f12.css:735 lo advierte). _THEME_TPL solo mapea f5,f6,f7,f8,f9,f11,f12,f9b, asi que
+// hoy los unicos silos ALCANZABLES con 2 lineas de titulo son f6 y f9, que son
+// exactamente los dos de esta tabla. f10/f13 quedan listados en el kernel por si se
+// mapean despues. Al anadir un silo aqui, anadelo TAMBIEN al kernel (o quedaria
+// dato capturado que el kernel nunca pinta).
+const _THEME_TITULO_2_LINEAS = { 'afromango-editor': true, 'mistico': true };
+
+function _capacidadTheme(theme) {
+  const preset = _THEME_MODULES[theme];
+  return {
+    lineasMeta: (preset && preset.metaDosLineas) ? 2 : 1,
+    titulo2Lineas: !!_THEME_TITULO_2_LINEAS[theme]
+  };
+}
+
+// Sincroniza el paso 1 con la capacidad del template elegido. Copia el patron
+// reveal canonico (#ev-multi-acceso/#ev-puntos-wrap): no crea markup nuevo, solo
+// cambia display de los campos L2 y el texto de las etiquetas.
+function syncLineasSegunTemplate() {
+  const cap = _capacidadTheme(_ldThemeSeleccionado);
+  document.querySelectorAll('[data-hero-meta-l2]').forEach(el => {
+    el.style.display = cap.lineasMeta === 2 ? '' : 'none';
+  });
+  const hint = document.getElementById('ld-hero-lineas-hint');
+  if (hint) hint.textContent = cap.lineasMeta === 2
+    ? 'Este template usa el hero meta a 2 lineas: completa los campos L1 y L2.'
+    : 'Este template usa el hero meta a 1 linea: solo se muestran los campos L1.';
+  const lbl = document.getElementById('ld-ev-hero-subtitulo-label');
+  if (lbl) lbl.textContent = cap.titulo2Lineas
+    ? 'Linea 2 del titulo (subtitulo)'
+    : 'Subtitulo del hero (opcional)';
+}
+
 function _aplicarPresetTheme(theme, tipo) {
   const preset = _THEME_MODULES[theme];
   if (!preset) return; // fallback: theme sin preset, no se toca nada
@@ -3657,10 +3766,12 @@ function _aplicarPresetTheme(theme, tipo) {
     fire(id);
   });
   // BLOQUE 5 - Hero meta movido al paso 1 Cimiento y disponible para las 3
-  // categorias: ya NO se oculta por theme. metaDosLineas queda como metadato de
-  // catalogo, sin gobernar la visibilidad. No limpia los inputs ld-meta-*.
+  // categorias: ya NO se oculta por theme. metaDosLineas deja de ser solo
+  // metadato de catalogo y pasa a gobernar cuantos campos muestra CIMIENTOS
+  // (ver syncLineasSegunTemplate). No limpia los inputs ld-meta-*.
   const metaWrap = document.getElementById('ld-meta-hero-wrap');
   if (metaWrap) metaWrap.style.display = '';
+  if (typeof syncLineasSegunTemplate === 'function') syncLineasSegunTemplate();
   // ADR-055 (tabla d.3 + punto 8): el canal de efectos de f9b nace con parallax
   // ON y grain/glow/vhs OFF. Se fija al elegir el theme para que un evento f9b
   // nuevo no dependa solo del atributo checked del HTML (MEDIA-1 de la revision).
@@ -3674,7 +3785,8 @@ function _aplicarPresetTheme(theme, tipo) {
 }
 
 // ════════════════════════════════════════════════════════════
-// ADR-021 — WIZARD INTELIGENTE DE CREACIÓN DE EVENTOS (4 pasos)
+// ADR-021 — WIZARD INTELIGENTE DE CREACIÓN DE EVENTOS (5 pasos)
+// 1 Cimiento · 2 ADN Visual · 3 Contenido · 4 Registro + QR · 5 Blindaje
 // ════════════════════════════════════════════════════════════
 let _wizStep      = 1;
 let _evCategoria  = null;    // 'cinematografia' | 'fiesta' | 'campana' — Orquestador de Intención
@@ -3715,6 +3827,32 @@ function setEvSalida(esCaptura) {
   if (hint) hint.textContent = esCaptura
     ? 'El asistente NO recibe QR: al registrarse ve un mensaje de agradecimiento personalizado (requiere soporte en evento.html — ver TSK-016 pendiente).'
     : 'Tras registrarse, el asistente recibe su QR de acceso.';
+  // El paso 4 (Registro + QR) lee el MISMO dato desde otro control: se espeja.
+  // Sin esta linea los dos controles divergirian en la UI (bug de doble fuente).
+  const formQr = document.getElementById('ev-form-qr-toggle');
+  if (formQr) formQr.checked = !esCaptura;
+}
+
+// 4b · "El formulario entrega código QR" (paso 4). No crea un dato nuevo:
+// escribe sobre el mismo _evCapturaPura que usa el paso 1 y llama a setEvSalida
+// para que los dos controles queden sincronizados en ambos sentidos.
+function toggleFormQR(on) {
+  _evCapturaPura = !on;
+  setEvSalida(!on);
+}
+
+// 4d · Segundo escaneo en el ticket. Revela el nombre del segundo punto y, si el
+// bloque de multiples puntos esta activo, agrega una fila con el mismo helper
+// (addPuntoRow) que ya usa el resto de puntos: no se inventa otro sistema.
+function toggleSegundoEscaneo(on) {
+  const wrap = document.getElementById('ev-segundo-escaneo-wrap');
+  if (wrap) wrap.style.display = on ? 'block' : 'none';
+  if (on) {
+    const wrapPuntos = document.getElementById('ev-puntos-wrap');
+    if (wrapPuntos && wrapPuntos.style.display !== 'none' && typeof addPuntoRow === 'function') {
+      addPuntoRow('Segundo escaneo');
+    }
+  }
 }
 
 // Armonías cromáticas sugeridas a partir del color del evento (TinyColor2, ADR-021)
@@ -3762,6 +3900,9 @@ function wizShow(step) {
   });
   // BLOQUE 6 — refrescar la barra de pestañas de contenido al mostrar el paso 3.
   if (step === 3 && typeof window.contRefreshTabs === 'function') window.contRefreshTabs();
+  // El paso 1 Cimientos se dibuja segun la capacidad de lineas del template: al
+  // entrar (o al volver desde el paso 2) se re-sincroniza.
+  if (step === 1 && typeof window.syncLineasSegunTemplate === 'function') window.syncLineasSegunTemplate();
   document.querySelectorAll('.wiz-pill').forEach(p => {
     const n = Number(p.dataset.pill);
     p.classList.toggle('active', n === step);
@@ -3770,7 +3911,7 @@ function wizShow(step) {
   const prevBtn = document.getElementById('wiz-btn-prev');
   const nextBtn = document.getElementById('wiz-btn-next');
   if (prevBtn) prevBtn.style.visibility = step > 1 ? 'visible' : 'hidden';
-  if (nextBtn) nextBtn.style.display    = step < 4 ? '' : 'none';
+  if (nextBtn) nextBtn.style.display    = step < 5 ? '' : 'none';
   const card = document.getElementById('pg-admin');
   if (card) window.scrollTo({ top: card.offsetTop, behavior: 'smooth' });
 }
@@ -3779,7 +3920,7 @@ function wizNext() {
   if (!wizValidate(_wizStep)) return;
   // ADR-033 — el modo de página pública ya viene preseleccionado (landing) por
   // setModoPublico(); no se fuerza aquí para no pisar una elección de "Formulario".
-  if (_wizStep < 4) wizShow(_wizStep + 1);
+  if (_wizStep < 5) wizShow(_wizStep + 1);
 }
 function wizPrev() { if (_wizStep > 1) wizShow(_wizStep - 1); }
 function wizJump(n) {
@@ -3959,7 +4100,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // ════════════════════════════════════════════════════════════
 (function() {
   var CONT_TABS = [
-    { id: 'identidad',       label: '✨ Identidad / Hero' },
+    // 2026-10-02: la pestaña 'identidad' SE RETIRA de la barra. Sus unicos campos
+    // vivos eran ev-hero-subtitulo y ev-d, que movieron a Cimientos (paso 1) para
+    // que el hero se capture en un solo lugar. El panel [data-cont-tab="identidad"]
+    // NO se borra del DOM (Cero Borrado): queda vacio y, al no existir ya el boton,
+    // _contAplicarPaneles nunca lo activa, asi que sigue oculto.
     { id: 'media',           label: '🖼 Media' },
     { id: 'sinopsis',        label: '📝 Sinopsis',       mods: ['ld-mod-sinopsis'] },
     { id: 'trailer',         label: '🎬 Tráiler',        mods: ['ld-mod-trailer'] },
@@ -4452,7 +4597,18 @@ function _buildConfigLanding(slug) {
   const sistDual = document.getElementById('ev-sist-dual')?.checked;
   const hayLanding = !!activa && !!_ldThemeSeleccionado;
   const hayForm = !!sistDual;
-  if (!hayLanding && !hayForm) return null;
+  // BUG-016 (rama a): el `return null` se reached sin mirar los disenos de ticket y
+  // guardarEventoWizard hace `payload.config_landing = cfgLanding || null`, con lo
+  // cual se borraba TODO el JSONB del evento, incluido content.ticket_disenos.
+  // Fail-open: solo se devuelve un cfg minimo cuando HAY disenos que preservar; sin
+  // ellos se mantiene el null original para no exponer una landing inexistente.
+  const _disenosPrevias = window._ticketDisenosGetEntries ? window._ticketDisenosGetEntries() : [];
+  if (!hayLanding && !hayForm) {
+    if (!_disenosPrevias.length) return null;
+    const cfgSinLanding = { content: {} };
+    cfgSinLanding.content.ticket_disenos = _disenosPrevias; // BUG-016
+    return cfgSinLanding;
+  }
 
   // ADR-033 — Solo formulario (sin landing): config mínimo con la página de registro.
   // No incluye theme/modules, así evento.html la trata como "sin plantilla" y el link
@@ -4465,6 +4621,7 @@ function _buildConfigLanding(slug) {
     };
     const comun = (document.getElementById('ev-comunidad-whatsapp')?.value || '').trim();
     if (comun) cfg.content.comunidad_whatsapp = comun;
+    cfg.content.ticket_disenos = _disenosPrevias; // BUG-016 (rama b)
     return cfg;
   }
 
@@ -4645,6 +4802,13 @@ function _buildConfigLanding(slug) {
       // objeto por tipo, sin campo `default`. Se escribe SIEMPRE (array vacio
       // incluido) y ANTES de los spreads finales, que no tocan esta clave.
       ticket_disenos: disenos,
+      // 4d · Segundo escaneo en el ticket (paso 4 Registro + QR). Objeto aditivo y
+      // opcional: si el checkbox esta apagado se emite null y el sweep de nulls lo
+      // elimina, sin tocar ninguna otra llave de content.
+      segundo_escaneo: (document.getElementById('ev-segundo-escaneo')?.checked) ? {
+        activo: true,
+        nombre: (document.getElementById('ev-segundo-escaneo-nombre')?.value || '').trim() || null,
+      } : null,
       // ADR-030/033 — Landing + formulario: form_solo activo; landing solo: se desactiva
       // explícitamente la página de registro (registroaforo.html queda "no disponible").
       ...(hayForm ? {
@@ -6022,6 +6186,21 @@ function _poblarContenidoWizard(content, suf) {
   // cae al fallback de ADR-008 si no carga). Tipos fuera del dominio se ignoran.
   if (window._ticketDisenosSetEntries) {
     window._ticketDisenosSetEntries(Array.isArray(content.ticket_disenos) ? content.ticket_disenos : []);
+  }
+  // Read-back de los controles del paso 4 (Registro + QR). Sin esto el dato se
+  // GUARDA pero no se RECUPERA: al editar, las dos casillas arrancarian apagadas
+  // y el usuario creeria que no hay QR ni segundo escaneo (dato falso en la UI).
+  // _poblarEventoBasico ya/setEvSalida dejo ev-salida-* y captura_pura coherentes;
+  // aqui solo se espeja ese mismo estado en las casillas del paso 4.
+  const _qrToggle = document.getElementById('ev-form-qr-toggle');
+  if (_qrToggle && typeof _evCapturaPura !== 'undefined') _qrToggle.checked = !_evCapturaPura;
+  const _segChk = document.getElementById('ev-segundo-escaneo');
+  if (_segChk && content.segundo_escaneo && typeof content.segundo_escaneo === 'object') {
+    _segChk.checked = content.segundo_escaneo.activo !== false;
+    const _segNom = document.getElementById('ev-segundo-escaneo-nombre');
+    if (_segNom) _segNom.value = content.segundo_escaneo.nombre || '';
+    const _segWrap = document.getElementById('ev-segundo-escaneo-wrap');
+    if (_segWrap) _segWrap.style.display = _segChk.checked ? 'block' : 'none';
   }
   // Campaña
   set('ld-historia-titulo', content.historia_titulo);
@@ -11534,6 +11713,17 @@ function addTicketDisenoRow(data) {
       '<span class="ticket-diseno-label" style="font-size:11px;font-weight:600;letter-spacing:.03em;color:var(--ink3)"></span>' +
       '<button type="button" class="ticket-diseno-remove" title="Quitar este diseno" style="background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--ink3);font-size:11px;cursor:pointer;padding:3px 8px">Quitar</button>' +
     '</div>' +
+    // 4 · Selector de medio de trabajo. Dos casillas mutuamente excluyentes (una
+    // por medio), no un campo de texto: el usuario declara COMO trabaja, en vez
+    // de que la URL escrita a mano pise en silencio la subida (bug de doble fuente).
+    '<div class="ticket-diseno-medio" style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden;width:fit-content">' +
+      '<label class="ticket-diseno-medio-opt" data-medio="archivo" style="flex:1;display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:11px;cursor:pointer;white-space:nowrap">' +
+        '<input type="checkbox" class="ticket-diseno-medio-chk" data-medio="archivo" style="width:13px;height:13px;accent-color:var(--gold)"> Subir archivo' +
+      '</label>' +
+      '<label class="ticket-diseno-medio-opt" data-medio="url" style="flex:1;display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:11px;cursor:pointer;border-left:1px solid var(--border);white-space:nowrap">' +
+        '<input type="checkbox" class="ticket-diseno-medio-chk" data-medio="url" style="width:13px;height:13px;accent-color:var(--gold)"> Usar URL' +
+      '</label>' +
+    '</div>' +
     '<div class="ticket-diseno-drop" style="border:1px dashed var(--border);border-radius:var(--rsm);padding:10px;text-align:center;cursor:pointer;background:var(--bg)">' +
       '<input type="file" class="ticket-diseno-file" accept="image/*" style="display:none">' +
       '<span class="ticket-diseno-drop-hint" style="font-size:11px;color:var(--ink3)">Arrastra la imagen aqui o haz clic para elegir el archivo</span>' +
@@ -11575,12 +11765,51 @@ function addTicketDisenoRow(data) {
     _ticketDisenoStatus(def.tipo, urlInp.value.trim() ? 'URL escrita a mano.' : '', urlInp.value.trim() ? 'ok' : null);
   });
   row.querySelector('.ticket-diseno-remove').addEventListener('click', () => ticketDisenoRemove(def.tipo));
+  // Selector de medio: reflecte el estado y revela el control que corresponde.
+  // Se infiere del dato guardado cuando la entrada viene de la base (ADR-064 no
+  // tiene la clave `medio` todavia): si hay URL persistida, el medio es 'url'.
+  row.querySelectorAll('.ticket-diseno-medio-chk').forEach(chkMedio => {
+    chkMedio.addEventListener('change', () => {
+      if (chkMedio.checked) ticketDisenoSetMedio(def.tipo, chkMedio.dataset.medio);
+    });
+  });
 
   cont.appendChild(row);
   _ticketDisenoSetUrl(def.tipo, src.diseno_url, { manual: !!src.manual });
   const chk = row.querySelector('.ticket-diseno-activo');
   if (chk) chk.checked = (src.activo === false) ? false : true;
+  const medioInferido = src.medio || ((src.diseno_url || '').trim() ? 'url' : 'archivo');
+  ticketDisenoSetMedio(def.tipo, medioInferido, { persistir: false });
   return row;
+}
+// Aplica el medio elegido a una fila: marca la casilla, resalta la opcion activa,
+// y muestra SOLO el control correspondiente (drop de archivo o campo de URL).
+function ticketDisenoSetMedio(tipo, medio, opts) {
+  const row = _ticketDisenoRow(tipo);
+  if (!row) return;
+  const esUrl = medio === 'url';
+  row.querySelectorAll('.ticket-diseno-medio-chk').forEach(chk => {
+    chk.checked = (chk.dataset.medio === medio);
+  });
+  row.querySelectorAll('.ticket-diseno-medio-opt').forEach(opt => {
+    const on = (opt.dataset.medio === medio);
+    opt.style.background = on ? 'var(--ink)' : 'transparent';
+    opt.style.color = on ? '#fff' : 'var(--ink3)';
+  });
+  const drop = row.querySelector('.ticket-diseno-drop');
+  const urlBox = row.querySelector('.ticket-diseno-url')?.closest('.fg');
+  if (drop) drop.style.display = esUrl ? 'none' : '';
+  if (urlBox) urlBox.style.display = esUrl ? '' : 'none';
+  // El estado actual siempre se muestra: si ya hay URL o imagen, la miniatura queda
+  // visible pase lo que pase, para que al editar se vea que YA HAY un diseno.
+  const preview = row.querySelector('.ticket-diseno-preview');
+  const img = row.querySelector('.ticket-diseno-img');
+  const tieneDiseno = !!(img && img.getAttribute('src'));
+  if (preview) preview.style.display = tieneDiseno ? '' : 'none';
+  if (!(opts && opts.persistir === false)) {
+    row.dataset.medio = medio;
+    if (typeof renderTicketDisenos === 'function') renderTicketDisenos();
+  }
 }
 function ticketDisenoRemove(tipo) {
   const row = _ticketDisenoRow(tipo);
@@ -11645,7 +11874,12 @@ window._ticketDisenosGetEntries = () => {
     const chk = row.querySelector('.ticket-diseno-activo');
     const url = (inp && inp.value || '').trim();
     if (!url) return null;
-    return { tipo: tipo, diseno_url: url, activo: !!(chk && chk.checked) };
+    // 'medio' es ADITIVO y OPCIONAL: si no se elige nada se emite 'archivo', el
+    // default que ya asumia el contrato congelado de ADR-064 (subida de archivo).
+    // La fila puede no existir todavia -> se infiere por presencia de URL.
+    const chkMedio = row.querySelector('.ticket-diseno-medio-chk:checked');
+    const medio = (chkMedio && chkMedio.dataset.medio) || row.dataset.medio || (url ? 'url' : 'archivo');
+    return { tipo: tipo, diseno_url: url, medio: medio, activo: !!(chk && chk.checked) };
   }).filter(Boolean);
 };
 // Reconstruye SIEMPRE la fila unica (tiene que existir aunque no haya dato):
@@ -11658,7 +11892,7 @@ window._ticketDisenosSetEntries = (arr) => {
   cont.innerHTML = '';
   TICKET_DISENOS_TIPOS.forEach(def => {
     const item = items.find(x => x && x.tipo === def.tipo) || items[0] || null;
-    addTicketDisenoRow({ tipo: def.tipo, diseno_url: item ? item.diseno_url : '', activo: item ? (item.activo !== false) : true });
+    addTicketDisenoRow({ tipo: def.tipo, diseno_url: item ? item.diseno_url : '', medio: item ? item.medio : null, activo: item ? (item.activo !== false) : true });
   });
 };
 // Montaje inicial (el script inline vive al final del body).

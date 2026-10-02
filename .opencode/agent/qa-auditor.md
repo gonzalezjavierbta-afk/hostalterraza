@@ -2,7 +2,7 @@
 name: qa-auditor
 description: QA Specialist de ExploraCO - Escudo GOLD, smoke tests de buildHTML(), verificación de integración con Node vm y contraste con ERRORES_HISTORICOS.md.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 30
 permission:
   edit: deny
   bash: allow

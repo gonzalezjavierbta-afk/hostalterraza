@@ -2,7 +2,7 @@
 name: frontend-tpl
 description: Frontend y estética visual de ExploraCO - paletas, tipografías, layouts responsive y consistencia UI en index.html, admin.html y páginas públicas.
 mode: subagent
-model: opencode-go/deepseek-v4.1-flash
+steps: 20
 permission:
   edit: allow
   bash: allow
