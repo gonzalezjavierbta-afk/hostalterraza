@@ -112,6 +112,11 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .adm-tab.active .adm-tab-badge{background:var(--gold-bg);color:var(--gold-d)}
 [data-adm-tab],[data-pnl-tab]{display:none}
 [data-adm-tab].adm-visible,[data-pnl-tab].adm-visible{display:block}
+/* BLOQUE 6 — pestañas de contenido del paso 3 (namespace data-cont-tab) */
+.cont-tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--border);margin:0 0 1rem}
+.cont-tabs .adm-tab{font-size:12px;padding:8px 6px}
+.cont-tab-empty{font-size:12px;color:var(--ink3);padding:.6rem 0}
+body.cont-tabs-ready [data-cont-tab]:not(.cont-active){display:none!important}
 .hist-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
 .hist-time-toggle{display:flex;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
 .hist-time-toggle button{padding:7px 12px;border:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--surface);color:var(--ink3)}
@@ -394,42 +399,35 @@ tr:hover td{background:var(--surface)}
   </div>
 </nav>
 
-<!-- ══ SIDEBAR · 5 bloques de navegación ══ -->
+<!-- ══ SIDEBAR · 4 bloques de navegación ══ -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-grp">
-    <div class="sb-grp-t">Eventos</div>
-    <a class="sb-item" data-go="admin" data-sub="historial" data-vis="all" onclick="navigate('#/eventos/historial')"><span class="sb-ic">📅</span> Historial</a>
+    <div class="sb-grp-t">Evento</div>
+    <a class="sb-item" data-go="admin" data-sub="historial" data-vis="all" onclick="navigate('#/eventos/historial')"><span class="sb-ic">📅</span> Eventos</a>
     <a class="sb-item" data-go="admin" data-sub="crear" data-vis="super" onclick="navigate('#/eventos/crear')"><span class="sb-ic">＋</span> Crear evento</a>
     <a class="sb-item" data-go="admin" data-sub="invitadores" data-vis="all" onclick="navigate('#/eventos/invitadores')"><span class="sb-ic">🔗</span> Invitadores</a>
   </div>
   <div class="sb-grp">
-    <div class="sb-grp-t">Personas y Datos</div>
-    <a class="sb-item" data-go="clientes" data-sub="cli-list" data-vis="super" onclick="navigate('#/personas/directorio')"><span class="sb-ic">👥</span> Directorio</a>
-    <a class="sb-item" data-go="clientes" data-sub="cli-new" data-vis="super" onclick="navigate('#/personas/nuevo')"><span class="sb-ic">＋</span> Nuevo registro</a>
-    <a class="sb-item" data-go="clientes" data-sub="cli-assign" data-vis="super" onclick="navigate('#/personas/asignar')"><span class="sb-ic">🎫</span> Asignar a evento</a>
-    <div class="sb-grp-t" style="margin-top:.55rem">Analítica</div>
+    <div class="sb-grp-t">Entrada QR</div>
+    <a class="sb-item" data-go="qrtrack" data-sub="qrt-new" data-vis="super" onclick="navigate('#/qr/crear')"><span class="sb-ic">🔗</span> Crear QR</a>
+    <a class="sb-item" data-go="qrtrack" data-sub="qrt-list" data-vis="super" onclick="navigate('#/qr/lista')"><span class="sb-ic">📋</span> QR links</a>
+    <a class="sb-item" data-go="scanner" data-vis="staff" onclick="navigate('#/puerta/control')"><span class="sb-ic">🎥</span> Control de entrada</a>
+    <a class="sb-link-ext" href="scanner.html" target="_blank" rel="noopener">↗ Abrir aplicativo portero (scanner.html)</a>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-grp-t">Analítica</div>
     <a class="sb-item" data-go="panel" data-sub="resumen" data-vis="all" onclick="navigate('#/datos/resumen')"><span class="sb-ic">📊</span> Resumen</a>
     <a class="sb-item" data-go="panel" data-sub="tendencias" data-vis="all" onclick="navigate('#/datos/tendencias')"><span class="sb-ic">📈</span> Tendencias</a>
     <a class="sb-item" data-go="panel" data-sub="rankings" data-vis="all" onclick="navigate('#/datos/rankings')"><span class="sb-ic">🏆</span> Rankings</a>
     <a class="sb-item" data-go="panel" data-sub="asistentes" data-vis="all" onclick="navigate('#/datos/asistentes')"><span class="sb-ic">🧾</span> Asistentes</a>
   </div>
-  <div class="sb-grp">
-    <div class="sb-grp-t">QR</div>
-    <a class="sb-item" data-go="qrtrack" data-sub="qrt-new" data-vis="super" onclick="navigate('#/qr/crear')"><span class="sb-ic">🔗</span> Crear QR</a>
-    <a class="sb-item" data-go="qrtrack" data-sub="qrt-list" data-vis="super" onclick="navigate('#/qr/lista')"><span class="sb-ic">📋</span> QR links</a>
-  </div>
-  <div class="sb-grp">
-    <div class="sb-grp-t">Subcuentas</div>
-    <a class="sb-item" data-go="usuarios" data-sub="usr-admins" data-vis="super" onclick="navigate('#/staff/admins')"><span class="sb-ic">🛡</span> Administradores</a>
-    <a class="sb-item" data-go="usuarios" data-sub="usr-porteros" data-vis="staff" onclick="navigate('#/staff/porteros')"><span class="sb-ic">🚪</span> Porteros</a>
-  </div>
-  <div class="sb-grp">
-    <div class="sb-grp-t">Aplicativo de Puerta</div>
-    <a class="sb-item" data-go="scanner" data-vis="staff" onclick="navigate('#/puerta/control')"><span class="sb-ic">🎥</span> Control de entrada</a>
-    <a class="sb-link-ext" href="scanner.html" target="_blank" rel="noopener">↗ Abrir aplicativo portero (scanner.html)</a>
-  </div>
   <div class="sb-grp" id="sb-sistema">
     <div class="sb-grp-t">Sistema</div>
+    <a class="sb-item" data-go="clientes" data-sub="cli-list" data-vis="super" onclick="navigate('#/personas/directorio')"><span class="sb-ic">👥</span> Directorio</a>
+    <a class="sb-item" data-go="clientes" data-sub="cli-new" data-vis="super" onclick="navigate('#/personas/nuevo')"><span class="sb-ic">＋</span> Nuevo registro</a>
+    <a class="sb-item" data-go="clientes" data-sub="cli-assign" data-vis="super" onclick="navigate('#/personas/asignar')"><span class="sb-ic">🎫</span> Asignar a evento</a>
+    <a class="sb-item" data-go="usuarios" data-sub="usr-admins" data-vis="super" onclick="navigate('#/staff/admins')"><span class="sb-ic">🛡</span> Administradores</a>
+    <a class="sb-item" data-go="usuarios" data-sub="usr-porteros" data-vis="staff" onclick="navigate('#/staff/porteros')"><span class="sb-ic">🚪</span> Porteros</a>
     <a class="sb-item" data-go="org" data-vis="all" onclick="navigate('#/org')"><span class="sb-ic">⚙</span> Mi organización</a>
     <a class="sb-item" data-go="config" data-vis="system" onclick="navigate('#/config')"><span class="sb-ic">🔐</span> Configuración</a>
     <a class="sb-item" data-go="globaladmin" data-vis="system" onclick="navigate('#/sistema')"><span class="sb-ic">🛠</span> Panel de Sistema</a>
@@ -445,7 +443,7 @@ tr:hover td{background:var(--surface)}
 
     <!-- ══ ADR-022: Navegación interna de Admin ══ -->
     <div class="adm-nav" id="adm-nav">
-      <button class="adm-tab" data-adm-pill="historial" onclick="admGoTab('historial')">📋 Historial <span class="adm-tab-badge" id="adm-badge-historial">0</span></button>
+      <button class="adm-tab" data-adm-pill="historial" onclick="admGoTab('historial')">📋 Eventos <span class="adm-tab-badge" id="adm-badge-historial">0</span></button>
       <button class="adm-tab" data-adm-pill="crear" onclick="admGoTab('crear')">+ Nuevo evento</button>
       <button class="adm-tab" data-adm-pill="invitadores" onclick="admGoTab('invitadores')">🔗 Invitadores <span class="adm-tab-badge" id="adm-badge-invitadores">0</span></button>
     </div>
@@ -461,6 +459,7 @@ tr:hover td{background:var(--surface)}
         <div class="wiz-pill" data-pill="2" onclick="wizJump(2)"><span class="wiz-pill-n">2</span> ADN Visual</div>
         <div class="wiz-pill" data-pill="3" onclick="wizJump(3)"><span class="wiz-pill-n">3</span> Contenido</div>
         <div class="wiz-pill" data-pill="4" onclick="wizJump(4)"><span class="wiz-pill-n">4</span> Blindaje</div>
+        <button type="button" class="btn btn-gold" id="wiz-btn-save-top" onclick="guardarWizardRapido()" style="align-self:center;white-space:nowrap">Guardar</button>
       </div>
 
       <!-- ══ PASO 1 · Orquestador de intención (Cine / Fiesta / Campaña) ══ -->
@@ -515,44 +514,12 @@ tr:hover td{background:var(--surface)}
           </button>
         </div>
 
-        <!-- ══ ADR-051: Fase de la landing (completa / proximamente). Se oculta si la columna eventos.fase_landing no existe (feature-detection) ══ -->
-        <div id="ev-fase-landing-wrap" style="margin-bottom:1rem">
-          <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px">🚦 Fase de la landing</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="ev-fase-landing">
-            <button type="button" id="ev-fase-completa" data-fase="completa" onclick="setFaseLanding('completa')" class="modo-card">
-              <div class="modo-emoji">🗓</div>
-              <div class="modo-title">Completa</div>
-              <div class="modo-sub">Landing ampliada con todos los módulos</div>
-            </button>
-            <button type="button" id="ev-fase-proximamente" data-fase="proximamente" onclick="setFaseLanding('proximamente')" class="modo-card">
-              <div class="modo-emoji">⏳</div>
-              <div class="modo-title">Próximamente</div>
-              <div class="modo-sub">Teaser: hero, contador y meta + WhatsApp</div>
-            </button>
-          </div>
-        </div>
-
         <!-- Checkboxes de estado interno (ADR-030 / ADR-033) — ocultos, controlados por setModoPublico() -->
         <input type="checkbox" id="ev-landing-activa" style="display:none" onchange="toggleLandingConfig(this.checked)">
         <input type="checkbox" id="ev-sist-dual" style="display:none" onchange="toggleSistDual(this.checked)">
 
-        <!-- Config Formulario (aforo) — visible si el modo incluye formulario -->
-        <div id="ev-sist-dual-config" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.85rem">
-          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">📝 Formulario de registro (aforo)</div>
-          <div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">Página independiente donde se registran artistas, invitados y pagos — estos registros son los que cuentan para el aforo.</div>
-          <div class="fg">
-            <label>Link comunidad de WhatsApp</label>
-            <input id="ev-comunidad-whatsapp" placeholder="https://chat.whatsapp.com/XXXX  o  https://wa.me/57..." style="width:100%">
-          </div>
-          <div class="fg" style="margin-top:.5rem">
-            <label>URL página de registro (aforo)</label>
-            <div style="display:flex;gap:6px;align-items:center">
-              <input id="ev-form-solo-url" readonly style="flex:1;background:rgba(0,0,0,.08)">
-              <button type="button" class="btn btn-ghost btn-sm" onclick="copyLink(document.getElementById('ev-form-solo-url').value,this)">Copiar</button>
-            </div>
-            <div style="font-size:10px;color:var(--ink3);margin-top:3px">Se genera automáticamente al guardar el evento con el slug. Ej: /registroaforo.html?slug=...</div>
-          </div>
-        </div>
+        <!-- BLOQUE 3: #ev-sist-dual-config se movió al paso 4 (Blindaje), sección Registro / Aforo.
+             Los ids se conservan (Cero Borrado); #ev-sist-dual permanece aquí como estado interno. -->
 
         <!-- Config Landing (plantilla visual) — visible si el modo incluye landing -->
         <div id="ev-landing-config" style="display:none">
@@ -686,29 +653,6 @@ tr:hover td{background:var(--surface)}
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-banner-2" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Banner 2</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-whatsapp" style="width:13px;height:13px;accent-color:var(--gold)"> 💬 WhatsApp contacto</label>
               </div>
-              <div id="ld-meta-hero-wrap" style="margin-top:.6rem;border-top:1px solid var(--border);padding-top:.6rem">
-                <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Hero Meta - 2 lineas (opcional)</div>
-                <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Si dejas el interruptor apagado, la linea del hero se arma sola con la fecha, la hora y la ubicacion del evento. Activalo solo si quieres escribirla a mano.</div>
-                <!-- ADR-056 (filas 7/8/11) - override del hero, colapsado y APAGADO por
-                     defecto. Se reutiliza el patron de despliegue que ya usa el wizard
-                     (#ev-multi-acceso + #ev-puntos-wrap: casilla visible + contenedor
-                     oculto por display). No hay <details> ni .ld-collapse en el archivo,
-                     asi que este es el patron existente mas cercano. -->
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--ink3)">
-                  <input type="checkbox" data-hero-meta-override onchange="toggleHeroMetaOverride(this.checked)" style="width:13px;height:13px;accent-color:var(--gold)">
-                  Personalizar texto del hero (avanzado)
-                </label>
-                <div data-hero-meta-fields style="display:none">
-                  <div class="grid2" style="margin-top:.5rem">
-                    <div class="fg"><label style="font-size:11px">Fecha L1</label><input id="ld-meta-fecha-l1" placeholder="Ej. Sabado 15" style="font-size:12px"></div>
-                    <div class="fg"><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
-                    <div class="fg"><label style="font-size:11px">Hora L1</label><input id="ld-meta-hora-l1" placeholder="Ej. Puertas 8:00 PM" style="font-size:12px"></div>
-                    <div class="fg"><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
-                    <div class="fg"><label style="font-size:11px">Lugar L1</label><input id="ld-meta-lugar-l1" placeholder="Ej. Terraza Central" style="font-size:12px"></div>
-                    <div class="fg"><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <!-- CAMPAÑA -->
@@ -745,8 +689,9 @@ tr:hover td{background:var(--surface)}
         <div class="wiz-step" data-wiz-step="3">
           <!-- Contenido de módulos — compartido por todos los tipos -->
           <div id="ld-contenido-campos">
+            <div id="ld-cont-tabs" class="cont-tabs" role="tablist"></div>
             <!-- CAMPOS CINEMATOGRAFÍA -->
-            <div id="ld-campo-sinopsis" style="display:none">
+            <div id="ld-campo-sinopsis" class="cont-tab-panel" data-cont-tab="sinopsis" style="display:none">
               <!-- ADR-056 (fila 12) - #ld-sinopsis-text se retira del formulario
                    (duplicaba #ev-d): la descripcion canonica vive en #ev-d (Paso 1)
                    y se persiste en la columna eventos.descripcion. El id se
@@ -762,13 +707,13 @@ tr:hover td{background:var(--surface)}
               </div>
             </div>
             <!-- ADR-051: subtítulo del hero (opcional). Se persiste en config_landing.content.subtitulo. -->
-            <div class="fg"><label style="font-size:12px">Subtítulo del hero
+            <div class="fg cont-tab-panel" data-cont-tab="identidad"><label style="font-size:12px">Subtítulo del hero
                 <span style="font-size:11px;color:var(--ink3);font-weight:400"> — opcional; se muestra bajo el título (útil en la fase "Próximamente")</span>
               </label>
               <input id="ev-hero-subtitulo" placeholder="Ej. Muy pronto en Bogotá" style="font-size:12px">
             </div>
-            <div id="ld-campo-trailer" style="display:none" class="fg"><label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label><input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px"></div>
-            <div id="ld-campo-director" style="display:none">
+            <div id="ld-campo-trailer" class="fg cont-tab-panel" data-cont-tab="trailer" style="display:none"><label style="font-size:12px">URL del tráiler (YouTube o Vimeo)</label><input id="ld-trailer-url" placeholder="https://youtube.com/watch?v=..." style="font-family:monospace;font-size:12px"></div>
+            <div id="ld-campo-director" class="cont-tab-panel" data-cont-tab="director" style="display:none">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500;margin-top:.5rem">👤 Datos del director</div>
               <div class="grid2">
                 <div class="fg"><label style="font-size:11px">Nombre</label><input id="ld-dir-nombre" placeholder="Nombre del director" style="font-size:12px"></div>
@@ -777,9 +722,9 @@ tr:hover td{background:var(--surface)}
                 <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">Biografía</label><textarea id="ld-dir-bio" rows="2" placeholder="Breve biografía..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
               </div>
             </div>
-            <div id="ld-campo-gallery" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 12)</label><textarea id="ld-gallery-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-dresscode" style="display:none" class="fg"><label style="font-size:12px">Dress code</label><input id="ld-dresscode-val" placeholder="Ej. Formal · Elegante · All black"></div>
-            <div id="ld-campo-sponsors" style="display:none" class="fg">
+            <div id="ld-campo-gallery" class="fg cont-tab-panel" data-cont-tab="galeria" style="display:none"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 12)</label><textarea id="ld-gallery-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-dresscode" class="fg cont-tab-panel" data-cont-tab="dresscode" style="display:none"><label style="font-size:12px">Dress code</label><input id="ld-dresscode-val" placeholder="Ej. Formal · Elegante · All black"></div>
+            <div id="ld-campo-sponsors" class="fg cont-tab-panel" data-cont-tab="sponsors" style="display:none">
               <label style="font-size:12px;font-weight:600;margin-bottom:8px;display:block">🤝 Patrocinadores — Logos</label>
               <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;background:var(--surface);padding:8px 10px;border-radius:var(--rsm);border:1px solid var(--border)">
                 <strong>Formato recomendado:</strong> PNG con fondo transparente o SVG<br>
@@ -789,16 +734,16 @@ tr:hover td{background:var(--surface)}
               <div id="sponsors-entries" style="display:flex;flex-direction:column;gap:12px"></div>
               <button type="button" id="sponsors-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Patrocinador</button>
             </div>
-            <div id="ld-campo-faq" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-faq" class="fg cont-tab-panel" data-cont-tab="faq" style="display:none"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
 
             <!-- CAMPOS FIESTA -->
-            <div id="ld-campo-dj-lineup" style="display:none" class="fg">
+            <div id="ld-campo-dj-lineup" class="fg cont-tab-panel" data-cont-tab="lineup" style="display:none">
               <label style="font-size:12px;font-weight:600;margin-bottom:8px;display:block">🎧 DJ Lineup — Artistas</label>
               <div id="dj-lineup-entries" style="display:flex;flex-direction:column;gap:12px"></div>
               <button type="button" id="dj-lineup-add" style="margin-top:10px;padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em">+ Agregar Artista</button>
             </div>
-            <div id="ld-campo-playlist" style="display:none" class="fg"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
-            <div id="ld-campo-guest-list" style="display:none" class="fg">
+            <div id="ld-campo-playlist" class="fg cont-tab-panel" data-cont-tab="playlist" style="display:none"><label style="font-size:12px">URL de Spotify Playlist</label><input id="ld-playlist-url" type="url" placeholder="https://open.spotify.com/playlist/..." style="font-family:monospace;font-size:12px"></div>
+            <div id="ld-campo-guest-list" class="fg cont-tab-panel" data-cont-tab="guestlist" style="display:none">
               <label style="font-size:12px">Instrucciones Guest List</label>
               <input id="ld-guest-list-val" placeholder="Ej. Registro antes de las 11pm para acceso prioritario">
               <!-- Card de beneficio Guest List (f9b) - config_landing.content.guestlist.
@@ -817,7 +762,7 @@ tr:hover td{background:var(--surface)}
                 <div class="fg"><label style="font-size:11px">URL CTA (opcional)</label><input id="ld-guestlist-cta-url" type="url" placeholder="https://..." style="font-size:12px"></div>
               </div>
             </div>
-            <div id="ld-campo-ubicacion" style="display:none" class="fg"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
+            <div id="ld-campo-ubicacion" class="fg cont-tab-panel" data-cont-tab="ubicacion" style="display:none"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
             <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 12)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg">
@@ -836,16 +781,16 @@ tr:hover td{background:var(--surface)}
                    (modMap, hideForeignModulesByType y la UI de patrocinadores lo
                    ignoran), de modo que no puede llegar a mostrarse. -->
             </div>
-            <div id="ld-campo-boletos" style="display:none" class="fg">
+            <div id="ld-campo-boletos" class="fg cont-tab-panel" data-cont-tab="boletos" style="display:none">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">🎟 Precio de boletería (preventa / taquilla)</div>
               <div class="grid2">
                 <div class="fg"><label style="font-size:11px">Preventa</label><input id="ld-boletos-preventa" placeholder="Ej. $40.000" style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:11px">Taquilla</label><input id="ld-boletos-taquilla" placeholder="Ej. $60.000" style="font-size:12px"></div>
               </div>
             </div>
-            <div id="ld-campo-whatsapp" style="display:none" class="fg"><label style="font-size:12px">WhatsApp de contacto — número internacional sin + (57...)</label><input id="ld-whatsapp-tel" placeholder="Ej. 573001234567" style="font-size:12px"></div>
+            <div id="ld-campo-whatsapp" class="fg cont-tab-panel" data-cont-tab="whatsapp" style="display:none"><label style="font-size:12px">WhatsApp de contacto — número internacional sin + (57...)</label><input id="ld-whatsapp-tel" placeholder="Ej. 573001234567" style="font-size:12px"></div>
             <!-- BANNERS EDITORIALES f9b - contrato congelado content.banners[0..1] -->
-            <div id="ld-campo-banner-1" style="display:none">
+            <div id="ld-campo-banner-1" class="cont-tab-panel" data-cont-tab="banners" style="display:none">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">Banner 1 - cita editorial (opcional)</div>
               <div class="fg"><label style="font-size:12px">Frase</label><textarea id="ld-banner-1-frase" rows="2" placeholder="Frase editorial del banner..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
               <div class="grid2">
@@ -857,7 +802,7 @@ tr:hover td{background:var(--surface)}
                 <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">URL video</label><input id="ld-banner-1-video" type="url" placeholder="https://..." style="font-family:monospace;font-size:12px"></div>
               </div>
             </div>
-            <div id="ld-campo-banner-2" style="display:none">
+            <div id="ld-campo-banner-2" class="cont-tab-panel" data-cont-tab="banners" style="display:none">
               <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">Banner 2 - cita editorial (opcional)</div>
               <div class="fg"><label style="font-size:12px">Frase</label><textarea id="ld-banner-2-frase" rows="2" placeholder="Frase editorial del banner..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
               <div class="grid2">
@@ -869,19 +814,19 @@ tr:hover td{background:var(--surface)}
                 <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">URL video</label><input id="ld-banner-2-video" type="url" placeholder="https://..." style="font-family:monospace;font-size:12px"></div>
               </div>
             </div>
-            <div class="fg" style="margin-top:.5rem">
+            <div class="fg cont-tab-panel" data-cont-tab="form-redirect" style="margin-top:.5rem">
               <label style="font-size:12px">Link de redireccion del formulario (WhatsApp / grupo / comunidad)</label>
               <input id="ld-form-redirect" type="url" placeholder="https://wa.me/57... o https://chat.whatsapp.com/..." style="font-family:monospace;font-size:12px">
               <div style="font-size:10px;color:var(--ink3);margin-top:3px">A donde se redirige el asistente despues de enviar el formulario. Si se deja vacio, se usa el link de comunidad de WhatsApp del formulario.</div>
             </div>
 
             <!-- CAMPOS CAMPAÑA -->
-            <div id="ld-campo-historia" style="display:none">
+            <div id="ld-campo-historia" class="cont-tab-panel" data-cont-tab="historia" style="display:none">
               <div class="fg"><label style="font-size:12px">Título de la historia</label><input id="ld-historia-titulo" placeholder="Ej. Historia de la causa" style="font-size:12px"></div>
               <div class="fg"><label style="font-size:12px">Historia de la causa</label><textarea id="ld-historia-val" rows="4" placeholder="Describe el contexto y la urgencia de la causa..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
               <div class="fg"><label style="font-size:12px">Historia — hitos numerados: Título|Texto|URL-imagen (imagen opcional, una por línea)</label><textarea id="ld-historia-items-val" rows="3" placeholder="El terremoto|El 24 de junio de 2026 un sismo sacudió la costa central...|https://foto-terremoto.jpg&#10;Nuestra misión|Sonidos por el Cambio nace para convertir la cultura en ayuda...|" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             </div>
-            <div id="ld-campo-objetivo" style="display:none">
+            <div id="ld-campo-objetivo" class="cont-tab-panel" data-cont-tab="objetivo" style="display:none">
               <div class="grid2">
                 <div class="fg"><label style="font-size:12px">Meta económica ($)</label><input id="ld-objetivo-meta" type="number" placeholder="60000" style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:12px">Recaudado actual ($)</label><input id="ld-objetivo-actual" type="number" placeholder="32600" style="font-size:12px"></div>
@@ -890,15 +835,15 @@ tr:hover td{background:var(--surface)}
                 <div class="fg" style="grid-column:1/-1"><label style="font-size:12px">Texto motivacional</label><input id="ld-donate-text" placeholder="Tu apoyo hace la diferencia" style="font-size:12px"></div>
               </div>
             </div>
-            <div id="ld-campo-impacto" style="display:none"><div class="fg"><label style="font-size:12px">Impacto — ítem|valor|icono-emoji (uno por línea)</label><textarea id="ld-impacto-val" rows="3" placeholder="Niños educados|100+|🎓&#10;Familias apoyadas|50+|👨‍👩‍👧&#10;Comunidades|10+|🏘️" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-impacto" class="cont-tab-panel" data-cont-tab="impacto" style="display:none"><div class="fg"><label style="font-size:12px">Impacto — ítem|valor|icono-emoji (uno por línea)</label><textarea id="ld-impacto-val" rows="3" placeholder="Niños educados|100+|🎓&#10;Familias apoyadas|50+|👨‍👩‍👧&#10;Comunidades|10+|🏘️" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div class="fg"><label style="font-size:12px">"¿Cómo puedo ayudar?" — métricas de la columna de impacto: Etiqueta|Valor (una por línea)</label><textarea id="ld-como-ayudar-stats-val" rows="3" placeholder="Personas ayudadas|150.000+&#10;Estados afectados|10&#10;Desplazados|23.000" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div class="fg"><label style="font-size:12px">"Impacto hasta hoy" — métricas: Etiqueta|Valor (una por línea)</label><textarea id="ld-impacto-historico-val" rows="4" placeholder="Eventos|12&#10;Asistentes|3.400&#10;Personas ayudadas|150.000+&#10;Recaudación|$45.000.000 COP" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div class="fg"><label style="font-size:12px">"Impacto hasta hoy" — frase destacada del banner</label><input id="ld-impacto-historico-frase" placeholder="LA CULTURA NOS UNE. LA SOLIDARIDAD NOS MUEVE." style="font-size:12px"></div>
             </div>
-            <div id="ld-campo-equipo" style="display:none" class="fg"><label style="font-size:12px">Equipo — Nombre|Rol|URL-foto (uno por línea)</label><textarea id="ld-equipo-val" rows="3" placeholder="María López|Directora|https://foto.jpg&#10;Carlos Ramírez|Coordinador|" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-testimonios" style="display:none" class="fg"><label style="font-size:12px">Testimonios — Texto|Nombre-Rol (uno por línea)</label><textarea id="ld-testimonios-val" rows="3" placeholder="Gracias a su ayuda...|Ana, Beneficiaria&#10;Mi hijo ahora tiene acceso...|Rosa, Madre" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-actualizaciones" style="display:none" class="fg"><label style="font-size:12px">Actualizaciones — Categoría|Fecha|Título corto|Resumen (para el modal)|URL-imagen (opcional) — una por línea</label><textarea id="ld-actualizaciones-val" rows="3" placeholder="Salud|24 JUN 2026 · 10:30 AM|Brigada médica en Catia La Mar|Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico...|https://foto-brigada.jpg&#10;Logística|24 JUN 2026 · 08:45 AM|Entrega de kits de higiene|Más de 600 kits entregados a familias damnificadas en Caraballeda...|" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
-            <div id="ld-campo-contacto" style="display:none">
+            <div id="ld-campo-equipo" class="fg cont-tab-panel" data-cont-tab="equipo" style="display:none"><label style="font-size:12px">Equipo — Nombre|Rol|URL-foto (uno por línea)</label><textarea id="ld-equipo-val" rows="3" placeholder="María López|Directora|https://foto.jpg&#10;Carlos Ramírez|Coordinador|" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-testimonios" class="fg cont-tab-panel" data-cont-tab="testimonios" style="display:none"><label style="font-size:12px">Testimonios — Texto|Nombre-Rol (uno por línea)</label><textarea id="ld-testimonios-val" rows="3" placeholder="Gracias a su ayuda...|Ana, Beneficiaria&#10;Mi hijo ahora tiene acceso...|Rosa, Madre" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-actualizaciones" class="fg cont-tab-panel" data-cont-tab="actualizaciones" style="display:none"><label style="font-size:12px">Actualizaciones — Categoría|Fecha|Título corto|Resumen (para el modal)|URL-imagen (opcional) — una por línea</label><textarea id="ld-actualizaciones-val" rows="3" placeholder="Salud|24 JUN 2026 · 10:30 AM|Brigada médica en Catia La Mar|Atención gratuita a más de 400 familias afectadas por el sismo. El equipo médico...|https://foto-brigada.jpg&#10;Logística|24 JUN 2026 · 08:45 AM|Entrega de kits de higiene|Más de 600 kits entregados a familias damnificadas en Caraballeda...|" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+            <div id="ld-campo-contacto" class="cont-tab-panel" data-cont-tab="contacto" style="display:none">
               <div class="grid2">
                 <div class="fg"><label style="font-size:12px">Email de contacto</label><input id="ld-contacto-email" type="email" placeholder="info@causa.org" style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:12px">Teléfono / WhatsApp</label><input id="ld-contacto-tel" placeholder="+57 300 123 4567" style="font-size:12px"></div>
@@ -978,13 +923,61 @@ tr:hover td{background:var(--surface)}
         </div>
       </div>
 
+      <!-- ══ BLOQUE 5 · Fase de la landing + Hero meta (modulo 1 "Cimiento") ══
+           Disponible para las 3 categorias (cine/fiesta/campana). El control
+           de fase se movio aqui (antes en "Tipo de pagina publica", pasos 2/3)
+           y el bloque Hero meta salio del panel FIESTA (antes solo visible en
+           esa categoria). Ids unicos; Cero Borrado: ningun id/campo/handler
+           se elimino. -->
+      <div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem">
+        <!-- Fase de la landing -->
+        <div id="ev-fase-landing-wrap" style="margin-bottom:1rem">
+          <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px">🚦 Fase de la landing</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="ev-fase-landing">
+            <button type="button" id="ev-fase-completa" data-fase="completa" onclick="setFaseLanding('completa')" class="modo-card">
+              <div class="modo-emoji">🗓</div>
+              <div class="modo-title">Completa</div>
+              <div class="modo-sub">Landing ampliada con todos los módulos</div>
+            </button>
+            <button type="button" id="ev-fase-proximamente" data-fase="proximamente" onclick="setFaseLanding('proximamente')" class="modo-card">
+              <div class="modo-emoji">⏳</div>
+              <div class="modo-title">Próximamente</div>
+              <div class="modo-sub">Teaser: hero, contador y meta + WhatsApp</div>
+            </button>
+          </div>
+        </div>
+        <!-- Hero meta (override 2 lineas) -->
+        <div id="ld-meta-hero-wrap" style="margin-top:.6rem;border-top:1px solid var(--border);padding-top:.6rem">
+          <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Hero Meta - 2 lineas (opcional)</div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Si dejas el interruptor apagado, la linea del hero se arma sola con la fecha, la hora y la ubicacion del evento. Activalo solo si quieres escribirla a mano.</div>
+          <!-- ADR-056 (filas 7/8/11) + BLOQUE 5: override del hero, colapsado y
+               APAGADO por defecto. Movido desde el panel FIESTA al paso 1
+               Cimiento para que este disponible en las 3 categorias. Conserva
+               el patron casilla visible + contenedor oculto por display. -->
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--ink3)">
+            <input type="checkbox" data-hero-meta-override onchange="toggleHeroMetaOverride(this.checked)" style="width:13px;height:13px;accent-color:var(--gold)">
+            Personalizar texto del hero (avanzado)
+          </label>
+          <div data-hero-meta-fields style="display:none">
+            <div class="grid2" style="margin-top:.5rem">
+              <div class="fg"><label style="font-size:11px">Fecha L1</label><input id="ld-meta-fecha-l1" placeholder="Ej. Sabado 15" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Fecha L2</label><input id="ld-meta-fecha-l2" placeholder="Ej. Noviembre 2026" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Hora L1</label><input id="ld-meta-hora-l1" placeholder="Ej. Puertas 8:00 PM" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Hora L2</label><input id="ld-meta-hora-l2" placeholder="Ej. Show 10:00 PM" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Lugar L1</label><input id="ld-meta-lugar-l1" placeholder="Ej. Terraza Central" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Lugar L2</label><input id="ld-meta-lugar-l2" placeholder="Ej. Calle 85, Bogota" style="font-size:12px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       </div><!-- /wiz-step 1 -->
 
       <!-- ══ Continuación PASO 3 · Contenido (descripción + media) — ADR-021 ══ -->
       <div class="wiz-step" data-wiz-step="3">
 
       <!-- Descripción enriquecida (ancho completo) -->
-      <div class="fg" style="margin-top:.75rem">
+      <div class="fg cont-tab-panel" data-cont-tab="media" style="margin-top:.75rem">
         <label>Descripción
           <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">Acepta saltos de línea y formato libre</span>
         </label>
@@ -994,7 +987,7 @@ tr:hover td{background:var(--surface)}
       </div>
 
       <!-- Imagen + Video (lado a lado) -->
-      <div class="grid2" style="margin-top:.75rem;align-items:start">
+      <div class="grid2 cont-tab-panel" data-cont-tab="media" style="margin-top:.75rem;align-items:start">
 
         <!-- Imagen hero (fondo) -->
         <div class="fg">
@@ -1100,15 +1093,16 @@ tr:hover td{background:var(--surface)}
 
       </div>
 
-      <!-- ══ Disenos de ticket por tipo (ADR-064) — Wizard paso 3 ══
-           5 filas fijas, una por tipo de asistente (invitado, frecuente,
-           artista, produccion, pago). Las filas las monta ticketDisenos
-           (window._ticketDisenosSetEntries) y se guardan en
-           config_landing.content.ticket_disenos. Contrato congelado:
-           [{ tipo, diseno_url, activo }], un objeto por tipo como maximo. -->
-      <div class="fg" style="margin-top:.75rem">
-        <label>Disenos de ticket por tipo
-          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">Una imagen por tipo de asistente · JPG, PNG o WEBP · Max. 5 MB</span>
+      <!-- ══ Diseno de ticket — UNICO y global (antes ADR-064: 5 filas) ══
+           Se dejo UN SOLO diseno de ticket para todos los asistentes. La
+           fila la monta ticketDisenos (window._ticketDisenosSetEntries) y se
+           guarda en config_landing.content.ticket_disenos. Contrato
+           congelado (sin cambios): [{ tipo, diseno_url, activo }]; ahora la
+           UI emite un unico objeto (tipo 'invitado'), y el render resuelve
+           ese diseno para cualquier tipo via fallback nivel 2. -->
+      <div class="fg cont-tab-panel" data-cont-tab="media" style="margin-top:.75rem">
+        <label>Diseno de ticket (uno solo)
+          <span style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">Una sola imagen de ticket · JPG, PNG o WEBP · Max. 5 MB</span>
         </label>
         <div style="font-size:11px;color:var(--ink3);margin:.35rem 0 .6rem;background:var(--surface);padding:8px 10px;border-radius:var(--rsm);border:1px solid var(--border)">
           Sube el archivo o pega la URL publica del diseno. Si pegas una URL a mano, esa URL manda sobre la subida. Se guarda en <strong>config_landing.content.ticket_disenos</strong>.
@@ -1142,6 +1136,32 @@ tr:hover td{background:var(--surface)}
           <input type="checkbox" id="ev-campo-nota" style="width:13px;height:13px;accent-color:var(--gold)"> Nota del asistente
         </label>
       </div>
+      <!-- ══ Registro / Aforo (sección revelable del paso 4 Blindaje) — BLOQUE 3 ══ -->
+      <div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;font-weight:500;color:var(--ink2)">
+          <input type="checkbox" id="ev-registro-toggle" style="width:15px;height:15px;accent-color:var(--gold)" onchange="toggleRegistroAforo(this.checked)">
+          🎟 Registro / Aforo (página de registro y control de cupos)
+        </label>
+        <div id="ev-registro-wrap" style="display:none;margin-top:.85rem">
+
+        <!-- Config Formulario (aforo) — visible si el modo incluye formulario -->
+        <div id="ev-sist-dual-config" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.85rem">
+          <div style="font-size:12px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">📝 Formulario de registro (aforo)</div>
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:.5rem">Página independiente donde se registran artistas, invitados y pagos — estos registros son los que cuentan para el aforo.</div>
+          <div class="fg">
+            <label>Link comunidad de WhatsApp</label>
+            <input id="ev-comunidad-whatsapp" placeholder="https://chat.whatsapp.com/XXXX  o  https://wa.me/57..." style="width:100%">
+          </div>
+          <div class="fg" style="margin-top:.5rem">
+            <label>URL página de registro (aforo)</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="ev-form-solo-url" readonly style="flex:1;background:rgba(0,0,0,.08)">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="copyLink(document.getElementById('ev-form-solo-url').value,this)">Copiar</button>
+            </div>
+            <div style="font-size:10px;color:var(--ink3);margin-top:3px">Se genera automáticamente al guardar el evento con el slug. Ej: /registroaforo.html?slug=...</div>
+          </div>
+        </div>
+
       <!-- Constructor de campos personalizados -->
       <div style="margin-top:1.1rem;border-top:1px solid var(--border);padding-top:1rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
@@ -1167,6 +1187,9 @@ tr:hover td{background:var(--surface)}
           style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif">
         <span style="font-size:12px;color:var(--ink3)">Dejar vacío = sin límite de inscripciones</span>
       </div>
+
+        </div><!-- /ev-registro-wrap -->
+      </div><!-- /Registro / Aforo -->
 
       <!-- Puntos de acceso múltiple -->
       <div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem">
@@ -1209,6 +1232,7 @@ tr:hover td{background:var(--surface)}
         <button type="button" class="btn btn-ghost" id="wiz-btn-prev" onclick="wizPrev()" style="visibility:hidden">← Atrás</button>
         <div style="display:flex;gap:8px">
           <button type="button" class="btn btn-ghost" id="wiz-btn-cancel-edit" onclick="cancelarEdicion()" style="display:none">✕ Cancelar edición</button>
+          <button type="button" class="btn btn-gold" id="wiz-btn-save-bottom" onclick="guardarWizardRapido()">Guardar</button>
           <button type="button" class="btn btn-gold" id="wiz-btn-next" onclick="wizNext()">Siguiente →</button>
         </div>
       </div>
@@ -1369,7 +1393,7 @@ tr:hover td{background:var(--surface)}
     </div>
 
     <div class="card" style="margin-top:1rem">
-      <div class="ch">Historial de eventos</div>
+      <div class="ch">Eventos</div>
       <div class="hist-filters">
         <input type="text" id="hist-search" placeholder="🔍 Buscar por nombre…" oninput="renderEventos()" style="flex:1;min-width:160px">
         <select id="hist-cat-filter" onchange="renderEventos()" style="width:auto">
@@ -3023,6 +3047,21 @@ function toggleSistDual(activa) {
   document.getElementById('ev-sist-dual-config').style.display = activa ? 'block' : 'none';
 }
 
+// BLOQUE 3 — Registro/Aforo movido al paso 4 (Blindaje) como sección revelable.
+// Reutiliza el patrón de visibilidad existente (checkbox + contenedor, igual que
+// toggleMultiAcceso): al marcarlo se despliegan TODAS las opciones de registro/aforo
+// (config de formulario, aforo y campos personalizados); al desmarcarlo se ocultan.
+function toggleRegistroAforo(activa) {
+  const wrap = document.getElementById('ev-registro-wrap');
+  if (wrap) wrap.style.display = activa ? 'block' : 'none';
+  // Si se revela el módulo, asegurar que el bloque interno de config del
+  // formulario (gobernado por el modo público) también sea visible.
+  if (activa) {
+    const dual = document.getElementById('ev-sist-dual-config');
+    if (dual) dual.style.display = 'block';
+  }
+}
+
 // ADR-033 — Modo de página pública del evento: 'landing' | 'formulario' | 'landing_formulario'.
 // Un único selector de 3 opciones gobierna los checkboxes internos ev-landing-activa y
 // ev-sist-dual (que a su vez alimentan _buildConfigLanding). Mantiene retrocompatibilidad
@@ -3082,6 +3121,15 @@ function setModoPublico(modo) {
   const sd = document.getElementById('ev-sist-dual');
   if (sd) sd.checked = inclForm;
   toggleSistDual(inclForm);
+
+  // BLOQUE 3 — el selector de modo (paso 2/3) también revela la sección
+  // Registro/Aforo del paso 4 cuando el modo incluye formulario. No se oculta
+  // al volver a "landing" para no descartar una configuración manual del usuario.
+  if (inclForm) {
+    const regToggle = document.getElementById('ev-registro-toggle');
+    if (regToggle) regToggle.checked = true;
+    toggleRegistroAforo(true);
+  }
 }
 
 // Deriva el modo de página pública de un evento guardado (usa modo_publico si existe;
@@ -3608,9 +3656,11 @@ function _aplicarPresetTheme(theme, tipo) {
     chk.disabled = true;
     fire(id);
   });
-  // Hero meta a 2 lineas: solo visibilidad, SIN limpiar los inputs ld-meta-*.
+  // BLOQUE 5 - Hero meta movido al paso 1 Cimiento y disponible para las 3
+  // categorias: ya NO se oculta por theme. metaDosLineas queda como metadato de
+  // catalogo, sin gobernar la visibilidad. No limpia los inputs ld-meta-*.
   const metaWrap = document.getElementById('ld-meta-hero-wrap');
-  if (metaWrap) metaWrap.style.display = preset.metaDosLineas ? '' : 'none';
+  if (metaWrap) metaWrap.style.display = '';
   // ADR-055 (tabla d.3 + punto 8): el canal de efectos de f9b nace con parallax
   // ON y grain/glow/vhs OFF. Se fija al elegir el theme para que un evento f9b
   // nuevo no dependa solo del atributo checked del HTML (MEDIA-1 de la revision).
@@ -3710,6 +3760,8 @@ function wizShow(step) {
     const steps = String(el.dataset.wizStep).split(',').map(s => s.trim());
     el.classList.toggle('wiz-visible', steps.includes(String(step)));
   });
+  // BLOQUE 6 — refrescar la barra de pestañas de contenido al mostrar el paso 3.
+  if (step === 3 && typeof window.contRefreshTabs === 'function') window.contRefreshTabs();
   document.querySelectorAll('.wiz-pill').forEach(p => {
     const n = Number(p.dataset.pill);
     p.classList.toggle('active', n === step);
@@ -3873,7 +3925,141 @@ document.addEventListener('DOMContentLoaded', () => {
       if (posterCampo) posterCampo.style.display = e.target.checked ? 'block' : 'none';
     }
   });
+
+  // BLOQUE 4 — sincroniza la visibilidad de los campos #ld-campo-* con el estado
+  // ACTUAL de los checkboxes (idempotente, sin depender de eventos change).
+  // openEditMod() la usa al restaurar cfg.modules para que las opciones de TODOS
+  // los módulos marcados se vean de inmediato. Un campo compartido por varias
+  // categorías (gallery/faq/sponsors/dresscode) se muestra si CUALQUIERA de sus
+  // checkboxes está marcado.
+  function _syncModCamposVisibilidad() {
+    const visibles = new Set();
+    Object.keys(modMap).forEach(modId => {
+      const chk = document.getElementById(modId);
+      if (chk && chk.checked) visibles.add(modMap[modId]);
+    });
+    Object.keys(modMap).forEach(modId => {
+      const el = document.getElementById(modMap[modId]);
+      if (el) el.style.display = visibles.has(modMap[modId]) ? 'block' : 'none';
+    });
+    const sinChk = document.getElementById('ld-mod-sinopsis');
+    const posterCampo = document.getElementById('ld-campo-sinopsis-poster');
+    if (posterCampo) posterCampo.style.display = (sinChk && sinChk.checked) ? 'block' : 'none';
+  }
+  window._syncModCamposVisibilidad = _syncModCamposVisibilidad;
 })();
+
+// ════════════════════════════════════════════════════════════
+// BLOQUE 6 — PESTAÑAS DE CONTENIDO del paso 3 (una por módulo ADN).
+// Organizan/navegan; NO tocan modMap ni _syncModCamposVisibilidad: la
+// visibilidad de cada #ld-campo-* sigue gobernada por su checkbox. Un
+// panel = todo elemento [data-cont-tab="X"] (varios pueden compartir id,
+// p. ej. banners 1+2). Una pestaña solo es navegable si su módulo está
+// marcado y su bloque .mods-tipo es el de la categoría activa.
+// ════════════════════════════════════════════════════════════
+(function() {
+  var CONT_TABS = [
+    { id: 'identidad',       label: '✨ Identidad / Hero' },
+    { id: 'media',           label: '🖼 Media' },
+    { id: 'sinopsis',        label: '📝 Sinopsis',       mods: ['ld-mod-sinopsis'] },
+    { id: 'trailer',         label: '🎬 Tráiler',        mods: ['ld-mod-trailer'] },
+    { id: 'director',        label: '🎥 Reparto / Director', mods: ['ld-mod-director'] },
+    { id: 'galeria',         label: '🖼 Galería',        mods: ['ld-mod-gallery-cine','ld-mod-gallery-fiesta','ld-mod-gallery-campana'] },
+    { id: 'dresscode',       label: '👗 Dresscode',      mods: ['ld-mod-dresscode-cine','ld-mod-dresscode-fiesta'] },
+    { id: 'sponsors',        label: '🤝 Sponsors',       mods: ['ld-mod-sponsors-cine','ld-mod-sponsors-fiesta','ld-mod-sponsors-campana'] },
+    { id: 'faq',             label: '❓ FAQ',             mods: ['ld-mod-faq-cine','ld-mod-faq-fiesta','ld-mod-faq-campana'] },
+    { id: 'lineup',          label: '🎧 Lineup',         mods: ['ld-mod-dj-lineup'] },
+    { id: 'playlist',        label: '🎵 Playlist',       mods: ['ld-mod-playlist'] },
+    { id: 'guestlist',       label: '📋 Guestlist',      mods: ['ld-mod-guest-list'] },
+    { id: 'ubicacion',       label: '📍 Ubicación',      mods: ['ld-mod-ubicacion'] },
+    { id: 'boletos',         label: '🎟 Boletos',        mods: ['ld-mod-boletos'] },
+    { id: 'whatsapp',        label: '💬 WhatsApp',       mods: ['ld-mod-whatsapp'] },
+    { id: 'banners',         label: '📰 Banners',        mods: ['ld-mod-banner-1','ld-mod-banner-2'] },
+    { id: 'form-redirect',   label: '🔗 Formulario' },
+    { id: 'historia',        label: '📖 Historia',       mods: ['ld-mod-historia'] },
+    { id: 'objetivo',        label: '💰 Objetivo',       mods: ['ld-mod-objetivo'] },
+    { id: 'impacto',         label: '✨ Impacto',        mods: ['ld-mod-impacto'] },
+    { id: 'equipo',          label: '👥 Equipo',         mods: ['ld-mod-equipo'] },
+    { id: 'testimonios',     label: '💬 Testimonios',    mods: ['ld-mod-testimonios'] },
+    { id: 'actualizaciones', label: '📢 Actualizaciones', mods: ['ld-mod-actualizaciones'] },
+    { id: 'contacto',        label: '📞 Contacto',       mods: ['ld-mod-contacto'] }
+  ];
+  var _contTab = null;
+
+  function _contTabDisponible(t) {
+    if (!t.mods || !t.mods.length) return true; // siempre disponible
+    return t.mods.some(function(mid) {
+      var chk = document.getElementById(mid);
+      if (!chk || !chk.checked) return false;
+      var box = chk.closest ? chk.closest('.mods-tipo') : null;
+      return !box || box.style.display !== 'none';
+    });
+  }
+
+  function _contAplicarPaneles(id) {
+    document.querySelectorAll('[data-cont-tab]').forEach(function(el) {
+      el.classList.toggle('cont-active', el.getAttribute('data-cont-tab') === id);
+    });
+    // #ld-campo-ubicacion quedó fuera de modMap (ADR-056): lo gobierna este tab.
+    var ub = document.getElementById('ld-campo-ubicacion');
+    if (ub) {
+      var chkU = document.getElementById('ld-mod-ubicacion');
+      ub.style.display = (id === 'ubicacion' && chkU && chkU.checked) ? 'block' : 'none';
+    }
+  }
+
+  function _contMarcarBoton(id) {
+    var bar = document.getElementById('ld-cont-tabs');
+    if (!bar) return;
+    bar.querySelectorAll('.cont-tab').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-cont-tab-btn') === id);
+    });
+  }
+
+  function contGoTab(id) {
+    var t = null;
+    for (var i = 0; i < CONT_TABS.length; i++) { if (CONT_TABS[i].id === id) t = CONT_TABS[i]; }
+    if (t && !_contTabDisponible(t)) return; // pestaña no navegable
+    _contTab = id;
+    _contAplicarPaneles(id);
+    _contMarcarBoton(id);
+  }
+
+  function contRefreshTabs() {
+    if (document.body) document.body.classList.add('cont-tabs-ready');
+    var bar = document.getElementById('ld-cont-tabs');
+    if (!bar) return;
+    var disp = CONT_TABS.filter(_contTabDisponible);
+    if (!disp.length) {
+      bar.innerHTML = '<div class="cont-tab-empty">Marca al menos un módulo para ver sus opciones de contenido.</div>';
+      _contTab = null;
+      _contAplicarPaneles(null);
+      return;
+    }
+    bar.innerHTML = disp.map(function(t) {
+      return '<button type="button" class="adm-tab cont-tab" data-cont-tab-btn="' + t.id +
+             '" onclick="contGoTab(\'' + t.id + '\')">' + t.label + '</button>';
+    }).join('');
+    var ids = disp.map(function(t) { return t.id; });
+    if (!_contTab || ids.indexOf(_contTab) === -1) _contTab = disp[0].id; // primera disponible
+    _contAplicarPaneles(_contTab);
+    _contMarcarBoton(_contTab);
+  }
+
+  window.contGoTab = contGoTab;
+  window.contRefreshTabs = contRefreshTabs;
+
+  // Refresco al marcar/desmarcar módulos (incluye los presets ADN que disparan change).
+  document.addEventListener('change', function(e) {
+    if (e.target && /^ld-mod-/.test(e.target.id || '')) contRefreshTabs();
+  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', contRefreshTabs);
+  } else {
+    contRefreshTabs();
+  }
+})();
+
 
 // === DJ LINEUP FORM (v223) — Formulario dinámico con campos individuales ===
 (function() {
@@ -5498,11 +5684,11 @@ function openEditMod(evId) {
         chk.dispatchEvent(new Event('change', { bubbles: true }));
       });
     }
-    // ADN Visual (edicion): gobernar el hero meta a 2 lineas segun el theme (el
-    // preset se omite con preserveModules). No limpia los inputs ld-meta-*.
+    // BLOQUE 5 - Hero meta movido al paso 1 Cimiento (disponible para todas las
+    // categorias): ya NO se oculta por theme. No limpia los inputs ld-meta-*.
     if (presetEdit) {
       const metaWrapEdit = document.getElementById('ld-meta-hero-wrap');
-      if (metaWrapEdit) metaWrapEdit.style.display = presetEdit.metaDosLineas ? '' : 'none';
+      if (metaWrapEdit) metaWrapEdit.style.display = '';
     }
     // Efectos
     const fx = cfg.effects || {};
@@ -5546,8 +5732,25 @@ function openEditMod(evId) {
   // queden visibles o marcados al editar. Solo las cajas del tipo activo se muestran.
   hideForeignModulesByType(tipo, suf);
 
+  // BLOQUE 4 — FIX: sincronizar la visibilidad de los campos de contenido
+  // (#ld-campo-*) con el estado FINAL de los checks (tras hideForeignModulesByType),
+  // para que al editar un evento los módulos ADN marcados desplieguen sus opciones
+  // de una sola vez, sin deseleccionar/reseleccionar manualmente.
+  if (typeof window._syncModCamposVisibilidad === 'function') window._syncModCamposVisibilidad();
+
   // ADR-033 — restaurar el selector de modo de página pública (y sus paneles).
   setModoPublico(_deriveModoPublico(ev));
+
+  // BLOQUE 3 — revelar la sección Registro/Aforo del paso 4 si el evento ya
+  // tiene formulario de registro, aforo o campos personalizados.
+  const _regToggleEdit = document.getElementById('ev-registro-toggle');
+  if (_regToggleEdit) {
+    const _regActiva = (_evModoPublico === 'formulario' || _evModoPublico === 'landing_formulario')
+      || !!ev.aforo_max
+      || (fc && Array.isArray(fc.custom) && fc.custom.length > 0);
+    _regToggleEdit.checked = _regActiva;
+    toggleRegistroAforo(_regActiva);
+  }
 
   // ADR-051 — restaurar la fase de la landing y el subtítulo del hero.
   _evFaseLanding = (ev.fase_landing === 'proximamente') ? 'proximamente' : 'completa';
@@ -5626,6 +5829,10 @@ function _limpiarWizardCompleto() {
   resetCamposCustom();
   _evCategoria = null; _evCapturaPura = false; _ldThemeSeleccionado = null;
   if (typeof _limpiarI18nEditor === 'function') _limpiarI18nEditor();
+  // BLOQUE 3 — la sección Registro/Aforo vuelve a su estado colapsado.
+  const _regToggleClear = document.getElementById('ev-registro-toggle');
+  if (_regToggleClear) _regToggleClear.checked = false;
+  toggleRegistroAforo(false);
   setModoPublico('landing');
   setFaseLanding('completa'); // ADR-051 — la fase vuelve a su default
 }
@@ -7057,6 +7264,16 @@ async function crearEvento() {
     btn.disabled = false;
     btn.textContent = textoOriginal;
   }
+}
+
+// Bloque 2 - handler unico de los botones "Guardar" del wizard (arriba y abajo).
+// Reutiliza la logica existente sin duplicar: en edicion delega a
+// guardarEventoWizard() (UPDATE); en evento nuevo delega a crearEvento(),
+// que a su vez despacha a _crearSerie()/_crearEventoUnico() segun _evTipo.
+// Conserva las validaciones y el feedback (alrt en #ev-alert) ya existentes.
+function guardarWizardRapido() {
+  if (_evEditandoId) return guardarEventoWizard();
+  return crearEvento();
 }
 
 // Calcula el estado inicial de un evento nuevo según el plan de la org activa.
@@ -11214,23 +11431,22 @@ async function _imgSharedUpload(bucket, path, file) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// DISENOS DE TICKET POR TIPO (ADR-064) — Wizard paso 3
+// DISENO DE TICKET — UNICO y global (antes ADR-064: 5 tipos) — Wizard paso 3
 // Contrato CONGELADO (lo consumen la migracion adr064_ticket_disenos.sql y
-// el kernel del render). NO cambiar la forma:
+// el kernel del render). NO cambiar la FORMA del dato:
 //   config_landing.content.ticket_disenos = [{ tipo, diseno_url, activo }]
-// Tipos validos: invitado | frecuente | artista | produccion | pago.
-// Un objeto por tipo como maximo. Sin campo `default`.
+// Ahora la UI emite UN SOLO objeto (tipo 'invitado', tipo valido del
+// contrato congelado). El render aplica ese diseno a cualquier tipo de
+// asistente via su fallback nivel 2 (primer diseno activo). Sin campo
+// `default`.
 //   - GetEntries: serializa SOLO las filas con diseno_url (array, nunca null).
-//   - SetEntries: reconstruye las 5 filas desde el dato guardado (preload).
+//   - SetEntries: reconstruye la fila unica desde el dato guardado (preload),
+//     aceptando tambien datos viejos (toma el primer tipo conocido).
 //   - Reset: se llama desde _limpiarWizardCompleto (mismo camino que
 //     _sponsorsSetEntries / _djLineupSetEntries, fail-open si no existe).
 // ══════════════════════════════════════════════════════════════════
 const TICKET_DISENOS_TIPOS = [
-  { tipo: 'invitado',   label: 'Invitado' },
-  { tipo: 'frecuente',  label: 'Frecuente' },
-  { tipo: 'artista',    label: 'Artista' },
-  { tipo: 'produccion', label: 'Producción' },
-  { tipo: 'pago',       label: 'Pago' },
+  { tipo: 'invitado',   label: 'Diseno de ticket' },
 ];
 const _TICKET_DISENO_BUCKET = 'eventos-imagenes';
 // Silueta 1x1 en data URI: fallback de ADR-008 para los <img> dinamicos (una
@@ -11432,15 +11648,16 @@ window._ticketDisenosGetEntries = () => {
     return { tipo: tipo, diseno_url: url, activo: !!(chk && chk.checked) };
   }).filter(Boolean);
 };
-// Reconstruye SIEMPRE las 5 filas (tienen que existir aunque no haya dato):
-// arr = [{ tipo, diseno_url, activo }] o [] para el estado inicial.
+// Reconstruye SIEMPRE la fila unica (tiene que existir aunque no haya dato):
+// arr = [{ tipo, diseno_url, activo }] o [] para el estado inicial. Acepta
+// datos viejos con cualquier tipo y toma el primer objeto conocido.
 window._ticketDisenosSetEntries = (arr) => {
   const cont = document.getElementById('ticket-disenos-rows');
   if (!cont) return;
   const items = Array.isArray(arr) ? arr : [];
   cont.innerHTML = '';
   TICKET_DISENOS_TIPOS.forEach(def => {
-    const item = items.find(x => x && x.tipo === def.tipo) || null;
+    const item = items.find(x => x && x.tipo === def.tipo) || items[0] || null;
     addTicketDisenoRow({ tipo: def.tipo, diseno_url: item ? item.diseno_url : '', activo: item ? (item.activo !== false) : true });
   });
 };

@@ -809,8 +809,8 @@ function s8(adm) {
   var orden = m ? (m[1].match(/tipo:\s*'([^']*)'/g) || []).map(function (s) {
     return s.replace(/tipo:\s*'/, '').replace(/'$/, '');
   }) : [];
-  eq(orden, ['invitado', 'frecuente', 'artista', 'produccion', 'pago'],
-    'S8 la UI declara los 5 tipos en el ORDEN CONGELADO');
+  eq(orden, ['invitado'],
+    'S8 la UI declara UN SOLO diseno de ticket (global) con tipo valido del contrato');
   ok(m && m[1].indexOf('default') === -1, 'S8 la UI NO declara un campo "default" (la ausencia ES el fallback)');
   ok(/_TICKET_DISENO_BUCKET\s*=\s*'eventos-imagenes'/.test(adm), 'S8 el bucket de los disenos es eventos-imagenes');
   ok(adm.indexOf("'disenos/' + _ticketDisenoSlug()") !== -1, 'S8 el path de Storage es disenos/{slug}/{tipo}_{ts}.{ext}');
