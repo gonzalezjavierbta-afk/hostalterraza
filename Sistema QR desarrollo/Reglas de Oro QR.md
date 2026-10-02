@@ -1,4 +1,46 @@
+---
+doc: Reglas de Oro QR.md
+version: v129-MASTER (preservada)
+fecha: 2026-10-01
+origen: Reglas de Oro QR.md L1-123 (AMPLIACION/_backups/Reglas de Oro QR.md.2026-10-01.bak)
+version_previa: Reglas de Oro QR.md v129-MASTER (123 líneas)
+relacionados: [INDEX.md, PROJECT.md, DECISIONS.md, NEXT.md]
+estado: vigente
+estructura: indice-v1 (2026-10-01)
+---
+
 # 🏆 REGLAS DE ORO DE AUDITORÍA (v129-MASTER)
+
+> **Mapa de secciones** (20 mandatos, texto original íntegro; líneas de este archivo):
+
+| Sección | Líneas |
+|---|---|
+| 🛡️ I. Protocolos de Desarrollo y Datos (Cimiento) | L49-50 |
+| 1. Mandato de Prioridad Estructural (Data-First) | L51-55 |
+| 2. Protocolo de "Cero Borrado" e Integridad (STRICT) | L56-58 |
+| 3. Protocolo de Masa Crítica y Segmentos (v123-Legacy) | L59-62 |
+| 4. Escudo de Auditoría GOLD (Salud del Sistema) | L63-72 |
+| 🎨 II. Estándares Visuales y Multimedia (Cara) | L73-74 |
+| 5. Sincronización Multimedia 1:1 | L75-77 |
+| 6. Protocolo de Video YouTube (ADR-005) | L78-80 |
+| 7. Silent Fallback y Transparencia Real (ADR-008) | L81-84 |
+| 8. Tratamiento No-Plano y Geist 900 | L85-89 |
+| 📂 III. Gobernanza y Gestión de Silos (Ley de AI-DOS) | L90-91 |
+| 9. Aislamiento Atómico (Scoped CSS) | L92-94 |
+| 10. Diagramación vía Grid (f1 Standard) | L95-97 |
+| 11. Integración de Proximidad Multimedia (ADR-010) | L98-100 |
+| 12. Mandato Maestro de Actualización Documental (Regla v126) | L101-108 |
+| 📐 IV. ACTUALIZACIÓN v2.9: Fidelidad Visual y Armonía Cromática | L109-110 |
+| 13. Regla #9: Sistema de Armonización Cromática AI-DOS | L111-116 |
+| 14. Regla #10: Estándar de Calidad Móvil 2026 ($10,000 Quality Standard) | L117-121 |
+| 15. Regla #11: Lógica de Negocio y Protocolo de "Captura Pura" | L122-125 |
+| 16. Regla #12: Orquestador de Intención Contextual y Centinela Temporal | L126-130 |
+| ⚙️ V. GOBERNANZA DE RECURSOS (v129) | L131-132 |
+| 17. Mandato de Eficiencia de Recursos y Contexto (costo = turnos × contexto) | L133-143 |
+| 18. Mandato de Consolidación de Fases y Agentes | L144-148 |
+| 19. Mandato de Presupuesto Explícito y Confirmación Final (v129) | L149-154 |
+| 20. Mandato de Umbral de Tareas Pesadas y Desvío Externo Asistido (v129) | L155-165 |
+
 
 Este documento representa el blindaje técnico y operativo innegociable del Sistema QR Hostal Terraza. Cualquier intervención por parte de una IA ejecutora debe ser validada contra estos 20 mandatos incondicionales bajo el framework AI-DOS v1.2.
 

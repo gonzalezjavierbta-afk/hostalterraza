@@ -1,4 +1,35 @@
+---
+doc: BLUEPRINT.md
+version: v1.6.2 — Contrato v112 (preservada)
+fecha: 2026-10-01
+origen: BLUEPRINT.md L1-137 (AMPLIACION/_backups/BLUEPRINT.md.2026-10-01.bak)
+version_previa: BLUEPRINT.md v1.6.2 — Contrato v112 (137 líneas)
+relacionados: [INDEX.md, PROJECT.md, DECISIONS.md, AMPLIACION/TEMPLATES.md]
+estado: vigente
+estructura: indice-v1 (2026-10-01)
+---
+
 # 🧬 BLUEPRINT.md — Arquitectura Técnica y Modelo de Datos (v1.6.2 — Contrato v112)
+
+> **Mapa de secciones** (cuerpo original íntegro; líneas de este archivo):
+
+| Sección | Líneas |
+|---|---|
+| Información de Estado | L38-45 |
+| 1. Arquitectura Frontend: Cerebro Único y Múltiples Caras | L46-48 |
+| 📂 Estándar de Filesystem (Silos Atómicos y Convención de Rutas) | L49-54 |
+| 🛠️ Componentes y Archivos Core | L55-65 |
+| 2. Estándar Layout & Grid v2.0 | L66-73 |
+| 3. Modelo de Datos: Fuente de Verdad (Supabase) | L74-77 |
+| 🗄️ Esquema de Tabla `organizaciones` | L78-81 |
+| 🗄️ Esquema de Tabla `eventos` e `inscritos` (Normalizada) | L82-89 |
+| 4. Contrato de Datos v111: Los 21 Átomos Soberanos Protegidos | L90-114 |
+| 4b. Extensiones Aditivas y Componentes Adicionales | L115-135 |
+| 5. Protocolo de Conversión Dual-Phase (Estándar de Alta Conversión) | L136-143 |
+| 6. Reglas de Blindaje de Calidad (QA GOLD) | L144-145 |
+| 🏗️ Lógica de Diagramación y Layout | L146-151 |
+| 🛡️ Salvaguarda de Activos y Media | L152-168 |
+
 
 Este documento constituye la **Única Fuente de Verdad** técnica del Sistema QR Hostal Terraza. Ninguna modificación estructural ni de esquema puede realizarse sin el Decision Protocol y la validación del Chief Architect.
 
