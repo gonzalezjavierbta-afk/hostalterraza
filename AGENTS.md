@@ -32,13 +32,13 @@ Roster: 20 agentes = 4 primarios (orquestan) + 16 subagentes; un agente por domi
 | certificación | @qa-auditor |
 
 - **Primarios** (`mode: primary`): `@plan`/`@build` (PAGO) y `@free-plan`/`@free-build` (FREE, default); orquestan y delegan, no implementan. Sin ruta híbrida (ADR-067).
-- **Herencia (ADR-069):** los 16 subagentes no declaran `model:`; heredan del primario (`big-pickle` vía `@free-build`, `deepseek-v4.1-flash` vía `@build`). Primarios FREE usan allow-list de `permission.task` (§2): 7 dominios seguros; 9 de riesgo a PAGO.
+- **Herencia (ADR-069):** los 16 subagentes no declaran `model:`; heredan del primario (`big-pickle` vía `@free-build`, `deepseek-v4.1-flash` vía `@build`). **Allow-list ampliada (ADR-071, 2026-10-02):** los 16 son invocables desde los primarios FREE; los 9 de riesgo conservan el gate de §2.
 - Agentes: `ls .opencode/agent/` (ADR-006).
 
 ## 2. Tier por riesgo y confirmación
 
 - **free-first** (FREE) para trabajo mecánico/lectura; `default_agent: build` es solo entrada, no fija tier (lo resuelve §0).
-- **Allow-list FREE (ADR-069):** `@docs-keeper`, `@explore`, `@js-silo-dev`, `@frontend-tpl`, `@content-loader`, `@media-reader`, `@qa-auditor` (`permission.task` con `"*": deny` primero). Los 9 de riesgo (**sql-security, data-migration, backend-dev, renderer-dev, admin-dev, architect, architect-review, seo-dev, research-agent**) exigen PAGO. Riesgo aceptado: forzar por `@` un dominio de riesgo desde FREE corre en `big-pickle`; mitiga la allow-list. Detalle: skill `cascada-tier`.
+- **Allow-list FREE (ADR-069 + ADR-071):** los **16 subagentes son invocables** desde `@free-build`/`@free-plan` (`permission.task` con `"*": deny` primero y las 16 excepciones en `allow`). Los 9 de riesgo (**sql-security, data-migration, backend-dev, renderer-dev, admin-dev, architect, architect-review, seo-dev, research-agent**) exigen el **gate de confirmación** del punto siguiente: permitidos por config no significa autorizados a ejecutar. Detalle: skill `cascada-tier`.
 - **Gate de confirmación por riesgo (PAGO):** confirmación explícita del usuario antes de RLS/esquema y migraciones (`@sql-security`, `@data-migration`), motor `evento-app.html` (`@renderer-dev`), arquitectura/ADR (`@architect`, `@architect-review`).
 - El tier solo cambia por decisión/confirmación explícita; nunca automático. Prohibido desdoblar PAGO+FREE en paralelo.
 
