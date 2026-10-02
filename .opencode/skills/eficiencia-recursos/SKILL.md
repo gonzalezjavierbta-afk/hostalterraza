@@ -5,7 +5,7 @@ description: "Reglas de eficiencia: costo = turnos x contexto, grep, diagnóstic
 
 # Eficiencia de Recursos (v129)
 
-Operativiza los Mandatos 17, 18, 19 y 20 de `Sistema QR desarrollo/Reglas de Oro QR.md` (v129-MASTER). La unidad de costo real es `turnos × contexto acumulado`, no el output: en la sesión de banners del silo `f9b` el `cache_read` fue 29.5M de 32.2M tokens (91.7%), con input fresco 2.16M (6.7%), output 0.28M (0.9%) y razonamiento 0.22M (0.7%); `AGENTS.md` (8.123 tokens) se releyó en cada turno de cada agente (~6.5M tokens, ~20% del total). Métrica de control: `cache_read / turnos` (50.000 a 76.000 tokens por turno en esa sesión).
+Operativiza los Mandatos 17, 18, 19 y 20 de `Sistema QR desarrollo/Reglas de Oro QR.md` (v129-MASTER). La unidad de costo real es `turnos × contexto acumulado`, no el output: en la sesión de banners del silo `f9b` el `cache_read` fue 29.5M de 32.2M tokens (91.7%), con input fresco 2.16M (6.7%), output 0.28M (0.9%) y razonamiento 0.22M (0.7%); `AGENTS.md` se releyó en cada turno de cada agente. **OVERHEAD REAL MEDIDO (2026-10-02, `usage_report.js --overhead`): 3.142 tokens/turno** = `AGENTS.md` 1.991 + descripciones de los 20 agentes 793 + 9 skills 359. En una sesión de 10,9M tokens eso es el **4,7%, no el ~20%** que se venía citando: los ~8,1k/turno eran el archivo completo, no las piezas que el system prompt inyecta. **Conclusión: el costo lo fija el historial acumulado, no el prompt** — por eso medir `--overhead` antes de culpar a la normativa. Métrica de control: `cache_read / turnos` (50.000 a 76.000 tokens por turno en esa sesión).
 
 ## Reglas de sesión
 
@@ -63,9 +63,22 @@ Datos reales del feature Guest List, medidos con `scripts/usage_report.js` (prev
 | Orquestador `build` | 5.196.654 tokens / 67 turnos = 77.562 tokens/turno (78,1% del feature) |
 | Subagentes | 15.000-29.000 tokens/turno |
 | `cache_read` global | 89-90% |
-| `AGENTS.md` | ~8.1k tokens releídos cada turno |
+| `AGENTS.md` (medido con `--overhead`, no estimado) | **3.142 tokens/turno** (antes citado como ~8,1k: erróneo) |
+| Feature registroaforo (2026-10-02, ruta FREE) | 10.922.712 tokens / 160 turnos = **63.994 tokens/turno**, `cache_read` 93,7%, costo $0 |
+| Subagentes en ruta FREE | **0** — el árbol `--tree` tiene 1 solo nodo; el aislamiento impide delegar, así que la única palanca es fragmentar |
 
 Objetivo de control: bajar el `cache_read/turno` del orquestador por debajo de **~50.000**.
+
+## Reglas duras derivadas de la medición del 2026-10-02
+
+Estas cuatro reglas no son recomendaciones: cada una corrige una fuga medida en la sesión de `registroaforo.html` (10,9M tokens, el peor `free-build` del histórico con el 12,4% de todo su consumo).
+
+1. **25 turnos = tope DURO.** La sesión de `registroaforo` los triplicó (160). El costo crece de forma superlineal con los turnos porque cada uno reenvía el historial completo. Al llegar a 25: resumen de estado y **sesión nueva**. Cada dominio es una sesión.
+2. **Editar solo con la herramienta `edit`, nunca PowerShell inline.** Un `edit` cuesta ~0,08 s de reloj; la cirugía equivalente con PowerShell sobre `TASKS-DETALLE.md` costó **19 min y borró TSK-089 y un encabezado de ADR**. Se detectó con `grep` de anclas y se revirtió con `git diff`. En docs, el shell inline no es más rápido: es más lento y destructivo.
+3. **`usage_report.js` siempre acotado** (`--root <id>` o `--since <fecha>`). Un `--json --since 0` sin acotar recorre todo el histórico y **expiró a los 120 s** de timeout sin devolver nada.
+4. **Verificación en una sola llamada `bash`.** Encadenar los `node scripts/*.js` con `;` y un solo resumen: ~5 turnos y ~2 min de reloj ahorrados por sesión.
+
+Corolario FREE: como la ruta FREE no puede delegar en `@explore` (los subagentes son PAGO), **el antidoto contra el contexto acumulado no es absorber la exploración sino abrir más sesiones cortas**.
 
 ## `scripts/usage_report.js` — contrato CONGELADO
 
