@@ -1935,7 +1935,7 @@ tr:hover td{background:var(--surface)}
     <!-- ADR-072 · Llegadas por link de invitador: accesos medidos (total historico, sin filtro de periodo) -->
     <div class="card" style="margin-bottom:1rem">
       <div class="ch" style="margin-bottom:.25rem">Llegadas por link de invitador</div>
-      <div style="font-size:11px;color:var(--ink3);margin-bottom:.75rem">Personas que entraron a la web por cada link de invitador. Cifras de accesos medidos, no de inscripciones: empiezan a contar desde que se publico la medicion, el historico anterior no quedo registrado.</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:.75rem">Personas que entraron a la web por cada link de invitador. Cifras de accesos medidos, no de inscripciones: empiezan a contar desde que se publico la medicion, el historico anterior no quedo registrado. La columna Conversion cruza los inscritos que dejaron el codigo de ese link en el formulario (inscritos ÷ personas que llegaron).</div>
       <div id="pn-ld-invitadores"></div>
     </div>
     </div>
@@ -9244,11 +9244,19 @@ function _renderLandingRank() {
 // TOTAL HISTORICO: esta excepcion NO aplica el filtro de periodo .pn-period (lo pidio la Direccion).
 let _ldInvKey  = null;   // clave (slug) de la ultima consulta OK; null = sin datos/fallo -> reintenta
 let _ldInvRows = null;   // null = vista ausente o fallo | [] = vista vacia | [..] = filas
+let _ldConvKey = null;   // clave (slug) del ultimo conteo de inscritos OK; null = reintenta
+let _ldConvMap = null;   // null = inscritos no cargados/fallo (columna conversion en guion largo) | { CODIGO -> inscritos }
 
 function _ldNum(v) {
   if (v === null || v === undefined || v === '') return 0;
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
+}
+
+// MISMA regla para ambos lados del cruce (view UPPER+trim vs inscritos texto libre):
+// trim + toUpperCase. Sin esto el ratio sale 0/guion para links que si tienen gente.
+function _ldNormCode(v) {
+  return String(v === null || v === undefined ? '' : v).trim().toUpperCase();
 }
 
 function _renderLandingInvitadores() {
@@ -9284,15 +9292,23 @@ function _renderLandingInvitadores() {
       '<span style="min-width:62px;text-align:right">Personas</span>' +
       '<span style="min-width:62px;text-align:right">Visitas</span>' +
       '<span style="min-width:46px;text-align:right">% del total</span>' +
+      '<span style="min-width:96px;text-align:right">Conversión</span>' +
       '<span style="min-width:78px;text-align:right">Ultima visita</span>' +
     '</div>' +
     filas.map((r, i) => {
       const cod = String(r.ref_codigo || '');
+      const codN = _ldNormCode(r.ref_codigo);
       const nom = nomMap[cod] || '';
       const pers = _ldNum(r.visitantes_unicos);
       const visitas = _ldNum(r.pageviews);
       const pct = totalPers > 0 ? (pers / totalPers * 100) : 0;
       const pctTxt = (pct >= 10 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
+      // Conversion = inscritos(ref_codigo) / visitantes unicos de la vista. Fail-open:
+      // sin inscritos cargados, sin empareje o sin denominador -> guion largo (nunca 0 falso/NaN).
+      const insVal = (_ldConvMap && codN) ? _ldConvMap[codN] : undefined;
+      const convTxt = (insVal === undefined || insVal <= 0)
+        ? '—'
+        : insVal.toLocaleString('es-CO') + ' · ' + (pers > 0 ? (insVal / pers * 100).toFixed(1) + '%' : '—');
       const ult = r.ultima_visita ? String(r.ultima_visita).slice(0, 10) : '—';
       return '<div style="display:flex;align-items:center;gap:10px;padding:.4rem 0;border-bottom:1px solid var(--surface)">' +
         '<span style="font-size:11px;color:var(--ink3);width:16px;text-align:right">' + (i + 1) + '</span>' +
@@ -9306,6 +9322,7 @@ function _renderLandingInvitadores() {
         '<span style="font-size:12px;font-weight:600;color:var(--gold-d);min-width:62px;text-align:right">' + pers.toLocaleString('es-CO') + '</span>' +
         '<span style="' + cell() + 'min-width:62px">' + visitas.toLocaleString('es-CO') + '</span>' +
         '<span style="' + cell() + 'min-width:46px">' + pctTxt + '</span>' +
+        '<span style="' + cell() + 'min-width:96px">' + convTxt + '</span>' +
         '<span style="' + cell() + 'min-width:78px">' + esc(ult) + '</span>' +
       '</div>';
     }).join('');
@@ -9325,6 +9342,43 @@ async function renderLandingInvitadores(slug) {
       if (res && !res.error && res.data) { _ldInvRows = res.data || []; _ldInvKey = key; }
     } catch (e) {
       console.error('[renderLandingInvitadores]', e.message);
+    }
+  }
+  // Numerador de la columna Conversion: inscritos por ref_codigo (solo esa columna: son miles).
+  // Consulta APARTE para que un fallo aca no tumbe la tabla de accesos (fail-open, guion largo).
+  // Se pagina en bloques de 1000 porque PostgREST trunca la respuesta: sin esto el conteo
+  // sale incompleto en organizaciones grandes y el ratio miente.
+  if (_ldConvKey !== key) {
+    _ldConvKey = null; _ldConvMap = null;
+    try {
+      let evId = null;
+      if (slug) {
+        // El panel ya esta filtrado por evento -> el numerador tambien (mismo slug).
+        const ev = (_eventos || []).find(e => String(e.slug || '') === key);
+        if (!ev || ev.id === null || ev.id === undefined) throw new Error('sin evento para slug ' + key);
+        evId = ev.id;
+      }
+      const map = {};
+      let from = 0, leidos = 0, seguir = true, ok = true;
+      while (seguir && leidos < 20000) {
+        let iq = SB.from('inscritos').select('ref_codigo').eq('org_id', ORG_ID);
+        if (evId !== null) iq = iq.eq('evento_id', evId);
+        const r = await sbQuery(iq.range(from, from + 999), 20000);
+        if (!r || r.error || !Array.isArray(r.data)) { ok = false; break; }
+        r.data.forEach(x => {
+          const c = _ldNormCode(x && x.ref_codigo);
+          if (c) map[c] = (map[c] || 0) + 1;   // ref_codigo vacio -> se descarta
+        });
+        leidos += r.data.length;
+        seguir = r.data.length === 1000;
+        from += 1000;
+      }
+      if (ok) {
+        _ldConvMap = map; _ldConvKey = key;
+        if (seguir) console.warn('[renderLandingInvitadores] conteo truncado en', leidos, 'inscritos');
+      }
+    } catch (e) {
+      console.error('[renderLandingInvitadores:inscritos]', e.message);
     }
   }
   _renderLandingInvitadores();

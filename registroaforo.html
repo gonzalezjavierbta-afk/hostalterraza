@@ -352,10 +352,15 @@
         // formulario (getClient/SB_URL/SB_KEY) y el patron fail-open del resto del
         // archivo. El valor de ref_codigo es el codigo CRUDO de la URL, NO el
         // resultado del lookup en `invitadores`: asi el trafico no se pierde si el
-        // lookup falla. Claves de sesion/visitante propias de este archivo (no
-        // colisionan con las del escudo de los silos).
-        const REG_SESSION_KEY = 'ht_reg_analytics_session';
-        const REG_VISITOR_KEY = 'ht_reg_analytics_visitor';
+        // lookup falla. Claves de sesion/visitante COMPARTIDAS con el escudo de
+        // los silos (misma clave = misma identidad): asi la persona que llega al
+        // landing por link de invitador y despues salta al formulario se cuenta
+        // como UN SOLO visitante en v_landing_invitadores y no como dos. Se
+        // comparte SOLO la clave: el generador (regUid) y el almacenamiento
+        // (sessionStorage/localStorage) siguen siendo los de este archivo; no se
+        // duplica el escudo de los silos.
+        const REG_SESSION_KEY = 'ht_analytics_session';
+        const REG_VISITOR_KEY = 'ht_analytics_visitor';
         function regUid() {
             try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
