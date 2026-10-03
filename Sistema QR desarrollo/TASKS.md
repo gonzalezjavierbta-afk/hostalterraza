@@ -69,6 +69,7 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-018](TASKS-DETALLE.md#tsk-018) | Lead Developer | Ejecutar `migrations/adr021_eventos_columns.sql` (idempotente) contra la instancia real de Supabase para… | Wizard Inteligente (ADR-021) — Pendientes de cierre | L211-212 |
 | [TSK-003](TASKS-DETALLE.md#tsk-003) | Lead Developer (Gemini) | Configurar pg_cron para envío automático de recordatorios 24h antes del evento vía send-ticket-email | Wizard Inteligente (ADR-021) — Pendientes de cierre | L214-215 |
 *TRACE (2026-10-03, canal de correos, ADR-073 + ADR-074 + cierre documental):* la parte de **`pg_cron` sigue SIN implementarse** — no hay cron, ni trigger de envio, ni llamada automatica; eso es lo que queda abierto (TSK-103/TSK-104). Lo que si cambio: **las 2 piezas que lo bloqueaban estan ESCRITAS y revisadas** (no validadas contra la base de datos real). (1) `eventos.evento_inicio timestamptz` en `migrations/adr073_eventos_evento_inicio.sql` (415 lineas): **instante calculable** derivado de `eventos.fecha`/`eventos.hora` (que son TEXT sin zona horaria, por eso "el recordatorio sale 56 h antes" no era respondible), con backfill fail-closed que acepta 2 formatos por regex y deja `NULL` + reporte DUDOSA en cualquier otro caso. (2) `config_recordatorios` en `migrations/adr074_config_recordatorios.sql` (452 lineas): **la ventana vive en datos** — default global **56 h** (decision de negocio) + override por evento, con el especifico ganando. **Ninguna de las 2 esta aplicada en la base de datos**, y ADR-074 **requiere ADR-073 aplicada antes** (sin instante canonico no hay "ahora + N - ventana"). Gate de `AGENTS.md` §2 (esquema): **AUTORIZADO por el usuario el 2026-10-03** para aplicar las 3 migraciones; **en esta sesion NO se aplico ninguna** (alcance = solo cierre documental). Nota: el valor del titulo ("24h") ya **no coincide** con el default vigente (56 h, ADR-074); la linea original se conserva intacta por Cero Borrado.
+*TRACE (2026-10-03, ADR-078 — cierre por cron de recordatorios):* **TSK-003 QUEDA CERRADA.** La parte de `pg_cron` **SI se implemento y se aplico**: `CREATE EXTENSION pg_cron` (version **1.6.4**; `pg_net` ya 0.20.0), funcion `public.fn_enviar_recordatorios_pendientes()` (SECURITY DEFINER, ejecutable solo por `service_role`), y job `recordatorios-horarios` con schedule **`5 * * * *`** ACTIVE y verificado en `cron.job`. Dry-run: `{"eventos":0,"enviados":0,"omitidos":0,"errores":0}`. Correccion ADR-006: el lugar del evento se toma de **`eventos.ubicacion`** (`eventos.lugar` NO existe -> error `42703`). Commit **`f3863fb`** (migracion `migrations/adr078_cron_recordatorios.sql` + ADR-078 + fila en `DECISIONS.md:92`). El TRACE del 2026-10-03 anterior (bajo la misma linea) queda **SUPERADO**: describia `pg_cron` como "SIN implementar" (estado previo a la aplicacion).
 | [TSK-010](TASKS-DETALLE.md#tsk-010) | Lead Developer | Verificar y crear columnas en tabla `inscritos` (whatsapp, tipo_ayuda, autorizacion) | Blindaje Campaña b5 (Emergencia) | L218-219 |
 | [TSK-012](TASKS-DETALLE.md#tsk-012) | Chief Architect | Implementar ADR-012 en `DECISIONS.md` para documentar la extensión del Contrato v110 | Blindaje Campaña b5 (Emergencia) | L221-222 |
 
@@ -252,7 +253,7 @@ task:
 3. **Fallo real encontrado y corregido durante la aplicacion (ADR-074):** el dry-run fallo con **`42804: foreign key constraint "config_recordatorios_evento_id_fkey" cannot be implemented`** porque la columna se declaro `uuid` y **`eventos.id` es `text`** en produccion. La causa no es la COINCIDENCIA de nombres sino la **COINCIDENCIA de tipos**. Correccion aplicada en el archivo: `config_recordatorios.evento_id` paso a **`text UNIQUE`** (`:86`) y el BLOQUE 3 de la FK ahora **compara los dos tipos en el catalogo ANTES de tocar nada** (`v_tipo_config` / `v_tipo_eventos`), con `WARNING` explicito si no coinciden y sin FK cuando `eventos` no tiene PK/UNIQUE sobre `id` (`:143-216`). El resolver quedo alineado: **`public.fn_horas_recordatorio(p_evento_id text)`** (`:352`).
 4. **Fallo real encontrado y corregido durante la aplicacion (ADR-076):** las firmas de las 2 RPC no coincidian con los tipos reales. Correccion aplicada: **`enviar_email_registro` paso de 12 a 13 parametros** y quedo alineada como **`text` x12 + `boolean`** (firma `:731-745`); **`obtener_inscrito_por_cedula` quedo como `text` x3** (firma `:1137-1141`). Los `uuid` que quedan en el cuerpo son **solo** `v_log` y `v_prev` (`v_req` es `bigint`, porque es el `pg_net_request_id`). Los `COMMENT ON FUNCTION`, los `REVOKE`/`GRANT` y el bloque de VERIFICACION se actualizaron a las firmas nuevas (`:1074`, `:1234`, `:1266-1295`, `:1390-1499`).
 5. **Verificacion post-aplicacion (favorable):** las 3 migraciones quedaron aplicadas y **sin efectos colaterales** — 0 filas borradas, 0 politicas RLS existentes modificadas, 0 politicas nuevas sobre tablas existentes, 0 vistas materializadas y 0 funciones preexistentes alteradas. `eventos.fecha`/`hora` intactas (ADR-073 solo anade `evento_inicio`); `config_recordatorios` con RLS activa y **0 politicas** (fail-closed, por decision de ADR-074); `email_envios_log` con RLS activa y permisos de tabla restringidos a `service_role`.
-6. **Smoke de las RPC ejecutado DENTRO de un `ROLLBACK` — por diseno no persiste nada.** Resultado = comportamiento esperado: (a) `enviar_email_registro` **falla CERRADO** sin secreto del operador en Vault ni en `app.settings`; (b) la **validacion de email** rechaza formatos invalidos; (c) `obtener_inscrito_por_cedula` de una cedula inexistente devuelve **`no_encontrado`** sin filtrar datos; (d) la **idempotencia y el encolado via `pg_net` no persisten** al terminar el smoke, porque el `ROLLBACK` deshizo la traza. **Consecuencia honesta: el smoke prueba la LOGICA, no el ENVIO de correo.** Nadie ha visto todavia un correo salir por esta ruta.
+6. **Smoke de las RPC ejecutado DENTRO de un `ROLLBACK` — por diseno no persiste nada.** Resultado = comportamiento esperado: (a) `enviar_email_registro` **falla CERRADO** sin secreto del operador en Vault ni en `app.settings`; (b) la **validacion de email** rechaza formatos invalidos; (c) `obtener_inscrito_por_cedula` de una cedula inexistente devuelve **`no_encontrado`** sin filtrar datos; (d) la **idempotencia y el encolado via `pg_net` no persisten** al terminar el smoke, porque el `ROLLBACK` deshizo la traza. **Consecuencia honesta: el smoke prueba la LOGICA, no el ENVIO de correo.** Nadie ha visto todavia un correo salir por esta ruta. >> **SUPERADO 2026-10-03 (ver "Cierre documental 2026-10-03 - remitente + cron"): SI salio un correo real por Resend (id `01a103e4-b89e-73c8-b2f0-0d818f80d7c2`); resta el smoke end-to-end por RPC -> Function -> Resend (B9).**
 
 #### TSK-106 — CERRADA. ASCII-safety real y verificada
 
@@ -335,5 +336,36 @@ task:
 ### Cierre documental FASE 2B — nota de actualizacion (2026-10-03)
 
 > **Totales (linea agregada):** las cifras anteriores se conservan. `TSK-101` pasa a **5/5 HECHO**; `TSK-102` implementada; `TSK-103` (B6) HECHO. Nuevos pendientes de 2B sin ID propio: smoke de envio real (**B9**), gap `p_tipo`, `p_inscrito_id` NULL, `MAIL_FROM`/`FROM_EMAIL`, limpieza de anon key en `admin bacup.html`, rotacion del PAT. `D1`/`TSK-105` sigue abierta. Commit `5ca58d8`.
+
+---
+
+### Cierre documental 2026-10-03 — remitente + cron (commits f3863fb/bbf3f33)
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Tier **PAGO**. Commits **`bbf3f33`** ("Update index.ts") y **`f3863fb`** ("recordatorios automaticos y remitente verificado"). Baseline = archivo real (ADR-006).
+
+#### HECHOS (remitente verificado)
+
+1. **Remitente de correo MIGRADO y VERIFICADO:** `MAIL_FROM = Taquilla Directa <no-reply@tickets.taquilladirecta.com>`. DNS en Vercel: **MX** `send.tickets` -> `feedback-smtp.sa-east-1.amazonses.com` (10); **TXT SPF** `v=spf1 include:amazonses.com ~all`; **TXT DKIM** `resend._domainkey.tickets`; **TXT DMARC** `_dmarc.tickets` = `v=DMARC1; p=none; rua=mailto:dmarc@taquilladirecta.com`. **Dominio verificado en Resend.**
+2. **`RESEND_API_KEY` anterior era un DIGEST invalido** (no el valor real); reemplazada por la key real. Se **ENVIO un correo REAL** a `brsk84@gmail.com` (**id Resend `01a103e4-b89e-73c8-b2f0-0d818f80d7c2`**), **entregado OK**. **Esto INVALIDA** la afirmacion de hitos -41/-42 "nadie ha visto salir un correo" (ver `NEXT.md` hito -43, correccion (b)).
+3. **`supabase/functions/send-ticket-email/index.ts` actualizado:** fallback/Default de remitente ahora `Taquilla Directa <no-reply@tickets.taquilladirecta.com>` (**L28** comentario, **L660** `from: env("MAIL_FROM") || "..."`). Re-desplegada.
+
+#### HECHOS (cron de recordatorios — ADR-078)
+
+4. **ADR-078 APLICADO:** `CREATE EXTENSION pg_cron` (**1.6.4**) + `public.fn_enviar_recordatorios_pendientes()` (SECURITY DEFINER, solo `service_role`) + job **`recordatorios-horarios`** schedule **`5 * * * *`** **ACTIVE**. Dry-run: `{"eventos":0,"enviados":0,"omitidos":0,"errores":0}`. **CORRECCION (ADR-006):** el lugar viene de **`eventos.ubicacion`** (`eventos.lugar` NO existe -> error `42703`). Commit `f3863fb` = migracion `migrations/adr078_cron_recordatorios.sql` + ADR-078 + fila en `DECISIONS.md:92`.
+5. **TSK-003 CERRADA por ADR-078** (ver TRACE bajo TSK-003 en este archivo).
+
+#### PENDIENTES QUE SIGUEN ABIERTOS (NO cerrados)
+
+6. **B9:** smoke de envio REAL por el flujo **RPC -> Function -> Resend** (falta un evento de prueba a ~56 h).
+7. **TSK-105/D1** (recorte del `SELECT *` anonimo); **gap `p_tipo`** admin; **`p_inscrito_id` NULL**; **anon key en `admin bacup.html:4779`**; **rotacion del PAT de Supabase**; **`FROM_EMAIL` obsoleto** (no borrado, Cero Borrado; decision pendiente de Direccion).
+8. **Seguridad:** rotar el **PAT de Supabase** usado en la sesion.
+
+#### Hallazgos/correcciones (ver `ERRORES_HISTORICOS.md` E30)
+
+9. Los hallazgos A-E del 2026-10-03 (digest vs valor en `supabase secrets list`, mismatch `MAIL_FROM`/`FROM_EMAIL`, `eventos.lugar` inexistente, `supabase db query --linked` requiere link, credenciales en claro fuera del repo) quedan registrados como **E30** en `ERRORES_HISTORICOS.md`.
+
+#### Verificacion de cierre
+
+10. `git log` confirma `f3863fb` y `bbf3f33`; `Select-String` de `MAIL_FROM`/remitente en `supabase/functions/send-ticket-email/index.ts` (L28/L660); **ADR-078 en `DECISIONS.md:92` = 1** con estado `APLICADO Y VERIFICADO`; TSK-003 con TRACE. `nadie ha visto salir un correo` en `NEXT.md` queda marcado como **SUPERADO**.
 
 
