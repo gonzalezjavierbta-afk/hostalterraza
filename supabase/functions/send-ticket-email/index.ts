@@ -25,7 +25,7 @@
 //                         X-Service-Token.
 // OPCIONALES
 //   MAIL_FROM              Remitente.
-//                           Default: Hostal Terraza <no-reply@hostalterraza.com>
+//                           Default: Taquilla Directa <no-reply@tickets.taquilladirecta.com>
 //   ALLOWED_ORIGINS        CSV de origins CORS. Si no se define se responde "*".
 //                           Si se define, jamas se responde "*".
 //   TICKET_ALLOWED_HOSTS   CSV de hosts permitidos para ticketUrl (anti SSRF).
@@ -657,7 +657,7 @@ async function sendViaResend(
   if (!apiKey) return { ok: false, status: 0, id: "" };
 
   const payload: Record<string, unknown> = {
-    from: env("MAIL_FROM") || "Hostal Terraza <no-reply@hostalterraza.com>",
+    from: env("MAIL_FROM") || "Taquilla Directa <no-reply@tickets.taquilladirecta.com>",
     to: [data.email],
     subject: buildSubject(data),
     html: buildHtml(data),
