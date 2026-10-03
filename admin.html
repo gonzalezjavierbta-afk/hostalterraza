@@ -8104,7 +8104,7 @@ async function asignarCliente() {
   // Enviar email si se proporcionó
   const emailFinal = email || cli.email;
   if (emailFinal) {
-    await enviarQREmail(emailFinal, cli.nombre, ev.nombre, ev.fecha, ev.hora, ev.ubicacion, qr, tipo);
+    await enviarQREmail(emailFinal, cli.nombre, ev.nombre, ev.fecha, ev.hora, ev.ubicacion, qr, tipo, cli.cedula, evId);
     alrt('assign-alert',`✓ ${cli.nombre} inscrito. QR enviado a ${emailFinal}.`,'ok');
   } else {
     alrt('assign-alert','✓ '+cli.nombre+' inscrito. QR generado.','ok');
@@ -8147,18 +8147,11 @@ function tipoBadge(tipo) {
   return map[tipo] || map.invitado;
 }
 
-// ── Enviar QR por email via Supabase Edge Function ─
-async function enviarQREmail(email, nombre, eventoNombre, eventoFecha, eventoHora, eventoLugar, qrCode, tipo) {
+// ── Enviar QR por email via RPC (ADR-077) ────────
+async function enviarQREmail(email, nombre, eventoNombre, eventoFecha, eventoHora, eventoLugar, qrCode, tipo, cedula, eventoId) {
   try {
-    const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
-    await fetch(fnUrl, {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY'
-      },
-      body: JSON.stringify({ email, nombre, eventoNombre, eventoFecha, eventoHora, eventoLugar, qrCode, tipo })
-    });
+    // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
+    const { error: rpcErr } = await SB.rpc('enviar_email_registro', { p_email: email, p_nombre: nombre, p_qr_code: qrCode, p_evento_nombre: eventoNombre, p_evento_fecha: eventoFecha, p_evento_hora: eventoHora, p_evento_lugar: eventoLugar, p_idempotency_key: 'admin-qr:' + qrCode, p_tipo: 'registro', p_cedula: cedula || null, p_evento_id: eventoId || null });
   } catch(e) { console.warn('Email send failed:', e); }
 }
 

@@ -990,21 +990,21 @@ async function enviarNotificacionesSerie(nombre, qr, emailAddr) {
   statusEl.style.cssText = 'display:block;margin-top:.75rem;padding:.6rem 1rem;border-radius:8px;font-size:13px;text-align:center;max-width:370px;width:100%;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)';
   statusEl.textContent = T('serie.enviando_confirm');
   try {
-    const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
-    const res = await fetch(fnUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
-      body: JSON.stringify({
-        email:        emailAddr,
-        nombre,
-        qrCode:       qr,
-        eventoNombre: (serieActual?.nombre || '') + (sesionSeleccionada?.nombre ? ' — ' + sesionSeleccionada.nombre : ''),
-        eventoFecha:  sesionSeleccionada.fecha,
-        eventoHora:   sesionSeleccionada.hora || '',
-        eventoLugar:  sesionSeleccionada.ubicacion || 'Terraza Hostal',
-      }),
+    // ADR-077 FASE 2B: camino unico via RPC; la anon key ya no es credencial de envio (fail-closed en servidor).
+    const { error: rpcErr } = await SB.rpc('enviar_email_registro', {
+      p_email:           emailAddr,
+      p_nombre:          nombre,
+      p_qr_code:         qr,
+      p_evento_nombre:   (serieActual?.nombre || '') + (sesionSeleccionada?.nombre ? ' — ' + sesionSeleccionada.nombre : ''),
+      p_evento_fecha:    sesionSeleccionada.fecha,
+      p_evento_hora:     sesionSeleccionada.hora || '',
+      p_evento_lugar:    sesionSeleccionada.ubicacion || 'Terraza Hostal',
+      p_idempotency_key: 'serie-registro:' + qr,
+      p_tipo:            'registro',
+      p_cedula:          (document.getElementById('f-cedula')?.value || '').trim() || null,
+      p_evento_id:       sesionSeleccionada.id,
     });
-    if (res.ok) {
+    if (!rpcErr) {
       statusEl.style.background = 'rgba(45,106,79,.25)';
       statusEl.style.color = '#74c69d';
       statusEl.textContent = T('serie.conf_enviada', { email: emailAddr });

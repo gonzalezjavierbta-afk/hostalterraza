@@ -674,28 +674,26 @@ async function crearOrganizacion() {
 
     // ── PASO 5: Email de bienvenida ──
     const base = window.location.origin;
+    // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
+    const qrCode       = base + '/admin.html';
+    const eventoNombre = '¡Bienvenido a ' + nombre + '!';
+    const eventoFecha  = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+    const eventoHora   = 'Tu cuenta está activa';
+    const eventoLugar  = [
+      '🔧 Panel admin: ' + base + '/admin.html',
+      '🎟️ Registro público: ' + base + '/evento.html?slug=[slug-de-tu-evento]',
+      '📱 Scanner puerta: ' + base + '/scanner.html?token=[token-del-portero]',
+      '🔗 Tu slug: ' + slug,
+    ].join('\n');
     try {
-      await fetch('https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-        },
-        body: JSON.stringify({
-          email,
-          nombre,
-          qrCode:       base + '/admin.html',
-          eventoNombre: '¡Bienvenido a ' + nombre + '!',
-          eventoFecha:  new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' }),
-          eventoHora:   'Tu cuenta está activa',
-          eventoLugar:  [
-            '🔧 Panel admin: ' + base + '/admin.html',
-            '🎟️ Registro público: ' + base + '/evento.html?slug=[slug-de-tu-evento]',
-            '📱 Scanner puerta: ' + base + '/scanner.html?token=[token-del-portero]',
-            '🔗 Tu slug: ' + slug,
-          ].join('\n'),
-        }),
+      const { error: rpcErr } = await SB.rpc('enviar_email_registro', {
+        p_email: email, p_nombre: nombre, p_qr_code: qrCode,
+        p_evento_nombre: eventoNombre, p_evento_fecha: eventoFecha,
+        p_evento_hora: eventoHora, p_evento_lugar: eventoLugar,
+        p_idempotency_key: 'bienvenida:' + email,
+        p_tipo: 'bienvenida'
       });
+      if (rpcErr) console.warn('Email de bienvenida no enviado:', rpcErr.message);
     } catch(e) {
       console.warn('Email de bienvenida no enviado:', e.message);
       // No bloquear el flujo si el email falla

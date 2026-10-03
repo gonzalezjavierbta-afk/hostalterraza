@@ -4175,7 +4175,7 @@ async function registrar() {
     eventoNombre: eventoActual?.nombre, eventoFecha: eventoActual?.fecha,
     eventoHora: eventoActual?.hora, eventoUbicacion: eventoActual?.ubicacion };
   const emailNotif = (document.getElementById('f-email')?.value||'').trim();
-  await enviarNotificaciones(nombre, qr, telCompleto, emailNotif);
+  await enviarNotificaciones(nombre, qr, telCompleto, emailNotif, cedula);
 }
 
 // Genera el QR como dataURL usando un canvas oculto — funciona en todos los navegadores
@@ -4431,7 +4431,7 @@ async function enviarTicketWA() {
 }
 
 
-async function enviarNotificaciones(nombre, qr, telefono, emailAddr) {
+async function enviarNotificaciones(nombre, qr, telefono, emailAddr, cedula) {
   // 1. Mostrar botón de WhatsApp si hay teléfono
   if (telefono) {
     _ticketData.telefono = telefono;
@@ -4446,24 +4446,19 @@ async function enviarNotificaciones(nombre, qr, telefono, emailAddr) {
     statusEl.textContent = '📧 Enviando confirmación…';
 
     try {
-      const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
-      const res = await fetch(fnUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-        },
-        body: JSON.stringify({
-          email:       emailAddr,
-          nombre,
-          qrCode:      qr,
-          eventoNombre:eventoActual.nombre,
-          eventoFecha: eventoActual.fecha,
-          eventoHora:  eventoActual.hora   || '',
-          eventoLugar: eventoActual.ubicacion || 'Terraza Hostal',
-        }),
+      // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
+      const { error: rpcErr } = await SB.rpc('enviar_email_registro', {
+        p_email: emailAddr, p_nombre: nombre, p_qr_code: qr,
+        p_evento_nombre: (eventoActual&&eventoActual.nombre)||'',
+        p_evento_fecha: (eventoActual&&eventoActual.fecha)||'',
+        p_evento_hora: (eventoActual&&eventoActual.hora)||'',
+        p_evento_lugar: (eventoActual&&eventoActual.ubicacion)||'Terraza Hostal',
+        p_idempotency_key: 'eventobackup-registro:' + qr,
+        p_tipo: 'registro',
+        p_cedula: cedula || null,
+        p_evento_id: (eventoActual&&eventoActual.id)||null
       });
-      if (res.ok) {
+      if (!rpcErr) {
         statusEl.style.background = 'rgba(45,106,79,.25)';
         statusEl.style.color = '#74c69d';
         statusEl.textContent = `✓ Confirmación enviada a ${emailAddr}`;
@@ -4607,7 +4602,7 @@ async function inscribirExistente() {
     telefono: _clienteEncontrado.telefono,
     eventoNombre: eventoActual?.nombre, eventoFecha: eventoActual?.fecha,
     eventoHora: eventoActual?.hora, eventoUbicacion: eventoActual?.ubicacion };
-  await enviarNotificaciones(_clienteEncontrado.nombre, qr, _clienteEncontrado.telefono, _clienteEncontrado.email || '');
+  await enviarNotificaciones(_clienteEncontrado.nombre, qr, _clienteEncontrado.telefono, _clienteEncontrado.email || '', _clienteEncontrado.cedula);
 }
 
 // ── Volver al paso 1 de verificación ───────────────

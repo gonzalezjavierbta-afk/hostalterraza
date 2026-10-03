@@ -83,7 +83,7 @@
 
 CREATE TABLE IF NOT EXISTS public.config_recordatorios (
     id                 uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-    evento_id          uuid        UNIQUE,
+    evento_id          text        UNIQUE,
     activo             boolean     NOT NULL DEFAULT true,
     horas_anticipacion integer     NOT NULL DEFAULT 56,
     canal              text        NOT NULL DEFAULT 'email',
@@ -142,12 +142,29 @@ END $adr074_checks$;
 -- ----------------------------------------------------------------------------
 -- BLOQUE 3: FK de evento_id (condicional y fail-safe)
 --
--- Una FK necesita que eventos.id tenga PRIMARY KEY o UNIQUE. En esta instancia
--- eventos.id es uuid con clave primaria, pero esta migracion NO lo da por
--- hecho: primero lo verifica en el catalogo y solo agrega la FK si la
--- condicion se cumple. Si no se cumple, avisa con WARNING y sigue (fail-open
--- en el sentido de que la tabla se crea igual y el dato queda sin integridad
--- referencial, que es preferible a que la migracion entera falle).
+-- Una FK necesita DOS cosas: (1) que eventos.id tenga PRIMARY KEY o UNIQUE, y
+-- (2) que ambos lados tengan el MISMO tipo. En PRODUCCION (introspeccion
+-- read-only del 2026-10-03) public.eventos.id es TEXT, no uuid: los valores
+-- PARECEN uuid (ej. '647803c9-bace-4d33-a175-8edeb0e6fc33') pero la columna
+-- es data_type = text, udt_name = text. Por eso config_recordatorios.evento_id
+-- se declara TEXT y NO uuid.
+--
+-- POR QUE NO se "arregla" migrando eventos.id a uuid: eso es una migracion de
+-- DATOS (reescribir una tabla existente con miles de filas y todas sus FK
+-- hijas), no una migracion aditiva de esquema. Queda FUERA del alcance de
+-- esta migracion. La salida correcta es alinear la columna NUEVA con el tipo
+-- REAL de eventos.id.
+--
+-- LECCION (dry-run fallido del 2026-10-03): con evento_id declarado uuid, el
+-- bloque de abajo creaba los 2 CHECK y reventaba despues con
+-- `42804: foreign key constraint "config_recordatorios_evento_id_fkey" cannot
+-- be implemented`, porque el guard solo comprobaba la EXISTENCIA de la clave y
+-- no la COINCIDENCIA de tipos. Por eso este bloque ahora compara los dos
+-- tipos en el catalogo ANTES de tocar nada: si no coinciden (o si alguna
+-- columna no existe), avisa con WARNING y OMITE la FK, en vez de dejar que
+-- Postgres reviente la transaccion entera. El fallo sigue siendo fail-closed
+-- en los dos casos: la tabla se crea igual, pero sin integridad referencial,
+-- que es preferible a que la migracion entera falle.
 --
 -- ON DELETE CASCADE: define COMO se comportaria un DELETE futuro sobre
 -- eventos. Esta migracion no borra nada (Cero Borrado). Se elige CASCADE y no
@@ -159,7 +176,33 @@ END $adr074_checks$;
 DO $adr074_fk$
 DECLARE
     v_eventos_tiene_clave integer;
+    v_tipo_config        text;
+    v_tipo_eventos       text;
 BEGIN
+    -- (3.1) TIPOS DE AMBOS LADOS, leidos una sola vez del catalogo. Se leen
+    --   antes que nada porque los dos warnings de este bloque los nombran: si
+    --   el diagnostico no dice los tipos, el problema reaparece como 42804 y
+    --   hay que volver a mirar el catalogo a mano.
+    --   attnum > 0 y NOT attisdropped descartan las columnas de sistema.
+    SELECT format_type(a.atttypid, a.atttypmod)
+      INTO v_tipo_config
+      FROM pg_attribute a
+     WHERE a.attrelid = 'public.config_recordatorios'::regclass
+       AND a.attname  = 'evento_id'
+       AND a.attnum   > 0
+       AND NOT a.attisdropped;
+
+    SELECT format_type(a.atttypid, a.atttypmod)
+      INTO v_tipo_eventos
+      FROM pg_attribute a
+     WHERE a.attrelid = 'public.eventos'::regclass
+       AND a.attname  = 'id'
+       AND a.attnum   > 0
+       AND NOT a.attisdropped;
+
+    -- (3.2) CLAVE REFERENCIABLE: PRIMARY KEY o UNIQUE exactamente sobre
+    --   eventos.id (conkey = solo esa columna). Fail-closed: sin clave no se
+    --   intenta la FK, se avisa y se sale.
     SELECT count(*) INTO v_eventos_tiene_clave
     FROM pg_constraint c
     WHERE c.conrelid = 'public.eventos'::regclass
@@ -170,7 +213,20 @@ BEGIN
                 AND attname = 'id')]::smallint[];
 
     IF v_eventos_tiene_clave = 0 THEN
-        RAISE WARNING '[ADR-074] public.eventos no tiene PRIMARY KEY ni UNIQUE sobre id: NO se crea la FK config_recordatorios_evento_id_fkey. Revisar a mano.';
+        RAISE WARNING '[ADR-074] public.eventos no tiene PRIMARY KEY ni UNIQUE sobre id: NO se crea la FK config_recordatorios_evento_id_fkey. Tipos observados: config_recordatorios.evento_id = "%", public.eventos.id = "%". Revisar a mano.', COALESCE(v_tipo_config, '<columna ausente>'), COALESCE(v_tipo_eventos, '<columna ausente>');
+        RETURN;
+    END IF;
+
+    -- (3.3) COMPATIBILIDAD DE TIPOS: la FK exige el MISMO tipo a los dos lados
+    --   (mismo tipo base y misma familia de operadores de igualdad). Con
+    --   evento_id uuid contra un eventos.id text, Postgres responde
+    --   42804 "foreign key constraint ... cannot be implemented" y MUERE la
+    --   transaccion, con lo cual se pierde TODO lo que el bloque ya habia
+    --   aplicado en la misma corrida.
+    --   IS DISTINCT FROM cubre tambien el caso "la columna no existe"
+    --   (format_type devuelve NULL y NULL es distinto de cualquier texto).
+    IF v_tipo_config IS DISTINCT FROM v_tipo_eventos THEN
+        RAISE WARNING '[ADR-074] tipos INCOMPATIBLES: config_recordatorios.evento_id = "%" y public.eventos.id = "%": una FK exige el mismo tipo a los dos lados, asi que NO se crea la FK config_recordatorios_evento_id_fkey (se evita el error 42804). Revisar a mano.', COALESCE(v_tipo_config, '<columna ausente>'), COALESCE(v_tipo_eventos, '<columna ausente>');
         RETURN;
     END IF;
 
@@ -194,7 +250,7 @@ END $adr074_fk$;
 -- BLOQUE 3b: UNA SOLA FILA GLOBAL, GARANTIZADO POR EL MOTOR
 --
 -- Por que hace falta: en PostgreSQL los NULL NO chocan entre si en un UNIQUE,
--- asi que `evento_id uuid UNIQUE` NO impide tener varias filas globales. El
+-- asi que `evento_id text UNIQUE` NO impide tener varias filas globales. El
 -- UNIQUE de la columna solo protege el nivel de override por evento.
 --
 -- El indice es sobre la expresion constante (1) con predicado
@@ -262,7 +318,7 @@ ALTER TABLE public.config_recordatorios ENABLE ROW LEVEL SECURITY;
 
 
 -- ----------------------------------------------------------------------------
--- BLOQUE 6: RESOLVER fn_horas_recordatorio(p_evento_id uuid)
+-- BLOQUE 6: RESOLVER fn_horas_recordatorio(p_evento_id text)
 --
 -- Precedencia: override del evento -> fila global -> constante 56.
 --
@@ -286,7 +342,14 @@ ALTER TABLE public.config_recordatorios ENABLE ROW LEVEL SECURITY;
 --   ve la configuracion. Ese comportamiento es intencional.
 -- ----------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION public.fn_horas_recordatorio(p_evento_id uuid)
+-- TIPO DEL PARAMETRO: text, NO uuid, y no es cosmetico. El parametro se
+-- compara con c.evento_id (que es text, ver BLOQUE 1): con el parametro en
+-- uuid, `c.evento_id = p_evento_id` seria text = uuid, una comparacion que no
+-- tiene operador de igualdad en PostgreSQL, y el resolver fallaria en
+-- runtime. El parametro sigue el tipo de la columna, igual que en
+-- config_recordatorios.evento_id.
+--
+CREATE OR REPLACE FUNCTION public.fn_horas_recordatorio(p_evento_id text)
 RETURNS integer
 LANGUAGE sql
 STABLE
@@ -405,7 +468,7 @@ NOTIFY pgrst, 'reload schema';
 --      ) AS evento_real_sin_override;                              -- -> 56
 --
 -- SELECT public.fn_horas_recordatorio(
---          '00000000-0000-0000-0000-000000000000'::uuid
+--          '00000000-0000-0000-0000-000000000000'::text
 --      ) AS evento_ficticio;                                       -- -> 56
 --
 -- (5) RLS fail-closed: la tabla debe reportar 0 politicas. Si aparece alguna,
@@ -445,7 +508,7 @@ NOTIFY pgrst, 'reload schema';
 -- ATENCION: este es el unico bloque del proyecto que propose borrar filas, y
 -- solo lo hace si la Direccion lo descomenta de forma expresa. Contiene el
 -- DELETE de la fila global y de los overrides creados para pruebas.
---   DROP FUNCTION IF EXISTS public.fn_horas_recordatorio(uuid);
+--   DROP FUNCTION IF EXISTS public.fn_horas_recordatorio(text);
 --   DELETE FROM public.config_recordatorios WHERE evento_id IS NULL;
 --       -- (uncomment SOLO con decision editorial: borra la fila global)
 --   DROP TABLE IF EXISTS public.config_recordatorios;

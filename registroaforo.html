@@ -723,7 +723,7 @@
                 if (tabsEl) tabsEl.style.display = 'none';
                 if (entregaQR) {
                     mostrarTicket(nombre, qrCode, ev, whatsapp, cedula);
-                    await enviarNotificacionesReg(nombre, qrCode, null);
+                    await enviarNotificacionesReg(nombre, qrCode, null, cedula);
                 } else {
                     const ok = document.getElementById('form-success-msg');
                     ok.style.display = 'block';
@@ -857,7 +857,7 @@
                 const tabsIns = document.getElementById('reg-tabs');
                 if (tabsIns) tabsIns.style.display = 'none';
                 mostrarTicket(_existenteReg.nombre, qrCode, ev, _existenteReg.telefono, _existenteReg.cedula);
-                await enviarNotificacionesReg(_existenteReg.nombre, qrCode, null);
+                await enviarNotificacionesReg(_existenteReg.nombre, qrCode, null, _existenteReg.cedula);
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
                 btn.disabled = false; btn.textContent = T('serie.inscribir_btn');
@@ -1002,25 +1002,21 @@
         }
 
         // ── Notificaciones post-registro (correo) ───────────────────────────
-        async function enviarNotificacionesReg(nombre, qr, emailAddr) {
+        async function enviarNotificacionesReg(nombre, qr, emailAddr, cedula) {
             if (!emailAddr) return;
             const ev = window.__ctxEv;
             try {
-                const fnUrl = 'https://ctgyvydzshueemlelkzv.supabase.co/functions/v1/send-ticket-email';
-                const res = await fetch(fnUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY },
-                    body: JSON.stringify({
-                        email: emailAddr,
-                        nombre: nombre,
-                        qrCode: qr,
-                        eventoNombre: ev ? (ev.nombre || '') : '',
-                        eventoFecha: ev ? (ev.fecha || '') : '',
-                        eventoHora: '',
-                        eventoLugar: 'Terraza Hostal'
-                    })
+                // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
+                const { error: rpcErr } = await getClient().rpc('enviar_email_registro', {
+                    p_email: emailAddr, p_nombre: nombre, p_qr_code: qr,
+                    p_evento_nombre: ev ? (ev.nombre||'') : '',
+                    p_evento_fecha: ev ? (ev.fecha||'') : '',
+                    p_evento_hora: ev ? (ev.hora||'') : '',
+                    p_evento_lugar: ev ? (ev.ubicacion||'Terraza Hostal') : 'Terraza Hostal',
+                    p_idempotency_key: 'aforo-registro:' + qr,
+                    p_tipo: 'registro', p_cedula: cedula || null, p_evento_id: ev ? ev.id : null
                 });
-                if (!res.ok) log("ERROR: Envio de confirmacion fallo (" + res.status + ").", "ERROR");
+                if (rpcErr) log("ERROR: Envio de confirmacion fallo (" + rpcErr.message + ").", "ERROR");
             } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
             }

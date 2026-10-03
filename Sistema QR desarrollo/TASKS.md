@@ -22,6 +22,7 @@ estructura: indice-v1 (2026-10-01)
 > **Este archivo es ahora el tablero.** Muestra solo tareas **abiertas** (una fila por tarea); el texto completo está en [TASKS-DETALLE.md](TASKS-DETALLE.md) (columna Detalle = líneas de ese archivo) y las cerradas en [TASKS-ARCHIVO.md](TASKS-ARCHIVO.md). Totales: **51 abiertas · 50 cerradas · 101 entradas**.
 
 > **Totales al 2026-10-03 (linea agregada, sin reescribir la de arriba):** **57 abiertas · 50 cerradas · 107 entradas**. Los 6 items nuevos son del bloque "CANAL DE CORREOS" (TSK-101..TSK-106), nacidas del cierre documental del canal de correos. Las cifras de la linea anterior se conservan intactas por Cero Borrado documental (Oro #2/#3).
+> **Totales tras la Fase 2A del canal de correos (2026-10-03, linea agregada):** **55 abiertas · 52 cerradas · 107 entradas**. Delta = **-2 abiertas / +2 cerradas**, sin entradas nuevas ni borradas: cierran **TSK-104** y **TSK-106**. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
@@ -88,12 +89,12 @@ estructura: indice-v1 (2026-10-01)
 
 | ID | Responsable | Título | Bloque | Detalle |
 |---|---|---|---|---|
-| [TSK-101](#tsk-101) | `@admin-dev` + `@js-silo-dev` (sesion FREE; el gate §2 aplica al deploy, no al HTML) | **Migrar los 5 call sites de `send-ticket-email` a JWT de sesion / `X-Service-Token`** — HOY siguen mandando la anon key | Canal de correos (ADR-076) | ver seccion de cierre al final |
-| [TSK-102](#tsk-102) | Direccion decide + `@backend-dev` / `@architect` (**SIN DECIDIR**) | **Alternativa para `registroaforo.html`, que es publico y NO tiene sesion** | Canal de correos (ADR-076) | ver seccion de cierre al final |
-| [TSK-103](#tsk-103) | Direccion (operacion) | **Ejecutar el despliegue en 3 pasos** de `send-ticket-email` | Canal de correos (ADR-076) | ver seccion de cierre al final |
-| [TSK-104](#tsk-104) | Direccion (con soporte `@sql-security` / `@data-migration` — PRO: es esquema) | **Aplicar las 3 migraciones**: dry-run + orden ADR-073 -> ADR-074 -> ADR-076 | Canal de correos (ADR-073/074/076) | ver seccion de cierre al final |
+| [TSK-101](#tsk-101) | `@admin-dev` + `@js-silo-dev` (sesion FREE; el gate §2 aplica al deploy, no al HTML) | **Migrar los 5 call sites** al camino unico (RPC, ADR-077) — **1/5 HECHO (piloto `serie.html`); 4 pendientes** | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
+| [TSK-102](#tsk-102) | `@backend-dev` (estrategia **RESUELTA** por ADR-077; implementacion PENDIENTE) | **`registroaforo.html` publico sin sesion** — resuelto por gateway A (RPC sin credencial del llamador) | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
+| [TSK-103](#tsk-103) | Direccion (operacion) | **Ejecutar el despliegue en 3 pasos** de `send-ticket-email` — **B6 DIFERIDO (bloqueador operativo: link + credenciales)** | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
+| [TSK-104](#tsk-104) | Direccion (con soporte `@sql-security` / `@data-migration` — PRO: es esquema) | ✅ **CERRADA 2026-10-03 (Fase 2A COMPLETA)** — **Aplicar las 3 migraciones**: dry-run + orden ADR-073 -> ADR-074 -> ADR-076 | Canal de correos (ADR-073/074/076) | ver seccion de cierre al final |
 | [TSK-105](#tsk-105) | Direccion + `@sql-security` (**iteracion D1**) | **Recorte del `SELECT *` anonimo en `inscritos` — NO se puede hacer antes de migrar los call sites** | Canal de correos (ADR-076) | ver seccion de cierre al final |
-| [TSK-106](#tsk-106) | Direccion + `@sql-security` (correccion de **comentarios**, no de logica) | **La auto-afirmacion ASCII de `adr076_enviar_email_seguro.sql` es falsa: 11 bytes > 127 en 3 lineas de comentario** | Canal de correos (ADR-076) | ver seccion de cierre al final |
+| [TSK-106](#tsk-106) | Direccion + `@sql-security` (correccion de **comentarios**, no de logica) | ✅ **CERRADA 2026-10-03 (Fase 2A)** — **La auto-afirmacion ASCII de `adr076_enviar_email_seguro.sql` es falsa: 11 bytes > 127 en 3 lineas de comentario** (CORREGIDA) | Canal de correos (ADR-076) | ver seccion de cierre al final |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -221,9 +222,9 @@ task:
 1. **TSK-101 — migrar los 5 call sites** a JWT de sesion (`session.access_token`) o `X-Service-Token` desde `pg_net`. Los 5 siguen con la anon key y hay **0 ocurrencias de `access_token`** en esas rutas: `admin.html:8153` (anon key **hardcodeada** dentro del `Bearer` en `enviarQREmail`), `registro.html:678` (key definida en `:451`), `registroaforo.html:1010` (`:329`), `serie.html:994` (`:344`), `eventobackup.html:4449` (`:3484`).
 2. **TSK-102 — `registroaforo.html` no tiene sesion.** Es el formulario **publico**: con la arquitectura decidida hoy ("JWT de sesion donde exista") su envio de correo **sigue sin poder autenticarse** y `enviarNotificacionesReg()` permanece el no-op de siempre (`emailAddr` siempre `null` en `:726` y `:860`; `:1006` hace `if (!emailAddr) return;`). **SIN DECIDIR**: la salida sobre el papel es la RPC `enviar_email_registro` de ADR-076, que no recibe credencial del llamador.
 3. **TSK-103 — despliegue en 3 pasos:** (1) `supabase functions deploy send-ticket-email --no-verify-jwt`, (2) migrar los call sites, (3) `supabase functions deploy send-ticket-email`.
-4. **TSK-104 — aplicar las 3 migraciones** desde el SQL Editor con `service_role`, con dry-run y en orden **ADR-073 -> ADR-074 -> ADR-076** (ADR-074 requiere ADR-073 aplicada).
+4. **TSK-104 — aplicar las 3 migraciones** desde el SQL Editor con `service_role`, con dry-run y en orden **ADR-073 -> ADR-074 -> ADR-076** (ADR-074 requiere ADR-073 aplicada). **CERRADA 2026-10-03 (Fase 2A):** aplicadas y verificadas las 3, en ese orden. Detalle en la seccion "Cierre de TSK-104 y TSK-106 (Fase 2A)" al final de este archivo.
 5. **TSK-105 (D1) — recorte del `select *` anonimo.** **No puede hacerse antes de migrar los call sites**: quitarlo sin migrar `registroaforo.html:908`, `eventobackup.html:3635` y `scanner.html:394` deja el formulario de registro caido. Nota de revision de este cierre: existe un **cuarto** `select *` en `scanner.html:803` (por `.eq('qr_code', code)`) que no figura en la lista del ADR-076; D1 debe incluirlo o dejar por escrito que queda excluido.
-6. **TSK-106 — auto-afirmacion ASCII falsa en ADR-076:** el archivo declara 0 bytes > 127 "incluidos los comentarios" y tiene **11 bytes > 127 en 3 lineas de comentario** (`:549`, `:557`, `:1100`). Solo afecta comentarios, no la ejecucion del SQL. No se corrige en un cierre documental (prohibida toda edicion de codigo). Las otras dos migraciones si son ASCII puras (verificado: 0 bytes > 127).
+6. **TSK-106 — auto-afirmacion ASCII falsa en ADR-076:** el archivo declaraba 0 bytes > 127 "incluidos los comentarios" y tenia **11 bytes > 127 en 3 lineas de comentario** (`:549`, `:557`, `:1100`). Solo afectaba comentarios, no la ejecucion del SQL. **CERRADA 2026-10-03 (Fase 2A):** los 3 comentarios fueron corregidos y el archivo real hoy da **0 bytes > 127**; la afirmacion del header es ahora **VERDADERA**. El mismo pase de ASCII-safety llevo `adr074_config_recordatorios.sql` de 21.256 a 24.991 bytes y `adr076_enviar_email_seguro.sql` de 70.428 a 71.173 bytes, ambos con **0 bytes > 127** y dollar-quotes balanceadas.
 
 #### Lo que se escribio (4 artefactos, SIN commit, SIN aplicar, SIN desplegar)
 
@@ -239,5 +240,73 @@ task:
 #### Verificacion de cierre (por script, 0 tokens de agente)
 
 `node scripts/express_check.js` -> **PASS 29 / FAIL 0**; `node scripts/smoke_qa_asserts.js` -> **PASS 49 / FAIL 0**; `git diff --numstat` de los 4 archivos de docs -> **solo `+N/-0`**. Las 3 rutas de migracion siguen **sin aplicar** y la funcion **sin desplegar**. Detalle en `NEXT.md` hito -39 y en `errores/TRACE-bitacora.md` (TRACE del 2026-10-03).
+
+### Cierre de TSK-104 y TSK-106 — FASE 2A DEL CANAL DE CORREOS (2026-10-03) — COMPLETA
+
+> Seccion **agregada** (nada de lo anterior se reescribe, Cero Borrado Oro #2/#3). Alcance real ejecutado: **aplicacion de 3 migraciones en la base de datos + correccion de ASCII en 2 de ellas + documental**. **0 deploys de la Edge Function**, **0 cambios en los 5 call sites**, **0 commit**. Ruta **FREE** (`opencode/big-pickle`). Gate de `AGENTS.md` §2 (esquema): AUTORIZADO por Direccion el 2026-10-03.
+
+#### TSK-104 — APLICADA. Las 3 migraciones aplicadas y verificadas (2026-10-03)
+
+1. **Prerrequisito:** extension **`pg_net` instalada, version 0.20.0**. Sin ella no hay envio HTTP desde SQL y la RPC de ADR-076 cae en `estado=error` con `motivo=pg_net_no_disponible`.
+2. **Orden real ejecutado:** **ADR-073 -> ADR-074 -> ADR-076** (la dependencia dura se respeta: ADR-074 usa `eventos.evento_inicio`, que crea ADR-073). Las 3 quedaron **aplicadas y verificadas una por una** (su bloque de VERIFICACION comentado se ejecuto y dio lo esperado).
+3. **Fallo real encontrado y corregido durante la aplicacion (ADR-074):** el dry-run fallo con **`42804: foreign key constraint "config_recordatorios_evento_id_fkey" cannot be implemented`** porque la columna se declaro `uuid` y **`eventos.id` es `text`** en produccion. La causa no es la COINCIDENCIA de nombres sino la **COINCIDENCIA de tipos**. Correccion aplicada en el archivo: `config_recordatorios.evento_id` paso a **`text UNIQUE`** (`:86`) y el BLOQUE 3 de la FK ahora **compara los dos tipos en el catalogo ANTES de tocar nada** (`v_tipo_config` / `v_tipo_eventos`), con `WARNING` explicito si no coinciden y sin FK cuando `eventos` no tiene PK/UNIQUE sobre `id` (`:143-216`). El resolver quedo alineado: **`public.fn_horas_recordatorio(p_evento_id text)`** (`:352`).
+4. **Fallo real encontrado y corregido durante la aplicacion (ADR-076):** las firmas de las 2 RPC no coincidian con los tipos reales. Correccion aplicada: **`enviar_email_registro` paso de 12 a 13 parametros** y quedo alineada como **`text` x12 + `boolean`** (firma `:731-745`); **`obtener_inscrito_por_cedula` quedo como `text` x3** (firma `:1137-1141`). Los `uuid` que quedan en el cuerpo son **solo** `v_log` y `v_prev` (`v_req` es `bigint`, porque es el `pg_net_request_id`). Los `COMMENT ON FUNCTION`, los `REVOKE`/`GRANT` y el bloque de VERIFICACION se actualizaron a las firmas nuevas (`:1074`, `:1234`, `:1266-1295`, `:1390-1499`).
+5. **Verificacion post-aplicacion (favorable):** las 3 migraciones quedaron aplicadas y **sin efectos colaterales** — 0 filas borradas, 0 politicas RLS existentes modificadas, 0 politicas nuevas sobre tablas existentes, 0 vistas materializadas y 0 funciones preexistentes alteradas. `eventos.fecha`/`hora` intactas (ADR-073 solo anade `evento_inicio`); `config_recordatorios` con RLS activa y **0 politicas** (fail-closed, por decision de ADR-074); `email_envios_log` con RLS activa y permisos de tabla restringidos a `service_role`.
+6. **Smoke de las RPC ejecutado DENTRO de un `ROLLBACK` — por diseno no persiste nada.** Resultado = comportamiento esperado: (a) `enviar_email_registro` **falla CERRADO** sin secreto del operador en Vault ni en `app.settings`; (b) la **validacion de email** rechaza formatos invalidos; (c) `obtener_inscrito_por_cedula` de una cedula inexistente devuelve **`no_encontrado`** sin filtrar datos; (d) la **idempotencia y el encolado via `pg_net` no persisten** al terminar el smoke, porque el `ROLLBACK` deshizo la traza. **Consecuencia honesta: el smoke prueba la LOGICA, no el ENVIO de correo.** Nadie ha visto todavia un correo salir por esta ruta.
+
+#### TSK-106 — CERRADA. ASCII-safety real y verificada
+
+7. Los **3 comentarios no-ASCII** de `adr076_enviar_email_seguro.sql` fueron corregidos. El archivo real hoy: **0 bytes > 127**, verificado byte a byte. **La auto-afirmacion del header (`:65-66`) ahora es VERDADERA**, que era exactamente lo que la tarea pedia cerrar.
+8. **Cifras reales de los 3 archivos verificadas hoy contra el disco (ADR-006 — prevalece el archivo), que DESAFASAN las cifras de la seccion de cierre documental anterior:**
+
+| Archivo | Lineas | Bytes | Bytes > 127 | Nota |
+|---|---|---|---|---|
+| `migrations/adr073_eventos_evento_inicio.sql` | 415 | 18.581 | **0** | sin cambios en la Fase 2A |
+| `migrations/adr074_config_recordatorios.sql` | **515** (antes 452) | **24.991** (antes 21.256) | **0** | `evento_id text` + guard de tipos + 63 lineas nuevas |
+| `migrations/adr076_enviar_email_seguro.sql` | **1.504** (antes 1.494) | **71.173** (antes 70.428) | **0** | firmas alineadas + 3 comentarios purificados |
+
+9. **Dollar-quotes balanceadas** en los 3 archivos (verificado por conteo de delimitadores). En `adr076` el delimitador real es `$fn$` (10 ocurrencias, balanceadas); el unico `$$` del archivo esta **dentro de un comentario** (`:59`), no abre ningun cuerpo SQL.
+
+#### Lo que NO se hizo en la Fase 2A (deliberado)
+
+10. **La Edge Function NO se desplego** (0 deploys). La ruta de correo por `send-ticket-email` sigue como estaba: la funcion existe **en el repo** pero **no en el gateway**.
+11. **Los 5 call sites NO se migraron** (0 cambios de HTML): `admin.html:8153`, `registro.html:678`, `registroaforo.html:1010`, `serie.html:994`, `eventobackup.html:4449` siguen mandando la anon key. **TSK-101 abierta.**
+12. **El secreto del operador NO se configuro** (`send_ticket_email_service_token` en Supabase Vault / `app.settings.service_token`): sin el, la RPC falla cerrado por diseno. **Sin Vault el smoke lo demostro.**
+13. **No se toco ninguna politica RLS existente** y **no se aplico** `adr068_inscritos_unique_cedula_evento.sql` (sigue escrita y sin aplicar). El recorte del `SELECT *` anonimo sigue siendo la iteracion **D1 / TSK-105**, bloqueada por TSK-101.
+14. **Ninguna afirmacion de esta seccion es una afirmacion de correo entregado.** La Fase 2A abre la posibilidad, no la entrega.
+
+#### Cierre verificado y que sigue
+
+15. **Verificacion de cierre (por script, 0 tokens de agente):** `git diff --stat` de los 4 archivos de docs -> **solo `+N/-0`** (Cero Borrado documental intacto). Los 3 `.sql` **NO se editaron en este cierre documental** (los 2 que aparecen con `M` en `git status` traian los cambios de la sesion de aplicacion, ya aplicados). Conteo de bytes > 127 y de lineas re-hecho **contra el disco**, no copiado de otro documento.
+16. **Que sigue = FASE 2B (pendiente, ver `NEXT.md` hito -40):** `supabase functions deploy send-ticket-email --no-verify-jwt` -> migrar los 5 call sites al **JWT de sesion** (`session.access_token`) o `X-Service-Token` -> `supabase functions deploy send-ticket-email`. Ademas: decidir TSK-102 (`registroaforo.html` es publico y no tiene sesion; salida sobre el papel = la RPC de ADR-076), configurar el secreto del operador, y **documentar `ADR-075`**, que hoy es un **hueco de numeracion declarado y sin asignar** (no rellenarlo por completitud).
+
+### Cierre documental de FASE 2B — gateway unico de correo (2026-10-03) — PILOTO HECHO, LOTE PENDIENTE
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Tier **PAGO**. En este cierre **no se toco codigo**: la migracion B3 (`serie.html`) es de la sesion de implementacion. Baseline = archivo real (ADR-006).
+
+#### B1 — Hallazgo ADR-006: la firma del brief NO existe
+
+1. La descripcion de parametros del brief de FASE 2B (`p_email_dest`, `p_apellidos`, `p_tipo_ticket`, `p_cantidad`, `p_qr_url`, `p_origen_ip`) **NO EXISTE en el repo**. La **firma real** es `migrations/adr076_enviar_email_seguro.sql:731-745`: `p_email, p_nombre, p_qr_code, p_evento_nombre, p_evento_fecha, p_evento_hora, p_evento_lugar, p_idempotency_key, p_tipo DEFAULT 'registro', p_cedula DEFAULT NULL, p_evento_id DEFAULT NULL, p_inscrito_id DEFAULT NULL, p_bypass_rate_limit boolean DEFAULT false` (**text x12 + boolean**). Re-verificado contra el disco en este cierre.
+2. **Cifra desfasada (ADR-006):** el documento previo citaba `send-ticket-email/index.ts` = 760 lineas / 28.733 bytes; el archivo real hoy es **775 lineas / 29.689 bytes** (versionado/tracked; `git status` limpio para ese path). Prevalece el archivo.
+
+#### B4 — ADR-077 (decision gateway A)
+
+3. `@architect-review` emitio la DECISION **gateway A**: la RPC `enviar_email_registro` es el **camino unico** desde el cliente; la Edge Function deja de ser gateway de cliente y pasa a **transporte server-to-server** (invocada por la RPC con `X-Service-Token`). Escrito en `decisiones/ADR-077-gateway-de-correo-de-los-5-call-sites-rpc-como-camino-unico.md` + fila de indice en `DECISIONS.md:91`.
+4. **Coherencia de indice/numeracion (verificada):** `ADR-077` existe (`decisiones/ADR-077*`, untracked al cierre); **`ADR-075` sigue NO asignado** (0 archivos `decisiones/ADR-075*`, 0 `migrations/adr075*`). Nota de numeracion en `DECISIONS.md:95-97` coherente.
+
+#### B3 — PILOTO HECHO (1/5): `serie.html`
+
+5. `enviarNotificacionesSerie` (`serie.html:985`) migrada de `fetch` con anon key a `SB.rpc('enviar_email_registro', {...})` (`:994-1006`, `p_tipo='registro'`, `p_idempotency_key='serie-registro:'+qr`). **Verificado 5/5 + Escudo GOLD 5/5 PASS.** La anon key deja de ser credencial de envio en ese sitio.
+
+#### LOTE PENDIENTE — 4 call sites + limpieza
+
+6. `admin.html:8153` (`enviarQREmail`, anon key hardcodeada en el `Bearer`), `registro.html:678` (**bienvenida**; migrara con `p_tipo='bienvenida'`, best-effort), `registroaforo.html:1009` (publico sin sesion, **TSK-102**), `eventobackup.html:4449`. **PENDIENTES de autorizacion.**
+7. `admin bacup.html:4779` trae la **anon key hardcodeada** en el `Bearer` (la URL en `:4774`); a limpiar (pendiente). Nota: el cierre FASE 2A citaba `registroaforo.html:1010`; el archivo real dice `:1009` (ADR-006).
+
+#### Bloqueador operativo y TSK-102
+
+8. **B5** (secreto Vault `send_ticket_email_service_token`) y **B6** (deploy Edge Function; requiere `supabase link` al ref `ctgyvydzshueemlelkzv` + credenciales) quedan **DIFERIDOS a Direccion** = **BLOQUEADOR OPERATIVO**. Sin secreto, la RPC **falla cerrado** (ya verificado en FASE 2A).
+9. **TSK-102** (`registroaforo.html` publico sin sesion): **estrategia RESUELTA** por el gateway A (la RPC no necesita credencial del llamador; rate limit 3/cedula+evento/10 min + 10/IP/h + idempotencia), pero la **implementacion sigue PENDIENTE**.
+10. **Decisiones de producto confirmadas por Direccion:** la fila "Tipo" de `admin.html` es **prescindible en 2B** (gap `p_ticket_tipo` futuro); el correo de bienvenida de `registro.html` va por RPC con `p_tipo='bienvenida'` (best-effort).
 
 

@@ -182,6 +182,16 @@ END $adr076_preflight$;
 --   Los valores quedan como datos sin integridad referencial, que es
 --   preferible a perder el rastro.
 --
+-- POR QUE `evento_id` e `inscrito_id` son TEXT y NO UUID:
+--   `public.inscritos.id`, `public.inscritos.evento_id` y `public.eventos.id`
+--   son `text` en produccion, y en `pg_cast` NO existe el cast uuid -> text.
+--   Con columnas `uuid` aqui, `l.evento_id IS NOT DISTINCT FROM p_evento_id` y
+--   `i.evento_id = p_evento_id` fallarian en runtime con "operator does not
+--   exist: text = uuid". Ademas los 12 eventos.id y los 111 inscritos.evento_id
+--   observados tienen forma de UUID, asi que no se pierde nada semantico, y
+--   queda coherente con adr074 (config_recordatorios.evento_id paso a text).
+--   `id` SI es uuid: es la PK propia de esta tabla y usa gen_random_uuid().
+--
 -- NOTA SOBRE `idempotency_key` NULLABLE:
 --   UNIQUE no hace colisionar los NULL entre si (misma razon que documento
 --   adr074 sobre `evento_id`). Por eso la llave es NULLABLE: las trazas que
@@ -198,8 +208,8 @@ END $adr076_preflight$;
 
 CREATE TABLE IF NOT EXISTS public.email_envios_log (
     id                uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-    evento_id         uuid,
-    inscrito_id       uuid,
+    evento_id         text,
+    inscrito_id       text,
     destinatario      text        NOT NULL,
     tipo              text        NOT NULL DEFAULT 'registro',
     estado            text        NOT NULL DEFAULT 'pendiente',
@@ -546,7 +556,7 @@ COMMENT ON FUNCTION public.fn_adr076_secreto(text) IS
 --       PostgREST devuelve la direccion del pooler, NO la del visitante, asi
 --       que en la practica casi nunca sirve. Se filtra 127.0.0.1, ::1, 0.0.0.0
 --       y :: porque una IP local no es un identificador de abusador: si
---       llegara a contar, todas las llamadas de la plataforma compartirián
+--       llegara a contar, todas las llamadas de la plataforma compartirian
 --       la misma cuota.
 --
 -- SECURITY INVOKER (no DEFINER) a proposito: el GUC de la sesion y
@@ -554,7 +564,7 @@ COMMENT ON FUNCTION public.fn_adr076_secreto(text) IS
 -- aqui. Solo devuelve la IP del PROPIO llamador.
 --
 -- DEVUELVE NULL cuando no hay IP utilizable. El rate limit por IP se SKIPEA
--- en ese caso (ver BLOQUE 6) en vez de猜 un valor.
+-- en ese caso (ver BLOQUE 6) en vez de asumir un valor.
 --
 -- SOBRE EL RIESGO DE FALSOS POSITIVOS (objecion de ADR-068):
 --   ADR-068 decidio NO poner un limite por IP en la tabla de inscriptions por
@@ -650,8 +660,8 @@ COMMENT ON FUNCTION public.fn_adr076_ip_origen() IS
 --       p_idempotency_key    text,   -- OBLIGATORIA (obligatorio)
 --       p_tipo               text    DEFAULT 'registro',
 --       p_cedula             text    DEFAULT NULL,
---       p_evento_id          uuid    DEFAULT NULL,
---       p_inscrito_id        uuid    DEFAULT NULL,
+--       p_evento_id          text    DEFAULT NULL,
+--       p_inscrito_id        text    DEFAULT NULL,
 --       p_bypass_rate_limit  boolean DEFAULT false
 --   ) RETURNS jsonb
 --
@@ -729,8 +739,8 @@ CREATE OR REPLACE FUNCTION public.enviar_email_registro(
     p_idempotency_key   text,
     p_tipo              text    DEFAULT 'registro',
     p_cedula            text    DEFAULT NULL,
-    p_evento_id         uuid    DEFAULT NULL,
-    p_inscrito_id       uuid    DEFAULT NULL,
+    p_evento_id         text    DEFAULT NULL,
+    p_inscrito_id       text    DEFAULT NULL,
     p_bypass_rate_limit boolean DEFAULT false
 )
 RETURNS jsonb
@@ -1061,7 +1071,7 @@ BEGIN
 END;
 $fn$;
 
-COMMENT ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) IS
+COMMENT ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) IS
 'ADR-076: UNICO camino permitido para enviar correo desde un call site publico. No recibe '
 'ninguna credencial del llamador: usa el secreto de servicio guardado en Supabase Vault '
 '(send_ticket_email_service_token) o en app.settings.service_token. Sin ese secreto falla '
@@ -1083,7 +1093,7 @@ COMMENT ON FUNCTION public.enviar_email_registro(text, text, text, text, text, t
 -- FIRMA:
 --   obtener_inscrito_por_cedula(
 --       p_cedula   text,        -- OBLIGATORIA
---       p_evento_id uuid,       -- OBLIGATORIA
+--       p_evento_id text,       -- OBLIGATORIA
 --       p_telefono text DEFAULT NULL   -- segundo factor, opcional
 --   ) RETURNS jsonb
 --
@@ -1097,7 +1107,7 @@ COMMENT ON FUNCTION public.enviar_email_registro(text, text, text, text, text, t
 --     recuperacion en un harvest de correos.
 --   - filas de otros eventos: el filtro `evento_id = p_evento_id` es
 --     OBLIGATORIO y la pareja se exige completa. Consultar por cedula sola
---    确认aria la existencia de una inscripcion y serviria para enumerar
+--    confirmaria la existencia de una inscripcion y serviria para enumerar
 --     asistentes evento por evento.
 --   - `tipo`, `org_id`, `respuestas_custom`, `ref_codigo`, `cliente_id`,
 --     `ciudad`, `whatsapp`: no hacen falta para renderizar el ticket.
@@ -1126,7 +1136,7 @@ COMMENT ON FUNCTION public.enviar_email_registro(text, text, text, text, text, t
 
 CREATE OR REPLACE FUNCTION public.obtener_inscrito_por_cedula(
     p_cedula    text,
-    p_evento_id uuid,
+    p_evento_id text,
     p_telefono  text DEFAULT NULL
 )
 RETURNS jsonb
@@ -1221,7 +1231,7 @@ BEGIN
 END;
 $fn$;
 
-COMMENT ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) IS
+COMMENT ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) IS
 'ADR-076: reemplaza el SELECT * anonimo sobre inscritos. Devuelve SOLO cedula, nombre, '
 'evento_id, evento_nombre, evento_fecha, qr_code, used y (telefono unicamente si el llamador '
 'lo aporta como segundo factor y coincide en digitos). NO devuelve el email de terceros ni '
@@ -1270,19 +1280,19 @@ GRANT EXECUTE ON FUNCTION public.fn_adr076_ip_origen() TO anon;
 GRANT EXECUTE ON FUNCTION public.fn_adr076_ip_origen() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.fn_adr076_ip_origen() TO service_role;
 
-REVOKE ALL ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) FROM anon;
-REVOKE ALL ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) TO anon;
-GRANT EXECUTE ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, uuid, uuid, boolean) TO service_role;
+REVOKE ALL ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) FROM anon;
+REVOKE ALL ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) TO anon;
+GRANT EXECUTE ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.enviar_email_registro(text, text, text, text, text, text, text, text, text, text, text, text, boolean) TO service_role;
 
-REVOKE ALL ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) FROM anon;
-REVOKE ALL ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) TO anon;
-GRANT EXECUTE ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.obtener_inscrito_por_cedula(text, uuid, text) TO service_role;
+REVOKE ALL ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) FROM anon;
+REVOKE ALL ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) TO anon;
+GRANT EXECUTE ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.obtener_inscrito_por_cedula(text, text, text) TO service_role;
 
 
 -- ----------------------------------------------------------------------------
@@ -1377,7 +1387,7 @@ NOTIFY pgrst, 'reload schema';
 -- -- fn_adr076_secreto NO debe listar anon ni authenticated.
 --
 -- SELECT has_function_privilege('anon',         'public.fn_adr076_secreto(text)',           'EXECUTE');  -- false
--- SELECT has_function_privilege('anon',         'public.enviar_email_registro(text,text,text,text,text,text,text,text,text,uuid,uuid,boolean)', 'EXECUTE'); -- true
+-- SELECT has_function_privilege('anon',         'public.enviar_email_registro(text,text,text,text,text,text,text,text,text,text,text,text,boolean)', 'EXECUTE'); -- true
 --
 -- (7) SEARCH_PATH FIJADO en las 5 funciones (defensa anti hijacking):
 --
@@ -1485,8 +1495,8 @@ NOTIFY pgrst, 'reload schema';
 -- datos de negocio: solo las tablas, funciones e indices creados por ESTE
 -- archivo. Las trazas de email_envios_log tambien se perderian, asi que
 -- exportar la tabla antes de correrlo.
---   DROP FUNCTION IF EXISTS public.enviar_email_registro(text,text,text,text,text,text,text,text,text,uuid,uuid,boolean);
---   DROP FUNCTION IF EXISTS public.obtener_inscrito_por_cedula(text,uuid,text);
+--   DROP FUNCTION IF EXISTS public.enviar_email_registro(text,text,text,text,text,text,text,text,text,text,text,text,boolean);
+--   DROP FUNCTION IF EXISTS public.obtener_inscrito_por_cedula(text,text,text);
 --   DROP FUNCTION IF EXISTS public.fn_adr076_ip_origen();
 --   DROP FUNCTION IF EXISTS public.fn_adr076_secreto(text);
 --   DROP FUNCTION IF EXISTS public.fn_adr076_texto_limpio(text,text,integer,boolean);
