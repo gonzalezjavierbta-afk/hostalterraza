@@ -15,7 +15,32 @@ Este documento define el punto de control estratégico y las directrices para la
 
 > **Hitos archivados:** 33 hitos anteriores (de -32 a 0b) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los 5 hitos más recientes y las secciones vigentes 1-4.
 
-#### -41. Hito Mas Reciente - FASE 2B DEL CANAL DE CORREOS: decision de gateway + piloto `serie.html`; lote y despliegue DIFERIDOS (ADR-077) (2026-10-03)
+#### -42. Hito Mas Reciente - FASE 2B DEL CANAL DE CORREOS EJECUTADA Y VERIFICADA: B5/B6 HECHOS + lote de 5 call sites migrado (ADR-077) (2026-10-03)
+
+*   **Que se estaba haciendo:** ejecutar la FASE 2B del canal de correos (tier PAGO), que el hito -41 habia dejado en piloto con B5/B6 **DIFERIDOS**. Commit **`5ca58d8`** ("canal de correos fase 2b", 13 archivos).
+*   **HECHOS VERIFICADOS (baseline = archivo real, ADR-006):**
+    *   `(1)` **B5 HECHO:** secreto `send_ticket_email_service_token` creado en Supabase Vault; verificado `public.fn_adr076_secreto('send_ticket_email_service_token') is not null = true`.
+    *   `(2)` **B6 HECHO:** Edge Function `send-ticket-email` re-desplegada desde el repo con `--no-verify-jwt`; ahora **VERSION 6 ACTIVE** (antes v4). Auth verificada por HTTP: sin token -> **401**; token correcto + body invalido -> **400**; token incorrecto -> **401** (sin relay abierto). Secret `SERVICE_SHARED_TOKEN` creado en Edge Functions con **el mismo valor** que el Vault.
+    *   `(3)` **Lote B10 HECHO (5/5):** migrados los 5 call sites a RPC — piloto `serie.html` + lote en orden `eventobackup`->`admin`->`registro`->`registroaforo`. En cada archivo: `send-ticket-email` = **0**, `rpc('enviar_email_registro')` = **1**, `node --check` OK, balance de `<div>` identico a HEAD, Cero Borrado, sin `Authorization` con anon key. **Escudo GOLD PASS 6/6.** `registro.html` usa `p_tipo='bienvenida'`; `registroaforo.html` conserva el **early-return** (email `null`) para no cambiar comportamiento. Re-verificado contra el disco: la unica ocurrencia de `send-ticket-email` restante es `admin bacup.html:4774` (backup).
+    *   `(4)` **Smoke parcial:** RPC alcanzable via PostgREST con `anon`; email invalido -> **`22023`** (sin envio). **Falta smoke de envio real** (requiere destinatario de prueba) -> **B9 PENDIENTE**.
+*   **Pendientes / hallazgos a registrar:**
+    *   **D1 (TSK-105):** recorte del `select *` anonimo en `inscritos`, **sigue pendiente**.
+    *   **Gap `p_tipo`:** `admin.html` **no mapea** la fila "Tipo" de ticket a `p_tipo` (se pierde en 2B).
+    *   **`p_inscrito_id` va NULL** en todos (los INSERT no hacen `.select('id')`).
+    *   **`admin bacup.html:4774`** conserva la **anon key hardcodeada** (limpieza pendiente).
+    *   **Hallazgo `MAIL_FROM`:** la Function lee `env("MAIL_FROM")` (`index.ts:660`), pero el secret existente se llama **`FROM_EMAIL`** (valor de 64 chars, no es email). Se usa el remitente por defecto **`Hostal Terraza <no-reply@hostalterraza.com>`** (verificar dominio verificado en Resend).
+    *   **`ADR-075` sigue NO asignado** (hueco); **`ADR-077` existe**.
+    *   **Seguridad:** rotar el **PAT de Supabase** usado en la sesion.
+*   **Riesgos activos:**
+    *   **(1) Smoke de envio real NO ejecutado (B9).** El canal quedo cableado y la auth verificada, pero **nadie ha visto salir un correo por la ruta RPC en produccion**; `estado='enviado'` = encolado en `pg_net`, no entregado.
+    *   **(2) `MAIL_FROM` vs `FROM_EMAIL`:** si el dominio no esta verificado en Resend, el envio puede fallar en silencio; hoy se usa el fallback por defecto.
+    *   **(3) `p_inscrito_id` NULL y gap `p_tipo`:** degradacion funcional aceptada en 2B (traza/idempotencia y fila "Tipo" de ticket).
+    *   **(4) `admin bacup.html` con anon key hardcodeada** sigue en el arbol (deuda de secreto).
+    *   **(5) D1 (`SELECT *` anonimo) sigue abierto.**
+    *   **(6) Los riesgos de hitos previos siguen vigentes.**
+*   **Verificacion de cierre (por archivo real, ADR-006):** `grep` de `send-ticket-email` y `rpc('enviar_email_registro')` sobre los 5 HTML re-leido del disco; commit `5ca58d8` existe en `git log`. **0 deploys en este cierre, 0 migraciones nuevas, 0 edicion de codigo** (solo docs).
+
+#### -41. Hito - FASE 2B DEL CANAL DE CORREOS: decision de gateway + piloto `serie.html`; lote y despliegue DIFERIDOS (ADR-077) (2026-10-03) — SUPERADO por el hito -42
 
 *   **Que se estaba haciendo:** cerrar la FASE 2B del canal de correos. Se **decidio el gateway** y se ejecuto el **piloto de migracion**; no se desplego ni se migro el lote.
 *   **Estado REAL (piloto SI, lote NO):**

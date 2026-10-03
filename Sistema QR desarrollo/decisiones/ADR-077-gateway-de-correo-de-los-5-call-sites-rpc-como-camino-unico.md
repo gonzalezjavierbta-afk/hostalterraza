@@ -17,7 +17,9 @@ estructura: detalle-v1 (2026-10-01)
 
 **Autor:** @architect-review (FASE 2B, tier PAGO). Gate de `AGENTS.md` seccion 2 AUTORIZADO por Direccion para FASE 2B.
 
-**Estado:** DECIDIDO. **Piloto B3 implementado** (`serie.html` migrado a `SB.rpc`, verificado 5/5 + Escudo GOLD 5/5). Lote pendiente: 4 call sites (`admin.html:8153`, `registro.html:678`, `registroaforo.html:1009`, `eventobackup.html:4449`) + secreto Vault (B5) + deploy de la Edge Function (B6), estos ultimos DIFERIDOS a Direccion como bloqueador operativo. Cierre documental: `TASKS.md` (seccion FASE 2B), `NEXT.md` hito -41.
+**Estado:** DECIDIDO. **EJECUTADO Y VERIFICADO (FASE 2B, 2026-10-03, commit `5ca58d8`).** Los **5/5 call sites migrados** a `SB.rpc('enviar_email_registro', ...)`: piloto `serie.html` + lote en orden `eventobackup`->`admin`->`registro`->`registroaforo`. B5 (secreto Vault `send_ticket_email_service_token`) y B6 (Edge Function re-desplegada con `--no-verify-jwt`, ahora **VERSION 6 ACTIVE**; auth HTTP verificada: sin token->401, token correcto+body invalido->400, token incorrecto->401) quedaron **HECHOS** (ya **no** diferidos). Escudo GOLD PASS 6/6. **Pendientes residuales de 2B:** smoke de envio real (B9), gap `p_tipo` (`admin.html` no mapea la fila "Tipo"), `p_inscrito_id` NULL (los INSERT no hacen `.select('id')`), `MAIL_FROM` vs secret `FROM_EMAIL`, anon key en `admin bacup.html:4774`, rotacion del PAT de Supabase. `ADR-075` sigue hueco. Cierre documental: `TASKS.md` (seccion FASE 2B), `NEXT.md` hito -42.
+
+> **Nota de actualizacion (2026-10-03):** esta Decision se escribio con el **piloto B3** implementado y el lote diferido (hito -41). El texto de Decision/Opciones/Mapeo/Consecuencias **se conserva intacto** (Cero Borrado); el estado REAL hoy es el descrito en este campo **Estado** y en el bloque de Hechos de `TASKS.md`/`NEXT.md`. La Decision de arquitectura (gateway A) **no cambio**.
 
 ### Problema
 
@@ -59,6 +61,8 @@ Todos: `SB.rpc('enviar_email_registro', { p_email, p_nombre, p_qr_code, p_evento
 La RPC es la respuesta: **no recibe credencial del llamador**, la autorizacion de envio vive en el secreto del servidor. La anon key solo alcanza PostgREST; no es la credencial que envia. Los controles de abuso los pone el servidor: rate limit 3/cedula+evento/10 min + 10/IP/h, validacion estricta de email, idempotencia. Es **estrictamente mas fuerte** que el estado previo (anon key embebida permanente, sin rate limit ni idempotencia). **No** se usa token de servicio en el cliente ni JWT anon con RLS acotado como autorizacion de envio. Endurecimiento recomendado (no bloqueante, ADR propio): exigir que `(p_cedula, p_evento_id)` exista en `inscritos` y/o honeypot-captcha, para acotar el relay de destinatario arbitrario.
 
 ### Consecuencias / orden de rollout (Cero Borrado, no romper registro)
+
+> **PASOS 1-3 EJECUTADOS (2026-10-03, commit `5ca58d8`):** el secreto Vault == Function env `SERVICE_SHARED_TOKEN` se creo; la funcion v6 esta ACTIVE (`--no-verify-jwt`); los 5 sitios migrados. El paso 4 (limpieza de la anon key hardcodeada) **sigue pendiente en `admin bacup.html:4774`**. El texto de los pasos se conserva como historial.
 
 1. Operador: crear Vault `send_ticket_email_service_token` y Function env `SERVICE_SHARED_TOKEN` **con el mismo valor** (si difieren, `X-Service-Token` da 401 y la RPC marca `estado='error'; fail-open -> correo perdido en silencio`).
 2. Desplegar `supabase functions deploy send-ticket-email --no-verify-jwt` (pg_net no manda JWT; la funcion se auto-autentica).

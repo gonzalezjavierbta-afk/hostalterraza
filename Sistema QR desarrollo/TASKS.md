@@ -89,9 +89,9 @@ estructura: indice-v1 (2026-10-01)
 
 | ID | Responsable | Título | Bloque | Detalle |
 |---|---|---|---|---|
-| [TSK-101](#tsk-101) | `@admin-dev` + `@js-silo-dev` (sesion FREE; el gate §2 aplica al deploy, no al HTML) | **Migrar los 5 call sites** al camino unico (RPC, ADR-077) — **1/5 HECHO (piloto `serie.html`); 4 pendientes** | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
-| [TSK-102](#tsk-102) | `@backend-dev` (estrategia **RESUELTA** por ADR-077; implementacion PENDIENTE) | **`registroaforo.html` publico sin sesion** — resuelto por gateway A (RPC sin credencial del llamador) | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
-| [TSK-103](#tsk-103) | Direccion (operacion) | **Ejecutar el despliegue en 3 pasos** de `send-ticket-email` — **B6 DIFERIDO (bloqueador operativo: link + credenciales)** | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
+| [TSK-101](#tsk-101) | `@admin-dev` + `@js-silo-dev` (sesion PAGO; gate §2 aplicado) | **Migrar los 5 call sites** al camino unico (RPC, ADR-077) — **5/5 HECHO (lote completo `serie` + `eventobackup` + `admin` + `registro` + `registroaforo`)** | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
+| [TSK-102](#tsk-102) | `@backend-dev` (estrategia **RESUELTA Y APLICADA** por ADR-077) | **`registroaforo.html` publico sin sesion** — resuelto por gateway A (RPC sin credencial del llamador), **IMPLEMENTADO** (early-return email null conservado) | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
+| [TSK-103](#tsk-103) | Direccion (operacion) | **Ejecutar el despliegue en 3 pasos** de `send-ticket-email` — **B6 HECHO: v6 ACTIVE (`--no-verify-jwt`); auth HTTP verificada** | Canal de correos (ADR-076/077) | ver seccion de cierre al final |
 | [TSK-104](#tsk-104) | Direccion (con soporte `@sql-security` / `@data-migration` — PRO: es esquema) | ✅ **CERRADA 2026-10-03 (Fase 2A COMPLETA)** — **Aplicar las 3 migraciones**: dry-run + orden ADR-073 -> ADR-074 -> ADR-076 | Canal de correos (ADR-073/074/076) | ver seccion de cierre al final |
 | [TSK-105](#tsk-105) | Direccion + `@sql-security` (**iteracion D1**) | **Recorte del `SELECT *` anonimo en `inscritos` — NO se puede hacer antes de migrar los call sites** | Canal de correos (ADR-076) | ver seccion de cierre al final |
 | [TSK-106](#tsk-106) | Direccion + `@sql-security` (correccion de **comentarios**, no de logica) | ✅ **CERRADA 2026-10-03 (Fase 2A)** — **La auto-afirmacion ASCII de `adr076_enviar_email_seguro.sql` es falsa: 11 bytes > 127 en 3 lineas de comentario** (CORREGIDA) | Canal de correos (ADR-076) | ver seccion de cierre al final |
@@ -280,9 +280,32 @@ task:
 15. **Verificacion de cierre (por script, 0 tokens de agente):** `git diff --stat` de los 4 archivos de docs -> **solo `+N/-0`** (Cero Borrado documental intacto). Los 3 `.sql` **NO se editaron en este cierre documental** (los 2 que aparecen con `M` en `git status` traian los cambios de la sesion de aplicacion, ya aplicados). Conteo de bytes > 127 y de lineas re-hecho **contra el disco**, no copiado de otro documento.
 16. **Que sigue = FASE 2B (pendiente, ver `NEXT.md` hito -40):** `supabase functions deploy send-ticket-email --no-verify-jwt` -> migrar los 5 call sites al **JWT de sesion** (`session.access_token`) o `X-Service-Token` -> `supabase functions deploy send-ticket-email`. Ademas: decidir TSK-102 (`registroaforo.html` es publico y no tiene sesion; salida sobre el papel = la RPC de ADR-076), configurar el secreto del operador, y **documentar `ADR-075`**, que hoy es un **hueco de numeracion declarado y sin asignar** (no rellenarlo por completitud).
 
-### Cierre documental de FASE 2B — gateway unico de correo (2026-10-03) — PILOTO HECHO, LOTE PENDIENTE
+### Cierre de FASE 2B — gateway unico de correo (2026-10-03) — EJECUTADA Y VERIFICADA (lote completo)
 
-> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Tier **PAGO**. En este cierre **no se toco codigo**: la migracion B3 (`serie.html`) es de la sesion de implementacion. Baseline = archivo real (ADR-006).
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Tier **PAGO**. Commit `5ca58d8` ("canal de correos fase 2b", 13 archivos). Baseline = archivo real (ADR-006): los 5 call sites re-verificados contra el disco, cada uno con `rpc('enviar_email_registro')` y **0** ocurrencias de `send-ticket-email` (la unica restante es `admin bacup.html:4774`, backup). Este bloque **actualiza el estado**: lo antes marcado "DIFERIDO/PENDIENTE" (B5/B6) quedo **HECHO**; se conserva el historial de la entrada previa mas abajo.
+
+#### HECHOS VERIFICADOS — B5, B6 y lote B10
+
+1. **B5 HECHO:** secreto `send_ticket_email_service_token` creado en Supabase Vault; verificado `public.fn_adr076_secreto('send_ticket_email_service_token') is not null = true`.
+2. **B6 HECHO:** Edge Function `send-ticket-email` re-desplegada desde el repo con `--no-verify-jwt`; ahora **VERSION 6 ACTIVE** (antes v4). Auth verificada por HTTP: sin token -> **401**; token correcto + body invalido -> **400**; token incorrecto -> **401** (sin relay abierto). Secret `SERVICE_SHARED_TOKEN` creado en Edge Functions con **el mismo valor** que el Vault.
+3. **B10 HECHO (lote completo, orden `eventobackup`->`admin`->`registro`->`registroaforo`, tras el piloto `serie.html`):** los **5 call sites** migrados a RPC. En cada archivo: `send-ticket-email` = **0**, `rpc('enviar_email_registro')` = **1**, `node --check` OK, balance de `<div>` identico a HEAD, Cero Borrado, sin `Authorization` con anon key. **Escudo GOLD PASS 6/6.** `registro.html` usa `p_tipo='bienvenida'`; `registroaforo.html` conserva el **early-return** (email `null`) para no cambiar comportamiento.
+4. **Smoke parcial:** RPC alcanzable via PostgREST con `anon`; email invalido -> **`22023`** (sin envio). Falta smoke de **envio real** (requiere destinatario de prueba) -> **B9 PENDIENTE**.
+
+#### PENDIENTES / HALLAZGOS (2B)
+
+5. **D1 (TSK-105):** recorte del `select *` anonimo en `inscritos`, **sigue pendiente**.
+6. **Gap `p_tipo`:** `admin.html` **no mapea** la fila "Tipo" de ticket a `p_tipo` (se pierde en 2B).
+7. **`p_inscrito_id` va NULL** en todos los call sites (los INSERT no hacen `.select('id')`).
+8. **`admin bacup.html:4774`** conserva la **anon key hardcodeada** en el `Bearer` (limpieza pendiente).
+9. **Hallazgo `MAIL_FROM`:** la Function lee `env("MAIL_FROM")` (`index.ts:660`), pero el secret existente se llama **`FROM_EMAIL`** (valor de 64 chars, no es email). Se usa el remitente por defecto **`Hostal Terraza <no-reply@hostalterraza.com>`** (verificar dominio verificado en Resend).
+10. **`ADR-075` sigue NO asignado** (hueco); **`ADR-077` existe**.
+11. **Seguridad:** rotar el **PAT de Supabase** usado en la sesion.
+
+---
+
+### Cierre documental de FASE 2B — gateway unico de correo (2026-10-03) — PILOTO HECHO, LOTE PENDIENTE (historial)
+
+> Entrada **conservada intacta** por Cero Borrado (Oro #2/#3): describe el estado ANTES de ejecutar B5/B6 y el lote. El estado REAL ejecutado y verificado esta en el bloque superior. Tier **PAGO**. En este cierre **no se toco codigo**: la migracion B3 (`serie.html`) es de la sesion de implementacion. Baseline = archivo real (ADR-006).
 
 #### B1 — Hallazgo ADR-006: la firma del brief NO existe
 
@@ -298,15 +321,19 @@ task:
 
 5. `enviarNotificacionesSerie` (`serie.html:985`) migrada de `fetch` con anon key a `SB.rpc('enviar_email_registro', {...})` (`:994-1006`, `p_tipo='registro'`, `p_idempotency_key='serie-registro:'+qr`). **Verificado 5/5 + Escudo GOLD 5/5 PASS.** La anon key deja de ser credencial de envio en ese sitio.
 
-#### LOTE PENDIENTE — 4 call sites + limpieza
+#### LOTE PENDIENTE — 4 call sites + limpieza (HISTORIAL: ya ejecutado, ver bloque superior)
 
-6. `admin.html:8153` (`enviarQREmail`, anon key hardcodeada en el `Bearer`), `registro.html:678` (**bienvenida**; migrara con `p_tipo='bienvenida'`, best-effort), `registroaforo.html:1009` (publico sin sesion, **TSK-102**), `eventobackup.html:4449`. **PENDIENTES de autorizacion.**
-7. `admin bacup.html:4779` trae la **anon key hardcodeada** en el `Bearer` (la URL en `:4774`); a limpiar (pendiente). Nota: el cierre FASE 2A citaba `registroaforo.html:1010`; el archivo real dice `:1009` (ADR-006).
+6. `admin.html:8153` (`enviarQREmail`, anon key hardcodeada en el `Bearer`), `registro.html:678` (**bienvenida**; migrara con `p_tipo='bienvenida'`, best-effort), `registroaforo.html:1009` (publico sin sesion, **TSK-102**), `eventobackup.html:4449`. **HECHO en 2B (B10): los 5 migrados a RPC.**
+7. `admin bacup.html:4779` trae la **anon key hardcodeada** en el `Bearer` (la URL en `:4774`); **limpieza PENDIENTE**. Nota: el cierre FASE 2A citaba `registroaforo.html:1010`; el archivo real dice `:1009` (ADR-006).
 
-#### Bloqueador operativo y TSK-102
+#### Bloqueador operativo y TSK-102 (HISTORIAL: resueltos)
 
-8. **B5** (secreto Vault `send_ticket_email_service_token`) y **B6** (deploy Edge Function; requiere `supabase link` al ref `ctgyvydzshueemlelkzv` + credenciales) quedan **DIFERIDOS a Direccion** = **BLOQUEADOR OPERATIVO**. Sin secreto, la RPC **falla cerrado** (ya verificado en FASE 2A).
-9. **TSK-102** (`registroaforo.html` publico sin sesion): **estrategia RESUELTA** por el gateway A (la RPC no necesita credencial del llamador; rate limit 3/cedula+evento/10 min + 10/IP/h + idempotencia), pero la **implementacion sigue PENDIENTE**.
+8. **B5** (secreto Vault `send_ticket_email_service_token`) y **B6** (deploy Edge Function) quedaron **DIFERIDOS a Direccion** = **BLOQUEADOR OPERATIVO**. Sin secreto, la RPC **falla cerrado**. >> **RESUELTOS en 2B: B5 y B6 HECHOS (v6 ACTIVE, auth HTTP verificada).**
+9. **TSK-102** (`registroaforo.html` publico sin sesion): **estrategia RESUELTA** por el gateway A (la RPC no necesita credencial del llamador; rate limit 3/cedula+evento/10 min + 10/IP/h + idempotencia), **IMPLEMENTADA en 2B** conservando el early-return.
 10. **Decisiones de producto confirmadas por Direccion:** la fila "Tipo" de `admin.html` es **prescindible en 2B** (gap `p_ticket_tipo` futuro); el correo de bienvenida de `registro.html` va por RPC con `p_tipo='bienvenida'` (best-effort).
+
+### Cierre documental FASE 2B — nota de actualizacion (2026-10-03)
+
+> **Totales (linea agregada):** las cifras anteriores se conservan. `TSK-101` pasa a **5/5 HECHO**; `TSK-102` implementada; `TSK-103` (B6) HECHO. Nuevos pendientes de 2B sin ID propio: smoke de envio real (**B9**), gap `p_tipo`, `p_inscrito_id` NULL, `MAIL_FROM`/`FROM_EMAIL`, limpieza de anon key en `admin bacup.html`, rotacion del PAT. `D1`/`TSK-105` sigue abierta. Commit `5ca58d8`.
 
 
