@@ -36,7 +36,10 @@ font-family:var(--font-main);line-height:1.55;-webkit-font-smoothing:antialiased
 .htz h1,.htz h2,.htz h3,.htz .hz-display{font-family:var(--font-display);font-weight:400;letter-spacing:.02em;text-transform:uppercase;margin:0}
 .htz :focus-visible{outline:2px solid var(--accent-cyan);outline-offset:3px;border-radius:4px}
 .htz ::selection{background:var(--accent-cyan);color:#000}
-.htz .hz-wrap{width:min(1180px,100% - 48px);margin-inline:auto}
+/* Contenedor seguro de flujo (ADR-017 fuente unica del ancho).
+   Nota: el markup usa `class="htz-wrap"`; `hz-wrap` se conserva por retrocompatibilidad
+   con pages que aun usan el nombre corto (planes-precios.html). */
+.htz .hz-wrap,.htz .htz-wrap{width:min(1200px,100% - 48px);margin-inline:auto}
 .htz .hz-kicker{display:inline-flex;align-items:center;gap:.5rem;font-size:11px;font-weight:600;
 letter-spacing:.22em;text-transform:uppercase;color:var(--accent-cyan)}
 .htz .hz-kicker::before{content:'';width:22px;height:2px;background:var(--accent-cyan)}
@@ -66,6 +69,14 @@ border:0;border-radius:999px;padding:.6rem 1.15rem;cursor:pointer;transition:bac
 .htz-btn-mini{padding:.35rem .7rem;font-size:12px}
 .htz-nav-burger{display:none;background:none;border:1px solid var(--border-glass);color:var(--cream);
 border-radius:8px;width:40px;height:40px;font-size:20px;cursor:pointer}
+
+/* Seccion .htz-sec: el FONDO va full-bleed (ADR-060), el CONTENIDO va centrado.
+   Solo aplica a las <section class="htz-wrap htz-sec">; el <footer class="htz-wrap"> NO
+   lleva htz-sec, asi que sus hijos heredan el centrado del wrap sin override. */
+.htz section.htz-wrap.htz-sec{width:100%;max-width:none;padding-inline:24px}
+.htz section.htz-wrap.htz-sec > .htz-sec-head,
+.htz section.htz-wrap.htz-sec > .htz-teaser,
+.htz section.htz-wrap.htz-sec > .htz-cta{width:min(1200px,100% - 48px);margin-inline:auto}
 
 /* ── HERO ── */
 .htz-hero{position:relative;overflow:hidden;padding:calc(72px + 3vw) 0 0;border-bottom:1px solid var(--border-glass);background:var(--bg-navy)}

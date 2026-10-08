@@ -44,6 +44,16 @@
         body.page-registro #cabezote-img { display: block; width: 100%; height: auto; }
         body.page-registro #cabezote-picture { display: block; width: 100%; }
         body.page-registro #mod-form { display: block !important; padding: 1.5rem 6% 3rem; border-bottom: none !important; }
+        /* Contenedor seguro de flujo (ADR-017). `.form-master-box` no trae max-width propio
+           (a diferencia de evento-app.html:307 = 550px), asi que el formulario se estiraba
+           de borde a borde en pantallas anchas. NO se toca el padding:6% de #mod-form ni el
+           cabezote full-bleed (ADR-060). */
+        body.page-registro #mod-form .form-master-box,
+        body.page-registro #main-content-flow .container-wrap {
+            width: min(1200px, 100% - 48px);
+            margin-inline: auto;
+            box-sizing: border-box;
+        }
         body.page-registro .wa-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1.1rem; flex-wrap: wrap; }
         /* Geometria commun select+input: el silo inyecta `padding/margin/width` con
            `!important` sobre `select` (p.ej. .tpl-f5 ... select), asi que la pagina
