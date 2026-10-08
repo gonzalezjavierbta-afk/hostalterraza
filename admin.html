@@ -6760,13 +6760,22 @@ function openPuntosInscrito(insId) {
   if (alertEl) alertEl.innerHTML = '';
   const puntos = _evPuntos(ins.evento_id);
   const propios = Array.isArray(ins.puntos_acceso) ? ins.puntos_acceso : [];
-  const efectivos = propios.length ? propios : puntos;
   // Union (puntos base del evento + override del ticket): el override puede incluir un
   // punto ya removido de la base; si no se renderiza se perderia al guardar (valor = seleccionados).
   const union = [...puntos];
   propios.forEach(p => { if (union.indexOf(p) === -1) union.push(p); });
+  // Distinguir "hereda" de "override" SIN preseleccionar la base: marcar la base convertiria
+  // la herencia en un override congelado que no sigue cambios futuros del evento.
   const efEl = document.getElementById('puntos-ins-efectivos');
-  if (efEl) efEl.innerHTML = 'Puntos efectivos actuales: ' + (efectivos.length ? esc(efectivos.join(' · ')) : '— (el evento no tiene puntos)');
+  if (efEl) {
+    if (propios.length) {
+      efEl.innerHTML = '<b>Override activo:</b> este ticket solo vale en los puntos marcados.';
+    } else if (puntos.length) {
+      efEl.innerHTML = 'Sin override: este ticket hereda los puntos del evento (' + esc(puntos.join(' · ')) + '). Marca puntos solo si quieres restringir esta entrada.';
+    } else {
+      efEl.innerHTML = 'El evento no tiene puntos configurados. Usa "Puntos" en el evento para definirlos.';
+    }
+  }
   const list = document.getElementById('puntos-ins-list');
   if (list) {
     list.innerHTML = union.length
