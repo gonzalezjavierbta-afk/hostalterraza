@@ -446,6 +446,13 @@ async function sincronizarCola() {
         await SB.from('inscritos').update(op.data).eq('id', op.id);
       } else if (op.type === 'log') {
         await SB.from('logs').insert(op.data);
+      } else if (op.type === 'log-delete') {
+        // Borrado diferido del log de un undo hecho offline
+        if (op.punto_acceso) {
+          await SB.from('logs').delete().eq('qr_code', op.qr_code).eq('punto_acceso', op.punto_acceso);
+        } else {
+          await SB.from('logs').delete().eq('qr_code', op.qr_code).eq('resultado', 'Ingreso');
+        }
       }
     } catch(e) {
       offlineQueue.push(op); // re-queue si falla
@@ -836,6 +843,16 @@ async function processScan() {
     return;
   }
 
+  // Validar que el punto del token pertenezca al evento (multi-punto)
+  if (esMultiUso && puntoAcceso && !(window._evData?.puntos_acceso || []).includes(puntoAcceso)) {
+    res.innerHTML = `<div class="res-card res-err">
+      <div style="font-size:16px;font-weight:500;color:var(--red)">Punto no autorizado</div>
+      <div style="font-size:13px;margin-top:.2rem;opacity:.8">El punto <strong>${puntoAcceso}</strong> no esta autorizado para este evento.</div>
+    </div>`;
+    addLog('Punto no autorizado', String(puntoAcceso), '#fca5a5');
+    return;
+  }
+
   if (esMultiUso && puntoAcceso) {
     // ── Multi-punto: verificar si ya pasó por ESTE punto ──
     const cacheKey = code + '|' + puntoAcceso;
@@ -984,7 +1001,7 @@ async function confirmEntry() {
       </button>
     </div>`;
     setTimeout(() => {
-      const btn = document.getElementById('undo-btn-${ins.id}');
+      const btn = document.getElementById(`undo-btn-${ins.id}`);
       if (btn) btn.style.display = 'none';
     }, 15000);
 
@@ -1027,7 +1044,7 @@ async function confirmEntry() {
     </div>`;
     // Auto-ocultar el botón de revertir después de 15 segundos
     setTimeout(() => {
-      const btn = document.getElementById('undo-btn-${ins.id}');
+      const btn = document.getElementById(`undo-btn-${ins.id}`);
       if (btn) btn.style.display = 'none';
     }, 15000);
   }
@@ -1050,11 +1067,24 @@ async function undoCheckinScanner(id, nombre, qrCode) {
       return;
     }
     // Eliminar el log de este ingreso
-    await SB.from('logs').delete()
-      .eq('qr_code', qrCode).eq('resultado', 'Ingreso');
+    // Multi-punto: borrar solo el log del punto actual (resultado='Ingreso · <punto>')
+    // Uso unico: borrar el log 'Ingreso' del QR
+    if (esMultiUso && puntoAcceso) {
+      await SB.from('logs').delete()
+        .eq('qr_code', qrCode).eq('punto_acceso', puntoAcceso);
+    } else {
+      await SB.from('logs').delete()
+        .eq('qr_code', qrCode).eq('resultado', 'Ingreso');
+    }
   } else {
     // Offline: agregar a la cola
     offlineQueue.push({ type: 'update', id, data: updates });
+    // Encolar borrado del log coherente con el modo (multi-punto vs uso unico)
+    if (esMultiUso && puntoAcceso) {
+      offlineQueue.push({ type: 'log-delete', qr_code: qrCode, punto_acceso: puntoAcceso });
+    } else {
+      offlineQueue.push({ type: 'log-delete', qr_code: qrCode, resultado: 'Ingreso' });
+    }
     persistirCola();
     actualizarBarraOffline();
   }
@@ -1063,6 +1093,8 @@ async function undoCheckinScanner(id, nombre, qrCode) {
   if (qrCache[qrCode]) {
     qrCache[qrCode] = { ...qrCache[qrCode], used: false, hora_ingreso: null, fecha_ingreso: null };
   }
+  // Invalidar cache de logs del punto actual (evita falsos duplicados tras revertir)
+  if (esMultiUso && puntoAcceso) delete logsCache[qrCode + '|' + puntoAcceso];
 
   document.getElementById('sc-res').innerHTML = `<div class="res-card" style="background:var(--surface);border:1px solid var(--border)">
     <div style="font-size:15px;font-weight:500;color:var(--ink2)">↩ Ingreso revertido</div>
