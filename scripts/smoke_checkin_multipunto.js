@@ -99,9 +99,12 @@ function checkPrecedencia(src) {
   assert(src.indexOf('allowed.includes(puntoAcceso)') !== -1,
     'scanner: el punto del token se valida con allowed.includes(puntoAcceso)',
     'no se hallo "allowed.includes(puntoAcceso)"');
-  assert(/Array\.isArray\(override\)\s*&&\s*override\.length\s*>\s*0/.test(src),
-    'scanner: la precedencia exige override no vacio antes de caer al evento',
-    'no se hallo el gate "Array.isArray(override) && override.length > 0"');
+  assert(/Array\.isArray\(data\.puntos_acceso\)/.test(src),
+    'scanner: distingue el override explicito con Array.isArray(data.puntos_acceso)',
+    'no se hallo "Array.isArray(data.puntos_acceso)"');
+  assert(/hasOwn\s*=\s*Array\.isArray\(data\.puntos_acceso\)/.test(src),
+    'scanner: semantica nueva via hasOwn (NULL/undefined hereda; [] = ninguno)',
+    'no se hallo "hasOwn = Array.isArray(data.puntos_acceso)"');
 }
 
 /* (b) scanner.html: logs con evento_id / inscrito_id. */

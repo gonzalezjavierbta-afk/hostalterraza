@@ -26,6 +26,7 @@ estructura: indice-v1 (2026-10-01)
 > **Delta por ADR-079 (2026-10-07, linea agregada, sin reescribir las de arriba):** +1 entrada / +1 cerrada = **TSK-107** (Check-in multi-punto con override por ticket). No se agregan tareas abiertas: la deuda residual de ADR-079 queda registrada sin ID propio en `NEXT.md` y `DECISIONS.md` (ver cierre al final). Cifras absolutas de este corte NO recontadas en este cierre; se declaran como delta para no afirmar un total no verificado (ADR-006). Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 > **Correccion aditiva (2026-10-07, misma fecha):** la deuda residual de ADR-079 **YA tiene ID**: **TSK-108..TSK-111** (bloque "DEUDA RESIDUAL ADR-079 — check-in multi-punto", 4 items). La linea anterior se conserva intacta (Cero Borrado); se corrige solo la afirmacion 'sin ID propio'. Deltas efectivos del corte: **+1 cerrada** (TSK-107) y **+4 abiertas** (TSK-108..TSK-111).
 > **Delta por ADR-080 (2026-10-07, linea agregada, sin reescribir las de arriba):** **+1 entrada / +1 cerrada = TSK-112** (Paleta de color de evento) y **+1 abierta = TSK-113** (Fase 2: consumo de los 4 slots derivados en los silos). Feature **implementada** en `admin.html` (Wizard, creacion + edicion) y verificada con Escudo GOLD (`node scripts/smoke_paleta_evento.js` -> **20 PASS / 0 FAIL**). Deuda tecnica declarada en ADR-080 (Decision 5). Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+> **Delta por ADR-081 (2026-10-07, linea agregada, sin reescribir las de arriba):** **+1 entrada / +1 cerrada = TSK-114** (Puntos de escaneo por evento + autorizacion por punto). Feature **implementada** en `admin.html`/`scanner.html` y **migracion `adr081_puntos_none_semantica.sql` APLICADA** (121 inscritos, 0 con `[]`, no-op). Verificada: `node scripts/smoke_checkin_multipunto.js` -> **28 PASS / 0 FAIL**; `node scripts/smoke_puntos_adr081.js` -> **30 PASS / 0 FAIL**; `node scripts/express_check.js` -> **35 PASS / 0 FAIL**. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
@@ -109,7 +110,7 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-108](#tsk-108) | Direccion + `@sql-security` (PRO — es seguridad/RLS) | **R1** — Verificar en vivo la RLS anonima de `logs` con las columnas nuevas (`evento_id`/`inscrito_id`) | Check-in multi-punto (ADR-079) | pendiente |
 | [TSK-109](#tsk-109) | Direccion + `@data-migration` (PRO — es esquema/backfill) | **R2** — `logs.evento_id` sin backfill en **22/66** filas (sin match exacto por nombre); `inscrito_id` historico **100% NULL** | Check-in multi-punto (ADR-079) | pendiente |
 | [TSK-110](#tsk-110) | Direccion / Producto (decision de alcance) | **R3** — Decidir si el override se expone en los registros publicos (`registroaforo.html`, `evento-app.html`); hoy no, por diseno | Check-in multi-punto (ADR-079) | pendiente |
-| [TSK-111](#tsk-111) | Frontend (`@admin-dev` / `@frontend-tpl`) | **R4** — `openPuntosInscrito` muestra la union base+override; distinguir herencia vs. propio | Check-in multi-punto (ADR-079) | pendiente |
+| [TSK-111](#tsk-111) | Frontend (`@admin-dev` / `@frontend-tpl`) | **R4** — `openPuntosInscrito` muestra la union base+override; distinguir herencia vs. propio | Check-in multi-punto (ADR-079) | resuelto (ADR-081, tri-state en `openPuntosInscrito`; ver cierre TSK-114) |
 
 #### 🟠 DEUDA RESIDUAL ADR-080 — paleta de color de evento (1 item NUEVO, 2026-10-07)
 
@@ -449,5 +450,33 @@ task:
 #### Correccion ADR-006 (baseline = archivo real)
 
 11. La implementacion **NO retiro `syncColor`** como planeaba el Anexo de ADR-080: la **conserva y la reescribe para 5 slots** (`function syncColor(hex, slot)`, `admin.html:11335`; 5 `oninput` en el HTML). No es un bug (TinyColor2 si se retiro), pero se registra para no afirmar un alcance no ejecutado.
+
+---
+
+### Cierre de TSK-114 - Puntos de escaneo por evento + autorizacion por punto (ADR-081) (2026-10-07) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Feature **implementada** y **migracion DML aplicada en produccion**; alcance REAL verificado contra el archivo real (ADR-006). Este cierre documental **no introduce** cambios de codigo ni migraciones adicionales (los del feature ya estan en el working tree); los **commits los hace el orquestador**.
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Semantica nueva de `inscritos.puntos_acceso` (jsonb):** `NULL` = **hereda TODOS** los puntos del evento (dinamico); `[]` = **ninguno explicito** (el ticket no vale en ningun punto); array no vacio = **override** (solo esos nombres). Cierra el agujero de ADR-079 (autoautorizacion de puntos nuevos a quien heredaba y colapso de "ninguno" a "hereda"). El scanner pasa a decidir por **presencia de la clave** (`scanner.html:850`: `const hasOwn = Array.isArray(data.puntos_acceso);`, con `motivo` "esta entrada"/"este evento").
+2. **Migracion `migrations/adr081_puntos_none_semantica.sql` APLICADA a produccion** (Supabase `ctgyvydzshueemlelkzv`) por `@data-migration`, gate de `AGENTS.md` §2 autorizado. `UPDATE ... SET puntos_acceso = NULL WHERE puntos_acceso = '[]'::jsonb`. **Resultado en produccion: 121 inscritos, 0 con `[]` (no-op), ejecutada OK.** Idempotente, 0 DDL, 0 endpoints, 0 RLS, sin DROP/DELETE/TRUNCATE.
+3. **`admin.html` - vista "Puntos" (nueva):** tab `data-pnl-pill="puntos"` (`:1702`, `onclick="pnlGoTab('puntos');pnlPuntosRefrescar()"`) y bloque `data-pnl-tab="puntos"` (`:1949-1982`). Motor `_pp*`/`pnlPuntos*` (`:10332-10584`): seleccion de evento + punto, chips base, **seleccion masiva** (marcar/desmarcar el punto activo a N invitados) y **paginacion** (`_ppPage`/`_ppPageSize=50`). Estado tri-state por invitado via `_ppEstado` (`:10364`): Hereda / Ninguno / Override.
+4. **`admin.html` - propagacion al editar los puntos del EVENTO:** `_puntosEventoCambiaron` (`:6933`) y `propagarPuntosEvento` (`:6941`) se invocan en `guardarPuntosEvento` (`:6992`) y en `guardarEventoWizard` (`:6692-6693`). Regla: herederos (`NULL`) no se tocan; override no vacio `O` -> `O INTERSECT N` por NOMBRE (interseccion vacia -> `[]`, no `NULL`); `[]` no se toca. Best-effort (no revierte el guardado del evento).
+5. **`admin.html` - modal por invitado tri-state:** `openPuntosInscrito` (`:7062-7117`) ramifica por `Array.isArray(ins.puntos_acceso)`: radio `heredar`/`explicito`, aviso "Override activo"/"Sin puntos"/"Sin override (hereda)", y lista con tags `(hereda)`/`(base + propio)`/`(solo propio)`/`(base)`. `guardarPuntosInscrito` (`:7125-7147`) persiste `heredar ? null : sel` (`[]` si explicito y sin marcas). **Resuelve TSK-111/R4** (union base+override ya distinguida).
+6. **CSV de 3 estados:** `i.puntos_acceso==null ? 'Hereda' : (Array.isArray(i.puntos_acceso) ? (i.puntos_acceso.length ? ... : 'Ninguno') : ...)` (`admin.html:10710`).
+7. **`scanner.html`:** regla `hasOwn` (`:850-855`), sin otros cambios. `evento-app.html`, `registroaforo.html`, `eventobackup.html`, `api/*.js` y `css/templates/*` **NO se tocan**.
+
+#### Decision y artefactos
+
+8. **ADR-081** creado: `Sistema QR desarrollo/decisiones/ADR-081-semantica-null-vs-vacio-y-propagacion-de-puntos-de-escaneo.md` (ASCII-safe, 0 bytes > 127) + fila de indice en `DECISIONS.md` (bajo ADR-080). Referencia a la migracion conciliada a `adr081_puntos_none_semantica.sql`.
+
+#### Deuda declarada (NO cerrada)
+
+9. **Rename de un punto = quitar + agregar:** el nombre viejo sale de todos los overrides (interseccion) y el nuevo NO se agrega a ningun override (solo lo reciben los herederos). Limite aceptado y documentado en ADR-081 (re-vincular por identidad exigiria IDs de punto; Opcion B rechazada). No es un bug.
+
+#### Verificacion de cierre (por archivo real, ADR-006)
+
+10. `node scripts/smoke_checkin_multipunto.js` -> **PASS 28 / FAIL 0**; `node scripts/smoke_puntos_adr081.js` -> **PASS 30 / FAIL 0**; `node scripts/express_check.js` -> **PASS 35 / FAIL 0**; `grep` confirma `hasOwn` en `scanner.html:850`, tab/bloque `data-pnl-*="puntos"`, motor `_pp*`/`propagarPuntosEvento` y tri-state en `admin.html`. Migracion real: `migrations/adr081_puntos_none_semantica.sql` presente (5550 bytes, 0 no-ASCII). **Este cierre documental no introduce cambios de codigo/migraciones adicionales; commits a cargo del orquestador.**
 
 

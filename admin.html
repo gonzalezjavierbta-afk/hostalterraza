@@ -1616,9 +1616,19 @@ tr:hover td{background:var(--surface)}
           </div>
         </div>
         <div class="fg" id="as-puntos-wrap" style="display:none;margin-top:.5rem">
-          <label>Puntos permitidos (opcional)</label>
+          <label>Acceso a puntos</label>
+          <div id="as-puntos-modo" style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+              <input type="radio" name="as-puntos-modo-radio" value="heredar" onchange="toggleAsPuntosModo()" style="accent-color:var(--gold)">
+              <span>Heredar (todos los puntos del evento)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+              <input type="radio" name="as-puntos-modo-radio" value="explicito" onchange="toggleAsPuntosModo()" style="accent-color:var(--gold)">
+              <span>Restringir a puntos concretos</span>
+            </label>
+          </div>
           <div id="as-puntos-list" style="display:flex;flex-direction:column;gap:4px;margin-top:4px"></div>
-          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Sin selección = hereda los puntos del evento.</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Heredar = usa todos los puntos del evento. Restringir sin marcar ninguno = sin acceso a puntos.</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button class="btn btn-teal" onclick="asignarCliente()">Asignar y generar QR</button>
@@ -1689,6 +1699,7 @@ tr:hover td{background:var(--surface)}
       <button class="adm-tab" data-pnl-pill="rankings" onclick="pnlGoTab('rankings')">🏆 Rankings</button>
       <button class="adm-tab" data-pnl-pill="asistentes" onclick="pnlGoTab('asistentes')">👥 Asistentes <span class="adm-tab-badge" id="pnl-badge-asistentes">0</span></button>
       <button class="adm-tab" data-pnl-pill="comunidad" onclick="pnlGoTab('comunidad')">💬 Comunidad WhatsApp <span class="adm-tab-badge" id="pnl-badge-comunidad">0</span></button>
+      <button class="adm-tab" data-pnl-pill="puntos" onclick="pnlGoTab('puntos');pnlPuntosRefrescar()">Puntos</button>
       <button class="adm-tab" data-pnl-pill="landing" onclick="pnlGoTab('landing')">🌐 Landing</button>
     </div>
 
@@ -1933,6 +1944,42 @@ tr:hover td{background:var(--surface)}
       <div style="font-size:12px;color:var(--ink3);margin-top:.5rem" id="pn-com-count"></div>
     </div>
     </div><!-- /data-pnl-tab="comunidad" -->
+
+    <!-- == Sub-tab "Puntos" (ADR-081): autorizacion manual en bloque por punto de escaneo == -->
+    <div data-pnl-tab="puntos">
+    <div class="card" style="margin-bottom:1rem">
+      <div class="ch" style="margin-bottom:.5rem">Autorizacion por punto de escaneo</div>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:.75rem;max-width:820px">
+        Elige un evento y un punto; marca a que invitados autorizas ese punto. Hereda = el ticket sigue los puntos del evento; Ninguno = sin acceso explicito; Override = solo sus puntos propios.
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:.75rem">
+        <select id="pn-puntos-evento" onchange="pnlPuntosSetEvento(this.value)" style="font-size:12px;padding:5px 8px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--paper);max-width:280px"></select>
+        <span style="width:1px;height:20px;background:var(--border);align-self:center"></span>
+        <div id="pn-puntos-chips" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+      </div>
+      <div id="pn-puntos-base" style="font-size:12px;color:var(--ink3);margin-bottom:.5rem"></div>
+      <div id="pn-puntos-bulk" style="display:none;background:var(--ink);color:#fff;border-radius:var(--rsm);padding:.6rem 1rem;margin-bottom:.5rem;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="pn-puntos-bulk-count" style="font-size:13px;font-weight:500;flex:1;min-width:120px"></span>
+        <button class="btn btn-sm" style="background:#1D9E75;color:#fff;border:none" onclick="pnlPuntosBulk('autorizar')">Autorizar a seleccionados</button>
+        <button class="btn btn-sm" style="background:rgba(220,38,38,.25);color:#fca5a5;border:none" onclick="pnlPuntosBulk('quitar')">Quitar a seleccionados</button>
+        <button class="btn btn-sm" style="background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15)" onclick="pnlPuntosBulk('ninguno')">Ninguno</button>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr><th style="width:32px"><input type="checkbox" id="pn-puntos-selall" onclick="pnlPuntosSelAll(this.checked)" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></th><th>Nombre</th><th>Cedula</th><th>Estado en el punto</th><th>Estado general</th></tr></thead>
+          <tbody id="pn-puntos-table"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:.5rem">
+        <div style="font-size:12px;color:var(--ink3)" id="pn-puntos-count"></div>
+        <div id="pn-puntos-pagination" style="display:none;gap:6px;align-items:center">
+          <button class="btn btn-ghost btn-sm" id="pn-puntos-prev" onclick="pnlPuntosPagina(-1)">&larr; Anterior</button>
+          <span id="pn-puntos-page-info" style="font-size:12px;color:var(--ink3);white-space:nowrap"></span>
+          <button class="btn btn-ghost btn-sm" id="pn-puntos-next" onclick="pnlPuntosPagina(1)">Siguiente &rarr;</button>
+        </div>
+      </div>
+    </div>
+    </div><!-- /data-pnl-tab="puntos" -->
 
     <div data-pnl-tab="landing">
     <!-- KPIs de telemetria del landing (ADR-032/050) -->
@@ -2655,9 +2702,19 @@ tr:hover td{background:var(--surface)}
   <div class="modal" style="max-width:480px">
     <button class="modal-x" onclick="cerrarPuntosInscrito()">×</button>
     <h3 style="font-size:18px;margin-bottom:.25rem" id="puntos-ins-titulo">Puntos del asistente</h3>
-    <p style="font-size:12px;color:var(--ink3);margin-bottom:.9rem">Marca los puntos permitidos para este ticket. Sin marcar ninguno, hereda los puntos del evento.</p>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:.9rem">Elige si este ticket hereda los puntos del evento o si restringe su acceso a puntos concretos.</p>
     <div id="puntos-ins-alert"></div>
     <div id="puntos-ins-efectivos" style="font-size:12px;color:var(--ink3);margin-bottom:.5rem"></div>
+    <div id="puntos-ins-modo" style="display:flex;flex-direction:column;gap:6px;margin-bottom:.75rem">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+        <input type="radio" name="puntos-ins-modo-radio" value="heredar" onchange="togglePuntosInsModo()" style="accent-color:var(--gold)">
+        <span>Heredar (todos los puntos del evento)</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+        <input type="radio" name="puntos-ins-modo-radio" value="explicito" onchange="togglePuntosInsModo()" style="accent-color:var(--gold)">
+        <span>Restringir a puntos concretos</span>
+      </label>
+    </div>
     <div id="puntos-ins-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:.5rem"></div>
     <div style="margin-top:1.25rem;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-gold" onclick="guardarPuntosInscrito()">Guardar puntos</button>
@@ -6587,6 +6644,9 @@ async function guardarEventoWizard() {
   }
 
   try {
+    // ADR-081 - capturar la lista nueva y la previa para propagar solo si cambio (edicion).
+    const _puntosNuevosWiz = getPuntosAcceso();
+    const _puntosPrevWiz   = _eventos.find(e => e.id === id)?.puntos_acceso;
     const payload = {
       nombre:         n,
       fecha:          _fechaParaGuardar,
@@ -6600,7 +6660,7 @@ async function guardarEventoWizard() {
       video_url:      (document.getElementById('ev-video')?.value || '').trim() || null,
       wa_share:       document.getElementById('ev-wa-share')?.checked ?? true,
       aforo_max:      parseInt(document.getElementById('ev-aforo')?.value) || null,
-      puntos_acceso:  getPuntosAcceso(),
+      puntos_acceso:  _puntosNuevosWiz,
       captura_pura:   _evCapturaPura,
       modo_publico:   _evModoPublico || 'landing',
       template_id:    _THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || null,
@@ -6627,8 +6687,16 @@ async function guardarEventoWizard() {
     const { error } = await SB.from('eventos').update(payload).eq('id', id);
     if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
 
+    // ADR-081 - propagacion solo en edicion y solo si la lista de puntos cambio.
+    let _propMsg = '';
+    if (_puntosEventoCambiaron(_puntosPrevWiz, _puntosNuevosWiz)) {
+      const prop = await propagarPuntosEvento(id, _puntosNuevosWiz);
+      _propMsg = prop.ok
+        ? (prop.reconciliados ? ` ${prop.reconciliados} invitado(s) re-vinculado(s).` : '')
+        : ' Aviso: no se pudieron reconciliar los overrides de los invitados.';
+    }
     const pubLink = prevSlug ? landingUrl({ ...(_eventos.find(e => e.id === id) || {}), slug: prevSlug }) : '';
-    alrt('ev-alert', `✓ Evento actualizado correctamente.${pubLink ? ` <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>` : ''}`, 'ok');
+    alrt('ev-alert', `✓ Evento actualizado correctamente.${_propMsg}${pubLink ? ` <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>` : ''}`, 'ok');
     cancelarEdicion();
     loadEventos();
     loadEventosSelects();
@@ -6857,6 +6925,56 @@ function cerrarPuntosEvento() {
   _puntosEvId = null;
 }
 
+// ADR-081 - propagacion de puntos del EVENTO a los invitados con override.
+// Solo el evento editado. Override real = Array.isArray(puntos_acceso); NULL hereda
+// y queda intacto. Nuevo override = interseccion por NOMBRE con la lista nueva; si
+// queda vacia se persiste [] (ninguno explicito, NUNCA null). No autoriza puntos
+// nuevos automaticamente. Best-effort: devuelve {ok, reconciliados} y no lanza.
+function _puntosEventoCambiaron(prev, nuevo) {
+  const a = Array.isArray(prev) ? prev : [];
+  const b = Array.isArray(nuevo) ? nuevo : [];
+  if (a.length !== b.length) return true;
+  const setA = new Set(a);
+  return b.some(p => !setA.has(p));
+}
+
+async function propagarPuntosEvento(evId, puntosNuevos) {
+  try {
+    if (!evId) return { ok: true, reconciliados: 0 };
+    const nuevos = new Set(Array.isArray(puntosNuevos) ? puntosNuevos : []);
+    // Fuente: cache del panel si tiene filas de ese evento; si no, consulta directa.
+    let fuente = (_pnAllList || []).filter(i => i.evento_id === evId);
+    if (!fuente.length) {
+      const { data, error } = await SB.from('inscritos')
+        .select('id,puntos_acceso').eq('evento_id', evId);
+      if (error) throw error;
+      fuente = data || [];
+    }
+    // Solo override real (array). Los NULL heredan y no se tocan.
+    const cambios = fuente
+      .filter(i => Array.isArray(i.puntos_acceso))
+      .map(i => ({ id: i.id, valor: i.puntos_acceso.filter(p => nuevos.has(p)) }));
+    if (!cambios.length) return { ok: true, reconciliados: 0 };
+    // Persistir por lote: el valor difiere por fila (no sirve .in con valor unico).
+    const LOTE = 20;
+    for (let k = 0; k < cambios.length; k += LOTE) {
+      await Promise.all(cambios.slice(k, k + LOTE).map(c =>
+        SB.from('inscritos').update({ puntos_acceso: c.valor }).eq('id', c.id)
+      ));
+    }
+    // Actualizar cache y re-renderizar solo si el panel esta montado.
+    const porId = new Map(cambios.map(c => [c.id, c.valor]));
+    (_pnAllList || []).forEach(i => { if (porId.has(i.id)) i.puntos_acceso = porId.get(i.id); });
+    if (document.getElementById('pn-table') && typeof _renderTablaPagina === 'function') {
+      _renderTablaPagina();
+    }
+    return { ok: true, reconciliados: cambios.length };
+  } catch (e) {
+    console.error('[propagarPuntosEvento]', e);
+    return { ok: false, reconciliados: 0, error: e };
+  }
+}
+
 async function guardarPuntosEvento() {
   if (!_puntosEvId) return;
   const btn = document.querySelector('#mod-puntos-ev .btn-gold');
@@ -6869,7 +6987,13 @@ async function guardarPuntosEvento() {
     if (error) { alrt('puntos-ev-alert','Error: ' + error.message,'err'); return; }
     const ev = _eventos.find(e => e.id === _puntosEvId);
     if (ev) ev.puntos_acceso = valor;
-    alrt('puntos-ev-alert','✓ Puntos actualizados.','ok');
+    // ADR-081 - propagar a los invitados con override (interseccion por nombre).
+    // Best-effort: si falla, el guardado del evento ya quedo persistido.
+    const prop = await propagarPuntosEvento(_puntosEvId, puntos);
+    const msgOk = '✓ Puntos actualizados.' + (prop.ok
+      ? (prop.reconciliados ? ' ' + prop.reconciliados + ' invitado(s) re-vinculado(s).' : '')
+      : ' Aviso: no se pudieron reconciliar los overrides de los invitados.');
+    alrt('puntos-ev-alert', msgOk, prop.ok ? 'ok' : 'warn');
     setTimeout(() => { cerrarPuntosEvento(); loadEventos(); }, 700);
   } catch (e) {
     console.error('[guardarPuntosEvento]', e);
@@ -6888,29 +7012,52 @@ function _evPuntos(evId) {
 }
 
 // Registro manual (inscribir cliente a evento): checkboxes poblados desde el evento.
+// Tri-state: "Heredar" -> null; "Restringir" -> array de checks ([] = ninguno explicito).
 function renderAsPuntos() {
   const wrap = document.getElementById('as-puntos-wrap');
   const list = document.getElementById('as-puntos-list');
   if (!wrap || !list) return;
+  const heredarEl = document.querySelector('#as-puntos-modo input[name="as-puntos-modo-radio"][value="heredar"]');
+  if (heredarEl) heredarEl.checked = true;
   const puntos = _evPuntos(document.getElementById('as-ev') && document.getElementById('as-ev').value);
-  if (!puntos.length) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+  if (!puntos.length) { wrap.style.display = 'none'; list.innerHTML = ''; toggleAsPuntosModo(); return; }
   wrap.style.display = 'block';
   list.innerHTML = puntos.map(p => `
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-      <input type="checkbox" class="as-punto-chk" value="${esc(String(p))}" style="accent-color:var(--gold)">
+      <input type="checkbox" class="as-punto-chk" value="${esc(String(p))}" disabled style="accent-color:var(--gold)">
       <span>${esc(String(p))}</span>
     </label>`).join('');
+  toggleAsPuntosModo();
 }
 
+function toggleAsPuntosModo() {
+  const modoEl = document.querySelector('#as-puntos-modo input[name="as-puntos-modo-radio"]:checked');
+  const explicito = !!modoEl && modoEl.value === 'explicito';
+  document.querySelectorAll('#as-puntos-list .as-punto-chk').forEach(c => { c.disabled = !explicito; });
+  const list = document.getElementById('as-puntos-list');
+  if (list) list.style.opacity = explicito ? '1' : '.5';
+}
+
+// null = hereda el evento; [] = explicito sin puntos (ninguno); array = puntos concretos.
 function _getAsPuntos() {
+  const modoEl = document.querySelector('#as-puntos-modo input[name="as-puntos-modo-radio"]:checked');
+  const heredar = !modoEl || modoEl.value === 'heredar';
+  if (heredar) return null;                             // hereda el evento
   const chks = [...document.querySelectorAll('#as-puntos-list .as-punto-chk')];
-  if (!chks.length) return null;                 // evento sin puntos -> hereda
-  const sel = chks.filter(c => c.checked).map(c => c.value);
-  return sel.length > 0 ? sel : null;            // nada marcado -> hereda
+  return chks.filter(c => c.checked).map(c => c.value); // explicito: [] o array
 }
 
 // Override por inscrito desde la lista del panel.
 let _puntosInsId = null;
+
+// Habilita los checkboxes solo en modo explicito; en "Heredar" quedan deshabilitados.
+function togglePuntosInsModo() {
+  const modoEl = document.querySelector('#puntos-ins-modo input[name="puntos-ins-modo-radio"]:checked');
+  const explicito = !!modoEl && modoEl.value === 'explicito';
+  document.querySelectorAll('#puntos-ins-list .punto-ins-chk').forEach(c => { c.disabled = !explicito; });
+  const list = document.getElementById('puntos-ins-list');
+  if (list) list.style.opacity = explicito ? '1' : '.5';
+}
 
 function openPuntosInscrito(insId) {
   const ins = (_pnAllList || []).find(i => i.id === insId);
@@ -6921,7 +7068,9 @@ function openPuntosInscrito(insId) {
   const alertEl = document.getElementById('puntos-ins-alert');
   if (alertEl) alertEl.innerHTML = '';
   const puntos = _evPuntos(ins.evento_id);
-  const propios = Array.isArray(ins.puntos_acceso) ? ins.puntos_acceso : [];
+  // Semantica nueva: NULL/undefined = heredar; array (incl. []) = explicito.
+  const explicito = Array.isArray(ins.puntos_acceso);
+  const propios = explicito ? ins.puntos_acceso : [];
   // Union (puntos base del evento + override del ticket): el override puede incluir un
   // punto ya removido de la base; si no se renderiza se perderia al guardar (valor = seleccionados).
   const union = [...puntos];
@@ -6930,24 +7079,39 @@ function openPuntosInscrito(insId) {
   // la herencia en un override congelado que no sigue cambios futuros del evento.
   const efEl = document.getElementById('puntos-ins-efectivos');
   if (efEl) {
-    if (propios.length) {
+    if (explicito && propios.length) {
       efEl.innerHTML = '<b>Override activo:</b> este ticket solo vale en los puntos marcados.';
+    } else if (explicito) {
+      efEl.innerHTML = '<b>Sin puntos:</b> este ticket no tiene acceso a ningun punto.';
     } else if (puntos.length) {
-      efEl.innerHTML = 'Sin override: este ticket hereda los puntos del evento (' + esc(puntos.join(' · ')) + '). Marca puntos solo si quieres restringir esta entrada.';
+      efEl.innerHTML = 'Sin override: este ticket hereda los puntos del evento (' + esc(puntos.join(' · ')) + ').';
     } else {
       efEl.innerHTML = 'El evento no tiene puntos configurados. Usa "Puntos" en el evento para definirlos.';
     }
   }
+  const heredarEl = document.querySelector('#puntos-ins-modo input[name="puntos-ins-modo-radio"][value="heredar"]');
+  const explEl    = document.querySelector('#puntos-ins-modo input[name="puntos-ins-modo-radio"][value="explicito"]');
+  if (heredarEl) heredarEl.checked = !explicito;
+  if (explEl) explEl.checked = explicito;
   const list = document.getElementById('puntos-ins-list');
   if (list) {
     list.innerHTML = union.length
-      ? union.map(p => `
+      ? union.map(p => {
+          const enBase = puntos.indexOf(p) !== -1;
+          const enProp = propios.indexOf(p) !== -1;
+          const tag = !explicito ? '(hereda)'
+            : (enBase && enProp) ? '(base + propio)'
+            : enProp ? '(solo propio)'
+            : '(base)';
+          return `
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" class="punto-ins-chk" value="${esc(String(p))}" ${propios.indexOf(p) !== -1 ? 'checked' : ''} style="accent-color:var(--gold)">
-          <span>${esc(String(p))}</span>
-        </label>`).join('')
+          <input type="checkbox" class="punto-ins-chk" value="${esc(String(p))}" ${enProp ? 'checked' : ''} style="accent-color:var(--gold)">
+          <span>${esc(String(p))} <span style="font-size:10px;color:var(--ink3)">${tag}</span></span>
+        </label>`;
+        }).join('')
       : '<div style="font-size:12px;color:var(--ink3)">El evento no tiene puntos configurados. Usa "Puntos" en el evento para definirlos.</div>';
   }
+  togglePuntosInsModo();
   const mod = document.getElementById('mod-puntos-ins');
   if (mod) mod.style.display = 'flex';
 }
@@ -6964,9 +7128,11 @@ async function guardarPuntosInscrito() {
   if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
   try {
     const ins = (_pnAllList || []).find(i => i.id === _puntosInsId);
+    const modoEl = document.querySelector('#puntos-ins-modo input[name="puntos-ins-modo-radio"]:checked');
+    const heredar = !modoEl || modoEl.value === 'heredar';
     const chks = [...document.querySelectorAll('#puntos-ins-list .punto-ins-chk')];
     const sel = chks.filter(c => c.checked).map(c => c.value);
-    const valor = sel.length > 0 ? sel : null;
+    const valor = heredar ? null : sel;   // heredar -> null; explicito -> [] o array
     const { error } = await SB.from('inscritos').update({ puntos_acceso: valor }).eq('id', _puntosInsId);
     if (error) { alrt('puntos-ins-alert', 'Error: ' + error.message, 'err'); return; }
     if (ins) ins.puntos_acceso = valor;
@@ -9957,6 +10123,7 @@ function renderTabla(list) {
   _pnPage = 0;
   _renderTablaPagina();
   renderComunidadPanel();
+  pnlPuntosRefrescar(); // ADR-081 - vista "Puntos" sincronizada con la cache del panel
 }
 
 // Lee los filtros visibles del tab Asistentes. Helper compartido por el render
@@ -10156,6 +10323,269 @@ function renderComunidadPanel() {
 
 function filtrarComunidadTabla() { renderComunidadPanel(); }
 
+// =====================================================================
+// PANEL - vista "Puntos" (ADR-081): autorizacion manual en bloque por
+// punto de escaneo. Prefijo de categoria pnlPuntos / _pp (Regla
+// anti-duplicados BUG-006/018/019). No colisiona con la tabla de
+// Asistentes: usa su propia clase de checkbox .pp-row-sel.
+// Semantica: NULL = hereda la base del evento; [] = ninguno explicito;
+// array = override propio. Autorizacion efectiva = _ppEstado().
+// =====================================================================
+let _ppEvId    = null;   // evento seleccionado en la vista
+let _ppPunto   = null;   // punto de escaneo seleccionado
+let _ppPage    = 0;      // pagina actual (0-indexed)
+const _ppPageSize = 50;  // invitados por pagina
+let _ppBasePuntos = [];  // base del evento (fallback async si _eventos no lo tiene)
+
+// Invitados del evento en la cache (excluye Comunidad WhatsApp).
+function _ppInvitados(evId) {
+  return (_pnAllList || []).filter(i => i.evento_id === evId && !_esComunidad(i));
+}
+
+// Base (puntos del evento). Si _eventos no tiene el evento, consulta directa.
+async function _ppCargarBase(evId) {
+  const ev = (_eventos || []).find(e => e.id === evId);
+  if (ev) { _ppBasePuntos = Array.isArray(ev.puntos_acceso) ? ev.puntos_acceso.slice() : []; return; }
+  _ppBasePuntos = [];
+  try {
+    if (!SB || !evId) return;
+    const { data, error } = await SB.from('eventos').select('id,puntos_acceso').eq('id', evId).single();
+    if (error) { console.error('[pnlPuntos base]', error.message); return; }
+    _ppBasePuntos = (data && Array.isArray(data.puntos_acceso)) ? data.puntos_acceso.slice() : [];
+  } catch(e) { console.error('[pnlPuntos base]', e && e.message); }
+}
+
+// Valor efectivo del ticket: override propio si es array; si no, la base.
+function _ppEfectivo(i) {
+  return Array.isArray(i.puntos_acceso) ? i.puntos_acceso.slice() : _ppBasePuntos.slice();
+}
+
+// Estado del ticket frente a un punto: hereda (null) / ninguno ([]) / override.
+function _ppEstado(i, punto, base) {
+  if (!Array.isArray(i.puntos_acceso)) {
+    const aut = base.indexOf(punto) !== -1;
+    return { tipo:'hereda', autorizado:aut, etiqueta:'Hereda', color:'#6B7280', detalle: aut ? 'autorizado (base)' : 'no autorizado (base)' };
+  }
+  if (i.puntos_acceso.length === 0) {
+    return { tipo:'ninguno', autorizado:false, etiqueta:'Ninguno', color:'#A32D2D', detalle:'sin acceso explicito' };
+  }
+  const aut = i.puntos_acceso.indexOf(punto) !== -1;
+  return { tipo:'override', autorizado:aut, etiqueta:'Override', color:'#854F0B', detalle: aut ? 'propio: autorizado' : 'propio: no autorizado' };
+}
+
+// Puebla el selector de eventos con los distintos de la cache, por nombre.
+function _ppPoblarEventos() {
+  const sel = document.getElementById('pn-puntos-evento');
+  if (!sel) return [];
+  const mapa = new Map();
+  (_pnAllList || []).forEach(i => {
+    if (i.evento_id && !mapa.has(i.evento_id)) mapa.set(i.evento_id, i.evento_nombre || '(sin nombre)');
+  });
+  const evs = [...mapa.entries()].map(([id, nombre]) => ({ id, nombre }))
+    .sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
+  const prev = sel.value;
+  sel.innerHTML = evs.length
+    ? evs.map(e => `<option value="${esc(e.id)}">${esc(e.nombre)}</option>`).join('')
+    : '<option value="">Sin eventos con invitados</option>';
+  if (prev && evs.some(e => e.id === prev)) sel.value = prev;
+  return evs;
+}
+
+// Primer evento cuya base tenga puntos; si ninguno, el primero.
+function _ppEventoDefault(evs) {
+  for (const e of evs) {
+    const ev = (_eventos || []).find(x => x.id === e.id);
+    if (ev && Array.isArray(ev.puntos_acceso) && ev.puntos_acceso.length) return e.id;
+  }
+  return evs.length ? evs[0].id : null;
+}
+
+// Render principal. Se invoca desde renderTabla() y al abrir el tab.
+async function pnlPuntosRefrescar() {
+  const evs = _ppPoblarEventos();
+  if (!_ppEvId || !evs.some(e => e.id === _ppEvId)) {
+    _ppEvId = _ppEventoDefault(evs);
+    _ppPunto = null;
+    _ppPage = 0;
+  }
+  const sel = document.getElementById('pn-puntos-evento');
+  if (sel && _ppEvId) sel.value = _ppEvId;
+  await _ppCargarBase(_ppEvId);
+  if (!_ppPunto || _ppBasePuntos.indexOf(_ppPunto) === -1) {
+    _ppPunto = _ppBasePuntos.length ? _ppBasePuntos[0] : null;
+  }
+  _ppRenderChips();
+  _ppRenderTabla();
+}
+
+function pnlPuntosSetEvento(evId) {
+  _ppEvId = evId || null;
+  _ppPunto = null;
+  _ppPage = 0;
+  pnlPuntosRefrescar();
+}
+
+function pnlPuntosSetPunto(punto) {
+  _ppPunto = punto;
+  _ppPage = 0;
+  _ppRenderChips();
+  _ppRenderTabla();
+}
+
+function _ppRenderChips() {
+  const wrap = document.getElementById('pn-puntos-chips');
+  const base = document.getElementById('pn-puntos-base');
+  if (!wrap) return;
+  if (!_ppBasePuntos.length) {
+    wrap.innerHTML = '<span style="font-size:12px;color:var(--ink3)">Este evento no tiene puntos configurados (usa "Puntos" en el evento).</span>';
+    if (base) base.textContent = '';
+    return;
+  }
+  wrap.innerHTML = _ppBasePuntos.map(p => {
+    const on = p === _ppPunto;
+    return `<button class="btn btn-ghost btn-sm" data-punto="${esc(String(p))}" onclick="pnlPuntosSetPunto(this.dataset.punto)" style="${on ? 'background:var(--gold);color:#fff;border-color:var(--gold)' : ''}">${esc(String(p))}</button>`;
+  }).join('');
+  if (base) base.textContent = 'Base del evento: ' + _ppBasePuntos.join(' | ') + ' - punto activo: ' + (_ppPunto || '(ninguno)');
+}
+
+function _ppRenderTabla() {
+  const tb = document.getElementById('pn-puntos-table');
+  const count = document.getElementById('pn-puntos-count');
+  const pag = document.getElementById('pn-puntos-pagination');
+  const info = document.getElementById('pn-puntos-page-info');
+  const prev = document.getElementById('pn-puntos-prev');
+  const next = document.getElementById('pn-puntos-next');
+  if (!tb) return;
+
+  if (!_ppEvId) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty">Sin eventos con invitados</td></tr>';
+    if (count) count.textContent = '';
+    if (pag) pag.style.display = 'none';
+    _ppActualizarBulk();
+    return;
+  }
+  if (!_ppPunto) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty">Este evento no tiene puntos configurados</td></tr>';
+    if (count) count.textContent = '';
+    if (pag) pag.style.display = 'none';
+    _ppActualizarBulk();
+    return;
+  }
+
+  const inv = _ppInvitados(_ppEvId);
+  const total = inv.length;
+  const pages = Math.ceil(total / _ppPageSize) || 1;
+  _ppPage = Math.min(_ppPage, pages - 1);
+  const start = _ppPage * _ppPageSize;
+  const page = inv.slice(start, start + _ppPageSize);
+
+  if (!total) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty">Sin invitados en este evento</td></tr>';
+    if (count) count.textContent = '0 invitado(s)';
+    if (pag) pag.style.display = 'none';
+    _ppActualizarBulk();
+    return;
+  }
+
+  if (count) count.textContent = `${start+1}-${Math.min(start+_ppPageSize,total)} de ${total} invitado(s)`;
+  if (pag) pag.style.display = pages > 1 ? 'flex' : 'none';
+  if (info) info.textContent = `Pag. ${_ppPage+1} / ${pages}`;
+  if (prev) prev.disabled = _ppPage === 0;
+  if (next) next.disabled = _ppPage >= pages - 1;
+
+  tb.innerHTML = page.map(i => {
+    const est = _ppEstado(i, _ppPunto, _ppBasePuntos);
+    const general = !Array.isArray(i.puntos_acceso)
+      ? 'Hereda (' + _ppBasePuntos.length + ' punto/s)'
+      : (i.puntos_acceso.length === 0 ? 'Ninguno' : 'Override: ' + i.puntos_acceso.join(', '));
+    return `<tr data-id="${i.id}">
+      <td><input type="checkbox" class="pp-row-sel" value="${i.id}" onchange="ppOnRowSel()" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></td>
+      <td style="font-weight:500">${esc(i.nombre)}</td>
+      <td>${esc(i.cedula || '-')}</td>
+      <td><span style="background:${est.color}22;color:${est.color};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">${est.etiqueta}</span>
+          <span style="font-size:11px;color:var(--ink3);margin-left:4px">${esc(est.detalle)}</span></td>
+      <td style="font-size:12px;color:var(--ink3)">${esc(general)}</td>
+    </tr>`;
+  }).join('');
+
+  _ppActualizarBulk();
+}
+
+// -- Seleccion (clase propia .pp-row-sel; no toca la de Asistentes) --
+function _ppSelIds() {
+  return [...document.querySelectorAll('.pp-row-sel:checked')].map(cb => cb.value);
+}
+
+function ppOnRowSel() { _ppActualizarBulk(); }
+
+function pnlPuntosSelAll(checked) {
+  document.querySelectorAll('.pp-row-sel').forEach(cb => cb.checked = checked);
+  _ppActualizarBulk();
+}
+
+function _ppActualizarBulk() {
+  const ids = _ppSelIds();
+  const bar = document.getElementById('pn-puntos-bulk');
+  const cnt = document.getElementById('pn-puntos-bulk-count');
+  const all = document.getElementById('pn-puntos-selall');
+  if (bar) bar.style.display = ids.length ? 'flex' : 'none';
+  if (cnt) cnt.textContent = `${ids.length} seleccionado${ids.length !== 1 ? 's' : ''}`;
+  const total = document.querySelectorAll('.pp-row-sel').length;
+  if (all) { all.indeterminate = ids.length > 0 && ids.length < total; all.checked = ids.length === total && total > 0; }
+}
+
+function pnlPuntosPagina(dir) {
+  _ppPage = Math.max(0, _ppPage + dir);
+  _ppRenderTabla();
+}
+
+// Acciones masivas. 'ninguno' = desmarcar filas (no escribe en BD).
+async function pnlPuntosBulk(accion) {
+  if (accion === 'ninguno') { pnlPuntosSelAll(false); return; }
+  if (!_ppPunto) { alert('Selecciona un punto de escaneo.'); return; }
+  const ids = _ppSelIds();
+  if (!ids.length) { alert('Marca al menos un invitado.'); return; }
+  const verbo = accion === 'autorizar' ? 'Autorizar' : 'Quitar';
+  if (!confirm(`${verbo} el punto "${_ppPunto}" para ${ids.length} invitado${ids.length !== 1 ? 's' : ''}?`)) return;
+
+  const cambios = [];
+  ids.forEach(id => {
+    const ins = (_pnAllList || []).find(i => i.id === id);
+    if (!ins) return;
+    const efectivo = _ppEfectivo(ins);
+    let nuevo;
+    if (accion === 'autorizar') {
+      nuevo = efectivo;
+      if (nuevo.indexOf(_ppPunto) === -1) nuevo.push(_ppPunto);
+    } else {
+      nuevo = efectivo.filter(p => p !== _ppPunto);
+    }
+    cambios.push({ id: ins.id, valor: nuevo });   // [] = ninguno explicito
+  });
+  if (!cambios.length) return;
+
+  const errs = await _ppPersistir(cambios);
+  pnlPuntosSelAll(false);
+  pnlPuntosRefrescar();
+  if (errs) alert('Aviso: ' + errs + ' de ' + cambios.length + ' invitado(s) no se pudieron guardar. Reintenta.');
+}
+
+// Persiste el override por invitado (valor distinto por fila) en lotes de 20.
+async function _ppPersistir(cambios) {
+  const LOTE = 20;
+  let errs = 0;
+  for (let k = 0; k < cambios.length; k += LOTE) {
+    const res = await Promise.all(cambios.slice(k, k + LOTE).map(c =>
+      SB.from('inscritos').update({ puntos_acceso: c.valor }).eq('id', c.id)
+    ));
+    res.forEach(r => { if (r && r.error) errs++; });
+  }
+  const porId = new Map(cambios.map(c => [c.id, c.valor]));
+  (_pnAllList || []).forEach(i => { if (porId.has(i.id)) i.puntos_acceso = porId.get(i.id); });
+  if (typeof _renderTablaPagina === 'function' && document.getElementById('pn-table')) _renderTablaPagina();
+  return errs;
+}
+
 // Exporta la comunidad (cache _pnAllList + filtros del sub-tab, sin consultas
 // nuevas a Supabase). xlsx via SheetJS; pdf via ventana imprimible (sin jsPDF).
 async function exportarComunidad(formato='xlsx') {
@@ -10277,7 +10707,7 @@ async function _xlsxInscritos() {
     i.fecha_inscripcion||'', i.hora_inscripcion||'',
     i.evento_nombre, i.evento_fecha||'',
     i.used?'Ingresó':'Pendiente', i.hora_ingreso||'',
-    i.puntos_acceso||''
+    i.puntos_acceso==null ? 'Hereda' : (Array.isArray(i.puntos_acceso) ? (i.puntos_acceso.length ? i.puntos_acceso.join(' | ') : 'Ninguno') : String(i.puntos_acceso))
   ]));
   const ws=XLSX.utils.aoa_to_sheet(rows);
   _applyXlsxRowStyle(ws, 0, 15, xlsxHeader());

@@ -13,7 +13,26 @@ estructura: indice-v1 (2026-10-01)
 
 Este documento define el punto de control estratégico y las directrices para la continuación inmediata del desarrollo. Es la hoja de ruta obligatoria para cualquier IA o agente que retome el proyecto para asegurar la fidelidad de 1px y la integridad del núcleo.
 
-> **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-45 a -33) y las secciones vigentes 1-4.
+> **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-46 a -33) y las secciones vigentes 1-4.
+
+#### -46. Hito Mas Reciente - PUNTOS DE ESCANEO POR EVENTO + AUTORIZACION POR PUNTO (ADR-081) implementado y migrado (2026-10-07)
+
+*   **Que se estaba haciendo:** cerrar la feature de **semantica NULL-vs-vacio de los puntos de escaneo** y **propagacion por interseccion** al editar los puntos del evento. Feature implementada; migracion DML aplicada en produccion. Registrar el cierre documental del ciclo (TSK-114).
+*   **HECHOS VERIFICADOS (baseline = archivo real, ADR-006):**
+    *   `(1)` **Semantica nueva de `inscritos.puntos_acceso` (jsonb):** `NULL` = hereda TODOS los puntos del evento; `[]` = **ninguno explicito**; array no vacio = **override**. El scanner decide por **presencia de la clave** (`const hasOwn = Array.isArray(data.puntos_acceso)`, `scanner.html:850`), con `motivo` "esta entrada"/"este evento".
+    *   `(2)` **Migracion `migrations/adr081_puntos_none_semantica.sql` APLICADA** a `ctgyvydzshueemlelkzv` (gate §2 autorizado): `UPDATE inscritos SET puntos_acceso=NULL WHERE puntos_acceso='[]'::jsonb`. **Resultado: 121 inscritos, 0 con `[]` (no-op), ejecutada OK.** Idempotente, 0 DDL / 0 endpoints / 0 RLS.
+    *   `(3)` **`admin.html` vista "Puntos":** tab `data-pnl-pill="puntos"` (`:1702`) + bloque `data-pnl-tab="puntos"` (`:1949-1982`); motor `_pp*` (`:10332-10584`) con seleccion de evento/punto, chips base, **seleccion masiva** y **paginacion** (50/pag), estado tri-state (`_ppEstado`, `:10364`).
+    *   `(4)` **Propagacion:** `propagarPuntosEvento` (`:6941`) + `_puntosEventoCambiaron` (`:6933`), invocados en `guardarPuntosEvento` (`:6992`) y `guardarEventoWizard` (`:6692`). `O INTERSECT N` por NOMBRE; vacio -> `[]`; herederos (`NULL`) intactos. Best-effort.
+    *   `(5)` **Modal por invitado tri-state + CSV 3 estados:** `openPuntosInscrito` (`:7062`) ramifica heredar/explicito; `guardarPuntosInscrito` (`:7125`) persiste `[]` para "Ninguno"; CSV distingue Hereda/Ninguno/Override (`:10710`). **Resuelve TSK-111/R4.**
+    *   `(6)` **Escudo GOLD:** JS nuevo ASCII-only. **Smokes:** `node scripts/smoke_checkin_multipunto.js` -> **28/28 PASS**; `node scripts/smoke_puntos_adr081.js` -> **30/30 PASS**; `node scripts/express_check.js` -> **35/35 PASS**.
+*   **Que sigue (en este orden):**
+    *   `(1)` Verificar en vivo la **RLS anonima de `logs`** con `evento_id`/`inscrito_id` (TSK-108, pendiente).
+    *   `(2)` `logs.evento_id` sin backfill en 22/66 (TSK-109); decidir exposicion publica del override (TSK-110).
+    *   `(3)` La deuda tecnica de ADR-080 (TSK-113) sigue vigente.
+*   **Riesgos activos:**
+    *   `(1)` **Rename de un punto = quitar + agregar** (limite aceptado y documentado en ADR-081): el nuevo nombre no se agrega a ningun override; solo lo reciben los herederos. No es un bug.
+    *   `(2)` Los riesgos de hitos previos siguen vigentes (hito -45/-44, R1-R4 de ADR-079, etc.).
+*   **Verificacion de cierre (por archivo real, ADR-006):** `node scripts/smoke_checkin_multipunto.js` -> **PASS 28 / FAIL 0**; `node scripts/smoke_puntos_adr081.js` -> **PASS 30 / FAIL 0**; `node scripts/express_check.js` -> **PASS 35 / FAIL 0**; grep confirma `hasOwn`, `data-pnl-*="puntos"`, motor `_pp*`/`propagarPuntosEvento` y tri-state en `admin.html`. ADR-081 presente en `DECISIONS.md` = **1**. **Migracion aplicada; cambios de codigo en el working tree; commits a cargo del orquestador** (este cierre no introduce cambios adicionales).
 
 #### -45. Hito Mas Reciente - PALETA DE COLOR DE EVENTO (ADR-080) implementada (Fases 0-I-II) (2026-10-07)
 

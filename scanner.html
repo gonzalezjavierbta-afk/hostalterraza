@@ -843,13 +843,16 @@ async function processScan() {
     return;
   }
 
-  // Validar punto efectivo: override del ticket (ADR-079) tiene prioridad sobre el evento
+  // Validar punto efectivo (ADR-079, semantica nueva):
+  // data.puntos_acceso NULL/undefined -> hereda los puntos del evento;
+  // [] -> ninguno explicito; array con items -> solo esos puntos.
   if (esMultiUso && puntoAcceso) {
-    const override = data.puntos_acceso;
-    const base     = window._evData?.puntos_acceso;
-    const allowed  = (Array.isArray(override) && override.length > 0) ? override : (Array.isArray(base) ? base : []);
+    const hasOwn  = Array.isArray(data.puntos_acceso);
+    const allowed = hasOwn
+      ? data.puntos_acceso
+      : (Array.isArray(window._evData?.puntos_acceso) ? window._evData.puntos_acceso : []);
     if (!allowed.includes(puntoAcceso)) {
-      const motivo = (Array.isArray(override) && override.length > 0) ? 'esta entrada' : 'este evento';
+      const motivo = hasOwn ? 'esta entrada' : 'este evento';
       res.innerHTML = `<div class="res-card res-err">
       <div style="font-size:16px;font-weight:500;color:var(--red)">Punto no autorizado</div>
       <div style="font-size:13px;margin-top:.2rem;opacity:.8">El punto <strong>${puntoAcceso}</strong> no esta autorizado para ${motivo}.</div>
