@@ -1568,7 +1568,7 @@ tr:hover td{background:var(--surface)}
         <div class="ch">Inscribir cliente a evento</div>
         <div id="assign-alert"></div>
         <div class="grid2">
-          <div class="fg"><label>Evento *</label><select id="as-ev"><option value="">Selecciona evento</option></select></div>
+          <div class="fg"><label>Evento *</label><select id="as-ev" onchange="renderAsPuntos()"><option value="">Selecciona evento</option></select></div>
           <div class="fg"><label>Cliente *</label><select id="as-cli"><option value="">Selecciona cliente</option></select></div>
           <div class="fg"><label>Tipo de asistente *</label>
             <select id="as-tipo" style="width:100%">
@@ -1582,6 +1582,11 @@ tr:hover td{background:var(--surface)}
           <div class="fg"><label>Email del cliente (para enviar QR)</label>
             <input id="as-email" type="email" placeholder="correo@email.com">
           </div>
+        </div>
+        <div class="fg" id="as-puntos-wrap" style="display:none;margin-top:.5rem">
+          <label>Puntos permitidos (opcional)</label>
+          <div id="as-puntos-list" style="display:flex;flex-direction:column;gap:4px;margin-top:4px"></div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Sin selección = hereda los puntos del evento.</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button class="btn btn-teal" onclick="asignarCliente()">Asignar y generar QR</button>
@@ -2610,6 +2615,21 @@ tr:hover td{background:var(--surface)}
     <div style="margin-top:1.25rem;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-gold" onclick="guardarPuntosEvento()">Guardar puntos</button>
       <button class="btn btn-ghost" onclick="cerrarPuntosEvento()">Cancelar</button>
+    </div>
+  </div>
+</div>
+<!-- EDITOR RÁPIDO: Override de puntos por inscrito (ADR-079) -->
+<div id="mod-puntos-ins" class="modal-bg" style="display:none" onclick="if(event.target===this)cerrarPuntosInscrito()">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-x" onclick="cerrarPuntosInscrito()">×</button>
+    <h3 style="font-size:18px;margin-bottom:.25rem" id="puntos-ins-titulo">Puntos del asistente</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:.9rem">Marca los puntos permitidos para este ticket. Sin marcar ninguno, hereda los puntos del evento.</p>
+    <div id="puntos-ins-alert"></div>
+    <div id="puntos-ins-efectivos" style="font-size:12px;color:var(--ink3);margin-bottom:.5rem"></div>
+    <div id="puntos-ins-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:.5rem"></div>
+    <div style="margin-top:1.25rem;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="guardarPuntosInscrito()">Guardar puntos</button>
+      <button class="btn btn-ghost" onclick="cerrarPuntosInscrito()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -6697,6 +6717,94 @@ async function guardarPuntosEvento() {
   }
 }
 
+// ── ADR-079: override de puntos por ticket (registro manual + lista de inscritos) ──
+// Reusa el patron de #puntos-ev, con contenedor/clase propios para no contaminar
+// otros selectores (Regla anti-duplicados).
+function _evPuntos(evId) {
+  const ev = _eventos.find(e => e.id === evId);
+  return Array.isArray(ev && ev.puntos_acceso) ? ev.puntos_acceso : [];
+}
+
+// Registro manual (inscribir cliente a evento): checkboxes poblados desde el evento.
+function renderAsPuntos() {
+  const wrap = document.getElementById('as-puntos-wrap');
+  const list = document.getElementById('as-puntos-list');
+  if (!wrap || !list) return;
+  const puntos = _evPuntos(document.getElementById('as-ev') && document.getElementById('as-ev').value);
+  if (!puntos.length) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = puntos.map(p => `
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+      <input type="checkbox" class="as-punto-chk" value="${esc(String(p))}" style="accent-color:var(--gold)">
+      <span>${esc(String(p))}</span>
+    </label>`).join('');
+}
+
+function _getAsPuntos() {
+  const chks = [...document.querySelectorAll('#as-puntos-list .as-punto-chk')];
+  if (!chks.length) return null;                 // evento sin puntos -> hereda
+  const sel = chks.filter(c => c.checked).map(c => c.value);
+  return sel.length > 0 ? sel : null;            // nada marcado -> hereda
+}
+
+// Override por inscrito desde la lista del panel.
+let _puntosInsId = null;
+
+function openPuntosInscrito(insId) {
+  const ins = (_pnAllList || []).find(i => i.id === insId);
+  if (!ins) return;
+  _puntosInsId = insId;
+  const title = document.getElementById('puntos-ins-titulo');
+  if (title) title.textContent = 'Puntos del asistente — ' + (ins.nombre || '');
+  const alertEl = document.getElementById('puntos-ins-alert');
+  if (alertEl) alertEl.innerHTML = '';
+  const puntos = _evPuntos(ins.evento_id);
+  const propios = Array.isArray(ins.puntos_acceso) ? ins.puntos_acceso : [];
+  const efectivos = propios.length ? propios : puntos;
+  const efEl = document.getElementById('puntos-ins-efectivos');
+  if (efEl) efEl.innerHTML = 'Puntos efectivos actuales: ' + (efectivos.length ? esc(efectivos.join(' · ')) : '— (el evento no tiene puntos)');
+  const list = document.getElementById('puntos-ins-list');
+  if (list) {
+    list.innerHTML = puntos.length
+      ? puntos.map(p => `
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+          <input type="checkbox" class="punto-ins-chk" value="${esc(String(p))}" ${propios.indexOf(p) !== -1 ? 'checked' : ''} style="accent-color:var(--gold)">
+          <span>${esc(String(p))}</span>
+        </label>`).join('')
+      : '<div style="font-size:12px;color:var(--ink3)">El evento no tiene puntos configurados. Usa "Puntos" en el evento para definirlos.</div>';
+  }
+  const mod = document.getElementById('mod-puntos-ins');
+  if (mod) mod.style.display = 'flex';
+}
+
+function cerrarPuntosInscrito() {
+  const mod = document.getElementById('mod-puntos-ins');
+  if (mod) mod.style.display = 'none';
+  _puntosInsId = null;
+}
+
+async function guardarPuntosInscrito() {
+  if (!_puntosInsId) return;
+  const btn = document.querySelector('#mod-puntos-ins .btn-gold');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+  try {
+    const ins = (_pnAllList || []).find(i => i.id === _puntosInsId);
+    const chks = [...document.querySelectorAll('#puntos-ins-list .punto-ins-chk')];
+    const sel = chks.filter(c => c.checked).map(c => c.value);
+    const valor = sel.length > 0 ? sel : null;
+    const { error } = await SB.from('inscritos').update({ puntos_acceso: valor }).eq('id', _puntosInsId);
+    if (error) { alrt('puntos-ins-alert', 'Error: ' + error.message, 'err'); return; }
+    if (ins) ins.puntos_acceso = valor;
+    alrt('puntos-ins-alert', '✓ Puntos actualizados.', 'ok');
+    setTimeout(() => { cerrarPuntosInscrito(); renderPanel(); }, 700);
+  } catch (e) {
+    console.error('[guardarPuntosInscrito]', e);
+    alrt('puntos-ins-alert', 'Error inesperado: ' + e.message, 'err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar puntos'; }
+  }
+}
+
 // ════════════════════════════════════════════════════
 // CAMPOS PERSONALIZADOS DEL FORMULARIO
 // ════════════════════════════════════════════════════
@@ -8205,7 +8313,7 @@ async function asignarCliente() {
   const ins = {tipo, nombre:cli.nombre, cedula:cli.cedula, telefono:cli.telefono,
     cliente_id:cli.id, evento_id:evId, evento_nombre:ev.nombre,
     evento_fecha:ev.fecha, qr_code:qr, used:false, hora_ingreso:null, fecha_ingreso:null,
-    fecha_inscripcion:TODAY(), hora_inscripcion:NOW()};
+    fecha_inscripcion:TODAY(), hora_inscripcion:NOW(), puntos_acceso:_getAsPuntos()};
   const {error} = await SB.from('inscritos').insert(ins);
   if (error) { alrt('assign-alert','Error: '+error.message,'err'); return; }
 
@@ -8218,6 +8326,7 @@ async function asignarCliente() {
     alrt('assign-alert','✓ '+cli.nombre+' inscrito. QR generado.','ok');
   }
   renderAsignados();
+  renderAsPuntos();
   showCliQR({...ins, eventoNombre:ev.nombre, eventoFecha:ev.fecha, qrCode:qr});
 }
 
@@ -8628,7 +8737,7 @@ async function confirmarIngreso() {
     return;
   }
   // Insertar en logs
-  await SB.from('logs').insert({hora, fecha, nombre:ins.nombre, cedula:ins.cedula, evento:ins.evento_nombre, tipo:ins.tipo, resultado:'Ingreso', org_id:ORG_ID});
+  await SB.from('logs').insert({hora, fecha, nombre:ins.nombre, cedula:ins.cedula, evento:ins.evento_nombre, tipo:ins.tipo, resultado:'Ingreso', org_id:ORG_ID, evento_id:ins.evento_id||null, inscrito_id:ins.id||null});
   const tipoBadge=ins.tipo==='frecuente'?'<span class="badge badge-gold">★ Frecuente</span>':'<span class="badge badge-teal">◎ Invitado</span>';
   document.getElementById('sc-res').innerHTML=`<div class="res-card res-ok">
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:.25rem">${tipoBadge}<span style="font-size:12px;color:var(--green)">Documento verificado</span></div>
@@ -8647,7 +8756,7 @@ async function confirmarIngreso() {
 async function rechazarIngreso() {
   if (!pendingVerify) return;
   const ins=pendingVerify; pendingVerify=null;
-  await SB.from('logs').insert({hora:NOW(),fecha:TODAY(),nombre:ins.nombre,cedula:ins.cedula,evento:ins.evento_nombre,tipo:ins.tipo,resultado:'Denegado',org_id:ORG_ID});
+  await SB.from('logs').insert({hora:NOW(),fecha:TODAY(),nombre:ins.nombre,cedula:ins.cedula,evento:ins.evento_nombre,tipo:ins.tipo,resultado:'Denegado',org_id:ORG_ID,evento_id:ins.evento_id||null,inscrito_id:ins.id||null});
   document.getElementById('sc-res').innerHTML=`<div class="res-card res-err">
     <div style="font-size:17px;color:var(--red)">✗ Acceso denegado</div>
     <div style="font-family:'DM Serif Display',serif;font-size:20px;margin:.2rem 0">${ins.nombre}</div>
@@ -9767,7 +9876,7 @@ function _renderTablaPagina() {
     <td><span class="badge ${i.used?'badge-green':'badge-amber'}">${i.used?'✓ Ingresó':'Pendiente'}</span></td>
     <td style="font-size:12px">${i.hora_ingreso?`<strong>${i.hora_ingreso}</strong> · ${i.fecha_ingreso}`:'—'}</td>
     <td>${!i.used
-      ?`<button class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green-border);white-space:nowrap" onclick="checkinManual('${i.id}','${nombreSafe}','${i.cedula||''}','${eventoSafe}','${i.tipo||''}')">✓ Check-in</button>`
+      ?`<button class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green-border);white-space:nowrap" onclick="checkinManual('${i.id}','${nombreSafe}','${i.cedula||''}','${eventoSafe}','${i.tipo||''}','${i.evento_id||''}')">✓ Check-in</button>`
       :`<button class="btn btn-ghost btn-sm" style="color:var(--ink3);white-space:nowrap" onclick="undoCheckin('${i.id}','${nombreSafe}')">↩ Revertir</button>`
     }</td>
     <td style="white-space:nowrap">
@@ -9778,6 +9887,7 @@ function _renderTablaPagina() {
         <option value="produccion" ${i.tipo==='produccion'?'selected':''}>🎬 Producción</option>
         <option value="pago"       ${i.tipo==='pago'      ?'selected':''}>💳 Por pago</option>
       </select>
+      <button class="btn btn-ghost btn-sm" style="margin-left:4px" onclick="openPuntosInscrito('${i.id}')">Puntos</button>
       <button class="btn btn-ghost btn-sm" style="margin-left:4px" title="Editar datos" onclick="abrirEditInscrito('${i.id}')">✏</button>
       <button class="btn btn-ghost btn-sm btn-red" style="margin-left:4px" onclick="eliminarInscrito('${i.id}','${nombreSafe}')">✕</button>
     </td>
@@ -11023,12 +11133,12 @@ async function guardarEditInscrito() {
 
 
 
-async function checkinManual(id, nombre, cedula, eventoNombre, tipo) {
+async function checkinManual(id, nombre, cedula, eventoNombre, tipo, eventoId) {
   if(!confirm(`¿Registrar ingreso manual de ${nombre}?\nEsto marcará su QR como usado.`)) return;
   const hora=NOW(), fecha=TODAY();
   const {error}=await SB.from('inscritos').update({used:true,hora_ingreso:hora,fecha_ingreso:fecha}).eq('id',id);
   if(error){alert('Error: '+error.message);return;}
-  await SB.from('logs').insert({hora,fecha,nombre,cedula,evento:eventoNombre,tipo,resultado:'Ingreso manual',org_id:ORG_ID});
+  await SB.from('logs').insert({hora,fecha,nombre,cedula,evento:eventoNombre,tipo,resultado:'Ingreso manual',org_id:ORG_ID,evento_id:eventoId||null,inscrito_id:id||null});
   renderPanel();
 }
 
