@@ -23,6 +23,8 @@ estructura: indice-v1 (2026-10-01)
 
 > **Totales al 2026-10-03 (linea agregada, sin reescribir la de arriba):** **57 abiertas · 50 cerradas · 107 entradas**. Los 6 items nuevos son del bloque "CANAL DE CORREOS" (TSK-101..TSK-106), nacidas del cierre documental del canal de correos. Las cifras de la linea anterior se conservan intactas por Cero Borrado documental (Oro #2/#3).
 > **Totales tras la Fase 2A del canal de correos (2026-10-03, linea agregada):** **55 abiertas · 52 cerradas · 107 entradas**. Delta = **-2 abiertas / +2 cerradas**, sin entradas nuevas ni borradas: cierran **TSK-104** y **TSK-106**. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+> **Delta por ADR-079 (2026-10-07, linea agregada, sin reescribir las de arriba):** +1 entrada / +1 cerrada = **TSK-107** (Check-in multi-punto con override por ticket). No se agregan tareas abiertas: la deuda residual de ADR-079 queda registrada sin ID propio en `NEXT.md` y `DECISIONS.md` (ver cierre al final). Cifras absolutas de este corte NO recontadas en este cierre; se declaran como delta para no afirmar un total no verificado (ADR-006). Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+> **Correccion aditiva (2026-10-07, misma fecha):** la deuda residual de ADR-079 **YA tiene ID**: **TSK-108..TSK-111** (bloque "DEUDA RESIDUAL ADR-079 — check-in multi-punto", 4 items). La linea anterior se conserva intacta (Cero Borrado); se corrige solo la afirmacion 'sin ID propio'. Deltas efectivos del corte: **+1 cerrada** (TSK-107) y **+4 abiertas** (TSK-108..TSK-111).
 
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
@@ -96,6 +98,17 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-104](#tsk-104) | Direccion (con soporte `@sql-security` / `@data-migration` — PRO: es esquema) | ✅ **CERRADA 2026-10-03 (Fase 2A COMPLETA)** — **Aplicar las 3 migraciones**: dry-run + orden ADR-073 -> ADR-074 -> ADR-076 | Canal de correos (ADR-073/074/076) | ver seccion de cierre al final |
 | [TSK-105](#tsk-105) | Direccion + `@sql-security` (**iteracion D1**) | **Recorte del `SELECT *` anonimo en `inscritos` — NO se puede hacer antes de migrar los call sites** | Canal de correos (ADR-076) | ver seccion de cierre al final |
 | [TSK-106](#tsk-106) | Direccion + `@sql-security` (correccion de **comentarios**, no de logica) | ✅ **CERRADA 2026-10-03 (Fase 2A)** — **La auto-afirmacion ASCII de `adr076_enviar_email_seguro.sql` es falsa: 11 bytes > 127 en 3 lineas de comentario** (CORREGIDA) | Canal de correos (ADR-076) | ver seccion de cierre al final |
+
+#### 🟠 DEUDA RESIDUAL ADR-079 — check-in multi-punto (4 items NUEVOS, 2026-10-07)
+
+> Items nacidos del cierre de ADR-079 (R1-R4). Estado: **PENDIENTES**. No bloquean la feature (ya en `main`). Detalle en `DECISIONS.md` ADR-079 y `NEXT.md` hito -44.
+
+| ID | Responsable | Título | Bloque | Detalle |
+|---|---|---|---|---|
+| [TSK-108](#tsk-108) | Direccion + `@sql-security` (PRO — es seguridad/RLS) | **R1** — Verificar en vivo la RLS anonima de `logs` con las columnas nuevas (`evento_id`/`inscrito_id`) | Check-in multi-punto (ADR-079) | pendiente |
+| [TSK-109](#tsk-109) | Direccion + `@data-migration` (PRO — es esquema/backfill) | **R2** — `logs.evento_id` sin backfill en **22/66** filas (sin match exacto por nombre); `inscrito_id` historico **100% NULL** | Check-in multi-punto (ADR-079) | pendiente |
+| [TSK-110](#tsk-110) | Direccion / Producto (decision de alcance) | **R3** — Decidir si el override se expone en los registros publicos (`registroaforo.html`, `evento-app.html`); hoy no, por diseno | Check-in multi-punto (ADR-079) | pendiente |
+| [TSK-111](#tsk-111) | Frontend (`@admin-dev` / `@frontend-tpl`) | **R4** — `openPuntosInscrito` muestra la union base+override; distinguir herencia vs. propio | Check-in multi-punto (ADR-079) | pendiente |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -367,5 +380,36 @@ task:
 #### Verificacion de cierre
 
 10. `git log` confirma `f3863fb` y `bbf3f33`; `Select-String` de `MAIL_FROM`/remitente en `supabase/functions/send-ticket-email/index.ts` (L28/L660); **ADR-078 en `DECISIONS.md:92` = 1** con estado `APLICADO Y VERIFICADO`; TSK-003 con TRACE. `nadie ha visto salir un correo` en `NEXT.md` queda marcado como **SUPERADO**.
+
+---
+
+### Cierre de TSK-107 — Check-in multi-punto con override por ticket (ADR-079) (2026-10-07) — COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Feature **implementada, mergeada y pusheada en `main`**. Baseline = archivo real (ADR-006): migracion, scripts y codigo re-verificados contra el disco en este cierre.
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Override por ticket (pieza central):** columna nueva `inscritos.puntos_acceso` (jsonb). `NULL` o `[]` = el ticket **hereda** `eventos.puntos_acceso`; un array no vacio lo **sobreescribe**. Regla efectiva en `scanner.html:846-860`: `allowed = (Array.isArray(override) && override.length > 0) ? override : (Array.isArray(base) ? base : [])`. El multi-punto basico previo (`eventos.puntos_acceso` jsonb + `scanner_tokens.punto_acceso` + `logs.punto_acceso`) se conserva; el mismo QR seguia siendo valido en cada punto distinto del evento.
+2. **Trazabilidad de `logs`:** columnas nuevas `logs.evento_id` y `logs.inscrito_id` (text, FK **ON DELETE SET NULL** a `eventos(id)` e `inscritos(id)`). Antes `logs` solo guardaba el NOMBRE (`logs.evento`, text) y no tenia relacion con el inscrito.
+3. **Migracion `migrations/adr079_multi_punto_override.sql` APLICADA a produccion** (Supabase `ctgyvydzshueemlelkzv`) por `@data-migration`, gate de `AGENTS.md` §2 autorizado (2026-10-07). Archivo real: **260 lineas / 12.700 bytes / 0 bytes > 127**. Incluye indice `idx_logs_qr_punto (qr_code, punto_acceso)` y backfill de `logs.evento_id` por match de nombre **exacto y no ambiguo** (**44/66** filas); `inscrito_id` **no** backfilleable (**0/18**).
+4. **Bugs corregidos en el mismo ciclo:** `scanQR` seleccionaba columna inexistente (dedup offline filtraba `logs.evento` = nombre y daba 0); undo por punto (no por resultado, `scanner.html:1082`); backticks en la plantilla de `undo-btn`; `logsCache` obsoleto (ahora poblado en `cargarCache:399-404`); dedup offline por `evento_id`; `denyEntry` ahora pobla ids (`scanner.html:1119`); `_crearSerie` propaga `puntos_acceso` (`admin.html:7852`).
+5. **UI admin:** editor rapido de puntos del evento post-creacion (`#mod-puntos-ev`, `admin.html:2607`), selector de puntos permitidos en el registro manual, editor por inscrito (`openPuntosInscrito`, `admin.html:6753`; boton "Puntos", `:9903`) y badge de puntos en la tarjeta.
+6. **Smoke de regresion:** `scripts/smoke_checkin_multipunto.js` (268 lineas) -> **PASS 27 / FAIL 0** (ejecutado en este cierre; analisis estatico sin red).
+
+#### Decision y artefactos
+
+7. **ADR-079** creado: `Sistema QR desarrollo/decisiones/ADR-079-checkin-multi-punto-con-override-por-ticket.md` (ASCII-safe, 0 bytes > 127) + fila de indice en `DECISIONS.md` (bajo ADR-078).
+8. **Commits en `main`:** `a1a1fe1` (multi-punto configurable y fixes de escaneo), `e7be4ea` (migracion adr079), `13efe7c` (override por ticket y trazabilidad), `eee3fec` (dedup offline por evento_id, denyEntry, union en editor), `7468ed6` (smoke de regresion + UX de herencia). Feature **mergeada y pusheada**.
+
+#### Deuda residual registrada (hoy con ID: **TSK-108..TSK-111**; ver ADR-079 y `NEXT.md` hito -44)
+
+9. **(R1)** La RLS anonima de `logs` con las columnas nuevas **NO se verifico en vivo**.
+10. **(R2)** `logs.evento_id` **no backfilleable en 22/66 filas** (sin match exacto por nombre); `inscrito_id` historico **100% NULL**.
+11. **(R3)** El override **no esta disponible** en los registros publicos (`registroaforo.html`, `evento-app.html`) — por diseno.
+12. **(R4)** `openPuntosInscrito` muestra la **union base+override** (no perder puntos), pero oculta cual es herencia y cual es propio.
+
+#### Verificacion de cierre (por archivo real, ADR-006)
+
+13. `git log` confirma los 5 commits; `git show --stat` confirma `admin.html` y `scanner.html` en `a1a1fe1`/`13efe7c`/`eee3fec`/`7468ed6`, y `migrations/adr079_multi_punto_override.sql` en `e7be4ea`; `node scripts/smoke_checkin_multipunto.js` -> **PASS 27 / FAIL 0**; migracion re-contada contra el disco (**260 / 12.700 / 0 no-ASCII**). **Este cierre es documental: 0 cambios de codigo, 0 migraciones nuevas, 0 commits** (los hace el orquestador).
 
 

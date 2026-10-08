@@ -15,7 +15,7 @@ estructura: indice-v1 (2026-10-01)
 *   **Nombre del Proyecto:** Sistema QR Hostal Terraza.
 *   **Tipo de Producto:** Plataforma Web de Gestión de Eventos, Ticketing y Control de Aforo (SaaS Multi-tenant).
 *   **Ubicación de Referencia:** Bogotá, Colombia.
-* Estado del Sistema: v1.6.8-FIX — Piloto Oficial de AI-DOS v1.2 / Baseline f1 Certified. [Crónica completa (ADR-021…ADR-064) → anexo](anexos/PROJECT-CRONICA-ESTADO.md#estado-del-sistema)
+* Estado del Sistema: v1.6.8-FIX — Piloto Oficial de AI-DOS v1.2 / Baseline f1 Certified. [Crónica completa (ADR-021…ADR-064) → anexo](anexos/PROJECT-CRONICA-ESTADO.md#estado-del-sistema) Nota aditiva (2026-10-07): el esquema incorpora el check-in multi-punto con override por ticket (`inscritos.puntos_acceso`) y trazabilidad de `logs` (`evento_id`/`inscrito_id`), migración aplicada en producción — ADR-079.
 *   **Framework de Coordinación:** **AI-DOS v1.2 (PM Hub Engine)**.
 *   **Estándar de Calidad:** Calidad Percibida de **$10,000** (Fidelidad de 1px, Afterglow visual, Geist 900).
 *   **URL Producción:** [https://hostalterraza.vercel.app](https://hostalterraza.vercel.app).
@@ -79,6 +79,7 @@ El sistema ha evolucionado de un modelo monolítico a un modelo de **Categorías
 *   **Expansión de Átomos (20 Átomos Soberanos):** Incorporación de componentes clave de campaña e impacto: `#meta-magnitud`, `#mod-mapa-crisis`, `#mod-como-ayudar` y `#mod-impacto-historico`.
 *   **Innovación Funcional (Lógica Dual-Phase):** Implementada en `eventovenezuela.html` (Registro ➔ Perfilamiento in-place) como el estándar de alta conversión del sistema.
 * Catálogo de Plantillas Curado por la Cuenta Master (ADR-040 → IMPLEMENTADO, ADR-044/045/046): la cuenta master puede ocultar y reordenar el catálogo de plantillas del Wizard para todas las organizaciones. [Detalle completo → anexo](anexos/PROJECT-CRONICA-ESTADO.md#catalogo-curado)
+*   **Check-in multi-punto con override por ticket (ADR-079, 2026-10-07):** `eventos.puntos_acceso` (jsonb) define los puntos del evento; cada ticket puede sobreescribirlos con `inscritos.puntos_acceso` (jsonb; `NULL`/vacío = hereda el evento) y el scanner aplica `allowed = override no vacío ? override : eventos.puntos_acceso`. `logs` gana `evento_id`/`inscrito_id` (text, FK `ON DELETE SET NULL` a `eventos`/`inscritos`) para trazar el escaneo contra el evento y el inscrito. Migración `adr079` aplicada en producción (`ctgyvydzshueemlelkzv`).
 
 ## 8. Gobernanza y Calidad ($10,000 Standard)
 *   Uso mandatorio de tipografía **Geist 900** y efectos **Afterglow** como identidad visual técnica.
