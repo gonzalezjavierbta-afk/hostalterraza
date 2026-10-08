@@ -397,7 +397,7 @@ async function cargarCache() {
     // Cargar logs de multi-punto
     if (esMultiUso) {
       const { data: logs } = await SB.from('logs').select('qr_code, punto_acceso')
-        .eq('evento', eventoId).not('punto_acceso', 'is', null);
+        .eq('evento_id', eventoId).not('punto_acceso', 'is', null);
       logsCache = {};
       (logs || []).forEach(l => {
         const key = l.qr_code + '|' + l.punto_acceso;
@@ -1116,7 +1116,7 @@ async function undoCheckinScanner(id, nombre, qrCode) {
 async function denyEntry() {
   if (!pendingVerify) return;
   const ins = pendingVerify; pendingVerify = null;
-  await SB.from('logs').insert({ hora:NOW(), fecha:TODAY(), nombre:ins.nombre, cedula:ins.cedula, evento:ins.evento_nombre, tipo:ins.tipo, resultado:'Denegado', org_id: window._evData?.org_id || null });
+  await SB.from('logs').insert({ hora:NOW(), fecha:TODAY(), nombre:ins.nombre, cedula:ins.cedula, evento:ins.evento_nombre, tipo:ins.tipo, resultado:'Denegado', org_id: window._evData?.org_id || null, evento_id: ins.evento_id || eventoId || null, inscrito_id: ins.id || null });
   document.getElementById('sc-res').innerHTML = `<div class="res-card res-err">
     <div style="font-size:16px;font-weight:500;color:var(--red)">✗ Acceso denegado</div>
     <div class="res-name">${ins.nombre}</div>

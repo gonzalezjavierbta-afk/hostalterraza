@@ -6761,12 +6761,16 @@ function openPuntosInscrito(insId) {
   const puntos = _evPuntos(ins.evento_id);
   const propios = Array.isArray(ins.puntos_acceso) ? ins.puntos_acceso : [];
   const efectivos = propios.length ? propios : puntos;
+  // Union (puntos base del evento + override del ticket): el override puede incluir un
+  // punto ya removido de la base; si no se renderiza se perderia al guardar (valor = seleccionados).
+  const union = [...puntos];
+  propios.forEach(p => { if (union.indexOf(p) === -1) union.push(p); });
   const efEl = document.getElementById('puntos-ins-efectivos');
   if (efEl) efEl.innerHTML = 'Puntos efectivos actuales: ' + (efectivos.length ? esc(efectivos.join(' · ')) : '— (el evento no tiene puntos)');
   const list = document.getElementById('puntos-ins-list');
   if (list) {
-    list.innerHTML = puntos.length
-      ? puntos.map(p => `
+    list.innerHTML = union.length
+      ? union.map(p => `
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
           <input type="checkbox" class="punto-ins-chk" value="${esc(String(p))}" ${propios.indexOf(p) !== -1 ? 'checked' : ''} style="accent-color:var(--gold)">
           <span>${esc(String(p))}</span>
