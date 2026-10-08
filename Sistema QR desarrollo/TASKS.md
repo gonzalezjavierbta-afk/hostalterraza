@@ -25,6 +25,7 @@ estructura: indice-v1 (2026-10-01)
 > **Totales tras la Fase 2A del canal de correos (2026-10-03, linea agregada):** **55 abiertas · 52 cerradas · 107 entradas**. Delta = **-2 abiertas / +2 cerradas**, sin entradas nuevas ni borradas: cierran **TSK-104** y **TSK-106**. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 > **Delta por ADR-079 (2026-10-07, linea agregada, sin reescribir las de arriba):** +1 entrada / +1 cerrada = **TSK-107** (Check-in multi-punto con override por ticket). No se agregan tareas abiertas: la deuda residual de ADR-079 queda registrada sin ID propio en `NEXT.md` y `DECISIONS.md` (ver cierre al final). Cifras absolutas de este corte NO recontadas en este cierre; se declaran como delta para no afirmar un total no verificado (ADR-006). Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 > **Correccion aditiva (2026-10-07, misma fecha):** la deuda residual de ADR-079 **YA tiene ID**: **TSK-108..TSK-111** (bloque "DEUDA RESIDUAL ADR-079 — check-in multi-punto", 4 items). La linea anterior se conserva intacta (Cero Borrado); se corrige solo la afirmacion 'sin ID propio'. Deltas efectivos del corte: **+1 cerrada** (TSK-107) y **+4 abiertas** (TSK-108..TSK-111).
+> **Delta por ADR-080 (2026-10-07, linea agregada, sin reescribir las de arriba):** **+1 entrada / +1 cerrada = TSK-112** (Paleta de color de evento) y **+1 abierta = TSK-113** (Fase 2: consumo de los 4 slots derivados en los silos). Feature **implementada** en `admin.html` (Wizard, creacion + edicion) y verificada con Escudo GOLD (`node scripts/smoke_paleta_evento.js` -> **20 PASS / 0 FAIL**). Deuda tecnica declarada en ADR-080 (Decision 5). Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
@@ -109,6 +110,14 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-109](#tsk-109) | Direccion + `@data-migration` (PRO — es esquema/backfill) | **R2** — `logs.evento_id` sin backfill en **22/66** filas (sin match exacto por nombre); `inscrito_id` historico **100% NULL** | Check-in multi-punto (ADR-079) | pendiente |
 | [TSK-110](#tsk-110) | Direccion / Producto (decision de alcance) | **R3** — Decidir si el override se expone en los registros publicos (`registroaforo.html`, `evento-app.html`); hoy no, por diseno | Check-in multi-punto (ADR-079) | pendiente |
 | [TSK-111](#tsk-111) | Frontend (`@admin-dev` / `@frontend-tpl`) | **R4** — `openPuntosInscrito` muestra la union base+override; distinguir herencia vs. propio | Check-in multi-punto (ADR-079) | pendiente |
+
+#### 🟠 DEUDA RESIDUAL ADR-080 — paleta de color de evento (1 item NUEVO, 2026-10-07)
+
+> Item nacido del cierre de ADR-080. Estado: **PENDIENTE**. No bloquea la feature (el contrato y el render minimo de `accent` ya funcionan). Requiere un ADR de amendment para definir los bridges `--master-secondary/tertiary/surface/background` y su `--tpl-*`, mas la inyeccion en `evento-app.html` (Decision 5 de ADR-080). Detalle en `DECISIONS.md` ADR-080 y `NEXT.md` hito -45.
+
+| ID | Responsable | Título | Bloque | Detalle |
+|---|---|---|---|---|
+| [TSK-113](#tsk-113) | Chief Architect + Frontend (`@architect` / `@admin-dev` / `@renderer-dev`) | **Fase 2 (opcional)** — consumir los 4 slots derivados (`secondary`/`tertiary`/`surface`/`background`) en los silos: hoy se persisten en el JSONB pero ningun CSS los lee (solo `accent` pinta via `--master-accent`) | Paleta de color de evento (ADR-080) | pendiente |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -411,5 +420,34 @@ task:
 #### Verificacion de cierre (por archivo real, ADR-006)
 
 13. `git log` confirma los 5 commits; `git show --stat` confirma `admin.html` y `scanner.html` en `a1a1fe1`/`13efe7c`/`eee3fec`/`7468ed6`, y `migrations/adr079_multi_punto_override.sql` en `e7be4ea`; `node scripts/smoke_checkin_multipunto.js` -> **PASS 27 / FAIL 0**; migracion re-contada contra el disco (**260 / 12.700 / 0 no-ASCII**). **Este cierre es documental: 0 cambios de codigo, 0 migraciones nuevas, 0 commits** (los hace el orquestador).
+
+---
+
+### Cierre de TSK-112 - Paleta de color de evento (ADR-080) (2026-10-07) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Feature **implementada** (Fases 0-I-II); alcance REAL verificado contra el archivo real (ADR-006). Este cierre es **documental: 0 cambios de codigo, 0 migraciones nuevas, 0 commits** (los hace el orquestador).
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Contrato de datos (ADR-080, Fase 0):** `eventos.config_landing.colors = { accent, secondary, tertiary, surface, background }` (5 slots nombrados, hex `#rrggbb`, se escriben SIEMPRE, nunca `null`; default canonico unico `#c9a84c`; **sin array `palette`**). **Invariante:** `eventos.color_primario === colors.accent` en todo guardado real. 0 DDL, 0 endpoints, 0 RLS; es una clave JSONB (patron ADR-064).
+2. **`admin.html` (Wizard, SOLO Paso 1b):** 5 slots de color. `#ev-color`/`#ev-color-hex` **se conservan como Slot 1 (`accent`)**; los slots 2-5 son `#ev-color-2..5` + `-hex` (`admin.html:893-913`). Barra de **Combinaciones Sugeridas** + boton **"Aplicar sugerencia completa"** (`#ev-color-apply`, `:926`). Previews de paleta en vivo.
+3. **Motor cromatico HSL puro (Vanilla JS):** `_evHexToHsl` (`:3940`), `_evHslToHex` (`:3961`), `_evGenerarSugerenciasHSL` (`:3981`) + `_evSetSlotColor`/`_evResetPaleta`/`_evRenderSugerencias`/`_evActualizarPreview`. **Se retira la dependencia TinyColor2** (CDN + `renderColorHarmony`): 0 referencias `tinycolor`/`TinyColor` en el archivo.
+4. **Persistencia (`_buildConfigLanding`, `:4843-4849`):** las 5 claves se emiten en el literal de `cfg.colors` (si falta una se borra en silencio al re-guardar: overwrite total, clase BUG-016). **Invariante aplicado** en `guardarEventoWizard` (`:6620-6622`) y `_crearEventoUnico` (`:7933-7935`): `payload.color_primario = config_landing.colors.accent`.
+5. **Round-trip en edicion:** `openEditMod` lee los 5 slots (`:5915`, fallback a `color_primario` y al default `#c9a84c`).
+6. **Resets en 3 circuitos:** `_evResetPaleta('#c9a84c')` en `_limpiarWizardCompleto` (`:6172`), `_crearEventoUnico` (`:7946`) y `_crearSerie` (`:8046`).
+7. **`evento-app.html` NO se toca:** `--master-accent` se sigue pintando desde `ev.color_primario` (`evento-app.html:1121`) con 0 cambios en el kernel publico (render minimo).
+
+#### Verificacion (Escudo GOLD independiente `@qa-auditor`, ADR-006)
+
+8. Balance de `<div>` de `admin.html` **diff = 3 = baseline preexistente** (delta de la feature = 0); **ASCII JS = 0 bytes > 127**; `<script>` inline compilan; **0 referencias tinycolor**.
+9. **`scripts/smoke_paleta_evento.js` (NUEVO, 0 dependencias, invocacion MANUAL):** `node scripts/smoke_paleta_evento.js` -> **PASS 20 / FAIL 0**. Cubre literal de las 5 claves, invariante, round-trip `openEditMod`, los 3 resets (`_evResetPaleta` x3), HSL complementario `(h+180)%360`, round-trip identidad `#c9a84c` (maxDelta 0) y 5 sugerencias hex validas.
+
+#### Deuda tecnica declarada (NO cerrada; ver TSK-113)
+
+10. **(a)** Los 4 slots `secondary`/`tertiary`/`surface`/`background` **se persisten pero NO se consumen** en render: los silos solo conocen `--master-accent`. Cerrarlo exige amendment de ADR (bridges `--master-*` + `--tpl-*` + inyeccion en `evento-app.html`). **(b)** Las ramas tempranas de `_buildConfigLanding` (solo-formulario `:4794-4804`; sin-landing `:4784-4789`) **no emiten `colors`** — fuera de alcance. **(c)** `eventobackup.html` es consumidor **LEGACY excluido** (lee `colors.accent` como string; no se rompe).
+
+#### Correccion ADR-006 (baseline = archivo real)
+
+11. La implementacion **NO retiro `syncColor`** como planeaba el Anexo de ADR-080: la **conserva y la reescribe para 5 slots** (`function syncColor(hex, slot)`, `admin.html:11335`; 5 `oninput` en el HTML). No es un bug (TinyColor2 si se retiro), pero se registra para no afirmar un alcance no ejecutado.
 
 

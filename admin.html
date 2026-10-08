@@ -885,13 +885,45 @@ tr:hover td{background:var(--surface)}
         <div class="fg" id="ev-fecha-wrap"><label>Fecha *</label><input type="date" id="ev-f"></div>
         <div class="fg"><label>Hora</label><input type="time" id="ev-h"></div>
         <div class="fg"><label>Ubicación</label><input id="ev-ubic" placeholder="Ej. Terraza piso 3 · Cra 5 #10-20, Bogotá"></div>
-        <div class="fg"><label>Color del evento</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="ev-color" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
-            <input id="ev-color-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value)">
+        <div class="fg"><label>Paleta de color del evento</label>
+          <div id="ev-palette-slots" style="display:flex;flex-direction:column;gap:6px">
+            <div class="ev-slot" data-slot="1" onclick="setSlotActivo(1)" title="Acento (accent) - obligatorio" style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;color:var(--ink3);width:76px;flex-shrink:0">Acento *</span>
+              <input type="color" id="ev-color" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
+              <input id="ev-color-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value)">
+            </div>
+            <div class="ev-slot" data-slot="2" onclick="setSlotActivo(2)" title="Secundario (secondary)" style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;color:var(--ink3);width:76px;flex-shrink:0">Secundario</span>
+              <input type="color" id="ev-color-2" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
+              <input id="ev-color-2-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value, 2)">
+            </div>
+            <div class="ev-slot" data-slot="3" onclick="setSlotActivo(3)" title="Terciario (tertiary)" style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;color:var(--ink3);width:76px;flex-shrink:0">Terciario</span>
+              <input type="color" id="ev-color-3" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
+              <input id="ev-color-3-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value, 3)">
+            </div>
+            <div class="ev-slot" data-slot="4" onclick="setSlotActivo(4)" title="Superficie (surface)" style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;color:var(--ink3);width:76px;flex-shrink:0">Superficie</span>
+              <input type="color" id="ev-color-4" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
+              <input id="ev-color-4-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value, 4)">
+            </div>
+            <div class="ev-slot" data-slot="5" onclick="setSlotActivo(5)" title="Fondo (background)" style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;color:var(--ink3);width:76px;flex-shrink:0">Fondo</span>
+              <input type="color" id="ev-color-5" value="#c9a84c" style="width:44px;height:36px;padding:2px;cursor:pointer;flex-shrink:0">
+              <input id="ev-color-5-hex" value="#c9a84c" style="flex:1;font-family:monospace;font-size:13px" oninput="syncColor(this.value, 5)">
+            </div>
           </div>
-          <!-- ADR-021: Armonías cromáticas sugeridas vía TinyColor -->
+          <div id="ev-color-preview" style="display:flex;height:14px;border-radius:4px;overflow:hidden;margin-top:8px">
+            <div style="flex:1;background:var(--evc-1,#c9a84c)"></div>
+            <div style="flex:1;background:var(--evc-2,#c9a84c)"></div>
+            <div style="flex:1;background:var(--evc-3,#c9a84c)"></div>
+            <div style="flex:1;background:var(--evc-4,#c9a84c)"></div>
+            <div style="flex:1;background:var(--evc-5,#c9a84c)"></div>
+          </div>
+          <!-- ADR-080: combinaciones sugeridas (motor HSL puro, sin dependencias) -->
+          <div style="font-size:11px;color:var(--ink3);margin-top:8px">Combinaciones sugeridas</div>
           <div id="ev-color-harmony" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="ev-color-apply" style="margin-top:8px" onclick="aplicarSugerenciaCompleta()">Aplicar sugerencia completa</button>
         </div>
       </div>
 
@@ -2778,9 +2810,7 @@ async function _ensureXLSX() {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js"></script>
-<!-- ADR-021: TinyColor2 para el selector de armonías cromáticas del Wizard. Mismo dominio CDN
-     (jsdelivr) que qr-creator, sin eval()/new Function() — cumple CSP de Vercel. -->
-<script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.6.0/dist/tinycolor-min.js"></script>
+<!-- ADR-080: el motor cromatico de la paleta es HSL puro en Vanilla JS (sin CDN, CSP-safe). -->
 <script>
 // ════════════════════════════════════════════════════
 // SUPABASE CONFIG
@@ -3897,21 +3927,127 @@ function toggleSegundoEscaneo(on) {
   }
 }
 
-// Armonías cromáticas sugeridas a partir del color del evento (TinyColor2, ADR-021)
-function renderColorHarmony(hex) {
-  const wrap = document.getElementById('ev-color-harmony');
-  if (!wrap || typeof tinycolor === 'undefined') return;
-  const base = tinycolor(hex);
-  if (!base.isValid()) { wrap.innerHTML = ''; return; }
-  const combos = [
-    { label: 'Complementario', color: base.complement() },
-    ...base.analogous(3).slice(1).map((c, i) => ({ label: 'Análogo ' + (i + 1), color: c })),
-    ...base.triad().slice(1).map((c, i) => ({ label: 'Tríada ' + (i + 1), color: c })),
+// ADR-080 - motor cromatico HSL puro para la paleta de 5 slots del evento.
+// Supera las armonias de ADR-021. Sin dependencias ni eval.
+// Referencia matematica: evento-app.html __hexToHsl/__hslToHex. Todo ASCII.
+let _evColorSlotActivo = 1;
+
+function _evNormalizarHex(hex, fallback) {
+  const v = (typeof hex === 'string') ? hex.trim().toLowerCase() : '';
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : fallback;
+}
+
+function _evHexToHsl(hex) {
+  const norm = _evNormalizarHex(hex, '');
+  if (!norm) return { h: 0, s: 0, l: 0 };
+  const m = norm.slice(1);
+  const r = parseInt(m.substr(0, 2), 16) / 255;
+  const g = parseInt(m.substr(2, 2), 16) / 255;
+  const b = parseInt(m.substr(4, 2), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (d !== 0) {
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  return { h: h, s: s * 100, l: l * 100 };
+}
+
+function _evHslToHex(h, s, l) {
+  h = ((h % 360) + 360) % 360;
+  s = Math.min(100, Math.max(0, s)) / 100;
+  l = Math.min(100, Math.max(0, l)) / 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) { r = c; g = x; }
+  else if (h < 120) { r = x; g = c; }
+  else if (h < 180) { g = c; b = x; }
+  else if (h < 240) { g = x; b = c; }
+  else if (h < 300) { r = x; b = c; }
+  else { r = c; b = x; }
+  const toHex = function(v){ const n = Math.round((v + m) * 255); return (n < 16 ? '0' : '') + n.toString(16); };
+  return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+// 5 sugerencias derivadas del color principal (accent): base, complementario,
+// analogo oscuro, analogo claro y fondo oscuro. Mapean 1:1 a los 5 slots.
+function _evGenerarSugerenciasHSL(hex) {
+  const hsl = _evHexToHsl(hex);
+  const h = hsl.h, s = hsl.s, l = hsl.l;
+  return [
+    { key: 'accent',     label: 'Acento',         hex: _evNormalizarHex(hex, '#c9a84c') },
+    { key: 'secondary',  label: 'Complementario', hex: _evHslToHex(h + 180, s, l) },
+    { key: 'tertiary',   label: 'Analogo oscuro', hex: _evHslToHex(h + 30, Math.max(s, 40), Math.max(10, l - 24)) },
+    { key: 'surface',    label: 'Analogo claro',  hex: _evHslToHex(h - 30, Math.max(s, 35), Math.min(90, l + 20)) },
+    { key: 'background', label: 'Fondo oscuro',   hex: _evHslToHex(h, Math.min(s, 60), Math.max(6, l - 40)) },
   ];
-  wrap.innerHTML = combos.map(c => {
-    const h = c.color.toHexString();
-    return `<button type="button" class="wiz-swatch" title="${c.label}: ${h}" style="background:${h}" onclick="syncColor('${h}');document.getElementById('ev-color-hex').value='${h}'"></button>`;
+}
+
+function _evRenderSugerencias(hex) {
+  const wrap = document.getElementById('ev-color-harmony');
+  if (!wrap) return;
+  const sug = _evGenerarSugerenciasHSL(_evNormalizarHex(hex, '#c9a84c'));
+  wrap.innerHTML = sug.map(function(c, i){
+    return '<button type="button" class="wiz-swatch" title="' + c.label + ': ' + c.hex +
+           '" style="background:' + c.hex + '" onclick="aplicarSugerencia(' + i + ')"></button>';
   }).join('');
+}
+
+function _evSetSlotColor(slot, hex) {
+  slot = (slot >= 1 && slot <= 5) ? slot : 1;
+  const val = _evNormalizarHex(hex, '#c9a84c');
+  const pick = document.getElementById(slot === 1 ? 'ev-color' : 'ev-color-' + slot);
+  const txt  = document.getElementById(slot === 1 ? 'ev-color-hex' : 'ev-color-' + slot + '-hex');
+  if (pick) pick.value = val;
+  if (txt)  txt.value  = val;
+  if (slot === 1) _evRenderSugerencias(val);
+  _evActualizarPreview();
+}
+
+function _evLeerSlotColor(slot) {
+  const txt = document.getElementById(slot === 1 ? 'ev-color-hex' : 'ev-color-' + slot + '-hex');
+  const accent = _evNormalizarHex(document.getElementById('ev-color-hex')?.value, '#c9a84c');
+  return _evNormalizarHex(txt ? txt.value : '', accent);
+}
+
+function _evActualizarPreview() {
+  const prev = document.getElementById('ev-color-preview');
+  if (!prev) return;
+  for (let i = 1; i <= 5; i++) prev.style.setProperty('--evc-' + i, _evLeerSlotColor(i));
+}
+
+function setSlotActivo(slot) {
+  _evColorSlotActivo = (slot >= 1 && slot <= 5) ? slot : 1;
+  document.querySelectorAll('#ev-palette-slots .ev-slot').forEach(function(el){
+    el.style.outline = (parseInt(el.dataset.slot, 10) === _evColorSlotActivo) ? '1px solid var(--gold)' : 'none';
+  });
+}
+
+function aplicarSugerencia(idx) {
+  const base = _evNormalizarHex(document.getElementById('ev-color-hex')?.value, '#c9a84c');
+  const c = _evGenerarSugerenciasHSL(base)[idx];
+  if (c) _evSetSlotColor(_evColorSlotActivo, c.hex);
+}
+
+function aplicarSugerenciaCompleta() {
+  const base = _evNormalizarHex(document.getElementById('ev-color-hex')?.value, '#c9a84c');
+  const sug = _evGenerarSugerenciasHSL(base);
+  for (let i = 0; i < 5; i++) _evSetSlotColor(i + 1, sug[i].hex);
+  _evActualizarPreview();
+}
+
+function _evResetPaleta(hex) {
+  const base = _evNormalizarHex(hex, '#c9a84c');
+  for (let i = 1; i <= 5; i++) _evSetSlotColor(i, base);
+  _evRenderSugerencias(base);
+  _evActualizarPreview();
 }
 
 function wizValidate(step) {
@@ -4701,7 +4837,16 @@ function _buildConfigLanding(slug) {
 
   const cfg = {
     theme: _ldThemeSeleccionado,
-    colors: { accent: val('ev-color-hex') || '#c8a96e' },
+    // ADR-080 - paleta de color de evento: 5 slots nombrados, se escriben SIEMPRE
+    // (nunca null). Si falta una clave aqui se BORRA al re-guardar (overwrite total,
+    // clase BUG-016). Default canonico unico #c9a84c.
+    colors: {
+      accent:     (val('ev-color-hex')   || '#c9a84c').toLowerCase(),
+      secondary:  (val('ev-color-2-hex') || val('ev-color-hex') || '#c9a84c').toLowerCase(),
+      tertiary:   (val('ev-color-3-hex') || val('ev-color-hex') || '#c9a84c').toLowerCase(),
+      surface:    (val('ev-color-4-hex') || val('ev-color-hex') || '#c9a84c').toLowerCase(),
+      background: (val('ev-color-5-hex') || val('ev-color-hex') || '#c9a84c').toLowerCase(),
+    },
     modules: {
       // Cinematografía
       trailer:       chk('ld-mod-trailer'),
@@ -5755,9 +5900,20 @@ function openEditMod(evId) {
   // ── Paso 1 · Cimiento (identidad) ──
   setEvTipo('unico');
   setEvSalida(!!ev.captura_pura);
-  const color = ev.color_primario || '#c9a84c';
-  document.getElementById('ev-color').value     = color;
-  document.getElementById('ev-color-hex').value = color;
+  // ADR-080 - round-trip de la paleta: relee config_landing.colors con Silent
+  // Fallback a color_primario (y al default canonico) por cada clave ausente.
+  const _evColors = (ev.config_landing && ev.config_landing.colors) || {};
+  const _evBaseColor = _evColors.accent || ev.color_primario || '#c9a84c';
+  const _evPaleta = [
+    _evBaseColor,
+    _evColors.secondary  || _evBaseColor,
+    _evColors.tertiary   || _evBaseColor,
+    _evColors.surface    || _evBaseColor,
+    _evColors.background || _evBaseColor,
+  ];
+  for (let _ei = 0; _ei < 5; _ei++) _evSetSlotColor(_ei + 1, _evPaleta[_ei]);
+  _evRenderSugerencias(_evBaseColor);
+  _evActualizarPreview();
   document.getElementById('ev-n').value     = ev.nombre  || '';
   document.getElementById('ev-f').value     = ev.fecha   || '';
   document.getElementById('ev-h').value     = ev.hora    || '';
@@ -6012,6 +6168,8 @@ function _limpiarWizardCompleto() {
     const el = document.getElementById(i); if (el) el.value = '';
   });
   document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; chk.disabled = false; });
+  // ADR-080 - los 5 slots de la paleta vuelven al default canonico.
+  _evResetPaleta('#c9a84c');
   // Banners f9b: los dos <select> de estilo vuelven a su default fail-open 'dorado'.
   ['ld-banner-1-estilo','ld-banner-2-estilo'].forEach(id => { const el = document.getElementById(id); if (el) el.value = 'dorado'; });
   const metaHeroWrapClear = document.getElementById('ld-meta-hero-wrap');
@@ -6459,6 +6617,10 @@ async function guardarEventoWizard() {
     if (HAS_EVENTO_FASE) payload.fase_landing = _evFaseLanding || 'completa';
     const prevSlug = _eventos.find(e => e.id === id)?.slug || null;
     const cfgLanding = _buildConfigLanding(prevSlug);
+    // ADR-080 - invariante: eventos.color_primario === config_landing.colors.accent.
+    if (cfgLanding && cfgLanding.colors && cfgLanding.colors.accent) {
+      payload.color_primario = cfgLanding.colors.accent;
+    }
     // Edición: si la landing se desactivó, limpiar el JSON previo (Cero Huérfanos).
     payload.config_landing = cfgLanding || null;
 
@@ -7768,6 +7930,10 @@ async function _crearEventoUnico(n) {
   if (HAS_EVENTO_ESTADO) payload.estado = await _calcularEstadoEvento();
   // ADR-051 — fase de la landing (solo si la columna existe en esta instancia).
   if (HAS_EVENTO_FASE) payload.fase_landing = _evFaseLanding || 'completa';
+  // ADR-080 - invariante: eventos.color_primario === config_landing.colors.accent.
+  if (payload.config_landing && payload.config_landing.colors && payload.config_landing.colors.accent) {
+    payload.color_primario = payload.config_landing.colors.accent;
+  }
   const {data:ev, error} = await SB.from('eventos').insert(payload).select().single();
 
   if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
@@ -7777,8 +7943,7 @@ async function _crearEventoUnico(n) {
   alrt('ev-alert',`✓ Evento "${n}" creado. <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>`,'ok');
 
   ['ev-n','ev-f','ev-h','ev-d','ev-ubic','ev-img','ev-aforo','ev-video','ev-cabezote-form'].forEach(i=>{const el=document.getElementById(i);if(el)el.value=''});
-  document.getElementById('ev-color-hex').value='#c9a84c';
-  document.getElementById('ev-color').value='#c9a84c';
+  _evResetPaleta('#c9a84c'); // ADR-080 - 5 slots al default canonico
   document.getElementById('ev-img-preview').style.display='none';
   document.getElementById('ev-cabezote-form-preview').style.display='none';
   previewVideo('');
@@ -7878,8 +8043,7 @@ async function _crearSerie(n) {
 
   ['ev-n','ev-h','ev-d','ev-ubic','ev-img'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('ev-serie-f1').value='';
-  document.getElementById('ev-color-hex').value='#c9a84c';
-  document.getElementById('ev-color').value='#c9a84c';
+  _evResetPaleta('#c9a84c'); // ADR-080 - 5 slots al default canonico
   document.getElementById('ev-img-preview').style.display='none';
   document.getElementById('ev-cabezote-form-preview').style.display='none';
   loadEventos();
@@ -11167,21 +11331,21 @@ async function undoCheckin(id, nombre) {
 // ════════════════════════════════════════════════════
 // HELPERS FORMULARIO EVENTO
 // ════════════════════════════════════════════════════
-function syncColor(hex) {
-  if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
-    document.getElementById('ev-color').value = hex;
-    renderColorHarmony(hex); // ADR-021
-  }
+// ADR-080 - sincroniza el hex de un slot con su picker y la preview en vivo.
+function syncColor(hex, slot) {
+  slot = (slot >= 1 && slot <= 5) ? slot : 1;
+  if (/^#[0-9a-fA-F]{6}$/.test((hex || '').trim())) _evSetSlotColor(slot, hex);
 }
 // Sincronizar color picker → hex input
 document.addEventListener('DOMContentLoaded', () => {
-  // Color picker sync
-  const picker = document.getElementById('ev-color');
-  if (picker) picker.addEventListener('input', e => {
-    document.getElementById('ev-color-hex').value = e.target.value;
-    renderColorHarmony(e.target.value); // ADR-021
+  // ADR-080 - 5 slots de paleta: cada picker sincroniza su hex y la preview en vivo.
+  [1, 2, 3, 4, 5].forEach(slot => {
+    const picker = document.getElementById(slot === 1 ? 'ev-color' : 'ev-color-' + slot);
+    if (picker) picker.addEventListener('input', e => syncColor(e.target.value, slot));
   });
-  renderColorHarmony(document.getElementById('ev-color-hex')?.value || '#c9a84c'); // ADR-021 · estado inicial
+  setSlotActivo(1);
+  _evRenderSugerencias(document.getElementById('ev-color-hex')?.value || '#c9a84c');
+  _evActualizarPreview();
   // Preview imagen
   const imgInput = document.getElementById('ev-img');
   if (imgInput) imgInput.addEventListener('input', e => {

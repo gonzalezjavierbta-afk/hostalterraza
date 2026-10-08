@@ -13,9 +13,27 @@ estructura: indice-v1 (2026-10-01)
 
 Este documento define el punto de control estratégico y las directrices para la continuación inmediata del desarrollo. Es la hoja de ruta obligatoria para cualquier IA o agente que retome el proyecto para asegurar la fidelidad de 1px y la integridad del núcleo.
 
-> **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-44 a -33) y las secciones vigentes 1-4.
+> **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-45 a -33) y las secciones vigentes 1-4.
 
-#### -44. Hito Mas Reciente - CHECK-IN MULTI-PUNTO CON OVERRIDE POR TICKET (ADR-079) implementado, mergeado y pusheado (2026-10-07)
+#### -45. Hito Mas Reciente - PALETA DE COLOR DE EVENTO (ADR-080) implementada (Fases 0-I-II) (2026-10-07)
+
+*   **Que se estaba haciendo:** implementar la paleta de color de evento de 5 slots (`eventos.config_landing.colors`) y su captura en el Wizard. Fases 0 (contrato), I (UI + motor HSL) y II (persistencia + invariante) **completadas**. Registrar el cierre documental del ciclo (TSK-112) y su deuda tecnica (TSK-113).
+*   **HECHOS VERIFICADOS (baseline = archivo real, ADR-006):**
+    *   `(1)` **Contrato:** `colors = { accent, secondary, tertiary, surface, background }` (5 slots nombrados, hex `#rrggbb`, escritos siempre, nunca `null`; default canonico `#c9a84c`; **sin array `palette`**). Invariante `eventos.color_primario === colors.accent`. Clave JSONB, 0 DDL / 0 endpoints / 0 RLS.
+    *   `(2)` **`admin.html` (Wizard, solo Paso 1b):** 5 slots (`#ev-color`/`#ev-color-hex` conservados como Slot 1; `#ev-color-2..5` nuevos, `:893-913`), barra de **Combinaciones Sugeridas** + boton **"Aplicar sugerencia completa"** (`#ev-color-apply`, `:926`). Motor **HSL puro** (`_evHexToHsl :3940`, `_evHslToHex :3961`, `_evGenerarSugerenciasHSL :3981`); **TinyColor2 retirado** (0 referencias `tinycolor`).
+    *   `(3)` **Persistencia literal:** las 5 claves en `_buildConfigLanding` (`:4843-4849`) — si falta una se borra en silencio (overwrite total, clase BUG-016). Invariante en `guardarEventoWizard` (`:6622`) y `_crearEventoUnico` (`:7935`); round-trip en `openEditMod` (`:5915`); resets en 3 circuitos (`_evResetPaleta` `:6172`/`:7946`/`:8046`).
+    *   `(4)` **`evento-app.html` NO se toca:** solo `accent` pinta via `color_primario -> --master-accent` (render minimo).
+    *   `(5)` **Escudo GOLD `@qa-auditor`:** divs `admin.html` **diff=3 = baseline**; **ASCII JS=0**; scripts inline compilan; **0 refs tinycolor**. **Smoke nuevo `scripts/smoke_paleta_evento.js` (0 dependencias, invocacion MANUAL):** `node scripts/smoke_paleta_evento.js` -> **PASS 20 / FAIL 0**.
+*   **Que sigue (en este orden):**
+    *   `(1)` **Fase 2 OPCIONAL (TSK-113):** consumir los 4 slots derivados en los silos (`secondary`/`tertiary`/`surface`/`background`), hoy persistidos pero **no consumidos** (solo `--master-accent`). Requiere un **ADR de amendment** que defina los bridges `--master-secondary/tertiary/surface/background` y su `--tpl-*`, mas la inyeccion en `evento-app.html`. Proviene de la Decision 5 de ADR-080.
+*   **Riesgos activos:**
+    *   `(1)` **Render minimo:** los 4 slots derivados no pintan aun; no es un defecto (deuda planificada), pero consumirlos sin el amendment seria un puente sin fuente.
+    *   `(2)` **Riesgo estructural BUG-016:** `config_landing` es overwrite total; cualquier clave nueva fuera del literal de `_buildConfigLanding` se pierde en silencio (ya cubierto para `colors`).
+    *   `(3)` **Ramas tempranas** de `_buildConfigLanding` (solo-formulario `:4794-4804`; sin-landing `:4784-4789`) no emiten `colors` (fuera de alcance).
+    *   `(4)` Los riesgos de hitos previos siguen vigentes (hito -44, R1-R4 de ADR-079, etc.).
+*   **Verificacion de cierre (por archivo real, ADR-006):** `node scripts/smoke_paleta_evento.js` -> **PASS 20 / FAIL 0**; grep de `_evHexToHsl`/`_evHslToHex`/`_evGenerarSugerenciasHSL`/`ev-color-2` e invariante en `admin.html` confirman el alcance; 0 refs `tinycolor`. ADR-080 presente en `DECISIONS.md` = **1**. **0 cambios de codigo, 0 migraciones nuevas, 0 commits** en este cierre (documental).
+
+#### -44. Hito - CHECK-IN MULTI-PUNTO CON OVERRIDE POR TICKET (ADR-079) implementado, mergeado y pusheado (2026-10-07)
 
 *   **Que se estaba haciendo:** cerrar la feature de check-in multi-punto con **override por ticket** y **trazabilidad de `logs`**, ya implementada, mergeada y pusheada en `main`. Commits **`a1a1fe1`**, **`e7be4ea`**, **`13efe7c`**, **`eee3fec`**, **`7468ed6`**.
 *   **HECHOS VERIFICADOS (baseline = archivo real, ADR-006):**
