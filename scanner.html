@@ -242,6 +242,7 @@ let tokenData   = null;
 let eventoId    = null;
 let puntoAcceso = null;
 let esMultiUso  = false;
+let esPuntoEspecifico = false; // el TOKEN tiene punto asignado (no es entrada general)
 let pendingVerify = null;
 
 // ── Offline support ───────────────────────────────
@@ -325,6 +326,7 @@ async function init() {
     .select('nombre,fecha,hora,puntos_acceso,aforo_max,org_id,form_campos,organizaciones(color_primario,nombre_app)').eq('id', eventoId).single();
 
   esMultiUso  = Array.isArray(ev?.puntos_acceso) && ev.puntos_acceso.length > 0;
+  esPuntoEspecifico = !!puntoAcceso;
   _afoMax     = ev?.aforo_max || null;
   window._evData = ev; // store for org_id access in logs
 
@@ -576,8 +578,26 @@ function setMode(mode) {
 
 let _listaFiltrada = [];
 
+// Puntos de acceso efectivos de un inscrito (ADR-079/081):
+// data.puntos_acceso es un array (incluido []) -> manda el propio;
+// null/undefined -> hereda los puntos del evento.
+function puntosEfectivos(inscrito) {
+  return Array.isArray(inscrito.puntos_acceso)
+    ? inscrito.puntos_acceso
+    : (Array.isArray(window._evData?.puntos_acceso) ? window._evData.puntos_acceso : []);
+}
+
+// Lista base con el flag derivado _autorizado.
+// En token general (punto_acceso null) todos quedan autorizados.
+function listaBase() {
+  return Object.values(qrCache).map(i => ({
+    ...i,
+    _autorizado: esPuntoEspecifico ? puntosEfectivos(i).includes(puntoAcceso) : true
+  }));
+}
+
 function renderListaInscritos() {
-  const lista = Object.values(qrCache);
+  const lista = listaBase();
   _listaFiltrada = lista.sort((a,b) => a.nombre.localeCompare(b.nombre));
   _renderListaHTML(_listaFiltrada);
 }
@@ -585,7 +605,7 @@ function renderListaInscritos() {
 function filtrarLista() {
   const raw = document.getElementById('lista-search')?.value || '';
   const q = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  const lista = Object.values(qrCache);
+  const lista = listaBase();
 
   if (!q) {
     _listaFiltrada = lista.sort((a,b) => a.nombre.localeCompare(b.nombre, 'es'));
@@ -624,13 +644,20 @@ function _renderListaHTML(lista) {
     const ingresoLabel = yaIngreso
       ? `<span style="font-size:11px;color:var(--green);font-weight:500;background:var(--green-bg);padding:2px 8px;border-radius:10px;border:1px solid var(--green-border)">✓ ${i.hora_ingreso||'Ingresó'}</span>`
       : `<button onclick="checkinManual('${i.qr_code}')" style="font-size:12px;font-weight:500;padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--rsm);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">Ingresar</button>`;
+    // Badge informativo: solo token de punto especifico e inscrito sin autorizacion.
+    // Puramente visual: no altera busqueda ni validacion de escaneo.
+    const noAutorizado = esPuntoEspecifico && !i._autorizado;
+    const badgeNoAut = noAutorizado
+      ? `<span style="font-size:11px;color:var(--ink3);font-weight:500;background:var(--surface);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">No autorizado</span>`
+      : '';
     return `<div id="lista-card-${idx}" style="background:#fff;border:1px solid var(--border);border-radius:var(--rsm);padding:.65rem .9rem;display:flex;align-items:center;gap:10px">
       <div style="width:36px;height:36px;border-radius:50%;background:${yaIngreso?'var(--green-bg)':'var(--gold-bg)'};color:${yaIngreso?'var(--green)':'var(--gold-d)'};border:1px solid ${yaIngreso?'var(--green-border)':'var(--gold-border)'};display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:14px;flex-shrink:0">${ini}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.nombre}</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <span>C.C. ${i.cedula}</span>
           ${i.telefono ? `<span>${i.telefono}</span>` : ''}
+          ${badgeNoAut}
         </div>
       </div>
       <div style="flex-shrink:0">${ingresoLabel}</div>
@@ -846,11 +873,11 @@ async function processScan() {
   // Validar punto efectivo (ADR-079, semantica nueva):
   // data.puntos_acceso NULL/undefined -> hereda los puntos del evento;
   // [] -> ninguno explicito; array con items -> solo esos puntos.
-  if (esMultiUso && puntoAcceso) {
+  // esPuntoEspecifico depende del TOKEN (punto_acceso != null), no del evento:
+  // en token general aplica uso unico, igual que en evento sin puntos.
+  if (esPuntoEspecifico) {
     const hasOwn  = Array.isArray(data.puntos_acceso);
-    const allowed = hasOwn
-      ? data.puntos_acceso
-      : (Array.isArray(window._evData?.puntos_acceso) ? window._evData.puntos_acceso : []);
+    const allowed = puntosEfectivos(data);
     if (!allowed.includes(puntoAcceso)) {
       const motivo = hasOwn ? 'esta entrada' : 'este evento';
       res.innerHTML = `<div class="res-card res-err">
@@ -860,9 +887,7 @@ async function processScan() {
       addLog('Punto no autorizado', String(puntoAcceso), '#fca5a5');
       return;
     }
-  }
 
-  if (esMultiUso && puntoAcceso) {
     // ── Multi-punto: verificar si ya pasó por ESTE punto ──
     const cacheKey = code + '|' + puntoAcceso;
     let yaEstuvo = logsCache[cacheKey] || false;
@@ -885,7 +910,7 @@ async function processScan() {
       return;
     }
     // Válido para este punto aunque used=true en otros
-  } else if (!esMultiUso && data.used) {
+  } else if (data.used) {
     // ── Uso único: bloquear si ya fue escaneado ──
     res.innerHTML = `<div class="res-card res-err">
       <div style="font-size:16px;font-weight:500;color:var(--red)">✗ QR ya utilizado</div>

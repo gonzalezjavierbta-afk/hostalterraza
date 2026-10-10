@@ -2160,10 +2160,10 @@ tr:hover td{background:var(--surface)}
           </div>
           <!-- Punto de acceso — visible solo si el evento tiene multi-acceso -->
           <div class="fg" id="tok-punto-wrap" style="display:none;grid-column:1/-1">
-            <label>Punto de acceso asignado *</label>
-            <div style="font-size:12px;color:var(--ink3);margin-bottom:.4rem">Este portero solo podrá validar entradas en este punto.</div>
+            <label>Punto de acceso asignado</label>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:.4rem">General valida todos los inscritos (uso único). Un punto valida solo a quienes estén autorizados para él.</div>
             <select id="tok-punto" style="width:100%">
-              <option value="">Selecciona punto…</option>
+              <option value="">General - todos los inscritos</option>
             </select>
           </div>
           <div class="fg"><label>Duración del link</label>
@@ -7275,14 +7275,17 @@ async function onTokEventoChange(evId) {
   const ev = _eventos.find(e => e.id === evId);
   const puntos = ev?.puntos_acceso;
 
+  const GENERAL_OPT = '<option value="">General - todos los inscritos</option>';
+
   if (!Array.isArray(puntos) || puntos.length === 0) {
     wrap.style.display = 'none';
-    sel.innerHTML = '<option value="">Acceso único</option>';
+    sel.innerHTML = GENERAL_OPT;
     return;
   }
 
-  // Populate selector
-  sel.innerHTML = '<option value="">— Selecciona punto —</option>' +
+  // Populate selector. La primera opcion es siempre la entrada general
+  // (punto_acceso = null -> uso unico, valida a todos los inscritos).
+  sel.innerHTML = GENERAL_OPT +
     puntos.map(p => `<option value="${p}">${p}</option>`).join('');
   wrap.style.display = 'block';
 }
@@ -12188,13 +12191,8 @@ async function generarToken() {
   const evId   = document.getElementById('tok-evento').value;
   const nombre = document.getElementById('tok-nombre').value.trim() || 'Portero';
   const punto  = document.getElementById('tok-punto')?.value || '';
-  const puntosRequeridos = document.getElementById('tok-punto-wrap')?.style.display !== 'none';
 
   if (!evId) { alrt('tok-alert','Selecciona el evento.','err'); return; }
-  if (puntosRequeridos && !punto) {
-    alrt('tok-alert','Este evento tiene múltiples puntos de acceso. Selecciona el punto asignado a este portero.','err');
-    return;
-  }
 
   const sel = document.getElementById('tok-horas');
   let horas = parseInt(sel.value);
@@ -12221,7 +12219,7 @@ async function generarToken() {
 
   const expStr   = expira.toLocaleDateString('es-CO') + ' a las ' +
     expira.toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
-  const puntoStr = punto ? ` · 📍 ${punto}` : '';
+  const puntoStr = punto ? ` · 📍 ${punto}` : ' · 📍 General (todos los inscritos)';
   document.getElementById('tok-info').textContent =
     `Portero: ${nombre} · Evento: ${ev?.nombre}${puntoStr} · Expira: ${expStr}`;
 
