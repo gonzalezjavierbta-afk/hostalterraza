@@ -6022,8 +6022,23 @@ function openEditMod(evId) {
     const list = document.getElementById('ev-puntos-list');
     list.innerHTML = '';
     const genEv = Array.isArray(ev.puntos_generales) ? ev.puntos_generales : [];
-    ev.puntos_acceso.forEach(p => addPuntoRow(p, genEv.indexOf(p) !== -1));
+    // ADR-083 - 3er modo. TOLERANCIA: si la cache no trae la columna (migracion
+    // no aplicada) se consulta AISLADA y solo entonces se corrigen las filas del
+    // wizard; si tampoco existe, todo queda en HEREDA (comportamiento actual).
+    const soloEv = Array.isArray(ev.puntos_solo_seleccionados) ? ev.puntos_solo_seleccionados : [];
+    ev.puntos_acceso.forEach(p => addPuntoRow(p, genEv.indexOf(p) !== -1, soloEv.indexOf(p) !== -1));
     document.getElementById('ev-puntos-wrap').style.display = 'block';
+    if (typeof ev.puntos_solo_seleccionados === 'undefined') {
+      _pgRescatarSolo(evId, (lista) => {
+        if (_evEditandoId !== evId) return;
+        [...list.children].forEach(row => {
+          const sel = row.querySelector('.punto-modo');
+          const inp = row.querySelector('.punto-input');
+          const v = inp ? inp.value.trim() : '';
+          if (sel && inp && v && sel.value !== 'solo' && lista.indexOf(v) !== -1) sel.value = 'solo';
+        });
+      });
+    }
   }
 
   // ── Landing: categoría + plantilla + módulos + contenido ──
@@ -6688,24 +6703,32 @@ async function guardarEventoWizard() {
     const { error } = await SB.from('eventos').update(payload).eq('id', id);
     if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
 
-    // ADR-082 - puntos_generales va en una llamada tolerante separada: el update
-    // grande de arriba conserva SU contrato actual (si la columna no existiera,
-    // este payload seguiria guardando todo lo demas). _pgUpdatePuntos reintenta
-    // solo con puntos_acceso si falta la columna y devuelve el aviso.
-    const _puntosGenWiz = getPuntosGenerales();
-    const _pgRes = await _pgUpdatePuntos(id, _puntosNuevosWiz, _puntosGenWiz);
+    // ADR-082/083 - puntos_generales y puntos_solo_seleccionados van en una llamada
+    // tolerante separada: el update grande de arriba conserva SU contrato actual (si
+    // la columna no existiera, este payload seguiria guardando todo lo demas).
+    // _pgUpdatePuntos degrada de a un campo y SIEMPRE termina guardando puntos_acceso.
+    // ADR-083 - exclusividad: si un punto quedo en los dos modos, gana SOLO y se avisa.
+    const _pgExclWiz = _pgResolverExclusividad(getPuntosGenerales(), getPuntosSolo());
+    if (_pgExclWiz.solapados.length) {
+      alrt('ev-alert', 'Aviso: ' + _pgExclWiz.solapados.join(', ') +
+        ' estaba(n) en "General" y en "Solo seleccionados"; quedo en "Solo seleccionados".', 'warn', 7000);
+    }
+    const _puntosGenWiz = _pgExclWiz.generales;
+    const _puntosSoloWiz = _pgExclWiz.solo;
+    const _pgRes = await _pgUpdatePuntos(id, _puntosNuevosWiz, _puntosGenWiz, _puntosSoloWiz);
     if (_pgRes.degradado) _pgAvisoMigracion('ev-alert');
     const _evWiz = _eventos.find(e => e.id === id);
     if (_evWiz && _pgRes.ok) {
       _evWiz.puntos_acceso = _pgRes.valor;
       _evWiz.puntos_generales = _pgRes.generales;
+      _evWiz.puntos_solo_seleccionados = _pgRes.solo;
     }
 
     // ADR-081 - propagacion solo en edicion y solo si la lista de puntos cambio.
-    // ADR-082 - la propagacion EXCLUYE los puntos generales.
+    // ADR-082/083 - la propagacion EXCLUYE los puntos generales y los solo-seleccionados.
     let _propMsg = '';
     if (_puntosEventoCambiaron(_puntosPrevWiz, _puntosNuevosWiz)) {
-      const prop = await propagarPuntosEvento(id, _puntosNuevosWiz, _puntosGenWiz);
+      const prop = await propagarPuntosEvento(id, _puntosNuevosWiz, _puntosGenWiz, _puntosSoloWiz);
       _propMsg = prop.ok
         ? (prop.reconciliados ? ` ${prop.reconciliados} invitado(s) re-vinculado(s).` : '')
         : ' Aviso: no se pudieron reconciliar los overrides de los invitados.';
@@ -6843,10 +6866,28 @@ function toggleMultiAcceso(checked) {
   }
 }
 
-// ADR-082: 2o parametro booleano = el punto nace marcado como GENERAL.
+// ── MODOS DE PUNTO (excluyentes, ADR-082) ────────────────────────────────
+//   hereda (default) -> esta en puntos_acceso y NO en las otras dos listas.
+//   general          -> esta en eventos.puntos_generales.
+//   solo             -> esta en eventos.puntos_solo_seleccionados.
+// Marcado UNICO del selector de 3 modos: una sola fuente para el wizard y el
+// editor rapido, para que ambos ofrezcan exactamente las mismas opciones.
+// Prefijo de dominio _pg* (mismo bloque que el resto de los modos).
+function _pgModoSelectHTML(modo) {
+  const m = (modo === 'general' || modo === 'solo') ? modo : 'hereda';
+  const sel = v => (v === m ? ' selected' : '');
+  return `<select class="punto-modo" title="Modo del punto: hereda, general o solo seleccionados"
+      style="flex-shrink:0;max-width:170px;padding:5px 6px;border:1px solid var(--border);border-radius:var(--rsm);font-size:11px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);cursor:pointer">
+      <option value="hereda"${sel('hereda')}>Hereda</option>
+      <option value="general"${sel('general')}>General - pasa cualquiera</option>
+      <option value="solo"${sel('solo')}>Solo seleccionados</option>
+    </select>`;
+}
+
+// 2o parametro booleano = el punto nace en modo GENERAL; 3o = en modo SOLO.
 // Firma retro-compatible: los llamadores existentes (toggleMultiAcceso, el onclick
 // inline "addPuntoRow()" y el prefill de openEditMod) siguen funcionando igual.
-function addPuntoRow(defaultVal = '', esGeneral = false) {
+function addPuntoRow(defaultVal = '', esGeneral = false, esSolo = false) {
   const list = document.getElementById('ev-puntos-list');
   const row  = document.createElement('div');
   row.style.cssText = 'display:flex;gap:7px;margin-bottom:.45rem;align-items:center';
@@ -6855,9 +6896,7 @@ function addPuntoRow(defaultVal = '', esGeneral = false) {
     <input class="punto-input" value="${String(defaultVal).replace(/"/g,'&quot;')}"
       placeholder="Nombre del punto (ej. Bar VIP)"
       style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--paper)">
-    <label title="Punto general: pasa cualquier inscrito del evento" style="display:flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;color:var(--ink3);cursor:pointer;white-space:nowrap">
-      <input type="checkbox" class="punto-general" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"${esGeneral ? ' checked' : ''}>General
-    </label>
+    ${_pgModoSelectHTML(esSolo ? 'solo' : (esGeneral ? 'general' : 'hereda'))}
     <button type="button" onclick="removePuntoRow(this)"
       style="width:28px;height:28px;flex-shrink:0;border:1px solid #fca5a5;border-radius:var(--rsm);background:#fef2f2;color:#dc2626;cursor:pointer;font-size:15px;line-height:1">×</button>`;
   list.appendChild(row);
@@ -6884,21 +6923,42 @@ function getPuntosAcceso() {
 }
 
 // ADR-082 - funcion hermana de getPuntosAcceso(). Devuelve SOLO los nombres de los
-// puntos con la casilla "General" marcada en la MISMA fila. Firma intacta de
+// puntos cuyo selector .punto-modo vale "general" en la MISMA fila. Firma intacta de
 // getPuntosAcceso() (no se toca ningun consumidor). Los nombres vacios se descartan,
 // con lo que el resultado siempre es subconjunto de puntos_acceso.
+function _pgNombreModoFila(row, claseInput) {
+  const sel = row.querySelector('.punto-modo');
+  const inp = row.querySelector(claseInput);
+  if (!sel || !inp) return null;
+  const v = inp.value.trim();
+  return v ? v : null;
+}
+
 function getPuntosGenerales() {
   if (!document.getElementById('ev-multi-acceso')?.checked) return null;
   const generales = [];
   document.querySelectorAll('#ev-puntos-list > div').forEach(row => {
-    const cb = row.querySelector('.punto-general');
+    const sel = row.querySelector('.punto-modo');
     const inp = row.querySelector('.punto-input');
-    if (cb && cb.checked && inp) {
-      const v = inp.value.trim();
-      if (v) generales.push(v);
-    }
+    const v = _pgNombreModoFila(row, '.punto-input');
+    if (sel && sel.value === 'general' && v) generales.push(v);
   });
   return generales.length ? generales : null;
+}
+
+// ADR-082 - tercer modo: SOLO SELECCIONADOS. Un punto en este modo ROMPE la
+// herencia (el scanner exige presencia explicita en inscritos.puntos_acceso).
+// Misma firma que getPuntosGenerales(): array o null.
+function getPuntosSolo() {
+  if (!document.getElementById('ev-multi-acceso')?.checked) return null;
+  const solos = [];
+  document.querySelectorAll('#ev-puntos-list > div').forEach(row => {
+    const sel = row.querySelector('.punto-modo');
+    const inp = row.querySelector('.punto-input');
+    const v = _pgNombreModoFila(row, '.punto-input');
+    if (sel && sel.value === 'solo' && v) solos.push(v);
+  });
+  return solos.length ? solos : null;
 }
 
 // ── Editor rápido post-creación de puntos (fuera del wizard) ──
@@ -6914,88 +6974,162 @@ function _getPuntosContenedor(listId) {
   return [...list.querySelectorAll('.punto-input-ev')].map(i => i.value.trim()).filter(Boolean);
 }
 
-// ADR-082 - funcion hermana de _getPuntosContenedor(): devuelve los nombres marcados
-// "General" del contenedor. Firma intacta de _getPuntosContenedor().
+// ADR-082 - funcion hermana de _getPuntosContenedor(): devuelve los nombres de las
+// filas cuyo selector .punto-modo vale "general". Firma intacta del lector base.
 function _getPuntosGeneralesContedor(listId) {
+  return _getPuntosModoContenedor(listId, 'general');
+}
+
+// ADR-083 - espejo para el TERCER modo: filas con .punto-modo === 'solo'.
+function _getPuntosSoloContenedor(listId) {
+  return _getPuntosModoContenedor(listId, 'solo');
+}
+
+// Lector UNICO de los dos modos. La clase .punto-general ya no existe (el marcado
+// unico es el <select class="punto-modo">), asi que se lee el select y nunca un
+// checkbox: una sola fuente de verdad para los 3 modos.
+function _getPuntosModoContenedor(listId, modo) {
   const list = document.getElementById(listId);
   if (!list) return [];
-  const generales = [];
+  const out = [];
   [...list.children].forEach(row => {
-    const cb = row.querySelector('.punto-general');
+    const sel = row.querySelector('.punto-modo');
     const inp = row.querySelector('.punto-input-ev');
-    if (cb && cb.checked && inp) {
+    if (sel && sel.value === modo && inp) {
       const v = inp.value.trim();
-      if (v) generales.push(v);
+      if (v) out.push(v);
     }
   });
-  return generales;
+  return out;
 }
 
 // ════════════════════════════════════════════════════
-// ADR-082 · PUNTOS GENERALES (eventos.puntos_generales)
-// TOLERANCIA A COLUMNA AUSENTE: la migracion adr082 es MANUAL y puede no estar
-// aplicada. Ningun guardado puede perder puntos_acceso por eso. Detecta el error
-// tipico de PostgREST/Postgres cuando la columna no existe y reintenta SOLO con la
-// lista base, avisando por alrt(). No toca selects existentes de lectura.
+// ADR-082 + ADR-083 · MODOS DE PUNTO (puntos_generales / puntos_solo_seleccionados)
+// TOLERANCIA A COLUMNA AUSENTE: las migraciones adr082 y adr083 son MANUALES y
+// pueden no estar aplicadas. Ningun guardado puede perder puntos_acceso por eso.
+// Detecta el error tipico de PostgREST/Postgres cuando la columna no existe y
+// reintenta degradando de a un campo, avisando por alrt(). No toca selects.
+// La cadena SIEMPRE termina en el UPDATE/INSERT solo con puntos_acceso.
 // ════════════════════════════════════════════════════
-const _PG_MSG_MIGRACION = ' Aviso: la migracion eventos.puntos_generales aun no esta aplicada; se guardo solo la lista de puntos.';
+const _PG_MSG_MIGRACION = ' Aviso: la migracion de modos de punto (eventos.puntos_generales y/o eventos.puntos_solo_seleccionados) aun no esta aplicada; se guardo solo la lista de puntos.';
 let _pgSinColumna = false;   // cache de la advertencia, para no repetirla en cada fila
 
-function _pgFaltaColumna(error) {
+// Parametrizada por NOMBRE de columna. El codigo generico (42703/PGRST204) no
+// dice cual falta, asi que si el mensaje nombra una columna de modos, esa manda:
+// degradar un campo que SI existe perderia datos (bucle de degradacion).
+function _pgFaltaColumna(error, columna) {
   if (!error) return false;
   const m = String(error.message || '');
   const c = String(error.code || '');
-  return m.indexOf('puntos_generales') !== -1 || c === '42703' || c === 'PGRST204';
+  const col = String(columna || 'puntos_generales');
+  if (m.indexOf('puntos_solo_seleccionados') !== -1 || m.indexOf('puntos_generales') !== -1) {
+    return m.indexOf(col) !== -1;
+  }
+  return c === '42703' || c === 'PGRST204';
 }
 
-function _pgAvisoMigracion(alertId) {
+function _pgAvisoMigracion(alertId, columna) {
   alrt(alertId, _PG_MSG_MIGRACION, 'warn', 7000);
-  if (!_pgSinColumna) console.warn('[ADR-082] eventos.puntos_generales no existe: aplica migrations/adr082_puntos_generales.sql');
+  if (!_pgSinColumna) {
+    console.warn('[ADR-082/083] eventos.' + String(columna || 'puntos_generales') +
+      ' no existe: aplica migrations/adr082_puntos_generales.sql y/o migrations/adr083_puntos_solo_seleccionados.sql');
+  }
   _pgSinColumna = true;
 }
 
-// UPDATE tolerante: intenta ambos campos; si la columna no existe, reintenta solo
-// con puntos_acceso. Devuelve {ok, error, degradado, valor, generales}.
-async function _pgUpdatePuntos(evId, puntos, generales) {
+// ADR-083 - EXCLUSIVIDAD DE MODOS. Un punto no puede ser General y Solo a la vez
+// (el guard SQL de adr083 tambien lo prohibe). Si el usuario lo dejo asi, gana
+// SOLO: es el mas restrictivo y el que rompe la herencia. Devuelve las listas ya
+// saneadas + los nombres que se movieron, para que el caller avise con alrt().
+function _pgResolverExclusividad(generales, solo) {
+  const g = Array.isArray(generales) ? generales.slice() : [];
+  const s = Array.isArray(solo) ? solo.slice() : [];
+  if (!g.length || !s.length) return { generales: g, solo: s, solapados: [] };
+  const setS = new Set(s);
+  return { generales: g.filter(x => !setS.has(x)), solo: s, solapados: g.filter(x => setS.has(x)) };
+}
+
+// UPDATE tolerante: intenta los 3 campos; si falta una columna, degrada de a un
+// campo y reintenta. El ULTIMO reintento es SIEMPRE solo con puntos_acceso.
+// Devuelve {ok, error, degradado, valor, generales, solo}.
+async function _pgUpdatePuntos(evId, puntos, generales, solo) {
   const valor = puntos && puntos.length ? puntos : null;
   const gen = generales && generales.length ? generales : null;
+  const sol = solo && solo.length ? solo : null;
   let degradado = false;
-  let r = await SB.from('eventos').update({ puntos_acceso: valor, puntos_generales: gen }).eq('id', evId);
-  if (r.error && _pgFaltaColumna(r.error)) {
+  let r = await SB.from('eventos')
+    .update({ puntos_acceso: valor, puntos_generales: gen, puntos_solo_seleccionados: sol })
+    .eq('id', evId);
+  if (r.error && _pgFaltaColumna(r.error, 'puntos_solo_seleccionados')) {
+    degradado = true;
+    r = await SB.from('eventos').update({ puntos_acceso: valor, puntos_generales: gen }).eq('id', evId);
+  }
+  if (r.error && _pgFaltaColumna(r.error, 'puntos_generales')) {
     degradado = true;
     r = await SB.from('eventos').update({ puntos_acceso: valor }).eq('id', evId);
   }
-  return { ok: !r.error, error: r.error, degradado, valor, generales: gen };
+  return { ok: !r.error, error: r.error, degradado, valor, generales: gen, solo: sol };
 }
 
 // INSERT tolerante (evento unico): si la columna no existe, el INSERT completo
-// fallaria y se perderia el evento; se reintenta sin la columna hermana.
+// fallaria y se perderia el evento; degrada de a un campo conservando el resto.
 async function _pgInsertEvento(payload) {
   let degradado = false;
   let r = await SB.from('eventos').insert(payload).select().single();
-  if (r.error && _pgFaltaColumna(r.error)) {
+  if (r.error && Object.prototype.hasOwnProperty.call(payload, 'puntos_solo_seleccionados')
+      && _pgFaltaColumna(r.error, 'puntos_solo_seleccionados')) {
     degradado = true;
     const p2 = Object.assign({}, payload);
-    delete p2.puntos_generales;
+    delete p2.puntos_solo_seleccionados;
     r = await SB.from('eventos').insert(p2).select().single();
+  }
+  if (r.error && Object.prototype.hasOwnProperty.call(payload, 'puntos_generales')
+      && _pgFaltaColumna(r.error, 'puntos_generales')) {
+    degradado = true;
+    const p3 = Object.assign({}, payload);
+    delete p3.puntos_solo_seleccionados;
+    delete p3.puntos_generales;
+    r = await SB.from('eventos').insert(p3).select().single();
   }
   return { data: r.data, error: r.error, degradado };
 }
 
 // INSERT tolerante (bulk de sesiones de serie): misma logica, fila por fila.
 async function _pgInsertEventosBulk(filas) {
+  const tiene = (k) => filas.length && filas.every(o => Object.prototype.hasOwnProperty.call(o, k));
   let degradado = false;
   let r = await SB.from('eventos').insert(filas);
-  if (r.error && _pgFaltaColumna(r.error)) {
+  if (r.error && tiene('puntos_solo_seleccionados') && _pgFaltaColumna(r.error, 'puntos_solo_seleccionados')) {
     degradado = true;
-    const f2 = filas.map(o => { const c = Object.assign({}, o); delete c.puntos_generales; return c; });
+    const f2 = filas.map(o => { const c = Object.assign({}, o); delete c.puntos_solo_seleccionados; return c; });
     r = await SB.from('eventos').insert(f2);
+  }
+  if (r.error && tiene('puntos_generales') && _pgFaltaColumna(r.error, 'puntos_generales')) {
+    degradado = true;
+    const f3 = filas.map(o => { const c = Object.assign({}, o); delete c.puntos_solo_seleccionados; delete c.puntos_generales; return c; });
+    r = await SB.from('eventos').insert(f3);
   }
   return { error: r.error, degradado };
 }
 
-// ADR-082: 2o parametro booleano = el punto nace marcado como GENERAL.
-function addEventoPuntoRow(defaultVal = '', esGeneral = false) {
+// ADR-083 - lectura tolerante de la columna nueva. La cache _eventos llega con
+// select('*'): si la migracion NO esta aplicada la clave ni aparece (undefined).
+// Consulta AISLADA y opcional; si falla, el modal queda en HEREDA (comportamiento
+// actual) sin romperse.
+async function _pgRescatarSolo(evId, alPoblarFila) {
+  try {
+    if (!SB || !evId) return;
+    const r = await SB.from('eventos').select('id,puntos_solo_seleccionados').eq('id', evId).maybeSingle();
+    if (!r || r.error || !r.data) return;
+    const lista = Array.isArray(r.data.puntos_solo_seleccionados) ? r.data.puntos_solo_seleccionados : [];
+    const ev = (_eventos || []).find(e => e.id === evId);
+    if (ev) ev.puntos_solo_seleccionados = lista;
+    if (typeof alPoblarFila === 'function') alPoblarFila(lista);
+  } catch(e) { console.warn('[ADR-083] puntos_solo_seleccionados no disponible:', e && e.message); }
+}
+
+// 2o parametro booleano = el punto nace en modo GENERAL; 3o = en modo SOLO.
+function addEventoPuntoRow(defaultVal = '', esGeneral = false, esSolo = false) {
   const list = document.getElementById('puntos-ev-list');
   if (!list) return;
   const row = document.createElement('div');
@@ -7005,9 +7139,7 @@ function addEventoPuntoRow(defaultVal = '', esGeneral = false) {
     <input class="punto-input-ev" value="${String(defaultVal).replace(/"/g,'&quot;')}"
       placeholder="Nombre del punto (ej. Bar VIP)"
       style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--paper)">
-    <label title="Punto general: pasa cualquier inscrito del evento" style="display:flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;color:var(--ink3);cursor:pointer;white-space:nowrap">
-      <input type="checkbox" class="punto-general" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"${esGeneral ? ' checked' : ''}>General
-    </label>
+    ${_pgModoSelectHTML(esSolo ? 'solo' : (esGeneral ? 'general' : 'hereda'))}
     <button type="button" onclick="removeEventoPuntoRow(this)"
       style="width:28px;height:28px;flex-shrink:0;border:1px solid #fca5a5;border-radius:var(--rsm);background:#fef2f2;color:#dc2626;cursor:pointer;font-size:15px;line-height:1">×</button>`;
   list.appendChild(row);
@@ -7027,7 +7159,10 @@ function renumberEventoPuntos() {
   });
 }
 
-function openPuntosEvento(evId) {
+// ADR-083 - la 3ra lectura del modo (solo seleccionados). TOLERANTE: si la cache
+// no trae la columna (migracion no aplicada) se consulta de forma AISLADA y solo
+// entonces se corrigen las filas; si tampoco existe, el modal queda en HEREDA.
+async function openPuntosEvento(evId) {
   const ev = _eventos.find(e => e.id === evId);
   if (!ev) return;
   _puntosEvId = evId;
@@ -7039,9 +7174,21 @@ function openPuntosEvento(evId) {
   if (list) list.innerHTML = '';
   const puntos = Array.isArray(ev.puntos_acceso) ? ev.puntos_acceso : [];
   const generales = Array.isArray(ev.puntos_generales) ? ev.puntos_generales : [];
-  puntos.forEach(p => addEventoPuntoRow(p, generales.indexOf(p) !== -1));
+  const solos = Array.isArray(ev.puntos_solo_seleccionados) ? ev.puntos_solo_seleccionados : [];
+  puntos.forEach(p => addEventoPuntoRow(p, generales.indexOf(p) !== -1, solos.indexOf(p) !== -1));
   const mod = document.getElementById('mod-puntos-ev');
   if (mod) mod.style.display = 'flex';
+  if (typeof ev.puntos_solo_seleccionados === 'undefined') {
+    await _pgRescatarSolo(evId, (lista) => {
+      if (_puntosEvId !== evId) return;
+      [...list.children].forEach(row => {
+        const sel = row.querySelector('.punto-modo');
+        const inp = row.querySelector('.punto-input-ev');
+        const v = inp ? inp.value.trim() : '';
+        if (sel && inp && v && sel.value !== 'solo' && lista.indexOf(v) !== -1) sel.value = 'solo';
+      });
+    });
+  }
 }
 
 function cerrarPuntosEvento() {
@@ -7121,16 +7268,31 @@ async function guardarPuntosEvento() {
     const puntos = _getPuntosContenedor('puntos-ev-list');
     // ADR-082 - los generales se leen de las mismas filas (subconjunto garantizado).
     const generales = _getPuntosGeneralesContedor('puntos-ev-list');
+    // ADR-083 - tercer modo, mismo contenedor: filas con .punto-modo === 'solo'.
+    const soloRaw = _getPuntosSoloContenedor('puntos-ev-list');
+    // ADR-083 - exclusividad: si un punto quedo en los dos modos, gana SOLO y se avisa.
+    const _pgExclPE = _pgResolverExclusividad(generales, soloRaw);
+    if (_pgExclPE.solapados.length) {
+      alrt('puntos-ev-alert', 'Aviso: ' + _pgExclPE.solapados.join(', ') +
+        ' estaba(n) en "General" y en "Solo seleccionados"; quedo en "Solo seleccionados".', 'warn', 7000);
+    }
+    const _pgGenPE = _pgExclPE.generales;
+    const _pgSoloPE = _pgExclPE.solo;
     // Consistente con _crearEventoUnico: array de strings, o null si vacío.
-    const res = await _pgUpdatePuntos(_puntosEvId, puntos, generales);
+    const res = await _pgUpdatePuntos(_puntosEvId, puntos, _pgGenPE, _pgSoloPE);
     if (res.degradado) _pgAvisoMigracion('puntos-ev-alert');
     if (!res.ok) { alrt('puntos-ev-alert','Error: ' + res.error.message,'err'); return; }
     const ev = _eventos.find(e => e.id === _puntosEvId);
-    if (ev) { ev.puntos_acceso = res.valor; ev.puntos_generales = res.generales; }
+    if (ev) {
+      ev.puntos_acceso = res.valor;
+      ev.puntos_generales = res.generales;
+      ev.puntos_solo_seleccionados = res.solo;
+    }
     // ADR-081 - propagar a los invitados con override (interseccion por nombre).
     // ADR-082 - la propagacion EXCLUYE los puntos generales.
+    // ADR-083 - y tambien los solo-seleccionados (4.º argumento).
     // Best-effort: si falla, el guardado del evento ya quedo persistido.
-    const prop = await propagarPuntosEvento(_puntosEvId, puntos, generales);
+    const prop = await propagarPuntosEvento(_puntosEvId, puntos, _pgGenPE, _pgSoloPE);
     let msgOk = '✓ Puntos actualizados.' + (prop.ok
       ? (prop.reconciliados ? ' ' + prop.reconciliados + ' invitado(s) re-vinculado(s).' : '')
       : ' Aviso: no se pudieron reconciliar los overrides de los invitados.');
@@ -8208,6 +8370,14 @@ async function _crearEventoUnico(n) {
     .trim().replace(/\s+/g,'-')
     + '-' + Math.random().toString(36).substr(2,4);
 
+  // ADR-083 - exclusividad ANTES del INSERT: si un punto quedo en los dos modos,
+  // gana SOLO (mismo criterio que guardarEventoWizard).
+  const _pgExclUni = _pgResolverExclusividad(getPuntosGenerales(), getPuntosSolo());
+  if (_pgExclUni.solapados.length) {
+    alrt('ev-alert', 'Aviso: ' + _pgExclUni.solapados.join(', ') +
+      ' estaba(n) en "General" y en "Solo seleccionados"; quedo en "Solo seleccionados".', 'warn', 7000);
+  }
+
   const payload = {
     nombre: n, fecha: _fechaParaGuardar, slug,
     hora: document.getElementById('ev-h').value||null,
@@ -8220,7 +8390,9 @@ async function _crearEventoUnico(n) {
     wa_share: document.getElementById('ev-wa-share')?.checked ?? true,
 puntos_acceso: getPuntosAcceso(),
       // ADR-082 - mismas casillas "General" replicadas en cada sesion.
-      puntos_generales: getPuntosGenerales(),
+      puntos_generales: _pgExclUni.generales.length ? _pgExclUni.generales : null,
+      // ADR-083 - tercer modo excluyente: solo pasa quien lo tenga explicito.
+      puntos_solo_seleccionados: _pgExclUni.solo.length ? _pgExclUni.solo : null,
     form_campos: {
       email:  document.getElementById('ev-campo-email')?.checked ?? false,
       edad:   document.getElementById('ev-campo-edad')?.checked ?? false,
@@ -8307,6 +8479,13 @@ async function _crearSerie(n) {
   const hora  = document.getElementById('ev-h').value||null;
   const ubic  = document.getElementById('ev-ubic').value.trim()||null;
 
+  // ADR-083 - exclusividad antes del bulk: misma regla que _crearEventoUnico.
+  const _pgExclSerie = _pgResolverExclusividad(getPuntosGenerales(), getPuntosSolo());
+  if (_pgExclSerie.solapados.length) {
+    alrt('ev-alert', 'Aviso: ' + _pgExclSerie.solapados.join(', ') +
+      ' estaba(n) en "General" y en "Solo seleccionados"; quedo en "Solo seleccionados".', 'warn', 7000);
+  }
+
   // 1. Crear la serie en tabla series
   const { data:serie, error:serieErr } = await SB.from('series').insert({
     nombre:n, slug, descripcion:desc, imagen_url:imagen, color, org_id: ORG_ID,
@@ -8334,7 +8513,9 @@ async function _crearSerie(n) {
       // definidos en el wizard (misma fuente que _crearEventoUnico L7522).
 puntos_acceso: getPuntosAcceso(),
     // ADR-082 - hermanos: los puntos marcados "General" (subconjunto garantizado).
-    puntos_generales: getPuntosGenerales(),
+    puntos_generales: _pgExclSerie.generales.length ? _pgExclSerie.generales : null,
+      // ADR-083 - tercer modo excluyente replicado en cada sesion.
+      puntos_solo_seleccionados: _pgExclSerie.solo.length ? _pgExclSerie.solo : null,
       cabezote_formulario_url: document.getElementById('ev-cabezote-form')?.value.trim()||null,
       descripcion: 'Sesión ' + i + ' de ' + nSes,
       form_campos: {
@@ -10495,6 +10676,7 @@ let _ppPage    = 0;      // pagina actual (0-indexed)
 const _ppPageSize = 50;  // invitados por pagina
 let _ppBasePuntos = [];  // base del evento (fallback async si _eventos no lo tiene)
 let _ppGenerales  = [];  // ADR-082: nombres de los puntos GENERAL del evento
+let _ppSolo       = [];  // ADR-083: nombres de los puntos SOLO SELECCIONADOS del evento
 
 // ADR-082 - un punto es GENERAL si su nombre esta en eventos.puntos_generales.
 // Fuente primaria: la cache _eventos (se carga con un select('*'), asi que trae la
@@ -10522,6 +10704,31 @@ async function _ppCargarGenerales(evId) {
   } catch(e) { console.warn('[pnlPuntos generales]', e && e.message); }
 }
 
+// ADR-083 - espejo exacto de los helpers de GENERAL para el modo SOLO SELECCIONADOS
+// (eventos.puntos_solo_seleccionados). Misma fuente primaria (cache _eventos), misma
+// tolerancia a columna ausente y misma consulta AISLADA en try/catch. Los modos son
+// excluyentes: un punto no puede ser general y solo-seleccionado a la vez.
+function _ppEsSolo(punto) {
+  return !!punto && _ppSolo.indexOf(punto) !== -1;
+}
+
+function _ppSoloDe(ev) {
+  return (ev && Array.isArray(ev.puntos_solo_seleccionados)) ? ev.puntos_solo_seleccionados.slice() : [];
+}
+
+async function _ppCargarSolo(evId) {
+  const ev = (_eventos || []).find(e => e.id === evId);
+  if (ev) { _ppSolo = _ppSoloDe(ev); return; }
+  _ppSolo = [];
+  try {
+    if (!SB || !evId) return;
+    // Consulta AISLADA: si la columna no existe, solo se quedan sin modo solo
+    // (comportamiento actual). Nunca toca _ppBasePuntos ni rompe la vista.
+    const r = await SB.from('eventos').select('id,puntos_solo_seleccionados').eq('id', evId).maybeSingle();
+    if (r && !r.error && r.data) _ppSolo = _ppSoloDe(r.data);
+  } catch(e) { console.warn('[pnlPuntos solo seleccionados]', e && e.message); }
+}
+
 // Invitados del evento en la cache (excluye Comunidad WhatsApp).
 function _ppInvitados(evId) {
   return (_pnAllList || []).filter(i => i.evento_id === evId && !_esComunidad(i));
@@ -10546,7 +10753,16 @@ function _ppEfectivo(i) {
 }
 
 // Estado del ticket frente a un punto: hereda (null) / ninguno ([]) / override.
+// ADR-083 - si el punto es SOLO SELECCIONADOS rompe la herencia: solo pasa quien lo
+// tenga EXPLICITO en su puntos_acceso, asi que un inscrito con NULL ya NO esta
+// autorizado (antes se mostraba como 'Hereda' = autorizado). Firma y retorno intactos.
 function _ppEstado(i, punto, base) {
+  if (_ppEsSolo(punto)) {
+    const aut = Array.isArray(i.puntos_acceso) && i.puntos_acceso.indexOf(punto) !== -1;
+    return aut
+      ? { tipo:'override', autorizado:true, etiqueta:'Seleccionado', color:'#854F0B', detalle:'seleccion explicita' }
+      : { tipo:'ninguno', autorizado:false, etiqueta:'No seleccionado', color:'#A32D2D', detalle:'exige seleccion explicita (no hereda)' };
+  }
   if (!Array.isArray(i.puntos_acceso)) {
     const aut = base.indexOf(punto) !== -1;
     return { tipo:'hereda', autorizado:aut, etiqueta:'Hereda', color:'#6B7280', detalle: aut ? 'autorizado (base)' : 'no autorizado (base)' };
@@ -10597,6 +10813,7 @@ async function pnlPuntosRefrescar() {
   if (sel && _ppEvId) sel.value = _ppEvId;
   await _ppCargarBase(_ppEvId);
   await _ppCargarGenerales(_ppEvId);   // ADR-082 - antes de renderizar chips/bulk
+  await _ppCargarSolo(_ppEvId);        // ADR-083 - antes de renderizar chips/tabla
   if (!_ppPunto || _ppBasePuntos.indexOf(_ppPunto) === -1) {
     _ppPunto = _ppBasePuntos.length ? _ppBasePuntos[0] : null;
   }
@@ -10630,13 +10847,17 @@ function _ppRenderChips() {
   wrap.innerHTML = _ppBasePuntos.map(p => {
     const on = p === _ppPunto;
     // ADR-082 - el punto general se distingue con un badge "General".
+    // ADR-083 - el punto solo-seleccionados lleva su propio badge (estilo distinto).
     const badge = _ppEsGeneral(p)
       ? `<span style="display:inline-block;margin-left:5px;padding:0 5px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:#1D9E7522;color:#1D9E75;border:1px solid #1D9E7566">General</span>`
-      : '';
+      : (_ppEsSolo(p)
+        ? `<span style="display:inline-block;margin-left:5px;padding:0 5px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:#7C3AED22;color:#7C3AED;border:1px solid #7C3AED66">Solo seleccionados</span>`
+        : '');
     return `<button class="btn btn-ghost btn-sm" data-punto="${esc(String(p))}" onclick="pnlPuntosSetPunto(this.dataset.punto)" style="${on ? 'background:var(--gold);color:#fff;border-color:var(--gold)' : ''}">${esc(String(p))}${badge}</button>`;
   }).join('');
   const genTxt = _ppGenerales.length ? ' | generales: ' + _ppGenerales.join(', ') : '';
-  if (base) base.textContent = 'Base del evento: ' + _ppBasePuntos.join(' | ') + genTxt + ' - punto activo: ' + (_ppPunto || '(ninguno)');
+  const soloTxt = _ppSolo.length ? ' | solo seleccionados: ' + _ppSolo.join(', ') : '';
+  if (base) base.textContent = 'Base del evento: ' + _ppBasePuntos.join(' | ') + genTxt + soloTxt + ' - punto activo: ' + (_ppPunto || '(ninguno)');
 }
 
 function _ppRenderTabla() {

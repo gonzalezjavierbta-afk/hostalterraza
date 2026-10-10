@@ -244,6 +244,7 @@ let puntoAcceso = null;
 let esMultiUso  = false;
 let esPuntoEspecifico = false; // el TOKEN tiene punto asignado (no es entrada general)
 let _puntosGenerales  = [];     // eventos.puntos_generales (nombres); [] = ninguno general
+let _puntosSoloSeleccionados = []; // eventos.puntos_solo_seleccionados (nombres); [] = ninguno
 let pendingVerify = null;
 
 // ── Offline support ───────────────────────────────
@@ -314,6 +315,34 @@ function leerPuntosGeneralesCache() {
   }
 }
 
+// -- Cache de puntos SOLO SELECCIONADOS en localStorage --
+// Mismo patron que puntos generales: sin senal o sin la columna en BD el
+// arranque no debe romperse ni dejar pasar gente que no debe.
+const PUNTOS_SEL_PREFIX = 'htz_puntos_solo_seleccionados_'; // sufijo por evento
+
+function persistirPuntosSoloSeleccionados(arr) {
+  if (!eventoId) return;
+  try {
+    localStorage.setItem(PUNTOS_SEL_PREFIX + eventoId, JSON.stringify(arr));
+  } catch (e) {
+    // modo privado / cuota llena: el cache es opcional, el arranque no debe romperse
+    console.error('persistirPuntosSoloSeleccionados: no se pudo guardar:', e);
+  }
+}
+
+// Devuelve el array cacheado; [] si no hay, si no es un array o si localStorage lanza.
+function leerPuntosSoloSeleccionadosCache() {
+  if (!eventoId) return [];
+  try {
+    const raw = localStorage.getItem(PUNTOS_SEL_PREFIX + eventoId);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : []; // dato corrupto -> []
+  } catch (e) {
+    return []; // localStorage no disponible -> comportamiento actual
+  }
+}
+
 function show(id) {
   ['s-loading','s-error','s-scanner'].forEach(s => {
     document.getElementById(s).style.display = 'none';
@@ -372,6 +401,22 @@ async function init() {
     }
   } catch (e) {
     _puntosGenerales = leerPuntosGeneralesCache(); // sin senal o columna ausente -> cache
+  }
+
+  // Puntos SOLO SELECCIONADOS del evento (columna hermana; ROMPE la herencia:
+  // solo pasa quien tenga el punto explicito en su puntos_acceso).
+  // Query SEPARADA y TOLERANTE a columna ausente: si `puntos_solo_seleccionados`
+  // todavia no existe en BD la query no devuelve datos y caemos al cache local.
+  try {
+    const { data: evSS } = await SB.from('eventos').select('puntos_solo_seleccionados').eq('id', eventoId).single();
+    if (Array.isArray(evSS?.puntos_solo_seleccionados)) {
+      _puntosSoloSeleccionados = evSS.puntos_solo_seleccionados; // la BD manda: [] = evento sin solo-seleccionados
+      persistirPuntosSoloSeleccionados(_puntosSoloSeleccionados); // refresca el cache (tambien al vaciarse)
+    } else {
+      _puntosSoloSeleccionados = leerPuntosSoloSeleccionadosCache(); // dato invalido -> cache
+    }
+  } catch (e) {
+    _puntosSoloSeleccionados = leerPuntosSoloSeleccionadosCache(); // sin senal o columna ausente -> cache
   }
 
   // Aplicar branding de la organización
@@ -641,16 +686,36 @@ function puntoEsGeneral(nombre) {
   return Array.isArray(_puntosGenerales) && _puntosGenerales.includes(nombre);
 }
 
+// Un punto es SOLO SELECCIONADO si su nombre esta en eventos.puntos_solo_seleccionados.
+// Rompe la herencia: solo pasa quien tenga el punto EXPLICITO en su puntos_acceso.
+// [] (columna ausente en BD) -> ningun punto es solo-seleccionado -> solo quedan los 2 modos de siempre.
+function puntoEsSoloSeleccionado(nombre) {
+  return Array.isArray(_puntosSoloSeleccionados) && _puntosSoloSeleccionados.includes(nombre);
+}
+
+// REGLA UNICA de acceso por punto: los 3 modos en un solo sitio.
+//   GENERAL            -> pasa cualquier inscrito (ignora su puntos_acceso).
+//   SOLO SELECCIONADOS -> solo pasa con el punto EXPLICITO en su puntos_acceso
+//                         (quien heredaba (NULL) deja de pasar).
+//   HEREDA (defecto)   -> null/undefined = puntos del evento; [] = ninguno (ADR-079/081).
+// El parametro se llama `puntoAcceso` (no `punto`) a proposito: conserva el literal
+// `allowed.includes(puntoAcceso)` que asertan los smokes de ADR-081 y multi-punto.
+function tieneAccesoPunto(inscrito, puntoAcceso) {
+  if (puntoEsGeneral(puntoAcceso)) return true;
+  if (puntoEsSoloSeleccionado(puntoAcceso)) {
+    return Array.isArray(inscrito.puntos_acceso) && inscrito.puntos_acceso.includes(puntoAcceso);
+  }
+  const allowed = puntosEfectivos(inscrito);
+  return allowed.includes(puntoAcceso);
+}
+
 // Lista base con el flag derivado _autorizado.
 // En token general (punto_acceso null) todos quedan autorizados.
-// En token de PUNTO solo se listan los autorizados para ese punto.
-// Si el punto del token es GENERAL pasa cualquier inscrito del evento.
+// En token de PUNTO solo se listan los que pasan tieneAccesoPunto (3 modos).
 function listaBase() {
   return Object.values(qrCache).map(i => ({
     ...i,
-    _autorizado: (!esPuntoEspecifico || puntoEsGeneral(puntoAcceso))
-      ? true
-      : puntosEfectivos(i).includes(puntoAcceso)
+    _autorizado: !esPuntoEspecifico || tieneAccesoPunto(i, puntoAcceso)
   })).filter(i => !esPuntoEspecifico || i._autorizado);
 }
 
@@ -663,9 +728,11 @@ function _evTienePuntos() {
   return Array.isArray(window._evData?.puntos_acceso) && window._evData.puntos_acceso.length > 0;
 }
 
-// Sufijo visual para los puntos marcados como GENERALES en el evento.
+// Sufijo visual segun el modo del punto en el evento: (general) / (solo seleccionados).
 function _puntoNombreGeneral(p) {
-  return puntoEsGeneral(p) ? `${p} (general)` : p;
+  if (puntoEsGeneral(p)) return `${p} (general)`;
+  if (puntoEsSoloSeleccionado(p)) return `${p} (solo seleccionados)`;
+  return p;
 }
 
 // Texto plano: puntos separados por ', ' o el aviso de entrada general.
@@ -969,9 +1036,8 @@ async function processScan() {
   // en token general aplica uso unico, igual que en evento sin puntos.
   if (esPuntoEspecifico) {
     const hasOwn  = Array.isArray(data.puntos_acceso);
-    const allowed = puntosEfectivos(data);
-    // Punto GENERAL: pasa cualquier inscrito; se ignora puntos_acceso del inscrito.
-    if (!puntoEsGeneral(puntoAcceso) && !allowed.includes(puntoAcceso)) {
+    // Regla unica de los 3 modos (GENERAL / SOLO SELECCIONADOS / HEREDA) en tieneAccesoPunto.
+    if (!tieneAccesoPunto(data, puntoAcceso)) {
       const motivo = hasOwn ? 'esta entrada' : 'este evento';
       res.innerHTML = `<div class="res-card res-err">
       <div style="font-size:16px;font-weight:500;color:var(--red)">Punto no autorizado</div>
