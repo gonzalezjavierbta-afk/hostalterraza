@@ -204,11 +204,17 @@ function checkAscii(abs, rel) {
   var ticks = findOccurrences(text, BACKTICK_CHAR);
   var escapes = findOccurrences(text, DOUBLE_ESCAPE);
 
+  // El backtick ASCII (0x60) es legitimo en codigo JS: template literals y
+  // cadenas con comillas invertidas. Solo es un riesgo de ASCII-safety cuando
+  // se combina con un byte >127 cerca (p.ej. U+2018 rodeando backticks en
+  // Markdown). Si el archivo es ASCII puro, los backticks no son un problema.
+  var backticksMatters = highCount > 0;
+
   var parts = [];
   if (highCount > 0) {
     parts.push('bytes>127=' + highCount + ' (linea ' + highLines.join(',') + ')');
   }
-  if (ticks.count > 0) {
+  if (backticksMatters && ticks.count > 0) {
     parts.push('backticks=' + ticks.count + ' (linea ' + ticks.lines.join(',') + ')');
   }
   if (escapes.count > 0) {

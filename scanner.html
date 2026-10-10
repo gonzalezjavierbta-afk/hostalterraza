@@ -738,7 +738,7 @@ function _puntoNombreGeneral(p) {
 // Texto plano: puntos separados por ', ' o el aviso de entrada general.
 function puntosTextoGeneral(ins) {
   if (esPuntoEspecifico) return '';
-  const puntos = puntosEfectivos(ins || {});
+  const puntos = puntosEfectivos(ins || {}).filter(p => tieneAccesoPunto(ins || {}, p));
   if (puntos.length > 0) return puntos.map(_puntoNombreGeneral).join(', ');
   return _evTienePuntos() ? 'Solo entrada general' : '';
 }
@@ -746,7 +746,7 @@ function puntosTextoGeneral(ins) {
 // Chips para la lista: uno por punto, o texto gris si solo entrada general.
 function puntosChipsGeneral(ins) {
   if (esPuntoEspecifico) return '';
-  const puntos = puntosEfectivos(ins || {});
+  const puntos = puntosEfectivos(ins || {}).filter(p => tieneAccesoPunto(ins || {}, p));
   if (puntos.length > 0) {
     return puntos.map(p => `<span style="${_CHIP_PUNTO_STYLE}">${_puntoNombreGeneral(p)}</span>`).join('');
   }
