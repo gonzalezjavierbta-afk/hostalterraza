@@ -6021,7 +6021,8 @@ function openEditMod(evId) {
     document.getElementById('ev-multi-acceso').checked = true;
     const list = document.getElementById('ev-puntos-list');
     list.innerHTML = '';
-    ev.puntos_acceso.forEach(p => addPuntoRow(p));
+    const genEv = Array.isArray(ev.puntos_generales) ? ev.puntos_generales : [];
+    ev.puntos_acceso.forEach(p => addPuntoRow(p, genEv.indexOf(p) !== -1));
     document.getElementById('ev-puntos-wrap').style.display = 'block';
   }
 
@@ -6687,14 +6688,29 @@ async function guardarEventoWizard() {
     const { error } = await SB.from('eventos').update(payload).eq('id', id);
     if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
 
+    // ADR-082 - puntos_generales va en una llamada tolerante separada: el update
+    // grande de arriba conserva SU contrato actual (si la columna no existiera,
+    // este payload seguiria guardando todo lo demas). _pgUpdatePuntos reintenta
+    // solo con puntos_acceso si falta la columna y devuelve el aviso.
+    const _puntosGenWiz = getPuntosGenerales();
+    const _pgRes = await _pgUpdatePuntos(id, _puntosNuevosWiz, _puntosGenWiz);
+    if (_pgRes.degradado) _pgAvisoMigracion('ev-alert');
+    const _evWiz = _eventos.find(e => e.id === id);
+    if (_evWiz && _pgRes.ok) {
+      _evWiz.puntos_acceso = _pgRes.valor;
+      _evWiz.puntos_generales = _pgRes.generales;
+    }
+
     // ADR-081 - propagacion solo en edicion y solo si la lista de puntos cambio.
+    // ADR-082 - la propagacion EXCLUYE los puntos generales.
     let _propMsg = '';
     if (_puntosEventoCambiaron(_puntosPrevWiz, _puntosNuevosWiz)) {
-      const prop = await propagarPuntosEvento(id, _puntosNuevosWiz);
+      const prop = await propagarPuntosEvento(id, _puntosNuevosWiz, _puntosGenWiz);
       _propMsg = prop.ok
         ? (prop.reconciliados ? ` ${prop.reconciliados} invitado(s) re-vinculado(s).` : '')
         : ' Aviso: no se pudieron reconciliar los overrides de los invitados.';
     }
+    if (_pgRes.degradado) _propMsg += _PG_MSG_MIGRACION;
     const pubLink = prevSlug ? landingUrl({ ...(_eventos.find(e => e.id === id) || {}), slug: prevSlug }) : '';
     alrt('ev-alert', `✓ Evento actualizado correctamente.${_propMsg}${pubLink ? ` <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página pública →</a>` : ''}`, 'ok');
     cancelarEdicion();
@@ -6827,15 +6843,21 @@ function toggleMultiAcceso(checked) {
   }
 }
 
-function addPuntoRow(defaultVal = '') {
+// ADR-082: 2o parametro booleano = el punto nace marcado como GENERAL.
+// Firma retro-compatible: los llamadores existentes (toggleMultiAcceso, el onclick
+// inline "addPuntoRow()" y el prefill de openEditMod) siguen funcionando igual.
+function addPuntoRow(defaultVal = '', esGeneral = false) {
   const list = document.getElementById('ev-puntos-list');
   const row  = document.createElement('div');
   row.style.cssText = 'display:flex;gap:7px;margin-bottom:.45rem;align-items:center';
   row.innerHTML = `
     <span style="width:20px;text-align:center;font-size:12px;color:var(--ink3);flex-shrink:0">${list.children.length + 1}</span>
-    <input class="punto-input" value="${defaultVal}"
+    <input class="punto-input" value="${String(defaultVal).replace(/"/g,'&quot;')}"
       placeholder="Nombre del punto (ej. Bar VIP)"
       style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--paper)">
+    <label title="Punto general: pasa cualquier inscrito del evento" style="display:flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;color:var(--ink3);cursor:pointer;white-space:nowrap">
+      <input type="checkbox" class="punto-general" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"${esGeneral ? ' checked' : ''}>General
+    </label>
     <button type="button" onclick="removePuntoRow(this)"
       style="width:28px;height:28px;flex-shrink:0;border:1px solid #fca5a5;border-radius:var(--rsm);background:#fef2f2;color:#dc2626;cursor:pointer;font-size:15px;line-height:1">×</button>`;
   list.appendChild(row);
@@ -6861,6 +6883,24 @@ function getPuntosAcceso() {
   return puntos.length > 0 ? puntos : null;
 }
 
+// ADR-082 - funcion hermana de getPuntosAcceso(). Devuelve SOLO los nombres de los
+// puntos con la casilla "General" marcada en la MISMA fila. Firma intacta de
+// getPuntosAcceso() (no se toca ningun consumidor). Los nombres vacios se descartan,
+// con lo que el resultado siempre es subconjunto de puntos_acceso.
+function getPuntosGenerales() {
+  if (!document.getElementById('ev-multi-acceso')?.checked) return null;
+  const generales = [];
+  document.querySelectorAll('#ev-puntos-list > div').forEach(row => {
+    const cb = row.querySelector('.punto-general');
+    const inp = row.querySelector('.punto-input');
+    if (cb && cb.checked && inp) {
+      const v = inp.value.trim();
+      if (v) generales.push(v);
+    }
+  });
+  return generales.length ? generales : null;
+}
+
 // ── Editor rápido post-creación de puntos (fuera del wizard) ──
 // Reusa el patrón de addPuntoRow/removePuntoRow/renumberPuntos, pero con
 // contenedor propio (#puntos-ev-list) y clase propia (.punto-input-ev) para
@@ -6874,7 +6914,88 @@ function _getPuntosContenedor(listId) {
   return [...list.querySelectorAll('.punto-input-ev')].map(i => i.value.trim()).filter(Boolean);
 }
 
-function addEventoPuntoRow(defaultVal = '') {
+// ADR-082 - funcion hermana de _getPuntosContenedor(): devuelve los nombres marcados
+// "General" del contenedor. Firma intacta de _getPuntosContenedor().
+function _getPuntosGeneralesContedor(listId) {
+  const list = document.getElementById(listId);
+  if (!list) return [];
+  const generales = [];
+  [...list.children].forEach(row => {
+    const cb = row.querySelector('.punto-general');
+    const inp = row.querySelector('.punto-input-ev');
+    if (cb && cb.checked && inp) {
+      const v = inp.value.trim();
+      if (v) generales.push(v);
+    }
+  });
+  return generales;
+}
+
+// ════════════════════════════════════════════════════
+// ADR-082 · PUNTOS GENERALES (eventos.puntos_generales)
+// TOLERANCIA A COLUMNA AUSENTE: la migracion adr082 es MANUAL y puede no estar
+// aplicada. Ningun guardado puede perder puntos_acceso por eso. Detecta el error
+// tipico de PostgREST/Postgres cuando la columna no existe y reintenta SOLO con la
+// lista base, avisando por alrt(). No toca selects existentes de lectura.
+// ════════════════════════════════════════════════════
+const _PG_MSG_MIGRACION = ' Aviso: la migracion eventos.puntos_generales aun no esta aplicada; se guardo solo la lista de puntos.';
+let _pgSinColumna = false;   // cache de la advertencia, para no repetirla en cada fila
+
+function _pgFaltaColumna(error) {
+  if (!error) return false;
+  const m = String(error.message || '');
+  const c = String(error.code || '');
+  return m.indexOf('puntos_generales') !== -1 || c === '42703' || c === 'PGRST204';
+}
+
+function _pgAvisoMigracion(alertId) {
+  alrt(alertId, _PG_MSG_MIGRACION, 'warn', 7000);
+  if (!_pgSinColumna) console.warn('[ADR-082] eventos.puntos_generales no existe: aplica migrations/adr082_puntos_generales.sql');
+  _pgSinColumna = true;
+}
+
+// UPDATE tolerante: intenta ambos campos; si la columna no existe, reintenta solo
+// con puntos_acceso. Devuelve {ok, error, degradado, valor, generales}.
+async function _pgUpdatePuntos(evId, puntos, generales) {
+  const valor = puntos && puntos.length ? puntos : null;
+  const gen = generales && generales.length ? generales : null;
+  let degradado = false;
+  let r = await SB.from('eventos').update({ puntos_acceso: valor, puntos_generales: gen }).eq('id', evId);
+  if (r.error && _pgFaltaColumna(r.error)) {
+    degradado = true;
+    r = await SB.from('eventos').update({ puntos_acceso: valor }).eq('id', evId);
+  }
+  return { ok: !r.error, error: r.error, degradado, valor, generales: gen };
+}
+
+// INSERT tolerante (evento unico): si la columna no existe, el INSERT completo
+// fallaria y se perderia el evento; se reintenta sin la columna hermana.
+async function _pgInsertEvento(payload) {
+  let degradado = false;
+  let r = await SB.from('eventos').insert(payload).select().single();
+  if (r.error && _pgFaltaColumna(r.error)) {
+    degradado = true;
+    const p2 = Object.assign({}, payload);
+    delete p2.puntos_generales;
+    r = await SB.from('eventos').insert(p2).select().single();
+  }
+  return { data: r.data, error: r.error, degradado };
+}
+
+// INSERT tolerante (bulk de sesiones de serie): misma logica, fila por fila.
+async function _pgInsertEventosBulk(filas) {
+  let degradado = false;
+  let r = await SB.from('eventos').insert(filas);
+  if (r.error && _pgFaltaColumna(r.error)) {
+    degradado = true;
+    const f2 = filas.map(o => { const c = Object.assign({}, o); delete c.puntos_generales; return c; });
+    r = await SB.from('eventos').insert(f2);
+  }
+  return { error: r.error, degradado };
+}
+
+// ADR-082: 2o parametro booleano = el punto nace marcado como GENERAL.
+function addEventoPuntoRow(defaultVal = '', esGeneral = false) {
   const list = document.getElementById('puntos-ev-list');
   if (!list) return;
   const row = document.createElement('div');
@@ -6884,6 +7005,9 @@ function addEventoPuntoRow(defaultVal = '') {
     <input class="punto-input-ev" value="${String(defaultVal).replace(/"/g,'&quot;')}"
       placeholder="Nombre del punto (ej. Bar VIP)"
       style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--paper)">
+    <label title="Punto general: pasa cualquier inscrito del evento" style="display:flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;color:var(--ink3);cursor:pointer;white-space:nowrap">
+      <input type="checkbox" class="punto-general" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"${esGeneral ? ' checked' : ''}>General
+    </label>
     <button type="button" onclick="removeEventoPuntoRow(this)"
       style="width:28px;height:28px;flex-shrink:0;border:1px solid #fca5a5;border-radius:var(--rsm);background:#fef2f2;color:#dc2626;cursor:pointer;font-size:15px;line-height:1">×</button>`;
   list.appendChild(row);
@@ -6914,7 +7038,8 @@ function openPuntosEvento(evId) {
   const list = document.getElementById('puntos-ev-list');
   if (list) list.innerHTML = '';
   const puntos = Array.isArray(ev.puntos_acceso) ? ev.puntos_acceso : [];
-  puntos.forEach(p => addEventoPuntoRow(p));
+  const generales = Array.isArray(ev.puntos_generales) ? ev.puntos_generales : [];
+  puntos.forEach(p => addEventoPuntoRow(p, generales.indexOf(p) !== -1));
   const mod = document.getElementById('mod-puntos-ev');
   if (mod) mod.style.display = 'flex';
 }
@@ -6938,10 +7063,23 @@ function _puntosEventoCambiaron(prev, nuevo) {
   return b.some(p => !setA.has(p));
 }
 
-async function propagarPuntosEvento(evId, puntosNuevos) {
+// ADR-082 - 3er parametro opcional = lista de puntos GENERALES (por nombre). Se
+// resuelve por parametro porque el caller acaba de leer las casillas del formulario
+// y es la fuente mas fresca; si no se pasa, se deriva de la cache _eventos.
+// Un punto general NO se propaga: pasa cualquier inscrito y un override []
+// ("Ninguno") no puede contradecirlo, asi que la interseccion se excluye.
+async function propagarPuntosEvento(evId, puntosNuevos, generalesNuevos) {
   try {
     if (!evId) return { ok: true, reconciliados: 0 };
-    const nuevos = new Set(Array.isArray(puntosNuevos) ? puntosNuevos : []);
+    let generales = generalesNuevos;
+    if (!Array.isArray(generales)) {
+      const _ev = (_eventos || []).find(e => e.id === evId);
+      generales = (_ev && Array.isArray(_ev.puntos_generales)) ? _ev.puntos_generales : [];
+    }
+    const setGeneral = new Set(generales);
+    const nuevos = new Set((Array.isArray(puntosNuevos) ? puntosNuevos : []).filter(p => !setGeneral.has(p)));
+    // Si no queda ningun punto restringido, no hay nada que reconciliar.
+    if (!nuevos.size) return { ok: true, reconciliados: 0, saltada: true };
     // Fuente: cache del panel si tiene filas de ese evento; si no, consulta directa.
     let fuente = (_pnAllList || []).filter(i => i.evento_id === evId);
     if (!fuente.length) {
@@ -6981,19 +7119,23 @@ async function guardarPuntosEvento() {
   if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
   try {
     const puntos = _getPuntosContenedor('puntos-ev-list');
-    // Consistente con _crearEventoUnico (L7522): array de strings, o null si vacío.
-    const valor = puntos.length > 0 ? puntos : null;
-    const { error } = await SB.from('eventos').update({ puntos_acceso: valor }).eq('id', _puntosEvId);
-    if (error) { alrt('puntos-ev-alert','Error: ' + error.message,'err'); return; }
+    // ADR-082 - los generales se leen de las mismas filas (subconjunto garantizado).
+    const generales = _getPuntosGeneralesContedor('puntos-ev-list');
+    // Consistente con _crearEventoUnico: array de strings, o null si vacío.
+    const res = await _pgUpdatePuntos(_puntosEvId, puntos, generales);
+    if (res.degradado) _pgAvisoMigracion('puntos-ev-alert');
+    if (!res.ok) { alrt('puntos-ev-alert','Error: ' + res.error.message,'err'); return; }
     const ev = _eventos.find(e => e.id === _puntosEvId);
-    if (ev) ev.puntos_acceso = valor;
+    if (ev) { ev.puntos_acceso = res.valor; ev.puntos_generales = res.generales; }
     // ADR-081 - propagar a los invitados con override (interseccion por nombre).
+    // ADR-082 - la propagacion EXCLUYE los puntos generales.
     // Best-effort: si falla, el guardado del evento ya quedo persistido.
-    const prop = await propagarPuntosEvento(_puntosEvId, puntos);
-    const msgOk = '✓ Puntos actualizados.' + (prop.ok
+    const prop = await propagarPuntosEvento(_puntosEvId, puntos, generales);
+    let msgOk = '✓ Puntos actualizados.' + (prop.ok
       ? (prop.reconciliados ? ' ' + prop.reconciliados + ' invitado(s) re-vinculado(s).' : '')
       : ' Aviso: no se pudieron reconciliar los overrides de los invitados.');
-    alrt('puntos-ev-alert', msgOk, prop.ok ? 'ok' : 'warn');
+    if (res.degradado) msgOk += _PG_MSG_MIGRACION;
+    alrt('puntos-ev-alert', msgOk, (prop.ok && !res.degradado) ? 'ok' : 'warn');
     setTimeout(() => { cerrarPuntosEvento(); loadEventos(); }, 700);
   } catch (e) {
     console.error('[guardarPuntosEvento]', e);
@@ -8076,7 +8218,9 @@ async function _crearEventoUnico(n) {
     video_url:  document.getElementById('ev-video')?.value.trim()||null,
     cabezote_formulario_url: document.getElementById('ev-cabezote-form')?.value.trim()||null,
     wa_share: document.getElementById('ev-wa-share')?.checked ?? true,
-    puntos_acceso: getPuntosAcceso(),
+puntos_acceso: getPuntosAcceso(),
+      // ADR-082 - mismas casillas "General" replicadas en cada sesion.
+      puntos_generales: getPuntosGenerales(),
     form_campos: {
       email:  document.getElementById('ev-campo-email')?.checked ?? false,
       edad:   document.getElementById('ev-campo-edad')?.checked ?? false,
@@ -8103,9 +8247,14 @@ async function _crearEventoUnico(n) {
   if (payload.config_landing && payload.config_landing.colors && payload.config_landing.colors.accent) {
     payload.color_primario = payload.config_landing.colors.accent;
   }
-  const {data:ev, error} = await SB.from('eventos').insert(payload).select().single();
+  // ADR-082 - insert tolerante: si eventos.puntos_generales no existe todavia, el
+  // reintento sin la columna conserva el resto del payload (nada se pierde).
+  const _ins = await _pgInsertEvento(payload);
+  if (_ins.degradado) _pgAvisoMigracion('ev-alert');
+  const error = _ins.error;
 
   if (error) { alrt('ev-alert','Error: '+error.message,'err'); return; }
+  const ev = _ins.data;
 
   const _tplCreado = (_THEME_TPL[_ldThemeSeleccionado] || _ldThemeSeleccionado || '').toLowerCase();
   const pubLink = landingUrl({ template_id: _tplCreado, slug: slug });
@@ -8183,7 +8332,9 @@ async function _crearSerie(n) {
       imagen_url: imagen,
       // BUG de propagación: las sesiones de la serie heredan los puntos de acceso
       // definidos en el wizard (misma fuente que _crearEventoUnico L7522).
-      puntos_acceso: getPuntosAcceso(),
+puntos_acceso: getPuntosAcceso(),
+    // ADR-082 - hermanos: los puntos marcados "General" (subconjunto garantizado).
+    puntos_generales: getPuntosGenerales(),
       cabezote_formulario_url: document.getElementById('ev-cabezote-form')?.value.trim()||null,
       descripcion: 'Sesión ' + i + ' de ' + nSes,
       form_campos: {
@@ -8203,7 +8354,11 @@ async function _crearSerie(n) {
     fecha.setDate(fecha.getDate() + rep);
   }
 
-  const { error:sesErr } = await SB.from('eventos').insert(sesiones);
+  // ADR-082 - insert masivo tolerante: reintenta sin puntos_generales si la
+  // columna no existe, sin perder las sesiones.
+  const _insS = await _pgInsertEventosBulk(sesiones);
+  const sesErr = _insS.error;
+  if (_insS.degradado) _pgAvisoMigracion('ev-alert');
 
   if (sesErr) { alrt('ev-alert','Serie creada pero error en sesiones: '+sesErr.message,'err'); return; }
 
@@ -10339,6 +10494,33 @@ let _ppPunto   = null;   // punto de escaneo seleccionado
 let _ppPage    = 0;      // pagina actual (0-indexed)
 const _ppPageSize = 50;  // invitados por pagina
 let _ppBasePuntos = [];  // base del evento (fallback async si _eventos no lo tiene)
+let _ppGenerales  = [];  // ADR-082: nombres de los puntos GENERAL del evento
+
+// ADR-082 - un punto es GENERAL si su nombre esta en eventos.puntos_generales.
+// Fuente primaria: la cache _eventos (se carga con un select('*'), asi que trae la
+// columna si la migracion esta aplicada y simplemente la omite si no lo esta: cero
+// riesgo, sin tocar NINGUN select existente). Fallback aislado y tolerante solo
+// cuando el evento no esta en la cache.
+function _ppEsGeneral(punto) {
+  return !!punto && _ppGenerales.indexOf(punto) !== -1;
+}
+
+function _ppGeneralesDe(ev) {
+  return (ev && Array.isArray(ev.puntos_generales)) ? ev.puntos_generales.slice() : [];
+}
+
+async function _ppCargarGenerales(evId) {
+  const ev = (_eventos || []).find(e => e.id === evId);
+  if (ev) { _ppGenerales = _ppGeneralesDe(ev); return; }
+  _ppGenerales = [];
+  try {
+    if (!SB || !evId) return;
+    // Consulta AISLADA: si la columna no existe, solo se quedan sin generales
+    // (comportamiento actual). Nunca toca _ppBasePuntos ni rompe la vista.
+    const r = await SB.from('eventos').select('id,puntos_generales').eq('id', evId).maybeSingle();
+    if (r && !r.error && r.data) _ppGenerales = _ppGeneralesDe(r.data);
+  } catch(e) { console.warn('[pnlPuntos generales]', e && e.message); }
+}
 
 // Invitados del evento en la cache (excluye Comunidad WhatsApp).
 function _ppInvitados(evId) {
@@ -10414,6 +10596,7 @@ async function pnlPuntosRefrescar() {
   const sel = document.getElementById('pn-puntos-evento');
   if (sel && _ppEvId) sel.value = _ppEvId;
   await _ppCargarBase(_ppEvId);
+  await _ppCargarGenerales(_ppEvId);   // ADR-082 - antes de renderizar chips/bulk
   if (!_ppPunto || _ppBasePuntos.indexOf(_ppPunto) === -1) {
     _ppPunto = _ppBasePuntos.length ? _ppBasePuntos[0] : null;
   }
@@ -10446,9 +10629,14 @@ function _ppRenderChips() {
   }
   wrap.innerHTML = _ppBasePuntos.map(p => {
     const on = p === _ppPunto;
-    return `<button class="btn btn-ghost btn-sm" data-punto="${esc(String(p))}" onclick="pnlPuntosSetPunto(this.dataset.punto)" style="${on ? 'background:var(--gold);color:#fff;border-color:var(--gold)' : ''}">${esc(String(p))}</button>`;
+    // ADR-082 - el punto general se distingue con un badge "General".
+    const badge = _ppEsGeneral(p)
+      ? `<span style="display:inline-block;margin-left:5px;padding:0 5px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:#1D9E7522;color:#1D9E75;border:1px solid #1D9E7566">General</span>`
+      : '';
+    return `<button class="btn btn-ghost btn-sm" data-punto="${esc(String(p))}" onclick="pnlPuntosSetPunto(this.dataset.punto)" style="${on ? 'background:var(--gold);color:#fff;border-color:var(--gold)' : ''}">${esc(String(p))}${badge}</button>`;
   }).join('');
-  if (base) base.textContent = 'Base del evento: ' + _ppBasePuntos.join(' | ') + ' - punto activo: ' + (_ppPunto || '(ninguno)');
+  const genTxt = _ppGenerales.length ? ' | generales: ' + _ppGenerales.join(', ') : '';
+  if (base) base.textContent = 'Base del evento: ' + _ppBasePuntos.join(' | ') + genTxt + ' - punto activo: ' + (_ppPunto || '(ninguno)');
 }
 
 function _ppRenderTabla() {
@@ -10497,16 +10685,23 @@ function _ppRenderTabla() {
   if (next) next.disabled = _ppPage >= pages - 1;
 
   tb.innerHTML = page.map(i => {
-    const est = _ppEstado(i, _ppPunto, _ppBasePuntos);
+    // ADR-082 - si el punto activo es GENERAL no hay estado por inscrito que
+    // mostrar: el override se ignora y todos los inscritos pasan.
+    const esGen = _ppEsGeneral(_ppPunto);
+    const est = esGen ? null : _ppEstado(i, _ppPunto, _ppBasePuntos);
     const general = !Array.isArray(i.puntos_acceso)
       ? 'Hereda (' + _ppBasePuntos.length + ' punto/s)'
       : (i.puntos_acceso.length === 0 ? 'Ninguno' : 'Override: ' + i.puntos_acceso.join(', '));
+    const celdaEstado = esGen
+      ? `<span style="background:#1D9E7522;color:#1D9E75;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">General</span>
+         <span style="font-size:11px;color:var(--ink3);margin-left:4px">pasa cualquier inscrito</span>`
+      : `<span style="background:${est.color}22;color:${est.color};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">${est.etiqueta}</span>
+         <span style="font-size:11px;color:var(--ink3);margin-left:4px">${esc(est.detalle)}</span>`;
     return `<tr data-id="${i.id}">
-      <td><input type="checkbox" class="pp-row-sel" value="${i.id}" onchange="ppOnRowSel()" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"></td>
+      <td><input type="checkbox" class="pp-row-sel" value="${i.id}" onchange="ppOnRowSel()" style="width:14px;height:14px;accent-color:var(--gold);cursor:pointer"${esGen ? ' disabled title="Punto general: no requiere asignacion por ticket"' : ''}></td>
       <td style="font-weight:500">${esc(i.nombre)}</td>
       <td>${esc(i.cedula || '-')}</td>
-      <td><span style="background:${est.color}22;color:${est.color};border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600">${est.etiqueta}</span>
-          <span style="font-size:11px;color:var(--ink3);margin-left:4px">${esc(est.detalle)}</span></td>
+      <td>${celdaEstado}</td>
       <td style="font-size:12px;color:var(--ink3)">${esc(general)}</td>
     </tr>`;
   }).join('');
@@ -10527,14 +10722,19 @@ function pnlPuntosSelAll(checked) {
 }
 
 function _ppActualizarBulk() {
-  const ids = _ppSelIds();
+  // ADR-082 - si el punto activo es GENERAL no hay nada que asignar por ticket:
+  // se limpia la seleccion y la barra no se ofrece. Se usa el MISMO mecanismo de
+  // ocultado que la barra ya tenia (style.display), no uno nuevo.
+  const esGen = _ppEsGeneral(_ppPunto);
+  if (esGen) document.querySelectorAll('.pp-row-sel').forEach(cb => { cb.checked = false; });
+  const ids = esGen ? [] : _ppSelIds();
   const bar = document.getElementById('pn-puntos-bulk');
   const cnt = document.getElementById('pn-puntos-bulk-count');
   const all = document.getElementById('pn-puntos-selall');
   if (bar) bar.style.display = ids.length ? 'flex' : 'none';
   if (cnt) cnt.textContent = `${ids.length} seleccionado${ids.length !== 1 ? 's' : ''}`;
   const total = document.querySelectorAll('.pp-row-sel').length;
-  if (all) { all.indeterminate = ids.length > 0 && ids.length < total; all.checked = ids.length === total && total > 0; }
+  if (all) { all.indeterminate = ids.length > 0 && ids.length < total; all.checked = ids.length === total && total > 0; all.disabled = esGen; }
 }
 
 function pnlPuntosPagina(dir) {
@@ -10546,6 +10746,8 @@ function pnlPuntosPagina(dir) {
 async function pnlPuntosBulk(accion) {
   if (accion === 'ninguno') { pnlPuntosSelAll(false); return; }
   if (!_ppPunto) { alert('Selecciona un punto de escaneo.'); return; }
+  // ADR-082 - guardia: un punto general pasa a cualquier inscrito del evento.
+  if (_ppEsGeneral(_ppPunto)) { alert('Este punto es General: no requiere autorizacion por ticket.'); return; }
   const ids = _ppSelIds();
   if (!ids.length) { alert('Marca al menos un invitado.'); return; }
   const verbo = accion === 'autorizar' ? 'Autorizar' : 'Quitar';

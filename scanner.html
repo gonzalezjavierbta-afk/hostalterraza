@@ -243,6 +243,7 @@ let eventoId    = null;
 let puntoAcceso = null;
 let esMultiUso  = false;
 let esPuntoEspecifico = false; // el TOKEN tiene punto asignado (no es entrada general)
+let _puntosGenerales  = [];     // eventos.puntos_generales (nombres); [] = ninguno general
 let pendingVerify = null;
 
 // ── Offline support ───────────────────────────────
@@ -282,6 +283,34 @@ function cargarColaPersistida() {
   } catch (e) {
     console.error('cargarColaPersistida: cola offline invalida, se descarta:', e);
     localStorage.removeItem(offlineQueueKey);
+  }
+}
+
+// -- Cache de puntos GENERALES en localStorage --
+// Motivo: sin senal la query falla y, sin cache, _puntosGenerales = [] rechazaria
+// en puerta a gente que si podia pasar. Con cache el punto general sigue funcionando offline.
+const PUNTOS_GEN_PREFIX = 'htz_puntos_generales_'; // sufijo por evento, mismo estilo que OFFLINE_QUEUE_PREFIX
+
+function persistirPuntosGenerales(arr) {
+  if (!eventoId) return;
+  try {
+    localStorage.setItem(PUNTOS_GEN_PREFIX + eventoId, JSON.stringify(arr));
+  } catch (e) {
+    // modo privado / cuota llena: el cache es opcional, el arranque no debe romperse
+    console.error('persistirPuntosGenerales: no se pudo guardar:', e);
+  }
+}
+
+// Devuelve el array cacheado; [] si no hay, si no es un array o si localStorage lanza.
+function leerPuntosGeneralesCache() {
+  if (!eventoId) return [];
+  try {
+    const raw = localStorage.getItem(PUNTOS_GEN_PREFIX + eventoId);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : []; // dato corrupto -> []
+  } catch (e) {
+    return []; // localStorage no disponible -> comportamiento actual
   }
 }
 
@@ -330,14 +359,31 @@ async function init() {
   _afoMax     = ev?.aforo_max || null;
   window._evData = ev; // store for org_id access in logs
 
+  // Puntos GENERALES del evento (columna hermana de puntos_acceso, array de nombres).
+  // Query SEPARADA y TOLERANTE a columna ausente: si `puntos_generales` todavia
+  // no existe en BD la query lanza y caemos al cache local del dispositivo.
+  try {
+    const { data: evPG } = await SB.from('eventos').select('puntos_generales').eq('id', eventoId).single();
+    if (Array.isArray(evPG?.puntos_generales)) {
+      _puntosGenerales = evPG.puntos_generales; // la BD manda: [] aqui = evento sin generales
+      persistirPuntosGenerales(_puntosGenerales); // refresca el cache (tambien al vaciarse)
+    } else {
+      _puntosGenerales = leerPuntosGeneralesCache(); // dato invalido -> cache
+    }
+  } catch (e) {
+    _puntosGenerales = leerPuntosGeneralesCache(); // sin senal o columna ausente -> cache
+  }
+
   // Aplicar branding de la organización
   const org = ev?.organizaciones;
   if (org?.color_primario) document.documentElement.style.setProperty('--gold', org.color_primario);
   if (org?.nombre_app) document.querySelector('.brand')?.setAttribute('data-org', org.nombre_app);
 
-  const puntoLabel = puntoAcceso ? ` · 📍 ${puntoAcceso}` : '';
+  // Reusa _puntoNombreGeneral: si el punto del token es general, se marca como tal.
+  const puntoNombre = puntoAcceso ? _puntoNombreGeneral(puntoAcceso) : '';
+  const puntoLabel = puntoAcceso ? ` · 📍 ${puntoNombre}` : '';
   document.getElementById('hdr-event').textContent = (ev ? ev.nombre + ' · ' + ev.fecha : 'Evento') + puntoLabel;
-  document.title = 'Scanner · ' + (ev?.nombre || 'Evento') + (puntoAcceso ? ' · ' + puntoAcceso : '');
+  document.title = 'Scanner · ' + (ev?.nombre || 'Evento') + (puntoAcceso ? ' · ' + puntoNombre : '');
 
   // Show expiry time
   const minLeft = Math.round((expira - now) / 60000);
@@ -589,13 +635,22 @@ function puntosEfectivos(inscrito) {
     : (Array.isArray(window._evData?.puntos_acceso) ? window._evData.puntos_acceso : []);
 }
 
+// Un punto es GENERAL si su nombre esta en eventos.puntos_generales (array de nombres).
+// [] (columna ausente en BD) -> ningun punto es general -> semantica actual intacta.
+function puntoEsGeneral(nombre) {
+  return Array.isArray(_puntosGenerales) && _puntosGenerales.includes(nombre);
+}
+
 // Lista base con el flag derivado _autorizado.
 // En token general (punto_acceso null) todos quedan autorizados.
 // En token de PUNTO solo se listan los autorizados para ese punto.
+// Si el punto del token es GENERAL pasa cualquier inscrito del evento.
 function listaBase() {
   return Object.values(qrCache).map(i => ({
     ...i,
-    _autorizado: esPuntoEspecifico ? puntosEfectivos(i).includes(puntoAcceso) : true
+    _autorizado: (!esPuntoEspecifico || puntoEsGeneral(puntoAcceso))
+      ? true
+      : puntosEfectivos(i).includes(puntoAcceso)
   })).filter(i => !esPuntoEspecifico || i._autorizado);
 }
 
@@ -608,11 +663,16 @@ function _evTienePuntos() {
   return Array.isArray(window._evData?.puntos_acceso) && window._evData.puntos_acceso.length > 0;
 }
 
+// Sufijo visual para los puntos marcados como GENERALES en el evento.
+function _puntoNombreGeneral(p) {
+  return puntoEsGeneral(p) ? `${p} (general)` : p;
+}
+
 // Texto plano: puntos separados por ', ' o el aviso de entrada general.
 function puntosTextoGeneral(ins) {
   if (esPuntoEspecifico) return '';
   const puntos = puntosEfectivos(ins || {});
-  if (puntos.length > 0) return puntos.join(', ');
+  if (puntos.length > 0) return puntos.map(_puntoNombreGeneral).join(', ');
   return _evTienePuntos() ? 'Solo entrada general' : '';
 }
 
@@ -621,7 +681,7 @@ function puntosChipsGeneral(ins) {
   if (esPuntoEspecifico) return '';
   const puntos = puntosEfectivos(ins || {});
   if (puntos.length > 0) {
-    return puntos.map(p => `<span style="${_CHIP_PUNTO_STYLE}">${p}</span>`).join('');
+    return puntos.map(p => `<span style="${_CHIP_PUNTO_STYLE}">${_puntoNombreGeneral(p)}</span>`).join('');
   }
   return _evTienePuntos()
     ? `<span style="font-size:11px;color:var(--ink3)">Solo entrada general</span>`
@@ -910,7 +970,8 @@ async function processScan() {
   if (esPuntoEspecifico) {
     const hasOwn  = Array.isArray(data.puntos_acceso);
     const allowed = puntosEfectivos(data);
-    if (!allowed.includes(puntoAcceso)) {
+    // Punto GENERAL: pasa cualquier inscrito; se ignora puntos_acceso del inscrito.
+    if (!puntoEsGeneral(puntoAcceso) && !allowed.includes(puntoAcceso)) {
       const motivo = hasOwn ? 'esta entrada' : 'este evento';
       res.innerHTML = `<div class="res-card res-err">
       <div style="font-size:16px;font-weight:500;color:var(--red)">Punto no autorizado</div>
