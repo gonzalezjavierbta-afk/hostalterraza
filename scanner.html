@@ -489,8 +489,10 @@ async function updateCounter() {
   document.getElementById('cnt-breakdown').innerHTML = ingresos > 0
     ? `<span class="badge badge-gold">★ ${frecs}</span><span class="badge badge-teal">◎ ${invs}</span>` : '';
 
-  // Total inscritos (cache local si está disponible, o query)
-  const totalIns = Object.keys(qrCache).length || ingresos;
+  // Total inscritos (cache local si esta disponible, o query).
+  // En token de punto solo se listan los autorizados -> mismo criterio que la lista.
+  const _totalCache = esPuntoEspecifico ? listaBase().length : Object.keys(qrCache).length;
+  const totalIns = _totalCache ?? ingresos;
   if (totalIns > 0) {
     document.getElementById('cnt-aforo').style.display = 'inline';
     document.getElementById('cnt-total-ins').textContent = totalIns;
@@ -589,11 +591,41 @@ function puntosEfectivos(inscrito) {
 
 // Lista base con el flag derivado _autorizado.
 // En token general (punto_acceso null) todos quedan autorizados.
+// En token de PUNTO solo se listan los autorizados para ese punto.
 function listaBase() {
   return Object.values(qrCache).map(i => ({
     ...i,
     _autorizado: esPuntoEspecifico ? puntosEfectivos(i).includes(puntoAcceso) : true
-  }));
+  })).filter(i => !esPuntoEspecifico || i._autorizado);
+}
+
+// ── Vista de puntos para el portero GENERAL (token sin punto) ──
+// Devuelve '' en token de punto (ahi manda puntoHtml/validacion) y en
+// eventos sin puntos definidos (evita ruido en eventos simples).
+const _CHIP_PUNTO_STYLE = 'font-size:11px;font-weight:500;color:var(--gold-d);background:var(--gold-bg);padding:2px 8px;border-radius:10px;border:1px solid var(--gold-border)';
+
+function _evTienePuntos() {
+  return Array.isArray(window._evData?.puntos_acceso) && window._evData.puntos_acceso.length > 0;
+}
+
+// Texto plano: puntos separados por ', ' o el aviso de entrada general.
+function puntosTextoGeneral(ins) {
+  if (esPuntoEspecifico) return '';
+  const puntos = puntosEfectivos(ins || {});
+  if (puntos.length > 0) return puntos.join(', ');
+  return _evTienePuntos() ? 'Solo entrada general' : '';
+}
+
+// Chips para la lista: uno por punto, o texto gris si solo entrada general.
+function puntosChipsGeneral(ins) {
+  if (esPuntoEspecifico) return '';
+  const puntos = puntosEfectivos(ins || {});
+  if (puntos.length > 0) {
+    return puntos.map(p => `<span style="${_CHIP_PUNTO_STYLE}">${p}</span>`).join('');
+  }
+  return _evTienePuntos()
+    ? `<span style="font-size:11px;color:var(--ink3)">Solo entrada general</span>`
+    : '';
 }
 
 function renderListaInscritos() {
@@ -636,7 +668,10 @@ function _renderListaHTML(lista) {
   const count = document.getElementById('lista-count');
   if (!cont) return;
   if (count) count.textContent = lista.length + ' persona' + (lista.length!==1?'s':'');
-  if (!lista.length) { cont.innerHTML = '<div style="color:var(--ink3);text-align:center;padding:1rem;font-size:13px">Sin resultados</div>'; return; }
+  if (!lista.length) {
+    const msg = esPuntoEspecifico ? 'Sin inscritos autorizados para este punto' : 'Sin resultados';
+    cont.innerHTML = `<div style="color:var(--ink3);text-align:center;padding:1rem;font-size:13px">${msg}</div>`; return;
+  }
 
   cont.innerHTML = lista.map((i, idx) => {
     const ini = i.nombre.split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
@@ -644,12 +679,9 @@ function _renderListaHTML(lista) {
     const ingresoLabel = yaIngreso
       ? `<span style="font-size:11px;color:var(--green);font-weight:500;background:var(--green-bg);padding:2px 8px;border-radius:10px;border:1px solid var(--green-border)">✓ ${i.hora_ingreso||'Ingresó'}</span>`
       : `<button onclick="checkinManual('${i.qr_code}')" style="font-size:12px;font-weight:500;padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--rsm);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">Ingresar</button>`;
-    // Badge informativo: solo token de punto especifico e inscrito sin autorizacion.
-    // Puramente visual: no altera busqueda ni validacion de escaneo.
-    const noAutorizado = esPuntoEspecifico && !i._autorizado;
-    const badgeNoAut = noAutorizado
-      ? `<span style="font-size:11px;color:var(--ink3);font-weight:500;background:var(--surface);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">No autorizado</span>`
-      : '';
+    // Chips de puntos: solo token general (portero general). En token de
+    // punto los no autorizados ya no llegan a la lista (ver listaBase).
+    const chipsPuntos = puntosChipsGeneral(i);
     return `<div id="lista-card-${idx}" style="background:#fff;border:1px solid var(--border);border-radius:var(--rsm);padding:.65rem .9rem;display:flex;align-items:center;gap:10px">
       <div style="width:36px;height:36px;border-radius:50%;background:${yaIngreso?'var(--green-bg)':'var(--gold-bg)'};color:${yaIngreso?'var(--green)':'var(--gold-d)'};border:1px solid ${yaIngreso?'var(--green-border)':'var(--gold-border)'};display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:14px;flex-shrink:0">${ini}</div>
       <div style="flex:1;min-width:0">
@@ -657,7 +689,7 @@ function _renderListaHTML(lista) {
         <div style="font-size:12px;color:var(--ink3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <span>C.C. ${i.cedula}</span>
           ${i.telefono ? `<span>${i.telefono}</span>` : ''}
-          ${badgeNoAut}
+          ${chipsPuntos}
         </div>
       </div>
       <div style="flex-shrink:0">${ingresoLabel}</div>
@@ -977,6 +1009,7 @@ function showVerify(ins) {
       </div>
     </div>
     ${puntoHtml}
+    ${puntosTextoGeneral(ins) ? `<div style="margin-top:.5rem;padding:.5rem .75rem;background:rgba(200,169,110,.15);border-radius:6px;border-left:3px solid var(--gold);font-size:13px;font-weight:500;color:var(--gold)">📍 ${puntosTextoGeneral(ins)}</div>` : ''}
     ${_renderCamposScanner(ins)}
     <div class="doc-row" style="margin-top:.5rem">
       <span class="doc-label">Documento registrado</span>
@@ -1027,6 +1060,7 @@ async function confirmEntry() {
       <div style="font-size:16px;font-weight:500;color:var(--green)">✓ Acceso permitido</div>
       <div class="res-name">${ins.nombre}</div>
       <div style="font-size:13px;font-weight:500;color:var(--green);margin-top:3px">📍 ${puntoAcceso}</div>
+      ${puntosTextoGeneral(ins) ? `<div style="font-size:12px;color:var(--gold);margin-top:3px">📍 ${puntosTextoGeneral(ins)}</div>` : ''}
       <div style="font-size:12px;color:var(--green);opacity:.8;margin-top:2px">${ins.cedula} · ${hora}</div>
       ${_renderCamposScanner(ins)}
       <div style="font-size:11px;margin-top:.4rem;color:var(--ink3)">QR válido para los demás puntos</div>
@@ -1070,6 +1104,7 @@ async function confirmEntry() {
       <div style="display:flex;gap:6px;align-items:center;margin-bottom:.2rem">${tipoBadgeScan(ins.tipo)}</div>
       <div style="font-size:16px;font-weight:500;color:var(--green)">✓ Acceso permitido</div>
       <div class="res-name">${ins.nombre}</div>
+      ${puntosTextoGeneral(ins) ? `<div style="font-size:12px;color:var(--gold);margin-top:3px">📍 ${puntosTextoGeneral(ins)}</div>` : ''}
       <div style="font-size:12px;color:var(--green);opacity:.8">${ins.cedula} · ${hora}</div>
       ${_renderCamposScanner(ins)}
       <div style="font-size:11px;margin-top:.35rem;opacity:.5">QR cancelado — uso único</div>

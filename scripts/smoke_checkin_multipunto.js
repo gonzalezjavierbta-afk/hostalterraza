@@ -105,6 +105,17 @@ function checkPrecedencia(src) {
   assert(/hasOwn\s*=\s*Array\.isArray\(data\.puntos_acceso\)/.test(src),
     'scanner: semantica nueva via hasOwn (NULL/undefined hereda; [] = ninguno)',
     'no se hallo "hasOwn = Array.isArray(data.puntos_acceso)"');
+  // A2: token GENERAL (punto_acceso null) en evento MULTI-punto con data.used=true
+  // debe caer en la rama de USO UNICO. Antes ambas ramas exigian
+  // "esMultiUso && puntoAcceso", asi que el token general se saltaba las dos
+  // y dejaba pasar a cualquiera sin registrar dedup por punto (bug C6).
+  var iA2 = src.indexOf('if (esPuntoEspecifico) {');
+  var iB2 = src.indexOf('pendingVerify = data;');
+  var regVal = (iA2 !== -1 && iB2 !== -1 && iB2 > iA2) ? src.slice(iA2, iB2) : '';
+  assert(regVal !== '' && regVal.indexOf('} else if (data.used) {') !== -1
+    && regVal.indexOf('esMultiUso && puntoAcceso') === -1,
+    'scanner: token general cae en "else if (data.used)" (uso unico); no queda el gate "esMultiUso && puntoAcceso"',
+    'la region de validacion no tiene el orden esPuntoEspecifico -> else if (data.used), o conserva el gate legacy');
 }
 
 /* (b) scanner.html: logs con evento_id / inscrito_id. */
@@ -246,6 +257,27 @@ function checkMigracionAscii(src) {
     'ultimos bytes no son LF');
 }
 
+/* (b) scanner.html: bypass DELIBERADO del ingreso manual por cedula.
+ * Decision de negocio tomada el 2026-10-10: el portero de un token de PUNTO
+ * PUEDE admitir manualmente a alguien que no tiene ese punto.
+ * Motivo: salida de emergencia ante error de captura; alguien sin el punto
+ * marcado no debe quedar trabado en la puerta. NO "arreglar" esto sin
+ * decision de negocio explicita: es una excepcion, no un bug.
+ */
+function checkBypassManualIntencional(src) {
+  if (src === null) {
+    assert(false, 'scanner.html existe y es legible (bypass manual deliberado)', 'archivo ausente');
+    return;
+  }
+  var iA3 = src.indexOf('async function checkinManual');
+  var iB3 = src.indexOf('pendingVerify = data;');
+  var reg = (iA3 !== -1 && iB3 !== -1 && iB3 > iA3) ? src.slice(iA3, iB3) : '';
+  assert(reg !== '' && reg.indexOf('_autorizado') === -1,
+    'scanner: bypass DELIBERADO - checkinManual/confirmarCheckinManual NO filtran por _autorizado (salida de emergencia)',
+    'alguien metio un filtro por _autorizado en el ingreso manual: requiere decision de negocio explicita');
+}
+
+
 function main() {
   var scanner = readText(SCANNER);
   var admin = readText(ADMIN);
@@ -256,6 +288,7 @@ function main() {
   log('');
 
   checkPrecedencia(scanner);
+  checkBypassManualIntencional(scanner);
   checkLogsScanner(scanner);
   checkCargarCache(scanner);
   checkAdminOverride(admin);
