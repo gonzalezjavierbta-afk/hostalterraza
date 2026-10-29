@@ -14,12 +14,28 @@
  *   En cuanto se pasa --since/--until/--project/--agent/--root, ese filtro
  *   manda sobre TODO el historico. Usa --since 0 para todo el historico.
  *
+ * ESQUEMA (autodetectado, sin flags):
+ *   La DB de OpenCode trae DOBLE esquema conviviendo:
+ *     V2 (ACTUAL): session_v2 (tokens_*, cost, time_created, parent_id, agent,
+ *        model JSON {id,providerID,variant}, directory) + session_message
+ *        (session_id, type, seq, time_created, data con $.content[]).
+ *        Todo lo nuevo se escribe en V2.
+ *     V1 (LEGACY): session + message + part (historico anterior a la
+ *        migracion; su ultimo dia escrito es 2026-10-09).
+ *   Si existe session_v2 se usa V2; si no, se cae a V1. Por eso el default
+ *   "dia local actual" ya no devuelve 0 sesiones.
+ *   TURNO = mensaje del asistente: V2 count(type='assistant'); V1 una fila
+ *   de message. Herramientas: V2 json_each($.content) type='tool'; V1 part.
+ *
  * SEGURIDAD (NO NEGOCIABLE):
  *   - La base se abre con { readOnly: true }.
  *   - NUNCA se leen, listan ni exportan las tablas:
- *       account, control_account, credential
- *     (contienen access_token, refresh_token, JWT). Este script solo consulta
- *     las tablas: session, message, part, project.
+ *       account, account_state, control_account, credential
+ *     (contienen access_token, refresh_token, JWT). Este script solo consulta:
+ *     session_v2, session_message, session, message, part, project.
+ *   - Los conteos sobre session_message.data / part.data son SIEMPRE por
+ *     session_id y agregados (count/sum/group by); nunca SELECT * sin filtro.
+ *     En --detail el blob de data se corta a DETAIL_DATA_CAP chars.
  *   - Con --with-content TODO texto pasa por redact() ANTES de truncar:
  *     enmascara tokens (sk-, sk-proj-, sk_live_/rk_live_/pk_live_, xoxb-,
  *     xapp-, ghp_, gho_, glpat-, npm_, AKIA, AIza), Bearer y Authorization,
@@ -65,8 +81,14 @@ var MAX_SESSIONS_DEFAULT = 5000;
 var CHARS_PER_TOKEN = 3.5;
 /* Umbral de la convencion v2 para description: de agentes/skills. */
 var DESC_LIMIT = 175;
-/* Contador de herramientas en part.data. */
+/* Contador de herramientas en part.data (V1). */
 var TOOL_SQL_EXTRA = " AND json_extract(data,'$.type')='tool'";
+/* Corte del blob session_message.data que se lee en --detail (V2). */
+var DETAIL_DATA_CAP = 20000;
+/* Esquema detectado una vez por proceso (ver detectSchema). */
+var SCHEMA_V2 = 'v2';
+var SCHEMA_V1 = 'v1';
+var SCHEMA_DETECTED = null;
 
 /* ----------------------------- utilidades ------------------------------- */
 
@@ -272,6 +294,36 @@ function redact(s) {
   return t;
 }
 
+/* ------------------------------ esquema --------------------------------- */
+
+/*
+ * Deteccion de esquema (V2 vs V1). Se resuelve una vez por proceso: una sola
+ * DB por ejecucion. Lanza Error (lo captura main y lo degrada a salida 2) si
+ * la base no tiene ninguna de las dos parejas de tablas.
+ */
+function tableExists(db, name) {
+  var rows = all(db, 'SELECT name FROM sqlite_master WHERE type = ? AND name = ?', ['table', name]);
+  return rows.length > 0;
+}
+
+function detectSchema(db) {
+  if (SCHEMA_DETECTED) return SCHEMA_DETECTED;
+  if (tableExists(db, 'session_v2') && tableExists(db, 'session_message')) {
+    SCHEMA_DETECTED = SCHEMA_V2;
+  } else if (tableExists(db, 'session') && tableExists(db, 'message')) {
+    SCHEMA_DETECTED = SCHEMA_V1;
+  } else {
+    throw new Error('Esquema desconocido: no existe session_v2/session_message ' +
+      'ni session/message en la base.');
+  }
+  return SCHEMA_DETECTED;
+}
+
+function sessionTable(db) { return detectSchema(db) === SCHEMA_V2 ? 'session_v2' : 'session'; }
+function messageTable(db) { return detectSchema(db) === SCHEMA_V2 ? 'session_message' : 'message'; }
+/* Turno = mensaje del asistente (V2 lo distingue por type; V1 no). */
+function turnsExtra(db) { return detectSchema(db) === SCHEMA_V2 ? " AND type = 'assistant'" : ''; }
+
 /* ------------------------------ consultas ------------------------------- */
 
 function descendants(rows, rootId) {
@@ -296,17 +348,26 @@ function descendants(rows, rootId) {
 }
 
 function loadSessions(db, opts) {
+  var v2 = detectSchema(db) === SCHEMA_V2;
   var w = []; var p = [];
   if (opts.effSince != null) { w.push('time_created >= ?'); p.push(opts.effSince); }
   if (opts.effUntil != null) { w.push('time_created <= ?'); p.push(opts.effUntil); }
   if (opts.agent) { w.push('agent = ?'); p.push(opts.agent); }
   if (opts.project) {
-    w.push('(project_id = ? OR project_id IN (SELECT id FROM project WHERE name = ? COLLATE NOCASE))');
-    p.push(opts.project, opts.project);
+    if (v2) {
+      /* V2 no siempre tiene nombre de proyecto: ademas de project_id se
+         compara directory (ruta del proyecto del agente, con '/'). */
+      w.push('(project_id = ? OR directory LIKE ? COLLATE NOCASE OR ' +
+        'project_id IN (SELECT id FROM project WHERE name = ? COLLATE NOCASE))');
+      p.push(opts.project, '%' + String(opts.project).replace(/\\/g, '/') + '%', opts.project);
+    } else {
+      w.push('(project_id = ? OR project_id IN (SELECT id FROM project WHERE name = ? COLLATE NOCASE))');
+      p.push(opts.project, opts.project);
+    }
   }
   var sql = 'SELECT id,parent_id,project_id,title,agent,model,cost,' +
     'tokens_input,tokens_output,tokens_reasoning,tokens_cache_read,tokens_cache_write,' +
-    'time_created,time_updated FROM session';
+    'time_created,time_updated FROM ' + sessionTable(db);
   if (w.length) sql += ' WHERE ' + w.join(' AND ');
 
   /* Cap de sesiones (no aplica con --root: ese alcance es explicito).
@@ -324,7 +385,7 @@ function loadSessions(db, opts) {
 
   var rootInfo = null;
   if (opts.root) {
-    var map = all(db, 'SELECT id,parent_id FROM session', []);
+    var map = all(db, 'SELECT id,parent_id FROM ' + sessionTable(db), []);
     rootInfo = descendants(map, opts.root);
     var set = {};
     rootInfo.ids.forEach(function (id) { set[id] = true; });
@@ -360,7 +421,93 @@ function extractPartContent(d, type) {
   try { return JSON.stringify(d); } catch (e) { return ''; }
 }
 
+/*
+ * Herramientas en V2: viven dentro de session_message.data -> $.content[],
+ * con type='tool'. Se agrega con json_each + count + group by por session_id
+ * (nunca se materializa el data completo fuera de SQLite).
+ */
+function toolsBySessionV2(db, ids) {
+  var map = {};
+  if (!ids.length) return map;
+  var batches = chunk(ids, 200);
+  for (var b = 0; b < batches.length; b++) {
+    var ph = batches[b].map(function () { return '?'; }).join(',');
+    var sql = 'SELECT sm.session_id AS sid, COUNT(*) AS n FROM session_message sm, ' +
+      "json_each(json_extract(sm.data, '$.content')) c " +
+      'WHERE sm.session_id IN (' + ph + ") AND json_extract(c.value, '$.type') = 'tool' " +
+      'GROUP BY sm.session_id';
+    var rows;
+    try {
+      rows = all(db, sql, batches[b]);
+    } catch (e) {
+      /* Sin JSON1 disponible: aproximacion por LIKE (puede contar de mas). */
+      rows = all(db, 'SELECT session_id AS sid, COUNT(*) AS n FROM session_message ' +
+        'WHERE session_id IN (' + ph + ") AND data LIKE '%\"type\":\"tool\"%' " +
+        'GROUP BY session_id', batches[b]);
+    }
+    for (var i = 0; i < rows.length; i++) map[rows[i].sid] = num(rows[i].n);
+  }
+  return map;
+}
+
+function toolCounts(db, ids) {
+  if (!ids.length) return {};
+  if (detectSchema(db) === SCHEMA_V2) return toolsBySessionV2(db, ids);
+  return countsBySession(db, 'part', ids, TOOL_SQL_EXTRA);
+}
+
+/*
+ * Detalle en V2: la unidad es el mensaje (session_message). El data se corta
+ * a DETAIL_DATA_CAP chars al leerlo; si el JSON queda truncado se usa crudo.
+ */
+function loadDetailV2(db, ids, opts) {
+  var out = [];
+  if (!ids.length) return out;
+  var batches = chunk(ids, 100);
+  for (var b = 0; b < batches.length; b++) {
+    var ph = batches[b].map(function () { return '?'; }).join(',');
+    var sql = 'SELECT id, session_id, type, time_created, time_updated, ' +
+      'substr(data, 1, ' + DETAIL_DATA_CAP + ') AS data FROM session_message ' +
+      'WHERE session_id IN (' + ph + ') ORDER BY session_id, time_created, id';
+    var rows = all(db, sql, batches[b]);
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var type = row.type ? String(row.type) : 'unknown';
+      var content = String(row.data == null ? '' : row.data);
+      var tool = null;
+      try {
+        var d = JSON.parse(content);
+        var arr = (d && d.content && d.content.length) ? d.content : null;
+        if (arr) {
+          var texts = []; var tools = [];
+          for (var k = 0; k < arr.length; k++) {
+            var it = arr[k] || {};
+            if (it.tool) tools.push(String(it.tool));
+            if (it.text != null) texts.push(String(it.text));
+          }
+          if (tools.length) tool = tools.join(',');
+          if (texts.length) content = texts.join('\n');
+        }
+      } catch (e) { /* data truncado o no-JSON: se usa el texto crudo */ }
+      var entry = {
+        session_id: row.session_id,
+        message_id: row.id,
+        part_id: row.id,
+        type: type,
+        tool: tool,
+        chars: content.length,
+        dur: num(row.time_updated) - num(row.time_created),
+        time_created: num(row.time_created)
+      };
+      if (opts.withContent) entry.content = truncate(redact(content), opts.maxChars);
+      out.push(entry);
+    }
+  }
+  return out;
+}
+
 function loadDetail(db, ids, opts) {
+  if (detectSchema(db) === SCHEMA_V2) return loadDetailV2(db, ids, opts);
   var out = [];
   if (!ids.length) return out;
   var batches = chunk(ids, 400);
@@ -750,10 +897,11 @@ function jsonSession(s) {
   };
 }
 
-function makeJson(opts, dbPath, totals, list, byAg, detailEntries) {
+function makeJson(opts, dbPath, totals, list, byAg, detailEntries, dbSchema) {
   var sessions = list.slice().sort(function (a, b) { return b.total - a.total; }).map(jsonSession);
   return {
     schema_version: 1,
+    db_schema: dbSchema || null,
     generated_at: new Date().toISOString(),
     db_path: dbPath,
     scope: opts.implicitToday
@@ -774,7 +922,7 @@ function makeJson(opts, dbPath, totals, list, byAg, detailEntries) {
       tokens_cache_read: 'tokens releidos desde cache: es el contexto acumulado re-leido en cada turno',
       tokens_cache_write: 'tokens escritos a cache',
       total: 'suma de los 5 tipos',
-      turns: 'cantidad de mensajes de la sesion',
+      turns: 'cantidad de turnos = mensajes del asistente (V2: session_message type=assistant; V1: filas de message)',
       tools: 'cantidad de llamadas a herramientas',
       seg: 'duracion en segundos (time_updated - time_created)',
       cache_por_turno: 'cache_read / turns; mide el tamano medio del contexto por turno. METRICA CLAVE: costo = turnos x contexto',
@@ -862,7 +1010,7 @@ function resolveDbPath(opts) {
 function countTurns(db, opts) {
   var loaded = loadSessions(db, opts);
   var ids = loaded.rows.map(function (r) { return r.id; });
-  var turnsMap = countsBySession(db, 'message', ids, '');
+  var turnsMap = countsBySession(db, messageTable(db), ids, turnsExtra(db));
   var total = 0;
   ids.forEach(function (id) { total += turnsMap[id] || 0; });
   return { turns: total, sessions: ids.length, capped: loaded.capped };
@@ -1093,9 +1241,19 @@ function helpText() {
   L.push('');
   L.push('SEGURIDAD:');
   L.push('  La DB se abre en SOLO LECTURA. NUNCA se leen ni exportan las tablas');
-  L.push('  account, control_account ni credential (contienen access_token,');
-  L.push('  refresh_token, JWT). Solo se consultan session, message, part, project.');
+  L.push('  account, account_state, control_account ni credential (contienen');
+  L.push('  access_token, refresh_token, JWT). Solo se consultan session_v2,');
+  L.push('  session_message, session, message, part y project.');
   L.push('  Con --with-content todo texto pasa por redact() antes de truncar.');
+  L.push('');
+  L.push('ESQUEMA (autodetectado, no hace falta ningun flag):');
+  L.push('  V2 actual  : session_v2 + session_message (todo lo nuevo se escribe');
+  L.push('               aqui; model es JSON {"id","providerID","variant"} y se');
+  L.push('               muestra como providerID/model).');
+  L.push('  V1 legacy  : session + message + part (historico hasta la migracion).');
+  L.push('  Si existe session_v2 se usa V2; si no, se cae a V1.');
+  L.push('  TURNO = mensaje del asistente (V2: type=assistant; V1: filas de');
+  L.push('  message). --root y --tree recorren parent_id en ambos esquemas.');
   L.push('');
   L.push('EJEMPLOS:');
   L.push('  node scripts/usage_report.js --summary');
@@ -1178,13 +1336,14 @@ function main() {
     }
 
     var ids = loaded.rows.map(function (r) { return r.id; });
-    var turnsMap = countsBySession(db, 'message', ids, '');
+    var turnsMap = countsBySession(db, messageTable(db), ids, turnsExtra(db));
     var list = buildMetrics(loaded.rows, turnsMap, null);
 
-    /* Conteo dirigido: part.data es lo caro, solo se lee para las sesiones
-       que se van a mostrar (--summary/--tree/--csv con --top y --sessions). */
+    /* Conteo dirigido: part.data / session_message.data es lo caro, solo se
+       lee para las sesiones que se van a mostrar (--summary/--tree/--csv con
+       --top y --sessions). */
     var toolIds = planToolIds(opts, list);
-    var toolsMap = toolIds.length ? countsBySession(db, 'part', toolIds, TOOL_SQL_EXTRA) : {};
+    var toolsMap = toolCounts(db, toolIds);
     applyTools(list, toolsMap);
 
     var totals = computeTotals(list);
@@ -1204,7 +1363,7 @@ function main() {
     } else if (opts.mode === 'csv') {
       text = renderCsv(list, opts);
     } else {
-      text = JSON.stringify(makeJson(opts, dbPath, totals, list, byAg, detailEntries), null, 2);
+      text = JSON.stringify(makeJson(opts, dbPath, totals, list, byAg, detailEntries, detectSchema(db)), null, 2);
     }
 
     emitOutput(opts, text);

@@ -51,6 +51,7 @@ Para evitar colisiones de estilos y permitir escalabilidad masiva, los activos s
 * **Ruta Maestra de Estilos:** `css/templates/{categoria_slug}/{template_id}.css`
 * **Convención de Casing:** El `template_id` y el nombre del archivo deben estar estrictamente en **minúsculas** (ej: `f1.css`, `b5.css`) para compatibilidad con servidores Linux.
 * **Referencias Certificadas:** `css/templates/fiesta/f1.css` (Selina Style) y `css/templates/campana/b5.css` (Emergencia Crítica).
+* **Referencias Certificadas - adicion 2026-10-29 (ADR-082):** `css/templates/fiesta/f14.css` (Fiesta / theme `vinilos`, "Vinilos Inversos", cartel urbano / fanzine grunge en modo oscuro). Aplica la misma Ruta Maestra sin excepciones: `css/templates/{categoria_slug}/{template_id}.css` = `css/templates/fiesta/f14.css`, `template_id` en minusculas, 40.075 bytes, ASCII puro (0 bytes > 127), 100% scopeado bajo `.tpl-f14`/`.Tpl-F14`. Se deja constancia de que el nombre `f14.css` **estuvo ocupado por un volcado de HTML+Tailwind** (respaldo: `css/templates/fiesta/f14-volcado-tailwind.bak.css`, ver `ERRORES_HISTORICOS.md` sec. 32): un archivo con nombre de silo **no certifica** un silo, lo certifica su contenido `.css` scopeado.
 
 ### 🛠️ Componentes y Archivos Core
 | Archivo | Rol Objetivo | Responsabilidad Operativa |

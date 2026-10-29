@@ -1,0 +1,567 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Vinilos Inversos | Música, Cultura y Resistencia</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Bebas Neue, Permanent Marker, Oswald, Barlow -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&amp;family=Bebas+Neue&amp;family=Permanent+Marker&amp;family=Rock+Salt&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#e64e1b',
+              deeporange: '#cc3d0c',
+              paper: '#e8d8be',
+              paperdark: '#cbb391',
+              dark: '#0d0d0d',
+              charcoal: '#171615',
+              gold: '#e09f45'
+            }
+          },
+          fontFamily: {
+            stencil: ['"Bebas Neue"', 'impact', 'sans-serif'],
+            marker: ['"Permanent Marker"', 'cursive'],
+            brush: ['"Rock Salt"', 'cursive'],
+            condensed: ['"Barlow Condensed"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- Base Custom Styles & Grunge Textures -->
+<style data-purpose="grunge-styles">
+    /* Textured analog paper background */
+    body {
+      background-color: #0b0b0b;
+      color: #ede8df;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(230, 78, 27, 0.28) 0%, rgba(13, 13, 13, 0.98) 70%),
+        radial-gradient(circle at 85% 60%, rgba(204, 61, 12, 0.15) 0%, transparent 60%);
+    }
+
+    /* Ripped torn paper effect with CSS masks / clip-paths */
+    .torn-paper-edge-top {
+      clip-path: polygon(
+        0% 15px, 2% 0px, 4% 18px, 6% 4px, 9% 19px, 12% 2px, 15% 15px, 18% 3px, 21% 17px, 25% 1px, 
+        28% 18px, 32% 4px, 35% 17px, 39% 2px, 42% 16px, 46% 3px, 50% 18px, 54% 2px, 58% 16px, 
+        62% 3px, 66% 17px, 70% 2px, 74% 18px, 78% 4px, 82% 16px, 86% 2px, 90% 17px, 94% 4px, 97% 15px, 100% 2px,
+        100% 100%, 0% 100%
+      );
+    }
+
+    .torn-paper-edge-bottom {
+      clip-path: polygon(
+        0% 0%, 100% 0%,
+        100% calc(100% - 15px), 98% 100%, 95% calc(100% - 14px), 92% 100%, 89% calc(100% - 15px), 86% 100%,
+        82% calc(100% - 13px), 79% 100%, 75% calc(100% - 15px), 71% 100%, 67% calc(100% - 14px), 63% 100%,
+        59% calc(100% - 16px), 55% 100%, 51% calc(100% - 13px), 47% 100%, 43% calc(100% - 15px), 39% 100%,
+        35% calc(100% - 14px), 31% 100%, 27% calc(100% - 16px), 23% 100%, 19% calc(100% - 13px), 15% 100%,
+        11% calc(100% - 15px), 7% 100%, 3% calc(100% - 14px), 0% calc(100% - 5px)
+      );
+    }
+
+    .torn-paper-both {
+      clip-path: polygon(
+        0% 12px, 3% 2px, 6% 14px, 10% 3px, 14% 15px, 18% 2px, 22% 13px, 27% 3px, 31% 15px, 36% 2px,
+        41% 14px, 46% 3px, 51% 15px, 56% 2px, 61% 14px, 66% 3px, 71% 15px, 76% 2px, 81% 13px, 86% 3px,
+        91% 14px, 95% 2px, 98% 12px, 100% 3px,
+        100% calc(100% - 12px), 97% 100%, 93% calc(100% - 13px), 89% 100%, 85% calc(100% - 14px), 80% 100%,
+        75% calc(100% - 12px), 70% 100%, 65% calc(100% - 14px), 60% 100%, 55% calc(100% - 13px), 50% 100%,
+        45% calc(100% - 14px), 40% 100%, 35% calc(100% - 12px), 30% 100%, 25% calc(100% - 14px), 20% 100%,
+        15% calc(100% - 13px), 10% 100%, 5% calc(100% - 14px), 0% calc(100% - 6px)
+      );
+    }
+
+    /* Distressed badge stamp */
+    .grunge-title {
+      text-shadow: 3px 3px 0px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 4px 5px 12px rgba(0,0,0,0.8);
+    }
+
+    .stamped-box {
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.4), 0 3px 6px rgba(0,0,0,0.5);
+    }
+
+    /* Sepia monotone filter for photos matching visual identity */
+    .sepia-duotone {
+      filter: contrast(125%) sepia(85%) hue-rotate(-25deg) brightness(85%);
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+    .sepia-duotone:hover {
+      filter: contrast(115%) sepia(50%) hue-rotate(-15deg) brightness(100%);
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body class="font-condensed antialiased selection:bg-brand-orange selection:text-white">
+<!-- BEGIN: MainContainer -->
+<div class="relative w-full max-w-[1280px] mx-auto bg-[#111111] shadow-2xl border-x border-[#2d221c]/40 overflow-hidden">
+<!-- BEGIN: HeroSection -->
+<header class="relative pt-6 sm:pt-10 pb-8 px-4 sm:px-8 md:px-12 bg-gradient-to-b from-[#181310] via-[#121110] to-[#141211]" data-purpose="hero-section">
+<!-- Top graphic doodles and organic waves -->
+<div class="absolute top-0 left-0 w-full h-40 pointer-events-none opacity-30 select-none overflow-hidden">
+<svg class="w-full h-full" fill="none" viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+<path d="M-50 40 Q 150 -30 350 40 T 750 40 T 1150 40" stroke="#000000" stroke-linecap="round" stroke-width="26"></path>
+<path d="M-30 90 Q 200 30 450 110 T 950 80" stroke="#000000" stroke-linecap="round" stroke-width="20"></path>
+<path d="M100 130 Q 300 80 600 130 T 1100 120" opacity="0.3" stroke="#e64e1b" stroke-linecap="round" stroke-width="10"></path>
+</svg>
+</div>
+<!-- Hero Main Content Grid -->
+<div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- Left Column: Title, Genres & Event Coordinates -->
+<div class="lg:col-span-7 flex flex-col justify-between pt-2">
+<!-- Event Header Title -->
+<div>
+<h1 class="font-stencil tracking-tight leading-[0.88] text-brand-paper grunge-title select-none text-[64px] sm:text-[90px] md:text-[115px] lg:text-[132px]">
+<span class="block text-brand-paperdark drop-shadow-md">VINILOS</span>
+<span class="block text-brand-paper tracking-normal text-[66px] sm:text-[94px] md:text-[118px] lg:text-[135px]">INVERSOS</span>
+</h1>
+<!-- Genres bar -->
+<p class="mt-2 text-brand-paper/90 font-stencil tracking-[0.22em] text-lg sm:text-2xl md:text-3xl uppercase flex items-center gap-2">
+<span class="">DRUM N BASS</span>
+<span class="text-brand-orange text-sm">●</span>
+<span class="">REGGAE</span>
+<span class="text-brand-orange text-sm">●</span>
+<span class="">HIP HOP</span>
+</p>
+</div>
+<!-- Date & Location Badges -->
+<div class="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+<!-- Date box -->
+<div class="flex items-center gap-3.5 bg-[#1b1917]/90 border border-brand-paperdark/40 px-4 py-3 rounded-none shadow-md backdrop-blur-sm" data-purpose="event-date-card">
+<div class="text-brand-orange">
+<!-- Calendar Icon SVG -->
+<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="leading-tight">
+<span class="font-stencil text-2xl tracking-wide text-brand-paper block">20 NOVIEMBRE</span>
+<span class="font-condensed font-semibold text-brand-paperdark text-base tracking-wider">8:00 PM</span>
+</div>
+</div>
+<!-- Location box -->
+<div class="flex items-center gap-3.5 bg-[#1b1917]/90 border border-brand-paperdark/40 px-4 py-3 rounded-none shadow-md backdrop-blur-sm" data-purpose="event-venue-card">
+<div class="text-brand-orange">
+<!-- Location Pin Icon SVG -->
+<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="leading-tight">
+<span class="font-stencil text-2xl tracking-wide text-brand-paper block">KLANDESTINO</span>
+<span class="font-condensed font-medium text-brand-paperdark/90 text-sm tracking-wide">KRA 4 # 19 - 56 | BOGOTÁ D.C.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Hero Figure & Diagonal Resistance Paper -->
+<div class="lg:col-span-5 relative flex justify-center lg:justify-end mt-6 lg:mt-0">
+<!-- Main Hero Artwork from DATA:IMAGE:IMAGE_7 -->
+<div class="relative w-full max-w-[420px] rounded-sm overflow-hidden border-2 border-[#2b2520] shadow-[0_15px_30px_rgba(0,0,0,0.9)] bg-brand-charcoal">
+<img alt="Personaje Vinilos Inversos - Gorra y pasamontañas sonoro" class="w-full h-auto object-cover filter contrast-110 sepia-[0.35]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7PCWUCG6mgKWLuleuZi6g6QjZnyaoQ2lC751_ZeL6vYcI9Z-KLDMAhtWaMcwzHVi8lpmJUpZofaEF6HsSgf-Gqg5YNBi1Jb08f0do5Wy-vUdBRHty6JirJ3jtR28UlOgx_nOwm1S4GiVjtx8zS-fgYRzQgs6ayvIdOG-HsPPP_OQjVWgLcUD9MKGGUOhmh9824FIz0vCe7lFW5g3Ae9ilgbh-cebRnrlSfwLYNWLqxPC7RZayPlrX_w">
+<!-- Dark gradient overlay at bottom edge of portrait -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
+</div>
+<!-- Torn Kraft Paper Tag: MÚSICA CULTURA Y RESISTENCIA -->
+<div class="absolute -bottom-6 -right-2 sm:-bottom-8 sm:right-2 z-20 transform rotate-[-6deg] bg-brand-paper text-brand-dark px-6 py-4 shadow-2xl torn-paper-both border-l-2 border-brand-paperdark max-w-[260px]">
+<p class="font-marker text-2xl sm:text-3xl leading-[1.05] tracking-tight text-center uppercase text-black">
+              MÚSICA<br>CULTURA<br><span class="text-brand-deeporange">Y RESISTENCIA</span>
+</p>
+</div>
+</div>
+</div>
+<!-- Countdown Timer Bar with Torn Grunge Borders -->
+<div class="relative z-10 mt-12 sm:mt-16 bg-[#161413]/95 border-y-2 border-brand-paperdark/40 py-4 px-3 sm:px-8" data-purpose="countdown-container">
+<div class="grid grid-cols-4 divide-x-2 divide-brand-paperdark/30 max-w-4xl mx-auto text-center font-stencil">
+<!-- Days -->
+<div class="px-2 sm:px-4">
+<span class="text-3xl sm:text-5xl md:text-6xl text-brand-paper block tracking-wider leading-none" id="countdown-days">24</span>
+<span class="text-xs sm:text-sm md:text-base text-brand-paperdark uppercase tracking-[0.25em] font-condensed font-bold mt-1 block">Días</span>
+</div>
+<!-- Hours -->
+<div class="px-2 sm:px-4">
+<span class="text-3xl sm:text-5xl md:text-6xl text-brand-paper block tracking-wider leading-none" id="countdown-hours">12</span>
+<span class="text-xs sm:text-sm md:text-base text-brand-paperdark uppercase tracking-[0.25em] font-condensed font-bold mt-1 block">Horas</span>
+</div>
+<!-- Minutes -->
+<div class="px-2 sm:px-4">
+<span class="text-3xl sm:text-5xl md:text-6xl text-brand-paper block tracking-wider leading-none" id="countdown-minutes">33</span>
+<span class="text-xs sm:text-sm md:text-base text-brand-paperdark uppercase tracking-[0.25em] font-condensed font-bold mt-1 block">Minutos</span>
+</div>
+<!-- Seconds -->
+<div class="px-2 sm:px-4">
+<span class="text-3xl sm:text-5xl md:text-6xl text-brand-orange block tracking-wider leading-none animate-pulse" id="countdown-seconds">42</span>
+<span class="text-xs sm:text-sm md:text-base text-brand-paperdark uppercase tracking-[0.25em] font-condensed font-bold mt-1 block">Segundos</span>
+</div>
+</div>
+</div>
+</header>
+<!-- END: HeroSection -->
+<!-- BEGIN: LineUpSection -->
+<section class="relative py-12 px-4 sm:px-8 md:px-12 bg-[#0e0e0e] border-t border-[#25201d]" data-purpose="lineup-section">
+<!-- Section Title with Red/Orange Grunge Strips -->
+<div class="text-center max-w-2xl mx-auto mb-10">
+<div class="inline-flex items-center justify-center gap-3 sm:gap-6">
+<span class="h-1 sm:h-1.5 w-10 sm:w-16 bg-brand-orange transform -rotate-1"></span>
+<h2 class="font-stencil text-5xl sm:text-6xl md:text-7xl tracking-wider text-brand-paper grunge-title">LINE UP</h2>
+<span class="h-1 sm:h-1.5 w-10 sm:w-16 bg-brand-orange transform rotate-1"></span>
+</div>
+<p class="font-condensed font-bold text-brand-paperdark tracking-[0.2em] text-sm sm:text-base uppercase mt-1">
+          UNA NOCHE PARA VIBRAR CON LOS MEJORES SONIDOS
+        </p>
+</div>
+<!-- Main Artists Grid: 5 Featured Artists -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 mb-8">
+<!-- Artist 1: DJ NÓMADA -->
+<article class="group relative flex flex-col bg-[#161413] border border-[#2e2621] p-2 hover:border-brand-orange transition-colors" data-purpose="artist-card">
+<div class="relative aspect-[3/4] overflow-hidden bg-[#241e1a] shadow-inner">
+<img alt="DJ Nómada en tornamesas" class="w-full h-full object-cover sepia-duotone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWnP4hTJO05EjC8_WF7_NrtGy58jbWwihI4Fj_FpnIYsEj_0lRIm41GfRE5eDUAqWIJPF67C9Q3gh2Z6UUET-_S6NILOXx7GOmW6nrM4WwF1_WL6tR8kXS9p6UKIWI-Qd1cPRmTSmmIuNHgMw4veC-ymuBdeaSGlLtltlO0lE9GKK-OqFnr1JhCY0nbukKByxkphZ5V_gh3p6KU5iVCTS4jtUHOPiYsiqHTyUKlLRG">
+<div class="absolute top-2 left-2 bg-black/85 text-brand-paper font-stencil text-xs px-2 py-0.5 border border-brand-paper/20">
+              DUB SET
+            </div>
+</div>
+<!-- Artist Label Plaque -->
+<div class="mt-2 bg-[#d46a36] text-black text-center py-2 px-1 font-stencil tracking-wider transform -rotate-1 group-hover:rotate-0 transition-transform">
+<h3 class="text-lg leading-tight uppercase font-black">DJ NÓMADA</h3>
+<p class="text-[11px] font-condensed font-extrabold tracking-widest text-[#2a1105]">REGGAE / DUB</p>
+</div>
+</article>
+<!-- Artist 2: RAS TEKO -->
+<article class="group relative flex flex-col bg-[#161413] border border-[#2e2621] p-2 hover:border-brand-orange transition-colors" data-purpose="artist-card">
+<div class="relative aspect-[3/4] overflow-hidden bg-[#241e1a] shadow-inner">
+<img alt="Ras Teko micrófono y dreadlocks" class="w-full h-full object-cover sepia-duotone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqgRw6o3yly4OEedvSPlSbxmrp0SG-bxQ5xbxjoSn3Fn1v5Tv_o6bBleCOiDJnJSLCFHuaplCw3ZqTQHq8bSW4b0mUHhB38H_fP_mdMI76Tkc1S2DUQxPG_BumBbeO2gMWTdrqVehoCrlva9PxPc52gmL2VOT8cbuCkh73wQ3OHsMq5e14X2jzktPPFkEwGLErUn19C2dobbPAhyEaWGI9qfN9Q34pE2k1KLbjN23N">
+<div class="absolute top-2 left-2 bg-black/85 text-brand-paper font-stencil text-xs px-2 py-0.5 border border-brand-paper/20">
+              LIVE VOCALS
+            </div>
+</div>
+<!-- Artist Label Plaque -->
+<div class="mt-2 bg-[#d46a36] text-black text-center py-2 px-1 font-stencil tracking-wider transform rotate-1 group-hover:rotate-0 transition-transform">
+<h3 class="text-lg leading-tight uppercase font-black">RAS TEKO</h3>
+<p class="text-[11px] font-condensed font-extrabold tracking-widest text-[#2a1105]">REGGAE</p>
+</div>
+</article>
+<!-- Artist 3: DJ SOLAR (Center Headliner) -->
+<article class="group relative flex flex-col bg-[#1c1714] border-2 border-brand-orange/70 p-2 shadow-lg" data-purpose="artist-card">
+<div class="relative aspect-[3/4] overflow-hidden bg-[#241e1a] shadow-inner">
+<img alt="DJ Solar vinilo scratch headliner" class="w-full h-full object-cover sepia-duotone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb5VSVGMWV2T1zn8TCIqfHYr5Rs9L5bVsE_YZ42qpenAsAKfg-DgbuesLSll4aRBDXNyuWFqc0h0Q3RQXGctmOcHanCV4-8K2ClWEcYz5FW1QB-ib8tPhomCBnh17SksPyuYGyTL4aOhiWo8elZJTKP4DFIqyWDjHebeiUh5bmP1XxunbA6JLd3uxepjW_GvFLVF5pXB6jBWcDvf8DRpNnQdCaBXjjtf0TaYJEFWnn">
+<div class="absolute top-2 left-2 bg-brand-orange text-black font-stencil text-xs px-2 py-0.5 font-bold shadow">
+              HEADLINER
+            </div>
+</div>
+<!-- Artist Label Plaque -->
+<div class="mt-2 bg-brand-orange text-black text-center py-2 px-1 font-stencil tracking-wider transform group-hover:scale-105 transition-transform">
+<h3 class="text-lg leading-tight uppercase font-black">DJ SOLAR</h3>
+<p class="text-[11px] font-condensed font-extrabold tracking-widest text-[#2a1105]">DRUM N BASS</p>
+</div>
+</article>
+<!-- Artist 4: MC ZION -->
+<article class="group relative flex flex-col bg-[#161413] border border-[#2e2621] p-2 hover:border-brand-orange transition-colors" data-purpose="artist-card">
+<div class="relative aspect-[3/4] overflow-hidden bg-[#241e1a] shadow-inner">
+<img alt="MC Zion cantando con micrófono hip hop" class="w-full h-full object-cover sepia-duotone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOuVtaTITCo6zHHskvG9P1JaY6ugOJlIALd3PXX0-R1KOeSGaFyQ4DSNA3y6gupr9yMWBWj7wRD3IEl_d0U3bqX5OvU2y16lT20rUQQ9QBCnuDxNEb0K4UIjNd0AxyxkfH7EdgMj_TJf-cat2i1sAJTeWJkpt8oV3o5YMTcn9EIVakW_mfhOWDAfACCRat2IWvzx8vRRUm84NjpXlfweNiLh7bi0ZAKoE_q64LFcER">
+<div class="absolute top-2 left-2 bg-black/85 text-brand-paper font-stencil text-xs px-2 py-0.5 border border-brand-paper/20">
+              FLOW BOGOTÁ
+            </div>
+</div>
+<!-- Artist Label Plaque -->
+<div class="mt-2 bg-[#d46a36] text-black text-center py-2 px-1 font-stencil tracking-wider transform -rotate-1 group-hover:rotate-0 transition-transform">
+<h3 class="text-lg leading-tight uppercase font-black">MC ZION</h3>
+<p class="text-[11px] font-condensed font-extrabold tracking-widest text-[#2a1105]">HIP HOP</p>
+</div>
+</article>
+<!-- Artist 5: LA SOBERANA -->
+<article class="group relative flex flex-col bg-[#161413] border border-[#2e2621] p-2 hover:border-brand-orange transition-colors" data-purpose="artist-card">
+<div class="relative aspect-[3/4] overflow-hidden bg-[#241e1a] shadow-inner">
+<img alt="La Soberana voz femenina reggae hip hop" class="w-full h-full object-cover sepia-duotone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjlKCo1NsmAe-XWCAGFmP0pSFutC3cy0o9BbpQ6jfCi8t0syIwoSZ9e_Adgr8lHEzCldbnQQ43CM6tcvLplsnkX0tJEGOgIXiTh82GhyFxmLnRbUazv7Rn8kMJcl9PjqCQwYA_jzBfAENh4BltgqsRL6LdQUntnAoxs5QeIITJjiMoepNkE_HlggxsKCh2uj123_4pOhavfnG_kHrqupvA4Avk_e7ctt4nj9O39rul">
+<div class="absolute top-2 left-2 bg-black/85 text-brand-paper font-stencil text-xs px-2 py-0.5 border border-brand-paper/20">
+              FEMME SOUND
+            </div>
+</div>
+<!-- Artist Label Plaque -->
+<div class="mt-2 bg-[#d46a36] text-black text-center py-2 px-1 font-stencil tracking-wider transform rotate-1 group-hover:rotate-0 transition-transform">
+<h3 class="text-lg leading-tight uppercase font-black">LA SOBERANA</h3>
+<p class="text-[11px] font-condensed font-extrabold tracking-widest text-[#2a1105]">REGGAE / HIP HOP</p>
+</div>
+</article>
+</div>
+<!-- Support Selectors / Residents Lineup Strip -->
+<div class="py-3 px-4 border-t border-b border-[#2d2520] text-center">
+<p class="font-stencil tracking-[0.25em] text-sm sm:text-base md:text-lg text-brand-paperdark/90 flex flex-wrap justify-center items-center gap-x-4 gap-y-2">
+<span class="">SELECTA KALIMA</span>
+<span class="text-brand-orange">|</span>
+<span class="">VIBRA ROOTS</span>
+<span class="text-brand-orange">|</span>
+<span class="">DJ KRIOLLO</span>
+<span class="text-brand-orange">|</span>
+<span class="">MC MESTIZA</span>
+</p>
+</div>
+</section>
+<!-- END: LineUpSection -->
+<!-- BEGIN: TicketingSection -->
+
+<!-- END: TicketingSection -->
+<!-- BEGIN: GallerySection -->
+<section class="py-12 px-4 sm:px-8 bg-[#0d0c0c]" data-purpose="gallery-section">
+<!-- Section Header -->
+<div class="text-center max-w-xl mx-auto mb-8">
+<div class="inline-flex items-center justify-center gap-4">
+<span class="h-1 w-12 bg-brand-orange transform -rotate-1"></span>
+<h2 class="font-stencil text-5xl sm:text-6xl tracking-wider text-brand-paper grunge-title">GALERÍA</h2>
+<span class="h-1 w-12 bg-brand-orange transform rotate-1"></span>
+</div>
+</div>
+<!-- 5 Photo Strip resembling 35mm Analog Frames -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+<!-- Photo 1: Concert crowd red lighting -->
+<div class="relative aspect-[4/3] border-2 border-brand-paper/30 overflow-hidden bg-black shadow-md group">
+<img alt="Público en concierto con luces rojas" class="w-full h-full object-cover filter contrast-125 sepia-[0.3] group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpO09H3VtBCWuzICuV9_3HOQDCjxeQzgOQL0qevGnVVpw0eWlD8n8Q_nR2ygqH8Gre1pRztRpeHoOB0x5ewLt6NQeCRXAtTIVkVdCilCyMYjKHNXSaytES1f3haUUz4McxYdDthZJicaDkhauCSS4ktqsD4f3oRBAENMPJr69QCbi1d8Ea97FbzFt9iasvPA6AJjC10ooDzI0GJvc5whbLZCvC-fTxCaCEgH-v75x0">
+<div class="absolute inset-0 bg-brand-orange/10 mix-blend-color"></div>
+</div>
+<!-- Photo 2: Hands on vinyl turntable -->
+<div class="relative aspect-[4/3] border-2 border-brand-paper/30 overflow-hidden bg-black shadow-md group">
+<img alt="DJ mezclando en tornamesa con vinilo de 12 pulgadas" class="w-full h-full object-cover filter contrast-125 sepia-[0.3] group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlQ0bB99YgE9M-n-EWu2CdHl2huNpm6-_ON7WBogcQPnE4CyrXoi5tfdH4tCHQBS7QPs2A9q4yDwsteX6OMTWhLX-eOh9BU_X-0HQoeC_GmWv9zO79cWXEMqEkelwlaPlHVVYPKekewlfQsiSGA5rKjfPxhxmQo_ZMeO465ZEMWEnTitDlms7kPSZCsmKnvbQw-etgpOo7GjbODjRTDoaOoFvXRrqjMD0whZOD0xDi">
+<div class="absolute inset-0 bg-brand-orange/10 mix-blend-color"></div>
+</div>
+<!-- Photo 3: Golden concert pyrotechnics -->
+<div class="relative aspect-[4/3] border-2 border-brand-paper/30 overflow-hidden bg-black shadow-md group col-span-2 sm:col-span-1">
+<img alt="Llamaradas y explosión lumínica en tarima" class="w-full h-full object-cover filter contrast-125 sepia-[0.3] group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVvrjdFMiMKKvv2wtgJg_YjoMOrupjLcq4hmaKg0KOHzV5NIpz2rO6M8rjUYyGaUaFzU0MqWpTnofiS5TvqhmOlEmreZLTJKrynBBOP_ULvmXblr84Y9saEU2U7ZEEry8YmMlUSpTsdKPSLTWiPDIbkgxB5TjzUeEOklbNNkw3XnkTVGVsExRLdNainYbibfTArwaQQ5ftRHbcO57uHV-aBRi_WRGL0vWhJs78wy2u">
+<div class="absolute inset-0 bg-brand-orange/10 mix-blend-color"></div>
+</div>
+<!-- Photo 4: Crowd silhouettes dancing -->
+<div class="relative aspect-[4/3] border-2 border-brand-paper/30 overflow-hidden bg-black shadow-md group">
+<img alt="Siluetas de manos y público eufórico" class="w-full h-full object-cover filter contrast-125 sepia-[0.3] group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdXoR-dwAneD080NPA9v-DBEmcpkbIsZOcDhjed50jeGPTXbQvza4jzMLeOKlf-3fzW5TkguK6kMOjr5qz5qJ4GpLGsMXImlpFeCv0iJ0AgoO3BdeQ3aUXpgwLatE5Vpqb2vAwnzXwtNBeuCRGq8UWp8-VA-dKomXO7G2QJS_croXbYcidNS2VUxLk_iVJ0OeyEEBYCL2HJs2S0WCz_5E7hVymXssMx4XCNFkksfL8">
+<div class="absolute inset-0 bg-brand-orange/10 mix-blend-color"></div>
+</div>
+<!-- Photo 5: Needle on vinyl close-up -->
+<div class="relative aspect-[4/3] border-2 border-brand-paper/30 overflow-hidden bg-black shadow-md group">
+<img alt="Detalle de aguja sobre disco de vinilo sonando" class="w-full h-full object-cover filter contrast-125 sepia-[0.3] group-hover:scale-110 transition duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwYtkx-2NrbtQrCOHLqLJ9HB5kE_Ylsz078QM0fA_Bd-PZh140MwzJPUvU-j5I227RlSJAuPEt1FIPubCpHsxm3_bwuBeXLSOaLxpC0ic0CVxew9C5klkFAbu8WpnVqt0Fsp5KPtFzQ0OI8pzcCnZoB2kEa2Exeg9_R07Pf5ioLbfnGjAsWNYUASLrZRX33uQnmcYD-VSEHtWM0PBD8YTAnbC4imoXTveKbp_ivZs5">
+<div class="absolute inset-0 bg-brand-orange/10 mix-blend-color"></div>
+</div>
+</div>
+</section>
+<!-- END: GallerySection -->
+<!-- BEGIN: InformationAndCommunityFooter -->
+<section class="py-12 px-4 sm:px-8 md:px-12 bg-[#12100f] border-t border-[#26201b] space-y-12" data-purpose="info-columns">
+<!-- FILA 1: FAQ Y UBICACIÓN EN 2 COLUMNAS EQUILIBRADAS -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
+  <!-- Columna 1: FAQ Accordions -->
+  <div class="flex flex-col">
+    <h3 class="font-stencil text-3xl sm:text-4xl text-brand-paper tracking-wider mb-4 border-b border-brand-paperdark/20 pb-2">
+      PREGUNTAS FRECUENTES
+    </h3>
+    <div class="space-y-2.5 font-condensed" id="faq-accordion-group">
+      <!-- FAQ Item 1 -->
+      <div class="border border-[#382f28] bg-[#1a1715]/70">
+        <button class="w-full text-left py-2.5 px-3.5 flex justify-between items-center text-brand-paper hover:text-brand-orange transition-colors" onclick="toggleFaq(1)">
+          <span class="text-base sm:text-lg font-semibold tracking-wide">¿Cómo comprar entradas?</span>
+          <span class="font-stencil text-2xl text-brand-orange leading-none" id="faq-icon-1">+</span>
+        </button>
+        <div class="hidden px-3.5 pb-3 text-sm text-brand-paperdark/90 leading-relaxed border-t border-[#2d251f]" id="faq-answer-1">
+          Haz clic en el botón "COMPRAR ENTRADAS". Podrás realizar tu pago mediante PSE, tarjetas de crédito, o transferencias directas con código QR.
+        </div>
+      </div>
+      <!-- FAQ Item 2 -->
+      <div class="border border-[#382f28] bg-[#1a1715]/70">
+        <button class="w-full text-left py-2.5 px-3.5 flex justify-between items-center text-brand-paper hover:text-brand-orange transition-colors" onclick="toggleFaq(2)">
+          <span class="text-base sm:text-lg font-semibold tracking-wide">¿Hay edad mínima?</span>
+          <span class="font-stencil text-2xl text-brand-orange leading-none" id="faq-icon-2">+</span>
+        </button>
+        <div class="hidden px-3.5 pb-3 text-sm text-brand-paperdark/90 leading-relaxed border-t border-[#2d251f]" id="faq-answer-2">
+          Evento exclusivo para mayores de 18 años. Es indispensable presentar documento original de identidad en el acceso.
+        </div>
+      </div>
+      <!-- FAQ Item 3 -->
+      <div class="border border-[#382f28] bg-[#1a1715]/70">
+        <button class="w-full text-left py-2.5 px-3.5 flex justify-between items-center text-brand-paper hover:text-brand-orange transition-colors" onclick="toggleFaq(3)">
+          <span class="text-base sm:text-lg font-semibold tracking-wide">¿Dónde es el evento?</span>
+          <span class="font-stencil text-2xl text-brand-orange leading-none" id="faq-icon-3">+</span>
+        </button>
+        <div class="hidden px-3.5 pb-3 text-sm text-brand-paperdark/90 leading-relaxed border-t border-[#2d251f]" id="faq-answer-3">
+          En KLANDESTINO Espacio Cultural: Carrera 4 # 19 - 56, centro histórico de Bogotá D.C.
+        </div>
+      </div>
+      <!-- FAQ Item 4 -->
+      <div class="border border-[#382f28] bg-[#1a1715]/70">
+        <button class="w-full text-left py-2.5 px-3.5 flex justify-between items-center text-brand-paper hover:text-brand-orange transition-colors" onclick="toggleFaq(4)">
+          <span class="text-base sm:text-lg font-semibold tracking-wide">¿Qué incluye mi entrada?</span>
+          <span class="font-stencil text-2xl text-brand-orange leading-none" id="faq-icon-4">+</span>
+        </button>
+        <div class="hidden px-3.5 pb-3 text-sm text-brand-paperdark/90 leading-relaxed border-t border-[#2d251f]" id="faq-answer-4">
+          Acceso general al Sound System, set de DJs completos, zona de feria de vinilos y sticker conmemorativo del cartel oficial.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna 2: Ubicación Klandestino -->
+  <div class="flex flex-col justify-between h-full bg-[#161413] border border-[#2e2621] p-6 shadow-md">
+    <div>
+      <div class="flex items-center gap-2 mb-3 text-brand-orange">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <h3 class="font-stencil text-3xl sm:text-4xl text-brand-paper tracking-wider">KLANDESTINO</h3>
+      </div>
+      <p class="font-condensed font-semibold text-brand-paperdark text-lg uppercase leading-relaxed pl-3 border-l-2 border-brand-orange mb-4">
+        KRA 4 # 19 - 56<br>CENTRO HISTÓRICO, BOGOTÁ D.C.
+      </p>
+      <p class="font-condensed text-brand-paperdark/80 text-sm leading-relaxed">
+        Espacio cultural de resistencia musical con sistema de sonido de alta fidelidad, zona de bebidas y patio al aire libre.
+      </p>
+    </div>
+    <div class="mt-8">
+      <a class="inline-flex items-center justify-center gap-2 w-full py-3.5 px-4 border-2 border-brand-paperdark/60 bg-[#1e1b18] hover:bg-brand-paperdark hover:text-black font-stencil text-xl text-brand-paper transition-all" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
+        <svg class="w-5 h-5 text-brand-orange" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path clip-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" fill-rule="evenodd"></path>
+        </svg>
+        <span class="">VER EN MAPA</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FILA 2: BOLETERÍA Y COMUNIDAD EN 2 COLUMNAS -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch pt-4 border-t border-[#26201b]">
+  <!-- Columna 1: Boletería -->
+  <div class="relative bg-brand-paper text-brand-dark p-6 sm:p-8 torn-paper-both shadow-2xl flex flex-col justify-between border-y-2 border-brand-paperdark">
+    <div>
+      <h2 class="font-stencil text-4xl sm:text-5xl tracking-wider text-black font-extrabold uppercase leading-none mb-3">
+        BOLETERÍA
+      </h2>
+      <p class="font-condensed font-bold text-base sm:text-lg text-black/80 mb-6">
+        Asegura tu entrada y sé parte de esta experiencia única de sonido y resistencia.
+      </p>
+    </div>
+    <div class="w-full pt-2">
+      <a class="w-full inline-flex items-center justify-center gap-3 bg-brand-orange hover:bg-brand-deeporange text-black font-stencil text-2xl tracking-wider px-6 py-4 shadow-[4px_4px_0px_#000] border-2 border-black transition-all hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1" href="#entradas" onclick="alert('Redirigiendo a pasarela segura de boletería...'); return false;">
+        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 4C2.89543 4 2 4.89543 2 6V9C3.10457 9 4 9.89543 4 11C4 12.1046 3.10457 13 2 13V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V13C20.8954 13 20 12.1046 20 11C20 9.89543 20.8954 9 22 9V6C22 4.89543 21.1046 4 20 4H4ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM7 15H9V17H7V15ZM11 7H17V9H11V7ZM11 11H17V13H11V11ZM11 15H17V17H11V15Z"></path>
+        </svg>
+        <span class="">COMPRAR ENTRADAS</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Columna 2: Únete a nuestra comunidad -->
+  <div class="bg-[#161413] border border-[#2e2621] p-6 sm:p-8 flex flex-col justify-between shadow-md">
+    <div>
+      <h3 class="font-stencil text-3xl sm:text-4xl text-brand-paper tracking-wider mb-2">
+        ÚNETE A NUESTRA COMUNIDAD
+      </h3>
+      <p class="font-condensed text-brand-paperdark text-sm sm:text-base mb-5">
+        Recibe las últimas noticias, lanzamientos exclusivos y convocatorias para próximos eventos.
+      </p>
+      <!-- Newsletter form -->
+      <form class="space-y-3" id="newsletter-form" onsubmit="handleSubscribe(event)">
+        <input class="w-full bg-brand-paper text-black placeholder-zinc-700 font-condensed font-medium text-base px-3.5 py-2.5 border-0 focus:ring-2 focus:ring-brand-orange" id="newsletter-email" placeholder="Tu correo electrónico" required="" type="email">
+        <button class="w-full bg-brand-orange hover:bg-brand-deeporange text-black font-stencil text-2xl tracking-wider py-2.5 transition-colors border border-black shadow" type="submit">
+          SUSCRIBIRME
+        </button>
+      </form>
+    </div>
+    <!-- Social media icons row -->
+    <div class="mt-6 pt-4 border-t border-[#26201b] flex items-center justify-between sm:justify-start gap-4">
+      <span class="font-condensed text-xs uppercase tracking-wider text-brand-paperdark/70 sm:hidden">Síguenos:</span>
+      <div class="flex items-center gap-3">
+        <a aria-label="Instagram" class="w-10 h-10 rounded-full bg-brand-paper text-black flex items-center justify-center hover:bg-brand-orange transition-colors" href="https://instagram.com" rel="noopener noreferrer" target="_blank">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
+        </a>
+        <a aria-label="Facebook" class="w-10 h-10 rounded-full bg-brand-paper text-black flex items-center justify-center hover:bg-brand-orange transition-colors" href="https://facebook.com" rel="noopener noreferrer" target="_blank">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.667 5H18V0h-3.808C10.597 0 9 1.583 9 4.615V8z"></path></svg>
+        </a>
+        <a aria-label="YouTube" class="w-10 h-10 rounded-full bg-brand-paper text-black flex items-center justify-center hover:bg-brand-orange transition-colors" href="https://youtube.com" rel="noopener noreferrer" target="_blank">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg>
+        </a>
+        <a aria-label="Spotify" class="w-10 h-10 rounded-full bg-brand-paper text-black flex items-center justify-center hover:bg-brand-orange transition-colors" href="https://spotify.com" rel="noopener noreferrer" target="_blank">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.495 17.316c-.218.358-.684.471-1.042.253-2.855-1.745-6.449-2.14-10.684-1.173-.41.094-.816-.164-.91-.573-.094-.41.164-.816.573-.91 4.636-1.06 8.607-.615 11.81 1.362.358.218.471.684.253 1.041zm1.464-3.256c-.274.447-.859.588-1.306.314-3.268-2.008-8.249-2.589-12.112-1.417-.497.151-1.026-.134-1.177-.631-.151-.497.134-1.026.631-1.177 4.417-1.34 9.907-.694 13.65 1.605.447.274.588.859.314 1.306zm.126-3.41c-3.918-2.327-10.375-2.541-14.103-1.408-.6.182-1.239-.164-1.421-.764-.182-.6.164-1.239.764-1.421 4.28-1.299 11.405-1.047 15.918 1.632.54.321.717 1.02.396 1.56-.321.54-1.02.717-1.554.399z"></path></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- END: InformationAndCommunityFooter -->
+<!-- BEGIN: FinalFooterBar -->
+
+<!-- END: FinalFooterBar -->
+</div>
+<!-- END: MainContainer -->
+<!-- BEGIN: InteractiveScripts -->
+<!-- Countdown Timer Logic -->
+<script data-purpose="countdown-timer">
+    (function initCountdown() {
+      // Set target date 24 days into the future from now or fixed target
+      let totalSeconds = (24 * 86400) + (12 * 3600) + (37 * 60) + 56;
+
+      const daysEl = document.getElementById('countdown-days');
+      const hoursEl = document.getElementById('countdown-hours');
+      const minutesEl = document.getElementById('countdown-minutes');
+      const secondsEl = document.getElementById('countdown-seconds');
+
+      setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+
+          if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+          if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+          if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+          if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+      }, 1000);
+    })();
+  </script>
+<!-- Accordion and Newsletter Script -->
+<script data-purpose="faq-and-forms">
+    function toggleFaq(id) {
+      const answer = document.getElementById(`faq-answer-${id}`);
+      const icon = document.getElementById(`faq-icon-${id}`);
+      
+      if (!answer) return;
+
+      const isHidden = answer.classList.contains('hidden');
+      
+      // Close other accordions
+      for (let i = 1; i <= 4; i++) {
+        const otherAns = document.getElementById(`faq-answer-${i}`);
+        const otherIco = document.getElementById(`faq-icon-${i}`);
+        if (otherAns && i !== id) {
+          otherAns.classList.add('hidden');
+          if (otherIco) otherIco.textContent = '+';
+        }
+      }
+
+      if (isHidden) {
+        answer.classList.remove('hidden');
+        if (icon) icon.textContent = '−';
+      } else {
+        answer.classList.add('hidden');
+        if (icon) icon.textContent = '+';
+      }
+    }
+
+    function handleSubscribe(event) {
+      event.preventDefault();
+      const emailInput = document.getElementById('newsletter-email');
+      if (emailInput && emailInput.value) {
+        alert(`¡Gracias por unirte a Vinilos Inversos! Hemos registrado ${emailInput.value}.`);
+        emailInput.value = '';
+      }
+    }
+  </script>
+<!-- END: InteractiveScripts -->
+
+
+</body></html>

@@ -1,0 +1,1395 @@
+/* ==========================================================================
+   F14 - VINILOS INVERSOS
+   ExploraCO / HostalTerraza - silo de fiesta (cartel urbano / fanzine grunge)
+   --------------------------------------------------------------------------
+   Estetica: modo oscuro profundo, papel kraft y naranja oxido.
+   Paleta (tokens --f14-*):
+     --f14-bg      #0E0E0E   fondo base
+     --f14-bg-2    #131313   superficies
+     --f14-fuego   #E35925   naranja oxido (acento)
+     --f14-fuego-2 #EA580C   naranja alto
+     --f14-kraft   #DBC8A8   papel kraft
+     --f14-kraft-2 #EAE0D0   kraft claro (inputs)
+     --f14-ink     #F5F5F5   texto principal
+     --f14-mute    #A3A3A3   texto secundario
+     --f14-line    #262626   bordes
+   Texto sobre kraft = #0E0E0E (contraste alto). Texto sobre fondo oscuro
+   cumple WCAG AA >= 4.5:1 (ink 17.7:1 / mute 7.7:1).
+   Tipografia: stack de sistema con peso 900. Sin @import ni @font-face.
+   Texturas: solo gradientes CSS (repeating-linear-gradient, radial-gradient).
+   Aislamiento atomico: toda regla vive bajo .tpl-f14 / .Tpl-F14.
+   Fecha: 2026-10-29
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TOKENS
+   ========================================================================== */
+.tpl-f14,
+.Tpl-F14 {
+    --f14-bg: #0E0E0E;
+    --f14-bg-2: #131313;
+    --f14-fuego: #E35925;
+    --f14-fuego-2: #EA580C;
+    --f14-kraft: #DBC8A8;
+    --f14-kraft-2: #EAE0D0;
+    --f14-ink: #F5F5F5;
+    --f14-mute: #A3A3A3;
+    --f14-line: #262626;
+
+    /* Puente cromatico obligatorio con el kernel */
+    --tpl-accent: var(--master-accent, #E35925);
+
+    --f14-font: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif;
+    --f14-display: system-ui, 'Arial Narrow', Impact, Haettenschweiler, sans-serif;
+}
+
+/* ==========================================================================
+   2. BASE DEL SILO (todo con scope)
+   ========================================================================== */
+.tpl-f14,
+.Tpl-F14,
+.tpl-f14 *,
+.Tpl-F14 * {
+    box-sizing: border-box;
+}
+
+.tpl-f14,
+.Tpl-F14 {
+    background-color: var(--f14-bg);
+    color: var(--f14-ink);
+    font-family: var(--f14-font);
+    -webkit-font-smoothing: antialiased;
+}
+
+.tpl-f14 ::selection,
+.Tpl-F14 ::selection {
+    background: var(--f14-fuego);
+    color: #0E0E0E;
+}
+
+/* ==========================================================================
+   3. ACTIVACION ATOMICA - el kernel IoC apaga todo por defecto
+   ========================================================================== */
+.tpl-f14 #mod-hero,
+.Tpl-F14 #mod-hero,
+.tpl-f14 #unified-frame,
+.Tpl-F14 #unified-frame,
+.tpl-f14 #mod-hero-meta,
+.Tpl-F14 #mod-hero-meta,
+.tpl-f14 #mod-hero-ctas,
+.Tpl-F14 #mod-hero-ctas {
+    display: flex !important;
+}
+
+.tpl-f14 #mod-lineup,
+.Tpl-F14 #mod-lineup,
+.tpl-f14 #mod-cartel,
+.Tpl-F14 #mod-cartel,
+.tpl-f14 #mod-video,
+.Tpl-F14 #mod-video,
+.tpl-f14 #mod-faq,
+.Tpl-F14 #mod-faq,
+.tpl-f14 #mod-ubicacion,
+.Tpl-F14 #mod-ubicacion,
+.tpl-f14 #mod-boletos,
+.Tpl-F14 #mod-boletos,
+.tpl-f14 #mod-form,
+.Tpl-F14 #mod-form {
+    display: block !important;
+}
+
+/* ==========================================================================
+   4. GRID EN #main-content-flow
+      1 columna en mobile; 2 columnas solo en FAQ|Ubicacion y Boletos|Comunidad.
+   ========================================================================== */
+.tpl-f14 #main-content-flow,
+.Tpl-F14 #main-content-flow {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "hero"
+        "countdown"
+        "meta"
+        "ctas"
+        "lineup"
+        "cartel"
+        "video"
+        "faq"
+        "ubicacion"
+        "boletos"
+        "form";
+    width: 100%;
+    row-gap: 0;
+    background-color: var(--f14-bg);
+    background-image:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.010) 0 1px, transparent 1px 5px);
+}
+
+.tpl-f14 #mod-hero,
+.Tpl-F14 #mod-hero {
+    grid-area: hero;
+}
+
+.tpl-f14 #unified-frame,
+.Tpl-F14 #unified-frame {
+    grid-area: countdown;
+}
+
+.tpl-f14 #mod-hero-meta,
+.Tpl-F14 #mod-hero-meta {
+    grid-area: meta;
+}
+
+.tpl-f14 #mod-hero-ctas,
+.Tpl-F14 #mod-hero-ctas {
+    grid-area: ctas;
+}
+
+.tpl-f14 #mod-lineup,
+.Tpl-F14 #mod-lineup {
+    grid-area: lineup;
+}
+
+.tpl-f14 #mod-cartel,
+.Tpl-F14 #mod-cartel {
+    grid-area: cartel;
+}
+
+.tpl-f14 #mod-video,
+.Tpl-F14 #mod-video {
+    grid-area: video;
+}
+
+.tpl-f14 #mod-faq,
+.Tpl-F14 #mod-faq {
+    grid-area: faq;
+}
+
+.tpl-f14 #mod-ubicacion,
+.Tpl-F14 #mod-ubicacion {
+    grid-area: ubicacion;
+}
+
+.tpl-f14 #mod-boletos,
+.Tpl-F14 #mod-boletos {
+    grid-area: boletos;
+}
+
+.tpl-f14 #mod-form,
+.Tpl-F14 #mod-form {
+    grid-area: form;
+}
+
+/* Reflujo: si un modulo de la pareja viene vacio, el hermano ocupa la fila */
+.tpl-f14 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.Tpl-F14 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.tpl-f14 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq,
+.Tpl-F14 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq,
+.tpl-f14 #main-content-flow:has(#mod-boletos[data-hidden]) #mod-form,
+.Tpl-F14 #main-content-flow:has(#mod-boletos[data-hidden]) #mod-form,
+.tpl-f14 #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos,
+.Tpl-F14 #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos {
+    grid-column: 1 / -1;
+}
+
+/* ==========================================================================
+   5. SECCIONES Y TIPOGRAFIA MONUMENTAL
+   ========================================================================== */
+.tpl-f14 section,
+.Tpl-F14 section {
+    padding: clamp(2.8rem, 7vw, 5.5rem) clamp(1.15rem, 6vw, 4rem);
+    position: relative;
+}
+
+.tpl-f14 section > h2,
+.Tpl-F14 section > h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0 0 1.9rem;
+    color: var(--f14-ink);
+    font-family: var(--f14-display);
+    font-size: clamp(1.55rem, 4.6vw, 2.6rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.tpl-f14 section > h2::before,
+.Tpl-F14 section > h2::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+    background: var(--f14-fuego);
+    transform: rotate(-8deg);
+}
+
+.tpl-f14 a,
+.Tpl-F14 a {
+    color: var(--f14-fuego);
+}
+
+/* ==========================================================================
+   6. HERO
+   ========================================================================== */
+.tpl-f14 #mod-hero,
+.Tpl-F14 #mod-hero {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 82vh;
+    padding: clamp(4.5rem, 10vw, 7rem) clamp(1.15rem, 6vw, 4rem) clamp(2.6rem, 6vw, 4rem);
+    overflow: hidden;
+    text-align: center;
+    background-color: var(--f14-bg);
+    background-image:
+        radial-gradient(115% 78% at 50% 0%, rgba(227, 89, 37, 0.22) 0%, rgba(14, 14, 14, 0) 62%),
+        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.020) 0 2px, transparent 2px 7px);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-hero::after,
+.Tpl-F14 #mod-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--f14-fuego) 0 26px, transparent 26px 52px);
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+.tpl-f14 #org-name-badge,
+.Tpl-F14 #org-name-badge {
+    top: 1.25rem !important;
+    left: 50% !important;
+    z-index: 6 !important;
+    transform: translateX(-50%) rotate(-2deg);
+    padding: 0.4rem 1rem;
+    background: var(--f14-kraft);
+    color: #0E0E0E;
+    font-family: var(--f14-display);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    max-width: calc(100% - 2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+}
+
+.tpl-f14 #mod-hero .hero-content,
+.Tpl-F14 #mod-hero .hero-content {
+    position: relative;
+    z-index: 5;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.tpl-f14 #event-title,
+.Tpl-F14 #event-title {
+    margin: 0;
+    color: var(--f14-ink);
+    font-family: var(--f14-display);
+    font-size: clamp(2.5rem, 10.5vw, 7rem);
+    font-weight: 900;
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    text-shadow: 0 0 42px rgba(227, 89, 37, 0.28);
+}
+
+/* ==========================================================================
+   7. COUNTDOWN (#unified-frame)
+   ========================================================================== */
+.tpl-f14 #unified-frame,
+.Tpl-F14 #unified-frame {
+    justify-content: center !important;
+    align-items: flex-start;
+    gap: 0;
+    margin-top: 0 !important;
+    padding: 1.5rem 0.5rem;
+    background: var(--f14-bg-2);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #unified-frame .cd-block,
+.Tpl-F14 #unified-frame .cd-block {
+    flex: 1 1 0;
+    padding: 0 0.35rem;
+    text-align: center !important;
+}
+
+.tpl-f14 #unified-frame .cd-block + .cd-block,
+.Tpl-F14 #unified-frame .cd-block + .cd-block {
+    border-left: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #unified-frame .cd-block span,
+.Tpl-F14 #unified-frame .cd-block span {
+    color: var(--f14-fuego);
+    font-family: var(--f14-display);
+    font-size: clamp(1.85rem, 8vw, 3rem) !important;
+    font-weight: 900 !important;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.tpl-f14 #unified-frame .cd-block small,
+.Tpl-F14 #unified-frame .cd-block small {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--f14-mute);
+    font-size: 0.54rem;
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   8. META (fecha / hora / lugar)
+   ========================================================================== */
+.tpl-f14 #mod-hero-meta,
+.Tpl-F14 #mod-hero-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.6rem clamp(1.15rem, 6vw, 4rem);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-hero-meta .meta-item,
+.Tpl-F14 #mod-hero-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 1rem;
+    background: var(--f14-bg-2);
+    border: 1px solid var(--f14-line);
+    color: var(--f14-ink);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.tpl-f14 #mod-hero-meta .meta-item span,
+.Tpl-F14 #mod-hero-meta .meta-item span {
+    color: var(--f14-ink);
+}
+
+.tpl-f14 #mod-hero-meta .meta-svg,
+.Tpl-F14 #mod-hero-meta .meta-svg {
+    fill: var(--f14-fuego);
+    flex: 0 0 auto;
+}
+
+/* ==========================================================================
+   9. CTAS DEL HERO
+   ========================================================================== */
+.tpl-f14 #mod-hero-ctas,
+.Tpl-F14 #mod-hero-ctas {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1.8rem clamp(1.15rem, 6vw, 4rem) 2.6rem;
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 .hero-cta-btn,
+.Tpl-F14 .hero-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1.6rem;
+    background: var(--f14-fuego);
+    border: 2px solid #0E0E0E;
+    color: #0E0E0E;
+    font-family: var(--f14-display);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 5px 5px 0 rgba(219, 200, 168, 0.22);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.tpl-f14 .hero-cta-btn--lineup,
+.Tpl-F14 .hero-cta-btn--lineup {
+    background: transparent;
+    border-color: var(--f14-kraft);
+    color: var(--f14-kraft);
+    box-shadow: 5px 5px 0 rgba(227, 89, 37, 0.28);
+}
+
+.tpl-f14 .hero-cta-btn:hover,
+.Tpl-F14 .hero-cta-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 rgba(14, 14, 14, 0.85);
+    background: var(--f14-fuego-2);
+    color: #0E0E0E;
+}
+
+/* ==========================================================================
+   10. LINE UP (#mod-lineup) - 2 columnas mobile, 5 en desktop
+   ========================================================================== */
+.tpl-f14 #mod-lineup,
+.Tpl-F14 #mod-lineup {
+    background-color: var(--f14-bg);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-lineup .lineup-grid,
+.Tpl-F14 #mod-lineup .lineup-grid {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto !important;
+}
+
+.tpl-f14 #db-lineup,
+.Tpl-F14 #db-lineup {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+}
+
+.tpl-f14 .artist-card,
+.Tpl-F14 .artist-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background: var(--f14-bg-2);
+    border: 1px solid var(--f14-line);
+}
+
+.tpl-f14 .artist-card .artist-photo,
+.Tpl-F14 .artist-card .artist-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.18) sepia(0.12);
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.tpl-f14 .artist-card:hover .artist-photo,
+.Tpl-F14 .artist-card:hover .artist-photo {
+    transform: scale(1.05);
+    filter: grayscale(0.15) contrast(1.1) saturate(1.15);
+}
+
+.tpl-f14 .artist-card .artist-overlay,
+.Tpl-F14 .artist-card .artist-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 0.85rem;
+    background-image: linear-gradient(180deg, rgba(14, 14, 14, 0) 38%, rgba(14, 14, 14, 0.92) 100%);
+}
+
+/* Cinta kraft: etiqueta de hora / tipo de set */
+.tpl-f14 .artist-card .artist-hora,
+.Tpl-F14 .artist-card .artist-hora {
+    display: inline-block;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+    padding: 0.26rem 0.62rem;
+    background: var(--f14-kraft);
+    color: #0E0E0E;
+    font-family: var(--f14-display);
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transform: rotate(-3deg);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Nombre en franja naranja */
+.tpl-f14 .artist-card .artist-name,
+.Tpl-F14 .artist-card .artist-name {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0.22rem 0.6rem;
+    background: var(--f14-fuego);
+    color: #0E0E0E;
+    font-family: var(--f14-display);
+    font-size: clamp(0.85rem, 2.4vw, 1.1rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    clip-path: polygon(0 0, 100% 0, 98% 100%, 0 100%);
+}
+
+.tpl-f14 .artist-card .artist-resena,
+.Tpl-F14 .artist-card .artist-resena {
+    margin-top: 0.5rem;
+    color: var(--f14-mute);
+    font-size: 0.68rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-transform: none;
+    letter-spacing: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tpl-f14 .artist-card .artist-social,
+.Tpl-F14 .artist-card .artist-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+}
+
+.tpl-f14 .artist-card a.artist-social-icon,
+.Tpl-F14 .artist-card a.artist-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: transparent;
+    border: 1px solid var(--f14-kraft);
+    border-radius: 50%;
+    color: var(--f14-kraft);
+    text-decoration: none;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.tpl-f14 .artist-card a.artist-social-icon:hover,
+.Tpl-F14 .artist-card a.artist-social-icon:hover {
+    background: var(--f14-fuego);
+    border-color: var(--f14-fuego);
+    color: #0E0E0E;
+}
+
+/* Headliner: borde encendido y badge naranja */
+.tpl-f14 .artist-card.headliner,
+.Tpl-F14 .artist-card.headliner {
+    grid-column: span 2;
+    border: 2px solid var(--f14-fuego);
+    box-shadow: 0 0 0 1px rgba(227, 89, 37, 0.3) inset;
+}
+
+.tpl-f14 .artist-card.headliner::before,
+.Tpl-F14 .artist-card.headliner::before {
+    content: "HEADLINER";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    padding: 0.3rem 0.7rem;
+    background: var(--f14-fuego);
+    color: #0E0E0E;
+    font-family: var(--f14-display);
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    line-height: 1;
+    transform: rotate(-1.5deg) translate(2px, 6px);
+}
+
+/* ==========================================================================
+   11. CARTEL / AFICHE (#mod-cartel)
+   ========================================================================== */
+.tpl-f14 #mod-cartel,
+.Tpl-F14 #mod-cartel {
+    background-color: var(--f14-bg-2);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-cartel .cartel-inner,
+.Tpl-F14 #mod-cartel .cartel-inner {
+    position: relative;
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+}
+
+/* Cinta kraft sobre el afiche */
+.tpl-f14 #mod-cartel .cartel-inner::before,
+.Tpl-F14 #mod-cartel .cartel-inner::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    z-index: 4;
+    width: 132px;
+    height: 26px;
+    background: rgba(219, 200, 168, 0.9);
+    transform: translateX(-50%) rotate(-1.5deg);
+    clip-path: polygon(0 14%, 8% 0, 16% 18%, 100% 4%, 92% 96%, 12% 100%, 2% 84%);
+    pointer-events: none;
+}
+
+.tpl-f14 #mod-cartel #db-poster-img,
+.Tpl-F14 #mod-cartel #db-poster-img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 82vh;
+    margin: 0 auto;
+    border: 6px solid var(--f14-kraft);
+    border-radius: 0 !important;
+    box-shadow: 12px 12px 0 rgba(227, 89, 37, 0.35), 0 0 0 1px #0E0E0E;
+    cursor: zoom-in;
+}
+
+/* ==========================================================================
+   12. GALERIA (#db-gallery-grid dentro de #mod-video)
+   ========================================================================== */
+.tpl-f14 #mod-video,
+.Tpl-F14 #mod-video {
+    background-color: var(--f14-bg);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #db-gallery-grid,
+.Tpl-F14 #db-gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem !important;
+    margin-bottom: 2.5rem !important;
+}
+
+.tpl-f14 #db-gallery-grid .gallery-item,
+.Tpl-F14 #db-gallery-grid .gallery-item {
+    position: relative;
+    margin: 0 !important;
+    padding: 0;
+    border: 1px solid var(--f14-line);
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: var(--f14-bg-2);
+}
+
+.tpl-f14 #db-gallery-grid .gallery-item img,
+.Tpl-F14 #db-gallery-grid .gallery-item img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.1);
+    transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.tpl-f14 #db-gallery-grid .gallery-item:hover img,
+.Tpl-F14 #db-gallery-grid .gallery-item:focus-within img,
+.Tpl-F14 #db-gallery-grid .gallery-item:hover img,
+.Tpl-F14 #db-gallery-grid .gallery-item:focus-within img {
+    transform: scale(1.05);
+    filter: grayscale(0) saturate(1.35);
+}
+
+/* ==========================================================================
+   13. FAQ (#mod-faq) - acordeon; el "+" es el SVG de .faq-icon-circle
+   ========================================================================== */
+.tpl-f14 #mod-faq,
+.Tpl-F14 #mod-faq {
+    background-color: var(--f14-bg-2);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #db-faq-list .faq-item,
+.Tpl-F14 #db-faq-list .faq-item {
+    padding: 1.15rem 0.9rem 1.15rem 0 !important;
+    border-bottom: 1px solid var(--f14-line) !important;
+    color: var(--f14-ink);
+    transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tpl-f14 #db-faq-list .faq-item:hover,
+.Tpl-F14 #db-faq-list .faq-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.tpl-f14 #db-faq-list .faq-item.active,
+.Tpl-F14 #db-faq-list .faq-item.active {
+    padding-left: 0.9rem !important;
+    background: rgba(227, 89, 37, 0.07);
+    box-shadow: inset 3px 0 0 var(--f14-fuego);
+}
+
+.tpl-f14 #db-faq-list .faq-item > div > span,
+.Tpl-F14 #db-faq-list .faq-item > div > span {
+    flex: 1 1 auto;
+    padding-right: 0.9rem;
+    color: var(--f14-ink);
+    font-family: var(--f14-display);
+    font-size: 0.92rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    line-height: 1.25;
+    text-transform: uppercase;
+}
+
+.tpl-f14 #db-faq-list .faq-icon-circle,
+.Tpl-F14 #db-faq-list .faq-icon-circle {
+    flex: 0 0 auto;
+    width: 30px !important;
+    height: 30px !important;
+    border: 2px solid var(--f14-fuego) !important;
+    border-radius: 50% !important;
+    color: var(--f14-fuego) !important;
+    background: transparent;
+    transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.tpl-f14 #db-faq-list .faq-item.active .faq-icon-circle,
+.Tpl-F14 #db-faq-list .faq-item.active .faq-icon-circle {
+    background: var(--f14-fuego);
+    color: #0E0E0E !important;
+    transform: rotate(180deg);
+}
+
+/* El trazo vertical se apaga: "+" pasa a "-" */
+.tpl-f14 #db-faq-list .faq-item.active .faq-icon-circle svg line:first-child,
+.Tpl-F14 #db-faq-list .faq-item.active .faq-icon-circle svg line:first-child {
+    opacity: 0;
+}
+
+.tpl-f14 #db-faq-list .faq-answer,
+.Tpl-F14 #db-faq-list .faq-answer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    color: var(--f14-mute);
+    font-size: 0.82rem;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0;
+    text-transform: none;
+    transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.3s ease;
+}
+
+.tpl-f14 #db-faq-list .faq-item.active .faq-answer,
+.Tpl-F14 #db-faq-list .faq-item.active .faq-answer {
+    max-height: 720px;
+    opacity: 1;
+    margin-top: 0.85rem;
+}
+
+/* ==========================================================================
+   14. UBICACION (#mod-ubicacion) - tarjeta + pin naranja + enlace
+   ========================================================================== */
+.tpl-f14 #mod-ubicacion,
+.Tpl-F14 #mod-ubicacion {
+    background-color: var(--f14-bg);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #db-mapa-container,
+.Tpl-F14 #db-mapa-container {
+    position: relative;
+    height: clamp(230px, 38vw, 380px) !important;
+    border: 1px solid var(--f14-line) !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: var(--f14-bg-2);
+    box-shadow: 0 0 0 6px rgba(19, 19, 19, 0.9);
+}
+
+.tpl-f14 #db-mapa-container iframe,
+.Tpl-F14 #db-mapa-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: grayscale(1) contrast(1.08) brightness(0.86);
+}
+
+/* Pin: cabeza + punta, ambos decorativos */
+.tpl-f14 #db-mapa-container::before,
+.Tpl-F14 #db-mapa-container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    margin: -18px 0 0 -10px;
+    background: var(--f14-fuego);
+    border: 3px solid #0E0E0E;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(227, 89, 37, 0.25);
+    pointer-events: none;
+}
+
+.tpl-f14 #db-mapa-container::after,
+.Tpl-F14 #db-mapa-container::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    margin: 0 0 0 -6px;
+    background: var(--f14-fuego);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    pointer-events: none;
+}
+
+.tpl-f14 #mod-ubicacion .mapa-link,
+.Tpl-F14 #mod-ubicacion .mapa-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    background: transparent;
+    border: 2px solid var(--f14-fuego);
+    color: var(--f14-fuego);
+    font-family: var(--f14-display);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.tpl-f14 #mod-ubicacion .mapa-link:hover,
+.Tpl-F14 #mod-ubicacion .mapa-link:hover {
+    background: var(--f14-fuego);
+    color: #0E0E0E;
+}
+
+/* ==========================================================================
+   15. BOLETERIA (#mod-boletos) - ticket de papel kraft con borde diente
+   ========================================================================== */
+.tpl-f14 #mod-boletos,
+.Tpl-F14 #mod-boletos {
+    background-color: var(--f14-bg);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-boletos .boleto-inner,
+.Tpl-F14 #mod-boletos .boleto-inner {
+    position: relative;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 2.6rem 1.6rem 2.2rem !important;
+    color: #0E0E0E;
+    background-color: var(--f14-kraft);
+    background-image:
+        repeating-linear-gradient(0deg, rgba(14, 14, 14, 0.05) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, rgba(14, 14, 14, 0.035) 0 1px, transparent 1px 4px),
+        radial-gradient(120% 85% at 18% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 62%),
+        radial-gradient(95% 70% at 100% 100%, rgba(14, 14, 14, 0.13) 0%, rgba(14, 14, 14, 0) 66%);
+    clip-path: polygon(
+        0 0, 12.5% 2.2%, 25% 0, 37.5% 2.2%, 50% 0, 62.5% 2.2%, 75% 0, 87.5% 2.2%, 100% 0,
+        100% 100%, 87.5% 97.8%, 75% 100%, 62.5% 97.8%, 50% 100%, 37.5% 97.8%, 25% 100%, 12.5% 97.8%, 0 100%
+    );
+    filter: drop-shadow(9px 9px 0 rgba(227, 89, 37, 0.28));
+}
+
+.tpl-f14 #mod-boletos .boleto-inner h2,
+.Tpl-F14 #mod-boletos .boleto-inner h2 {
+    justify-content: center;
+    margin-bottom: 1.4rem;
+    color: #0E0E0E;
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+}
+
+.tpl-f14 #mod-boletos .boleto-inner h2::before,
+.Tpl-F14 #mod-boletos .boleto-inner h2::before {
+    background: #0E0E0E;
+}
+
+.tpl-f14 #mod-boletos .boleto-cards-wrap,
+.Tpl-F14 #mod-boletos .boleto-cards-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+}
+
+.tpl-f14 #db-boletos-preventa,
+.Tpl-F14 #db-boletos-preventa,
+.tpl-f14 #db-boletos-taquilla,
+.Tpl-F14 #db-boletos-taquilla {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tpl-f14 .boleto-card-row,
+.Tpl-F14 .boleto-card-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    width: 100%;
+    padding: 0.95rem 1.05rem !important;
+    background: var(--f14-fuego) !important;
+    border: 2px solid #0E0E0E !important;
+    border-bottom: 2px solid #0E0E0E !important;
+    color: #0E0E0E !important;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.tpl-f14 .boleto-card-row:hover,
+.Tpl-F14 .boleto-card-row:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #0E0E0E;
+    background: var(--f14-fuego-2) !important;
+}
+
+.tpl-f14 .boleto-card-row .boleto-icon,
+.Tpl-F14 .boleto-card-row .boleto-icon {
+    color: #0E0E0E !important;
+    flex-shrink: 0;
+}
+
+.tpl-f14 .boleto-card-row .boleto-icon svg,
+.Tpl-F14 .boleto-card-row .boleto-icon svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+}
+
+.tpl-f14 .boleto-card-row .boleto-tipo,
+.Tpl-F14 .boleto-card-row .boleto-tipo {
+    color: #0E0E0E !important;
+    font-family: var(--f14-display);
+    font-size: 0.6rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.22em !important;
+}
+
+.tpl-f14 .boleto-card-row .boleto-precio,
+.Tpl-F14 .boleto-card-row .boleto-precio {
+    color: #0E0E0E !important;
+    font-family: var(--f14-display);
+    font-size: 1.45rem !important;
+    line-height: 1.1;
+}
+
+.tpl-f14 .boleto-card-row .boleto-desc,
+.Tpl-F14 .boleto-card-row .boleto-desc {
+    color: #0E0E0E !important;
+    opacity: 0.78 !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.08em;
+}
+
+.tpl-f14 .boleto-card-row .boleto-arrow,
+.Tpl-F14 .boleto-card-row .boleto-arrow {
+    color: #0E0E0E !important;
+    opacity: 1 !important;
+}
+
+.tpl-f14 #mod-boletos .boleto-trust,
+.Tpl-F14 #mod-boletos .boleto-trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-top: 1.4rem;
+    color: #0E0E0E;
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   16. COMUNIDAD (#mod-form)
+   ========================================================================== */
+.tpl-f14 #mod-form,
+.Tpl-F14 #mod-form {
+    background-color: var(--f14-bg-2);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 .form-master-box,
+.Tpl-F14 .form-master-box {
+    position: relative;
+    max-width: 550px !important;
+    padding: clamp(1.6rem, 4vw, 2.4rem) !important;
+    background: var(--f14-bg) !important;
+    border: 2px solid var(--f14-line) !important;
+    border-radius: 0 !important;
+    box-shadow: 10px 10px 0 rgba(227, 89, 37, 0.18);
+}
+
+/* Cinta kraft de cierre del bloque */
+.tpl-f14 .form-master-box::before,
+.Tpl-F14 .form-master-box::before {
+    content: "";
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    z-index: 3;
+    width: 112px;
+    height: 24px;
+    background: rgba(219, 200, 168, 0.92);
+    transform: translateX(-50%) rotate(-2deg);
+    clip-path: polygon(0 16%, 9% 0, 18% 20%, 100% 6%, 93% 96%, 10% 100%, 3% 82%);
+    pointer-events: none;
+}
+
+.tpl-f14 .form-tabs,
+.Tpl-F14 .form-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.7rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--f14-line);
+}
+
+.tpl-f14 .form-tabs button,
+.Tpl-F14 .form-tabs button {
+    flex: 1 1 0;
+    padding: 0.75rem 0.5rem;
+    background: transparent;
+    border: 1px solid var(--f14-line);
+    border-radius: 0;
+    color: var(--f14-mute);
+    font-family: var(--f14-display);
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.tpl-f14 .form-tabs button.active,
+.Tpl-F14 .form-tabs button.active {
+    background: var(--f14-fuego);
+    border-color: #0E0E0E;
+    color: #0E0E0E;
+}
+
+.tpl-f14 #mod-form #reg-nombre,
+.Tpl-F14 #mod-form #reg-nombre,
+.tpl-f14 #mod-form #reg-whatsapp,
+.Tpl-F14 #mod-form #reg-whatsapp,
+.tpl-f14 #mod-form #rec-cedula,
+.Tpl-F14 #mod-form #rec-cedula {
+    width: 100%;
+    padding: 0.95rem 1.05rem !important;
+    background: var(--f14-kraft-2) !important;
+    border: 2px solid #0E0E0E !important;
+    border-radius: 0 !important;
+    color: #0E0E0E !important;
+    font-family: var(--f14-font);
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.tpl-f14 #mod-form #reg-nombre::placeholder,
+.Tpl-F14 #mod-form #reg-nombre::placeholder,
+.tpl-f14 #mod-form #reg-whatsapp::placeholder,
+.Tpl-F14 #mod-form #reg-whatsapp::placeholder,
+.tpl-f14 #mod-form #rec-cedula::placeholder,
+.Tpl-F14 #mod-form #rec-cedula::placeholder {
+    color: #4A4A4A;
+    font-weight: 600;
+}
+
+.tpl-f14 #mod-form #reg-nombre:focus,
+.Tpl-F14 #mod-form #reg-nombre:focus,
+.tpl-f14 #mod-form #reg-whatsapp:focus,
+.Tpl-F14 #mod-form #reg-whatsapp:focus,
+.tpl-f14 #mod-form #rec-cedula:focus,
+.Tpl-F14 #mod-form #rec-cedula:focus {
+    outline: 3px solid var(--f14-fuego);
+    outline-offset: 2px;
+}
+
+.tpl-f14 #mod-form #reg-unir-comunidad-wrap,
+.Tpl-F14 #mod-form #reg-unir-comunidad-wrap {
+    padding: 0.8rem 0.9rem !important;
+    background: rgba(227, 89, 37, 0.1) !important;
+    border: 1px solid var(--f14-line) !important;
+    border-radius: 0 !important;
+    color: var(--f14-kraft) !important;
+    font-size: 0.72rem !important;
+}
+
+.tpl-f14 #mod-form #reg-unir-comunidad,
+.Tpl-F14 #mod-form #reg-unir-comunidad {
+    accent-color: var(--f14-fuego);
+}
+
+.tpl-f14 #master-reg-form button[type="submit"],
+.Tpl-F14 #master-reg-form button[type="submit"],
+.tpl-f14 #form-ya button,
+.Tpl-F14 #form-ya button {
+    width: 100%;
+    padding: 1.05rem 1rem !important;
+    background: var(--f14-fuego) !important;
+    border: 2px solid #0E0E0E !important;
+    border-radius: 0 !important;
+    color: #0E0E0E !important;
+    font-family: var(--f14-display);
+    font-size: 0.76rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.tpl-f14 #master-reg-form button[type="submit"]:hover,
+.Tpl-F14 #master-reg-form button[type="submit"]:hover,
+.tpl-f14 #form-ya button:hover,
+.Tpl-F14 #form-ya button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #0E0E0E;
+    background: var(--f14-fuego-2) !important;
+}
+
+/* Redes de comunidad (atomos inyectados por el kernel) */
+.tpl-f14 .form-social,
+.Tpl-F14 .form-social {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.7rem;
+    padding-top: 1.3rem;
+    border-top: 1px dashed var(--f14-line);
+}
+
+.tpl-f14 .form-social .footer-social-icon,
+.Tpl-F14 .form-social .footer-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--f14-fuego);
+    border: 2px solid #0E0E0E;
+    border-radius: 50%;
+    color: #0E0E0E;
+    text-decoration: none;
+    transition: transform 0.18s ease, background-color 0.18s ease;
+}
+
+.tpl-f14 .form-social .footer-social-icon svg,
+.Tpl-F14 .form-social .footer-social-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.tpl-f14 .form-social .footer-social-icon:hover,
+.Tpl-F14 .form-social .footer-social-icon:hover {
+    transform: translateY(-3px);
+    background: var(--f14-kraft);
+}
+
+/* ==========================================================================
+   17. BREAKPOINT 640 - aire, galeria y lineup intermedios
+   ========================================================================== */
+@media (min-width: 640px) {
+    .tpl-f14 #unified-frame,
+    .Tpl-F14 #unified-frame {
+        padding: 1.7rem 1rem;
+    }
+
+    .tpl-f14 #unified-frame .cd-block,
+    .Tpl-F14 #unified-frame .cd-block {
+        padding: 0 1rem;
+    }
+
+    .tpl-f14 #db-gallery-grid,
+    .Tpl-F14 #db-gallery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem !important;
+    }
+
+    .tpl-f14 #db-lineup,
+    .Tpl-F14 #db-lineup {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.9rem !important;
+    }
+
+    .tpl-f14 .hero-cta-btn,
+    .Tpl-F14 .hero-cta-btn {
+        min-width: 240px;
+    }
+
+    .tpl-f14 #mod-boletos .boleto-inner,
+    .Tpl-F14 #mod-boletos .boleto-inner {
+        padding: 2.8rem 2rem 2.4rem !important;
+    }
+}
+
+/* ==========================================================================
+   18. BREAKPOINT 767 - grid de 2 columnas (FAQ|Ubicacion, Boletos|Comunidad)
+   ========================================================================== */
+@media (min-width: 767px) {
+    .tpl-f14 #main-content-flow,
+    .Tpl-F14 #main-content-flow {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "hero hero"
+            "countdown countdown"
+            "meta meta"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel cartel"
+            "video video"
+            "faq ubicacion"
+            "boletos form";
+        column-gap: 1.5rem;
+    }
+
+    .tpl-f14 #db-gallery-grid,
+    .Tpl-F14 #db-gallery-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.5rem !important;
+    }
+
+    .tpl-f14 .artist-card.headliner,
+    .Tpl-F14 .artist-card.headliner {
+        grid-column: span 2;
+    }
+}
+
+/* ==========================================================================
+   19. BREAKPOINT 992 - lineup de 5 columnas y hero monumento
+   ========================================================================== */
+@media (min-width: 992px) {
+    .tpl-f14 #mod-hero,
+    .Tpl-F14 #mod-hero {
+        min-height: 88vh;
+    }
+
+    .tpl-f14 #db-lineup,
+    .Tpl-F14 #db-lineup {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.65rem !important;
+    }
+
+    .tpl-f14 .artist-card,
+    .Tpl-F14 .artist-card {
+        aspect-ratio: 3 / 4.2;
+    }
+
+    .tpl-f14 #mod-faq,
+    .Tpl-F14 #mod-faq {
+        padding-right: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    .tpl-f14 #mod-ubicacion,
+    .Tpl-F14 #mod-ubicacion {
+        padding-left: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    .tpl-f14 #mod-boletos,
+    .Tpl-F14 #mod-boletos {
+        padding-right: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    .tpl-f14 #mod-form,
+    .Tpl-F14 #mod-form {
+        padding-left: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    .tpl-f14 #db-gallery-grid,
+    .Tpl-F14 #db-gallery-grid {
+        gap: 0.6rem !important;
+    }
+}
+
+/* ==========================================================================
+   20. BREAKPOINT 1279 - escala final de escritorio
+   ========================================================================== */
+@media (min-width: 1279px) {
+    .tpl-f14 #event-title,
+    .Tpl-F14 #event-title {
+        font-size: clamp(5rem, 8.5vw, 7.5rem);
+    }
+
+    .tpl-f14 #unified-frame .cd-block span,
+    .Tpl-F14 #unified-frame .cd-block span {
+        font-size: 3.2rem !important;
+    }
+
+    .tpl-f14 #unified-frame .cd-block,
+    .Tpl-F14 #unified-frame .cd-block {
+        padding: 0 1.8rem;
+    }
+
+    .tpl-f14 #mod-lineup .lineup-grid,
+    .Tpl-F14 #mod-lineup .lineup-grid {
+        max-width: 1240px;
+    }
+
+    .tpl-f14 #db-faq-list .faq-item > div > span,
+    .Tpl-F14 #db-faq-list .faq-item > div > span {
+        font-size: 1rem;
+    }
+}
+
+/* ==========================================================================
+   21. ACCESIBILIDAD - movimiento reducido
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f14 *,
+    .Tpl-F14 * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .tpl-f14 .artist-card:hover .artist-photo,
+    .Tpl-F14 .artist-card:hover .artist-photo,
+    .tpl-f14 #db-gallery-grid .gallery-item:hover img,
+    .Tpl-F14 #db-gallery-grid .gallery-item:hover img,
+    .tpl-f14 .gallery-item:focus-within img,
+    .Tpl-F14 .gallery-item:focus-within img,
+    .tpl-f14 .hero-cta-btn:hover,
+    .Tpl-F14 .hero-cta-btn:hover,
+    .tpl-f14 .boleto-card-row:hover,
+    .Tpl-F14 .boleto-card-row:hover,
+    .tpl-f14 .form-social .footer-social-icon:hover,
+    .Tpl-F14 .form-social .footer-social-icon:hover {
+        transform: none !important;
+        box-shadow: none;
+    }
+}
+
+/* ==========================================================================
+   LOG DE VERSIONES
+   v1.0 - 2026-10-29 - Silo inicial F14 "Vinilos Inversos": tokens --f14-*,
+          puente --tpl-accent, activacion atomica, grid de 2 columnas con
+          reflujo :has, hero/countdown/meta/ctas, lineup 5 col con cinta
+          kraft y franja naranja, galeria de 5, FAQ acordeon con icono
+          rotado, ubicacion con pin y mapa-link, boleteria kraft con
+          clip-path diente y CTA naranja, comunidad con inputs kraft.
+          Solo ASCII (0 bytes > 127). Reemplaza el volcado Tailwind previo,
+          respaldado en f14-volcado-tailwind.bak.css.
+   ========================================================================== */

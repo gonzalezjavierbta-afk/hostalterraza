@@ -597,6 +597,14 @@ tr:hover td{background:var(--surface)}
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37, 0 0 16px rgba(212,175,55,.45)"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Mistico Nocturno</span></div>
               <div style="font-size:10px;color:#a89f91">Dorado Antiguo &middot; Profundidad Suave &middot; Hero Editorial</div>
             </div>
+            <div class="ld-theme-card" data-theme="vinilos" onclick="abrirFichaTheme('vinilos')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0E0E0E,#131313)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#E35925;box-shadow:0 0 8px #E35925"></div><span style="font-size:12px;font-weight:600;color:#E35925">Vinilos Inversos</span></div>
+              <div style="font-size:10px;color:#DBC8A8">Grunge oxido &middot; kraft &middot; cartel urbano</div>
+            </div>
+            <div class="ld-theme-card" data-theme="noche-avalon" onclick="abrirFichaTheme('noche-avalon')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#050709,#0D3B2A)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#F2F2E8;box-shadow:0 0 8px #8E216C"></div><span style="font-size:12px;font-weight:600;color:#F2F2E8">Noche Avalon</span></div>
+              <div style="font-size:10px;color:#8FA88B">Psicodelia nocturna &middot; aurora &middot; editorial</div>
+            </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
@@ -790,6 +798,7 @@ tr:hover td{background:var(--surface)}
               <div class="grid2">
                 <div class="fg"><label style="font-size:11px">Preventa</label><input id="ld-boletos-preventa" placeholder="Ej. $40.000" style="font-size:12px"></div>
                 <div class="fg"><label style="font-size:11px">Taquilla</label><input id="ld-boletos-taquilla" placeholder="Ej. $60.000" style="font-size:12px"></div>
+              <div class="fg"><label style="font-size:11px">Link de ticketera (opcional)</label><input id="ld-boletos-link" type="url" placeholder="https://... (vacio = usa WhatsApp)" style="font-size:12px"></div>
               </div>
             </div>
             <div id="ld-campo-whatsapp" class="fg cont-tab-panel" data-cont-tab="whatsapp" style="display:none"><label style="font-size:12px">WhatsApp de contacto — número internacional sin + (57...)</label><input id="ld-whatsapp-tel" placeholder="Ej. 573001234567" style="font-size:12px"></div>
@@ -3345,6 +3354,11 @@ const _THEME_TYPE = {
   'tropilove':'fiesta','mistico':'fiesta','fosforescente':'fiesta','kande':'fiesta',
   // ADR-054: silo f9b "Mistico Nocturno" (categoria fiesta, ruta css/templates/fiesta/f9b.css).
   'mistico-nocturno':'fiesta',
+  // Silo f14 "Vinilos Inversos" (categoria fiesta, ruta css/templates/fiesta/f14.css).
+  'vinilos':'fiesta',
+// Silo f13 "Noche Avalon" (categoria fiesta, ruta css/templates/fiesta/f13.css).
+// Deuda previa saldada: el silo existia desde 2026-09 sin theme ni card.
+'noche-avalon':'fiesta',
   'solidario-moderno':'campana','urgente-impactante':'campana',
   'tech-futurista':'campana','vintage-organico':'campana',
 };
@@ -3365,6 +3379,12 @@ const _THEME_TPL = {
   // El reverse map _TPL_THEME (linea siguiente) se deriva de este objeto, asi
   // que 'f9b' -> 'mistico-nocturno' queda registrado sin codigo adicional.
   'mistico-nocturno':'f9b',
+  // Silo f14 "Vinilos Inversos": template_id atomico propio. El reverse map
+  // _TPL_THEME se deriva de este objeto, asi que 'f14' -> 'vinilos' queda
+  // registrado sin codigo adicional.
+  'vinilos':'f14',
+// Silo f13 "Noche Avalon": template_id atomico propio. _TPL_THEME se deriva.
+'noche-avalon':'f13',
 };
 
 // Reverse map template_id → theme slug (para cargar la plantilla al editar).
@@ -3417,6 +3437,26 @@ const _THEME_MODULES = {
   // NEVERA ADR-006: antes de listar un ld-mod-* se verifico en QUE panel existe
   // el checkbox (ERRORES_HISTORICOS seccion 13); los 12 listados estan en #mods-fiesta.
   'mistico-nocturno': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-faq-fiesta'], recomendados:['ld-mod-countdown-fiesta','ld-mod-playlist','ld-mod-ubicacion','ld-mod-gallery-fiesta','ld-mod-sponsors-fiesta','ld-mod-whatsapp','ld-mod-banner-1','ld-mod-banner-2'], selectivos:['ld-mod-aforo-fiesta','ld-mod-dresscode-fiesta','ld-mod-guest-list'], metaDosLineas:true },
+  // Silo f14 "Vinilos Inversos". El silo enciende hero, countdown, meta y ctas
+  // del hero, lineup, cartel/poster, video (#mod-video + #db-gallery-grid),
+  // boletos, faq, ubicacion y form. NO enciende footer. De esos, los que tienen
+  // checkbox en #mods-fiesta se mapean aqui:
+  //   #mod-countdown -> ld-mod-countdown-fiesta
+  //   #mod-lineup    -> ld-mod-dj-lineup
+  //   #mod-video     -> ld-mod-gallery-fiesta (galeria)
+  //   #mod-boletos   -> ld-mod-boletos
+  //   #mod-faq       -> ld-mod-faq-fiesta
+  //   #mod-ubicacion -> ld-mod-ubicacion
+  //   #mod-form      -> fase del wizard (no tiene ld-mod-*)
+  // NEVERA ADR-006: hero/hero-meta/hero-ctas/cartel/form/footer NO tienen
+  // checkbox en ningun panel; los gobierna el silo (CSS), por eso no se
+  // inventa ningun id. metaDosLineas:false = hero de 1 linea de meta (el
+  // kernel __esMeta2Lineas() no lista f14, ver nota de _THEME_TITULO_2_LINEAS).
+  'vinilos': { requeridos:['ld-mod-boletos','ld-mod-ubicacion','ld-mod-faq-fiesta'], recomendados:['ld-mod-dj-lineup','ld-mod-countdown-fiesta','ld-mod-gallery-fiesta'], selectivos:['ld-mod-playlist','ld-mod-whatsapp','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta','ld-mod-sponsors-fiesta'], metaDosLineas:false },
+  // Silo f13 "Noche Avalon": modulos deducidos de los #mod-* que f13.css enciende
+  // (hero, hero-ctas, hero-meta, lineup, cartel, video, playlist, boletos, faq,
+  //  ubicacion, form, whatsapp, sponsors y footer).
+  'noche-avalon': { requeridos:['ld-mod-dj-lineup','ld-mod-boletos','ld-mod-ubicacion','ld-mod-faq-fiesta'], recomendados:['ld-mod-playlist','ld-mod-gallery-fiesta','ld-mod-sponsors-fiesta'], selectivos:['ld-mod-whatsapp','ld-mod-dresscode-fiesta','ld-mod-guest-list','ld-mod-aforo-fiesta'], footer:true, metaDosLineas:false },
   'solidario-moderno': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
   'urgente-impactante': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
   'tech-futurista': { requeridos:['ld-mod-historia','ld-mod-objetivo','ld-mod-impacto'], recomendados:['ld-mod-gallery-campana','ld-mod-equipo','ld-mod-sponsors-campana','ld-mod-faq-campana'], selectivos:['ld-mod-testimonios','ld-mod-actualizaciones','ld-mod-contacto'], metaDosLineas:false },
@@ -3647,6 +3687,16 @@ const _THEME_FICHA = {
     t: ['Cyberpunk neon fucsia con azul electrico.','Hero 100svh, mobile-first, Geist 900.','Publico joven y electronica urbana.','Requeridos: lineup, boletos, ubicacion.'] },
   'kande': { n: 'Kande', c: [['Fondo','#0d0b09'],['Secundario','#123b3a'],['Primario','#d98a00'],['Acento','#d6218a'],['Texto','#f5f0e8']],
     t: ['Tropical noir con mostaza y fucsia sobre negro carbon.','Display pesada y textura de papel rasgado.','Publico joven de fiesta caribena.','Requeridos: boletos, playlist y ubicacion.'] },
+  // Silo f14: paleta de la card real (oxido/brasa sobre negro hollin + kraft).
+  // Los 5 slots del panel son Fondo/Secundario/Primario/Acento/Texto; kraft
+  // (#DBC8A8 / claro #EAE0D0), texto tenue (#A3A3A3) y linea (#262626) se
+  // describen en las sugerencias porque el panel solo pinta 5 muestras.
+  'vinilos': { n: 'Vinilos Inversos', c: [['Fondo','#0E0E0E'],['Secundario','#131313'],['Primario','#E35925'],['Acento','#EA580C'],['Texto','#F5F5F5']],
+    t: ['Grunge oxido: brasa #E35925 sobre negro hollin, con kraft #DBC8A8 como papel.','Cartel urbano y poster: tipografia pesada, textura de impresion y grano.','Publico de musica en vivo, vinilo y escena urbana.','Enciende lineup, cartel, video, boletos, FAQ y ubicacion; sin footer.'] },
+  // Silo f13: paleta canonica "Noche Avalon" declarada en la cabecera de f13.css
+  // (negro abismo, verde bosque, musgo, blanco niebla, morado y magenta).
+  'noche-avalon': { n: 'Noche Avalon', c: [['Fondo','#050709'],['Secundario','#0D3B2A'],['Primario','#F2F2E8'],['Acento','#8E216C'],['Texto','#F2F2E8']],
+    t: ['Psicodelia nocturna: niebla #F2F2E8 sobre negro abismo #050709, con verde bosque #0D3B2A.','Editorial pesada con aurora animada, grano cinematografico y reveal al scroll.','Publico de musica electronica y nightlife.','Morado #4C236F y magenta #8E216C son decorativos: nunca texto ni fondo de texto.','Enciende hero, meta, ctas, lineup, cartel, video, playlist, boletos, FAQ, ubicacion, form, whatsapp, sponsors y footer.'] },
   // ADR-054: paleta CALIDA DE f9 HEREDADA con los mismos valores (solo cambia
   // la profundidad, nunca el cromatismo), por eso los 5 colores coinciden con
   // los de 'mistico' a proposito.
@@ -3783,6 +3833,8 @@ function seleccionarTheme(theme, opts) {
     'fosforescente':'Fosforescente',
     'kande':'Kande',
     'mistico-nocturno':'Mistico Nocturno',
+    'vinilos':'Vinilos Inversos',
+'noche-avalon':'Noche Avalon',
   };
   const badge  = document.getElementById('ld-preview-badge');
   const nameEl = document.getElementById('ld-preview-theme-name');
@@ -3818,10 +3870,12 @@ function toggleHeroMetaOverride(on) {
 // CRUCE CON EL KERNEL (verificado 2026-10-02): evento-app.html __esTitulo2Lineas()
 // acepta ['tpl-f6','tpl-f9','tpl-f10','tpl-f13'] y __esMeta2Lineas() acepta
 // ['tpl-f9','tpl-f9b'] (= familia F9, porque .meta-line solo tiene CSS en esos dos;
-// f12.css:735 lo advierte). _THEME_TPL solo mapea f5,f6,f7,f8,f9,f11,f12,f9b, asi que
+// f12.css:735 lo advierte). _THEME_TPL hoy mapea f5,f6,f7,f8,f9,f11,f12,f9b,f13,f14
+// (f13 y f14 desde 2026-10-29), asi que
 // hoy los unicos silos ALCANZABLES con 2 lineas de titulo son f6 y f9, que son
 // exactamente los dos de esta tabla. f10/f13 quedan listados en el kernel por si se
-// mapean despues. Al anadir un silo aqui, anadelo TAMBIEN al kernel (o quedaria
+// mapean despues; mapear el template (f13/f14) NO basta: el silo solo alcanza las 2
+// lineas si su theme se anade TAMBIEN a esta tabla. Al anadir un silo aqui, anadelo TAMBIEN al kernel (o quedaria
 // dato capturado que el kernel nunca pinta).
 const _THEME_TITULO_2_LINEAS = { 'afromango-editor': true, 'mistico': true };
 
@@ -4983,7 +5037,17 @@ function _buildConfigLanding(slug) {
       // el fallback 5.b de openEditMod. #ld-ubicacion-val se retira del formulario
       // (modMap ya no lo muestra); el kernel nunca leyo content.ubicacion.
       whatsapp:    val('ld-whatsapp-tel')   || null,
-      boletos:     (val('ld-boletos-preventa') || val('ld-boletos-taquilla')) ? { preventa: val('ld-boletos-preventa') || null, taquilla: val('ld-boletos-taquilla') || null } : null,
+      boletos:     (() => {
+        // ADR-082: contrato opt-in content.boletos.link|url (solo http(s)).
+        // El kernel lo consume en boleteria y cae al wa.me si falta o es invalido.
+        // Se emite SIEMPRE la clave (null si no aplica) para que no se pierda en
+        // el overwrite total de config_landing (clase BUG-016 / ADR-080).
+        var _bP = val('ld-boletos-preventa') || null;
+        var _bT = val('ld-boletos-taquilla') || null;
+        var _bL = (val('ld-boletos-link') || '').trim();
+        var _bLOk = /^https?:\/\//i.test(_bL) ? _bL : null;
+        return (_bP || _bT || _bLOk) ? { preventa: _bP, taquilla: _bT, link: _bLOk } : null;
+      })(),
       // Banners editoriales f9b - contrato congelado content.banners[0..1]. SIEMPRE se
       // emiten 2 objetos (aunque queden vacios) para que la clave nunca se pierda al
       // re-guardar. Solo frase/autor/etiqueta encienden el modulo en el kernel;
@@ -6229,7 +6293,7 @@ function _limpiarWizardCompleto() {
    'ld-playlist-url','ld-guest-list-val','ld-guestlist-badge','ld-guestlist-titulo','ld-guestlist-descripcion',
    'ld-guestlist-imagen','ld-guestlist-alt','ld-guestlist-patrocina','ld-guestlist-cta-texto','ld-guestlist-cta-url',
    'ld-ubicacion-val','ld-whatsapp-tel','ld-form-redirect','ld-boletos-preventa',
-   'ld-boletos-taquilla','ld-meta-fecha-l1','ld-meta-fecha-l2','ld-meta-hora-l1','ld-meta-hora-l2',
+   'ld-boletos-taquilla','ld-boletos-link','ld-meta-fecha-l1','ld-meta-fecha-l2','ld-meta-hora-l1','ld-meta-hora-l2',
    'ld-meta-lugar-l1','ld-meta-lugar-l2','ld-gallery-fiesta-urls','ld-gallery-urls','ld-faq-fiesta-val','ld-faq-val',
    'ld-sponsors-fiesta-val','ld-sponsors-val','ld-dir-nombre','ld-dir-rol','ld-dir-foto','ld-dir-bio',
    'ld-historia-titulo','ld-historia-val','ld-historia-items-val','ld-objetivo-meta','ld-objetivo-actual',
@@ -6403,6 +6467,7 @@ function _poblarContenidoWizard(content, suf) {
   if (content.boletos) {
     set('ld-boletos-preventa', content.boletos.preventa);
     set('ld-boletos-taquilla', content.boletos.taquilla);
+      set('ld-boletos-link', content.boletos.link || content.boletos.url || '');
   }
   // Banners editoriales f9b - read-back tolerante: si el evento no trae content.banners
   // (undefined) los campos quedan vacios y las cajas sin marcar, sin romper.

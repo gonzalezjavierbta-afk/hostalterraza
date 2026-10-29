@@ -217,6 +217,7 @@
         <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
         <section id="mod-ubicacion">
             <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
+            <a class="mapa-link" target="_blank" rel="noopener" hidden>VER EN MAPA</a>
         </section>
 
         <!-- ============================================================
@@ -321,6 +322,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     </form>
                 </div>
                 <div id="form-ya" style="display:none;"><input type="text" id="rec-cedula" placeholder="Cédula *" style="width:100%; padding:1.2rem; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px;" data-i18n-ph="landing.form_cedula_ph"><button class="btn-submit" style="width:100%; padding:1.5rem; margin-top:1.5rem; background:transparent; border:1px solid var(--gold); color:white; font-weight:900; border-radius:15px; cursor:pointer;" onclick="alert(I18N.t('landing.form_verificar_alert'))" data-i18n="landing.form_verificar">VERIFICAR →</button></div>
+                <div id="db-form-social" class="form-social"></div>
             </div>
         </section>
 
@@ -1911,16 +1913,32 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         footerLinksEl.innerHTML = footerLinksData.map(l => `<li><a href="${l.href || '#'}">${l.texto || ''}</a></li>`).join('');
     }
 
-    const footerSocialData = footerData.social || {};
-    const footerSocialEl = document.getElementById('db-footer-social');
-    if (footerSocialEl) {
+    // v1.14.0 (aditivo): el render de iconos sociales se extrae a una funcion
+    // reutilizable para que el silo f14 pueda pintarlos tambien dentro de
+    // #mod-form. La clase .footer-social-icon y el fallback legado ('#' cuando
+    // no hay URL, mailto: para email) se conservan EXACTAMENTE igual: el footer
+    // de los silos viejos no cambia.
+    function renderSocialIcons(el, socialData, omitirVacios) {
+        if (!el) return;
         const platforms = ['instagram', 'facebook', 'youtube', 'email'];
-        footerSocialEl.innerHTML = platforms.map(p => {
-            const url = footerSocialData[p];
+        const socialObj = socialData || {};
+        el.innerHTML = platforms.map(p => {
+            const url = socialObj[p];
+            if (omitirVacios && !url) return '';
             const icon = FOOTER_SOCIAL_ICONS[p];
             const href = url ? (p === 'email' ? `mailto:${url}` : url) : '#';
             return `<a href="${href}" ${url ? 'target="_blank" rel="noopener"' : ''} class="footer-social-icon">${icon}</a>`;
         }).join('');
+    }
+
+    const footerSocialData = footerData.social || {};
+    renderSocialIcons(document.getElementById('db-footer-social'), footerSocialData);
+    // f14: tira de redes dentro del bloque de registro. Sin datos el contenedor
+    // queda vacio y el silo lo colapsa por :empty. En el resto de silos no se
+    // pinta (cero cambio visual respecto al comportamiento previo).
+    const __esF14Silo = (' ' + String(document.body.className || '') + ' ').indexOf(' tpl-f14 ') !== -1;
+    if (__esF14Silo) {
+        renderSocialIcons(document.getElementById('db-form-social'), footerSocialData, true);
     }
 
     const footerContactoData = footerData.contacto || {};
@@ -2252,7 +2270,7 @@ if (document.getElementById('db-poster-img')) {
         if (faqItems.length > 0) {
             // Inyección con Contrato de Interactividad Física [cite: 706, 18]
             document.getElementById('db-faq-list').innerHTML = faqItems.map(item => `
-                <div class="faq-item" onclick="this.classList.toggle('active')" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="this.classList.toggle('active'); this.setAttribute('aria-expanded', this.classList.contains('active') ? 'true' : 'false');" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }" style="cursor:pointer; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-weight:800; font-size:0.85rem; letter-spacing:1px;">${(item.pregunta || "").toUpperCase()}</span>
                         <div class="faq-icon-circle" style="width:22px; height:22px; border-radius:50%; border:1px solid var(--tpl-accent, #d72dc0); display:flex; align-items:center; justify-content:center; color:var(--tpl-accent, #d72dc0);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
@@ -2293,6 +2311,14 @@ if (document.getElementById('db-poster-img')) {
                 ? `https://maps.google.com/maps?q=${encodeURIComponent(__mapaQuerySilo)}&t=&z=16&ie=UTF8&iwloc=&output=embed`
                 : `https://maps.google.com/maps?ll=${encodeURIComponent(__mapaQuerySilo)}&z=16&output=embed`)
             : `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        // v1.14.0 (aditivo): "VER EN MAPA" como enlace externo navegable.
+        // mapUrl es un EMBED (output=embed), no un link usable: se construye una
+        // constante propia con el MISMO query (override --f12-mapa-query o
+        // ev.ubicacion). Sin query => sin href y el anchor queda oculto.
+        const __mapaQueryLink = __mapaQuerySilo || (ev.ubicacion || '');
+        const mapLink = __mapaQueryLink
+            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(__mapaQueryLink)}`
+            : '';
         const mapContainer = document.getElementById('db-mapa-container');
         
         if (mapContainer) {
@@ -2305,6 +2331,22 @@ if (document.getElementById('db-poster-img')) {
             mapContainer.innerHTML = `
                 <iframe width="100%" height="100%" src="${mapUrl}" allowfullscreen 
                         style="filter: grayscale(1) invert(1) contrast(1.2); border:none;"></iframe>`;
+        }
+
+        // v1.14.0 (aditivo): cableado del anchor "VER EN MAPA". Solo el silo
+        // f14 lo enciende; en el resto de silos permanece oculto (identico al
+        // comportamiento previo). Nunca se deja un link roto sin href.
+        const mapaLinkEl = document.querySelector('#mod-ubicacion .mapa-link');
+        if (mapaLinkEl) {
+            if (__esF14Silo && mapLink) {
+                mapaLinkEl.setAttribute('href', mapLink);
+                mapaLinkEl.hidden = false;
+                mapaLinkEl.style.display = '';
+            } else {
+                mapaLinkEl.removeAttribute('href');
+                mapaLinkEl.hidden = true;
+                mapaLinkEl.style.display = 'none';
+            }
         }
 
         // Certificación de Salud Escudo GOLD [cite: 805, 811]
@@ -2384,13 +2426,22 @@ if (document.getElementById('db-poster-img')) {
     const __waDestino = __normalizeWaTel(effContent.whatsapp || '3102465591');
     const __waBoletosMsg = (effContent.whatsapp_msg || T('landing.wa_info_msg') + ' ' + (effNombre || '')).replace(/ /g, '%20');
 
+    // v1.14.0 (aditivo, SIN migracion): data-ticket-url para que el silo f14
+    // enrute la compra sin tocar el href visible. Override opt-in por dato ya
+    // existente: boletos.link / boletos.url con prefijo http. Si no hay dato,
+    // se replica el wa.me que ya usa el href (compatibilidad total).
+    const __ticketUrlRaw = (boletosData.link || boletosData.url || '');
+    const __ticketUrlOverride = (typeof __ticketUrlRaw === 'string' && /^https?:\/\//i.test(__ticketUrlRaw.trim()))
+        ? __ticketUrlRaw.trim() : '';
+    const __ticketDataUrl = __ticketUrlOverride || `https://wa.me/${__waDestino}?text=${__waBoletosMsg}`;
+
     const boletoCard = (tipo, precio, color, enlazarWA) => {
         const descWA = `<span class="boleto-desc" style="display:block; font-size:0.75rem; opacity:0.6; margin-top:0.2rem; color:#25d366; font-weight:700;">${T('landing.wa_comprar')}</span>`;
         const descNormal = `<span class="boleto-desc" style="display:block; font-size:0.75rem; opacity:0.6; margin-top:0.2rem;">${T('landing.precio_entrada')}</span>`;
         const precioCop = `<span style="font-size:0.7em; font-weight:600; opacity:0.8;">${T('landing.cop')}</span>`;
         if (enlazarWA) {
             return `
-        <a href="https://wa.me/${__waDestino}?text=${__waBoletosMsg}" target="_blank" rel="noopener" class="boleto-card-row" style="display:flex; align-items:center; gap:1rem; padding:1.2rem 1.4rem; border-bottom:1px solid rgba(255,255,255,0.08); cursor:pointer; transition:background 0.2s ease; text-decoration:none;">
+        <a href="${__ticketDataUrl}" data-ticket-url="${__ticketDataUrl}" target="_blank" rel="noopener" class="boleto-card-row" style="display:flex; align-items:center; gap:1rem; padding:1.2rem 1.4rem; border-bottom:1px solid rgba(255,255,255,0.08); cursor:pointer; transition:background 0.2s ease; text-decoration:none;">
             <div class="boleto-icon" style="color:${color}; flex-shrink:0;">${ticketIcon}</div>
             <div style="flex:1; text-align:left;">
                 <span class="boleto-tipo" style="display:block; font-weight:800; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:${color}; margin-bottom:0.3rem;">${tipo}</span>

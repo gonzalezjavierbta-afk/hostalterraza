@@ -1,6 +1,6 @@
 ---
 doc: TEMPLATES.md
-version: v1.7.0 (preservada)
+version: v1.8.0
 fecha: 2026-10-01
 origen: AMPLIACION/TEMPLATES.md L1-503 (AMPLIACION/_backups/TEMPLATES.md.2026-10-01.bak)
 version_previa: TEMPLATES.md v1.7.0 (503 líneas, 57 KB)
@@ -13,9 +13,9 @@ estructura: indice-v1 (2026-10-01)
 
 | Campo | Valor |
 |---|---|
-| **Versión** | v1.7.0 |
+| **Versión** | v1.8.0 |
 | **Propósito** | Hub normativo de silos CSS de `evento.html` (motor real: `evento-app.html`, ver banner de reconciliacion abajo): inventario real del DOM, metodologia de creacion en 8 pasos y brief obligatorio - para que cualquier IA cree, edite o audite un template de forma reproducible. |
-| **Fecha** | 2026-09-16 (v1.3.0) · **2026-09-22 (v1.4.0)** · **2026-09-23 (v1.5.0, salvaguarda hero movil f12)** · **2026-09-26 (v1.6.0, silo f9b + aviso capital-T + contrato de preview)** · **2026-09-29 (v1.7.0, excepción acotada ADR-060 + f9b v1.3.0 — ver Anexo A)** |
+| **Fecha** | 2026-09-16 (v1.3.0) · **2026-09-22 (v1.4.0)** · **2026-09-23 (v1.5.0, salvaguarda hero movil f12)** · **2026-09-26 (v1.6.0, silo f9b + aviso capital-T + contrato de preview)** · **2026-09-29 (v1.7.0, excepción acotada ADR-060 + f9b v1.3.0 — ver Anexo A)** · **2026-10-29 (v1.8.0, silo f14 `vinilos` + 4 cambios aditivos de kernel y contrato opt-in `boletos.link\|url` — ADR-082)** |
 | **Audiencia** | `@frontend-tpl-free`, `@frontend-tpl`, `@free-build`, `@admin-dev-free`, `@docs-keeper-free`, `@qa-auditor` |
 | **Marco** | MOTHER, AI-DOS v1.2, 16 Mandatos de `Reglas de Oro QR.md` (v127-MASTER) |
 | **Baseline de verdad** | Archivos REALES del repositorio (ADR-006). Ningún dato citado aquí se dio por supuesto; todo se verificó contra `evento-app.html` (motor real, reconciliado 2026-09-22), `css/templates/**`, `admin.html` y los docs del Dossier. |

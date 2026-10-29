@@ -479,4 +479,38 @@ task:
 
 10. `node scripts/smoke_checkin_multipunto.js` -> **PASS 28 / FAIL 0**; `node scripts/smoke_puntos_adr081.js` -> **PASS 30 / FAIL 0**; `node scripts/express_check.js` -> **PASS 35 / FAIL 0**; `grep` confirma `hasOwn` en `scanner.html:850`, tab/bloque `data-pnl-*="puntos"`, motor `_pp*`/`propagarPuntosEvento` y tri-state en `admin.html`. Migracion real: `migrations/adr081_puntos_none_semantica.sql` presente (5550 bytes, 0 no-ASCII). **Este cierre documental no introduce cambios de codigo/migraciones adicionales; commits a cargo del orquestador.**
 
+### Cierre de TSK-115 - Silo F14 "Vinilos Inversos" (theme `vinilos`) + 4 cambios aditivos de kernel + contrato `boletos.link|url` (ADR-082) (2026-10-29) - COMPLETADA
+
+#### Entregables
+
+1. **Silo NUEVO real** `css/templates/fiesta/f14.css`: 40.075 bytes, 1.396 lineas, 143 reglas, 5 at-rules, **0 bytes > 127**, doble notacion `.tpl-f14`/`.Tpl-F14` (166 ocurrencias), **0 selectores fuera de scope**, **0 clases/IDs fantasma**. Paleta modo oscuro + kraft + oxido (`#0E0E0E`, `#131313`, `#E35925`, `#EA580C`, `#DBC8A8`, `#EAE0D0`, `#F5F5F5`, `#A3A3A3`, `#262626`), tokens `--f14-*` + puente `--tpl-accent: var(--master-accent, #E35925)`. Grid de 1 columna en mobile y areas `hero/countdown/meta/ctas/lineup/cartel/video/boletos/faq/ubicacion/form` **sin area footer** (la pagina termina en boleteria + comunidad). Breakpoints 640/767/992/1279 + `prefers-reduced-motion`.
+2. **Volcado previo respaldado:** `css/templates/fiesta/f14-volcado-tailwind.bak.css` (38.082 bytes de HTML+Tailwind que ocupaban el nombre del silo; incidente registrado en `ERRORES_HISTORICOS.md` sec. 32 / E32).
+3. **Tipografia:** stack de sistema con peso 900. **Cero `@import`, cero `@font-face`, cero requests a Google Fonts** (patron f12/f13/f9b); el efecto fanzine se resuelve con forma (cinta kraft rotada), no con fuente manuscrita.
+4. **4 cambios aditivos en `evento-app.html`:** FAQ accesible (`:2273`, `role`/`tabindex`/`aria-expanded`/`onkeydown`, el estilo sigue siendo `.active`); anchor "VER EN MAPA" `hidden` por defecto y gateado por `__esF14Silo()` (`:220`, `:2314-2321`, `:2336-2350`, gate `:1939-1942`); `renderSocialIcons()` por extract-method (`:1916-1942`) + `div#db-form-social` (`:325`) bajo gate; `data-ticket-url` desde la constante unica `__ticketDataUrl` (`:2429-2436`, `:2444`).
+5. **Contrato de datos NUEVO opt-in:** `config_landing.content.boletos.link|url` (solo `http(s)`; ruta relativa NO soportada; invalido o ausente -> fallback silencioso al `wa.me` previo). Sin migracion, sin DDL, sin RLS.
+6. **Registro en `admin.html`** (6 puntos, nace visible por ADR-040): card `:600-603`, `_THEME_TYPE` `:3352-3353`, `_THEME_TPL` `:3374-3377`, `_THEME_MODULES` `:3430-3445`, `_THEME_FICHA` `:3675-3681`, `names` del badge `:3818`.
+7. **Smoke NUEVO** `scripts/smoke_f14_vinilos.js` (33 asserts, exit code 0/1).
+8. **ADRs:** `ADR-082` creado en `decisiones/ADR-082-silo-f14-vinilos-inversos-kernel-y-contrato-boletos-link.md` + fila de indice en `DECISIONS.md`. **Nota de numeracion:** el brief preveia `ADR-072`, ya asignado a la atribucion del link de invitador; se usa el siguiente libre tras ADR-081 (`ADR-075` sigue siendo hueco y no se rellena).
+
+#### Deuda declarada (NO cerrada)
+
+9. **El wizard no captura `boletos.link|url`:** el contrato existe en el kernel pero no hay campo de UI que lo alimente; hasta agregarlo, el override es inoperante en la practica (todo cae al `wa.me`).
+10. **`_THEME_TITULO_2_LINEAS`** (`admin.html:3859`) no incluye `vinilos` -> f14 con `metaDosLineas:false` y fuera de `__esTitulo2Lineas()`. Ampliarlo exige tocar admin **y** kernel en el mismo cambio (invariante ADR-070).
+11. **Comentario desactualizado** en `admin.html:3855` (cabecera de `_THEME_TITULO_2_LINEAS` no lista f14). Sin efecto funcional.
+12. **f13 sigue sin theme ni card** en el catalogo de admin (deuda previa, no de esta tarea).
+
+#### Verificacion de cierre (por archivo real, ADR-006)
+
+13. `node scripts/smoke_f14_vinilos.js` -> **PASS 33 / FAIL 0 / exit 0**; `node scripts/express_check.js` -> **PASS, FAIL 0**; balance de divs en baseline preexistente (`evento-app.html` 102/101, `admin.html` 1605/1602); `node --check` de los bloques `<script>` de `evento-app.html` OK. Contraste WCAG: 17.71 / 11.80 / 14.77 / 5.26 / 7.65, y el par no-AA (`#F5F5F5`/`#E35925` = 3.37) **no se usa como texto**. Archivos temporales del QA eliminados de la raiz. **Cambios de codigo en working tree; commit a cargo de Direccion.**
+
+#### Addendum (misma sesion, 2026-10-29): deudas saldadas + tooling de medicion
+
+14. **`f13` registrado** como theme `noche-avalon` (6 puntos del catalogo): card `admin.html:604-607`, `_THEME_TYPE :3361`, `_THEME_TPL :3387`, `_THEME_MODULES :3459`, `_THEME_FICHA :3698`, `names :3837`. Nombre y paleta derivados de la cabecera real de `f13.css` ("Noche Avalon"); modulos deducidos de sus `#mod-*`. Se descarto `ld-mod-cartel` porque **no existe como checkbox** (el `#mod-cartel` lo gobierna el silo).
+15. **El wizard captura la URL de ticketera:** input `#ld-boletos-link` (`:801`), escritura como `content.boletos.link` solo con prefijo `http(s)` (`:5039-5048`), read-back (`:6468`) y reset (`:6294`). La clave se emite siempre (`null` si no aplica) para no perderse en el overwrite total de `config_landing` (clase BUG-016 / ADR-080). El contrato del kernel queda alimentable desde la UI.
+16. **Comentario del catalogo corregido:** `admin.html:3873-3877` ahora lista f13/f14 y advierte que mapear el template **no** habilita las 2 lineas de titulo.
+17. **Tooling de medicion (Mandato #20) reparado:** `scripts/usage_report.js` y `scripts/session_close.js` leian el esquema **V1** (`session`/`message`/`part`, 2.037 sesiones) mientras el runtime escribe **V2** (`session_v2`/`session_message`, 2.442): el reporte del dia devolvia **0 sesiones**. Ahora detectan el esquema, resuelven `--tree`/`--root` por `parent_id` y cuentan turnos por `session_message.type='assistant'`. Verificado: `--summary` del dia lista las 11 sesiones reales (~11,6M tokens, 76,5% cache_read); `node --check` OK en ambos scripts.
+18. **Verificacion tras el addendum:** `node scripts/smoke_f14_vinilos.js` -> **PASS 38 / FAIL 0**; `node scripts/express_check.js` -> **PASS 39 / FAIL 0**; balance de divs `admin.html` en baseline (1605/1602); sintaxis de los 2 bloques `<script>` inline de `admin.html` OK.
+19. **Siguen abiertas:** `_THEME_TITULO_2_LINEAS` no incluye `vinilos` ni `noche-avalon` (f14/f13 con `metaDosLineas:false`); `f13.css` sigue estilizando `.faq-q` inexistente.
+
+
 
