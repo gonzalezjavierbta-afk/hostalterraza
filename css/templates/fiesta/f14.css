@@ -905,6 +905,23 @@
     margin-bottom: 2.5rem !important;
 }
 
+/* Caja 16:9 del video vacia (Cero Borrado).
+   El kernel solo apaga #mod-video cuando NO hay galeria; en este evento hay
+   galeria y NO hay video_url, asi que #db-video-content quedaba como un
+   rectangulo negro 16:9 sin nada dentro. Se oculta SOLO esa caja mientras
+   este vacia: el atomo sigue en el DOM y reaparece en cuanto el kernel le
+   inyecte contenido, porque el selector :empty deja de aplicar. */
+.tpl-f14 #db-video-content:empty,
+.Tpl-F14 #db-video-content:empty {
+    display: none !important;
+}
+
+/* Sin caja de video no hace falta el aire bajo las fotos */
+.tpl-f14 #mod-video:has(#db-video-content:empty) #db-gallery-grid,
+.Tpl-F14 #mod-video:has(#db-video-content:empty) #db-gallery-grid {
+    margin-bottom: 0 !important;
+}
+
 .tpl-f14 #db-gallery-grid .gallery-item,
 .Tpl-F14 #db-gallery-grid .gallery-item {
     position: relative;
@@ -1614,9 +1631,8 @@
             "hero hero"
             "ctas ctas"
             "lineup lineup"
-            "cartel cartel"
+            "cartel playlist"
             "video video"
-            "playlist playlist"
             "faq ubicacion"
             "boletos form";
         column-gap: 1.5rem;
@@ -1631,6 +1647,67 @@
     .tpl-f14 .artist-card.headliner,
     .Tpl-F14 .artist-card.headliner {
         grid-column: span 2;
+    }
+
+    /* --- 18b. CARTEL + PLAYLIST en la misma fila de la rejilla -------------
+       El poster manda el alto de la fila y el embed de Spotify se estira
+       hasta igualarlo (piso de 480px). El alto 400px/352px de la base y de
+       <=767 sigue vigente; aqui se sobrescribe solo por cascada y, en el
+       limite exacto de 767px, por especificidad extra (#mod-playlist). */
+    .tpl-f14 #mod-cartel,
+    .Tpl-F14 #mod-cartel {
+        align-self: stretch;
+    }
+
+    .tpl-f14 #mod-cartel .cartel-inner,
+    .Tpl-F14 #mod-cartel .cartel-inner {
+        max-width: 100% !important;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tpl-f14 #mod-cartel #db-poster-img,
+    .Tpl-F14 #mod-cartel #db-poster-img {
+        width: 100% !important;
+        max-width: 100%;
+        height: auto;
+        max-height: 640px;
+        object-fit: contain;
+    }
+
+    .tpl-f14 #mod-playlist,
+    .Tpl-F14 #mod-playlist {
+        align-self: stretch;
+    }
+
+    .tpl-f14 #mod-playlist > div,
+    .Tpl-F14 #mod-playlist > div {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .tpl-f14 #mod-playlist #db-spotify-embed,
+    .Tpl-F14 #mod-playlist #db-spotify-embed {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 480px !important;
+    }
+
+    .tpl-f14 #mod-playlist #db-spotify-embed iframe,
+    .Tpl-F14 #mod-playlist #db-spotify-embed iframe {
+        flex: 1 1 auto;
+        height: 100% !important;
+        min-height: 0;
+    }
+
+    .tpl-f14 #mod-playlist .spotify-open-link,
+    .Tpl-F14 #mod-playlist .spotify-open-link {
+        flex: 0 0 auto;
+        align-self: center;
     }
 }
 
@@ -1915,5 +1992,30 @@
           - Seccion 12b: rotulo "PLAYLIST" en CSS (la seccion no trae h2;
             Cero Borrado), marco kraft/naranja de fanzine y anchor "Abrir en
             Spotify" (ADR-050) con hover de bloque solido.
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.3 - 2026-11-01 - Reacomodo del layout CARTEL + PLAYLIST + VIDEO:
+          - >=767: el cartel y el playlist comparten UNA fila (la rejilla pasa
+            de "cartel cartel" + "playlist playlist" a "cartel playlist"); el
+            resto de filas (hero, ctas, lineup, video, faq/ubicacion,
+            boletos/form) queda igual y en el mismo orden. <=767 sigue apilado
+            a ancho completo.
+          - La columna del cartel estira su celda (align-self: stretch) y el
+            .cartel-inner se vuelve flex centrado con max-width:100%, para que
+            el poster (#db-poster-img: width 100%, max-height 640px,
+            object-fit: contain) defina el alto de la fila sin deformarse.
+          - El playlist se estira al alto del cartel: cadena flex de altura
+            completa (#mod-playlist > div -> #db-spotify-embed -> iframe) con
+            piso de 480px en el embed; el anchor "Abrir en Spotify" queda
+            flex: 0 0 auto y centrado, sin empujar al iframe. El alto fijo de
+            400px (352px en <=767) se conserva para movil; esta media lo
+            sobrescribe por cascada y, en el limite exacto de 767px, por
+            especificidad (.tpl-f14 #mod-playlist #db-spotify-embed iframe).
+          - Caja de video vacia: #db-video-content:empty se oculta con CSS
+            (display:none). El kernel solo apaga #mod-video cuando no hay
+            galeria; aqui hay 3 fotos y no hay video_url, asi que la caja 16:9
+            quedaba negra y vacia. Cero Borrado: el atomo sigue en el DOM y
+            reaparece cuando el kernel le inyecte contenido (:empty deja de
+            aplicar). #db-gallery-grid pierde su margin-bottom solo en ese
+            caso, para no dejar hueco bajo las fotos.
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */

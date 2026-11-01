@@ -162,9 +162,17 @@ check('admin: write boletos.link', /link:\s*_bLOk/.test(admin));
 //     inyecta en el DOM y queda invisible.
 check('silo: activa #mod-playlist', /\.tpl-f14 #mod-playlist,[\s\S]{0,900}?display:\s*block !important/.test(cssRaw));
 check('silo: grid-area playlist', /\.tpl-f14 #mod-playlist,[\s\S]{0,90}?grid-area:\s*playlist/.test(cssRaw));
-const playlistAreas = (cssRaw.match(/"playlist"/g) || []).length;
+// Los conteos de rejilla se hacen sobre el CSS sin comentarios: el LOG DE
+// VERSIONES menciona los nombres de las areas y producia falsos positivos.
+const playlistAreas = (css.match(/"playlist"/g) || []).length;
 check('silo: "playlist" en las rejillas (base + movil)', playlistAreas >= 2, playlistAreas + ' ocurrencias');
-check('silo: "playlist playlist" en breakpoint 767', /"playlist playlist"/.test(cssRaw));
+check('silo: "cartel playlist" en la fila del breakpoint 767', /"cartel playlist"/.test(css));
+check('silo: sin fila "playlist playlist" suelta', !/"playlist playlist"/.test(css));
+check('silo: playlist estirado al alto del cartel', /#db-spotify-embed iframe[\s\S]{0,200}?height:\s*100% !important/.test(css) && /min-height:\s*480px !important/.test(css));
+check('silo: cartel a alto completo en 2 columnas', /#mod-cartel[\s\S]{0,80}?align-self:\s*stretch/.test(css));
+check('silo: caja de video vacia oculta (Cero Borrado)', /#db-video-content:empty[\s\S]{0,120}?display:\s*none !important/.test(css));
+check('silo: sin aire bajo la galeria sin video', /#mod-video:has\(#db-video-content:empty\) #db-gallery-grid/.test(css));
+
 check('silo: iframe del embed con alto fijo', /#db-spotify-embed iframe[\s\S]{0,400}?height:\s*\d+px !important/.test(cssRaw));
 check('silo: alto movil del iframe', /352px/.test(cssRaw));
 check('silo: rotulo PLAYLIST en ::before', /content:\s*"PLAYLIST"/.test(cssRaw));
