@@ -894,6 +894,8 @@ tr:hover td{background:var(--surface)}
         <div class="fg" id="ev-fecha-wrap"><label>Fecha *</label><input type="date" id="ev-f"></div>
         <div class="fg"><label>Hora</label><input type="time" id="ev-h"></div>
         <div class="fg"><label>Ubicación</label><input id="ev-ubic" placeholder="Ej. Terraza piso 3 · Cra 5 #10-20, Bogotá"></div>
+        <div class="fg" id="ev-lat-wrap"><label>Latitud <span style="color:var(--ink3);font-weight:400;font-size:11px">(opcional)</span></label><input id="ev-lat" inputmode="decimal" placeholder="4.60393995" title="Coordenada WGS84 del recinto. Si existe, el mapa se centra en este punto y manda sobre la direccion."></div>
+        <div class="fg" id="ev-lng-wrap"><label>Longitud <span style="color:var(--ink3);font-weight:400;font-size:11px">(opcional)</span></label><input id="ev-lng" inputmode="decimal" placeholder="-74.06869074" title="Coordenada WGS84 del recinto (negativa al oeste de Greenwich)."></div>
         <div class="fg"><label>Paleta de color del evento</label>
           <div id="ev-palette-slots" style="display:flex;flex-direction:column;gap:6px">
             <div class="ev-slot" data-slot="1" onclick="setSlotActivo(1)" title="Acento (accent) - obligatorio" style="display:flex;gap:8px;align-items:center">
@@ -2889,6 +2891,10 @@ let HAS_EVENTO_ESTADO = false;
 // ADR-051: feature-detection de la columna 'eventos.fase_landing' (migracion
 // adr051 aplicada manualmente). Se resuelve UNA VEZ en _detectarFaseLanding().
 let HAS_EVENTO_FASE = false;
+// ADR-088: feature-detection de las columnas 'eventos.lat' / 'eventos.lng'
+// (migracion adr088 aplicada manualmente). Mientras no existan, los inputs se
+// ocultan y NUNCA se escriben, para no romper el INSERT/UPDATE de eventos.
+let HAS_EVENTO_COORDS = false;
 let _orgData = null;     // Datos completos de la organización (branding, plan, etc.) // cliente Supabase global
 
 const STORAGE_CFG = 'hostal_supa_cfg';
@@ -2965,6 +2971,40 @@ async function _detectarFaseLanding() {
 function _aplicarEstadoFaseLanding() {
   const wrap = document.getElementById('ev-fase-landing-wrap');
   if (wrap) wrap.style.display = HAS_EVENTO_FASE ? '' : 'none';
+}
+
+// ADR-088: coordenadas WGS84 opcionales del recinto (eventos.lat / eventos.lng).
+// Lee el valor de un input y devuelve numero finito o null: nunca NaN ni ''.
+function __coordNum(v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+// ADR-088: misma deteccion que estado/fase. Un error PGRST204 significa que las
+// columnas no existen: default conservador false (inputs ocultos, payload limpio).
+async function _detectarCoordenadasEvento() {
+  if (!SB) { HAS_EVENTO_COORDS = false; _aplicarEstadoCoordenadas(); return; }
+  try {
+    const { error } = await SB.from('eventos').select('lat,lng').limit(1);
+    HAS_EVENTO_COORDS = !error;
+    if (error) console.info('[ADR-088] eventos.lat/lng no existen en esta instancia (' + (error.code || 'query-failed') + '):', error.message);
+    else       console.info('[ADR-088] eventos.lat/lng disponibles; se escribiran en los INSERT/UPDATE de eventos.');
+  } catch (e) {
+    console.warn('[ADR-088] no se pudo detectar eventos.lat/lng; default false:', e.message);
+    HAS_EVENTO_COORDS = false;
+  }
+  _aplicarEstadoCoordenadas();
+}
+
+// ADR-088: Cero Borrado. Los inputs siguen en el DOM; solo se ocultan mientras
+// la migracion no este aplicada en la instancia.
+function _aplicarEstadoCoordenadas() {
+  ['ev-lat-wrap', 'ev-lng-wrap'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = HAS_EVENTO_COORDS ? '' : 'none';
+  });
 }
 
 async function checkConnection() {
@@ -6039,6 +6079,9 @@ function openEditMod(evId) {
   document.getElementById('ev-f').value     = ev.fecha   || '';
   document.getElementById('ev-h').value     = ev.hora    || '';
   document.getElementById('ev-ubic').value  = ev.ubicacion || '';
+  const __fillCoord = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v === null || v === undefined) ? '' : String(v); };
+  __fillCoord('ev-lat', ev.lat);
+  __fillCoord('ev-lng', ev.lng);
   document.getElementById('ev-aforo').value = ev.aforo_max || '';
   document.getElementById('ev-wa-share').checked = ev.wa_share !== false;
 
@@ -6622,6 +6665,12 @@ function _buildPreviewPayload() {
       fecha:       (document.getElementById('ev-f')?.value || '').trim(),
       hora:        (document.getElementById('ev-h')?.value || '').trim(),
       ubicacion:   (document.getElementById('ev-ubic')?.value || '').trim(),
+      // ADR-088: coordenadas opcionales. Sin columnas en la instancia el spread
+      // queda vacio y el payload es identico al de antes.
+      ...(HAS_EVENTO_COORDS ? {
+        lat: __coordNum(document.getElementById('ev-lat')?.value),
+        lng: __coordNum(document.getElementById('ev-lng')?.value),
+      } : {}),
       descripcion: (document.getElementById('ev-d')?.value || '').trim(),
       poster_url:  (document.getElementById('ev-poster-url')?.value || '').trim(),
       imagen_url:  (document.getElementById('ev-img')?.value || '').trim(),
@@ -6734,6 +6783,10 @@ async function guardarEventoWizard() {
       hora:           document.getElementById('ev-h').value || null,
       descripcion:    (document.getElementById('ev-d').value || '').trim() || null,
       ubicacion:      (document.getElementById('ev-ubic').value || '').trim() || null,
+      ...(HAS_EVENTO_COORDS ? {
+        lat: __coordNum(document.getElementById('ev-lat')?.value),
+        lng: __coordNum(document.getElementById('ev-lng')?.value),
+      } : {}),
       color_primario: document.getElementById('ev-color-hex').value.trim() || '#c9a84c',
       imagen_url:     (document.getElementById('ev-img').value || '').trim() || null,
       poster_url:     (document.getElementById('ev-poster-url').value || '').trim() || null,
@@ -8448,6 +8501,10 @@ async function _crearEventoUnico(n) {
     hora: document.getElementById('ev-h').value||null,
     descripcion: document.getElementById('ev-d').value.trim()||null,
     ubicacion: document.getElementById('ev-ubic').value.trim()||null,
+    ...(HAS_EVENTO_COORDS ? {
+      lat: __coordNum(document.getElementById('ev-lat')?.value),
+      lng: __coordNum(document.getElementById('ev-lng')?.value),
+    } : {}),
     color_primario: document.getElementById('ev-color-hex').value.trim()||'#c9a84c',
     imagen_url: document.getElementById('ev-img').value.trim()||null,
     video_url:  document.getElementById('ev-video')?.value.trim()||null,
@@ -8611,7 +8668,7 @@ puntos_acceso: getPuntosAcceso(),
   const pubLink = window.location.origin + '/serie.html?slug=' + slug;
   alrt('ev-alert',`✓ Serie "${n}" creada con ${nSes} sesiones. <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página de la serie →</a>`,'ok');
 
-  ['ev-n','ev-h','ev-d','ev-ubic','ev-img'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  ['ev-n','ev-h','ev-d','ev-ubic','ev-img','ev-lat','ev-lng'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('ev-serie-f1').value='';
   _evResetPaleta('#c9a84c'); // ADR-080 - 5 slots al default canonico
   document.getElementById('ev-img-preview').style.display='none';
@@ -12352,6 +12409,9 @@ async function onLogin(user) {
   // ADR-051: unica deteccion de 'eventos.fase_landing' (fire-and-forget; si
   // aun no termino, el bloque de fase se mantiene oculto y no se escribe).
   _detectarFaseLanding();
+
+  // ADR-088: unica deteccion de 'eventos.lat'/'eventos.lng' (fire-and-forget).
+  _detectarCoordenadasEvento();
 
   // 1. Cargar perfil del usuario
   const { data: perfil, error: perfilErr } = await SB.from('perfiles')

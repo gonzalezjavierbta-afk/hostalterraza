@@ -40,6 +40,18 @@
        (.tpl-f6) lo enciende vía su CSS con display flex. Cero Borrado. */
     #mod-hero-ctas { display: none !important; }
 
+    /* 3B. DIRECCION EN TEXTO BAJO EL MAPA (v1.15.0, aditivo - ADR-088).
+       Unica regla global permitida para este nodo: los silos la sobrescriben
+       desde su CSS .tpl-{id}. Sin estilos de silo filtrados a :root aqui. */
+    #mod-ubicacion .mapa-direccion {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        opacity: .82;
+        margin: .9rem 0 0;
+        line-height: 1.5;
+    }
+    #mod-ubicacion .mapa-direccion[hidden] { display: none !important; }
+
     /* 4. CARGA Y FEEDBACK — preloader minimalista (solo la rueda, sin texto) */
     .loading-overlay {
         position: fixed; inset: 0; background: #000; z-index: 999;
@@ -217,6 +229,9 @@
         <!-- MÓDULO 6B: UBICACIÓN / MAPA (split v1.4.8 de #mod-faq-ubicacion) -->
         <section id="mod-ubicacion">
             <div id="db-mapa-container" style="height:380px; border-radius:15px; overflow:hidden;"></div>
+            <!-- v1.15.0 (aditivo, ADR-088): direccion en texto bajo el mapa. Nace
+                 oculto; el kernel lo enciende solo si eventos.ubicacion trae texto. -->
+            <p id="db-mapa-direccion" class="mapa-direccion" hidden></p>
             <a class="mapa-link" target="_blank" rel="noopener" hidden>VER EN MAPA</a>
         </section>
 
@@ -2374,7 +2389,16 @@ if (document.getElementById('db-poster-img')) {
     // === FIN SEGMENTO FAQ ===
 
     // === INICIO SEGMENTO: VINCULACIÓN DE UBICACIÓN (v201) ===
-    if (ev.ubicacion) {
+    // v1.15.0 (ADR-088): coordenadas reales del evento (eventos.lat / lng).
+    // Acepta number o string numerico devuelto por el REST: normaliza con
+    // Number() y valida isFinite. Descarta null, '', undefined y 0,0.
+    const __latEvento = (ev.lat === null || ev.lat === undefined || ev.lat === '') ? NaN : Number(ev.lat);
+    const __lngEvento = (ev.lng === null || ev.lng === undefined || ev.lng === '') ? NaN : Number(ev.lng);
+    const __coordsEvento = (isFinite(__latEvento) && isFinite(__lngEvento) && !(__latEvento === 0 && __lngEvento === 0))
+        ? __latEvento + ',' + __lngEvento
+        : '';
+    // Con coordenadas hay mapa aunque la direccion en texto este vacia.
+    if (ev.ubicacion || __coordsEvento) {
         // Nota v1.4.8: se retiró la referencia a #venue-name — ese ID nunca existió en el HTML
         // (remanente huérfano de una versión anterior), la condición nunca era verdadera.
 
@@ -2390,16 +2414,24 @@ if (document.getElementById('db-poster-img')) {
         // exacta + cero overlay. Default 0 = comportamiento anterior (ll=).
         const __mapaQuerySilo = (getComputedStyle(document.body).getPropertyValue('--f12-mapa-query') || '').trim();
         const __mapaPinNativo = (getComputedStyle(document.body).getPropertyValue('--mapa-pin-nativo') || '').trim() === '1';
-        const mapUrl = __mapaQuerySilo
+        // v1.15.0 (ADR-088): precedencia del query del mapa.
+        //   (1) token del silo --f12-mapa-query  -> comportamiento previo intacto
+        //   (2) eventos.lat + eventos.lng        -> coordenada real del evento
+        //   (3) ev.ubicacion en crudo            -> fallback historico (z=15)
+        const __mapaQuery = __mapaQuerySilo || __coordsEvento;
+        // Direccion cruda (solo se usa si (1) y (2) no existen). Sin trim:
+        // el fallback historico debe producir EXACTAMENTE el mismo string.
+        const __mapaQueryRaw = ev.ubicacion || '';
+        const mapUrl = __mapaQuery
             ? (__mapaPinNativo
-                ? `https://maps.google.com/maps?q=${encodeURIComponent(__mapaQuerySilo)}&t=&z=16&ie=UTF8&iwloc=&output=embed`
-                : `https://maps.google.com/maps?ll=${encodeURIComponent(__mapaQuerySilo)}&z=16&output=embed`)
-            : `https://maps.google.com/maps?q=${encodeURIComponent(ev.ubicacion)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                ? `https://maps.google.com/maps?q=${encodeURIComponent(__mapaQuery)}&t=&z=16&ie=UTF8&iwloc=&output=embed`
+                : `https://maps.google.com/maps?ll=${encodeURIComponent(__mapaQuery)}&z=16&output=embed`)
+            : `https://maps.google.com/maps?q=${encodeURIComponent(__mapaQueryRaw)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
         // v1.14.0 (aditivo): "VER EN MAPA" como enlace externo navegable.
         // mapUrl es un EMBED (output=embed), no un link usable: se construye una
-        // constante propia con el MISMO query (override --f12-mapa-query o
-        // ev.ubicacion). Sin query => sin href y el anchor queda oculto.
-        const __mapaQueryLink = __mapaQuerySilo || (ev.ubicacion || '');
+        // constante propia con el MISMO query (__mapaQuery o la direccion cruda).
+        // Sin query => sin href y el anchor queda oculto.
+        const __mapaQueryLink = __mapaQuery || __mapaQueryRaw;
         const mapLink = __mapaQueryLink
             ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(__mapaQueryLink)}`
             : '';
@@ -2407,7 +2439,7 @@ if (document.getElementById('db-poster-img')) {
         
         if (mapContainer) {
             mapContainer.style.border = '1px solid var(--tpl-accent)';
-            if (__mapaQuerySilo && !__mapaPinNativo) {
+            if (__mapaQuery && !__mapaPinNativo) {
                 mapContainer.classList.add('map-own-pin');
             } else {
                 mapContainer.classList.remove('map-own-pin');
@@ -2430,6 +2462,21 @@ if (document.getElementById('db-poster-img')) {
                 mapaLinkEl.removeAttribute('href');
                 mapaLinkEl.hidden = true;
                 mapaLinkEl.style.display = 'none';
+            }
+        }
+
+        // v1.15.0 (aditivo, ADR-088): direccion en texto bajo el mapa. Funciona
+        // en TODOS los silos (sin gate de template). textContent, nunca
+        // innerHTML: la direccion es dato de usuario. Sin texto => hidden.
+        const mapDirEl = document.getElementById('db-mapa-direccion');
+        if (mapDirEl) {
+            const __dirTexto = String(ev.ubicacion || '').trim();
+            if (__dirTexto) {
+                mapDirEl.textContent = __dirTexto;
+                mapDirEl.removeAttribute('hidden');
+            } else {
+                mapDirEl.textContent = '';
+                mapDirEl.setAttribute('hidden', '');
             }
         }
 
