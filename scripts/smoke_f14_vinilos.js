@@ -176,6 +176,8 @@ check('silo: sin aire bajo la galeria sin video', /#mod-video:has\(#db-video-con
 check('silo: iframe del embed con alto fijo', /#db-spotify-embed iframe[\s\S]{0,400}?height:\s*\d+px !important/.test(cssRaw));
 check('silo: alto movil del iframe', /352px/.test(cssRaw));
 check('silo: rotulo PLAYLIST en ::before', /content:\s*"PLAYLIST"/.test(cssRaw));
+check('silo: rotulo PLAYLIST compacto en escritorio', /#mod-playlist::before[\s\S]{0,220}?font-size:\s*clamp\(1\.5rem,\s*2\.4vw,\s*2\.4rem\)/.test(css));
+check('silo: embed ocupa el 100% de su columna', /#mod-playlist #db-spotify-embed[\s\S]{0,300}?max-width:\s*100% !important/.test(css));
 check('silo: enlace Abrir en Spotify estilizado', /\.spotify-open-link[\s\S]{0,400}?\{/.test(cssRaw));
 
 // 13) Kernel: regla general de boleteria de tarifa unica (v1.15.0).

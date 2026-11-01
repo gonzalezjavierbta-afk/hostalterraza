@@ -1682,11 +1682,30 @@
         align-self: stretch;
     }
 
+    /* Rotulo PLAYLIST compacto en escritorio: el clamp gigante de la base es
+       mobile-first y en la columna 50/50 competia con el ancho de la caja (se
+       comia el aire lateral y empujaba el rotulo fuera del marco). Aqui baja a
+       2.4rem maximo. <=767 conserva el clamp(2.4rem, 8vw, 6rem) de la base. */
+    .tpl-f14 #mod-playlist::before,
+    .Tpl-F14 #mod-playlist::before {
+        font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+        letter-spacing: 0.08em;
+        padding: 0 0 0.7rem;
+        -webkit-text-stroke: 1px var(--f14-cafe);
+    }
+
+    /* Ancho real de la caja: el wrapper que inyecta el kernel trae
+       max-width:1100px; margin:0 auto en linea y el embed el mismo tope, asi
+       que en la columna 50/50 la caja quedaba mas angosta que su celda. Se
+       anade solo ancho (la cadena flex de alto de abajo sigue intacta). */
     .tpl-f14 #mod-playlist > div,
     .Tpl-F14 #mod-playlist > div {
         display: flex;
         flex-direction: column;
         height: 100%;
+        width: 100%;
+        max-width: 100% !important;
+        margin: 0 !important;
     }
 
     .tpl-f14 #mod-playlist #db-spotify-embed,
@@ -1695,6 +1714,13 @@
         display: flex;
         flex-direction: column;
         min-height: 480px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        /* Sombra a 6px: a 767px el marco llega al borde de la columna y el
+           desplazamiento de 8px del marco base se recortaba contra el padding
+           del contenedor. */
+        box-shadow: 6px 6px 0 rgba(227, 89, 37, 0.22);
     }
 
     .tpl-f14 #mod-playlist #db-spotify-embed iframe,
@@ -2017,5 +2043,20 @@
             reaparece cuando el kernel le inyecte contenido (:empty deja de
             aplicar). #db-gallery-grid pierde su margin-bottom solo en ese
             caso, para no dejar hueco bajo las fotos.
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.4 - 2026-11-01 - Ajuste visual del modulo PLAYLIST en escritorio:
+          - >=767: el rotulo "PLAYLIST" (:before de CSS, la seccion no trae h2)
+            pasa a tamano compacto clamp(1.5rem, 2.4vw, 2.4rem), letter-spacing
+            0.08em y stroke de 1px, porque el clamp gigante de la base es
+            mobile-first y en la columna 50/50 competia con el ancho de la caja.
+            <=767 conserva intacto clamp(2.4rem, 8vw, 6rem).
+          - El embed ocupa el 100% de su columna: el wrapper del kernel llega
+            con max-width:1100px y margin:0 auto en linea y el embed tenia el
+            mismo tope, asi que la caja quedaba mas angosta que la celda. Ahora
+            #mod-playlist > div y #db-spotify-embed van a width/max-width 100%
+            sin margenes laterales, sin duplicar la cadena flex de estiramiento
+            (que sigue con su piso de 480px).
+          - La sombra del marco baja a 6px 6px 0 solo en esta media, para que el
+            desplazamiento no se recorte al tocar el borde de la columna.
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */
