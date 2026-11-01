@@ -2573,11 +2573,39 @@ if (document.getElementById('db-poster-img')) {
         if (bwT) bwT.innerHTML = __hasTaquillaReal ? boletoCard(__labelTaquilla, boletosData.taquilla, '#e67e22', true) : '';
         __hideEmptyModule('mod-boletos', __hasPreventaReal || __hasTaquillaReal);
     } else {
-        if (bwP) bwP.innerHTML = boletoCard(__labelPreventa, preventaVal, '#9b59b6', true);
-        if (bwT) bwT.innerHTML = boletoCard(__labelTaquilla, taquillaVal, '#e67e22', true);
-        // v307 (aditivo): sin tarifas configuradas (ni preventa/taquilla ni tickets_info)
-        // la boleteria se oculta en lugar de pintar tarjetas "POR DEFINIR".
-        __hideEmptyModule('mod-boletos', !!(boletosData.preventa && boletosData.preventa !== T('landing.pendiente_def')) || (boletosData.taquilla && boletosData.taquilla !== T('landing.pendiente_def')) || effContent.tickets_info);
+        // v1.15.0 (regla general): si hay UNA SOLA tarifa real se pinta UNA tarjeta
+        // con rotulo ENTRADA GENERAL en el slot de taquilla (bwT) y el slot de
+        // preventa (bwP) queda vacio. Motivo: la rama vieja pintaba siempre dos
+        // tarjetas y la que no tenia dato caia al relleno "POR DEFINIR"
+        // (caso real: vinilos-inversos-c8yu con solo boletos.taquilla).
+        // Fuentes de tarifa real: boletos.preventa, boletos.taquilla y, como
+        // tercera fuente legacy, content.tickets_info. Con dos o mas tarifas y
+        // con cero tarifas se conserva el comportamiento anterior. La rama f9
+        // (__esF9Boletos, arriba) queda intacta. No se elimina ningun atomo: los
+        // contenedores db-boletos-preventa / db-boletos-taquilla siguen en el DOM.
+        const __ticketsInfoLegacy = (typeof effContent.tickets_info === 'string')
+            ? effContent.tickets_info.trim() : '';
+        const __hasTicketsInfoReal = !!__ticketsInfoLegacy && __ticketsInfoLegacy !== __pendienteVal;
+        const __tarifasReales = (__hasPreventaReal ? 1 : 0) + (__hasTaquillaReal ? 1 : 0) + (__hasTicketsInfoReal ? 1 : 0);
+        if (__tarifasReales === 1) {
+            const __precioUnico = __hasPreventaReal
+                ? boletosData.preventa
+                : (__hasTaquillaReal ? boletosData.taquilla : __ticketsInfoLegacy);
+            // En el silo f8 "preventa"/"taquilla" significan INDIVIDUAL/PAREJA:
+            // ahi se conserva el rotulo propio de la tarjeta con precio real.
+            const __labelUnico = __esF8Boletos
+                ? (__hasTaquillaReal && !__hasPreventaReal ? __labelTaquilla : __labelPreventa)
+                : T('landing.boletos_entrada_general');
+            if (bwP) bwP.innerHTML = '';
+            if (bwT) bwT.innerHTML = boletoCard(__labelUnico, __precioUnico, '#e67e22', true);
+            __hideEmptyModule('mod-boletos', true);
+        } else {
+            if (bwP) bwP.innerHTML = boletoCard(__labelPreventa, preventaVal, '#9b59b6', true);
+            if (bwT) bwT.innerHTML = boletoCard(__labelTaquilla, taquillaVal, '#e67e22', true);
+            // v307 (aditivo): sin tarifas configuradas (ni preventa/taquilla ni tickets_info)
+            // la boleteria se oculta en lugar de pintar tarjetas "POR DEFINIR".
+            __hideEmptyModule('mod-boletos', !!(boletosData.preventa && boletosData.preventa !== T('landing.pendiente_def')) || (boletosData.taquilla && boletosData.taquilla !== T('landing.pendiente_def')) || effContent.tickets_info);
+        }
     }
     // === FIN SEGMENTO BOLETERÍA ===
 

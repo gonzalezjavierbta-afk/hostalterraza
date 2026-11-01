@@ -121,6 +121,8 @@ Estructuras y componentes aditivos habilitados bajo la Flexibilización de Proto
 * `#org-name-badge`: Badge de identidad de la organización promotora.
 * `#unified-frame`: Contenedor maestro del Countdown (Heartbeat activo).
 * `#db-spotify-embed`: Playlist sincronizada (Sync 1:1 con altura del video).
+* Regla de boleteria de **tarifa unica** (ADR-087, kernel `evento-app.html` v1.15.0): `#mod-boletos` cuenta las tarifas REALES de `content.boletos.preventa`, `content.boletos.taquilla` y la fuente legacy `content.tickets_info` (cada una excluye vacio y el centinela `landing.pendiente_def`). Con exactamente 1 se pinta UNA tarjeta rotulada `landing.boletos_entrada_general` en `#db-boletos-taquilla` y `#db-boletos-preventa` queda vacio; con 0 o 2+ se mantiene el par PREVENTA/TAQUILLA. La familia f9/f9b (`__esF9Boletos`) y el silo f8 (`__esF8Boletos` = INDIVIDUAL/PAREJA) quedan fuera por contrato. Los atomos NO se eliminan (Cero Borrado).
+* Activacion de modulos por silo: el kernel oculta por IoC (`section, header, footer { display:none }`) y es el CSS del silo el unico que enciende sus `section` y las declara en sus `grid-template-areas`; un modulo con contenido inyectado puede quedar invisible si el silo no lo activa (caso `#mod-playlist` en f14, silo v1.2).
 * `#meta-magnitud`: Metadatos sísmicos / métricas numéricas de impacto.
 * `#mod-mapa-crisis`: Visualización interactiva/animada de zonas y mapas operativos.
 * `#mod-como-ayudar`: Módulo interactivo de segmentación de roles, tipos de ayuda y voluntariado. 5 categorías vigentes desde el Contrato v112 (ADR-015): `espacio`, `artista`, `marca`, `voluntario`, `donacion`.

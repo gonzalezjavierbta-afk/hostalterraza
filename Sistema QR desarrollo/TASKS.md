@@ -32,6 +32,8 @@ estructura: indice-v1 (2026-10-01)
 
 > **Delta por TSK-117 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+1 cerrada = TSK-117** (contador del landing en zona horaria de Bogota + cleanup del `setInterval`) y **+3 deudas NUEVAS sin ID propio** (declaradas en el cierre de TSK-117 y en ADR-084). Delta efectivo del corte: **+1 cerrada / +3 abiertas**. TSK-117 es **motor compartido** (`evento-app.html`, 14 silos): `git diff --numstat` = **+86 / -19** y `scripts/smoke_countdown_tz.js` (NUEVO, 11.142 bytes); **0 cambios en CSS/JS/admin/API/SQL**. Verificado: `smoke_countdown_tz.js` -> **PASS 36 / FAIL 0**; sin regresion (`smoke_f14_vinilos` 38/0, `smoke_hero_contract` 64/0, `smoke_qa_asserts` 64/0); Escudo GOLD OK. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
+> **Delta por boleteria de tarifa unica + PLAYLIST del silo f14 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+2 entradas / +2 cerradas = TSK-122 (motor: ADR-087) + TSK-123 (silo f14 v1.2)**, ambas nacen y cierran en el mismo ciclo. Delta efectivo: **+2 cerradas / 0 abiertas**. TSK-122 toca el **motor compartido** (`evento-app.html`, segmento boleteria `:2575-2610`, v1.15.0 + `js/i18n.js` 3 tablas, clave nueva `landing.boletos_entrada_general`); TSK-123 es **CSS-only** (`css/templates/fiesta/f14.css`, v1.2 del silo). **Evento afectado:** `vinilos-inversos-c8yu` (`template_id='f14'`, theme `vinilos`). **Smokes:** `smoke_f14_vinilos` **38/38**, `smoke_qa_asserts` **70/70**, `smoke_hero_contract` **64/64**, `smoke_paleta_evento` **20/20** (0 FAIL). Queda **1 pendiente de verificacion en PRODUCCION** (alto del iframe del playlist en movil < 360 px), declarado en el cierre. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -135,6 +137,15 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-119](#tsk-119) | `@renderer-dev` (OPCIONAL — dominio de riesgo: es el formateador del motor, no el silo) | **`#meta-hora` en formato 12 h** — hoy muestra `20:00 HRS`; la maqueta pide `8:00 PM` | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `__hora12()` (v125) reutiliza `__horaA24`; `ev.hora='20:00'` -> `8:00 PM`; el texto libre legacy (ej. `11:56 AM / 7:34 AM`) cae al formato previo con `T('landing.hrs')`. `evento-app.html` +18/-1. Verificacion en el cierre de TSK-117 (seccion final) |
 | [TSK-120](#tsk-120) | `@frontend-tpl` (**FREE**: CSS del silo, 0 runtime, 0 JS) + `@renderer-dev` (**gate §2 confirmado** para la fecha) | **Meta del hero en 2 columnas y titulo del evento sobre el line up** — la maqueta `referentes/hero.jpg` pide `[cal] 20 NOVIEMBRE / 8:00 PM  \|  [pin] KLANDESTINO / KRA 4 # 19-56` y el nombre del evento presidiendo la grilla de artistas de la seccion de abajo | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `f14.css` **+147/-18** (CSS-only) + `evento-app.html` **+6/-5** y `scripts/smoke_hero_contract.js` **+4/-4**: `__esMeta2Lineas()` agrega `'tpl-f14'` a la allowlist, asi que la fecha pasa de ISO (`2026-11-20`) a `VIERNES 20` / `NOVIEMBRE DE 2026`. Gate `AGENTS.md` §2 confirmado por el usuario el 2026-11-01 |
 | [TSK-121](#tsk-121) | `@frontend-tpl` (**FREE**: CSS del silo, 0 runtime, 0 JS) | **Tipografia de cartel (condensada + contorno cafe), meta pegado al subtitulo y rotulo LINE UP con tagline** — la maqueta `referentes/hero.jpg` pide un titulo condensado muy pesado con borde cafe, y el meta debe subir hasta el subtitulo en 2 columnas (`NOVIEMBRE 20 / 8:00 P.M` \| `KLANDESTUNO BAR / KRA 4 # 19-54 (PISO 4)`); en `#mod-lineup` el rotulo pasa de `VINILOS INVERSOS` a `LINE UP` con el subtitulo `una noche para vibrar con los mejores sonidos` | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `f14.css` **+64/-28**, CSS-only. Stack condensado medido con sonda (Impact 368 px vs 'Arial Narrow' 551 px = fallback) y hero guiado por contenido (hueco subtitulo->meta 26 px desktop / 25 px movil). **Deuda declarada:** los textos del meta y del subtitulo son DATOS; el `PATCH` directo a Supabase fue rechazado por RLS (200 + `[]`), hay que aplicarlos en el admin |
+
+#### 🟣 BOLETERIA DE TARIFA UNICA (MOTOR) + PLAYLIST DEL SILO F14 (2 items NUEVOS, 2026-11-01)
+
+> Items del ciclo del 2026-11-01 sobre el evento `vinilos-inversos-c8yu` (theme `vinilos`, `template_id='f14'`). **TSK-122** es **motor compartido** (afecta a los 14 silos) y **TSK-123** es **CSS-only del silo**. Ambos nacen y cierran en el mismo ciclo; el alcance REAL ejecutado esta en la seccion de cierre al final del documento.
+
+| ID | Responsable | Titulo | Bloque | Detalle |
+|---|---|---|---|---|
+| [TSK-122](#tsk-122) | `@renderer-dev` (**ruta de riesgo / gate `AGENTS.md` §2**: es el motor compartido `evento-app.html`) + `@js-silo-dev` (i18n) | **Regla general de boleteria de tarifa unica (ENTRADA GENERAL, ADR-087)** — la rama generica de `#mod-boletos` pintaba siempre 2 tarjetas (PREVENTA / TAQUILLA) y la que no tenia dato caia al relleno `POR DEFINIR`; con UNA tarifa real se pinta UNA tarjeta `ENTRADA GENERAL` | Motor compartido (afecta a los 14 silos) | **CERRADA 2026-11-01** — `evento-app.html` v1.15.0 `:2575-2610` + `js/i18n.js` (3 idiomas: `:230` ES / `:607` FR / `:984` EN). Verificacion y evidencia en la seccion de cierre al final |
+| [TSK-123](#tsk-123) | `@frontend-tpl` (**FREE**: CSS del silo, 0 runtime, 0 JS) | **Modulo PLAYLIST encendido en f14 (v1.2 del silo)** — el kernel apaga todas las `section` por IoC (`section, header, footer { display:none }`) y f14 nunca encendia `#mod-playlist`, asi que el embed de Spotify (`content.playlist_url`) se inyectaba en el DOM pero invisible; ademas el `<iframe height="100%">` colapsaba porque el contenedor solo tenia `min-height` | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `css/templates/fiesta/f14.css` (CSS-only, v1.2). Verificacion y evidencia en la seccion de cierre al final |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -666,6 +677,62 @@ task:
     **Se intento el `PATCH` directo** a `eventos?slug=eq.vinilos-inversos-c8yu` con la clave anon del motor: **200 + `[]`** (0 filas) y read-back sin cambios -> RLS lo rechaza, igual que TSK-118. No hay `SUPABASE_SERVICE_ROLE_KEY` local ni `.env`. **Se aplica desde el admin** (`Configuracion de landing > content`); el CSS del silo ya pinta los overrides (`meta-line` en bloque). Sin ellos, el hero sigue mostrando `VIERNES 20` / `NOVIEMBRE DE 2026`, `8:00 PM` y `KLANDESTINO, KR 4 # 19-56`.
 15. **[COSMETICA - preexistente]** El comentario de `admin.html:3872` sigue citando solo `f9`/`f9b` para `.meta-line`; es documentacion, no logica.
 16. **[ERROR HISTORICO - preexistente]** `smoke_f9b_mistico_nocturno.js` sigue fallando el assert de la subconmutacion 1; verificado con `git stash` que tambien falla en HEAD. **No bloquea.**
+
+
+
+### Cierre de TSK-122 - Regla general de boleteria de tarifa unica / ENTRADA GENERAL (ADR-087) (2026-11-01) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Alcance REAL ejecutado y verificado contra el archivo real (ADR-006). **Ruta de riesgo `AGENTS.md` §2** (motor compartido `evento-app.html`). **Evento que lo disparo:** `vinilos-inversos-c8yu` (`template_id='f14'`, theme `vinilos`).
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Motor:** `evento-app.html` v1.15.0, segmento boleteria (`:2575-2610`). La rama generica (todos los silos salvo la familia f9) pintaba **siempre** dos tarjetas, PREVENTA y TAQUILLA, y la que no tenia dato caia al relleno `landing.pendiente_def` (`POR DEFINIR`).
+2. **Criterio de conteo:** `__tarifasReales` = 1 por cada fuente **REAL** entre `content.boletos.preventa`, `content.boletos.taquilla` y la **fuente legacy `content.tickets_info`**; cada una excluye vacio y el centinela `landing.pendiente_def`.
+3. **Comportamiento nuevo:** con **exactamente 1** tarifa real -> **UNA** tarjeta con rotulo `landing.boletos_entrada_general` en el slot `#db-boletos-taquilla`, y `#db-boletos-preventa` queda vacio. Con **0 o 2+** tarifas -> comportamiento previo intacto (incluye el auto-ocultamiento `v307` cuando no hay ningun dato).
+4. **Regla GENERAL, no gate por silo:** aplica a todos los silos, no solo a f14 (decision del usuario el 2026-11-01). **Fuera de contrato:** familia f9/f9b (`__esF9Boletos`, rama propia sin cambios) y silo f8 (`__esF8Boletos`: ahi `preventa`/`taquilla` significan INDIVIDUAL/PAREJA y conservan su rotulo). `__esFamiliaF9()` no se toca.
+5. **Cero Borrado:** solo se vacia el `innerHTML` del slot; los atomos `#db-boletos-preventa` y `#db-boletos-taquilla` **siguen en el DOM**; 0 IDs eliminados y 0 `display:none` nuevos.
+6. **i18n:** clave nueva `landing.boletos_entrada_general` en las 3 tablas de `js/i18n.js` -> `ENTRADA GENERAL` / `ENTREE GENERALE` / `GENERAL ADMISSION`.
+
+#### Verificacion (por archivo real, ADR-006)
+
+| Comprobacion | Resultado |
+|---|---|
+| `node scripts/smoke_f14_vinilos.js` | **PASS 38 / FAIL 0** |
+| `node scripts/smoke_qa_asserts.js` | **PASS 70 / FAIL 0** |
+| `node scripts/smoke_hero_contract.js` | **PASS 64 / FAIL 0** |
+| `node scripts/smoke_paleta_evento.js` | **PASS 20 / FAIL 0** |
+| Caso real `vinilos-inversos-c8yu` (`boletos = { preventa: null, taquilla: "$15.000" }`) | 1 tarjeta `ENTRADA GENERAL` / `$15.000`; `#db-boletos-preventa` vacio pero presente |
+
+#### Pendiente declarado (NO cerrado)
+
+17. **[PRODUCCION] Verificacion visual del alto del iframe del playlist en movil < 360 px** (heredado de TSK-123): el `iframe` se fija a 352 px en movil, pero el ancho de pantalla mas estrecho no se probo en dispositivo real. Se revisa junto con la boleteria en `https://taquilladirecta.com/evento.html?slug=vinilos-inversos-c8yu` (ver `NEXT.md` hito -53).
+
+### Cierre de TSK-123 - Modulo PLAYLIST encendido en el silo f14 (v1.2 del silo) (2026-11-01) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Alcance REAL ejecutado y verificado contra el archivo real (ADR-006). **Tier FREE / CSS-only**: 1 archivo, `css/templates/fiesta/f14.css`.
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Causa raiz (IoC del kernel):** el kernel oculta todas las `section` (`section, header, footer { display:none }`) y cada silo **enciende** sus modulos. `f14.css` nunca encendia `#mod-playlist`, asi que el embed de Spotify (`content.playlist_url` -> `#db-spotify-embed`) se inyectaba en el DOM pero quedaba **invisible**.
+2. **Causa raiz (colapso del alto):** el `<iframe height="100%">` no tenia contra que resolver el alto porque el contenedor solo declaraba `min-height`.
+3. **Activacion:** `#mod-playlist` entra en el bloque de activacion del silo; `playlist` se agrega a las **3** `grid-template-areas` (base, `min-width: 767`, `max-width: 767`) con su regla `grid-area: playlist` (`f14.css:181-183`).
+4. **Estetica:** seccion **12b** con rotulo tipografico `PLAYLIST` en `::before` (mismo lenguaje de cartel que `#mod-lineup::before`, ADR-085/086), marco kraft/naranja del embed, `iframe` a **400 px** (352 px en movil) y estilizado del enlace `a.spotify-open-link` (incluye `:hover` y `:focus-visible`).
+5. **Cabecera del archivo:** se documenta `v1.2 - 2026-11-01 - Modulo PLAYLIST (#mod-playlist) encendido y estilizado` (`f14.css:1906`).
+
+#### Verificacion (por archivo real, ADR-006)
+
+| Comprobacion | Resultado |
+|---|---|
+| `node scripts/smoke_f14_vinilos.js` | **PASS 38 / FAIL 0** |
+| `node scripts/smoke_hero_contract.js` | **PASS 64 / FAIL 0** (sin regresion del hero) |
+| `node scripts/smoke_qa_asserts.js` | **PASS 70 / FAIL 0** |
+| Selectores fuera de scope `.tpl-f14` / `.Tpl-F14` | **0** |
+| `evento-app.html` / `admin.html` / `api/*.js` / SQL | **sin cambios** |
+
+#### Deuda declarada
+
+18. **[PRODUCCION - visual] Alto del iframe en movil < 360 px:** verificado por CSS y en harness de escritorio/movil, **no** en dispositivo real de 320-359 px. Si el embed se recorta, el ajuste es CSS del silo (352 px -> `height: clamp(...)`).
+
 
 
 

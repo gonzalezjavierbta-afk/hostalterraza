@@ -98,6 +98,8 @@
 .Tpl-F14 #mod-cartel,
 .tpl-f14 #mod-video,
 .Tpl-F14 #mod-video,
+.tpl-f14 #mod-playlist,
+.Tpl-F14 #mod-playlist,
 .tpl-f14 #mod-faq,
 .Tpl-F14 #mod-faq,
 .tpl-f14 #mod-ubicacion,
@@ -123,6 +125,7 @@
         "lineup"
         "cartel"
         "video"
+        "playlist"
         "faq"
         "ubicacion"
         "boletos"
@@ -173,6 +176,11 @@
 .tpl-f14 #mod-video,
 .Tpl-F14 #mod-video {
     grid-area: video;
+}
+
+.tpl-f14 #mod-playlist,
+.Tpl-F14 #mod-playlist {
+    grid-area: playlist;
 }
 
 .tpl-f14 #mod-faq,
@@ -927,6 +935,104 @@
 }
 
 /* ==========================================================================
+   12b. PLAYLIST (#mod-playlist) - embed de Spotify con marco de fanzine
+   El kernel inyecta el iframe dentro de #db-spotify-embed y el anchor
+   "Abrir en Spotify" (ADR-050) como hermano suyo, ambos dentro del wrapper
+   interno de 1100px. La seccion no trae encabezado en el DOM, asi que el
+   rotulo vive en el ::before (Cero Borrado: no se toca el HTML del motor).
+   El silo f14 es exclusivo del evento vinilos-inversos-c8yu.
+   ========================================================================== */
+.tpl-f14 #mod-playlist,
+.Tpl-F14 #mod-playlist {
+    background-color: var(--f14-bg);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+/* Rotulo de cartel: mismo lenguaje visual que el ::before de #mod-lineup */
+.tpl-f14 #mod-playlist::before,
+.Tpl-F14 #mod-playlist::before {
+    content: "PLAYLIST";
+    display: block;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 0 0.9rem;
+    color: var(--f14-kraft);
+    font-family: var(--f14-poster);
+    font-size: clamp(2.4rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-align: center;
+    -webkit-text-stroke: clamp(1px, 0.18vw, 2.8px) var(--f14-cafe);
+    paint-order: stroke fill;
+}
+
+/* El wrapper interno del kernel (div con inline max-width:1100px) es el que
+   centra el anchor que se inserta bajo el embed. Via elegida: text-align,
+   asi el enlace sigue siendo inline-block y se centra tambien en mobile. */
+.tpl-f14 #mod-playlist > div,
+.Tpl-F14 #mod-playlist > div {
+    text-align: center;
+}
+
+/* Marco del embed: el kernel escribe borderColor y border-radius:15px en el
+   propio iframe, por eso los !important; el min-height:400px inline se anula
+   porque el alto real lo define el iframe. */
+.tpl-f14 #db-spotify-embed,
+.Tpl-F14 #db-spotify-embed {
+    overflow: hidden;
+    max-width: 1100px;
+    margin: 0 auto;
+    min-height: 0 !important;
+    background: var(--f14-bg-2);
+    border: 2px solid var(--f14-line) !important;
+    border-radius: 0 !important;
+    box-shadow: 8px 8px 0 rgba(227, 89, 37, 0.22);
+}
+
+/* Alto real del iframe: el kernel inserta height="100%" y, sin alto declarado
+   en el padre, el embed colapsaba a ~150px. */
+.tpl-f14 #db-spotify-embed iframe,
+.Tpl-F14 #db-spotify-embed iframe {
+    display: block !important;
+    width: 100% !important;
+    height: 400px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+/* Anchor "Abrir en Spotify" inyectado por el kernel como hermano del embed */
+.tpl-f14 .spotify-open-link,
+.Tpl-F14 .spotify-open-link {
+    display: inline-block !important;
+    margin: 1.1rem 0 0 !important;
+    padding: 0.7rem 1.3rem !important;
+    background: transparent;
+    border: 2px solid var(--f14-fuego) !important;
+    border-radius: 0 !important;
+    color: var(--f14-kraft) !important;
+    font-family: var(--f14-display);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.tpl-f14 .spotify-open-link:hover,
+.Tpl-F14 .spotify-open-link:hover,
+.tpl-f14 .spotify-open-link:focus-visible,
+.Tpl-F14 .spotify-open-link:focus-visible {
+    background: var(--f14-fuego);
+    color: #0E0E0E;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #0E0E0E;
+}
+
+/* ==========================================================================
    13. FAQ (#mod-faq) - acordeon; el "+" es el SVG de .faq-icon-circle
    ========================================================================== */
 .tpl-f14 #mod-faq,
@@ -1510,6 +1616,7 @@
             "lineup lineup"
             "cartel cartel"
             "video video"
+            "playlist playlist"
             "faq ubicacion"
             "boletos form";
         column-gap: 1.5rem;
@@ -1642,10 +1749,17 @@
             "lineup"
             "cartel"
             "video"
+            "playlist"
             "faq"
             "ubicacion"
             "boletos"
             "form";
+    }
+
+    /* El embed de Spotify baja de alto en movil (marco 2px + padding) */
+    .tpl-f14 #db-spotify-embed iframe,
+    .Tpl-F14 #db-spotify-embed iframe {
+        height: 352px !important;
     }
 
     .tpl-f14 #mod-hero,
@@ -1788,5 +1902,18 @@
             todos los anchos, para no tapar el contador ni el CTA.
           - Breakpoints: nuevo <=1199px y <=767px (hero movil 80svh); retirado
             el hero 88vh de >=992px y el padding del contador de >=640px.
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.2 - 2026-11-01 - Modulo PLAYLIST (#mod-playlist) encendido y estilizado:
+          - El kernel apaga toda <section> por IoC y f14 nunca encendia esta,
+            asi que el embed de Spotify quedaba invisible. Ahora va en el
+            bloque de activacion y en la rejilla ("playlist" tras "video" en
+            base y en <=767, "playlist playlist" en >=767).
+          - BUG de alto: el kernel inserta <iframe height="100%"> y el padre
+            solo tenia min-height:400px -> el embed colapsaba a ~150px. Ahora
+            el iframe mide 400px (352px en <=767) y el min-height inline se
+            anula con !important.
+          - Seccion 12b: rotulo "PLAYLIST" en CSS (la seccion no trae h2;
+            Cero Borrado), marco kraft/naranja de fanzine y anchor "Abrir en
+            Spotify" (ADR-050) con hover de bloque solido.
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */

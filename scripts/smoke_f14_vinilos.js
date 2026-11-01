@@ -27,6 +27,7 @@ const SILO = path.join(ROOT, 'css', 'templates', 'fiesta', 'f14.css');
 const BACKUP = path.join(ROOT, 'css', 'templates', 'fiesta', 'f14-volcado-tailwind.bak.css');
 const KERNEL = path.join(ROOT, 'evento-app.html');
 const ADMIN = path.join(ROOT, 'admin.html');
+const I18N = path.join(ROOT, 'js', 'i18n.js');
 
 let pass = 0;
 let fail = 0;
@@ -155,6 +156,33 @@ check('admin: card data-theme noche-avalon', /data-theme="noche-avalon"/.test(ad
 check('admin: input ld-boletos-link', /id="ld-boletos-link"/.test(admin));
 check('admin: read-back boletos.link', /set\('ld-boletos-link'/.test(admin));
 check('admin: write boletos.link', /link:\s*_bLOk/.test(admin));
+
+// 12) Modulo PLAYLIST encendido (v1.2 del silo): el kernel IoC apaga toda
+//     section y el silo debe activarla. Sin estas reglas el embed de Spotify se
+//     inyecta en el DOM y queda invisible.
+check('silo: activa #mod-playlist', /\.tpl-f14 #mod-playlist,[\s\S]{0,900}?display:\s*block !important/.test(cssRaw));
+check('silo: grid-area playlist', /\.tpl-f14 #mod-playlist,[\s\S]{0,90}?grid-area:\s*playlist/.test(cssRaw));
+const playlistAreas = (cssRaw.match(/"playlist"/g) || []).length;
+check('silo: "playlist" en las rejillas (base + movil)', playlistAreas >= 2, playlistAreas + ' ocurrencias');
+check('silo: "playlist playlist" en breakpoint 767', /"playlist playlist"/.test(cssRaw));
+check('silo: iframe del embed con alto fijo', /#db-spotify-embed iframe[\s\S]{0,400}?height:\s*\d+px !important/.test(cssRaw));
+check('silo: alto movil del iframe', /352px/.test(cssRaw));
+check('silo: rotulo PLAYLIST en ::before', /content:\s*"PLAYLIST"/.test(cssRaw));
+check('silo: enlace Abrir en Spotify estilizado', /\.spotify-open-link[\s\S]{0,400}?\{/.test(cssRaw));
+
+// 13) Kernel: regla general de boleteria de tarifa unica (v1.15.0).
+//     Con UNA sola tarifa real se pinta una tarjeta "ENTRADA GENERAL" y el slot
+//     de preventa queda vacio. Con 0 o >=2 tarifas se conserva lo anterior.
+check('kernel: clave ENTRADA GENERAL (1 uso)', (kernel.match(/landing\.boletos_entrada_general/g) || []).length === 1);
+const i18n = fs.existsSync(I18N) ? read(I18N) : '';
+const i18nKeys = (i18n.match(/landing\.boletos_entrada_general/g) || []).length;
+check('i18n: clave en los 3 idiomas', i18nKeys === 3, i18nKeys + ' definiciones');
+check('kernel: conteo de tarifas reales', /__tarifasReales/.test(kernel));
+check('kernel: rama de tarifa unica', /__tarifasReales === 1/.test(kernel));
+check('kernel: slot preventa vacio en tarifa unica', /bwP\.innerHTML = ''/.test(kernel));
+check('kernel: fuente legacy tickets_info cuenta', /__hasTicketsInfoReal/.test(kernel));
+check('kernel: rama f9 intacta (1 sola)', (kernel.match(/if \(__esF9Boletos\) \{/g) || []).length === 1);
+check('kernel: v307 centinela conservado', (kernel.match(/landing\.pendiente_def/g) || []).length >= 2);
 
 console.log('\nResumen: PASS ' + pass + ', FAIL ' + fail);
 if (fail > 0) {
