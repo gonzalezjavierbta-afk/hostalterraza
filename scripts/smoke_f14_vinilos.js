@@ -180,6 +180,18 @@ check('silo: rotulo PLAYLIST compacto en escritorio', /#mod-playlist::before[\s\
 check('silo: embed ocupa el 100% de su columna', /#mod-playlist #db-spotify-embed[\s\S]{0,300}?max-width:\s*100% !important/.test(css));
 check('silo: enlace Abrir en Spotify estilizado', /\.spotify-open-link[\s\S]{0,400}?\{/.test(cssRaw));
 
+// 12c) Seccion de PATROCINADORES (v1.5 del silo): misma causa que el playlist,
+//      el kernel apaga toda section y sin activacion la banda de logos nunca
+//      aparece aunque content.sponsors traiga logos reales.
+check('silo: activa #mod-sponsors', /\.tpl-f14 #mod-sponsors,[\s\S]{0,700}?display:\s*block !important/.test(cssRaw));
+check('silo: grid-area sponsors', /\.tpl-f14 #mod-sponsors,[\s\S]{0,90}?grid-area:\s*sponsors/.test(cssRaw));
+const sponsorAreas = (css.match(/"sponsors"/g) || []).length;
+check('silo: "sponsors" en base y en el breakpoint 767', sponsorAreas >= 2, sponsorAreas + ' ocurrencias de "sponsors"');
+check('silo: banda de patrocinadores de ancho completo', /"sponsors sponsors"/.test(css));
+check('silo: logos de patrocinador a 42px', /\.sponsor-img[\s\S]{0,220}?height:\s*42px/.test(css));
+check('silo: logos sin marco en la tarjeta', /\.sponsor-item[\s\S]{0,220}?border:\s*none/.test(css));
+check('silo: seguro data-hidden de sponsors', /#mod-sponsors\[data-hidden="true"\]/.test(css));
+
 // 13) Kernel: regla general de boleteria de tarifa unica (v1.15.0).
 //     Con UNA sola tarifa real se pinta una tarjeta "ENTRADA GENERAL" y el slot
 //     de preventa queda vacio. Con 0 o >=2 tarifas se conserva lo anterior.

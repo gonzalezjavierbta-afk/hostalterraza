@@ -106,6 +106,8 @@
 .Tpl-F14 #mod-ubicacion,
 .tpl-f14 #mod-boletos,
 .Tpl-F14 #mod-boletos,
+.tpl-f14 #mod-sponsors,
+.Tpl-F14 #mod-sponsors,
 .tpl-f14 #mod-form,
 .Tpl-F14 #mod-form {
     display: block !important;
@@ -128,6 +130,7 @@
         "playlist"
         "faq"
         "ubicacion"
+        "sponsors"
         "boletos"
         "form";
     width: 100%;
@@ -191,6 +194,11 @@
 .tpl-f14 #mod-ubicacion,
 .Tpl-F14 #mod-ubicacion {
     grid-area: ubicacion;
+}
+
+.tpl-f14 #mod-sponsors,
+.Tpl-F14 #mod-sponsors {
+    grid-area: sponsors;
 }
 
 .tpl-f14 #mod-boletos,
@@ -1621,6 +1629,72 @@
 }
 
 /* ==========================================================================
+   17b. SPONSORS (#mod-sponsors) - banda de logos al cierre
+   Mismo patron del silo f9b (evento lanzamiento-mistico-64k6): banda centrada
+   de ancho completo, logos sueltos sin marco y hover de opacidad. El kernel
+   pinta #db-sponsors-list desde content.sponsors; sin datos apaga la seccion
+   con display:none inline + data-hidden="true".
+   ========================================================================== */
+.tpl-f14 #mod-sponsors,
+.Tpl-F14 #mod-sponsors {
+    text-align: center;
+    padding: 3.2rem 1.5rem !important;
+    background-color: var(--f14-bg);
+    border-top: 1px solid var(--f14-line);
+}
+
+/* El kernel trae gap:4rem inline en la lista: el silo manda con !important */
+.tpl-f14 #db-sponsors-list,
+.Tpl-F14 #db-sponsors-list {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2.6rem !important;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.tpl-f14 .sponsor-item,
+.Tpl-F14 .sponsor-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1rem !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Altura fija + object-fit: los logos reales vienen en proporciones distintas
+   (Ancestral y Klandestino) y sin tope crecian a su tamano natural. */
+.tpl-f14 .sponsor-img,
+.Tpl-F14 .sponsor-img {
+    display: block;
+    height: 42px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    opacity: 0.72;
+    transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+}
+
+.tpl-f14 .sponsor-item:hover .sponsor-img,
+.Tpl-F14 .sponsor-item:hover .sponsor-img {
+    opacity: 1;
+    transform: scale(1.06);
+    filter: brightness(1.12);
+}
+
+/* Cero Borrado / anti-resurreccion: sin patrocinadores el kernel marca
+   data-hidden y escribe display:none !important en linea. El display:block
+   !important de la activacion IoC no debe revivir la banda vacia. */
+.tpl-f14 #mod-sponsors[data-hidden="true"],
+.Tpl-F14 #mod-sponsors[data-hidden="true"] {
+    display: none !important;
+}
+
+/* ==========================================================================
    18. BREAKPOINT 767 - grid de 2 columnas (FAQ|Ubicacion, Boletos|Comunidad)
    ========================================================================== */
 @media (min-width: 767px) {
@@ -1634,6 +1708,7 @@
             "cartel playlist"
             "video video"
             "faq ubicacion"
+            "sponsors sponsors"
             "boletos form";
         column-gap: 1.5rem;
     }
@@ -1855,6 +1930,7 @@
             "playlist"
             "faq"
             "ubicacion"
+            "sponsors"
             "boletos"
             "form";
     }
@@ -1863,6 +1939,19 @@
     .tpl-f14 #db-spotify-embed iframe,
     .Tpl-F14 #db-spotify-embed iframe {
         height: 352px !important;
+    }
+
+    /* Banda de patrocinadores en pantalla pequena: menos aire entre logos y
+       logos mas bajos, igual que el silo f9b de referencia. */
+    .tpl-f14 #db-sponsors-list,
+    .Tpl-F14 #db-sponsors-list {
+        gap: 1.4rem !important;
+    }
+
+    .tpl-f14 .sponsor-img,
+    .Tpl-F14 .sponsor-img {
+        height: 32px;
+        max-width: 140px;
     }
 
     .tpl-f14 #mod-hero,
@@ -2058,5 +2147,28 @@
             (que sigue con su piso de 480px).
           - La sombra del marco baja a 6px 6px 0 solo en esta media, para que el
             desplazamiento no se recorte al tocar el borde de la columna.
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.5 - 2026-11-01 - Seccion de PATROCINADORES (#mod-sponsors) encendida:
+          - Causa: el silo no tenia ninguna regla de sponsor y #mod-sponsors no
+            estaba en la lista IoC ni en las grid-template-areas, asi que el
+            kernel (que apaga toda section) nunca mostraba la banda, aunque
+            content.sponsors trae 2 logos reales (Ancestral, Klandestino).
+          - Activacion: #mod-sponsors entra en la lista IoC (display:block
+            !important) y recibe grid-area propia. La banda va de ancho
+            completo entre la fila faq|ubicacion y la fila boletos|form, tanto
+            en la base de 1 columna como en <=767, igual que el silo f9b del
+            evento lanzamiento-mistico-64k6.
+          - Estilos (referencia f9b): seccion centrada con border-top y padding
+            3.2rem 1.5rem (!important por el padding inline del kernel), lista
+            flex centrada con gap 2.6rem (!important por el gap:4rem inline),
+            .sponsor-item sin marco ni fondo y .sponsor-img de altura fija 42px
+            (32px y gap 1.4rem en <=767) con object-fit:contain y hover de
+            opacidad 0.72 -> 1 + escala 1.06. Altura fija porque los logos
+            reales llegan en proporciones distintas y sin tope crecian a su
+            tamano natural.
+          - Seguro anti-resurreccion: #mod-sponsors[data-hidden="true"] se
+            oculta con display:none !important, para que el display:block
+            !important de la activacion no reviva la banda cuando el kernel la
+            apaga por falta de patrocinadores (Cero Borrado).
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */
