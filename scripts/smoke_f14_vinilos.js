@@ -144,6 +144,7 @@ check('kernel: class="mapa-link"', /class="mapa-link"/.test(kernel));
 check('silo: pin nativo de Google (ADR-088)', /--mapa-pin-nativo:\s*1/.test(css));
 check('silo: pin decorativo solo con .map-own-pin', /#db-mapa-container\.map-own-pin::before/.test(css) && /#db-mapa-container\.map-own-pin::after/.test(css));
 check('kernel: mapa por coordenadas (ADR-088)', /__coordsEvento/.test(kernel) && /db-mapa-direccion/.test(kernel));
+check('kernel: pin del silo tambien en el fallback', /!__mapaPinNativo \|\| !__mapaQuery/.test(kernel));
 check('kernel: data-ticket-url', /data-ticket-url=/.test(kernel));
 check('kernel: aria-expanded en faq-item', /class="faq-item"[^>]*aria-expanded/.test(kernel));
 check('kernel: gate __esF14Silo', /__esF14Silo/.test(kernel));

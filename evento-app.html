@@ -2439,7 +2439,12 @@ if (document.getElementById('db-poster-img')) {
         
         if (mapContainer) {
             mapContainer.style.border = '1px solid var(--tpl-accent)';
-            if (__mapaQuery && !__mapaPinNativo) {
+            // v1.15.1 (ADR-088): map-own-pin significa "el pin lo pinta el silo".
+            // Se pone cuando el silo NO pide pin nativo (centra con ll=) y TAMBIEN
+            // cuando no hay query propia (fallback con la direccion): ahi Google no
+            // garantiza marcador y el pin del silo es el unico punto visible.
+            // Con pin nativo Y query propia (coordenadas o token) manda Google.
+            if (!__mapaPinNativo || !__mapaQuery) {
                 mapContainer.classList.add('map-own-pin');
             } else {
                 mapContainer.classList.remove('map-own-pin');
