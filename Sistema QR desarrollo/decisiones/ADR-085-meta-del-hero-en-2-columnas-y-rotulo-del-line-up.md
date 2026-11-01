@@ -61,9 +61,13 @@ Y `#mod-lineup` **no tiene ningun encabezado** en el DOM: es `<section>` + `.lin
 4. **El rotulo del line up va en `#mod-lineup::before`** con el nombre del evento. El silo f14
    es **exclusivo** de este evento (verificado por REST: **1 de 13** eventos con
    `template_id='f14'`), asi que un `content` fijo no contamina otros silos ni otros eventos.
-5. **Soporte `.meta-line`** (`display: block`) agregado en el silo: hoy es **inerte** porque el
-   motor solo habilita la fecha en 2 lineas para `tpl-f9`/`tpl-f9b`; queda listo para el fix
-   descrito en las deudas.
+5. **Soporte `.meta-line`** (`display: block`) agregado en el silo. **Fase 2 (gate §2 confirmado por el
+   usuario el 2026-11-01):** `__esMeta2Lineas()` (`evento-app.html:919-926`) agrega `'tpl-f14'` a su
+   allowlist, con lo que la fecha pasa a pintarse `VIERNES 20` / `NOVIEMBRE DE 2026`. Los asserts S2 de
+   `scripts/smoke_hero_contract.js` se actualizaron al contrato nuevo (el invariante deja de ser "solo
+   f9/f9b" y pasa a ser "solo los silos con CSS para `.meta-line`"). `__esFamiliaF9()` (`:886`) **no se
+   toca**: f14 no pertenece a la familia F9 y no debe heredar sus subconmutaciones ni su contenido
+   editorial.
 
 ## Por que `display: grid !important`
 
@@ -91,19 +95,21 @@ y las declaraciones inline `!important` ganan siempre al CSS de autor.
 * **Limite aceptado:** el lugar es **un unico string** (`eventos.ubicacion`), asi que no se
   puede pintar en 3 lineas (`nombre` / `direccion` / `ciudad`) sin override `content.meta.lugar`
   (gateado) o un campo nuevo. Se ve correcto en una linea.
-* **Deuda declarada (media):** la fecha se sigue pintando **ISO** (`2026-11-20`) y ahora es la
-  linea grande, asi que el defecto es visible. La causa es `__esMeta2Lineas()`
-  (`evento-app.html:919-926`), cuya allowlist es literal `['tpl-f9','tpl-f9b']`; en f14 la rama
-  de `__formatoFechaLarga()` no se ejecuta. Fix propuesto: agregar `'tpl-f14'` a la allowlist
-  (2 lineas aditivas) y el silo pintaria `VIERNES 20` / `NOVIEMBRE DE 2026` con el CSS ya
-  presente. **No ejecutado: requiere gate `AGENTS.md` §2** (motor compartido).
+* **Deuda (media) - RESUELTA el 2026-11-01 (gate `AGENTS.md` §2 confirmado por el usuario):** la fecha
+  se pintaba **ISO** (`2026-11-20`) porque `__esMeta2Lineas()` (`evento-app.html:919-926`) tenia una
+  allowlist literal `['tpl-f9','tpl-f9b']` y la rama de `__formatoFechaLarga()` no corria en f14.
+  Fix aplicado: `'tpl-f14'` agregado a la allowlist (`evento-app.html` **+6 / -5**) y los asserts S2
+  de `scripts/smoke_hero_contract.js` actualizados al contrato nuevo (**+4 / -4**). La fecha se pinta
+  `VIERNES 20` / `NOVIEMBRE DE 2026` con el CSS que el silo ya tenia. `__esFamiliaF9()` (`:886`)
+  conserva `['tpl-f9','tpl-f9b']` **a proposito**: f14 no debe heredar las subconmutaciones ni el
+  contenido editorial de RASTRO MC.
 
 ## Verificacion (archivo real, ADR-006)
 
 | Comprobacion | Resultado |
 |---|---|
-| `git diff --numstat` | `css/templates/fiesta/f14.css` **+147 / -18** (unico archivo de codigo) |
-| Cambios en otros silos / motor / admin / API / SQL | **0** |
+| `git diff --numstat` | `css/templates/fiesta/f14.css` **+147 / -18**, `evento-app.html` **+6 / -5**, `scripts/smoke_hero_contract.js` **+4 / -4** |
+| Cambios en otros silos / admin / API / SQL | **0** |
 | Balance de llaves del CSS | **0** (minimo 0) |
 | Lineas agregadas con bytes > 127 | **0** |
 | `node scripts/smoke_f14_vinilos.js` | **PASS 38 / FAIL 0** |

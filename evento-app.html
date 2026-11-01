@@ -912,12 +912,13 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         }
 
         // (3) CAPACIDAD DE META EN 2 LINEAS (.meta-line). Allowlist explicita y
-        // CONSERVADORA: .meta-line solo tiene CSS en .tpl-f9 y .tpl-f9b (ver f12.css:735,
-        // que lo advierte). Encenderlo en otro silo imprimiria los dos spans sin estilo
-        // (una linea cruda) y DEGRADARIA el hero, asi que la lista no crece sin CSS.
-        // Por eso el admin tampoco debe ofrecer los campos l2 de meta fuera de aqui.
+        // CONSERVADORA: solo entran los silos que TIENEN CSS para .meta-line, porque
+        // encenderlo en otro imprimiria los dos spans sin estilo (una linea cruda) y
+        // DEGRADARIA el hero. Hoy: .tpl-f9 y .tpl-f9b (ver f12.css:735) y .tpl-f14
+        // (ADR-085: f14.css define .meta-line como bloque y pone la fecha en la
+        // columna grande del meta). La lista no crece sin CSS en el silo.
         function __esMeta2Lineas() {
-            const allow = ['tpl-f9', 'tpl-f9b'];
+            const allow = ['tpl-f9', 'tpl-f9b', 'tpl-f14'];
             const toks = String(document.body.className || '').split(/\s+/);
             for (let i = 0; i < toks.length; i++) {
                 if (allow.indexOf(String(toks[i]).toLowerCase()) !== -1) return true;

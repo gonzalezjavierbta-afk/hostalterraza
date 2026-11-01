@@ -57,12 +57,12 @@ ok('S1 #event-subtitle NO se enciende cuando el titulo ya lo pinto (sin duplicar
 console.log('\n=== S2 KERNEL: capacidad de meta a 2 lineas ===');
 ok('S2 existe __esMeta2Lineas()', /function\s+__esMeta2Lineas\s*\(/.test(KERNEL_CODE));
 const aMeta = allowlistDe(KERNEL_CODE, '__esMeta2Lineas');
-ok('S2 allowlist de meta 2 lineas = f9,f9b',
-   JSON.stringify(aMeta) === JSON.stringify(['tpl-f9', 'tpl-f9b']));
+ok('S2 allowlist de meta 2 lineas = f9,f9b,f14 (ADR-085)',
+   JSON.stringify(aMeta) === JSON.stringify(['tpl-f9', 'tpl-f9b', 'tpl-f14']));
 ok('S2 el gate de la meta usa __esMeta2Lineas() y NO __esFamiliaF9()',
    /__esF9Meta\s*=\s*__esMeta2Lineas\s*\(\s*\)/.test(KERNEL_CODE));
-ok('S2 .meta-line NO se habilita fuera de f9/f9b (no hay CSS alla: f12.css:735)',
-   aMeta && aMeta.length === 2);
+ok('S2 .meta-line solo se habilita donde el silo tiene CSS (f9/f9b/f14)',
+   aMeta && aMeta.length === 3);
 
 console.log('\n=== S3 ADMIN: captura unica del hero en Cimientos ===');
 ok('S3 ev-hero-subtitulo existe como id exactamente UNA vez',
