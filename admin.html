@@ -774,7 +774,7 @@ tr:hover td{background:var(--surface)}
                 <div class="fg"><label style="font-size:11px">URL CTA (opcional)</label><input id="ld-guestlist-cta-url" type="url" placeholder="https://..." style="font-size:12px"></div>
               </div>
             </div>
-            <div id="ld-campo-ubicacion" class="fg cont-tab-panel" data-cont-tab="ubicacion" style="display:none"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"><div style="display:flex;gap:6px;margin-top:6px"><input id="ld-mapa-lat" placeholder="Latitud (4.60393995)" title="Opcional. Coordenada WGS84 del recinto: si existe, el mapa centra en este punto y manda sobre la direccion."><input id="ld-mapa-lng" placeholder="Longitud (-74.06869074)" title="Opcional. Longitud WGS84 (negativa al oeste de Greenwich)."></div></div>
+            <div id="ld-campo-ubicacion" class="fg cont-tab-panel" data-cont-tab="ubicacion" style="display:none"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"><div style="display:flex;gap:6px;margin-top:6px"><input id="ld-mapa-lat" placeholder="Latitud (4.60393995)" title="Opcional. Coordenada WGS84 del recinto: si existe, el mapa centra en este punto y manda sobre la direccion."><input id="ld-mapa-lng" placeholder="Longitud (-74.06869074)" title="Opcional. Longitud WGS84 (negativa al oeste de Greenwich)."></div><div style="margin-top:8px;font-size:11px;color:var(--ink3)">Haz clic en el mapa (o arrastra el pin) para fijar el punto exacto del recinto.</div><div id="ld-mapa-picker" style="height:260px;margin-top:6px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)"></div></div>
             <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 12)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg">
@@ -3007,6 +3007,103 @@ function _aplicarEstadoCoordenadas() {
   });
 }
 
+// ADR-088 - selector de punto en el mapa (SIN API key: Leaflet + OpenStreetMap).
+// El admin no puede capturar clics dentro de un iframe de Google Maps (cross-origin),
+// asi que el picker se monta con Leaflet cargado de CDN, mismo criterio que Chart.js:
+// vanilla JS, cero build. Click en el mapa o arrastre del pin escriben
+// #ld-mapa-lat / #ld-mapa-lng, que son los que persisten content.mapa.
+var _mapaPickerMap = null;
+var _mapaPickerMarker = null;
+var _mapaPickerCargando = false;
+
+function _mapaPickerEscribir(lat, lng) {
+  var a = document.getElementById('ld-mapa-lat');
+  var b = document.getElementById('ld-mapa-lng');
+  if (a) a.value = Number(lat).toFixed(6);
+  if (b) b.value = Number(lng).toFixed(6);
+}
+
+function _mapaPickerLeer() {
+  var a = document.getElementById('ld-mapa-lat');
+  var b = document.getElementById('ld-mapa-lng');
+  var lat = a ? __coordNum(a.value) : null;
+  var lng = b ? __coordNum(b.value) : null;
+  return (lat === null || lng === null) ? null : { lat: lat, lng: lng };
+}
+
+function _mapaPickerMarcar(lat, lng, escribir) {
+  if (!_mapaPickerMap || !window.L) return;
+  if (!_mapaPickerMarker) {
+    _mapaPickerMarker = L.marker([lat, lng], { draggable: true }).addTo(_mapaPickerMap);
+    _mapaPickerMarker.on('dragend', function () {
+      var p = _mapaPickerMarker.getLatLng();
+      _mapaPickerEscribir(p.lat, p.lng);
+    });
+  } else {
+    _mapaPickerMarker.setLatLng([lat, lng]);
+  }
+  if (escribir) _mapaPickerEscribir(lat, lng);
+}
+
+function _mapaPickerCargarLeaflet(cb) {
+  if (window.L) { cb(); return; }
+  if (_mapaPickerCargando) { setTimeout(function () { _mapaPickerCargarLeaflet(cb); }, 150); return; }
+  _mapaPickerCargando = true;
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload = function () { _mapaPickerCargando = false; cb(); };
+  js.onerror = function () {
+    _mapaPickerCargando = false;
+    var el = document.getElementById('ld-mapa-picker');
+    if (el) el.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--ink3)">No se pudo cargar el mapa interactivo. Las coordenadas escritas a mano se guardan igual.</div>';
+  };
+  document.head.appendChild(js);
+}
+
+function _mapaPickerInit() {
+  var el = document.getElementById('ld-mapa-picker');
+  if (!el) return;
+  if (_mapaPickerMap) {
+    _mapaPickerMap.invalidateSize();
+    var p0 = _mapaPickerLeer();
+    if (p0) {
+      _mapaPickerMarcar(p0.lat, p0.lng, false);
+      _mapaPickerMap.setView([p0.lat, p0.lng], 16);
+    }
+    return;
+  }
+  _mapaPickerCargarLeaflet(function () {
+    if (_mapaPickerMap) return;
+    var punto = _mapaPickerLeer();
+    var lat = punto ? punto.lat : 4.60971;
+    var lng = punto ? punto.lng : -74.08175;
+    _mapaPickerMap = L.map(el, { scrollWheelZoom: false }).setView([lat, lng], punto ? 16 : 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(_mapaPickerMap);
+    if (punto) _mapaPickerMarcar(lat, lng, false);
+    _mapaPickerMap.on('click', function (e) { _mapaPickerMarcar(e.latlng.lat, e.latlng.lng, true); });
+    ['ld-mapa-lat', 'ld-mapa-lng'].forEach(function (id) {
+      var inp = document.getElementById(id);
+      if (!inp) return;
+      inp.addEventListener('input', function () {
+        var p = _mapaPickerLeer();
+        if (!p) return;
+        _mapaPickerMarcar(p.lat, p.lng, false);
+        _mapaPickerMap.setView([p.lat, p.lng]);
+      });
+    });
+    _mapaPickerMap.invalidateSize();
+  });
+}
+window._mapaPickerInit = _mapaPickerInit;
+
+
 async function checkConnection() {
   const status = document.getElementById('db-status');
   status.className = 'db-status loading';
@@ -4480,6 +4577,8 @@ document.addEventListener('DOMContentLoaded', () => {
       var chkU = document.getElementById('ld-mod-ubicacion');
       ub.style.display = (id === 'ubicacion' && chkU && chkU.checked) ? 'block' : 'none';
     }
+    // ADR-088: el mapa interactivo necesita estar visible para medirse.
+    if (id === 'ubicacion' && window._mapaPickerInit) window._mapaPickerInit();
   }
 
   function _contMarcarBoton(id) {
