@@ -45,6 +45,13 @@
 
     --f14-font: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif;
     --f14-display: system-ui, 'Arial Narrow', Impact, Haettenschweiler, sans-serif;
+    /* Cartel del hero y rotulo del line up: stack CONDENSADO de sistema (sin
+       @import ni @font-face, ADR-001). Sonda medida en Chrome (ADR-086):
+       Impact = 368px, Haettenschweiler = 274px y 'Arial Narrow' cae al
+       sans-serif generico (551px), por eso Impact va primero. */
+    --f14-poster: Impact, Haettenschweiler, 'Franklin Gothic Medium', 'Arial Narrow', sans-serif;
+    /* Cafe del contorno del cartel (tinta de la maqueta referentes/hero.jpg) */
+    --f14-cafe: #4A2E1B;
 }
 
 /* ==========================================================================
@@ -249,8 +256,12 @@
     justify-content: flex-start;
     align-items: flex-start;
     text-align: left;
-    min-height: clamp(600px, 43vw, 880px);
-    padding: clamp(4rem, 7vw, 6rem) var(--f14-pad-x) calc(var(--f14-cd-h) + 8.5rem);
+    /* Alto guiado por el CONTENIDO (ADR-086): el meta y el contador viven en la
+       misma celda del grid y se alinean al fondo, asi que un alto fijo grande
+       abria un hueco muerto entre el subtitulo y el meta. El padding inferior
+       reserva meta + contador; el min-height ya no impone banda vacia. */
+    min-height: clamp(360px, 26vw, 560px);
+    padding: clamp(4rem, 7vw, 6rem) var(--f14-pad-x) calc(var(--f14-cd-h) + 6rem);
     overflow: hidden;
     background-color: var(--f14-bg);
     background-image:
@@ -320,16 +331,21 @@
 .tpl-f14 #event-title,
 .Tpl-F14 #event-title {
     margin: 0;
-    color: var(--f14-kraft-2);
-    font-family: var(--f14-display);
-    font-size: clamp(2.4rem, 6.4vw, 6.2rem);
+    color: var(--f14-kraft);
+    /* Cartel de la maqueta: condensada muy pesada con contorno cafe. El stack
+       es de sistema (ADR-001: sin @import ni @font-face) y el contorno se pinta
+       con text-stroke; el text-shadow plano de antes hacia de relieve sucio. */
+    font-family: var(--f14-poster);
+    font-size: clamp(2.6rem, 9.6vw, 9rem);
     font-weight: 900;
-    line-height: 0.86;
-    letter-spacing: -0.015em;
+    line-height: 0.82;
+    letter-spacing: 0.005em;
     text-transform: uppercase;
     text-wrap: balance;
     text-align: left;
-    text-shadow: 0.035em 0.035em 0 rgba(10, 10, 10, 0.55);
+    -webkit-text-stroke: clamp(1.2px, 0.32vw, 4.4px) var(--f14-cafe);
+    paint-order: stroke fill;
+    text-shadow: 0.045em 0.045em 0 rgba(10, 10, 10, 0.45);
 }
 
 /* ATOMO #event-subtitle - DRUM N BASS / REGGAE / HIP-HOP */
@@ -610,35 +626,55 @@
     border-bottom: 1px solid var(--f14-line);
 }
 
-/* Titulo del cartel sobre la grilla de artistas: el nombre del evento preside
-   el line up, igual que en la maqueta del hero. El rotulo vive en CSS porque
-   el DOM de #mod-lineup no tiene encabezado propio (Cero Borrado: no se toca
-   el HTML del motor). El silo f14 es exclusivo del evento vinilos-inversos-c8yu
-   (verificado: 1 de 13 eventos), asi que no contamina otros silos. */
+/* Rotulo del line up: "LINE UP" preside la grilla de artistas con la misma
+   tipografia de cartel del hero, y debajo va la tagline. Ambos viven en CSS
+   porque el DOM de #mod-lineup no tiene encabezado propio (Cero Borrado: no se
+   toca el HTML del motor). El silo f14 es exclusivo del evento
+   vinilos-inversos-c8yu (verificado: 1 de 13 eventos), asi que no contamina
+   otros silos. */
 .tpl-f14 #mod-lineup::before,
 .Tpl-F14 #mod-lineup::before {
-    content: "VINILOS INVERSOS";
+    content: "LINE UP";
     display: block;
     width: 100%;
     max-width: 1180px;
     margin: 0 auto;
-    padding: 0 0 clamp(1.1rem, 2.4vw, 2rem);
+    padding: 0 0 0.4rem;
     color: var(--f14-kraft);
-    font-family: var(--f14-display);
-    font-size: clamp(1.9rem, 5.6vw, 4.2rem);
+    font-family: var(--f14-poster);
+    font-size: clamp(2.4rem, 8vw, 6rem);
     font-weight: 900;
-    line-height: 0.92;
-    letter-spacing: -0.02em;
+    line-height: 0.9;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     text-align: center;
-    text-decoration-line: underline;
-    text-decoration-color: var(--f14-fuego);
-    text-decoration-thickness: 0.1em;
-    text-underline-offset: 0.16em;
+    -webkit-text-stroke: clamp(1px, 0.18vw, 2.8px) var(--f14-cafe);
+    paint-order: stroke fill;
+}
+
+/* Tagline del rotulo (subtitulo del line up). Va en el ::before del wrapper y
+   no en el ::after de la seccion, porque el ::after de #mod-lineup cae DESPUES
+   de la grilla de artistas. El wrapper se fuerza a block para que el texto sea
+   hermano de #db-lineup y quede justo bajo el rotulo. */
+.tpl-f14 #mod-lineup .lineup-grid::before,
+.Tpl-F14 #mod-lineup .lineup-grid::before {
+    content: "una noche para vibrar con los mejores sonidos";
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0 clamp(1.4rem, 2.8vw, 2.4rem);
+    color: var(--f14-kraft-2);
+    font-family: var(--f14-font);
+    font-size: clamp(0.72rem, 1.05vw, 0.9rem);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .tpl-f14 #mod-lineup .lineup-grid,
 .Tpl-F14 #mod-lineup .lineup-grid {
+    display: block !important;
     width: 100%;
     max-width: 1180px;
     margin: 0 auto !important;
@@ -1440,7 +1476,7 @@
 @media (max-width: 1199px) {
     .tpl-f14 #mod-hero,
     .Tpl-F14 #mod-hero {
-        min-height: clamp(560px, 62vw, 760px);
+        min-height: clamp(340px, 40vw, 520px);
         background-position: 100% 0% !important;
     }
 
@@ -1451,7 +1487,7 @@
 
     .tpl-f14 #event-title,
     .Tpl-F14 #event-title {
-        font-size: clamp(2.2rem, 7vw, 4.4rem);
+        font-size: clamp(2.4rem, 8.6vw, 5.4rem);
     }
 
     .tpl-f14 #mod-hero-meta,
@@ -1613,8 +1649,8 @@
 
     .tpl-f14 #mod-hero,
     .Tpl-F14 #mod-hero {
-        min-height: clamp(540px, 80svh, 680px);
-        padding: 4.6rem 1.15rem calc(var(--f14-cd-h) + 8rem);
+        min-height: 280px;
+        padding: 4.6rem 1.15rem calc(var(--f14-cd-h) + 4.7rem);
         background-position: 82% 0% !important;
     }
 
@@ -1631,7 +1667,7 @@
 
     .tpl-f14 #event-title,
     .Tpl-F14 #event-title {
-        font-size: clamp(2.3rem, 12.5vw, 3.4rem);
+        font-size: clamp(2.4rem, 17vw, 4rem);
     }
 
     .tpl-f14 #mod-hero .hero-subtitle,

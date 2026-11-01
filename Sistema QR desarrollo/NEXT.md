@@ -15,7 +15,20 @@ Este documento define el punto de control estratégico y las directrices para la
 
 > **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-47 a -33) y las secciones vigentes 1-4.
 
-#### -51. Hito Mas Reciente - META DEL HERO EN 2 COLUMNAS Y TITULO SOBRE EL LINE UP (TSK-120) - cerrado y verificado (2026-11-01)
+#### -52. Hito Mas Reciente - TIPOGRAFIA DE CARTEL, HERO COMPACTO Y ROTULO LINE UP (TSK-121) - cerrado y verificado (2026-11-01)
+
+*   **Que se estaba haciendo:** acercar el hero de `vinilos-inversos-c8yu` a `referentes/hero.jpg` en 3 frentes: titulo condensado muy pesado con contorno cafe, meta mas arriba (pegado al subtitulo) y rotulo del line up cambiado a `LINE UP` con su tagline. **Tier FREE** y **alcance solo silo f14** (decididos por el usuario en la consulta de §0).
+*   **HECHOS VERIFICADOS:**
+    *   `(1)` **Archivo unico:** `css/templates/fiesta/f14.css` -> **+64 / -28**. Cero cambios en motor, admin, API, SQL y los otros 13 silos.
+    *   `(2)` **Stack condensado medido, no supuesto:** sonda en Chrome a 120 px -> `Impact` 368 px, `Haettenschweiler` 274 px, `Franklin Gothic Medium` 410 px, `'Arial Narrow'` **551 px** (= cae al sans generico) y `system-ui` 491 px. Por eso `--f14-poster` empieza por `Impact` y NO por `Arial Narrow`. `font-stretch: condensed` se descarto: no cambia el ancho (551 -> 551).
+    *   `(3)` **Contorno cafe:** `-webkit-text-stroke: clamp(1.2px, 0.32vw, 4.4px) #4A2E1B` (token nuevo `--f14-cafe`) + `paint-order: stroke fill`; se reemplazo el `text-shadow` plano que hacia de relieve sucio.
+    *   `(4)` **Meta mas arriba:** la causa del hueco era el alto fijo del hero (ADR-083: `clamp(600px,43vw,880px)`), no el margen del meta. Ahora el hero es **guiado por contenido** (`min-height` bajo, `padding-bottom` = cd-h + 6rem) y el meta/contador siguen alineados al fondo de la celda. Medido: hueco subtitulo->meta **26 px** a 1440 y **25 px** a 500 (antes 123 px / 158 px). Meta -> contador 24/16 px.
+    *   `(5)` **Rotulo del line up:** `#mod-lineup::before` = `LINE UP` con la tipografia de cartel; la tagline va en `.lineup-grid::before` (NO en `#mod-lineup::after`, que cae despues de la grilla de artistas) y el wrapper se fuerza a `display:block`.
+    *   `(6)` **Verificacion:** llaves **0**; 0 lineas no-ASCII en el diff; `smoke_f14_vinilos` **38/0**; `smoke_hero_contract` **64/64**; harness visual local 1440/767/500 px sin desborde horizontal (`scrollWidth == clientWidth`).
+*   **Que sigue (bloqueado por datos, no por codigo):** el `PATCH` a `eventos.config_landing` con la clave anon devuelve **200 + `[]`** (0 filas): RLS lo rechaza. Los textos pedidos (`DRUM N BASS - REGGAE - HIP HOP`, `NOVIEMBRE 20`, `8:00 P.M`, `KLANDESTUNO BAR` / `KRA 4 # 19-54 (PISO 4)`) se aplican en el admin como overrides (`content.subtitulo` + `content.meta`). Sin ellos el hero sigue mostrando `VIERNES 20 / NOVIEMBRE DE 2026`, `8:00 PM` y `KLANDESTINO, KR 4 # 19-56`.
+*   **Riesgos activos:** ninguno de runtime (CSS aislado por `.tpl-f14`). El unico riesgo es de datos: si cambia el nombre del evento, el rotulo `LINE UP` (content fijo) no depende de el, pero la tagline tampoco; ambos son textos de marca del silo.
+
+#### -51. Hito - META DEL HERO EN 2 COLUMNAS Y TITULO SOBRE EL LINE UP (TSK-120) - cerrado y verificado (2026-11-01)
 
 *   **Que se estaba haciendo:** acercar el meta del hero de `vinilos-inversos-c8yu` a la maqueta `referentes/hero.jpg` (columna `fecha + hora` | columna `lugar + direccion`, tipografia mayor) y poner el nombre del evento presidiendo la seccion de artistas de abajo. **Tier FREE** y **alcance solo silo f14**, ambos decididos por el usuario en la consulta de §0.
 *   **HECHOS VERIFICADOS:**

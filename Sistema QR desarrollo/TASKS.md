@@ -134,6 +134,7 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-118](#tsk-118) | Direccion (wizard del admin / Supabase; **sin codigo**) | **Datos del evento `vinilos-inversos-c8yu`** — (a) **sede ausente**: `eventos.ubicacion` = `"Kr 4 # 19-56"` y no existe columna de nombre de sede (campo vivo: `#ev-ubic`, `admin.html:896`; ver correccion ADR-006 en el cierre de TSK-116); (b) `config_landing.colors` conserva la paleta vieja f9 (`accent: #c9a84c`) con `template_id='f14'` (oxido `#E35925`); (c) `config_landing.content.subtitulo` = `"DRUMN AND BASS REGGAE HIP-HOP"` (typo "DRUMN", sin separadores; la maqueta dice `DRUM N BASS - REGGAE - HIP-HOP`) | Silo F14 "Vinilos Inversos" | **ALTA** — (a) **RESUELTO 2026-11-01**: `eventos.ubicacion` ya es `"Klandestino, Kr 4 # 19-56"` (verificado por REST). (b)(c) **BLOQUEADOS por diseno (2026-11-01)**: la anon key no puede hacer UPDATE sobre `eventos` (RLS: el PATCH devuelve 2xx pero con 0 filas afectadas, verificado leyendo el valor antes y despues) y `admin.html` escribe con la sesion del usuario (`SB.from('eventos').update(payload).eq('id', id)`). Se aplican **desde el admin, sin codigo**: (b) paleta -> `accent #E35925 / secondary #EA580C / surface #131313 / tertiary #DBC8A8 / background #0E0E0E` + `color_primario #E35925` (invariante ADR-080); (c) subtitulo -> `DRUM N BASS · REGGAE · HIP-HOP`. Nota: en f14 `--tpl-accent` solo esta declarado y no se consume, asi que (b) es higiene de datos sin efecto visual |
 | [TSK-119](#tsk-119) | `@renderer-dev` (OPCIONAL — dominio de riesgo: es el formateador del motor, no el silo) | **`#meta-hora` en formato 12 h** — hoy muestra `20:00 HRS`; la maqueta pide `8:00 PM` | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `__hora12()` (v125) reutiliza `__horaA24`; `ev.hora='20:00'` -> `8:00 PM`; el texto libre legacy (ej. `11:56 AM / 7:34 AM`) cae al formato previo con `T('landing.hrs')`. `evento-app.html` +18/-1. Verificacion en el cierre de TSK-117 (seccion final) |
 | [TSK-120](#tsk-120) | `@frontend-tpl` (**FREE**: CSS del silo, 0 runtime, 0 JS) + `@renderer-dev` (**gate §2 confirmado** para la fecha) | **Meta del hero en 2 columnas y titulo del evento sobre el line up** — la maqueta `referentes/hero.jpg` pide `[cal] 20 NOVIEMBRE / 8:00 PM  \|  [pin] KLANDESTINO / KRA 4 # 19-56` y el nombre del evento presidiendo la grilla de artistas de la seccion de abajo | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `f14.css` **+147/-18** (CSS-only) + `evento-app.html` **+6/-5** y `scripts/smoke_hero_contract.js` **+4/-4**: `__esMeta2Lineas()` agrega `'tpl-f14'` a la allowlist, asi que la fecha pasa de ISO (`2026-11-20`) a `VIERNES 20` / `NOVIEMBRE DE 2026`. Gate `AGENTS.md` §2 confirmado por el usuario el 2026-11-01 |
+| [TSK-121](#tsk-121) | `@frontend-tpl` (**FREE**: CSS del silo, 0 runtime, 0 JS) | **Tipografia de cartel (condensada + contorno cafe), meta pegado al subtitulo y rotulo LINE UP con tagline** — la maqueta `referentes/hero.jpg` pide un titulo condensado muy pesado con borde cafe, y el meta debe subir hasta el subtitulo en 2 columnas (`NOVIEMBRE 20 / 8:00 P.M` \| `KLANDESTUNO BAR / KRA 4 # 19-54 (PISO 4)`); en `#mod-lineup` el rotulo pasa de `VINILOS INVERSOS` a `LINE UP` con el subtitulo `una noche para vibrar con los mejores sonidos` | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `f14.css` **+64/-28**, CSS-only. Stack condensado medido con sonda (Impact 368 px vs 'Arial Narrow' 551 px = fallback) y hero guiado por contenido (hueco subtitulo->meta 26 px desktop / 25 px movil). **Deuda declarada:** los textos del meta y del subtitulo son DATOS; el `PATCH` directo a Supabase fue rechazado por RLS (200 + `[]`), hay que aplicarlos en el admin |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -632,6 +633,39 @@ task:
 11. **[DATOS + CODIGO - RESUELTA 2026-11-01] Fecha del hero en ISO:** `__metaSet('meta-fecha', __metaDerive(ev.fecha, true), __metaData.fecha, true)` solo entraba a la rama de fecha localizada si `__esMeta2Lineas()` devolvia `true`, y esa allowlist era literal `['tpl-f9','tpl-f9b']` (`evento-app.html:919-926`), asi que en f14 el hero pintaba **`2026-11-20`**. **Gate `AGENTS.md` §2 confirmado por el usuario el 2026-11-01.** Fix aplicado: `'tpl-f14'` agregado a la allowlist (`evento-app.html` **+6/-5**, incluido el comentario del contrato) y `scripts/smoke_hero_contract.js` **+4/-4** (asserts S2 actualizados a `f9,f9b,f14`; el invariante pasa a ser "solo los silos con CSS para `.meta-line`"). La fecha se pinta ahora `VIERNES 20` / `NOVIEMBRE DE 2026` con el CSS que el silo ya tenia. **Nota de coherencia:** `__esFamiliaF9()` (`:886`) conserva `['tpl-f9','tpl-f9b']` **a proposito** — f14 no puede heredar las subconmutaciones ni el contenido editorial de RASTRO MC. El comentario de `admin.html:3872` sigue citando solo f9/f9b: es documentacion, no logica (deuda cosmetica).
 12. **[DATOS - baja] Lugar en una sola linea:** la maqueta separa `KLANDESTINO` / `KRA 4 # 19-56` / `BOGOTA D.C.`; `eventos.ubicacion` es un unico string y el DOM del meta no admite salto de linea. Se ve bien en una linea; para replicar el 3-lineas hace falta override `content.meta.lugar` (gateado por el mismo allowlist) o un campo nuevo.
 13. **[ERROR HISTORICO - preexistente]** `smoke_f9b_mistico_nocturno.js` falla el assert `subconmutacion 1 (__esF9Meta / meta 2 lineas) usa __esFamiliaF9` (PASS 102 / FAIL 1). Verificado con `git stash` que tambien falla en HEAD sin estos cambios. **No bloquea** el despliegue del silo.
+
+---
+
+### Cierre de TSK-121 - Tipografia de cartel, hero compacto y rotulo LINE UP (2026-11-01) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Alcance REAL ejecutado y verificado contra el archivo real (ADR-006). **Tier FREE** (`AGENTS.md` §0, decidido por el usuario el 2026-11-01) y **solo silo f14**.
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Archivo:** `css/templates/fiesta/f14.css` -> **+64 / -28**. Cero cambios en `evento-app.html`, `admin.html`, `api/*.js`, SQL y los otros 13 silos.
+2. **Titulo de cartel:** token `--f14-poster` con stack condensado **elegido por sonda medida** (Impact 368 px, Haettenschweiler 274 px, Franklin Gothic Medium 410 px, `'Arial Narrow'` **551 px = fallback**, `system-ui` 491 px). `Arial Narrow` se descarto porque no resuelve en Chrome y `font-stretch: condensed` porque no cambia el ancho (551 -> 551). Tamano: `clamp(2.6rem, 9.6vw, 9rem)`.
+3. **Contorno cafe:** token `--f14-cafe: #4A2E1B` + `-webkit-text-stroke: clamp(1.2px, 0.32vw, 4.4px)` + `paint-order: stroke fill`; se retiro el `text-shadow` plano (relieve sucio) y se dejo una sombra corta.
+4. **Meta pegado al subtitulo:** la causa era el **alto fijo** del hero (ADR-083), no el margen del meta. El hero pasa a ser **guiado por contenido** (`min-height: clamp(360px,26vw,560px)` + `padding-bottom: calc(var(--f14-cd-h) + 6rem)`) y los tres breakpoints se recalcularon con la misma aritmetica (1199 / 767). Medido en el harness: hueco subtitulo->meta **26 px** (1440) y **25 px** (500), antes **123 px** y **158 px**; meta->contador 24/16 px.
+5. **Rotulo del line up:** `#mod-lineup::before` = `LINE UP` con la tipografia de cartel; la tagline `una noche para vibrar con los mejores sonidos` va en **`.lineup-grid::before`** (el `::after` de la seccion renderiza DESPUES de la grilla) y el wrapper se fuerza a `display:block !important`.
+
+#### Verificacion (por archivo real, ADR-006)
+
+| Comprobacion | Resultado |
+|---|---|
+| Balance de llaves del CSS | **0** (minimo 0) |
+| Lineas agregadas con bytes > 127 | **0** |
+| `node scripts/smoke_f14_vinilos.js` | **PASS 38 / FAIL 0** |
+| `node scripts/smoke_hero_contract.js` | **PASS 64 / FAIL 0** |
+| Harness visual local (1440 / 767 / 500 px) | sin solapes ni desborde horizontal (`scrollWidth == clientWidth`) |
+| `git diff --numstat` | solo `css/templates/fiesta/f14.css` (+64/-28) |
+
+#### Deuda declarada (NO cerrada: son DATOS, no codigo)
+
+14. **[DATOS - bloqueada por RLS] Textos del meta y del subtitulo.** Pedido: `content.subtitulo = "DRUM N BASS - REGGAE - HIP HOP"` y
+    `content.meta = { fecha:{l1:"NOVIEMBRE 20"}, hora:{l1:"8:00 P.M"}, lugar:{l1:"KLANDESTUNO BAR", l2:"KRA 4 # 19-54 (PISO 4)"} }`.
+    **Se intento el `PATCH` directo** a `eventos?slug=eq.vinilos-inversos-c8yu` con la clave anon del motor: **200 + `[]`** (0 filas) y read-back sin cambios -> RLS lo rechaza, igual que TSK-118. No hay `SUPABASE_SERVICE_ROLE_KEY` local ni `.env`. **Se aplica desde el admin** (`Configuracion de landing > content`); el CSS del silo ya pinta los overrides (`meta-line` en bloque). Sin ellos, el hero sigue mostrando `VIERNES 20` / `NOVIEMBRE DE 2026`, `8:00 PM` y `KLANDESTINO, KR 4 # 19-56`.
+15. **[COSMETICA - preexistente]** El comentario de `admin.html:3872` sigue citando solo `f9`/`f9b` para `.meta-line`; es documentacion, no logica.
+16. **[ERROR HISTORICO - preexistente]** `smoke_f9b_mistico_nocturno.js` sigue fallando el assert de la subconmutacion 1; verificado con `git stash` que tambien falla en HEAD. **No bloquea.**
 
 
 
