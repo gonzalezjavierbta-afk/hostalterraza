@@ -28,6 +28,8 @@ estructura: indice-v1 (2026-10-01)
 > **Delta por ADR-080 (2026-10-07, linea agregada, sin reescribir las de arriba):** **+1 entrada / +1 cerrada = TSK-112** (Paleta de color de evento) y **+1 abierta = TSK-113** (Fase 2: consumo de los 4 slots derivados en los silos). Feature **implementada** en `admin.html` (Wizard, creacion + edicion) y verificada con Escudo GOLD (`node scripts/smoke_paleta_evento.js` -> **20 PASS / 0 FAIL**). Deuda tecnica declarada en ADR-080 (Decision 5). Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 > **Delta por ADR-081 (2026-10-07, linea agregada, sin reescribir las de arriba):** **+1 entrada / +1 cerrada = TSK-114** (Puntos de escaneo por evento + autorizacion por punto). Feature **implementada** en `admin.html`/`scanner.html` y **migracion `adr081_puntos_none_semantica.sql` APLICADA** (121 inscritos, 0 con `[]`, no-op). Verificada: `node scripts/smoke_checkin_multipunto.js` -> **28 PASS / 0 FAIL**; `node scripts/smoke_puntos_adr081.js` -> **30 PASS / 0 FAIL**; `node scripts/express_check.js` -> **35 PASS / 0 FAIL**. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
+> **Delta por rediseno del HERO del silo f14 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+4 entradas = TSK-116 (cerrada) + TSK-117 / TSK-118 / TSK-119 (abiertas)**. Delta efectivo: **+1 cerrada / +3 abiertas**. TSK-116 (rediseno del HERO del evento `vinilos-inversos-c8yu`) nace y cierra en el mismo ciclo: **1 archivo, CSS-only** (`css/templates/fiesta/f14.css`, `git diff --numstat` = **+290 / -59**, 47.483 bytes, 0 bytes > 127, llaves 168/168), `node scripts/smoke_f14_vinilos.js` -> **PASS 38 / FAIL 0**. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -119,6 +121,16 @@ estructura: indice-v1 (2026-10-01)
 | ID | Responsable | Título | Bloque | Detalle |
 |---|---|---|---|---|
 | [TSK-113](#tsk-113) | Chief Architect + Frontend (`@architect` / `@admin-dev` / `@renderer-dev`) | **Fase 2 (opcional)** — consumir los 4 slots derivados (`secondary`/`tertiary`/`surface`/`background`) en los silos: hoy se persisten en el JSONB pero ningun CSS los lee (solo `accent` pinta via `--master-accent`) | Paleta de color de evento (ADR-080) | pendiente |
+
+#### 🟠 REDISENO DEL HERO DEL SILO F14 + DEUDAS ABIERTAS (3 items NUEVOS, 2026-11-01)
+
+> Items nacidos del rediseno del HERO del evento `vinilos-inversos-c8yu` (theme `vinilos`, `template_id='f14'`), implementado y verificado el 2026-11-01 (**TSK-116, cerrada**; ver seccion de cierre al final). **Ninguno de estos 3 se ejecuto en ese ciclo:** el alcance fue CSS-only sobre `f14.css` (0 cambios de HTML/JS, 0 migraciones).
+
+| ID | Responsable | Título | Bloque | Detalle |
+|---|---|---|---|---|
+| [TSK-117](#tsk-117) | `@renderer-dev` + `@qa-auditor` (**PAGO obligatorio** + gate `AGENTS.md` §2: es el motor compartido `evento-app.html`) | **Contador con zona horaria real y `setInterval` con cleanup** — `parseSpanishDate()` (`evento-app.html:720-730`) construye `new Date("YYYY-MM-DDTHH:mm")` en la zona del DISPOSITIVO, no en `America/Bogota`; el `setInterval` (`:1424-1431`) nunca se limpia | Motor compartido (afecta a los 14 silos) | **ALTA** (gate §2 confirmado por el usuario 2026-11-01) |
+| [TSK-118](#tsk-118) | Direccion (wizard del admin / Supabase; **sin codigo**) | **Datos del evento `vinilos-inversos-c8yu`** — (a) **sede ausente**: `eventos.ubicacion` = `"Kr 4 # 19-56"` y no existe columna de nombre de sede (campo vivo: `#ev-ubic`, `admin.html:896`; ver correccion ADR-006 en el cierre de TSK-116); (b) `config_landing.colors` conserva la paleta vieja f9 (`accent: #c9a84c`) con `template_id='f14'` (oxido `#E35925`); (c) `config_landing.content.subtitulo` = `"DRUMN AND BASS REGGAE HIP-HOP"` (typo "DRUMN", sin separadores; la maqueta dice `DRUM N BASS - REGGAE - HIP-HOP`) | Silo F14 "Vinilos Inversos" | **ALTA** — (a) **RESUELTO 2026-11-01**: `eventos.ubicacion` ya es `"Klandestino, Kr 4 # 19-56"` (verificado por REST); quedan (b) y (c) |
+| [TSK-119](#tsk-119) | `@renderer-dev` (OPCIONAL — dominio de riesgo: es el formateador del motor, no el silo) | **`#meta-hora` en formato 12 h** — hoy muestra `20:00 HRS`; la maqueta pide `8:00 PM` | Silo F14 "Vinilos Inversos" | opcional |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -511,6 +523,33 @@ task:
 17. **Tooling de medicion (Mandato #20) reparado:** `scripts/usage_report.js` y `scripts/session_close.js` leian el esquema **V1** (`session`/`message`/`part`, 2.037 sesiones) mientras el runtime escribe **V2** (`session_v2`/`session_message`, 2.442): el reporte del dia devolvia **0 sesiones**. Ahora detectan el esquema, resuelven `--tree`/`--root` por `parent_id` y cuentan turnos por `session_message.type='assistant'`. Verificado: `--summary` del dia lista las 11 sesiones reales (~11,6M tokens, 76,5% cache_read); `node --check` OK en ambos scripts.
 18. **Verificacion tras el addendum:** `node scripts/smoke_f14_vinilos.js` -> **PASS 38 / FAIL 0**; `node scripts/express_check.js` -> **PASS 39 / FAIL 0**; balance de divs `admin.html` en baseline (1605/1602); sintaxis de los 2 bloques `<script>` inline de `admin.html` OK.
 19. **Siguen abiertas:** `_THEME_TITULO_2_LINEAS` no incluye `vinilos` ni `noche-avalon` (f14/f13 con `metaDosLineas:false`); `f13.css` sigue estilizando `.faq-q` inexistente.
+
+---
+
+### Cierre de TSK-116 - Rediseno del HERO del silo f14 (evento VINILOS INVERSOS) (2026-11-01) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Cambio **CSS-only** en un unico archivo, implementado y verificado contra el archivo real (ADR-006). Este cierre es **documental: 0 cambios de codigo, 0 migraciones, 0 commits** (el commit de `f14.css` lo hace el orquestador).
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Archivo unico modificado:** `css/templates/fiesta/f14.css` — `git diff --numstat` -> **+290 / -59**; archivo final **47.483 bytes / 1.626 lineas**; **0 bytes > 127**; llaves **168/168**. **Cero cambios en HTML/JS** (ni `evento-app.html` ni `admin.html`).
+2. **Causa raiz del bug:** `#mod-hero` **no declaraba `background-size` en todo el silo**, y el fondo se inyecta por JS como `background-image` inline (`evento-app.html:1564`); el navegador pintaba la foto (1671x941) a tamano nativo desde `0% 0%` -> a 1440 px desbordaba **231 px** y cortaba al artista; a 2560 px dejaba **889 px** vacios.
+3. **Solucion:** `background-size: cover !important` (`f14.css:259`), `background-position: 100% 0% !important` (`:260`) y `no-repeat`; alto guiado por ancho `clamp(600px, 43vw, 880px)` (`:253`) y movil `clamp(540px, 80svh, 680px)` (`:1517`) con `background-position: 82% 0%` en `<=767px` (`:1518`).
+4. **Composicion sin tocar el DOM** (contrato v210, atomos hermanos): `#mod-hero` (`:131-135`), `#unified-frame` (`:137-142`) y `#mod-hero-meta` (`:144-149`) comparten la celda `grid-area: hero` y se apilan con `align-self`. Orden visual resultante: organizador -> titulo -> subtitulo -> meta -> contador.
+5. **Piezas nuevas:** tokens `--f14-cd-h: 106px` (movil 74 px, `:1496`) y `--f14-pad-x` (`:40-41`); scrim `#mod-hero::before` (`:266-267`); atomo `.hero-subtitle` (`:336-337`, antes **sin CSS en ningun silo**); franja de contador a sangre (`:383-385`); meta en linea con iconos kraft; `#i18n-sw` a la esquina superior derecha del hero en `absolute` (`:350-354`) para no tapar contador ni CTA.
+6. **Breakpoints:** nuevos `<=1199px` y `<=767px`; retirados el hero `88vh` de `>=992px` y el padding del contador de `>=640px`. Log de versiones del archivo actualizado a **v1.1** (`f14.css:1609-1625`).
+
+#### Verificacion (por archivo real, ADR-006)
+
+7. `node scripts/smoke_f14_vinilos.js` -> **PASS 38 / FAIL 0** (ejecutado en este cierre). Balance de llaves **168/168**; **0 selectores fuera de scope**; **ASCII-safety 0 bytes > 127** (medido con `[System.IO.File]::ReadAllBytes`). Capturas headless Chrome a 1920/1440/768/390 confirman `scrollWidth == viewport` (cero scroll horizontal), rostro intacto a la derecha y jerarquia de la maqueta `referentes/hero.jpg`.
+8. **Leccion reutilizable (registrada en ADR-083):** en este proyecto el fondo del hero se inyecta por JS (`evento-app.html:1564`); **cualquier silo que no declare `background-size`/`background-position` hereda el default `auto`/`0% 0%`** y recorta de forma distinta en cada resolucion.
+
+#### Correcciones ADR-006 al brief de la tarea (baseline = archivo real)
+
+9. El brief declaraba **+281 / -59** lineas: el real es **+290 / -59** (`git diff --numstat`). Diferencia de 9 lineas; no cambia el alcance.
+10. El brief ubicaba `parseSpanishDate()` en `evento-app.html:727-729`: la funcion real vive en **`:720-730`** (los dos `new Date(...)` si estan en `:727` y `:729`); el `setInterval` real es **`:1424-1431`** (el brief decia `:1423-1431`, que es la linea del `parseSpanishDate(...)` que lo precede).
+11. El brief pedia escribir la sede en `#ld-ubicacion-val` (`admin.html:777`): ese campo **existe en el DOM pero esta RETIRADO del formulario** por **ADR-056 (fila 9)** (`admin.html:4320-4323`; `modMap` ya no lo mapea, aunque su lectura legacy se conserva). La fuente canonica que escribe `eventos.ubicacion` es **`#ev-ubic`** (Paso 1, `admin.html:896`; lectura `:6041`, escritura `:6624`). **TSK-118 se abre con esa correccion.**
+
 
 
 
