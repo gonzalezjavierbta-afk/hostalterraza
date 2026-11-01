@@ -192,6 +192,21 @@ check('silo: logos de patrocinador a 42px', /\.sponsor-img[\s\S]{0,220}?height:\
 check('silo: logos sin marco en la tarjeta', /\.sponsor-item[\s\S]{0,220}?border:\s*none/.test(css));
 check('silo: seguro data-hidden de sponsors', /#mod-sponsors\[data-hidden="true"\]/.test(css));
 
+// 12d) FOOTER (v1.6 del silo): el kernel trae <footer id="mod-footer"> pero su
+//      IoC global apaga section/header/footer; sin activacion el cierre no
+//      aparece. Ademas se verifica el orden nuevo de la rejilla.
+check('silo: activa #mod-footer', /\.tpl-f14 #mod-footer,[\s\S]{0,400}?display:\s*block !important/.test(cssRaw));
+check('silo: grid-area footer', /\.tpl-f14 #mod-footer,[\s\S]{0,90}?grid-area:\s*footer/.test(cssRaw));
+const footerAreas = (css.match(/"footer"|"footer footer"/g) || []).length;
+check('silo: footer en las 3 rejillas', footerAreas >= 3, footerAreas + ' ocurrencias');
+check('silo: .footer-inner oculto (Cero Borrado)', /#mod-footer \.footer-inner[\s\S]{0,90}?display:\s*none !important/.test(css));
+check('silo: #footer-copy estilizado', /#footer-copy[\s\S]{0,200}?letter-spacing/.test(css));
+const media767 = (css.match(/@media \(min-width: 767px\)[\s\S]*?\n\}/) || [''])[0];
+const ordenEsperado = ['"hero hero"', '"ctas ctas"', '"lineup lineup"', '"cartel playlist"', '"boletos form"', '"video video"', '"faq ubicacion"', '"sponsors sponsors"', '"footer footer"'];
+const posiciones = ordenEsperado.map((t) => media767.indexOf(t));
+const ordenOk = posiciones.every((v, i, arr) => v > -1 && (i === 0 || v > arr[i - 1]));
+check('silo: orden hero-lineup-cartel-playlist-boletos-form-galeria-faq-ubicacion-sponsors-footer', ordenOk, posiciones.join(','));
+
 // 13) Kernel: regla general de boleteria de tarifa unica (v1.15.0).
 //     Con UNA sola tarifa real se pinta una tarjeta "ENTRADA GENERAL" y el slot
 //     de preventa queda vacio. Con 0 o >=2 tarifas se conserva lo anterior.

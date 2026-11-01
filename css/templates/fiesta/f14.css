@@ -109,7 +109,9 @@
 .tpl-f14 #mod-sponsors,
 .Tpl-F14 #mod-sponsors,
 .tpl-f14 #mod-form,
-.Tpl-F14 #mod-form {
+.Tpl-F14 #mod-form,
+.tpl-f14 #mod-footer,
+.Tpl-F14 #mod-footer {
     display: block !important;
 }
 
@@ -126,13 +128,14 @@
         "ctas"
         "lineup"
         "cartel"
-        "video"
         "playlist"
+        "boletos"
+        "form"
+        "video"
         "faq"
         "ubicacion"
         "sponsors"
-        "boletos"
-        "form";
+        "footer";
     width: 100%;
     row-gap: 0;
     background-color: var(--f14-bg);
@@ -209,6 +212,11 @@
 .tpl-f14 #mod-form,
 .Tpl-F14 #mod-form {
     grid-area: form;
+}
+
+.tpl-f14 #mod-footer,
+.Tpl-F14 #mod-footer {
+    grid-area: footer;
 }
 
 /* Reflujo: si un modulo de la pareja viene vacio, el hermano ocupa la fila */
@@ -1695,6 +1703,50 @@
 }
 
 /* ==========================================================================
+   17c. FOOTER (#mod-footer) - franja de cierre
+   El kernel trae el footer completo (marca, enlaces, redes, contacto) pero su
+   IoC global apaga section/header/footer (evento-app.html:38), asi que cada
+   silo debe encenderlo. Patron de f8/f9b: el nodo se conserva entero en el DOM
+   (Cero Borrado) y se pinta la franja inferior centrada con #footer-copy, que
+   es el dato real del evento; .footer-inner no tiene estilos globales en el
+   kernel y mostrarlo apilado romperia el cierre.
+   ========================================================================== */
+.tpl-f14 #mod-footer,
+.Tpl-F14 #mod-footer {
+    display: block !important;
+    text-align: center;
+    padding: 1.8rem 1.5rem;
+    background-color: var(--f14-bg-2);
+    border-top: 2px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-footer .footer-inner,
+.Tpl-F14 #mod-footer .footer-inner {
+    display: none !important;
+}
+
+.tpl-f14 #mod-footer .footer-bottom,
+.Tpl-F14 #mod-footer .footer-bottom {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0;
+    border-top: none;
+    text-align: center;
+}
+
+.tpl-f14 #footer-copy,
+.Tpl-F14 #footer-copy {
+    display: inline-block;
+    color: var(--f14-kraft);
+    font-family: var(--f14-display);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.78;
+}
+
+/* ==========================================================================
    18. BREAKPOINT 767 - grid de 2 columnas (FAQ|Ubicacion, Boletos|Comunidad)
    ========================================================================== */
 @media (min-width: 767px) {
@@ -1706,10 +1758,11 @@
             "ctas ctas"
             "lineup lineup"
             "cartel playlist"
+            "boletos form"
             "video video"
             "faq ubicacion"
             "sponsors sponsors"
-            "boletos form";
+            "footer footer";
         column-gap: 1.5rem;
     }
 
@@ -1926,13 +1979,14 @@
             "ctas"
             "lineup"
             "cartel"
-            "video"
             "playlist"
+            "boletos"
+            "form"
+            "video"
             "faq"
             "ubicacion"
             "sponsors"
-            "boletos"
-            "form";
+            "footer";
     }
 
     /* El embed de Spotify baja de alto en movil (marco 2px + padding) */
@@ -2170,5 +2224,23 @@
             oculta con display:none !important, para que el display:block
             !important de la activacion no reviva la banda cuando el kernel la
             apaga por falta de patrocinadores (Cero Borrado).
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.6 - 2026-11-01 - Reorden de la rejilla y FOOTER encendido:
+          - Orden nuevo (pedido de Direccion): hero, ctas, LINE UP, cartel +
+            playlist, boleteria + formulario, galeria (que vive dentro de
+            #mod-video), faq + ubicacion, patrocinadores y footer. Antes el
+            video y el playlist iban antes de boleteria y el footer no existia.
+            Se aplica en los 3 bloques de areas: base de 1 columna (12 filas),
+            >=767 (9 filas, con cartel|playlist y boletos|form pareados) y
+            <=767 (12 filas). row-gap sigue en 0.
+          - Footer: el kernel ya trae <footer id="mod-footer"> con marca,
+            enlaces, redes y contacto, pero su IoC global apaga
+            section/header/footer, asi que el silo debe encenderlo. Se sigue el
+            patron de f8/f9b: activacion (display:block !important), grid-area
+            footer y franja inferior centrada. .footer-inner se oculta (el nodo
+            queda intacto en el DOM: Cero Borrado) porque el kernel no trae
+            estilos globales para sus columnas y sin ellos se apilaria sin aire.
+          - #footer-copy se pinta con la tipografia de cartel del silo, en
+            kraft al 78% y con border-top de 2px.
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */
