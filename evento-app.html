@@ -738,6 +738,23 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             return { hh: hh, mm: mm };
         }
 
+        // v125 (TSK-119): hora del hero en formato 12 h con AM/PM, que es el de
+        // la maqueta del evento. Reutiliza __horaA24: solo reformatea lo que ya
+        // es una hora valida de 24 h. Devuelve '' con cualquier otro valor
+        // (texto libre legacy) para que el llamador caiga al formato previo.
+        // La guarda es ESTRICTA a proposito: __horaA24 acepta prefijos
+        // ('11:56 AM / 7:34 AM' daria 11:56), aqui se exige la cadena completa.
+        function __hora12(hora) {
+            var raw = String(hora == null ? '' : hora).trim();
+            if (!/^\d{1,2}[:.]\d{2}(:\d{2})?$/.test(raw)) return '';
+            var t = __horaA24(raw);
+            if (!t) return '';
+            var h12 = t.hh % 12;
+            if (h12 === 0) h12 = 12;
+            var mm = t.mm < 10 ? '0' + t.mm : String(t.mm);
+            return h12 + ':' + mm + ' ' + (t.hh < 12 ? 'AM' : 'PM');
+        }
+
         // Acepta 'YYYY-MM-DD' (columna eventos.fecha) y el formato legacy
         // '20 de noviembre de 2026'. Si la fecha trae la hora embebida
         // ('YYYY-MM-DDTHH:mm') se usa solo cuando eventos.hora viene vacia.
@@ -1625,7 +1642,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // La fecha real de la familia f9/f9b se formatea en 2 lineas dentro de
                 // __metaSet (esFecha=true); hora y lugar quedan en linea unica.
                 __metaSet('meta-fecha', __metaDerive(ev.fecha, true), __metaData.fecha, true);
-                __metaSet('meta-hora', __metaDerive(ev.hora ? (ev.hora + ' ' + T('landing.hrs')) : ''), __metaData.hora);
+                __metaSet('meta-hora', __metaDerive(ev.hora ? ((__hora12(ev.hora) || (ev.hora + ' ' + T('landing.hrs')))) : ''), __metaData.hora);
                 __metaSet('meta-lugar', __metaDerive(effUbicacion).toUpperCase(), __metaData.lugar);
                 if (ev.imagen_url) document.getElementById('mod-hero').style.backgroundImage = `url('${ev.imagen_url}')`;
 

@@ -15,7 +15,19 @@ Este documento define el punto de control estratégico y las directrices para la
 
 > **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-47 a -33) y las secciones vigentes 1-4.
 
-#### -49. Hito Mas Reciente - CONTADOR DEL LANDING EN ZONA HORARIA DE BOGOTA + CLEANUP DEL `setInterval` (ADR-084) - cerrado y verificado (2026-11-01)
+#### -50. Hito Mas Reciente - META EN 12 H, DATOS DEL EVENTO BLOQUEADOS POR RLS Y RUNNER DE SMOKES (2026-11-01)
+
+*   **Que se estaba haciendo:** los dos pendientes derivados de TSK-117 — TSK-118 (b)(c) (paleta y subtitulo del evento en Supabase) y TSK-119 (`#meta-hora` en 12 h) — mas la decision de pipeline que pidio el usuario ("tomar mejor decision").
+*   **HECHOS VERIFICADOS:**
+    *   `(1)` **TSK-119 CERRADA:** `evento-app.html` -> `git diff --numstat` **+18 / -1**. Nuevo `__hora12(hora)` (v125) reutiliza `__horaA24` y devuelve `''` con cualquier valor que no sea hora de 24 h. `20:00` -> `8:00 PM`, `00:00` -> `12:00 AM`, `12:30` -> `12:30 PM`, `20:05` -> `8:05 PM`; `11:56 AM / 7:34 AM`, `''` y `25:00` -> `''` (fallback al formato previo con `T('landing.hrs')`). **7/7** casos exactos. `@renderer-dev` detecto que el brief original no cumplia su propio criterio de aceptacion (`__horaA24` usa regex **sin anclaje final**, asi que `11:56 AM / ...` daba `11:56 AM`) y lo resolvio con una guarda estricta **dentro de `__hora12`**, dejando `__horaA24` intacta.
+    *   `(2)` **TSK-118 (b)(c) BLOQUEADOS por diseno:** el PATCH con la anon key a `eventos?slug=eq.vinilos-inversos-c8yu` responde 2xx pero **no persiste** (0 filas afectadas: `config_landing.colors` sigue `#c9a84c` y el subtitulo `"DRUMN AND BASS REGGAE HIP-HOP"` tras releer). Es RLS correcta: `admin.html` escribe con la **sesion del usuario** (`SB.from('eventos').update(payload).eq('id', id)`). No se relaja ninguna politica por una tarea de datos. Valores objetivo y ruta de aplicacion registrados en TASKS.md (TSK-118).
+    *   `(3)` **Hallazgo de riesgo cero:** en `f14.css` el `--tpl-accent` solo esta **declarado** (linea 44) y **no se consume**: alinear `colors.accent` no cambia ni un pixel del evento. El "dorado f9" no se veia porque hubiera ganado a nadie, era deuda de datos.
+    *   `(4)` **Decision de pipeline (punto 3 del usuario):** en vez de acoplar `smoke_countdown_tz.js` dentro de `smoke_qa_asserts.js` se creo **`scripts/smoke_all.js`**: descubre `scripts/smoke_*.js`, los corre en procesos hijos y agrega el veredicto (`--only`, `--list`, timeout 120 s, exit 1 si falla alguno). Cero acoplamiento, futuros smokes entran solos.
+    *   `(5)` **El runner encontro deuda preexistente:** `12 smokes -> 11 PASS / 1 FAIL`. Falla `smoke_f9b_mistico_nocturno.js` en `subconmutacion 1 (__esF9Meta / meta 2 lineas) usa __esFamiliaF9` (**PASS 102 / FAIL 1**). **No lo causo este ciclo:** `git stash push -u` + relanzar sobre HEAD (sin TSK-119) da el mismo FAIL. Queda como deuda abierta.
+*   **Que sigue:** aplicar TSK-118 (b)(c) desde el admin (2 minutos, sin codigo); revisar el assert de `__esFamiliaF9` en `smoke_f9b`; y desplegar (`git push` ya hecho: `bb7dd73..94bc825`, mas el commit de este ciclo) con **Ctrl+F5** porque `evento-app.html` es el motor.
+*   **Riesgos activos:** el evento `vinilos-inversos-c8yu` es el **20 de noviembre**; el contador ya es correcto para cualquier zona horaria. `smoke_all.js` en rojo por el FAIL historico de f9b: no bloquea el despliegue del motor, pero ensucia el veredicto global.
+
+#### -49. Hito - CONTADOR DEL LANDING EN ZONA HORARIA DE BOGOTA + CLEANUP DEL `setInterval` (ADR-084) - cerrado y verificado (2026-11-01)
 
 *   **Que se estaba haciendo:** cerrar TSK-117, el defecto del **motor compartido** `evento-app.html` (afecta a los **14 silos**): el contador del landing se calculaba en la zona horaria del **DISPOSITIVO** y el `setInterval` no se limpiaba nunca. Ciclo cerrado y verificado; cierre documental en TSK-117 y ADR-084.
 *   **HECHOS VERIFICADOS (baseline = archivo real, ADR-006):**
