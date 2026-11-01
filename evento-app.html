@@ -2397,8 +2397,21 @@ if (document.getElementById('db-poster-img')) {
     const __coordsEvento = (isFinite(__latEvento) && isFinite(__lngEvento) && !(__latEvento === 0 && __lngEvento === 0))
         ? __latEvento + ',' + __lngEvento
         : '';
+    // v1.15.2 (ADR-088): ruta SIN DDL. Si la instancia no tiene las columnas
+    // eventos.lat/lng, las coordenadas se leen de config_landing.content.mapa
+    // ({lat,lng}), que el admin ya escribe en el JSONB existente. Precedencia:
+    // token del silo > columnas > content.mapa > ev.ubicacion.
+    const __mapaContent = (effContent && effContent.mapa) ? effContent.mapa : null;
+    const __latContent = (__mapaContent && __mapaContent.lat !== null && __mapaContent.lat !== undefined && __mapaContent.lat !== '')
+        ? Number(__mapaContent.lat) : NaN;
+    const __lngContent = (__mapaContent && __mapaContent.lng !== null && __mapaContent.lng !== undefined && __mapaContent.lng !== '')
+        ? Number(__mapaContent.lng) : NaN;
+    const __coordsContenido = (isFinite(__latContent) && isFinite(__lngContent) && !(__latContent === 0 && __lngContent === 0))
+        ? __latContent + ',' + __lngContent
+        : '';
+    const __coords = __coordsEvento || __coordsContenido;
     // Con coordenadas hay mapa aunque la direccion en texto este vacia.
-    if (ev.ubicacion || __coordsEvento) {
+    if (ev.ubicacion || __coords) {
         // Nota v1.4.8: se retiró la referencia a #venue-name — ese ID nunca existió en el HTML
         // (remanente huérfano de una versión anterior), la condición nunca era verdadera.
 
@@ -2418,7 +2431,7 @@ if (document.getElementById('db-poster-img')) {
         //   (1) token del silo --f12-mapa-query  -> comportamiento previo intacto
         //   (2) eventos.lat + eventos.lng        -> coordenada real del evento
         //   (3) ev.ubicacion en crudo            -> fallback historico (z=15)
-        const __mapaQuery = __mapaQuerySilo || __coordsEvento;
+        const __mapaQuery = __mapaQuerySilo || __coords;
         // Direccion cruda (solo se usa si (1) y (2) no existen). Sin trim:
         // el fallback historico debe producir EXACTAMENTE el mismo string.
         const __mapaQueryRaw = ev.ubicacion || '';

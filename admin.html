@@ -774,7 +774,7 @@ tr:hover td{background:var(--surface)}
                 <div class="fg"><label style="font-size:11px">URL CTA (opcional)</label><input id="ld-guestlist-cta-url" type="url" placeholder="https://..." style="font-size:12px"></div>
               </div>
             </div>
-            <div id="ld-campo-ubicacion" class="fg cont-tab-panel" data-cont-tab="ubicacion" style="display:none"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"></div>
+            <div id="ld-campo-ubicacion" class="fg cont-tab-panel" data-cont-tab="ubicacion" style="display:none"><label style="font-size:12px">Dirección / Ubicación</label><input id="ld-ubicacion-val" placeholder="Ej. Calle 85 #15-20, Bogotá"><div style="display:flex;gap:6px;margin-top:6px"><input id="ld-mapa-lat" placeholder="Latitud (4.60393995)" title="Opcional. Coordenada WGS84 del recinto: si existe, el mapa centra en este punto y manda sobre la direccion."><input id="ld-mapa-lng" placeholder="Longitud (-74.06869074)" title="Opcional. Longitud WGS84 (negativa al oeste de Greenwich)."></div></div>
             <div id="ld-campo-gallery-fiesta" style="display:none" class="fg"><label style="font-size:12px">Galería — URLs de imágenes (una por línea, máx. 12)</label><textarea id="ld-gallery-fiesta-urls" rows="3" placeholder="https://imagen1.com/foto.jpg&#10;https://imagen2.com/foto.jpg" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-faq-fiesta" style="display:none" class="fg"><label style="font-size:12px">FAQ — Pregunta|Respuesta (una por línea)</label><textarea id="ld-faq-fiesta-val" rows="3" placeholder="¿Hay parqueadero?|Sí, desde las 7pm.&#10;¿Cuál es la política de reembolso?|No hay reembolsos." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:monospace;font-size:11px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
             <div id="ld-campo-sponsors-fiesta" style="display:none" class="fg">
@@ -5054,6 +5054,13 @@ function _buildConfigLanding(slug) {
       subtitulo:      val('ev-hero-subtitulo')   || null,
       trailer_url:    val('ld-trailer-url')      || null,
       dresscode:      val('ld-dresscode-val')    || null,
+      // ADR-088 - coordenadas del recinto en el JSONB EXISTENTE (sin DDL). El
+      // kernel las lee cuando las columnas eventos.lat/lng no estan aplicadas.
+      // Ambas o ninguna: si falta una, se emite null y el sweep la descarta.
+      mapa: (__coordNum(val('ld-mapa-lat')) !== null && __coordNum(val('ld-mapa-lng')) !== null) ? {
+        lat: __coordNum(val('ld-mapa-lat')),
+        lng: __coordNum(val('ld-mapa-lng')),
+      } : null,
       // Fiesta
       // v223: DJ Lineup con formulario dinámico (campos individuales)
       dj_lineup:   window._djLineupGetEntries ? window._djLineupGetEntries() : undefined,
@@ -6483,6 +6490,10 @@ function _poblarContenidoWizard(content, suf) {
   }
   // Fiesta
   set('ld-playlist-url', content.playlist_url);
+  if (content.mapa && typeof content.mapa === 'object') {
+    set('ld-mapa-lat', content.mapa.lat);
+    set('ld-mapa-lng', content.mapa.lng);
+  }
   set('ld-guest-list-val', content.guest_list);
   if (content.guestlist && typeof content.guestlist === 'object') {
     set('ld-guestlist-badge',       content.guestlist.badge);
