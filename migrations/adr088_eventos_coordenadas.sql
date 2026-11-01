@@ -79,24 +79,21 @@
 --         en el SQL Editor de Supabase con service_role (ver final del archivo).
 -- ============================================================================
 
-BEGIN;
+-- v2 - 2026-11-01 - REESCRITO SIN TRANSACCION MANUAL NI BLOQUES DO.
+-- Motivo: el SQL Editor de Supabase parte el script por ';' y el dollar-quoting
+-- de los bloques DO ($adr088_lat$ / $adr088_lng$) rompia el envio. Ademas el
+-- BEGIN; explicito dejaba la sesion en estado abortado (25P02) al primer error,
+-- y de ahi el "pide rollback". Ahora cada sentencia es independiente,
+-- idempotente y se puede correr de una o una por una sin dejar transacciones
+-- abiertas. Los CHECK se hacen idempotentes con DROP CONSTRAINT IF EXISTS en vez
+-- de capturar duplicate_object.
 
-
--- ----------------------------------------------------------------------------
 -- BLOQUE 1: COLUMNAS lat / lng
---
--- double precision y no numeric(x,y): es el tipo nativo de PostGIS y de las
--- APIs de mapas, sin perdida practica para un punto de recinto. DEFAULT NULL
--- explicito: las 3+ filas existentes no cambian de comportamiento hasta que el
--- backfill del BLOQUE 4 las toque. Se agregan al FINAL: ningun lector por
--- posicion se altera.
--- ----------------------------------------------------------------------------
-
-ALTER TABLE public.eventos
-    ADD COLUMN IF NOT EXISTS lat double precision DEFAULT NULL;
-
-ALTER TABLE public.eventos
-    ADD COLUMN IF NOT EXISTS lng double precision DEFAULT NULL;
+-- double precision y no numeric(x,y): es el tipo nativo de las APIs de mapas,
+-- sin perdida practica para un punto de recinto. DEFAULT NULL: las filas
+-- existentes no cambian de comportamiento hasta el backfill del BLOQUE 4.
+ALTER TABLE public.eventos ADD COLUMN IF NOT EXISTS lat double precision DEFAULT NULL;
+ALTER TABLE public.eventos ADD COLUMN IF NOT EXISTS lng double precision DEFAULT NULL;
 
 COMMENT ON COLUMN public.eventos.lat IS
   'Latitud WGS84 EXACTA del recinto del evento (ADR-088), en grados decimales. NULL = desconocida. Si lat y lng estan presentes MANDAN sobre eventos.ubicacion: el embed de Google Maps se arma con estas coordenadas y ubicacion queda solo como texto visible. Si son NULL el front conserva el comportamiento anterior (usar ubicacion como query). Rango validado por CHECK -90..90.';
@@ -104,64 +101,27 @@ COMMENT ON COLUMN public.eventos.lat IS
 COMMENT ON COLUMN public.eventos.lng IS
   'Longitud WGS84 EXACTA del recinto del evento (ADR-088), en grados decimales (valores negativos al oeste de Greenwich: Colombia queda negativa). NULL = desconocida. Si lat y lng estan presentes MANDAN sobre eventos.ubicacion: el embed de Google Maps se arma con estas coordenadas y ubicacion queda solo como texto visible. Si son NULL el front conserva el comportamiento anterior (usar ubicacion como query). Rango validado por CHECK -180..180.';
 
-
--- ----------------------------------------------------------------------------
--- BLOQUE 2: RANGO VALIDO (CHECK idempotente)
---
+-- BLOQUE 2: RANGO VALIDO (CHECK idempotente, sin DO ni plpgsql)
 -- Un CHECK de SQL deja pasar NULL por definicion (el resultado es UNKNOWN, no
 -- FALSE), pero se escribe explicito (IS NULL OR rango) para que la intencion no
--- dependa de esa regla. Bloque DO con EXCEPTION WHEN duplicate_object: en la
--- segunda corrida el ADD CONSTRAINT falla con 42710 y se absorbe sin error, de
--- modo que el archivo es re-ejecutable sin cambios.
---
--- Nombre estable de constraint: eventos_lat_rango_chk / eventos_lng_rango_chk.
--- ----------------------------------------------------------------------------
+-- dependa de esa regla. DROP IF EXISTS + ADD hace el bloque re-ejecutable: la
+-- segunda corrida borra y recrea el mismo CHECK, sin error.
+ALTER TABLE public.eventos DROP CONSTRAINT IF EXISTS eventos_lat_rango_chk;
+ALTER TABLE public.eventos ADD CONSTRAINT eventos_lat_rango_chk
+    CHECK (lat IS NULL OR (lat BETWEEN -90 AND 90));
 
-DO $adr088_lat$
-BEGIN
-    ALTER TABLE public.eventos
-        ADD CONSTRAINT eventos_lat_rango_chk
-        CHECK (lat IS NULL OR (lat BETWEEN -90 AND 90));
-EXCEPTION
-    WHEN duplicate_object THEN NULL;
-END $adr088_lat$;
+ALTER TABLE public.eventos DROP CONSTRAINT IF EXISTS eventos_lng_rango_chk;
+ALTER TABLE public.eventos ADD CONSTRAINT eventos_lng_rango_chk
+    CHECK (lng IS NULL OR (lng BETWEEN -180 AND 180));
 
-DO $adr088_lng$
-BEGIN
-    ALTER TABLE public.eventos
-        ADD CONSTRAINT eventos_lng_rango_chk
-        CHECK (lng IS NULL OR (lng BETWEEN -180 AND 180));
-EXCEPTION
-    WHEN duplicate_object THEN NULL;
-END $adr088_lng$;
+-- BLOQUE 3: sin cambios de datos masivos (ubicacion se queda tal cual).
 
-
--- ----------------------------------------------------------------------------
--- BLOQUE 3: (reservado / sin cambios de datos masivos)
---
--- No hay normalizacion de ubicacion en esta migracion. ubicacion se queda tal
--- cual: es texto visible para el usuario y reescribirlo rompe el contrato de
--- lectura del kernel y de las paginas de destino.
--- ----------------------------------------------------------------------------
-
-
--- ----------------------------------------------------------------------------
 -- BLOQUE 4: BACKFILL MINIMO - recinto Klandestino
---
 -- 4.60393995301205, -74.06869074365889 son las MISMAS coordenadas ya probadas en
 -- produccion para la direccion "Cr 4 # 19-56" (Klandestino): es el token
--- --f12-mapa-query de css/templates/fiesta/f12.css:115 y f9b.css:273. No se
--- geocodifica nada nuevo aqui.
---
--- Solo los 3 eventos cuyo texto de ubicacion cae en esa direccion. Filtro
--- lat IS NULL AND lng IS NULL: si Direccion ya cargo un punto desde admin, el
--- UPDATE no lo pisa (Cero Borrado tambien aplica a datos correctos).
---
--- El resto de eventos queda NULL A PROPOSITO (ver DECISION SOBRE EL BACKFILL en
--- la cabecera): las otras direcciones deben cargarse desde admin con el punto
--- exacto.
--- ----------------------------------------------------------------------------
-
+-- --f12-mapa-query de css/templates/fiesta/f12.css:115 y f9b.css:273.
+-- Filtro lat IS NULL AND lng IS NULL: si ya hay un punto cargado desde admin,
+-- este UPDATE no lo pisa. El resto de eventos queda NULL A PROPOSITO.
 UPDATE public.eventos
    SET lat = 4.60393995301205,
        lng = -74.06869074365889
@@ -173,14 +133,9 @@ UPDATE public.eventos
    AND lat IS NULL
    AND lng IS NULL;
 
-
--- ----------------------------------------------------------------------------
 -- BLOQUE 5: RECARGA DEL CACHE DE SCHEMA DE POSTGREST
--- ----------------------------------------------------------------------------
-
 NOTIFY pgrst, 'reload schema';
 
-COMMIT;
 
 
 -- ============================================================================
