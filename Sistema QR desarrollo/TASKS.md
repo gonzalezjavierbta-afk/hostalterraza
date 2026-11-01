@@ -133,6 +133,7 @@ estructura: indice-v1 (2026-10-01)
 | [TSK-117](#tsk-117) | `@renderer-dev` + `@qa-auditor` (**PAGO obligatorio** + gate `AGENTS.md` §2: es el motor compartido `evento-app.html`) | **Contador con zona horaria real y `setInterval` con cleanup** — `parseSpanishDate()` (`evento-app.html:720-730`) construye `new Date("YYYY-MM-DDTHH:mm")` en la zona del DISPOSITIVO, no en `America/Bogota`; el `setInterval` (`:1424-1431`) nunca se limpia | Motor compartido (afecta a los 14 silos) | **CERRADA 2026-11-01** (ver cierre al final) |
 | [TSK-118](#tsk-118) | Direccion (wizard del admin / Supabase; **sin codigo**) | **Datos del evento `vinilos-inversos-c8yu`** — (a) **sede ausente**: `eventos.ubicacion` = `"Kr 4 # 19-56"` y no existe columna de nombre de sede (campo vivo: `#ev-ubic`, `admin.html:896`; ver correccion ADR-006 en el cierre de TSK-116); (b) `config_landing.colors` conserva la paleta vieja f9 (`accent: #c9a84c`) con `template_id='f14'` (oxido `#E35925`); (c) `config_landing.content.subtitulo` = `"DRUMN AND BASS REGGAE HIP-HOP"` (typo "DRUMN", sin separadores; la maqueta dice `DRUM N BASS - REGGAE - HIP-HOP`) | Silo F14 "Vinilos Inversos" | **ALTA** — (a) **RESUELTO 2026-11-01**: `eventos.ubicacion` ya es `"Klandestino, Kr 4 # 19-56"` (verificado por REST). (b)(c) **BLOQUEADOS por diseno (2026-11-01)**: la anon key no puede hacer UPDATE sobre `eventos` (RLS: el PATCH devuelve 2xx pero con 0 filas afectadas, verificado leyendo el valor antes y despues) y `admin.html` escribe con la sesion del usuario (`SB.from('eventos').update(payload).eq('id', id)`). Se aplican **desde el admin, sin codigo**: (b) paleta -> `accent #E35925 / secondary #EA580C / surface #131313 / tertiary #DBC8A8 / background #0E0E0E` + `color_primario #E35925` (invariante ADR-080); (c) subtitulo -> `DRUM N BASS · REGGAE · HIP-HOP`. Nota: en f14 `--tpl-accent` solo esta declarado y no se consume, asi que (b) es higiene de datos sin efecto visual |
 | [TSK-119](#tsk-119) | `@renderer-dev` (OPCIONAL — dominio de riesgo: es el formateador del motor, no el silo) | **`#meta-hora` en formato 12 h** — hoy muestra `20:00 HRS`; la maqueta pide `8:00 PM` | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `__hora12()` (v125) reutiliza `__horaA24`; `ev.hora='20:00'` -> `8:00 PM`; el texto libre legacy (ej. `11:56 AM / 7:34 AM`) cae al formato previo con `T('landing.hrs')`. `evento-app.html` +18/-1. Verificacion en el cierre de TSK-117 (seccion final) |
+| [TSK-120](#tsk-120) | `@frontend-tpl` (**FREE**: CSS del silo, 0 runtime, 0 JS) | **Meta del hero en 2 columnas y titulo del evento sobre el line up** — la maqueta `referentes/hero.jpg` pide `[cal] 20 NOVIEMBRE / 8:00 PM  \|  [pin] KLANDESTINO / KRA 4 # 19-56` y el nombre del evento presidiendo la grilla de artistas de la seccion de abajo | Silo F14 "Vinilos Inversos" | **CERRADA 2026-11-01** — `f14.css` **+147/-18**, CSS-only (0 cambios de HTML/JS). Deuda declarada: la fecha se sigue pintando ISO (`2026-11-20`) porque `__esMeta2Lineas()` solo habilita `tpl-f9`/`tpl-f9b`; el fix son **2 lineas aditivas en el motor** y queda **pendiente del gate `AGENTS.md` §2** |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -591,6 +592,43 @@ task:
 8. **[CODIGO - deuda] `eventovenezuela.html:787` y `eventologs.html:304`:** conservan el patron v123 (**2 ocurrencias cada uno**). Son **paginas legacy**, no el motor de los 14 silos. No se tocaron.
 9. **[DATOS - aceptado] `2026-02-30`:** desborda a marzo via `Date.UTC` (`2026-03-03T01:00Z`). **Aceptado:** `eventos.fecha` es ISO y la escribe el admin con selector de fecha.
 10. **[REUTILIZACION]** TSK-119 (`#meta-hora` `20:00 HRS` -> `8:00 PM`) **puede reutilizar `__horaA24()`**; no se ejecuto en este ciclo.
+
+---
+
+### Cierre de TSK-120 - Meta del hero en 2 columnas y titulo del evento sobre el line up (2026-11-01) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Alcance REAL ejecutado y verificado contra el archivo real (ADR-006). **Tier FREE** (`AGENTS.md` §0, decidido por el usuario el 2026-11-01) y alcance **solo silo f14** (decidido por el usuario en la misma consulta): **0 cambios en `evento-app.html`**, 0 migraciones, 0 JS.
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Archivo:** `css/templates/fiesta/f14.css` -> `git diff --numstat` = **+147 / -18**. **Cero cambios en `evento-app.html`, `admin.html`, `api/*.js`, SQL y otros silos.**
+2. **Meta en 2 columnas sin tocar el DOM:** `#mod-hero-meta` pasa de `flex` a `display: grid !important` (el `!important` es obligatorio porque la activacion atomica de la seccion 3 del mismo archivo fija `display:flex !important`; el ocultamiento del kernel sigue ganando porque es **inline** `!important`). `grid-template-columns: auto minmax(0, 1fr)` + `grid-template-rows: auto auto` y colocacion por `:nth-child`:
+   * `:nth-child(1)` = **fecha** -> columna 1, fila 1, tipografia grande (`clamp(1.05rem, 1.7vw, 1.55rem)`, peso 900).
+   * `:nth-child(2)` = **hora** -> columna 1, fila 2; **se oculta su icono de reloj** (la maqueta usa un solo icono de calendario para las dos lineas) y el `padding-left: calc(clamp(20px, 2.2vw, 26px) + 0.5rem)` la alinea bajo el texto de la fecha.
+   * `:nth-child(3)` = **lugar + direccion** -> columna 2, `grid-row: 1 / span 2`, `align-self: stretch` y `border-left: 1px solid rgba(219, 200, 168, 0.32)` => el divisor vertical cubre la altura de las dos filas, como en la maqueta.
+3. **Robustez del lugar:** `min-width: 0` + `max-width: 26ch` + `overflow-wrap: anywhere` en el `span` del lugar, para que envuelva sin desbordar en pantallas estrechas (medido a 500 px: `scrollWidth == clientWidth`).
+4. **Titulo del evento sobre el line up:** `#mod-lineup::before { content: "VINILOS INVERSOS"; ... }` con tipografia display kraft, `clamp(1.9rem, 5.6vw, 4.2rem)` y subrayado naranja oxido. Va en CSS porque `#mod-lineup` **no tiene encabezado propio en el DOM** (tocar el HTML seria Cero Borrado + gate de motor). El silo f14 es **exclusivo** del evento `vinilos-inversos-c8yu` (verificado por REST: **1 de 13** eventos usa `template_id='f14'`), asi que el rotulo no contamina otros silos.
+5. **Responsive:** el bloque `@media (max-width: 767px)` se reescribio para el grid (antes ponia `flex-direction: column`, que en grid se ignora): columnas con `gap 0.9rem`, `minmax(0, 1fr)` y escala tipografica reducida. Se corrigio tambien el `gap` del `@media (min-width: 1279px)` (era `0.7rem 1.4rem`, ajeno al grid) a `0.12rem clamp(1.1rem, 2.6vw, 2.4rem)`.
+6. **Soporte `.meta-line` en el silo:** `display: block` para los dos spans del formateador de fecha del kernel. Regla **inerte** hoy (el motor solo habilita 2 lineas en f9/f9b) y lista si se autoriza el gate.
+
+#### Verificacion (por archivo real, ADR-006)
+
+| Comprobacion | Resultado |
+|---|---|
+| Balance de llaves del CSS | **0** (minimo 0) |
+| Lineas agregadas con bytes > 127 | **0** |
+| `node scripts/smoke_f14_vinilos.js` | **PASS 38 / FAIL 0** |
+| `node scripts/smoke_all.js` | **11 PASS / 1 FAIL** (`smoke_f9b_mistico_nocturno`, deuda preexistente verificado con `git stash`) |
+| Harness visual local (1440 px, 2 variantes de fecha) | 2 columnas, divisor y jerarquia correctos; sin solapes |
+| Harness a 500 px y 767 px | `scrollWidth == clientWidth`; sin desbordamiento horizontal |
+| `git diff --numstat` | solo `css/templates/fiesta/f14.css` (+147/-18) |
+
+#### Deuda declarada (NO cerrada)
+
+11. **[DATOS + CODIGO - media] Fecha del hero en ISO:** `__metaSet('meta-fecha', __metaDerive(ev.fecha, true), __metaData.fecha, true)` solo entra a la rama de fecha localizada si `__esMeta2Lineas()` devuelve `true`, y esa allowlist es literal `['tpl-f9','tpl-f9b']` (`evento-app.html:919-926`). En f14 el hero pinta **`2026-11-20`**. Ahora que la fecha es la linea grande del meta, el defecto es visible. **Fix propuesto (2 lineas aditivas, riesgo bajo):** agregar `'tpl-f14'` a la allowlist y dejar que `__formatoFechaLarga()` pinte `VIERNES 20` / `NOVIEMBRE DE 2026` (el CSS del silo ya lo soporta). **Requiere gate `AGENTS.md` §2** porque es el motor compartido; **no se ejecuto**.
+12. **[DATOS - baja] Lugar en una sola linea:** la maqueta separa `KLANDESTINO` / `KRA 4 # 19-56` / `BOGOTA D.C.`; `eventos.ubicacion` es un unico string y el DOM del meta no admite salto de linea. Se ve bien en una linea; para replicar el 3-lineas hace falta override `content.meta.lugar` (gateado por el mismo allowlist) o un campo nuevo.
+13. **[ERROR HISTORICO - preexistente]** `smoke_f9b_mistico_nocturno.js` falla el assert `subconmutacion 1 (__esF9Meta / meta 2 lineas) usa __esFamiliaF9` (PASS 102 / FAIL 1). Verificado con `git stash` que tambien falla en HEAD sin estos cambios. **No bloquea** el despliegue del silo.
+
 
 
 

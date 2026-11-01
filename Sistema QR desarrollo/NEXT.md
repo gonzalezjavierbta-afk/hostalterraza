@@ -15,7 +15,21 @@ Este documento define el punto de control estratégico y las directrices para la
 
 > **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-47 a -33) y las secciones vigentes 1-4.
 
-#### -50. Hito Mas Reciente - META EN 12 H, DATOS DEL EVENTO BLOQUEADOS POR RLS Y RUNNER DE SMOKES (2026-11-01)
+#### -51. Hito Mas Reciente - META DEL HERO EN 2 COLUMNAS Y TITULO SOBRE EL LINE UP (TSK-120) - cerrado y verificado (2026-11-01)
+
+*   **Que se estaba haciendo:** acercar el meta del hero de `vinilos-inversos-c8yu` a la maqueta `referentes/hero.jpg` (columna `fecha + hora` | columna `lugar + direccion`, tipografia mayor) y poner el nombre del evento presidiendo la seccion de artistas de abajo. **Tier FREE** y **alcance solo silo f14**, ambos decididos por el usuario en la consulta de §0.
+*   **HECHOS VERIFICADOS:**
+    *   `(1)` **Archivo unico:** `css/templates/fiesta/f14.css` -> `git diff --numstat` **+147 / -18**. **Cero cambios en `evento-app.html`, `admin.html`, `api/*.js`, SQL y los otros 13 silos.**
+    *   `(2)` **2 columnas sin tocar el DOM:** el kernel pinta 3 `.meta-item` planos (fecha / hora / lugar) dentro de `#mod-hero-meta`. El silo los convierte en `display: grid !important` + `grid-template-columns: auto minmax(0,1fr)` y los coloca por `:nth-child` (fecha 1/1, hora 1/2, lugar 2 con `grid-row: 1 / span 2`). El `!important` es obligatorio: la activacion atomica del mismo archivo fija `display:flex !important`; el ocultamiento del kernel sigue ganando por ser **inline** `!important`.
+    *   `(3)` **Icono unico como la maqueta:** se oculta el icono de reloj de la hora y se alinea su texto con `padding-left: calc(clamp(20px, 2.2vw, 26px) + 0.5rem)`; el divisor vertical es un `border-left` sobre el lugar con `align-self: stretch`, asi que cubre las dos filas.
+    *   `(4)` **Titulo del line up:** `#mod-lineup::before { content: "VINILOS INVERSOS"; }`. Va en CSS porque el `#mod-lineup` del kernel **no tiene encabezado** (tocar el HTML seria gate de motor). El silo f14 es **exclusivo** del evento: REST confirma **1 de 13** eventos con `template_id='f14'`.
+    *   `(5)` **Responsive arreglado de paso:** el `@media (max-width:767px)` ponia `flex-direction: column` (inerte en grid) y el `@media (min-width:1279px)` un `gap` ajeno al grid; ambos se reescribieron para el nuevo layout. Verificado a 500 px y 767 px: `scrollWidth == clientWidth`, sin desbordamiento.
+    *   `(6)` **Soporte `.meta-line`** (`display:block`) agregado en el silo: **inerte hoy**, listo para el fix de la fecha.
+    *   `(7)` **Verificacion:** balance de llaves **0**; **0** lineas con bytes > 127; `smoke_f14_vinilos` **38/0**; `smoke_all` **11 PASS / 1 FAIL** (el FAIL de `smoke_f9b` es deuda preexistente, comprobada con `git stash`). Harness visual local con Chrome headless (1440/767/500 px) generado en `%TEMP%\opencode` (no entra al repo).
+*   **Que sigue:** la fecha del hero se sigue pintando **ISO** (`2026-11-20`) y ahora es la linea grande. El fix son **2 lineas aditivas** en el motor (agregar `'tpl-f14'` a `__esMeta2Lineas()`, `evento-app.html:920`): `__formatoFechaLarga()` pasaria a pintar `VIERNES 20` / `NOVIEMBRE DE 2026`, que el CSS del silo ya estiliza. **Requiere gate `AGENTS.md` §2** (motor compartido): no se ejecuto.
+*   **Riesgos activos:** ninguno de runtime (cambio 100 % CSS, aislado por `.tpl-f14`). El unico riesgo es de **datos**: si el evento se reprograma, el rotulo del line up no cambia (es `content` fijo) pero el contador y la fecha si; el rotulo es solo el nombre, no la fecha.
+
+#### -50. Hito - META EN 12 H, DATOS DEL EVENTO BLOQUEADOS POR RLS Y RUNNER DE SMOKES (2026-11-01)
 
 *   **Que se estaba haciendo:** los dos pendientes derivados de TSK-117 — TSK-118 (b)(c) (paleta y subtitulo del evento en Supabase) y TSK-119 (`#meta-hora` en 12 h) — mas la decision de pipeline que pidio el usuario ("tomar mejor decision").
 *   **HECHOS VERIFICADOS:**
