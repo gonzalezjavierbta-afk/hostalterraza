@@ -1603,170 +1603,42 @@
 }
 
 /* ==========================================================================
-   FOOTER (#mod-footer) - cierre de 4 columnas (v1.2 del silo, 2026-11-01)
+   FOOTER (#mod-footer) - franja de cierre (solo #footer-copy)
    El kernel trae el footer completo dentro de #main-content-flow y su IoC
-   global apaga section/header/footer, asi que el silo debe encenderlo (arriba,
-   junto a la lista de "Ocultos", que antes lo apagaba a proposito). El kernel
-   NO trae estilos para estas clases: todo lo de abajo es del silo y ningun nodo
-   se borra (Cero Borrado).
+   global apaga section/header/footer, asi que el silo lo enciende arriba, en
+   el punto 2 (ACTIVACION ATOMICA), donde antes estaba en la lista de
+   "Ocultos" con display:none !important. Decision de Direccion (2026-11-01):
+   en TODOS los templates el footer se queda SOLO con la franja inferior; el
+   cuerpo de 4 columnas no se pinta (Cero Borrado: sigue en el DOM).
    ========================================================================== */
 .tpl-f11 #mod-footer,
 .Tpl-F11 #mod-footer {
-    text-align: left;
-    padding: 3rem 1.5rem 1.6rem;
+    text-align: center;
+    padding: 1.8rem 1.5rem;
     background-color: var(--f11-bg-ink);
     border-top: 1px solid var(--f11-line);
 }
 
 .tpl-f11 #mod-footer .footer-inner,
 .Tpl-F11 #mod-footer .footer-inner {
-    display: grid !important;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 2rem 1.6rem;
-    max-width: 1100px;
-    margin: 0 auto 2rem 0;
-}
-
-.tpl-f11 #mod-footer #footer-org-name,
-.Tpl-F11 #mod-footer #footer-org-name {
-    display: block;
-    color: var(--f11-text-cream);
-    font-family: var(--f11-font);
-    font-size: clamp(1.05rem, 1.5vw, 1.4rem);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    line-height: 1.1;
-    text-transform: uppercase;
-}
-
-.tpl-f11 #mod-footer #footer-tagline,
-.Tpl-F11 #mod-footer #footer-tagline {
-    margin: 0.6rem 0 0;
-    color: var(--f11-text-muted);
-    font-size: 0.74rem;
-    line-height: 1.65;
-}
-
-.tpl-f11 #mod-footer .footer-col h4,
-.Tpl-F11 #mod-footer .footer-col h4 {
-    margin: 0 0 0.9rem;
-    color: var(--f11-yellow);
-    font-family: var(--f11-font);
-    font-size: 0.58rem;
-    font-weight: 900;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-}
-
-.tpl-f11 #mod-footer #db-footer-links,
-.Tpl-F11 #mod-footer #db-footer-links {
-    display: grid;
-    gap: 0.45rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.tpl-f11 #mod-footer #db-footer-links a,
-.Tpl-F11 #mod-footer #db-footer-links a {
-    color: var(--f11-text);
-    font-size: 0.74rem;
-    text-decoration: none;
-    transition: color 0.18s ease;
-}
-
-.tpl-f11 #mod-footer #db-footer-links a:hover,
-.tpl-f11 #mod-footer #db-footer-links a:focus-visible,
-.Tpl-F11 #mod-footer #db-footer-links a:hover,
-.Tpl-F11 #mod-footer #db-footer-links a:focus-visible {
-    color: var(--f11-pink);
-}
-
-/* El fallback del kernel apunta a #mod-historia y #mod-impacto, que este silo no
-   enciende: esos dos enlaces no se pintan (Cero Borrado: siguen en el DOM). */
-.tpl-f11 #mod-footer #db-footer-links a[href="#mod-historia"],
-.tpl-f11 #mod-footer #db-footer-links a[href="#mod-impacto"],
-.Tpl-F11 #mod-footer #db-footer-links a[href="#mod-historia"],
-.Tpl-F11 #mod-footer #db-footer-links a[href="#mod-impacto"] {
     display: none !important;
-}
-
-.tpl-f11 #mod-footer #db-footer-social,
-.Tpl-F11 #mod-footer #db-footer-social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-}
-
-.tpl-f11 #mod-footer #db-footer-social .footer-social-icon,
-.Tpl-F11 #mod-footer #db-footer-social .footer-social-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--f11-line);
-    color: var(--f11-text-cream);
-    text-decoration: none;
-    transition: border-color 0.18s ease, color 0.18s ease;
-}
-
-.tpl-f11 #mod-footer #db-footer-social .footer-social-icon:hover,
-.tpl-f11 #mod-footer #db-footer-social .footer-social-icon:focus-visible,
-.Tpl-F11 #mod-footer #db-footer-social .footer-social-icon:hover,
-.Tpl-F11 #mod-footer #db-footer-social .footer-social-icon:focus-visible {
-    border-color: var(--f11-pink);
-    color: var(--f11-pink);
-}
-
-.tpl-f11 #mod-footer #db-footer-contacto,
-.Tpl-F11 #mod-footer #db-footer-contacto {
-    display: grid;
-    gap: 0.5rem;
-    color: var(--f11-text-muted);
-    font-size: 0.72rem;
-    line-height: 1.5;
-    word-break: break-word;
 }
 
 .tpl-f11 #mod-footer .footer-bottom,
 .Tpl-F11 #mod-footer .footer-bottom {
-    max-width: 1100px;
+    max-width: 900px;
     margin: 0 auto;
-    padding-top: 1.2rem;
-    border-top: 1px solid var(--f11-line);
+    padding: 0;
+    border-top: none;
     text-align: center;
 }
 
 .tpl-f11 #mod-footer #footer-copy,
 .Tpl-F11 #mod-footer #footer-copy {
+    display: inline-block;
     color: var(--f11-text-muted);
     font-size: 0.62rem;
     font-weight: 800;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-}
-
-@media (max-width: 767px) {
-    .tpl-f11 #mod-footer,
-    .Tpl-F11 #mod-footer {
-        text-align: center;
-    }
-
-    .tpl-f11 #mod-footer .footer-inner,
-    .Tpl-F11 #mod-footer .footer-inner {
-        grid-template-columns: 1fr;
-        gap: 1.8rem;
-        margin-bottom: 1.6rem;
-    }
-
-    .tpl-f11 #mod-footer #db-footer-social,
-    .Tpl-F11 #mod-footer #db-footer-social {
-        justify-content: center;
-    }
-
-    .tpl-f11 #mod-footer #db-footer-contacto,
-    .Tpl-F11 #mod-footer #db-footer-contacto {
-        justify-items: center;
-    }
 }

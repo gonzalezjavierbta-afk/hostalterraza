@@ -939,188 +939,47 @@
 }
 
 /* ==========================================================================
-   16. FOOTER (#mod-footer) - cierre de 4 columnas sobre verde profundo
+   16. FOOTER (#mod-footer) - franja de cierre (solo #footer-copy)
    El kernel trae el footer completo dentro de #main-content-flow
-   (evento-app.html:351) y su IoC global apaga section/header/footer
-   (evento-app.html:38), asi que es este silo quien lo enciende con
-   display:block !important. El kernel no aporta estilos globales para
-   .footer-inner, .footer-col, .footer-social-icon ni #footer-copy: todo lo de
-   abajo es del silo. Datos que pinta el kernel: #footer-org-name,
-   #footer-tagline, #db-footer-links (<li><a>), #db-footer-social
-   (a.footer-social-icon con SVG 18x18 que hereda currentColor) y
-   #db-footer-contacto (spans de email, telefono y ubicacion).
-   Cero Borrado: no se elimina ningun nodo; los dos enlaces del fallback que
-   apuntan a anclas que este silo NO enciende se ocultan, no se borran.
+   (evento-app.html:351) y su IoC global apaga section/header/footer (:38), asi
+   que el silo debe encenderlo. Decision de Direccion (2026-11-01): en TODOS los
+   templates el footer se queda SOLO con la franja inferior; el cuerpo de 4
+   columnas no se pinta.
+   Cero Borrado: .footer-inner y sus columnas siguen en el DOM, solo se ocultan.
    ========================================================================== */
 .tpl-f1 #mod-footer,
 .Tpl-F1 #mod-footer {
     display: block !important;
-    width: 100%;
-    padding: 3rem 1.5rem 1.6rem;
-    background-color: var(--f1-bg-deep, #0a1a0a);
-    border-top: 1px solid var(--tpl-accent, #a3e635);
-    text-align: left;
+    text-align: center;
+    padding: 1.8rem 1.5rem;
+    background-color: var(--f1-bg-deep);
+    border-top: 1px solid rgba(163, 184, 153, 0.18);
 }
 
 .tpl-f1 #mod-footer .footer-inner,
 .Tpl-F1 #mod-footer .footer-inner {
-    display: grid !important;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 2rem 1.6rem;
-    max-width: 1100px;
-    margin: 0 auto 2rem 0;
-}
-
-.tpl-f1 #mod-footer .footer-brand #footer-org-name,
-.Tpl-F1 #mod-footer .footer-brand #footer-org-name {
-    display: block;
-    color: var(--f1-text-main, #f3f6f0);
-    font-family: var(--f1-font-serif);
-    font-size: clamp(1.1rem, 1.6vw, 1.5rem);
-    font-weight: 900;
-    letter-spacing: 0.06em;
-    line-height: 1.15;
-    text-transform: uppercase;
-}
-
-.tpl-f1 #mod-footer #footer-tagline,
-.Tpl-F1 #mod-footer #footer-tagline {
-    margin: 0.6rem 0 0;
-    color: var(--f1-text-muted, #a3b899);
-    font-size: 0.74rem;
-    line-height: 1.65;
-}
-
-.tpl-f1 #mod-footer .footer-col h4,
-.Tpl-F1 #mod-footer .footer-col h4 {
-    margin: 0 0 0.9rem;
-    color: var(--tpl-accent, #a3e635);
-    font-family: var(--f1-font-sans);
-    font-size: 0.58rem;
-    font-weight: 900;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-}
-
-.tpl-f1 #mod-footer #db-footer-links,
-.Tpl-F1 #mod-footer #db-footer-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.45rem;
-}
-
-.tpl-f1 #mod-footer #db-footer-links a,
-.Tpl-F1 #mod-footer #db-footer-links a {
-    color: var(--f1-text-muted, #a3b899);
-    font-size: 0.74rem;
-    text-decoration: none;
-    transition: color 0.18s ease;
-}
-
-.tpl-f1 #mod-footer #db-footer-links a:hover,
-.tpl-f1 #mod-footer #db-footer-links a:focus-visible,
-.Tpl-F1 #mod-footer #db-footer-links a:hover,
-.Tpl-F1 #mod-footer #db-footer-links a:focus-visible {
-    color: var(--tpl-accent, #a3e635);
-}
-
-/* El fallback del kernel apunta a #mod-historia y #mod-impacto, anclas que este
-   silo no enciende (no hay grid-area ni activacion para ellas): esos dos
-   enlaces llevarian a la nada, asi que no se pintan (Cero Borrado: se ocultan). */
-.tpl-f1 #mod-footer #db-footer-links a[href="#mod-historia"],
-.tpl-f1 #mod-footer #db-footer-links a[href="#mod-impacto"],
-.Tpl-F1 #mod-footer #db-footer-links a[href="#mod-historia"],
-.Tpl-F1 #mod-footer #db-footer-links a[href="#mod-impacto"] {
     display: none !important;
-}
-
-.tpl-f1 #mod-footer #db-footer-social,
-.Tpl-F1 #mod-footer #db-footer-social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-}
-
-.tpl-f1 #mod-footer #db-footer-social .footer-social-icon,
-.Tpl-F1 #mod-footer #db-footer-social .footer-social-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    color: var(--f1-text-muted, #a3b899);
-    text-decoration: none;
-    transition: border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-}
-
-.tpl-f1 #mod-footer #db-footer-social .footer-social-icon:hover,
-.tpl-f1 #mod-footer #db-footer-social .footer-social-icon:focus-visible,
-.Tpl-F1 #mod-footer #db-footer-social .footer-social-icon:hover,
-.Tpl-F1 #mod-footer #db-footer-social .footer-social-icon:focus-visible {
-    border-color: var(--tpl-accent, #a3e635);
-    color: var(--tpl-accent, #a3e635);
-    box-shadow: 0 0 14px rgba(163, 230, 53, 0.35);
-}
-
-.tpl-f1 #mod-footer #db-footer-contacto,
-.Tpl-F1 #mod-footer #db-footer-contacto {
-    display: grid;
-    gap: 0.5rem;
-    color: var(--f1-text-muted, #a3b899);
-    font-size: 0.72rem;
-    line-height: 1.5;
-    word-break: break-word;
 }
 
 .tpl-f1 #mod-footer .footer-bottom,
 .Tpl-F1 #mod-footer .footer-bottom {
-    max-width: 1100px;
+    max-width: 900px;
     margin: 0 auto;
-    padding-top: 1.2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0;
+    border-top: none;
     text-align: center;
 }
 
-.tpl-f1 #footer-copy,
-.Tpl-F1 #footer-copy {
+.tpl-f1 #mod-footer #footer-copy,
+.Tpl-F1 #mod-footer #footer-copy {
     display: inline-block;
-    color: var(--f1-text-muted, #a3b899);
+    color: var(--f1-text-muted);
     font-family: var(--f1-font-sans);
     font-size: 0.62rem;
-    font-weight: 900;
-    letter-spacing: 0.22em;
+    font-weight: 800;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     opacity: 0.78;
-}
-
-/* Footer a una columna: marca arriba, luego enlaces, redes y contacto */
-@media (max-width: 767px) {
-    .tpl-f1 #mod-footer,
-    .Tpl-F1 #mod-footer {
-        padding: 2.4rem 1.15rem 1.3rem;
-    }
-
-    .tpl-f1 #mod-footer .footer-inner,
-    .Tpl-F1 #mod-footer .footer-inner {
-        grid-template-columns: 1fr;
-        gap: 1.8rem;
-        margin-bottom: 1.6rem;
-        text-align: center;
-    }
-
-    .tpl-f1 #mod-footer #db-footer-social,
-    .Tpl-F1 #mod-footer #db-footer-social {
-        justify-content: center;
-    }
-
-    .tpl-f1 #mod-footer #db-footer-contacto,
-    .Tpl-F1 #mod-footer #db-footer-contacto {
-        justify-items: center;
-    }
 }
 
 /* ============================================================================
@@ -1138,4 +997,8 @@
 |          |            | 1.5fr 1fr 1fr 1fr, redes en caja de 34px y .footer-bottom con border-top; nueva fila  |        |
 |          |            | "footer" en las 3 listas de grid-template-areas (base, <=1023 y >=1024) + grid-area.  |        |
 |          |            | Enlaces #mod-historia/#mod-impacto ocultos: este silo no enciende esas anclas.        |        |
+| v3.2.0   | 01/11/2026 | Decision de Direccion: el footer se queda SOLO con la franja inferior. .footer-inner   | [OK]   |
+|          |            | vuelve a display:none (Cero Borrado: sigue en el DOM), #mod-footer centrado, padding  |        |
+|          |            | 1.8rem y .footer-bottom sin border-top (max-width 900px). Se conserva la fila "footer" |        |
+|          |            | en las 3 listas de areas y el grid-area footer. Reemplaza el relleno de v3.1.0.       |        |
 */

@@ -199,7 +199,7 @@ check('silo: activa #mod-footer', /\.tpl-f14 #mod-footer,[\s\S]{0,400}?display:\
 check('silo: grid-area footer', /\.tpl-f14 #mod-footer,[\s\S]{0,90}?grid-area:\s*footer/.test(cssRaw));
 const footerAreas = (css.match(/"footer"|"footer footer"/g) || []).length;
 check('silo: footer en las 3 rejillas', footerAreas >= 3, footerAreas + ' ocurrencias');
-check('silo: .footer-inner en 4 columnas', /\.footer-inner[\s\S]{0,120}?grid-template-columns:\s*1\.5fr 1fr 1fr 1fr/.test(css));
+check('silo: .footer-inner oculto, solo franja (Cero Borrado)', /\.footer-inner[\s\S]{0,120}?display:\s*none !important/.test(css));
 check('silo: #footer-copy estilizado', /#footer-copy[\s\S]{0,200}?letter-spacing/.test(css));
 const media767 = (css.match(/@media \(min-width: 767px\)[\s\S]*?\n\}/) || [''])[0];
 const ordenEsperado = ['"hero hero"', '"ctas ctas"', '"lineup lineup"', '"cartel playlist"', '"boletos form"', '"video video"', '"faq ubicacion"', '"sponsors sponsors"', '"footer footer"'];

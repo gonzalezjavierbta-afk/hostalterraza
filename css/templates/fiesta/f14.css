@@ -1703,140 +1703,35 @@
 }
 
 /* ==========================================================================
-   17c. FOOTER (#mod-footer) - cierre de 4 columnas
+   17c. FOOTER (#mod-footer) - franja de cierre (solo #footer-copy)
    El kernel trae el footer completo (marca, enlaces, redes, contacto) pero su
    IoC global apaga section/header/footer (evento-app.html:38), asi que cada
-   silo debe encenderlo. El kernel no trae estilos globales para estas clases:
-   todo lo de abajo es del silo (Cero Borrado: no se borra ningun nodo).
-   Datos: #footer-org-name, #footer-tagline, #db-footer-links,
-   #db-footer-social (a.footer-social-icon con SVG) y #db-footer-contacto.
+   silo debe encenderlo. Decision de Direccion (2026-11-01): en TODOS los
+   templates el footer se queda SOLO con la franja inferior, que es el dato real
+   del evento; el cuerpo de 4 columnas no se pinta.
+   Cero Borrado: .footer-inner, .footer-col, #db-footer-links, #db-footer-social
+   y #db-footer-contacto siguen en el DOM; solo se ocultan por CSS.
    ========================================================================== */
 .tpl-f14 #mod-footer,
 .Tpl-F14 #mod-footer {
     display: block !important;
-    text-align: left;
-    padding: 3rem 1.5rem 1.6rem;
+    text-align: center;
+    padding: 1.8rem 1.5rem;
     background-color: var(--f14-bg-2);
     border-top: 2px solid var(--f14-line);
 }
 
 .tpl-f14 #mod-footer .footer-inner,
 .Tpl-F14 #mod-footer .footer-inner {
-    display: grid !important;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 2rem 1.6rem;
-    max-width: 1100px;
-    margin: 0 auto 2rem 0;
-}
-
-.tpl-f14 #mod-footer .footer-brand #footer-org-name,
-.Tpl-F14 #mod-footer .footer-brand #footer-org-name {
-    display: block;
-    color: var(--f14-kraft);
-    font-family: var(--f14-poster);
-    font-size: clamp(1.1rem, 1.6vw, 1.5rem);
-    font-weight: 900;
-    letter-spacing: 0.06em;
-    line-height: 1;
-    text-transform: uppercase;
-    -webkit-text-stroke: 1px var(--f14-cafe);
-    paint-order: stroke fill;
-}
-
-.tpl-f14 #mod-footer #footer-tagline,
-.Tpl-F14 #mod-footer #footer-tagline {
-    margin: 0.6rem 0 0;
-    color: rgba(219, 200, 168, 0.62);
-    font-size: 0.74rem;
-    line-height: 1.65;
-}
-
-.tpl-f14 #mod-footer .footer-col h4,
-.Tpl-F14 #mod-footer .footer-col h4 {
-    margin: 0 0 0.9rem;
-    color: var(--f14-fuego);
-    font-family: var(--f14-display);
-    font-size: 0.58rem;
-    font-weight: 900;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-}
-
-.tpl-f14 #mod-footer #db-footer-links,
-.Tpl-F14 #mod-footer #db-footer-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.45rem;
-}
-
-.tpl-f14 #mod-footer #db-footer-links a,
-.Tpl-F14 #mod-footer #db-footer-links a {
-    color: var(--f14-kraft);
-    font-size: 0.74rem;
-    text-decoration: none;
-    transition: color 0.18s ease;
-}
-
-.tpl-f14 #mod-footer #db-footer-links a:hover,
-.Tpl-F14 #mod-footer #db-footer-links a:focus-visible {
-    color: var(--f14-fuego);
-}
-
-/* El fallback del kernel apunta a #mod-historia y #mod-impacto, que este silo
-   no enciende: esos dos enlaces llevarian a la nada, asi que no se pintan. */
-.tpl-f14 #mod-footer #db-footer-links a[href="#mod-historia"],
-.tpl-f14 #mod-footer #db-footer-links a[href="#mod-impacto"],
-.Tpl-F14 #mod-footer #db-footer-links a[href="#mod-historia"],
-.Tpl-F14 #mod-footer #db-footer-links a[href="#mod-impacto"] {
     display: none !important;
-}
-
-.tpl-f14 #mod-footer #db-footer-social,
-.Tpl-F14 #mod-footer #db-footer-social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-}
-
-.tpl-f14 #mod-footer #db-footer-social .footer-social-icon,
-.Tpl-F14 #mod-footer #db-footer-social .footer-social-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--f14-line);
-    color: var(--f14-kraft);
-    text-decoration: none;
-    transition: border-color 0.18s ease, color 0.18s ease;
-}
-
-.tpl-f14 #mod-footer #db-footer-social .footer-social-icon:hover,
-.tpl-f14 #mod-footer #db-footer-social .footer-social-icon:focus-visible,
-.Tpl-F14 #mod-footer #db-footer-social .footer-social-icon:hover,
-.Tpl-F14 #mod-footer #db-footer-social .footer-social-icon:focus-visible {
-    border-color: var(--f14-fuego);
-    color: var(--f14-fuego);
-}
-
-.tpl-f14 #mod-footer #db-footer-contacto,
-.Tpl-F14 #mod-footer #db-footer-contacto {
-    display: grid;
-    gap: 0.5rem;
-    color: rgba(219, 200, 168, 0.72);
-    font-size: 0.72rem;
-    line-height: 1.5;
-    word-break: break-word;
 }
 
 .tpl-f14 #mod-footer .footer-bottom,
 .Tpl-F14 #mod-footer .footer-bottom {
-    max-width: 1100px;
+    max-width: 900px;
     margin: 0 auto;
-    padding-top: 1.2rem;
-    border-top: 1px solid var(--f14-line);
+    padding: 0;
+    border-top: none;
     text-align: center;
 }
 
@@ -2114,25 +2009,6 @@
         max-width: 140px;
     }
 
-    /* Footer a una columna: marca arriba, luego enlaces, redes y contacto */
-    .tpl-f14 #mod-footer .footer-inner,
-    .Tpl-F14 #mod-footer .footer-inner {
-        grid-template-columns: 1fr;
-        gap: 1.8rem;
-        text-align: center;
-        margin-bottom: 1.6rem;
-    }
-
-    .tpl-f14 #mod-footer #db-footer-social,
-    .Tpl-F14 #mod-footer #db-footer-social {
-        justify-content: center;
-    }
-
-    .tpl-f14 #mod-footer #db-footer-contacto,
-    .Tpl-F14 #mod-footer #db-footer-contacto {
-        justify-items: center;
-    }
-
     .tpl-f14 #mod-hero,
     .Tpl-F14 #mod-hero {
         min-height: 280px;
@@ -2381,5 +2257,16 @@
             ocultan por atributo [href] (Cero Borrado: siguen en el DOM).
           - <=767: una sola columna, texto centrado, redes y contacto centrados.
           - .footer-bottom con border-top de 1px y #footer-copy centrado.
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.8 - 2026-11-01 - VUELTA ATRAS de v1.7 por decision de Direccion: en
+          TODOS los templates el footer se queda SOLO con la franja inferior.
+          - .footer-inner vuelve a display:none !important (el nodo y sus 4
+            columnas siguen en el DOM: Cero Borrado). Se retiran del bloque las
+            reglas, ya inertes, de marca/tagline/columnas/enlaces/redes y
+            contacto, y la media <=767 que las ponia en una columna.
+          - #mod-footer vuelve a text-align center con padding 1.8rem 1.5rem;
+            .footer-bottom sin border-top y con max-width 900px.
+          - Se conservan de v1.6/v1.7: activacion, grid-area footer y la fila de
+            footer en los 3 bloques de areas (12 / 9 / 12 filas).
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */
