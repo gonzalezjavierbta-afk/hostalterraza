@@ -40,6 +40,11 @@
     --f14-cd-h: 106px;
     --f14-pad-x: clamp(1.15rem, 6vw, 4rem);
 
+    /* ADR-088: el mapa usa el pin NATIVO de Google sobre la coordenada exacta
+       del evento (eventos.lat/lng): el kernel arma q=<lat>,<lng>&z=16 en vez de
+       ll= y se retira el pin decorativo del silo para no duplicar marcador. */
+    --mapa-pin-nativo: 1;
+
     /* Puente cromatico obligatorio con el kernel */
     --tpl-accent: var(--master-accent, #E35925);
 
@@ -1182,9 +1187,13 @@
     filter: grayscale(1) contrast(1.08) brightness(0.86);
 }
 
-/* Pin: cabeza + punta, ambos decorativos */
-.tpl-f14 #db-mapa-container::before,
-.Tpl-F14 #db-mapa-container::before {
+/* Pin: cabeza + punta, ambos decorativos. SOLO se pintan cuando el kernel
+   centra el mapa con ll= y por tanto NO hay marcador nativo de Google (clase
+   .map-own-pin). Con --mapa-pin-nativo: 1 (ADR-088) el kernel arma
+   q=<lat>,<lng> y el pin lo dibuja Google: sin esa clase, estos dos nodos no
+   se pintan y no hay marcador duplicado. */
+.tpl-f14 #db-mapa-container.map-own-pin::before,
+.Tpl-F14 #db-mapa-container.map-own-pin::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -1200,8 +1209,8 @@
     pointer-events: none;
 }
 
-.tpl-f14 #db-mapa-container::after,
-.Tpl-F14 #db-mapa-container::after {
+.tpl-f14 #db-mapa-container.map-own-pin::after,
+.Tpl-F14 #db-mapa-container.map-own-pin::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -2268,5 +2277,15 @@
             .footer-bottom sin border-top y con max-width 900px.
           - Se conservan de v1.6/v1.7: activacion, grid-area footer y la fila de
             footer en los 3 bloques de areas (12 / 9 / 12 filas).
+          Cero cambios en HTML/JS: solo CSS del silo.
+   v1.9 - 2026-11-01 - Mapa con PIN NATIVO de Google (ADR-088):
+          - Nuevo token --mapa-pin-nativo: 1. El kernel deja de centrar con ll=
+            y arma q=<lat>,<lng>&z=16 usando eventos.lat/eventos.lng, asi que el
+            marcador lo dibuja Google justo en la coordenada del recinto.
+          - El pin decorativo del silo (::before/::after en #db-mapa-container)
+            solo se pinta con la clase .map-own-pin, que el kernel agrega cuando
+            centra con ll= (sin pin nativo). Resultado: nunca hay dos marcadores.
+          - Sin coordenadas en el evento el kernel cae al fallback historico
+            (q=<ubicacion>&z=15) y Google dibuja su propio pin en la direccion.
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */
