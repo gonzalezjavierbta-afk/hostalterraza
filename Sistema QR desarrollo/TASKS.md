@@ -761,6 +761,22 @@ task:
 
 **Verificacion (ADDENDUM v1.4, ejecutada en este cierre):** `node scripts/smoke_f14_vinilos.js` -> **PASS 61 / FAIL 0** (antes 59), con **2 asserts nuevos**: `silo: rotulo PLAYLIST compacto en escritorio` y `silo: embed ocupa el 100% de su columna`. Cabecera del archivo actualizada a **`v1.4 - 2026-11-01 - Ajuste visual del modulo PLAYLIST en escritorio`** (`f14.css:2047`). **Pendiente heredado y actualizado:** el chequeo visual en PRODUCCION (767 / 1024 / 1440 y movil < 360 px) sigue abierto en `NEXT.md` hito `-53`, ahora con dos comprobaciones nuevas (rotulo compacto y caja al borde de su columna).
 
+#### Addendum v1.5 - Seccion de PATROCINADORES activada (2026-11-01, mismo dia)
+
+> Linea **agregada** al cierre de TSK-123 (nada anterior se reescribe, Cero Borrado Oro #2/#3). Continuacion del mismo dia, dentro del hito `-53` de `NEXT.md` (**0 entradas nuevas, 0 TSK nuevos**; totales de TASKS.md intactos). Alcance REAL verificado contra el archivo real (ADR-006), **CSS-only** en `css/templates/fiesta/f14.css` **v1.5** (commit `eb9bbdc`): **0 cambios en el kernel** (`evento-app.html`), **0 cambios de base de datos** (0 DDL, 0 RLS, 0 migraciones) y **0 cambios** en `admin.html`, `api/*.js` y los otros 13 silos. `git show --numstat eb9bbdc` -> `f14.css` **+112 / -0**, `scripts/smoke_f14_vinilos.js` **+12 / -0**; archivo final **69.923 bytes**.
+
+(a) **Causa raiz:** el silo `f14` **no tenia ninguna regla de sponsor** y `#mod-sponsors` no estaba ni en la **lista de activacion IoC** ni en las **`grid-template-areas`**. Como el kernel apaga toda `<section>` (`section { display:none }`) y cada silo enciende sus modulos, la banda **nunca se mostraba** aunque `content.sponsors` ya trae **2 logos reales** (Ancestral y Klandestino, PNG en Supabase Storage).
+
+(b) **Activacion y layout:** `#mod-sponsors` entra en la lista IoC con `display:block !important` (`f14.css:109-110`) y recibe `grid-area: sponsors` (`:199-202`). La banda es de **ancho completo** y va **entre la fila `faq|ubicacion` y la fila `boletos|form`** en los **3** bloques de areas: base de 1 columna (**11 filas**, `:124-135`), `@media (min-width: 767px)` (**8 filas**, `:1704-1712`) y `@media (max-width: 767px)` (**11 filas**, `:1924-1935`). Las tres incluyen la fila `sponsors`.
+
+(c) **Estilos replicados del silo f9b** (evento de referencia `lanzamiento-mistico-64k6`, **sin rotulo**, logos sueltos): seccion centrada con `border-top` y `padding: 3.2rem 1.5rem !important` (`:1638-1644`; el kernel trae `padding:4rem 0` inline), lista `#db-sponsors-list` flex centrada con `gap: 2.6rem !important` (`:1647-1656`; el kernel trae `gap:4rem` inline), `.sponsor-item` **sin marco ni fondo** (`:1658-1667`) y `.sponsor-img` con `height:42px; width:auto; max-width:180px; object-fit:contain; opacity:0.72` (`:1671-1680`) + hover `opacity:1 + scale(1.06) + brightness(1.12)` (`:1682-1687`). En `<=767px`: `gap:1.4rem` (`:1946-1949`) y logos de **32 px** con `max-width:140px` (`:1951-1955`). La altura fija se debe a que los logos reales llegan en **proporciones distintas** y sin tope crecian a su tamano natural.
+
+(d) **Seguro anti-resurreccion (Cero Borrado):** `#mod-sponsors[data-hidden="true"] { display:none !important }` (`:1692-1695`), para que el `display:block !important` de la activacion **no reviva la banda** cuando el kernel la apaga por falta de patrocinadores (`__hideEmptyModule` escribe `display:none !important` **en linea** + `data-hidden="true"`).
+
+(e) **Sin cambios de comportamiento:** ningun modulo, atomo ni ID se elimina; los patrocinadores viven en `#db-sponsors-list` que sigue siendo del kernel. El cambio solo **anade** activacion, area y estilos.
+
+**Verificacion (ADDENDUM v1.5, ejecutada en este cierre):** `node scripts/smoke_f14_vinilos.js` -> **PASS 68 / FAIL 0** (antes 61), con **7 asserts nuevos** de patrocinadores; CSS de produccion verificado (**69.923 bytes**) con las areas `sponsors` en los 3 bloques, la entrada IoC, los logos de **42 px / 32 px**, `border:none` en `.sponsor-item`, el selector `[data-hidden="true"]` y el log **v1.5** del archivo (`:2151-2172`). **Pendiente heredado y actualizado:** el chequeo visual en PRODUCCION sigue abierto en `NEXT.md` hito `-53`, ahora con la banda de patrocinadores como comprobacion adicional.
+
 
 
 
