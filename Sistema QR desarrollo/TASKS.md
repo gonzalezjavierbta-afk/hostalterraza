@@ -34,6 +34,8 @@ estructura: indice-v1 (2026-10-01)
 
 > **Delta por boleteria de tarifa unica + PLAYLIST del silo f14 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+2 entradas / +2 cerradas = TSK-122 (motor: ADR-087) + TSK-123 (silo f14 v1.2)**, ambas nacen y cierran en el mismo ciclo. Delta efectivo: **+2 cerradas / 0 abiertas**. TSK-122 toca el **motor compartido** (`evento-app.html`, segmento boleteria `:2575-2610`, v1.15.0 + `js/i18n.js` 3 tablas, clave nueva `landing.boletos_entrada_general`); TSK-123 es **CSS-only** (`css/templates/fiesta/f14.css`, v1.2 del silo). **Evento afectado:** `vinilos-inversos-c8yu` (`template_id='f14'`, theme `vinilos`). **Smokes:** `smoke_f14_vinilos` **38/38**, `smoke_qa_asserts` **70/70**, `smoke_hero_contract` **64/64**, `smoke_paleta_evento` **20/20** (0 FAIL). Queda **1 pendiente de verificacion en PRODUCCION** (alto del iframe del playlist en movil < 360 px), declarado en el cierre. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
+> **Delta por reacomodo del layout del silo f14 v1.3 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+0 entradas / +0 cerradas**. No nace un TSK nuevo: es un **addendum al cierre de TSK-123** (`css/templates/fiesta/f14.css` **v1.3**, CSS-only) y asi queda documentado al final de su seccion de cierre. `git show --numstat 0e46e51` -> `f14.css` **+104 / -2** y `scripts/smoke_f14_vinilos.js` **+10 / -2**; **0 cambios** en el kernel (`evento-app.html`), `admin.html`, `api/*.js`, SQL/RLS y los otros 13 silos. Smokes: `smoke_f14_vinilos` -> **PASS 59 / FAIL 0**. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -732,6 +734,18 @@ task:
 #### Deuda declarada
 
 18. **[PRODUCCION - visual] Alto del iframe en movil < 360 px:** verificado por CSS y en harness de escritorio/movil, **no** en dispositivo real de 320-359 px. Si el embed se recorta, el ajuste es CSS del silo (352 px -> `height: clamp(...)`).
+
+#### Addendum v1.3 - reacomodo CARTEL + PLAYLIST + VIDEO (2026-11-01, mismo dia)
+
+> Linea **agregada** al cierre de TSK-123 (nada anterior se reescribe, Cero Borrado Oro #2/#3). Continuacion del mismo dia de ADR-087 / TSK-122-123, ya dentro del hito `-53` de `NEXT.md` (no se crea hito ni TSK nuevo): **0 entradas nuevas**. Alcance REAL verificado contra el archivo real (ADR-006), **CSS-only** en `css/templates/fiesta/f14.css` **v1.3**: **0 cambios en el kernel** (`evento-app.html`), **0 cambios de base de datos** (0 DDL, 0 RLS, 0 migraciones).
+
+(a) **PLAYLIST al lado del CARTEL en una sola fila** (`@media (min-width: 767px)`): la rejilla pasa de `"cartel cartel"` + `"playlist playlist"` (dos filas) a **`"cartel playlist"`** en una sola fila (`f14.css:1634`); el resto de filas y su orden quedan igual. En movil (`<=767px`) siguen **apilados** a ancho completo. Se anaden `align-self: stretch` en `#mod-cartel` / `#mod-playlist` (`:1657-1660`, `:1680-1683`).
+
+(b) **Embed de Spotify estirado al alto de la fila del poster:** cadena de altura completa `#mod-playlist > div` -> `#db-spotify-embed` (`flex: 1 1 auto`, `min-height: 480px !important`, `:1685-1698`) -> `iframe` (`height: 100% !important`, `:1700-1705`), con **especificidad extra** (`#mod-playlist #db-spotify-embed ...`) para ganar en el limite exacto de **767 px**; el anchor `Abrir en Spotify` queda `flex: 0 0 auto` centrado. El poster se limita a **`max-height: 640px`** con `object-fit: contain` (`:1671-1678`) y define el alto de la fila; `.cartel-inner` pasa a flex centrado con `max-width: 100%`.
+
+(c) **Caja del player de video oculta SOLO cuando esta vacia:** `.tpl-f14 #db-video-content:empty { display: none !important }` (`:914-917`) + `#mod-video:has(#db-video-content:empty) #db-gallery-grid { margin-bottom: 0 !important }` (`:920-923`). Motivo: el kernel solo apaga `#mod-video` cuando **no hay galeria**, y en `vinilos-inversos-c8yu` hay galeria (3 fotos) con `video_url = null`, asi que quedaba un **rectangulo negro 16:9 vacio**. **Cero Borrado:** el atomo sigue en el DOM y reaparece cuando el kernel le inyecte contenido (`:empty` deja de aplicar).
+
+**Verificacion (ADDENDUM v1.3, ejecutada en este cierre):** `node scripts/smoke_f14_vinilos.js` -> **PASS 59 / FAIL 0** (antes 38), con asserts nuevos para la fila `"cartel playlist"` (`f14.css:1634`), el estiramiento (`min-height: 480px !important` + `height: 100% !important`) y el ocultamiento de la caja vacia; ademas se **corrigio un falso positivo previo** que contaba `"playlist playlist"` sobre el **LOG DE VERSIONES** del archivo (`f14.css:1987`) en lugar del CSS vivo. Cabecera del archivo actualizada a **`v1.3 - 2026-11-01 - Reacomodo del layout CARTEL + PLAYLIST + VIDEO`** (`f14.css:1996-2020`). `git show --numstat 0e46e51` -> `f14.css` **+104 / -2**, `smoke_f14_vinilos.js` **+10 / -2**; archivo final **63.194 bytes / 1.824 lineas**. **Pendiente heredado:** el chequeo visual en PRODUCCION (767 / 1024 / 1440 y movil < 360 px) sigue abierto en `NEXT.md` hito `-53`.
 
 
 
