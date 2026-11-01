@@ -96,7 +96,8 @@
         "info"
         "faq"
         "ubicacion"
-        "sponsors";
+        "sponsors"
+        "footer";
     row-gap: 0;
     width: 100%;
 }
@@ -112,6 +113,9 @@
 .tpl-f1 #mod-faq          { grid-area: faq; }
 .tpl-f1 #mod-ubicacion    { grid-area: ubicacion; }
 .tpl-f1 #mod-sponsors     { grid-area: sponsors; }
+/* El footer del kernel vive DENTRO de #main-content-flow: sin grid-area propia
+   caeria en una fila implicita y romperia el orden del silo. */
+.tpl-f1 #mod-footer       { grid-area: footer; }
 
 /* Desktop split 38vw | 62vw */
 @media (min-width: 1024px) {
@@ -126,7 +130,11 @@
             "hero info"
             "hero faq"
             "hero ubicacion"
-            "hero sponsors";
+            "hero sponsors"
+            /* Fila de footer solo en la columna de contenido (62vw): el hero
+               es un panel fijo de 38vw con z-index 10, asi que un footer a todo
+               el ancho quedaria por debajo de el. */
+            "hero footer";
     }
     .tpl-f1 #mod-form { grid-area: hero; }
 }
@@ -905,7 +913,8 @@
             "info"
             "faq"
             "ubicacion"
-            "sponsors" !important;
+            "sponsors"
+            "footer" !important;
         row-gap: 0 !important;
         overflow-x: hidden !important;
         width: 100% !important;
@@ -929,6 +938,191 @@
     }
 }
 
+/* ==========================================================================
+   16. FOOTER (#mod-footer) - cierre de 4 columnas sobre verde profundo
+   El kernel trae el footer completo dentro de #main-content-flow
+   (evento-app.html:351) y su IoC global apaga section/header/footer
+   (evento-app.html:38), asi que es este silo quien lo enciende con
+   display:block !important. El kernel no aporta estilos globales para
+   .footer-inner, .footer-col, .footer-social-icon ni #footer-copy: todo lo de
+   abajo es del silo. Datos que pinta el kernel: #footer-org-name,
+   #footer-tagline, #db-footer-links (<li><a>), #db-footer-social
+   (a.footer-social-icon con SVG 18x18 que hereda currentColor) y
+   #db-footer-contacto (spans de email, telefono y ubicacion).
+   Cero Borrado: no se elimina ningun nodo; los dos enlaces del fallback que
+   apuntan a anclas que este silo NO enciende se ocultan, no se borran.
+   ========================================================================== */
+.tpl-f1 #mod-footer,
+.Tpl-F1 #mod-footer {
+    display: block !important;
+    width: 100%;
+    padding: 3rem 1.5rem 1.6rem;
+    background-color: var(--f1-bg-deep, #0a1a0a);
+    border-top: 1px solid var(--tpl-accent, #a3e635);
+    text-align: left;
+}
+
+.tpl-f1 #mod-footer .footer-inner,
+.Tpl-F1 #mod-footer .footer-inner {
+    display: grid !important;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 2rem 1.6rem;
+    max-width: 1100px;
+    margin: 0 auto 2rem 0;
+}
+
+.tpl-f1 #mod-footer .footer-brand #footer-org-name,
+.Tpl-F1 #mod-footer .footer-brand #footer-org-name {
+    display: block;
+    color: var(--f1-text-main, #f3f6f0);
+    font-family: var(--f1-font-serif);
+    font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+.tpl-f1 #mod-footer #footer-tagline,
+.Tpl-F1 #mod-footer #footer-tagline {
+    margin: 0.6rem 0 0;
+    color: var(--f1-text-muted, #a3b899);
+    font-size: 0.74rem;
+    line-height: 1.65;
+}
+
+.tpl-f1 #mod-footer .footer-col h4,
+.Tpl-F1 #mod-footer .footer-col h4 {
+    margin: 0 0 0.9rem;
+    color: var(--tpl-accent, #a3e635);
+    font-family: var(--f1-font-sans);
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.tpl-f1 #mod-footer #db-footer-links,
+.Tpl-F1 #mod-footer #db-footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.tpl-f1 #mod-footer #db-footer-links a,
+.Tpl-F1 #mod-footer #db-footer-links a {
+    color: var(--f1-text-muted, #a3b899);
+    font-size: 0.74rem;
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.tpl-f1 #mod-footer #db-footer-links a:hover,
+.tpl-f1 #mod-footer #db-footer-links a:focus-visible,
+.Tpl-F1 #mod-footer #db-footer-links a:hover,
+.Tpl-F1 #mod-footer #db-footer-links a:focus-visible {
+    color: var(--tpl-accent, #a3e635);
+}
+
+/* El fallback del kernel apunta a #mod-historia y #mod-impacto, anclas que este
+   silo no enciende (no hay grid-area ni activacion para ellas): esos dos
+   enlaces llevarian a la nada, asi que no se pintan (Cero Borrado: se ocultan). */
+.tpl-f1 #mod-footer #db-footer-links a[href="#mod-historia"],
+.tpl-f1 #mod-footer #db-footer-links a[href="#mod-impacto"],
+.Tpl-F1 #mod-footer #db-footer-links a[href="#mod-historia"],
+.Tpl-F1 #mod-footer #db-footer-links a[href="#mod-impacto"] {
+    display: none !important;
+}
+
+.tpl-f1 #mod-footer #db-footer-social,
+.Tpl-F1 #mod-footer #db-footer-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.tpl-f1 #mod-footer #db-footer-social .footer-social-icon,
+.Tpl-F1 #mod-footer #db-footer-social .footer-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: var(--f1-text-muted, #a3b899);
+    text-decoration: none;
+    transition: border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tpl-f1 #mod-footer #db-footer-social .footer-social-icon:hover,
+.tpl-f1 #mod-footer #db-footer-social .footer-social-icon:focus-visible,
+.Tpl-F1 #mod-footer #db-footer-social .footer-social-icon:hover,
+.Tpl-F1 #mod-footer #db-footer-social .footer-social-icon:focus-visible {
+    border-color: var(--tpl-accent, #a3e635);
+    color: var(--tpl-accent, #a3e635);
+    box-shadow: 0 0 14px rgba(163, 230, 53, 0.35);
+}
+
+.tpl-f1 #mod-footer #db-footer-contacto,
+.Tpl-F1 #mod-footer #db-footer-contacto {
+    display: grid;
+    gap: 0.5rem;
+    color: var(--f1-text-muted, #a3b899);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.tpl-f1 #mod-footer .footer-bottom,
+.Tpl-F1 #mod-footer .footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+}
+
+.tpl-f1 #footer-copy,
+.Tpl-F1 #footer-copy {
+    display: inline-block;
+    color: var(--f1-text-muted, #a3b899);
+    font-family: var(--f1-font-sans);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.78;
+}
+
+/* Footer a una columna: marca arriba, luego enlaces, redes y contacto */
+@media (max-width: 767px) {
+    .tpl-f1 #mod-footer,
+    .Tpl-F1 #mod-footer {
+        padding: 2.4rem 1.15rem 1.3rem;
+    }
+
+    .tpl-f1 #mod-footer .footer-inner,
+    .Tpl-F1 #mod-footer .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+        margin-bottom: 1.6rem;
+        text-align: center;
+    }
+
+    .tpl-f1 #mod-footer #db-footer-social,
+    .Tpl-F1 #mod-footer #db-footer-social {
+        justify-content: center;
+    }
+
+    .tpl-f1 #mod-footer #db-footer-contacto,
+    .Tpl-F1 #mod-footer #db-footer-contacto {
+        justify-items: center;
+    }
+}
+
 /* ============================================================================
    LOG DE VERSIONES — Template f1 "Selina Style"
    ============================================================================ */
@@ -940,4 +1134,8 @@
 | v3.0.0   | 27/08/2026 | ADR-029 — Consolidación completa: ADR-017 (1 regla/selector), Fix llave huérfana    | [OK]   |
 |          |            | 400px, responsive real (countdown/tarjetas/lineup/artist-name/hero-meta/hero/form), |        |
 |          |            | Cero selectores fantasma, box-sizing global, overflow-x:hidden mobile.              |        |
+| v3.1.0   | 01/11/2026 | Footer encendido (seccion 16): #mod-footer display:block !important, rejilla          | [OK]   |
+|          |            | 1.5fr 1fr 1fr 1fr, redes en caja de 34px y .footer-bottom con border-top; nueva fila  |        |
+|          |            | "footer" en las 3 listas de grid-template-areas (base, <=1023 y >=1024) + grid-area.  |        |
+|          |            | Enlaces #mod-historia/#mod-impacto ocultos: este silo no enciende esas anclas.        |        |
 */
