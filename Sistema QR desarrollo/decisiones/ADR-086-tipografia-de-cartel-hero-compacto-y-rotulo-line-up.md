@@ -64,7 +64,9 @@ la misma aritmetica (1199: `clamp(340px,40vw,520px)`; 767: `min-height: 280px` y
 - `#mod-lineup::before` = `LINE UP` con la tipografia de cartel.
 - Tagline en **`.lineup-grid::before`**, no en `#mod-lineup::after`: el `::after` de la seccion
   renderiza **despues** de la grilla de artistas. El wrapper se fuerza a `display:block !important`
-  para que la tagline sea hermana de `#db-lineup` y quede justo bajo el rotulo.
+  para que la tagline sea hermana de `#db-lineup` y quede justo bajo el rotulo. Se muestra en
+  MAYUSCULAS con `letter-spacing: 0.24em` via `text-transform`: el `content` conserva el texto tal
+  como se escribio, la transformacion es solo de presentacion.
 
 ## Alternativas descartadas
 
