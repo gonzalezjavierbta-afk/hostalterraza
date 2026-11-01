@@ -116,6 +116,9 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .cont-tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--border);margin:0 0 1rem}
 .cont-tabs .adm-tab{font-size:12px;padding:8px 6px}
 .cont-tab-empty{font-size:12px;color:var(--ink3);padding:.6rem 0}
+/* ADR-088 - el pin del selector es un SVG propio: se anula la caja blanca que
+   Leaflet aplica a .leaflet-div-icon para que solo se vea la gota naranja. */
+.mapa-picker-pin{background:none;border:0;box-shadow:none}
 body.cont-tabs-ready [data-cont-tab]:not(.cont-active){display:none!important}
 .hist-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
 .hist-time-toggle{display:flex;border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
@@ -3031,10 +3034,31 @@ function _mapaPickerLeer() {
   return (lat === null || lng === null) ? null : { lat: lat, lng: lng };
 }
 
+// Color del pin del selector. Un solo punto de cambio: si manana se quiere
+// otro color, se cambia aqui y no hay que tocar el SVG.
+var _MAPA_PIN_COLOR = '#f97316';
+
+function _mapaPickerIcono() {
+  // Leaflet pinta el marcador azul por defecto. Se sustituye por un SVG inline:
+  // cero imagenes externas, cero CDN de iconos, color en una sola variable.
+  if (!window.L || typeof L.divIcon !== 'function') return undefined;
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="42" viewBox="0 0 30 42">'
+    + '<path d="M15 1C7.268 1 1 7.268 1 15c0 10.4 12.2 24.6 12.7 25.2a1.7 1.7 0 0 0 2.6 0C16.8 39.6 29 25.4 29 15 29 7.268 22.732 1 15 1z"'
+    + ' fill="' + _MAPA_PIN_COLOR + '" stroke="#ffffff" stroke-width="2"/>'
+    + '<circle cx="15" cy="15" r="5" fill="#ffffff"/></svg>';
+  return L.divIcon({
+    className: 'mapa-picker-pin',
+    html: svg,
+    iconSize: [30, 42],
+    iconAnchor: [15, 42],   // la punta del pin es el punto exacto
+    popupAnchor: [0, -40]
+  });
+}
+
 function _mapaPickerMarcar(lat, lng, escribir) {
   if (!_mapaPickerMap || !window.L) return;
   if (!_mapaPickerMarker) {
-    _mapaPickerMarker = L.marker([lat, lng], { draggable: true }).addTo(_mapaPickerMap);
+    _mapaPickerMarker = L.marker([lat, lng], { draggable: true, icon: _mapaPickerIcono() }).addTo(_mapaPickerMap);
     _mapaPickerMarker.on('dragend', function () {
       var p = _mapaPickerMarker.getLatLng();
       _mapaPickerEscribir(p.lat, p.lng);
