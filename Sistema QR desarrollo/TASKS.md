@@ -30,6 +30,8 @@ estructura: indice-v1 (2026-10-01)
 
 > **Delta por rediseno del HERO del silo f14 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+4 entradas = TSK-116 (cerrada) + TSK-117 / TSK-118 / TSK-119 (abiertas)**. Delta efectivo: **+1 cerrada / +3 abiertas**. TSK-116 (rediseno del HERO del evento `vinilos-inversos-c8yu`) nace y cierra en el mismo ciclo: **1 archivo, CSS-only** (`css/templates/fiesta/f14.css`, `git diff --numstat` = **+290 / -59**, 47.483 bytes, 0 bytes > 127, llaves 168/168), `node scripts/smoke_f14_vinilos.js` -> **PASS 38 / FAIL 0**. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
+> **Delta por TSK-117 (2026-11-01, linea agregada, sin reescribir las de arriba):** **+1 cerrada = TSK-117** (contador del landing en zona horaria de Bogota + cleanup del `setInterval`) y **+3 deudas NUEVAS sin ID propio** (declaradas en el cierre de TSK-117 y en ADR-084). Delta efectivo del corte: **+1 cerrada / +3 abiertas**. TSK-117 es **motor compartido** (`evento-app.html`, 14 silos): `git diff --numstat` = **+86 / -19** y `scripts/smoke_countdown_tz.js` (NUEVO, 11.142 bytes); **0 cambios en CSS/JS/admin/API/SQL**. Verificado: `smoke_countdown_tz.js` -> **PASS 36 / FAIL 0**; sin regresion (`smoke_f14_vinilos` 38/0, `smoke_hero_contract` 64/0, `smoke_qa_asserts` 64/0); Escudo GOLD OK. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -128,7 +130,7 @@ estructura: indice-v1 (2026-10-01)
 
 | ID | Responsable | Título | Bloque | Detalle |
 |---|---|---|---|---|
-| [TSK-117](#tsk-117) | `@renderer-dev` + `@qa-auditor` (**PAGO obligatorio** + gate `AGENTS.md` §2: es el motor compartido `evento-app.html`) | **Contador con zona horaria real y `setInterval` con cleanup** — `parseSpanishDate()` (`evento-app.html:720-730`) construye `new Date("YYYY-MM-DDTHH:mm")` en la zona del DISPOSITIVO, no en `America/Bogota`; el `setInterval` (`:1424-1431`) nunca se limpia | Motor compartido (afecta a los 14 silos) | **ALTA** (gate §2 confirmado por el usuario 2026-11-01) |
+| [TSK-117](#tsk-117) | `@renderer-dev` + `@qa-auditor` (**PAGO obligatorio** + gate `AGENTS.md` §2: es el motor compartido `evento-app.html`) | **Contador con zona horaria real y `setInterval` con cleanup** — `parseSpanishDate()` (`evento-app.html:720-730`) construye `new Date("YYYY-MM-DDTHH:mm")` en la zona del DISPOSITIVO, no en `America/Bogota`; el `setInterval` (`:1424-1431`) nunca se limpia | Motor compartido (afecta a los 14 silos) | **CERRADA 2026-11-01** (ver cierre al final) |
 | [TSK-118](#tsk-118) | Direccion (wizard del admin / Supabase; **sin codigo**) | **Datos del evento `vinilos-inversos-c8yu`** — (a) **sede ausente**: `eventos.ubicacion` = `"Kr 4 # 19-56"` y no existe columna de nombre de sede (campo vivo: `#ev-ubic`, `admin.html:896`; ver correccion ADR-006 en el cierre de TSK-116); (b) `config_landing.colors` conserva la paleta vieja f9 (`accent: #c9a84c`) con `template_id='f14'` (oxido `#E35925`); (c) `config_landing.content.subtitulo` = `"DRUMN AND BASS REGGAE HIP-HOP"` (typo "DRUMN", sin separadores; la maqueta dice `DRUM N BASS - REGGAE - HIP-HOP`) | Silo F14 "Vinilos Inversos" | **ALTA** — (a) **RESUELTO 2026-11-01**: `eventos.ubicacion` ya es `"Klandestino, Kr 4 # 19-56"` (verificado por REST); quedan (b) y (c) |
 | [TSK-119](#tsk-119) | `@renderer-dev` (OPCIONAL — dominio de riesgo: es el formateador del motor, no el silo) | **`#meta-hora` en formato 12 h** — hoy muestra `20:00 HRS`; la maqueta pide `8:00 PM` | Silo F14 "Vinilos Inversos" | opcional |
 
@@ -549,6 +551,47 @@ task:
 9. El brief declaraba **+281 / -59** lineas: el real es **+290 / -59** (`git diff --numstat`). Diferencia de 9 lineas; no cambia el alcance.
 10. El brief ubicaba `parseSpanishDate()` en `evento-app.html:727-729`: la funcion real vive en **`:720-730`** (los dos `new Date(...)` si estan en `:727` y `:729`); el `setInterval` real es **`:1424-1431`** (el brief decia `:1423-1431`, que es la linea del `parseSpanishDate(...)` que lo precede).
 11. El brief pedia escribir la sede en `#ld-ubicacion-val` (`admin.html:777`): ese campo **existe en el DOM pero esta RETIRADO del formulario** por **ADR-056 (fila 9)** (`admin.html:4320-4323`; `modMap` ya no lo mapea, aunque su lectura legacy se conserva). La fuente canonica que escribe `eventos.ubicacion` es **`#ev-ubic`** (Paso 1, `admin.html:896`; lectura `:6041`, escritura `:6624`). **TSK-118 se abre con esa correccion.**
+
+---
+
+### Cierre de TSK-117 - Contador del landing en zona horaria de Bogota (UTC-5 fijo) y cleanup del `setInterval` (ADR-084) (2026-11-01) - COMPLETADA
+
+> Seccion **agregada** (nada anterior se reescribe, Cero Borrado Oro #2/#3). Alcance REAL ejecutado y verificado contra el archivo real (ADR-006). Es el **motor compartido** `evento-app.html` (14 silos), por lo que exigio **PAGO obligatorio** y **gate `AGENTS.md` §2 confirmado por el usuario el 2026-11-01**. Este cierre es **documental: 0 cambios de codigo, 0 migraciones, 0 commits** (el commit lo hace el orquestador).
+
+#### Que se hizo (alcance REAL ejecutado)
+
+1. **Archivos:** `evento-app.html` -> `git diff --numstat` = **+86 / -19**; y `scripts/smoke_countdown_tz.js` (**NUEVO**, 11.142 bytes). **Cero cambios en CSS / JS de silos / `admin.html` / `api/*.js` / SQL.**
+2. **Causa raiz 1 (zona horaria):** `parseSpanishDate()` construia `new Date('YYYY-MM-DDTHH:mm')` **sin sufijo de zona**, asi que el motor del navegador lo interpretaba en la zona del **DISPOSITIVO**. Medido contra `v123` (`git show HEAD`): en **UTC** el contador iba **5 h adelantado** en el tiempo (fecha objetivo 5 h antes), en **Asia/Tokyo 14 h antes** y en **Europe/Madrid 6 h antes**. **En Bogota coincidia**, y por eso el defecto era **invisible en pruebas locales**.
+3. **Causa raiz 2 (fuga de intervalo):** el `setInterval` nunca se limpiaba y el loader se re-ejecuta al cambiar idioma -> **un intervalo por pasada** sobre el mismo DOM; al vencer, el ultimo quedaba vivo pintando el **valor congelado**.
+4. **Solucion v124:** `__CO_OFFSET_MIN = -300` (Colombia, UTC-5 **fijo**, sin horario de verano) + helper `__horaA24(timeStr)` + `parseSpanishDate()` con `Date.UTC(y, mo-1, d, hh, mm) - (__CO_OFFSET_MIN * 60000)` -> **epoch absoluto**, identico en cualquier dispositivo. Contador reescrito con `__cdTarget` / `__cdPaint` / `__cdTick`, `clearInterval(window.__cdTimer)` **antes** de crear el nuevo, ceros al vencer, auto-detencion (`__cdDone` -> `__cdTimer = null`) y guarda `isFinite()` que impide escribir `NaN`.
+5. **Contrato preservado:** `parseSpanishDate(dateStr, timeStr) -> Date`, con los **mismos 2 llamadores** (contador y gate de fase `proximamente`). **Cero Borrado: 0 IDs / 0 modulos / 0 atomos tocados.**
+6. **Fallbacks:** fecha invalida -> `new Date(NaN)` (antes el DOM recibia el literal `NaN`); sin hora -> `00:00` de Bogota; hora embebida `YYYY-MM-DDTHH:mm` -> se usa si `eventos.hora` viene vacia.
+
+#### Verificacion (por archivo real, ADR-006)
+
+| Comprobacion | Resultado |
+|---|---|
+| `node scripts/smoke_countdown_tz.js` (extrae el motor REAL del HTML) | **PASS 36 / FAIL 0** |
+| 4 sondas de `TZ` en proceso hijo (UTC / Asia-Tokyo / America-Bogota / Europe-Madrid) | epoch identico **1795222800000** en las 4 |
+| Assert duro contra el signo invertido del offset | OK |
+| `node scripts/smoke_f14_vinilos.js` (sin regresion) | **PASS 38 / FAIL 0** |
+| `node scripts/smoke_hero_contract.js` | **PASS 64 / FAIL 0** |
+| `node scripts/smoke_qa_asserts.js` | **PASS 64 / FAIL 0** |
+| Escudo GOLD: `node --check` de los 2 `<script>` inline (167.413 bytes) | exit **0** |
+| Lineas agregadas con bytes > 127 | **0** |
+| Nuevas `display: none` | **0** |
+| Balance de `<div>` antes/despues (`git show HEAD`) | **102 / 101**, identico (preexistente) |
+| Harness de timers: 3 pasadas del loader | **1 intervalo vivo** |
+| Harness de timers: al vencer | **0 intervalos**, `window.__cdTimer = null`, pinta `00:00:00:00` |
+| Harness de timers: fecha invalida | **0 intervalos**, **0 escrituras DOM** |
+
+#### Deudas NUEVAS registradas (declaradas, NO ejecutadas)
+
+7. **[CODIGO - baja] `evento-app.html:2770`:** `new Date(__tFase).getFullYear()` lee en la zona del DISPOSITIVO el ano del centinela de campana (2099). **No se corrigio** porque solo alimenta `__yearFase >= 2090` y el otro brazo de la condicion (`__tFase <= Date.now()`) es absoluto: la decision de fase **no cambia**. Cosmetico.
+8. **[CODIGO - deuda] `eventovenezuela.html:787` y `eventologs.html:304`:** conservan el patron v123 (**2 ocurrencias cada uno**). Son **paginas legacy**, no el motor de los 14 silos. No se tocaron.
+9. **[DATOS - aceptado] `2026-02-30`:** desborda a marzo via `Date.UTC` (`2026-03-03T01:00Z`). **Aceptado:** `eventos.fecha` es ISO y la escribe el admin con selector de fecha.
+10. **[REUTILIZACION]** TSK-119 (`#meta-hora` `20:00 HRS` -> `8:00 PM`) **puede reutilizar `__horaA24()`**; no se ejecuto en este ciclo.
+
 
 
 

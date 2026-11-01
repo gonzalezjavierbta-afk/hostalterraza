@@ -716,17 +716,58 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         })();
         // === FIN SEGMENTO: LIGHTBOX GLOBAL ===
 
-        // MOTOR DE FECHAS CALIBRADO v123 [cite: 9, 872]
+        // MOTOR DE FECHAS CALIBRADO v124 (TSK-117)
+        // v123 usaba new Date('YYYY-MM-DDTHH:mm') SIN sufijo de zona: el motor
+        // del navegador lo interpreta en la zona del DISPOSITIVO, asi que un
+        // visitante fuera de Colombia veia el contador desviado (5 h en Madrid,
+        // 14 h en Tokio). v124 construye el instante con Date.UTC y le resta el
+        // offset fijo de Colombia (UTC-5 todo el ano, sin horario de verano):
+        // el resultado es un epoch absoluto, identico en cualquier dispositivo.
+        var __CO_OFFSET_MIN = -300;
+
+        // Normaliza la hora del evento. Acepta el formato canonico de la columna
+        // eventos.hora ('HH:MM') y variantes 'H:MM'. Devuelve null si no es una
+        // hora valida: el llamador decide el fallback.
+        function __horaA24(timeStr) {
+            var m = String(timeStr == null ? '' : timeStr).trim().match(/^(\d{1,2})[:.](\d{2})/);
+            if (!m) return null;
+            var hh = parseInt(m[1], 10);
+            var mm = parseInt(m[2], 10);
+            if (!(hh >= 0 && hh <= 23)) return null;
+            if (!(mm >= 0 && mm <= 59)) return null;
+            return { hh: hh, mm: mm };
+        }
+
+        // Acepta 'YYYY-MM-DD' (columna eventos.fecha) y el formato legacy
+        // '20 de noviembre de 2026'. Si la fecha trae la hora embebida
+        // ('YYYY-MM-DDTHH:mm') se usa solo cuando eventos.hora viene vacia.
+        // Sin hora valida se asume 00:00 de Bogota (inicio del dia del evento):
+        // antes el resultado era Invalid Date y el contador pintaba 'NaN'.
+        // Con fecha invalida devuelve un Date invalido (getTime() = NaN) para
+        // que los llamadores degraden con su propia guarda.
         function parseSpanishDate(dateStr, timeStr) {
             const months = { "enero":"01", "febrero":"02", "marzo":"03", "abril":"04", "mayo":"05", "junio":"06", "julio":"07", "agosto":"08", "septiembre":"09", "octubre":"10", "noviembre":"11", "diciembre":"12" };
-            const parts = dateStr.toLowerCase().split(' de ');
+            var raw = String(dateStr == null ? '' : dateStr).trim();
+            var y = 0, mo = 0, d = 0, emb = null;
+            var parts = raw.toLowerCase().split(' de ');
             if (parts.length === 3) {
-                const d = parts[0].trim().padStart(2, '0');
-                const m = months[parts[1].trim()];
-                const a = parts[2].trim();
-                return new Date(`${a}-${m}-${d}T${timeStr}`);
+                d = parseInt(parts[0].trim(), 10);
+                mo = parseInt(months[parts[1].trim()] || '0', 10);
+                y = parseInt(parts[2].trim(), 10);
+            } else {
+                var m = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/);
+                if (m) {
+                    y = parseInt(m[1], 10);
+                    mo = parseInt(m[2], 10);
+                    d = parseInt(m[3], 10);
+                    if (m[4] != null) emb = { hh: parseInt(m[4], 10), mm: parseInt(m[5], 10) };
+                }
             }
-            return new Date(`${dateStr}T${timeStr}`);
+            if (!(y > 1900)) return new Date(NaN);
+            if (!(mo >= 1 && mo <= 12)) return new Date(NaN);
+            if (!(d >= 1 && d <= 31)) return new Date(NaN);
+            var t = __horaA24(timeStr) || emb || { hh: 0, mm: 0 };
+            return new Date(Date.UTC(y, mo - 1, d, t.hh, t.mm) - (__CO_OFFSET_MIN * 60000));
         }
 
         function switchForm(type) {
@@ -1420,15 +1461,40 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // "MULTIMEDIA FINAL (v205)" más abajo sobreescribe por completo con lógica superior
                 // (soporta ev.video_url, trailer_url y fallback). Ver ese segmento para la lógica vigente.
 
-                const target = parseSpanishDate(ev.fecha, ev.hora).getTime();
-                setInterval(() => {
-                    const diff = target - Date.now();
-                    if (diff <= 0) return;
-                    document.getElementById('cd-days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-                    document.getElementById('cd-hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById('cd-mins').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById('cd-secs').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                }, 1000);
+                // CONTADOR v124 (TSK-117): un unico intervalo vivo por pagina.
+                // El loader puede re-ejecutarse (cambio de idioma): sin cleanup se
+                // acumulaba un setInterval por pasada escribiendo en el mismo DOM.
+                // Al pasar la fecha se pintan ceros y se detiene el intervalo (antes
+                // quedaba vivo con el ultimo valor congelado).
+                const __cdTarget = parseSpanishDate(ev.fecha, ev.hora).getTime();
+                if (window.__cdTimer) { clearInterval(window.__cdTimer); window.__cdTimer = null; }
+                if (isFinite(__cdTarget)) {
+                    const __cdPaint = (diff) => {
+                        const __cd = [
+                            ['cd-days', Math.floor(diff / 86400000)],
+                            ['cd-hours', Math.floor((diff % 86400000) / 3600000)],
+                            ['cd-mins', Math.floor((diff % 3600000) / 60000)],
+                            ['cd-secs', Math.floor((diff % 60000) / 1000)]
+                        ];
+                        for (var i = 0; i < __cd.length; i++) {
+                            var el = document.getElementById(__cd[i][0]);
+                            if (el) el.innerText = String(__cd[i][1]).padStart(2, '0');
+                        }
+                    };
+                    let __cdDone = false;
+                    const __cdTick = () => {
+                        const diff = __cdTarget - Date.now();
+                        if (diff <= 0) { __cdPaint(0); __cdDone = true; return; }
+                        __cdPaint(diff);
+                    };
+                    __cdTick();
+                    if (!__cdDone) {
+                        window.__cdTimer = setInterval(() => {
+                            __cdTick();
+                            if (__cdDone) { clearInterval(window.__cdTimer); window.__cdTimer = null; }
+                        }, 1000);
+                    }
+                }
 
                 // MAPEO DE HERO & METADATA
                 const __tituloEl = document.getElementById('event-title');
@@ -2695,9 +2761,10 @@ if (document.getElementById('db-poster-img')) {
                 // futura valida degrada a 'completa' (no se rompe la feature si el
                 // formato de fecha es inesperado: NaN mantiene 'proximamente').
                 var __faseProx = !!(ev && ev.fase_landing === 'proximamente');
-                // Guarda de tipo: parseSpanishDate hace dateStr.toLowerCase(); si
-                // fecha no fuese string lanzaria y abortaria el gate (se mantiene
-                // 'proximamente', degradacion segura).
+                // Guarda de tipo (v124): parseSpanishDate ya NO lanza con valores
+                // no-string (normaliza con String(...) y devuelve un Date invalido),
+                // pero se conserva la guarda para que un fecha ausente o nula
+                // mantenga 'proximamente' sin depender del comportamiento del parser.
                 if (__faseProx && typeof parseSpanishDate === 'function' && typeof ev.fecha === 'string') {
                     var __tFase = parseSpanishDate(ev.fecha, ev.hora).getTime();
                     if (!isNaN(__tFase)) {
