@@ -104,5 +104,5 @@ DROP TABLE _v089b;
 -- ============================================================================
 -- FIN. V1 (idempotencia) NO se puede automatizar aqui: se comprueba
 -- re-ejecutando migrations/adr089b_cierre_no_meta.sql completo; debe terminar
--- sin error y decir "ya existe, skip" cuatro veces.
+-- sin error y decir "ya existe, skip" dos veces (un CHECK por bloque).
 -- ============================================================================
