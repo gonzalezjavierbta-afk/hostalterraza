@@ -241,6 +241,19 @@
                         <input type="tel" id="reg-whatsapp" class="form-input wa-number" placeholder="WhatsApp *" inputmode="numeric" maxlength="10" required data-i18n-ph="reg.f_wa_ph">
                     </div>
                     <input type="tel" id="reg-whatsapp-custom-code" class="form-input" placeholder="Código de país (ej. +7)" inputmode="numeric" maxlength="5" style="display:none" data-i18n-ph="reg.f_pais_codigo_ph">
+                    <!-- ADR-089 §6: opt-in de WhatsApp. Es captura, no puerta: sin
+                         `checked` (un opt-in premarcado no es consentimiento) y sin
+                         `required` (bloquear el registro por el checkbox cambiaria
+                         el flujo de aforo). El literal visible lo inyecta el JS
+                         desde WA_OPTIN_TEXTO para que el texto mostrado y el que se
+                         guarda en wa_optin_texto no puedan divergir. -->
+                    <div style="display:flex; align-items:flex-start; gap:9px; margin:.25rem 0 1rem;">
+                        <input type="checkbox" id="reg-wa-optin" name="wa_optin" aria-describedby="reg-wa-optin-hint" style="flex:0 0 auto; width:18px; height:18px; margin:2px 0 0; accent-color:var(--gold,#ff9f1c); cursor:pointer;">
+                        <div>
+                            <label for="reg-wa-optin" style="display:block; font-size:12px; line-height:1.45; color:rgba(255,255,255,.72); cursor:pointer;"><span id="reg-wa-optin-texto"></span></label>
+                            <p id="reg-wa-optin-hint" style="margin:4px 0 0; font-size:11px; line-height:1.4; color:rgba(255,255,255,.4);">Opcional. Puedes registrarte sin aceptar.</p>
+                        </div>
+                    </div>
                     <button type="submit" class="btn-submit" data-i18n="reg.registrarme_btn">Registrarme →</button>
                     <!-- Honeypot: fuera de pantalla y oculto a lectores de
                          pantalla. Un humano nunca lo ve ni lo llena; un bot que
@@ -263,6 +276,19 @@
                       <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em" data-i18n="serie.encontramos">Encontramos tu registro</div>
                       <div id="conf-nombre" style="font-size:18px;font-weight:500"></div>
                       <div id="conf-meta" style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px"></div>
+                    </div>
+                    <!-- ADR-089 seccion 6: opt-in del camino "ya estoy registrado".
+                         Espejo de #reg-wa-optin, porque #modo-nuevo queda oculto
+                         en esta pestana y el consentimiento necesita un control
+                         visible en el panel que se esta mostrando. Igual que el
+                         principal: sin checked y sin required. El literal sale de
+                         WA_OPTIN_TEXTO, nunca de un texto duplicado aqui. -->
+                    <div style="display:flex; align-items:flex-start; gap:9px; margin:.25rem 0 1rem;">
+                        <input type="checkbox" id="ex-wa-optin" name="wa_optin_existe" aria-describedby="ex-wa-optin-hint" style="flex:0 0 auto; width:18px; height:18px; margin:2px 0 0; accent-color:var(--gold,#ff9f1c); cursor:pointer;">
+                        <div>
+                            <label for="ex-wa-optin" style="display:block; font-size:12px; line-height:1.45; color:rgba(255,255,255,.72); cursor:pointer;"><span id="ex-wa-optin-texto"></span></label>
+                            <p id="ex-wa-optin-hint" style="margin:4px 0 0; font-size:11px; line-height:1.4; color:rgba(255,255,255,.4);">Opcional. Puedes inscribirte sin aceptar.</p>
+                        </div>
                     </div>
                     <button type="button" id="confirm-btn" class="btn-submit" onclick="inscribirExistente()" data-i18n="serie.inscribir_btn">✓ Inscribirme →</button>
                     <button type="button" onclick="resetVerif()" style="width:100%;margin-top:.5rem;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:rgba(255,255,255,.5);font-size:13px;cursor:pointer" data-i18n="serie.no_soy_yo">No soy yo</button>
@@ -487,6 +513,15 @@
         const CEDULA_MIN = 5;
         const CEDULA_MAX = 12;
 
+        // ADR-089 seccion 6: texto unico del opt-in de WhatsApp. El literal que se ve en
+        // el formulario y el que se persiste en wa_optin_texto salen de ESTA
+        // constante, para que no puedan divergir.
+        // PENDIENTE (deuda ADR-089 seccion 13): el texto legal definitivo y la URL de la
+        // politica de privacidad estan a la espera de validacion. Si el texto
+        // cambia, wa_optin_texto de las filas viejas NO se reescribe: es la
+        // evidencia de lo que el titular acepto en su momento.
+        const WA_OPTIN_TEXTO = 'Acepto recibir por WhatsApp los recordatorios y la informaci\u00f3n de este evento. Puedo retirar esta autorizaci\u00f3n cuando quiera.';
+
         // Cedula: canonico = solo digitos (puntos, guiones, espacios y letras
         // se descartan). No se exige algoritmo de digito de control: la cedula
         // de disminuidor y la extranjera no siguen el de la CC.
@@ -553,6 +588,15 @@
 
         async function init() {
             log("Iniciando Registro (ADR-030) — captura simple de datos con estilos del template del landing.", "INFO");
+            // ADR-089 seccion 6: inyecta el literal visible del opt-in desde la constante
+            // unica. El HTML lo deja vacio a proposito.
+            const optinTextoEl = document.getElementById('reg-wa-optin-texto');
+            if (optinTextoEl) optinTextoEl.textContent = WA_OPTIN_TEXTO;
+            // Espejo del panel "ya estoy registrado": mismo literal, una sola
+            // fuente (WA_OPTIN_TEXTO). Si el texto cambia, cambia ahi y en ningun
+            // otro sitio, para que el literal mostrado y el persistido coincidan.
+            const optinTextoExEl = document.getElementById('ex-wa-optin-texto');
+            if (optinTextoExEl) optinTextoExEl.textContent = WA_OPTIN_TEXTO;
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
             const id = params.get('id');
@@ -702,6 +746,9 @@
                 // captura_pura=false => se genera QR de entrada; true => sin QR (Cero Borrado: no se altera si ya hay logica futura).
                 const entregaQR = (window.__ctxCapturaPura === false);
                 const qrCode = entregaQR ? ('QR-' + UID()) : null;
+                // ADR-089 seccion 6: consentimiento leido del checkbox. Solo captura: no
+                // interviene en ninguna decision del flujo (aforo, duplicados, QR).
+                const optinWa = document.getElementById('reg-wa-optin')?.checked === true;
                 const payload = {
                     evento_id: ev.id,
                     org_id: window.__ctxOrgId,
@@ -720,7 +767,11 @@
                     hora_inscripcion: NOW(),
                     respuestas_custom: { rol, origen: 'pagina-registro' },
                     ref_codigo: window.__ctxRefCodigo || null,
-                    ref_nombre: window.__ctxRefNombre || null
+                    ref_nombre: window.__ctxRefNombre || null,
+                    wa_optin: optinWa,
+                    wa_optin_at: optinWa ? new Date().toISOString() : null,
+                    wa_optin_origen: 'landing',
+                    wa_optin_texto: optinWa ? WA_OPTIN_TEXTO : null
                 };
                 const { error } = await getClient().from('inscritos').insert(payload);
                 if (error) throw error;
@@ -838,6 +889,12 @@
             _existenteReg.tipo = normalizeRol(_existenteReg.tipo, rol);
             const tipoPersona = _existenteReg.tipo || rol;
             const qrCode = 'QR-' + UID();
+            // ADR-089 seccion 6: el segundo camino tambien debe capturar el consentimiento;
+            // si solo lo hiciera el alta nueva, esta via quedaria sin cobertura.
+            // Lee #ex-wa-optin, el espejo visible en este panel: #modo-nuevo esta
+            // oculto cuando se llega aqui, asi que leer el checkbox del otro panel
+            // daria siempre false y el consentimiento se perderia en silencio.
+            const optinWa = document.getElementById('ex-wa-optin')?.checked === true;
             const payload = {
                 evento_id: ev.id,
                 org_id: window.__ctxOrgId,
@@ -857,7 +914,11 @@
                 hora_inscripcion: NOW(),
                 respuestas_custom: { rol: 'existente', origen: 'pagina-registro' },
                 ref_codigo: window.__ctxRefCodigo || null,
-                ref_nombre: window.__ctxRefNombre || null
+                ref_nombre: window.__ctxRefNombre || null,
+                wa_optin: optinWa,
+                wa_optin_at: optinWa ? new Date().toISOString() : null,
+                wa_optin_origen: 'landing',
+                wa_optin_texto: optinWa ? WA_OPTIN_TEXTO : null
             };
             try {
                 const { error } = await getClient().from('inscritos').insert(payload);
