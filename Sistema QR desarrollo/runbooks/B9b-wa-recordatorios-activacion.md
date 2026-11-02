@@ -654,8 +654,8 @@ UPDATE public.canal_flags
 - [ ] `canal_flags.dry_run = false` (y `WA_DRY_RUN=0` con redeploy)
 - [ ] Primera corrida real con tope 10, sin errores
 - [ ] `costo_unitario_usd` cargado con la tarifa utility de Colombia
-- [ ] Migracion `migrations/adr089b_cierre_no_meta.sql` aplicada a mano en el SQL Editor
-- [ ] Verificaciones **V1-V8** del propio archivo adr089b en verde
+- [x] Migracion `migrations/adr089b_cierre_no_meta.sql` aplicada a mano en el SQL Editor (2026-11-02)
+- [x] Verificaciones **V1-V8** del propio archivo adr089b en verde (18/18: 14 parte 1 + 4 parte 2, y V1 re-ejecutada sin error)
 - [x] Edge Function `wa-webhook` desplegada el 2026-11-02 (`supabase functions deploy wa-webhook --project-ref ctgyvydzshueemlelkzv --no-verify-jwt`)
 - [ ] Webhook suscrito en Meta con el campo `messages` y el verify token igual a `WA_VERIFY_TOKEN`
 
