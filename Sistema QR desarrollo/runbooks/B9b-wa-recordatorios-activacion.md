@@ -171,8 +171,17 @@ aparece si se deja vacia: es correcto.
 ## 5. Deploy de la Edge Function
 
 ```bash
-supabase functions deploy send-wa-recordatorio --project-ref ctgyvydzshueemlelkzv
+supabase functions deploy send-wa-recordatorio --project-ref ctgyvydzshueemlelkzv --no-verify-jwt
 ```
+
+> **`--no-verify-jwt` NO es opcional.** Sin ese flag, el gateway de Supabase exige un
+> `Authorization: Bearer <JWT>` **antes** de ejecutar la Function, y `pg_net` manda unicamente
+> `Content-Type` y `X-Service-Token` (`migrations/adr089_recordatorios_multicanal.sql:549-552`).
+> Resultado sin el flag: **401 del gateway** en cada envio, con la Function intacta y sin un solo log
+> suyo. El canal fallaria por configuracion, no por codigo, y el sintoma no apunta a la causa.
+> La autenticacion real la hace `authorize()`: `X-Service-Token` en tiempo casi constante o JWT de
+> sesion validado por la propia Function. `wa-webhook` tambien lo necesita, por otra razon: Meta no
+> manda `Authorization` en ningun caso y se autentica con la firma `X-Hub-Signature-256`.
 
 Verificacion del arnes (local, sin Deno ni Docker; el arnes levanta la Function en un entorno Node):
 
@@ -502,7 +511,7 @@ UPDATE public.canal_flags
 ```sql
 -- Paso 3: sacar el dry-run tambien del secreto (requiere REDEPLOY de la Function).
 -- supabase secrets set WA_DRY_RUN="0" --project-ref ctgyvydzshueemlelkzv
--- supabase functions deploy send-wa-recordatorio --project-ref ctgyvydzshueemlelkzv
+-- supabase functions deploy send-wa-recordatorio --project-ref ctgyvydzshueemlelkzv --no-verify-jwt
 ```
 
 **Por que dos pasos y por que 10:** el flag de base de datos **solo puede restringir, nunca habilitar
@@ -647,7 +656,7 @@ UPDATE public.canal_flags
 - [ ] `costo_unitario_usd` cargado con la tarifa utility de Colombia
 - [ ] Migracion `migrations/adr089b_cierre_no_meta.sql` aplicada a mano en el SQL Editor
 - [ ] Verificaciones **V1-V8** del propio archivo adr089b en verde
-- [ ] Edge Function `wa-webhook` desplegada (`supabase functions deploy wa-webhook --project-ref ctgyvydzshueemlelkzv`)
+- [x] Edge Function `wa-webhook` desplegada el 2026-11-02 (`supabase functions deploy wa-webhook --project-ref ctgyvydzshueemlelkzv --no-verify-jwt`)
 - [ ] Webhook suscrito en Meta con el campo `messages` y el verify token igual a `WA_VERIFY_TOKEN`
 
 ---
@@ -676,7 +685,7 @@ configuracion externa.
 2. **Verificaciones V1-V8 (comentadas al final del archivo):** se corren **despues** del `COMMIT`.
    Cubren: (V1) idempotencia, (V2) constraints, (V3) `security_invoker`, (V4) costo `NULL`,
    (V5) guardas de retencion, (V6) RPC con payload raro, (V7) permisos, (V8) `anon` sin privilegios.
-3. **Despliegue del webhook:** `supabase functions deploy wa-webhook --project-ref ctgyvydzshueemlelkzv`.
+3. **Despliegue del webhook:** `supabase functions deploy wa-webhook --project-ref ctgyvydzshueemlelkzv --no-verify-jwt`. **Hecho el 2026-11-02.** Verificado en produccion: `GET` con el token correcto devuelve el `hub.challenge` byte a byte (200), token incorrecto devuelve `403 verificacion_fallida`, y `POST` sin `WA_APP_SECRET` devuelve `503 servicio_misconfigurado` (fail-closed). El `503` desaparece cuando se cargue el App Secret de Meta.
    La funcion (`supabase/functions/wa-webhook/index.ts`, 535 lineas) valida el GET con `hub.challenge`
    (**403** si el token no coincide o esta vacio) y el POST con HMAC `X-Hub-Signature-256` contra
    `WA_APP_SECRET` (**401** sin firma valida y **cero** llamadas al RPC; **503** si falta el secreto),
