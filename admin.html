@@ -9306,7 +9306,13 @@ function tipoBadge(tipo) {
 async function enviarQREmail(email, nombre, eventoNombre, eventoFecha, eventoHora, eventoLugar, qrCode, tipo, cedula, eventoId) {
   try {
     // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
-    const { error: rpcErr } = await SB.rpc('enviar_email_registro', { p_email: email, p_nombre: nombre, p_qr_code: qrCode, p_evento_nombre: eventoNombre, p_evento_fecha: eventoFecha, p_evento_hora: eventoHora, p_evento_lugar: eventoLugar, p_idempotency_key: 'admin-qr:' + qrCode, p_tipo: 'registro', p_cedula: cedula || null, p_evento_id: eventoId || null });
+    // H9: la Edge Function send-ticket-email exige qrCode con ^https?:// (400 si no).
+    // El codigo corto 'QR-...' sigue siendo el valor de inscritos.qr_code (lo valida
+    // scanner.html); SOLO el parametro p_qr_code del correo lleva la URL publica.
+    const evMail = (typeof _eventos !== 'undefined' && _eventos) ? _eventos.find(e => e.id === eventoId) : null;
+    const qrUrlRaw = evMail ? landingUrl(evMail) : '';
+    const qrMailUrl = /^https?:\/\//i.test(qrUrlRaw) ? qrUrlRaw : 'https://taquilladirecta.com/';
+    const { error: rpcErr } = await SB.rpc('enviar_email_registro', { p_email: email, p_nombre: nombre, p_qr_code: qrMailUrl, p_evento_nombre: eventoNombre, p_evento_fecha: eventoFecha, p_evento_hora: eventoHora, p_evento_lugar: eventoLugar, p_idempotency_key: 'admin-qr:' + qrCode, p_tipo: 'registro', p_cedula: cedula || null, p_evento_id: eventoId || null });
   } catch(e) { console.warn('Email send failed:', e); }
 }
 

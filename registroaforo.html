@@ -1017,8 +1017,13 @@
             const ev = window.__ctxEv;
             try {
                 // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
+                // H9: la Edge Function send-ticket-email exige qrCode con ^https?://.
+                // El codigo corto 'QR-...' sigue en inscritos.qr_code (lo valida
+                // scanner.html); SOLO p_qr_code lleva la URL publica del evento.
+                const _mailOrigin = /^https?:\/\//i.test(window.location.origin) ? window.location.origin : 'https://taquilladirecta.com';
+                const _qrMailUrl = (ev && ev.slug) ? (_mailOrigin + '/evento.html?slug=' + encodeURIComponent(ev.slug)) : (_mailOrigin + '/');
                 const { error: rpcErr } = await getClient().rpc('enviar_email_registro', {
-                    p_email: emailAddr, p_nombre: nombre, p_qr_code: qr,
+                    p_email: emailAddr, p_nombre: nombre, p_qr_code: _qrMailUrl,
                     p_evento_nombre: ev ? (ev.nombre||'') : '',
                     p_evento_fecha: ev ? (ev.fecha||'') : '',
                     p_evento_hora: ev ? (ev.hora||'') : '',

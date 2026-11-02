@@ -15,6 +15,18 @@ Este documento define el punto de control estratégico y las directrices para la
 
 > **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-47 a -33) y las secciones vigentes 1-4.
 
+#### -55. Hito - HOTFIX DEL CRON DE RECORDATORIOS (H1 + H2b + H9, ADR-078b): aplicado en la base, smoke end-to-end PENDIENTE (TSK-126) (2026-11-01)
+
+*   **Que se estaba haciendo:** cerrar la deuda del canal de correo detectada en el runbook `B9-smoke-email.md`. Con H1 abierto, los **recordatorios automaticos nunca enviaron un correo**: el job `recordatorios-horarios` fallaba entero y `email_envios_log` no recibia ni una fila (`0` trazas), asi que el canal parecia "cableado" sin haber ejercitado nada.
+*   **HECHOS VERIFICADOS (baseline = archivo real, ADR-006, 2026-11-01):**
+    *   `(1)` **H1 (causa raiz):** `migrations/adr078_cron_recordatorios.sql:112` pasa `p_qr_code => ''`; `migrations/adr076_enviar_email_seguro.sql:791` lo declara obligatorio (`fn_adr076_texto_limpio(p_qr_code, 'qr_code', 600, true)`) -> **SQLSTATE `22023`** antes del `INSERT` de traza (`adr076:935`) y antes del bloque fail-open (`:869`, handler `:1061`). Excepcion no capturada.
+    *   `(2)` **H2b:** `p_nombre` vacio/NULL hacia que `jsonb_strip_nulls` borrara la clave y la Edge Function respondiera `400`.
+    *   `(3)` **H9 (misma familia, verificado en disco):** `admin.html` genera `qr_code = 'QR-' + UID()` (codigo corto) y `supabase/functions/send-ticket-email/index.ts:276-280` exige `^https?://` -> `400`. Un `COALESCE` sobre vacio/NULL **no bastaba**: el valor no esta vacio, solo no es URL: hizo falta un `CASE` por forma.
+    *   `(4)` **H6 (documental):** la Function **solo** lee `MAIL_FROM` (`index.ts:27` y `:660`); **`FROM_EMAIL` no existe en el archivo**. Nota `SUPERADO 2026-11-01` puesta bajo los hallazgos del hito -42.
+*   **Estado REAL:** `migrations/adr078b_fix_cron_recordatorios.sql` (**v1.0: H1 + H2b + H9**) esta **APLICADO en la base el 2026-11-01** (`CREATE OR REPLACE` de `fn_enviar_recordatorios_pendientes()`; fallback de `p_nombre` a `'Asistente'` y `CASE` para `p_qr_code`; no re-agenda el cron ni crea extensiones). La **v1.1** del mismo archivo (blindaje de slug NULL: cae a la raiz del dominio en vez de `...?slug=` vacio) esta **escrita y pendiente de re-aplicar**.
+*   **Lo que sigue (TSK-126):** **smoke end-to-end** por la ruta **RPC -> Function -> Resend** con al menos **1 fixture dentro de la ventana de 56 h**; el esperado deja de ser `22023` y pasa a ser un jsonb con `enviados >= 1`. Un dry-run con `0` filas **no valida nada**.
+*   **Verificacion de cierre (por archivo real, ADR-006):** `adr078_cron_recordatorios.sql:112` = `p_qr_code => ''` (**1**); `adr076_enviar_email_seguro.sql:791` = `fn_adr076_texto_limpio(p_qr_code, 'qr_code', 600, true)` (**1**); `adr076:935` = `INSERT INTO public.email_envios_log` (la traza; **`:934` es el `BEGIN` del bloque**, cita corregida en el runbook); `index.ts:278` = `^https?:\/\/` (**1**). **0 deploys de front, 0 cambios de codigo, 0 edicion de `.sql`** en este cierre documental.
+
 #### -54. Hito Mas Reciente - MAPA DE UBICACION POR COORDENADAS REALES DEL EVENTO (ADR-088) - codigo desplegado y verificado (`9b45058`); **MIGRACION PENDIENTE DE EJECUCION MANUAL** (2026-11-01)
 
 *   **Que se estaba haciendo:** el mapa de Ubicacion centraba mal porque `eventos.ubicacion` guarda **solo calle, sin ciudad** (`"Klandestino, Kr 4 # 19-56"`) y el kernel armaba el embed con `q=<ubicacion>&z=15`: Google no acierta el punto y el pin decorativo del silo quedaba sobre un lugar equivocado. Se paso el punto a **dato** (columnas `lat`/`lng`) y se dejo la direccion como **texto visible** bajo el mapa.
@@ -244,11 +256,13 @@ Este documento define el punto de control estratégico y las directrices para la
     *   **`p_inscrito_id` va NULL** en todos (los INSERT no hacen `.select('id')`).
     *   **`admin bacup.html:4774`** conserva la **anon key hardcodeada** (limpieza pendiente).
     *   **Hallazgo `MAIL_FROM`:** la Function lee `env("MAIL_FROM")` (`index.ts:660`), pero el secret existente se llama **`FROM_EMAIL`** (valor de 64 chars, no es email). Se usa el remitente por defecto **`Hostal Terraza <no-reply@hostalterraza.com>`** (verificar dominio verificado en Resend).
+        *   **SUPERADO 2026-11-01:** la Function **solo** lee `MAIL_FROM` (`index.ts:27` y `:660`); **`FROM_EMAIL` no existe en el archivo** (0 ocurrencias). El secret vigente es **`MAIL_FROM`**, ya migrado a `Taquilla Directa <no-reply@tickets.taquilladirecta.com>` y **verificado con correo real** (`01a103e4-b89e-73c8-b2f0-0d818f80d7c2`). Lo que sigue abierto es solo el residuo del secret `FROM_EMAIL` (obsoleto, valor de 64 hex, no borrado por Cero Borrado) -> decision de Direccion, no un defecto de la Function.
     *   **`ADR-075` sigue NO asignado** (hueco); **`ADR-077` existe**.
     *   **Seguridad:** rotar el **PAT de Supabase** usado en la sesion.
 *   **Riesgos activos:**
     *   **(1) Smoke de envio real NO ejecutado (B9).** El canal quedo cableado y la auth verificada, pero **nadie ha visto salir un correo por la ruta RPC en produccion**; `estado='enviado'` = encolado en `pg_net`, no entregado. >> **SUPERADO 2026-10-03 (hito -43): ya salio un correo real por Resend (id `01a103e4-b89e-73c8-b2f0-0d818f80d7c2`); resta el smoke end-to-end por RPC -> Function -> Resend.**
     *   **(2) `MAIL_FROM` vs `FROM_EMAIL`:** si el dominio no esta verificado en Resend, el envio puede fallar en silencio; hoy se usa el fallback por defecto.
+        *   **SUPERADO 2026-11-01:** el riesgo "hoy se usa el fallback por defecto" ya no aplica: la Function lee **solo `MAIL_FROM`** (`index.ts:27`/`:660`), el secret **`FROM_EMAIL` no existe** en el archivo (0 ocurrencias) y el dominio `tickets.taquilladirecta.com` esta **verificado en Resend** (MX/SPF/DKIM/DMARC). Envio real confirmado con id `01a103e4-b89e-73c8-b2f0-0d818f80d7c2`. Lo que queda es el **smoke end-to-end por RPC -> Function -> Resend** (TSK-126), no el remitente.
     *   **(3) `p_inscrito_id` NULL y gap `p_tipo`:** degradacion funcional aceptada en 2B (traza/idempotencia y fila "Tipo" de ticket).
     *   **(4) `admin bacup.html` con anon key hardcodeada** sigue en el arbol (deuda de secreto).
     *   **(5) D1 (`SELECT *` anonimo) sigue abierto.**

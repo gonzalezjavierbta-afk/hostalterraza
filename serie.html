@@ -991,10 +991,18 @@ async function enviarNotificacionesSerie(nombre, qr, emailAddr) {
   statusEl.textContent = T('serie.enviando_confirm');
   try {
     // ADR-077 FASE 2B: camino unico via RPC; la anon key ya no es credencial de envio (fail-closed en servidor).
+    // H9: la Edge Function send-ticket-email exige qrCode con ^https?:// (400 si no).
+    // El codigo corto 'QR-...' sigue en inscritos.qr_code (lo valida scanner.html) y
+    // en p_idempotency_key; SOLO p_qr_code lleva la URL publica del evento.
+    const _mailOrigin = /^https?:\/\//i.test(window.location.origin) ? window.location.origin : 'https://taquilladirecta.com';
+    const _evSlug = (sesionSeleccionada && sesionSeleccionada.slug) || '';
+    const _serieSlug = (serieActual && serieActual.slug) || '';
+    const _qrMailUrl = _evSlug ? (_mailOrigin + '/evento.html?slug=' + encodeURIComponent(_evSlug))
+      : (_serieSlug ? (_mailOrigin + '/serie.html?slug=' + encodeURIComponent(_serieSlug)) : (_mailOrigin + '/'));
     const { error: rpcErr } = await SB.rpc('enviar_email_registro', {
       p_email:           emailAddr,
       p_nombre:          nombre,
-      p_qr_code:         qr,
+      p_qr_code:         _qrMailUrl,
       p_evento_nombre:   (serieActual?.nombre || '') + (sesionSeleccionada?.nombre ? ' — ' + sesionSeleccionada.nombre : ''),
       p_evento_fecha:    sesionSeleccionada.fecha,
       p_evento_hora:     sesionSeleccionada.hora || '',
