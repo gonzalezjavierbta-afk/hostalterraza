@@ -136,6 +136,7 @@
         "playlist"
         "boletos"
         "form"
+        "guestlist"
         "video"
         "faq"
         "ubicacion"
@@ -1178,13 +1179,20 @@
     box-shadow: 0 0 0 6px rgba(19, 19, 19, 0.9);
 }
 
+/* MAPA OSCURO CON EL PIN NATIVO DE GOOGLE EN DORADO (misma tecnica medida en
+   f9b.css). NO usar grayscale ni sepia: el grayscale mata el color del pin y el
+   sepia dora TODO el mapa. La cadena correcta: invert(1) deja el mapa negro y
+   el rojo #EA4335 del pin de Google (tono 5) vira a cian; hue-rotate(232deg)
+   lo lleva a DORADO ~#D2AD3B, contra el objetivo #D4AF37 del silo. El negro y
+   los grises no tienen tono y no se mueven. El kernel inyecta su propio filter
+   INLINE en el <iframe>; un inline solo pierde ante una hoja con !important. */
 .tpl-f14 #db-mapa-container iframe,
 .Tpl-F14 #db-mapa-container iframe {
     display: block;
     width: 100%;
     height: 100%;
     border: 0;
-    filter: grayscale(1) contrast(1.08) brightness(0.86);
+    filter: invert(1) hue-rotate(232deg) saturate(0.7) brightness(1.1) contrast(1.1) !important;
 }
 
 /* Pin: cabeza + punta, ambos decorativos. SOLO se pintan cuando el kernel
@@ -1769,6 +1777,7 @@
             "lineup lineup"
             "cartel playlist"
             "boletos form"
+            "guestlist guestlist"
             "video video"
             "faq ubicacion"
             "sponsors sponsors"
@@ -2289,3 +2298,198 @@
             (q=<ubicacion>&z=15) y Google dibuja su propio pin en la direccion.
           Cero cambios en HTML/JS: solo CSS del silo.
    ========================================================================== */
+
+/* ==========================================================================
+   28. GUEST LIST - CARD DE BENEFICIO (#mod-guestlist)
+   Espejo de f9b.css:3690-3747 adaptado a los tokens f14 (naranja oxido sobre
+   papel kraft). El markup (evento-app.html L268-287) trae colores de ORO
+   inline y clases custom (gl-card, gold-border, gold-glow-hover,
+   gold-gradient-text) que NO estan definidas fuera de f9b: por eso se
+   redefinen aqui bajo el scope del silo. Aislamiento Atomico (Oro #9): todo
+   bajo .tpl-f14 / .Tpl-F14.
+   ========================================================================== */
+.tpl-f14 #mod-guestlist,
+.Tpl-F14 #mod-guestlist {
+    display: block !important;
+    grid-area: guestlist;
+    position: relative;
+    width: 100%;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+}
+
+/* El IoC global apaga todo section; la card nace data-empty="true" y el render
+   la puebla. El kernel pone el atributo solo: aqui solo se lee. */
+.tpl-f14 #mod-guestlist[data-empty="true"],
+.Tpl-F14 #mod-guestlist[data-empty="true"] {
+    display: none !important;
+}
+
+/* ANTI-HUECO: sin contenido, la fila guestlist sale de la rejilla. Se repite
+   la lista COMPLETA de areas sin el token guestlist (movil y >=767px). Si
+   :has no aplica, el peor caso es una fila de mas: row-gap es 0 y no rompe
+   nada. */
+.tpl-f14 #main-content-flow:has(#mod-guestlist[data-empty="true"]),
+.Tpl-F14 #main-content-flow:has(#mod-guestlist[data-empty="true"]) {
+    grid-template-areas:
+        "hero"
+        "ctas"
+        "lineup"
+        "cartel"
+        "playlist"
+        "boletos"
+        "form"
+        "video"
+        "faq"
+        "ubicacion"
+        "sponsors"
+        "footer";
+}
+
+@media (min-width: 767px) {
+    .tpl-f14 #main-content-flow:has(#mod-guestlist[data-empty="true"]),
+    .Tpl-F14 #main-content-flow:has(#mod-guestlist[data-empty="true"]) {
+        grid-template-areas:
+            "hero hero"
+            "ctas ctas"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos form"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer";
+    }
+}
+
+/* La card (1,2,0) gana al min-h-[580px] de Tailwind (0,1,0): 460px es el
+   piso real del silo, sin !important. */
+.tpl-f14 #mod-guestlist .gl-card,
+.Tpl-F14 #mod-guestlist .gl-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    min-height: 460px;
+    background-color: var(--f14-bg-2);
+}
+
+/* Clases custom del markup inexistentes fuera de f9b: equivalentes f14. */
+.tpl-f14 #mod-guestlist .gold-border,
+.Tpl-F14 #mod-guestlist .gold-border {
+    border: 1px solid rgba(227, 89, 37, 0.35);
+}
+
+.tpl-f14 #mod-guestlist .gold-glow-hover,
+.Tpl-F14 #mod-guestlist .gold-glow-hover {
+    transition: box-shadow 0.5s ease;
+}
+
+.tpl-f14 #mod-guestlist .gold-glow-hover:hover,
+.Tpl-F14 #mod-guestlist .gold-glow-hover:hover {
+    box-shadow: 0 0 30px rgba(227, 89, 37, 0.26), 0 0 64px rgba(227, 89, 37, 0.12);
+}
+
+.tpl-f14 #mod-guestlist .gold-gradient-text,
+.Tpl-F14 #mod-guestlist .gold-gradient-text {
+    background: linear-gradient(180deg, var(--f14-kraft-2) 0%, var(--f14-kraft) 48%, var(--f14-fuego) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Circulo del icono: el markup trae background/border/color inline de oro. */
+.tpl-f14 #mod-guestlist .w-14,
+.Tpl-F14 #mod-guestlist .w-14 {
+    background: rgba(227, 89, 37, 0.12) !important;
+    border-color: rgba(227, 89, 37, 0.45) !important;
+    color: var(--f14-fuego) !important;
+}
+
+/* El svg trae stroke="#D4AF37" como atributo de presentacion: el CSS le gana. */
+.tpl-f14 #mod-guestlist .w-14 svg,
+.Tpl-F14 #mod-guestlist .w-14 svg {
+    stroke: var(--f14-fuego);
+}
+
+.tpl-f14 #mod-guestlist #db-gl-badge,
+.Tpl-F14 #mod-guestlist #db-gl-badge {
+    color: var(--f14-fuego) !important;
+    background: rgba(227, 89, 37, 0.10) !important;
+    border-color: rgba(227, 89, 37, 0.4) !important;
+}
+
+/* Separador: el span.w-16 trae el gradiente dorado inline. */
+.tpl-f14 #mod-guestlist .w-16,
+.Tpl-F14 #mod-guestlist .w-16 {
+    background: linear-gradient(to right, transparent, rgba(227, 89, 37, 0.6), transparent) !important;
+}
+
+/* El titulo es <h2> dentro de la card: la base del silo no lo alcanza, pero se
+   refuerza por id para que mande sobre cualquier utilidad. Cero Cinzel. */
+.tpl-f14 #mod-guestlist #db-gl-title,
+.Tpl-F14 #mod-guestlist #db-gl-title {
+    width: 100%;
+    font-family: var(--f14-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 0.95;
+    font-size: clamp(1.5rem, 3.2vw, 1.875rem);
+    margin: 0 0 1rem 0;
+    color: transparent;
+}
+
+.tpl-f14 #mod-guestlist #db-gl-desc,
+.Tpl-F14 #mod-guestlist #db-gl-desc {
+    max-width: 28rem;
+    margin: 0.5rem 0 0 0;
+    color: var(--f14-mute) !important;
+    font-size: clamp(0.75rem, 1.6vw, 0.875rem);
+    line-height: 1.7;
+}
+
+.tpl-f14 #mod-guestlist #db-gl-cta,
+.Tpl-F14 #mod-guestlist #db-gl-cta {
+    background: var(--f14-fuego) !important;
+    color: #0E0E0E !important;
+    font-family: var(--f14-display);
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.tpl-f14 #mod-guestlist #db-gl-cta:hover,
+.tpl-f14 #mod-guestlist #db-gl-cta:focus-visible,
+.Tpl-F14 #mod-guestlist #db-gl-cta:hover,
+.Tpl-F14 #mod-guestlist #db-gl-cta:focus-visible {
+    background: var(--f14-fuego-2) !important;
+    color: #0E0E0E !important;
+}
+
+/* El pie trae border-top y color inline. */
+.tpl-f14 #mod-guestlist #db-gl-foot,
+.Tpl-F14 #mod-guestlist #db-gl-foot {
+    border-top-color: rgba(227, 89, 37, 0.25) !important;
+}
+
+.tpl-f14 #mod-guestlist #db-gl-foot p,
+.Tpl-F14 #mod-guestlist #db-gl-foot p {
+    color: var(--f14-mute) !important;
+    font-family: var(--f14-display);
+    letter-spacing: 0.22em;
+}
+
+/* Foto de fondo: cover + tinte discreto del silo (kraft + oxido apagado). */
+.tpl-f14 #mod-guestlist #db-gl-img,
+.Tpl-F14 #mod-guestlist #db-gl-img {
+    object-fit: cover;
+    filter: grayscale(0.4) sepia(0.28) saturate(1.05) contrast(1.06) brightness(0.72);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tpl-f14 #mod-guestlist .gold-glow-hover,
+    .Tpl-F14 #mod-guestlist .gold-glow-hover,
+    .tpl-f14 #mod-guestlist #db-gl-cta,
+    .Tpl-F14 #mod-guestlist #db-gl-cta {
+        transition: none;
+    }
+}
