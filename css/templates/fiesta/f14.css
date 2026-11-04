@@ -515,11 +515,13 @@
     background: none;
     border: 0;
     color: var(--f14-kraft-2);
-    font-size: clamp(0.98rem, 1.3vw, 1.22rem);
+    /* Tipografia unica para las cuatro lineas de las dos columnas: antes la
+       fecha iba a ~21px, la hora a ~14px y el lugar a 16px en escritorio. */
+    font-size: clamp(0.95rem, 1.25vw, 1.16rem);
     font-weight: 900;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     text-transform: uppercase;
-    line-height: 1.1;
+    line-height: 1.2;
     text-shadow: 0 1px 8px rgba(10, 10, 10, 0.85);
 }
 
@@ -529,8 +531,6 @@
     grid-column: 1;
     grid-row: 1;
     color: var(--f14-kraft);
-    font-size: clamp(1.05rem, 1.7vw, 1.55rem);
-    letter-spacing: 0.01em;
 }
 
 /* Columna 1, fila 2: hora. Su icono de reloj se oculta porque la maqueta usa
@@ -541,8 +541,6 @@
     grid-column: 1;
     grid-row: 2;
     padding-left: calc(clamp(20px, 2.2vw, 26px) + 0.5rem);
-    font-size: clamp(0.92rem, 1.15vw, 1.1rem);
-    letter-spacing: 0.07em;
     text-transform: none;
 }
 
@@ -562,8 +560,6 @@
     gap: 0.6rem;
     padding-left: clamp(0.9rem, 2vw, 1.8rem);
     border-left: 1px solid rgba(219, 200, 168, 0.32);
-    font-size: clamp(0.95rem, 1.25vw, 1.16rem);
-    line-height: 1.24;
 }
 
 /* Envoltorio del lugar: corta en 2-3 lineas como la maqueta (nombre /
