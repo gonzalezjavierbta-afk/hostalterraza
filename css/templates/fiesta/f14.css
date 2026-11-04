@@ -2073,12 +2073,13 @@
         font-size: clamp(2rem, 13.4vw, 3.3rem);
     }
 
-    /* Subtitulo con separadores: 32 caracteres a 8.8px y 0.13em miden 204px,
-       el ancho de la linea mas larga del titulo (205px). */
+    /* Subtitulo con separadores: mas grande y pegado al titulo, con el tracking
+       justo para no pasar del ancho de INVERSOS (205px). */
     .tpl-f14 #mod-hero .hero-subtitle,
     .Tpl-F14 #mod-hero .hero-subtitle {
-        font-size: 0.55rem;
-        letter-spacing: 0.13em;
+        margin-top: 0.45rem;
+        font-size: 0.6rem;
+        letter-spacing: 0.075em;
         white-space: nowrap;
     }
 
@@ -2086,47 +2087,63 @@
        contenida; el lugar puede envolver sin desbordar (minmax(0,1fr)). */
     .tpl-f14 #mod-hero-meta,
     .Tpl-F14 #mod-hero-meta {
+        position: relative;
         display: grid;
         grid-template-columns: auto minmax(0, 1fr);
-        column-gap: 0.9rem;
+        column-gap: 0.5rem;
         row-gap: 0.06rem;
         align-items: start;
-        margin-bottom: calc(var(--f14-cd-h) + 1rem);
+        letter-spacing: 0;
+        /* Deja el bloque 14px bajo el rasgado (344): hero 562 - 162 - 42. */
+        margin-bottom: 162px;
         padding: 0 1.15rem;
     }
 
+    /* Misma tipografia en las dos filas de las dos columnas. */
     .tpl-f14 #mod-hero-meta .meta-item,
     .Tpl-F14 #mod-hero-meta .meta-item {
         gap: 0.4rem;
-        font-size: 0.82rem;
+        font-size: 0.9rem;
+        letter-spacing: 0;
+    }
+
+    /* Iconos a la altura de las dos lineas (42px). El calendario sale del
+       flujo del item 1 (que solo ocupa la fila 1) y se ancla al contenedor. */
+    .tpl-f14 #mod-hero-meta .meta-item:nth-child(1) .meta-svg,
+    .Tpl-F14 #mod-hero-meta .meta-item:nth-child(1) .meta-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 42px;
     }
 
     .tpl-f14 #mod-hero-meta .meta-item:nth-child(1),
     .Tpl-F14 #mod-hero-meta .meta-item:nth-child(1) {
-        font-size: clamp(0.95rem, 4.2vw, 1.15rem);
+        padding-left: 44px;
+        font-size: 0.9rem;
     }
 
     .tpl-f14 #mod-hero-meta .meta-item:nth-child(2),
     .Tpl-F14 #mod-hero-meta .meta-item:nth-child(2) {
-        padding-left: calc(18px + 0.4rem);
-        /* La hora manda visualmente sobre la fecha: se sube a 1.4rem y se
-           libera del uppercase del silo para conservar "8:00 p.m". */
-        font-size: 1.4rem;
+        padding-left: 44px;
+        font-size: 0.9rem;
         font-weight: 800;
-        line-height: 1.05;
+        line-height: 1.1;
     }
 
     .tpl-f14 #mod-hero-meta .meta-item:nth-child(3),
     .Tpl-F14 #mod-hero-meta .meta-item:nth-child(3) {
+        gap: 0.3rem;
         padding-left: 0.7rem;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         line-height: 1.22;
     }
 
-    .tpl-f14 #mod-hero-meta .meta-svg,
-    .Tpl-F14 #mod-hero-meta .meta-svg {
-        width: 18px;
-        height: 18px;
+    .tpl-f14 #mod-hero-meta .meta-item:nth-child(3) .meta-svg,
+    .Tpl-F14 #mod-hero-meta .meta-item:nth-child(3) .meta-svg {
+        width: 40px;
+        height: 42px;
     }
 
     .tpl-f14 #unified-frame,
