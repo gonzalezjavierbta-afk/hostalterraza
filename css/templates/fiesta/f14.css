@@ -2030,8 +2030,12 @@
 
     .tpl-f14 #mod-hero,
     .Tpl-F14 #mod-hero {
-        min-height: 280px;
-        padding: 4.6rem 1.15rem calc(var(--f14-cd-h) + 4.7rem);
+        /* 465px = rasgado (81.03vw, ~316px a 390) + 8px de aire + meta (51px
+           + 90px de margen inferior) + countdown (74px). Asi el meta y el
+           contador caen sobre el negro, despues del rasgado, sin tocar el
+           orden del DOM ni el anclaje align-self:end de la celda hero. */
+        min-height: 465px;
+        padding: 6.4rem 1.15rem calc(var(--f14-cd-h) + 5.4rem);
         /* Pieza vertical propia del silo (1086x1448). La imagen horizontal del
            evento, recortada por `cover` en un contenedor casi cuadrado, perdia
            al sujeto y dejaba el texto sobre una zona clara. El drawer del kernel
@@ -2053,15 +2057,21 @@
         max-width: 100%;
     }
 
+    /* El titulo baja ~20% para liberar el rostro de la pieza vertical: la linea
+       mas larga pasa de 251px a 205px (+18px de padding = 223, antes de los
+       ~240px donde arranca la cara). */
     .tpl-f14 #event-title,
     .Tpl-F14 #event-title {
-        font-size: clamp(2.4rem, 17vw, 4rem);
+        font-size: clamp(2rem, 13.4vw, 3.3rem);
     }
 
+    /* Subtitulo con separadores: 32 caracteres a 8.8px y 0.13em miden 204px,
+       el ancho de la linea mas larga del titulo (205px). */
     .tpl-f14 #mod-hero .hero-subtitle,
     .Tpl-F14 #mod-hero .hero-subtitle {
-        font-size: 0.6rem;
-        letter-spacing: 0.22em;
+        font-size: 0.55rem;
+        letter-spacing: 0.13em;
+        white-space: nowrap;
     }
 
     /* Meta en 2 columnas tambien en movil: columnas mas juntas y tipografia
