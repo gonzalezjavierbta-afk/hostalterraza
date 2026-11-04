@@ -2080,13 +2080,16 @@
 
     /* Meta en 2 columnas tambien en movil. Filas de 16px y row-gap 0: la fecha
        ocupa exactamente la fila 1 y la hora la fila 2, de modo que sus lineas
-       coinciden con las dos del lugar en la columna derecha. */
+       coinciden con las dos del lugar en la columna derecha. Las pistas son
+       `auto` y el grid se centra: los dos margenes visibles quedan iguales en
+       lugar de dejar 18px a la izquierda y 48px a la derecha. */
     .tpl-f14 #mod-hero-meta,
     .Tpl-F14 #mod-hero-meta {
         position: relative;
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-columns: auto minmax(0, auto);
         grid-template-rows: 16px 16px;
+        justify-content: center;
         column-gap: 0.4rem;
         row-gap: 0;
         align-items: start;
@@ -2108,8 +2111,10 @@
     }
 
     /* Iconos de 36px para cubrir las dos filas. El calendario sale del flujo
-       del item 1 (que solo ocupa la fila 1) y se ancla al contenedor; el
-       padding-left de 34px deja ~2px entre el glifo y el texto. */
+       del item 1 (que solo ocupa la fila 1) y se ancla a SU celda, no al
+       contenedor: con left:0 sobre el contenedor se pegaba al borde de la
+       pantalla y rompia el centrado. El padding-left de 34px deja ~2px entre
+       el glifo y el texto. */
     .tpl-f14 #mod-hero-meta .meta-item:nth-child(1) .meta-svg,
     .Tpl-F14 #mod-hero-meta .meta-item:nth-child(1) .meta-svg {
         position: absolute;
@@ -2121,6 +2126,7 @@
 
     .tpl-f14 #mod-hero-meta .meta-item:nth-child(1),
     .Tpl-F14 #mod-hero-meta .meta-item:nth-child(1) {
+        position: relative;
         padding-left: 34px;
         font-size: 0.9rem;
         line-height: 16px;
