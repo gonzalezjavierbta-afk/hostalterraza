@@ -2032,7 +2032,14 @@
     .Tpl-F14 #mod-hero {
         min-height: 280px;
         padding: 4.6rem 1.15rem calc(var(--f14-cd-h) + 4.7rem);
+        /* Pieza vertical propia del silo (1086x1448). La imagen horizontal del
+           evento, recortada por `cover` en un contenedor casi cuadrado, perdia
+           al sujeto y dejaba el texto sobre una zona clara. El drawer del kernel
+           es `style.background-image` (inline normal), asi que la declaracion
+           !important de autor gana sin tocar evento-app.html. */
+        background-image: url("../../../assets/f14-hero-mobile.jpg") !important;
         background-position: 82% 0% !important;
+        background-size: cover !important;
     }
 
     .tpl-f14 #mod-hero::before,
