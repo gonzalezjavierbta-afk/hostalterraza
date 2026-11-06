@@ -84,6 +84,20 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .wiz-pill.active .wiz-pill-n{background:var(--gold);color:#fff;border-color:var(--gold)}
 .wiz-step{display:none}
 .wiz-step.wiz-visible{display:block}
+/* ADN Visual: layout de 2 columnas con preview lateral (solo >=1280px) */
+.ld-adn-layout{display:grid;grid-template-columns:1fr;gap:1rem;align-items:start}
+.ld-adn-main{min-width:0}
+.ld-adn-aside{display:none}
+.ld-adn-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.35rem}
+.ld-adn-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.ld-adn-theme{font-size:12.5px;font-weight:600;color:var(--ink2);margin-bottom:.5rem}
+.ld-adn-frame-wrap{width:100%}
+#ld-adn-preview-frame{width:100%;aspect-ratio:9/16;border:1px solid var(--border);border-radius:var(--rsm);background:#0b0b0b;display:block}
+.ld-adn-empty{font-size:12px;color:var(--ink3);line-height:1.55}
+.ld-adn-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:.35rem}
+.ld-adn-chip{font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:999px;color:var(--ink3)}
+.ld-adn-mobile{display:inline-flex;margin-top:.6rem}
+@media(min-width:1280px){.ld-adn-layout{grid-template-columns:1fr 380px;gap:1.25rem;align-items:start}.ld-adn-aside{display:block}#ld-adn-preview{position:sticky;top:1rem}.ld-adn-mobile{display:none}}
 .wiz-cat-card{border:2px solid var(--border);border-radius:var(--r);padding:1.1rem .75rem;cursor:pointer;text-align:center;transition:.15s;background:#fff}
 .wiz-cat-card:hover{border-color:var(--gold-border)}
 .wiz-cat-card.active{border-color:var(--gold);background:var(--gold-bg)}
@@ -528,8 +542,12 @@ tr:hover td{background:var(--surface)}
 
         <!-- Config Landing (plantilla visual) — visible si el modo incluye landing -->
         <div id="ev-landing-config" style="display:none">
+        <!-- ADN Visual: el layout envuelve los pasos 2 y 3 para que el panel del
+             evento de ejemplo persista al pasar a Atomos de Contenido. -->
+        <div class="ld-adn-layout">
         <!-- ══ Sub-paso 2 · ADN Visual (plantilla + módulos + efectos) ══ -->
         <div class="wiz-step" data-wiz-step="2">
+        <div class="ld-adn-main">
           <!-- Selector de themes -->
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem" data-cat="cinematografia">🎬 Cinematografía</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" id="ev-theme-cards" data-cat="cinematografia">
@@ -696,6 +714,7 @@ tr:hover td{background:var(--surface)}
             <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="ld-fx-parallax" checked style="width:13px;height:13px;accent-color:var(--gold)"> Parallax</label>
           </div>
 
+        </div><!-- /ld-adn-main -->
         </div><!-- /wiz-step 2 -->
 
         <!-- ══ Sub-paso 3 · Átomos de Contenido (campos dinámicos por tipo) ══ -->
@@ -871,6 +890,26 @@ tr:hover td{background:var(--surface)}
             <span style="color:var(--gold)">●</span> Plantilla: <strong id="ld-preview-theme-name">—</strong>
           </div>
         </div><!-- /wiz-step 3 -->
+        <aside id="ld-adn-preview" class="ld-adn-aside" aria-label="Vista previa del evento de ejemplo">
+          <div class="ld-adn-head">
+            <span class="ld-adn-title">Vista previa</span>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="ldAdnAbrirPestana()">Abrir en pestana</button>
+          </div>
+          <div id="ld-adn-theme-name" class="ld-adn-theme">Sin plantilla</div>
+          <div class="ld-adn-frame-wrap">
+            <iframe id="ld-adn-preview-frame" title="Preview del evento de ejemplo" loading="lazy"></iframe>
+          </div>
+          <div id="ld-adn-empty" class="ld-adn-empty">
+            <p style="margin:0 0 .35rem">Elige una plantilla con silo CSS para ver el evento de ejemplo.</p>
+            <p style="margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em">Templates con silo</p>
+            <div class="ld-adn-chips">
+              <span class="ld-adn-chip">f1</span><span class="ld-adn-chip">f5</span><span class="ld-adn-chip">f6</span><span class="ld-adn-chip">f7</span><span class="ld-adn-chip">f8</span><span class="ld-adn-chip">f9</span><span class="ld-adn-chip">f9b</span><span class="ld-adn-chip">f11</span><span class="ld-adn-chip">f12</span><span class="ld-adn-chip">f13</span><span class="ld-adn-chip">f14</span><span class="ld-adn-chip">c1</span><span class="ld-adn-chip">b2</span><span class="ld-adn-chip">b3</span><span class="ld-adn-chip">b4</span><span class="ld-adn-chip">b5</span>
+            </div>
+          </div>
+        </aside>
+        <!-- Boton movil FUERA del aside: el aside se oculta con clase <1280px -->
+        <button type="button" class="btn btn-gold btn-sm ld-adn-mobile" onclick="ldAdnVerMuestra()">Ver pagina de ejemplo</button>
+        </div><!-- /ld-adn-layout -->
 
         </div><!-- /ev-landing-config -->
       </div><!-- /contenedor compartido pasos 2-3 -->
@@ -3873,6 +3912,237 @@ const _THEME_FICHA = {
     t: ['Verde oliva y crema, tono raices.','Serif Playfair con Geist 900.','Comunidad, agro y causas locales.','Requeridos: historia, objetivo e impacto.'] }
 };
 
+// === Pagina de ejemplo por theme (ADR-056 p.7) - muestra sintetica, cero Supabase ===
+// Desde el catalogo de ADN Visual cualquier card puede abrir una landing de
+// ejemplo aunque no exista un evento real de esa plantilla: se arma un payload
+// con la MISMA forma del contrato {ev, content, theme, template_id,
+// categoria_slug, effects} y la monta el adapter __evDesdePreview del kernel.
+const _IMG_MUESTRA = 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+
+// Silos con CSS registrado en css/templates/**. Sin silo no hay render real:
+// _muestraPayload() devuelve null y la ficha avisa en vez de montar algo vacio.
+const _TPL_CON_SILO = ['f1','f5','f6','f7','f8','f9','f11','f12','f9b','f14','f13','c1','b2','b3','b4','b5'];
+
+// Mapa SOLO para la vista previa (NO crea eventos): cine y campana todavia no
+// tienen silo en _THEME_TPL, pero su evento de ejemplo si renderiza con el silo
+// real c1 / b2..b5. Las 4 plantillas legacy de fiesta no tienen CSS propio: se
+// muestran con el silo base f1 para que toda card tenga pagina de ejemplo.
+// _THEME_TPL y _TPL_THEME quedan intactos a proposito.
+const _THEME_TPL_PREVIEW = {
+  'arthouse':'c1','premiere-gold':'c1','neon-cult-cine':'c1','interactive-cine':'c1',
+  'solidario-moderno':'b2','urgente-impactante':'b3','tech-futurista':'b4','vintage-organico':'b5',
+  'tropical-hostel':'f1','rooftop-sunset':'f1','underground':'f1','elegant-cocktail':'f1'
+};
+
+// Canal de efectos de la muestra. _default replica el estado inicial de los
+// checkboxes #ld-fx-* (grain/glow/vhs OFF, parallax ON). Los overrides copian
+// los flags que _aplicarPresetTheme fija por theme (ADR-055 p.8); hoy solo
+// 'mistico-nocturno' declara preset explicito, el resto hereda _default.
+const _THEME_FX = {
+  _default:           { grain: false, glow: false, vhs: false, parallax: true },
+  'mistico-nocturno': { grain: false, glow: false, vhs: false, parallax: true },
+};
+
+// Contenido de muestra por categoria. Claves reales que consume el renderer;
+// toda imagen apunta al unico asset permitido (no hay assets locales) y las
+// URLs externas se evitan a proposito (playlist/trailer usan '#').
+const _SAMPLE_EVENTS = {
+  fiesta: {
+    ev: {
+      nombre: 'Noche de Muestra - Terraza House',
+      slug: 'muestra-fiesta-terraza',
+      fecha: '2026-12-19',
+      hora: '22:00',
+      ubicacion: 'Terraza Hostal Terraza, Bogota',
+      descripcion: 'Muestra sintetica de landing de fiesta: lineup, boletos, galeria y ubicacion.',
+      poster_url: _IMG_MUESTRA,
+      imagen_url: _IMG_MUESTRA,
+      aforo_max: 120,
+      org_nombre: 'Hostal Terraza',
+      plan: 'freemium',
+      fase_landing: 'completa'
+    },
+    content: {
+      subtitulo: 'Tres cabinas, una terraza y house hasta el amanecer',
+      descripcion: 'Pagina de ejemplo del silo de fiesta: lineup por posiciones, preventa y taquilla, galeria, FAQ y mapa.',
+      dj_lineup: [
+        { nombre: 'DJ Muestra Uno', foto: _IMG_MUESTRA, resena: 'Headliner: house organico con percusion en vivo.', hora: '22:00' },
+        { nombre: 'DJ Muestra Dos', foto: _IMG_MUESTRA, resena: 'Apertura con disco y funk selecto.', hora: '20:30' },
+        { nombre: 'DJ Muestra Tres', foto: _IMG_MUESTRA, resena: 'Cierre techno melodico hasta el final.', hora: '01:00' }
+      ],
+      boletos: { preventa: '50000', taquilla: '70000' },
+      tickets_info: 'Preventa en linea hasta el 18 de diciembre. Taquilla el dia del evento: efectivo y Nequi.',
+      gallery: [_IMG_MUESTRA, _IMG_MUESTRA, _IMG_MUESTRA],
+      faq: [
+        { q: 'Hay edad minima?', a: 'Si: mayores de 18 anos con documento.' },
+        { q: 'Hay parqueadero?', a: 'Cupo limitado por orden de llegada.' },
+        { q: 'Se puede fumar?', a: 'Solo en la zona de terraza habilitada.' }
+      ],
+      dresscode: 'Casual elegante: sin chanclas ni gorra.',
+      guest_list: ['Invitado Uno', 'Invitado Dos', 'Invitado Tres'],
+      playlist_url: '#',
+      sponsors: [{ nombre: 'Marca Muestra', logo_url: _IMG_MUESTRA }],
+      mapa: '',
+      lat: 4.6533,
+      lng: -74.0576,
+      cta_final: { titulo: 'Ultimas entradas', subtitulo: 'Asegura la tuya antes del viernes.', boton_texto: 'Comprar boleto' },
+      footer: { tagline: 'Hostal Terraza - ExploraCO' },
+      whatsapp: '573102465591',
+      whatsapp_msg: 'Hola, quiero informacion de la noche de muestra.'
+    }
+  },
+  cine: {
+    ev: {
+      nombre: 'Funcion de Muestra - Cineclub',
+      slug: 'muestra-cine-club',
+      fecha: '2026-12-12',
+      hora: '19:30',
+      ubicacion: 'Sala Hostal Terraza, Bogota',
+      descripcion: 'Muestra sintetica de landing de cinematografia: poster, trailer, banners y boletos.',
+      poster_url: _IMG_MUESTRA,
+      imagen_url: _IMG_MUESTRA,
+      aforo_max: 60,
+      org_nombre: 'Hostal Terraza',
+      plan: 'freemium',
+      fase_landing: 'completa'
+    },
+    content: {
+      poster_url: _IMG_MUESTRA,
+      trailer_url: '#',
+      banners: [_IMG_MUESTRA, _IMG_MUESTRA],
+      gallery: [_IMG_MUESTRA, _IMG_MUESTRA],
+      tickets_info: 'Funcion unica 19:30. Boleto general y descuento para estudiantes.',
+      faq: [
+        { q: 'Hay funciones adicionales?', a: 'Solo la funcion de las 19:30.' },
+        { q: 'Se permite ingreso despues de iniciar?', a: 'Si, con acomodacion segun disponibilidad.' }
+      ],
+      mapa: '',
+      lat: 4.6533,
+      lng: -74.0576,
+      cta_final: { titulo: 'Reserva tu silla', subtitulo: 'El aforo de la sala es limitado.', boton_texto: 'Reservar' },
+      footer: { tagline: 'Hostal Terraza - ExploraCO' }
+    }
+  },
+  campana: {
+    ev: {
+      nombre: 'Campana de Muestra - Techo para todos',
+      slug: 'muestra-campana-techo',
+      fecha: '2026-12-31',
+      hora: '18:00',
+      ubicacion: 'Bogota',
+      descripcion: 'Muestra sintetica de landing de campana: historia, objetivo, impacto y equipo.',
+      poster_url: _IMG_MUESTRA,
+      imagen_url: _IMG_MUESTRA,
+      aforo_max: 200,
+      org_nombre: 'Hostal Terraza',
+      plan: 'freemium',
+      fase_landing: 'completa'
+    },
+    content: {
+      historia: {
+        titulo: 'De una terraza a un techo digno',
+        texto: 'La campana de ejemplo reune materiales y mano de obra para reparar techos de cuatro barrios. Cada aporte se convierte en planchas, tornillos y horas de trabajo.',
+        imagen: _IMG_MUESTRA
+      },
+      objetivo: { meta: 12000000, recaudado: 4350000, moneda: 'COP', donantes: 87 },
+      impacto: [
+        { etiqueta: 'Familias', valor: '120', icono: 'grupo' },
+        { etiqueta: 'Kits entregados', valor: '340', icono: 'caja' },
+        { etiqueta: 'Barrios', valor: '4', icono: 'mapa' }
+      ],
+      equipo: [
+        { nombre: 'Lider de muestra', rol: 'Coordinacion en terreno', foto: _IMG_MUESTRA },
+        { nombre: 'Voluntaria de muestra', rol: 'Logistica y entregas', foto: _IMG_MUESTRA }
+      ],
+      experiencias: [
+        { titulo: 'Jornada de armado', tag: 'comunidad', texto: 'Voluntarios y vecinos arman los kits en una sola jornada.' }
+      ],
+      gallery: [_IMG_MUESTRA, _IMG_MUESTRA],
+      mapa: '',
+      lat: 4.6533,
+      lng: -74.0576,
+      cta_final: { titulo: 'Suma tu aporte', subtitulo: 'Cada kit cambia un techo.', boton_texto: 'Donar ahora' },
+      footer: { tagline: 'Hostal Terraza - ExploraCO' },
+      whatsapp: '573102465591',
+      whatsapp_msg: 'Hola, quiero sumarme a la campana de muestra.'
+    }
+  }
+};
+
+// Payload de muestra para un theme. Null cuando no hay silo CSS registrado:
+// el kernel renderizaria vacio y seria peor que un aviso honesto.
+function _muestraPayload(theme) {
+  theme = String(theme || '');
+  const tpl = String(_THEME_TPL_PREVIEW[theme] || _THEME_TPL[theme] || theme).toLowerCase();
+  if (_TPL_CON_SILO.indexOf(tpl) === -1) return null;
+  const cat = String(_THEME_TYPE[theme] || '');
+  const key = (cat === 'cinematografia') ? 'cine' : cat;
+  const base = _SAMPLE_EVENTS[key];
+  if (!base || !cat) return null;
+  const payload = JSON.parse(JSON.stringify(base));
+  payload.template_id = tpl;
+  payload.categoria_slug = cat;
+  payload.theme = theme;
+  payload.effects = JSON.parse(JSON.stringify(_THEME_FX[theme] || _THEME_FX._default));
+  // La muestra respeta la paleta de la ficha: 2 = Primario, 3 = Acento.
+  const ficha = _THEME_FICHA[theme] || null;
+  if (ficha && Array.isArray(ficha.c)) {
+    if (ficha.c[2]) payload.content.color_primario = ficha.c[2][1];
+    if (ficha.c[3]) payload.content.accent_color = ficha.c[3][1];
+  }
+  return payload;
+}
+
+function abrirVistaPreviaDeMuestra(theme) {
+  const payload = _muestraPayload(theme);
+  if (!payload) {
+    alert('Esta plantilla aun no tiene silo CSS registrado: no hay pagina de ejemplo.');
+    return;
+  }
+  // abrirVistaPrevia respeta el payload recibido: no reconstruye el borrador.
+  abrirVistaPrevia(payload);
+}
+
+// === ADN Visual: panel lateral con el evento de ejemplo de la plantilla ===
+// Muestra el sample ESTATICO (_SAMPLE_EVENTS), no el borrador del formulario.
+// El iframe se recarga con debounce para no encadenar cargas al cambiar de card.
+let _ldAdnTimer = null;
+
+function _ldAdnSyncPreview(theme) {
+  theme = theme || _ldThemeSeleccionado || null;
+  const frame = document.getElementById('ld-adn-preview-frame');
+  const empty = document.getElementById('ld-adn-empty');
+  const nameEl = document.getElementById('ld-adn-theme-name');
+  const ficha = theme ? _THEME_FICHA[theme] : null;
+  if (nameEl) nameEl.textContent = (ficha && ficha.n) || theme || 'Sin plantilla';
+  const payload = theme ? _muestraPayload(theme) : null;
+  if (_ldAdnTimer) { clearTimeout(_ldAdnTimer); _ldAdnTimer = null; }
+  if (!payload) {
+    if (frame) frame.removeAttribute('src');
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (!_guardarPreviewPayload(payload)) return;
+  if (empty) empty.style.display = 'none';
+  _ldAdnTimer = setTimeout(function () {
+    _ldAdnTimer = null;
+    if (frame) frame.src = 'evento-app.html?preview=1&_=' + Date.now();
+  }, 250);
+}
+
+function ldAdnVerMuestra() {
+  abrirVistaPreviaDeMuestra(_ldThemeSeleccionado);
+}
+
+function ldAdnAbrirPestana() {
+  const payload = _muestraPayload(_ldThemeSeleccionado);
+  if (!payload) {
+    alert('Esta plantilla aun no tiene silo CSS registrado: no hay pagina de ejemplo.');
+    return;
+  }
+  abrirVistaPreviaPestana(payload);
+}
+
 let _fichaThemeEventUrl = '';
 
 // Primer evento de muestra: (1) template_id == silo del theme; (2) primer
@@ -3923,7 +4193,9 @@ function abrirFichaTheme(theme) {
       evBox.innerHTML = '<p style="font-size:12px;color:var(--ink3);margin-bottom:.5rem">Evento de muestra: <b>' + esc(ev.nombre || ev.slug || ev.id) + '</b></p>' +
         '<button class="btn btn-gold btn-sm" onclick="abrirEventoMuestra()">Ver evento de muestra</button>';
     } else {
-      evBox.innerHTML = '<button class="btn btn-ghost btn-sm" disabled style="opacity:.55;cursor:not-allowed">Sin evento de muestra</button>';
+      // Sin evento real de la plantilla: la card sigue ofreciendo una landing
+      // de ejemplo (_SAMPLE_EVENTS) en vez de un boton muerto.
+      evBox.innerHTML = '<button class="btn btn-ghost btn-sm" onclick="abrirVistaPreviaDeMuestra(&#39;' + esc(theme) + '&#39;)">Ver pagina de ejemplo</button>';
     }
   }
   const mod = document.getElementById('mod-ficha-tpl');
@@ -4003,6 +4275,10 @@ function seleccionarTheme(theme, opts) {
   if (nameEl) nameEl.textContent   = names[theme] || theme;
 
   try { sessionStorage.setItem('ld_theme', theme); } catch(e) {}
+
+  // ADN Visual: el panel lateral muestra la pagina de ejemplo de la plantilla
+  // confirmada (nunca el borrador). El debounce vive en el helper.
+  try { _ldAdnSyncPreview(theme); } catch(e) {}
 }
 
 // Aplica el preset ADN Visual del template sobre los checkboxes de la categoria
@@ -4353,6 +4629,9 @@ function wizShow(step) {
   // El paso 1 Cimientos se dibuja segun la capacidad de lineas del template: al
   // entrar (o al volver desde el paso 2) se re-sincroniza.
   if (step === 1 && typeof window.syncLineasSegunTemplate === 'function') window.syncLineasSegunTemplate();
+  // ADN Visual: al entrar al paso 2 se re-sincroniza el panel de ejemplo con la
+  // plantilla ya elegida (creacion o edicion).
+  if (step === 2) { try { _ldAdnSyncPreview(_ldThemeSeleccionado); } catch(e) {} }
   document.querySelectorAll('.wiz-pill').forEach(p => {
     const n = Number(p.dataset.pill);
     p.classList.toggle('active', n === step);
@@ -6838,8 +7117,8 @@ function _previewValido(payload) {
   return true;
 }
 
-function abrirVistaPrevia() {
-  const payload = _buildPreviewPayload();
+function abrirVistaPrevia(payload) {
+  payload = payload || _buildPreviewPayload();
   if (!_previewValido(payload)) return;
   if (!_guardarPreviewPayload(payload)) return;
   const mod = document.querySelector('[data-preview-modal]');
@@ -6848,8 +7127,8 @@ function abrirVistaPrevia() {
   if (mod) mod.style.display = 'flex';
 }
 
-function abrirVistaPreviaPestana() {
-  const payload = _buildPreviewPayload();
+function abrirVistaPreviaPestana(payload) {
+  payload = payload || _buildPreviewPayload();
   if (!_previewValido(payload)) return;
   if (!_guardarPreviewPayload(payload)) return;
   window.open('evento-app.html?preview=1', '_blank');
