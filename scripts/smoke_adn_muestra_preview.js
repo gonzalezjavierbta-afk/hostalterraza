@@ -160,6 +160,7 @@ ok('cards: 22 clic seleccionan plantilla', count(html, 'onclick="seleccionarThem
 ok('cards: ninguna abre la ficha directamente', count(html, 'onclick="abrirFichaTheme(') === 0, String(count(html, 'onclick="abrirFichaTheme(')));
 ok('descripcion: parrafo + boton Mas informacion', html.indexOf('id="ld-adn-desc"') > -1 && html.indexOf('id="ld-adn-more"') > -1);
 ok('descripcion: ldAdnMasInfo abre la ficha', html.indexOf('function ldAdnMasInfo()') > -1 && html.indexOf('abrirFichaTheme(_ldThemeSeleccionado)') > -1);
+ok('descripcion: acceso movil a Mas informacion', count(html, 'onclick="ldAdnMasInfo()"') === 2, String(count(html, 'onclick="ldAdnMasInfo()"')));
 ok('wiring: _ldAdnSyncPreview definida', html.indexOf('function _ldAdnSyncPreview(theme)') > -1);
 ok('wiring: sync al confirmar plantilla', count(html, '_ldAdnSyncPreview(theme)') >= 1);
 ok('wiring: sync al entrar al paso 2', html.indexOf('if (step === 2)') > -1 && html.indexOf('_ldAdnSyncPreview(_ldThemeSeleccionado)') > -1);
