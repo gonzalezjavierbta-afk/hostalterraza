@@ -295,6 +295,12 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        // Fallback ADR-008 de avatar: silueta data-URI (misma que admin.html).
+        // Unica definicion del literal en este bloque; los demas consumidores la referencian.
+        const __AVATAR_FALLBACK_IMG = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="#e8e6e1"/><circle cx="24" cy="18" r="7" fill="#b9b3a6"/><rect x="11" y="30" width="26" height="11" rx="5" fill="#b9b3a6"/></svg>'
+        );
+
         function logStatus(m, t = 'INFO') {
             const colors = { 'INFO':'#00ff88', 'LINK':'#f1c40f', 'TIME':'#9b59b6', 'TRACE':'#e67e22', 'DEBUG':'#3498db', 'ERROR':'#ff4d4d' };
             console.log(`%c[${new Date().toLocaleTimeString()}] [${t}] ${m}`, `color: ${colors[t] || '#fff'}; font-weight: bold;`);
@@ -685,10 +691,10 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
     const equipoGridEl = document.getElementById('db-equipo-grid');
     if (equipoGridEl) {
         equipoGridEl.innerHTML = equipoList.map(p => {
-            const foto = p.foto || 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+            const foto = p.foto || __AVATAR_FALLBACK_IMG;
             return `
             <div class="equipo-item">
-                <img src="${foto}" class="equipo-avatar" onerror="this.src='https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';">
+                <img src="${foto}" class="equipo-avatar" onerror="this.onerror=null;this.src='${__AVATAR_FALLBACK_IMG}';">
                 <span class="equipo-nombre">${p.nombre || '--'}</span>
                 <span class="equipo-rol">${p.rol || ''}</span>
             </div>`;
@@ -772,7 +778,7 @@ if (document.getElementById('db-poster-img')) {
             // {nombre,foto,resena,hora,instagram,youtube,tiktok,web,spotify} [cite: 821] + mejora v223
             const isObj = dj && typeof dj === 'object';
             const name   = isObj ? (dj.nombre || '') : String(dj || '');
-            const photo  = (isObj && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
+            const photo  = (isObj && dj.foto) ? dj.foto : __AVATAR_FALLBACK_IMG;
             const resena = (isObj && dj.resena) ? dj.resena : '';
             const hora   = (isObj && dj.hora) ? dj.hora : '';
             const rawIg = (isObj && dj.instagram) ? dj.instagram : '';
@@ -803,7 +809,7 @@ if (document.getElementById('db-poster-img')) {
 
             return `
                 <div class="artist-card" data-idx="${idx}">
-                    <img src="${photo}" class="artist-photo" alt="${name}">
+                    <img src="${photo}" class="artist-photo" alt="${name}" onerror="this.onerror=null;this.src='${__AVATAR_FALLBACK_IMG}';">
                     <div class="artist-overlay">
                         ${hora ? `<span class="artist-hora">${hora}</span>` : ''}
                         <span class="artist-name">${name.toUpperCase()}</span>

@@ -556,6 +556,12 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY";
         const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        // Fallback ADR-008 de avatar: silueta data-URI (misma que admin.html).
+        // Unica definicion del literal en este bloque; los demas consumidores la referencian.
+        const __AVATAR_FALLBACK_IMG = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="#e8e6e1"/><circle cx="24" cy="18" r="7" fill="#b9b3a6"/><rect x="11" y="30" width="26" height="11" rx="5" fill="#b9b3a6"/></svg>'
+        );
+
         // === INICIO SEGMENTO: ESCUDO ANALYTICS (v1.0.0 - campana b5) ===
         // Telemetria de primer partido sobre Supabase (tabla page_events, ADR-032/050).
         // Mide: vistas del landing (pageview con visitante/sesion unicos), envios del
@@ -1617,10 +1623,10 @@
     const equipoGridEl = document.getElementById('db-equipo-grid');
     if (equipoGridEl) {
         equipoGridEl.innerHTML = equipoList.map(p => {
-            const foto = p.foto || 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+            const foto = p.foto || __AVATAR_FALLBACK_IMG;
             return `
             <div class="equipo-item">
-                <img src="${foto}" class="equipo-avatar" onerror="this.src='https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';">
+                <img src="${foto}" class="equipo-avatar" onerror="this.onerror=null;this.src='${__AVATAR_FALLBACK_IMG}';">
                 <span class="equipo-nombre">${p.nombre || '--'}</span>
                 <span class="equipo-rol">${p.rol || ''}</span>
             </div>`;
@@ -1706,11 +1712,11 @@ if (document.getElementById('db-poster-img')) {
         document.getElementById('db-lineup').innerHTML = content.dj_lineup.map(dj => {
             // Soporte Dual: Detecta si 'dj' es un texto simple o un objeto {nombre, foto} [cite: 821]
             const name = typeof dj === 'object' ? dj.nombre : dj;
-            const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : "https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png";
+            const photo = (typeof dj === 'object' && dj.foto) ? dj.foto : __AVATAR_FALLBACK_IMG;
             
             return `
                 <div class="artist-item" style="display:flex; align-items:center; gap:1.8rem; margin-bottom:2.5rem;">
-                    <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;">
+                    <img src="${photo}" class="artist-avatar" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold, #d72dc0); object-fit:cover;" onerror="this.onerror=null;this.src='${__AVATAR_FALLBACK_IMG}';">
                     <span class="artist-name" style="font-weight:900; text-transform:uppercase;">${name.toUpperCase()}</span>
                 </div>`;
         }).join('');

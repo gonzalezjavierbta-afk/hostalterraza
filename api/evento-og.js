@@ -8,7 +8,7 @@
 // ASCII-safe: sin tildes, sin enes, sin backticks.
 // ============================================================
 
-var FALLBACK_IMG = 'https://ctgyvydzshueemlelkzv.supabase.co/storage/v1/object/public/assets/avatar-default.png';
+var FALLBACK_IMG = 'https://taquilladirecta.com/assets/og-taquilladirecta.png';
 var SB_URL = process.env.SUPABASE_URL || 'https://ctgyvydzshueemlelkzv.supabase.co';
 var SB_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
 var DEFAULT_DESC = 'Eventos, musica y cultura en Hostal Terraza.';
