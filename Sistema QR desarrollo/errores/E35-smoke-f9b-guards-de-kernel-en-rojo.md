@@ -4,7 +4,7 @@ version: v1.8.0-STABLE (heredada)
 fecha: 2026-11-05
 origen: ERRORES_HISTORICOS.md seccion 35 (nueva, 2026-11-05). Detectado al correr la bateria de smokes despues del commit ab37cba (`feat(admin): evento de ejemplo por plantilla en el ADN visual`, solo `admin.html` + `scripts/smoke_adn_muestra_preview.js`).
 relacionados: [../ERRORES_HISTORICOS.md, ../INDEX.md, ../NEXT.md, ../TASKS.md, ../evento-app.html, ../scripts/smoke_f9b_mistico_nocturno.js]
-estado: ABIERTO (preexistente a ab37cba; causa raiz por diagnosticar)
+estado: CERRADO (2026-11-05: guard del smoke desactualizado frente a ADR-088; no era regresion del kernel)
 estructura: detalle-v1 (2026-10-01)
 ---
 
@@ -52,3 +52,15 @@ Queda por determinar si el cambio de forma es **solo textual** (guards desactual
 
 * Dominio: **`@renderer-dev`** (motor de render `evento-app.html`). Cualquier ajuste al kernel exige el gate de confirmacion de PAGO (motor de render); el ajuste al guard es de `scripts/smoke_f9b_mistico_nocturno.js`.
 * Este registro es **documental**: 0 cambios en `evento-app.html`, 0 cambios en el smoke, 0 migraciones, 0 commits. `evento-app.html` y el guard se dejan como estan (Cero Borrado).
+
+### G. Cierre (2026-11-05)
+
+**Diagnostico:** los 3 asserts eran **guards desactualizados**, no regresiones del kernel. La evidencia esta en el propio codigo de produccion:
+
+1. `__esF9Meta` paso de `__esFamiliaF9()` a `__esMeta2Lineas()` (`evento-app.html:1592`; el helper existe desde `:935`) por ADR-054: "meta de 2 lineas" es una capacidad del template, no una propiedad de la familia f9.
+2. H13: el criterio vigente es `!__mapaPinNativo || !__mapaQuery` (`:2455-2467`, v1.15.1/ADR-088): el pin propio del silo se pinta tambien cuando no hay query propia. El guard exigia la formula vieja.
+3. H15: el kernel arma `q=` / `ll=` con `__mapaQuery` (`:2440-2441`), no con `__mapaQuerySilo`; el guard apuntaba al nombre anterior.
+
+**Correccion:** se actualizaron los 3 guards en `scripts/smoke_f9b_mistico_nocturno.js` (assert 196 + H13 L1121-1126 + H15 L1139-1144) y se agrego el contrato `function __esMeta2Lineas()` existe.
+
+**Verificacion:** `node scripts/smoke_f9b_mistico_nocturno.js` -> **PASS 104 / FAIL 0**. `node scripts/smoke_all.js` -> **15/15 PASS**. `evento-app.html` sin cambios.

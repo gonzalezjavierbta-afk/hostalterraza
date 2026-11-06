@@ -193,7 +193,8 @@ if (typeof ctx.__aplicarEfectosLanding === 'function') {
  * 5. Las 5 subconmutaciones de la familia f9 en el kernel
  * ------------------------------------------------------------------------- */
 
-check(kernel.indexOf('const __esF9Meta = __esFamiliaF9();') !== -1, 'subconmutacion 1 (__esF9Meta / meta 2 lineas) usa __esFamiliaF9');
+check(kernel.indexOf('const __esF9Meta = __esMeta2Lineas();') !== -1, 'subconmutacion 1 (__esF9Meta / meta 2 lineas) usa __esMeta2Lineas (ADR-054)');
+check(kernel.indexOf('function __esMeta2Lineas()') !== -1, 'contrato: el helper __esMeta2Lineas existe en el kernel');
 check(kernel.indexOf('__esHeadlinerFamilia') !== -1 && kernel.indexOf('idx === 0') !== -1, 'subconmutacion 2 (headliner por POSICION idx 0) presente');
 check(kernel.indexOf('|| __esFamiliaF9())') !== -1, 'subconmutacion 3 (experiencias, gate compartido f8/f9) usa __esFamiliaF9');
 check(kernel.indexOf('if (!effContent.faq && __esFamiliaF9())') !== -1, 'subconmutacion 4 (FAQ) gatea por __esFamiliaF9');
@@ -1118,11 +1119,12 @@ check(H12nativo,
   'H12: el silo activa --mapa-pin-nativo: 1 (pin de Google exacto sobre --f12-mapa-query)',
   'nativo=' + H12nativo);
 
-/* --- H13: el kernel marca el contenedor SOLO en modo pin propio ------------ */
-var H13add = /if\s*\(\s*__mapaQuerySilo\s*&&\s*!__mapaPinNativo\s*\)\s*\{[^}]*classList\.add\('map-own-pin'\)/.test(kernel);
+/* --- H13: el kernel marca el pin propio cuando el silo no pide pin nativo
+   O cuando no hay query propia (v1.15.1, ADR-088) ------------------------- */
+var H13add = /if\s*\(\s*!__mapaPinNativo\s*\|\|\s*!__mapaQuery\s*\)\s*\{[^}]*classList\.add\('map-own-pin'\)/.test(kernel);
 var H13rem = /classList\.remove\('map-own-pin'\)/.test(kernel);
 check(H13add && H13rem,
-  'H13: el kernel agrega map-own-pin solo con --f12-mapa-query y SIN --mapa-pin-nativo (y la retira si no)',
+  'H13: el kernel agrega map-own-pin sin pin nativo O sin query propia, y lo retira con pin nativo + query (ADR-088)',
   'add=' + H13add + ' remove=' + H13rem);
 
 /* --- H14: el silo lleva las coordenadas del lugar en el token -------------- */
@@ -1136,11 +1138,11 @@ check(H14ok,
   'H14: --f12-mapa-query tiene "lat,long" sin espacios (o vacio para centrar por direccion)',
   'valor=' + JSON.stringify(H14val) + ' formato=' + H14ok);
 
-/* --- H15: el kernel arma q=<coords> (pin nativo) y conserva ll= ------------ */
-var H15q = /q=\$\{encodeURIComponent\(__mapaQuerySilo\)\}&t=&z=16/.test(kernel);
-var H15ll = /ll=\$\{encodeURIComponent\(__mapaQuerySilo\)\}&z=16/.test(kernel);
+/* --- H15: el kernel arma q=<query> (pin nativo) y ll=<query> (pin propio) --- */
+var H15q = /q=\$\{encodeURIComponent\(__mapaQuery\)\}&t=&z=16/.test(kernel);
+var H15ll = /ll=\$\{encodeURIComponent\(__mapaQuery\)\}&z=16/.test(kernel);
 check(H15q && H15ll,
-  'H15: el kernel usa q=<coords>&z=16 con --mapa-pin-nativo:1 (pin de Google) y mantiene ll= para el modo pin propio',
+  'H15: el kernel usa q=<query>&z=16 con pin nativo y ll=<query> para el modo pin propio (ADR-088)',
   'q=' + H15q + ' ll=' + H15ll);
 
 /* ---------------------------------------------------------------------------
