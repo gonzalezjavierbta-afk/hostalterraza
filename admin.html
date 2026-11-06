@@ -4970,11 +4970,9 @@ document.addEventListener('DOMContentLoaded', () => {
   //   - URL escrita a mano GANA sobre una subida en vuelo (flag djManual).
   //   - Elegir un archivo GANA sobre una URL escrita ANTES (ultima accion).
   const _DJ_LINEUP_BUCKET = 'eventos-imagenes';
-  // Silueta data-URI: fallback ADR-008 (mismo criterio que _TICKET_DISENO_FALLBACK).
-  // Ninguna URL rota debe dejar un cuadro vacio ni depender de un asset externo.
-  const _DJ_LINEUP_FALLBACK = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" fill="#e8e6e1"/><circle cx="24" cy="18" r="7" fill="#b9b3a6"/><rect x="11" y="30" width="26" height="11" rx="5" fill="#b9b3a6"/></svg>'
-  );
+  // Silueta data-URI: fallback ADR-008. Reutiliza _IMG_MUESTRA (linea 3928):
+  // una sola definicion del SVG en el archivo (H1 de la auditoria v223.2).
+  const _DJ_LINEUP_FALLBACK = _IMG_MUESTRA;
   let _djLineupRowSeq = 0;   // ids unicos por fila (no reutiliza indices tras borrar)
   let _djLineupReqSeq = 0;   // token de la subida en vuelo (descarta resultados viejos)
 
