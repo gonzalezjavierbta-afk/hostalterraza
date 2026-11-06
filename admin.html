@@ -98,6 +98,11 @@ input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .ld-adn-chip{font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:999px;color:var(--ink3)}
 .ld-adn-mobile{display:inline-flex;margin-top:.6rem}
 @media(min-width:1280px){.ld-adn-layout{grid-template-columns:1fr 380px;gap:1.25rem;align-items:start}.ld-adn-aside{display:block}#ld-adn-preview{position:sticky;top:1rem}.ld-adn-mobile{display:none}}
+/* El panel de ejemplo solo vive en ADN Visual (paso 2): fuera de el, 1 columna. */
+.ld-adn-layout--off .ld-adn-aside,.ld-adn-layout--off .ld-adn-mobile{display:none}
+@media(min-width:1280px){.ld-adn-layout--off{grid-template-columns:1fr}}
+.ld-adn-desc{font-size:12px;color:var(--ink3);line-height:1.5;margin:0 0 .45rem}
+.ld-adn-more{margin-bottom:.6rem}
 .wiz-cat-card{border:2px solid var(--border);border-radius:var(--r);padding:1.1rem .75rem;cursor:pointer;text-align:center;transition:.15s;background:#fff}
 .wiz-cat-card:hover{border-color:var(--gold-border)}
 .wiz-cat-card.active{border-color:var(--gold);background:var(--gold-bg)}
@@ -551,97 +556,97 @@ tr:hover td{background:var(--surface)}
           <!-- Selector de themes -->
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem" data-cat="cinematografia">🎬 Cinematografía</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" id="ev-theme-cards" data-cat="cinematografia">
-            <div class="ld-theme-card" data-theme="arthouse" onclick="abrirFichaTheme('arthouse')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
+            <div class="ld-theme-card" data-theme="arthouse" onclick="seleccionarTheme('arthouse')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5f0e8,#e8e3d8)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#0d0d0b"></div><span style="font-size:12px;font-weight:600;color:#0d0d0b">Arthouse</span></div>
               <div style="font-size:10px;color:#555">A24 · MUBI · Editorial blanco/negro</div>
             </div>
-            <div class="ld-theme-card" data-theme="premiere-gold" onclick="abrirFichaTheme('premiere-gold')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a1408,#2d2210)">
+            <div class="ld-theme-card" data-theme="premiere-gold" onclick="seleccionarTheme('premiere-gold')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a1408,#2d2210)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 5px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Premiere Gold</span></div>
               <div style="font-size:10px;color:#a08040">Gala · Ovation · Negro y dorado</div>
             </div>
-            <div class="ld-theme-card" data-theme="neon-cult-cine" onclick="abrirFichaTheme('neon-cult-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#08030d,#120820)">
+            <div class="ld-theme-card" data-theme="neon-cult-cine" onclick="seleccionarTheme('neon-cult-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#08030d,#120820)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#bf00ff;box-shadow:0 0 7px #bf00ff"></div><span style="font-size:12px;font-weight:600;color:#bf00ff">Neon Cult Cine</span></div>
               <div style="font-size:10px;color:#8040a0">Experimental · Por definir</div>
             </div>
-            <div class="ld-theme-card" data-theme="interactive-cine" onclick="abrirFichaTheme('interactive-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#080c0f,#0d1820)">
+            <div class="ld-theme-card" data-theme="interactive-cine" onclick="seleccionarTheme('interactive-cine')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#080c0f,#0d1820)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 5px #4fc3f7"></div><span style="font-size:12px;font-weight:600;color:#4fc3f7">Interactive Cine</span></div>
               <div style="font-size:10px;color:#3080a0">Multimedia · Por definir</div>
             </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="fiesta">🎉 Fiesta</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="fiesta">
-            <div class="ld-theme-card" data-theme="tropical-hostel" onclick="abrirFichaTheme('tropical-hostel')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f1f0f,#1a3010)">
+            <div class="ld-theme-card" data-theme="tropical-hostel" onclick="seleccionarTheme('tropical-hostel')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f1f0f,#1a3010)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-size:12px;font-weight:600;color:#4ade80">Tropical Hostel</span></div>
               <div style="font-size:10px;color:#2d7040">Selina · Naturaleza · Mochileros</div>
             </div>
-            <div class="ld-theme-card" data-theme="rooftop-sunset" onclick="abrirFichaTheme('rooftop-sunset')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0a00,#2d1800)">
+            <div class="ld-theme-card" data-theme="rooftop-sunset" onclick="seleccionarTheme('rooftop-sunset')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0a00,#2d1800)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;box-shadow:0 0 5px #f59e0b"></div><span style="font-size:12px;font-weight:600;color:#f59e0b">Rooftop Sunset</span></div>
               <div style="font-size:10px;color:#a06010">Edition Hotels · Golden Hour</div>
             </div>
-            <div class="ld-theme-card" data-theme="underground" onclick="abrirFichaTheme('underground')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a0000,#1a0000)">
+            <div class="ld-theme-card" data-theme="underground" onclick="seleccionarTheme('underground')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a0000,#1a0000)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2d55;box-shadow:0 0 7px #ff2d55"></div><span style="font-size:12px;font-weight:600;color:#ff2d55">Underground</span></div>
               <div style="font-size:10px;color:#a01030">Boiler Room · RA.co · Techno</div>
             </div>
-            <div class="ld-theme-card" data-theme="elegant-cocktail" onclick="abrirFichaTheme('elegant-cocktail')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f2efe9,#e8e3d8)">
+            <div class="ld-theme-card" data-theme="elegant-cocktail" onclick="seleccionarTheme('elegant-cocktail')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f2efe9,#e8e3d8)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#8b7355"></div><span style="font-size:12px;font-weight:600;color:#3a3530">Elegant Cocktail</span></div>
               <div style="font-size:10px;color:#7a7570">Aman · Standard Hotels · VIP</div>
             </div>
-            <div class="ld-theme-card" data-theme="afromango" onclick="abrirFichaTheme('afromango')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#2a1800,#4a2c06)">
+            <div class="ld-theme-card" data-theme="afromango" onclick="seleccionarTheme('afromango')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#2a1800,#4a2c06)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9d00;box-shadow:0 0 7px #ff9d00"></div><span style="font-size:12px;font-weight:600;color:#ffb020">Afromango</span></div>
               <div style="font-size:10px;color:#c8862a">Mango · Fiesta Tropical · DJ & Playlist</div>
             </div>
-            <div class="ld-theme-card" data-theme="afromango-editor" onclick="abrirFichaTheme('afromango-editor')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0b0806,#18120d)">
+            <div class="ld-theme-card" data-theme="afromango-editor" onclick="seleccionarTheme('afromango-editor')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0b0806,#18120d)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff9f1c;box-shadow:0 0 8px #ff9f1c"></div><span style="font-size:12px;font-weight:600;color:#ffb84d">Afromango Editor</span></div>
               <div style="font-size:10px;color:#a89b85">Editorial Oscura · Vervee x Deep End · Aurora</div>
             </div>
-            <div class="ld-theme-card" data-theme="tropical-brutalism" onclick="abrirFichaTheme('tropical-brutalism')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#090909,#171020)">
+            <div class="ld-theme-card" data-theme="tropical-brutalism" onclick="seleccionarTheme('tropical-brutalism')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#090909,#171020)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#F4D000;box-shadow:0 0 8px #F4D000"></div><span style="font-size:12px;font-weight:600;color:#F4D000">Tropical Brutalism</span></div>
               <div style="font-size:10px;color:#7B2CFF">Festival Afro-Caribeño · Afromango · Poster Brutalista</div>
             </div>
-            <div class="ld-theme-card" data-theme="tropilove" onclick="abrirFichaTheme('tropilove')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0B0117,#14032C)">
+            <div class="ld-theme-card" data-theme="tropilove" onclick="seleccionarTheme('tropilove')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0B0117,#14032C)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#FF3CAC;box-shadow:0 0 8px #FF3CAC"></div><span style="font-size:12px;font-weight:600;color:#FF3CAC">TropiLove</span></div>
               <div style="font-size:10px;color:#FFE500">Tropical Neón · Brutalismo Maximalista · Palm Grain</div>
             </div>
-            <div class="ld-theme-card" data-theme="mistico" onclick="abrirFichaTheme('mistico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#14110e)">
+            <div class="ld-theme-card" data-theme="mistico" onclick="seleccionarTheme('mistico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#14110e)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Mistico</span></div>
               <div style="font-size:10px;color:#a89f91">Dorado Antiguo &middot; Editorial Oscuro &middot; Rastro MC</div>
             </div>
-            <div class="ld-theme-card" data-theme="fosforescente" onclick="abrirFichaTheme('fosforescente')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f021e,#190830)">
+            <div class="ld-theme-card" data-theme="fosforescente" onclick="seleccionarTheme('fosforescente')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0f021e,#190830)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ff2a85;box-shadow:0 0 8px #ff2a85"></div><span style="font-size:12px;font-weight:600;color:#ff2a85">Fosforescente</span></div>
               <div style="font-size:10px;color:#c0508a">Neon fucsia &middot; Hero 100svh &middot; Mobile-first</div>
             </div>
-            <div class="ld-theme-card" data-theme="kande" onclick="abrirFichaTheme('kande')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#140f0a,#2b1f08)">
+            <div class="ld-theme-card" data-theme="kande" onclick="seleccionarTheme('kande')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#140f0a,#2b1f08)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d98a00;box-shadow:0 0 8px #d98a00"></div><span style="font-size:12px;font-weight:600;color:#d98a00">Kande</span></div>
               <div style="font-size:10px;color:#b8894a">Tropical Noir &middot; Brutalismo Caribeno &middot; Papel Rasgado</div>
             </div>
-            <div class="ld-theme-card" data-theme="mistico-nocturno" onclick="abrirFichaTheme('mistico-nocturno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#1a140c)">
+            <div class="ld-theme-card" data-theme="mistico-nocturno" onclick="seleccionarTheme('mistico-nocturno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0c0a08,#1a140c)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#d4af37;box-shadow:0 0 8px #d4af37, 0 0 16px rgba(212,175,55,.45)"></div><span style="font-size:12px;font-weight:600;color:#d4af37">Mistico Nocturno</span></div>
               <div style="font-size:10px;color:#a89f91">Dorado Antiguo &middot; Profundidad Suave &middot; Hero Editorial</div>
             </div>
-            <div class="ld-theme-card" data-theme="vinilos" onclick="abrirFichaTheme('vinilos')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0E0E0E,#131313)">
+            <div class="ld-theme-card" data-theme="vinilos" onclick="seleccionarTheme('vinilos')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0E0E0E,#131313)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#E35925;box-shadow:0 0 8px #E35925"></div><span style="font-size:12px;font-weight:600;color:#E35925">Vinilos Inversos</span></div>
               <div style="font-size:10px;color:#DBC8A8">Grunge oxido &middot; kraft &middot; cartel urbano</div>
             </div>
-            <div class="ld-theme-card" data-theme="noche-avalon" onclick="abrirFichaTheme('noche-avalon')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#050709,#0D3B2A)">
+            <div class="ld-theme-card" data-theme="noche-avalon" onclick="seleccionarTheme('noche-avalon')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#050709,#0D3B2A)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:0;background:#F2F2E8;box-shadow:0 0 8px #8E216C"></div><span style="font-size:12px;font-weight:600;color:#F2F2E8">Noche Avalon</span></div>
               <div style="font-size:10px;color:#8FA88B">Psicodelia nocturna &middot; aurora &middot; editorial</div>
             </div>
           </div>
           <div style="font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;margin-top:.5rem" data-cat="campana">📣 Campaña</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem" data-cat="campana">
-            <div class="ld-theme-card" data-theme="solidario-moderno" onclick="abrirFichaTheme('solidario-moderno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a1628,#0d2040)">
+            <div class="ld-theme-card" data-theme="solidario-moderno" onclick="seleccionarTheme('solidario-moderno')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#0a1628,#0d2040)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;box-shadow:0 0 5px #3b82f6"></div><span style="font-size:12px;font-weight:600;color:#3b82f6">Solidario Moderno</span></div>
               <div style="font-size:10px;color:#4060a0">Azul · Esperanza · ONG profesional</div>
             </div>
-            <div class="ld-theme-card" data-theme="urgente-impactante" onclick="abrirFichaTheme('urgente-impactante')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0000,#2d0000)">
+            <div class="ld-theme-card" data-theme="urgente-impactante" onclick="seleccionarTheme('urgente-impactante')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#1a0000,#2d0000)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 5px #ef4444"></div><span style="font-size:12px;font-weight:600;color:#ef4444">Urgente & Impactante</span></div>
               <div style="font-size:10px;color:#a03030">Rojo · Emergencia · Urgencia</div>
             </div>
-            <div class="ld-theme-card" data-theme="tech-futurista" onclick="abrirFichaTheme('tech-futurista')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#001428,#001e3c)">
+            <div class="ld-theme-card" data-theme="tech-futurista" onclick="seleccionarTheme('tech-futurista')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#001428,#001e3c)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#06b6d4;box-shadow:0 0 5px #06b6d4"></div><span style="font-size:12px;font-weight:600;color:#06b6d4">Tech & Futurista</span></div>
               <div style="font-size:10px;color:#0080a0">Cyan · Innovación · Tecnología</div>
             </div>
-            <div class="ld-theme-card" data-theme="vintage-organico" onclick="abrirFichaTheme('vintage-organico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5efe0,#e8dcc8)">
+            <div class="ld-theme-card" data-theme="vintage-organico" onclick="seleccionarTheme('vintage-organico')" style="border:2px solid var(--border);border-radius:var(--rsm);padding:.75rem;cursor:pointer;background:linear-gradient(135deg,#f5efe0,#e8dcc8)">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:.3rem"><div style="width:10px;height:10px;border-radius:50%;background:#6b7c3c"></div><span style="font-size:12px;font-weight:600;color:#4a5c2a">Vintage & Org&aacute;nico</span></div>
               <div style="font-size:10px;color:#7a7050">Verde · Raíces · Comunidad</div>
             </div>
@@ -896,6 +901,8 @@ tr:hover td{background:var(--surface)}
             <button type="button" class="btn btn-ghost btn-sm" onclick="ldAdnAbrirPestana()">Abrir en pestana</button>
           </div>
           <div id="ld-adn-theme-name" class="ld-adn-theme">Sin plantilla</div>
+          <p id="ld-adn-desc" class="ld-adn-desc">Elige una plantilla para ver su descripcion.</p>
+          <button type="button" class="btn btn-ghost btn-sm ld-adn-more" id="ld-adn-more" onclick="ldAdnMasInfo()" disabled>Mas informacion</button>
           <div class="ld-adn-frame-wrap">
             <iframe id="ld-adn-preview-frame" title="Preview del evento de ejemplo" loading="lazy"></iframe>
           </div>
@@ -4115,6 +4122,11 @@ function _ldAdnSyncPreview(theme) {
   const nameEl = document.getElementById('ld-adn-theme-name');
   const ficha = theme ? _THEME_FICHA[theme] : null;
   if (nameEl) nameEl.textContent = (ficha && ficha.n) || theme || 'Sin plantilla';
+  const descEl = document.getElementById('ld-adn-desc');
+  const moreBtn = document.getElementById('ld-adn-more');
+  const tips = (ficha && Array.isArray(ficha.t)) ? ficha.t.slice(0, 2) : [];
+  if (descEl) descEl.textContent = tips.length ? tips.join(' ') : 'Elige una plantilla para ver su descripcion.';
+  if (moreBtn) moreBtn.disabled = !ficha;
   const payload = theme ? _muestraPayload(theme) : null;
   if (_ldAdnTimer) { clearTimeout(_ldAdnTimer); _ldAdnTimer = null; }
   if (!payload) {
@@ -4132,6 +4144,11 @@ function _ldAdnSyncPreview(theme) {
 
 function ldAdnVerMuestra() {
   abrirVistaPreviaDeMuestra(_ldThemeSeleccionado);
+}
+
+function ldAdnMasInfo() {
+  if (!_ldThemeSeleccionado) return;
+  abrirFichaTheme(_ldThemeSeleccionado);
 }
 
 function ldAdnAbrirPestana() {
@@ -4632,6 +4649,9 @@ function wizShow(step) {
   // ADN Visual: al entrar al paso 2 se re-sincroniza el panel de ejemplo con la
   // plantilla ya elegida (creacion o edicion).
   if (step === 2) { try { _ldAdnSyncPreview(_ldThemeSeleccionado); } catch(e) {} }
+  // El panel de ejemplo solo se ve en ADN Visual (paso 2).
+  const adnLayout = document.querySelector('.ld-adn-layout');
+  if (adnLayout) adnLayout.classList.toggle('ld-adn-layout--off', String(step) !== '2');
   document.querySelectorAll('.wiz-pill').forEach(p => {
     const n = Number(p.dataset.pill);
     p.classList.toggle('active', n === step);

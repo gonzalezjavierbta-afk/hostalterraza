@@ -150,10 +150,16 @@ ok('panel: id ld-adn-preview', html.indexOf('id="ld-adn-preview"') > -1);
 ok('panel: iframe ld-adn-preview-frame', html.indexOf('id="ld-adn-preview-frame"') > -1);
 ok('panel: contenedor ld-adn-layout', html.indexOf('class="ld-adn-layout"') > -1);
 ok('panel: CSS grid 2 columnas >=1280px', html.indexOf('@media(min-width:1280px){.ld-adn-layout{grid-template-columns:1fr 380px') > -1);
-// Sidebar global: el layout abre antes del paso 2 y el aside vive despues del paso 3.
-ok('persistencia: layout abre antes del paso 2', html.indexOf('<div class="ld-adn-layout">') > -1 && html.indexOf('<div class="ld-adn-layout">') < html.indexOf('data-wiz-step="2"'));
-ok('persistencia: aside despues del paso 3', html.indexOf('id="ld-adn-preview"') > html.indexOf('</div><!-- /wiz-step 3 -->'));
-ok('persistencia: layout cierra antes de ev-landing-config', html.indexOf('</div><!-- /ld-adn-layout -->') > html.indexOf('id="ld-adn-preview"') && html.indexOf('</div><!-- /ld-adn-layout -->') < html.indexOf('</div><!-- /ev-landing-config -->'));
+// Estructura: panel solo en ADN Visual (paso 2).
+ok('estructura: layout abre antes del paso 2', html.indexOf('<div class="ld-adn-layout">') > -1 && html.indexOf('<div class="ld-adn-layout">') < html.indexOf('data-wiz-step="2"'));
+ok('estructura: aside despues del paso 3', html.indexOf('id="ld-adn-preview"') > html.indexOf('</div><!-- /wiz-step 3 -->'));
+ok('estructura: layout cierra antes de ev-landing-config', html.indexOf('</div><!-- /ld-adn-layout -->') > html.indexOf('id="ld-adn-preview"') && html.indexOf('</div><!-- /ld-adn-layout -->') < html.indexOf('</div><!-- /ev-landing-config -->'));
+ok('solo ADN: CSS oculta el panel fuera del paso 2', html.indexOf('.ld-adn-layout--off .ld-adn-aside') > -1 && html.indexOf('.ld-adn-layout--off .ld-adn-mobile') > -1);
+ok('solo ADN: wizShow alterna ld-adn-layout--off', html.indexOf("classList.toggle('ld-adn-layout--off'") > -1);
+ok('cards: 22 clic seleccionan plantilla', count(html, 'onclick="seleccionarTheme(') === 22, String(count(html, 'onclick="seleccionarTheme(')));
+ok('cards: ninguna abre la ficha directamente', count(html, 'onclick="abrirFichaTheme(') === 0, String(count(html, 'onclick="abrirFichaTheme(')));
+ok('descripcion: parrafo + boton Mas informacion', html.indexOf('id="ld-adn-desc"') > -1 && html.indexOf('id="ld-adn-more"') > -1);
+ok('descripcion: ldAdnMasInfo abre la ficha', html.indexOf('function ldAdnMasInfo()') > -1 && html.indexOf('abrirFichaTheme(_ldThemeSeleccionado)') > -1);
 ok('wiring: _ldAdnSyncPreview definida', html.indexOf('function _ldAdnSyncPreview(theme)') > -1);
 ok('wiring: sync al confirmar plantilla', count(html, '_ldAdnSyncPreview(theme)') >= 1);
 ok('wiring: sync al entrar al paso 2', html.indexOf('if (step === 2)') > -1 && html.indexOf('_ldAdnSyncPreview(_ldThemeSeleccionado)') > -1);
