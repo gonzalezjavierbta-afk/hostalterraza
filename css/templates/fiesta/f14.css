@@ -723,6 +723,13 @@
     aspect-ratio: 3 / 4;
     background: var(--f14-bg-2);
     border: 1px solid var(--f14-line);
+    cursor: pointer;
+}
+
+.tpl-f14 .artist-card:focus-visible,
+.Tpl-F14 .artist-card:focus-visible {
+    outline: 2px solid var(--f14-fuego);
+    outline-offset: 2px;
 }
 
 .tpl-f14 .artist-card .artist-photo,
@@ -750,6 +757,7 @@
     justify-content: flex-end;
     align-items: flex-start;
     padding: 0.85rem;
+    overflow: hidden;
     background-image: linear-gradient(180deg, rgba(14, 14, 14, 0) 38%, rgba(14, 14, 14, 0.92) 100%);
 }
 
@@ -793,17 +801,42 @@
 
 .tpl-f14 .artist-card .artist-resena,
 .Tpl-F14 .artist-card .artist-resena {
-    margin-top: 0.5rem;
-    color: var(--f14-mute);
-    font-size: 0.68rem;
+    margin-top: 0.45rem;
+    color: #fff;
+    font-size: 0.8rem;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.55;
     text-transform: none;
     letter-spacing: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.tpl-f14 .artist-card .artist-more,
+.Tpl-F14 .artist-card .artist-more {
+    display: inline-block;
+    margin-top: 0.4rem;
+    color: var(--f14-kraft);
+    font-family: var(--f14-display);
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border-bottom: 1px solid currentColor;
+    pointer-events: none;
+}
+
+.tpl-f14 .artist-card .artist-more::after,
+.Tpl-F14 .artist-card .artist-more::after {
+    content: "\2192";
+    margin-left: 0.35rem;
+}
+
+.tpl-f14 .artist-card:hover .artist-more,
+.Tpl-F14 .artist-card:hover .artist-more {
+    color: var(--f14-fuego);
 }
 
 .tpl-f14 .artist-card .artist-social,
@@ -860,6 +893,160 @@
     letter-spacing: 0.22em;
     line-height: 1;
     transform: rotate(-1.5deg) translate(2px, 6px);
+}
+
+/* ==========================================================================
+   10.b MODAL FICHA DE ARTISTA
+   ========================================================================== */
+.tpl-f14 .f14-artist-modal,
+.Tpl-F14 .f14-artist-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(10, 10, 10, 0.82);
+    backdrop-filter: blur(4px);
+}
+
+.tpl-f14 .f14-artist-modal.is-open,
+.Tpl-F14 .f14-artist-modal.is-open {
+    display: flex;
+}
+
+.tpl-f14 .f14-am-panel,
+.Tpl-F14 .f14-am-panel {
+    position: relative;
+    width: 100%;
+    max-width: 860px;
+    max-height: 86vh;
+    display: grid;
+    grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
+    background: var(--f14-bg-2);
+    border: 1px solid var(--f14-fuego);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+}
+
+.tpl-f14 .f14-am-photo,
+.Tpl-F14 .f14-am-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 380px;
+    object-fit: cover;
+    filter: none;
+}
+
+.tpl-f14 .f14-am-body,
+.Tpl-F14 .f14-am-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.6rem;
+    overflow-y: auto;
+}
+
+.tpl-f14 .f14-am-name,
+.Tpl-F14 .f14-am-name {
+    margin: 0;
+    display: inline-block;
+    width: fit-content;
+    padding: 0.3rem 0.7rem;
+    background: var(--f14-fuego);
+    color: #0E0E0E;
+    font-family: var(--f14-display);
+    font-size: clamp(1.05rem, 2.6vw, 1.45rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.1;
+    clip-path: polygon(0 0, 100% 0, 98% 100%, 0 100%);
+}
+
+.tpl-f14 .f14-am-bio,
+.Tpl-F14 .f14-am-bio {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.tpl-f14 .f14-am-social,
+.Tpl-F14 .f14-am-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--f14-line);
+}
+
+.tpl-f14 .f14-am-social a.artist-social-icon,
+.Tpl-F14 .f14-am-social a.artist-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: transparent;
+    border: 1px solid var(--f14-kraft);
+    border-radius: 50%;
+    color: var(--f14-kraft);
+    text-decoration: none;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.tpl-f14 .f14-am-social a.artist-social-icon:hover,
+.Tpl-F14 .f14-am-social a.artist-social-icon:hover {
+    background: var(--f14-fuego);
+    border-color: var(--f14-fuego);
+    color: #0E0E0E;
+}
+
+.tpl-f14 .f14-am-close,
+.Tpl-F14 .f14-am-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(14, 14, 14, 0.75);
+    color: #fff;
+    border: 1px solid var(--f14-line);
+    border-radius: 50%;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    .tpl-f14 .f14-am-panel,
+    .Tpl-F14 .f14-am-panel {
+        grid-template-columns: 1fr;
+        max-height: 92vh;
+    }
+
+    .tpl-f14 .f14-am-photo,
+    .Tpl-F14 .f14-am-photo {
+        min-height: 0;
+        height: 38vh;
+    }
+
+    .tpl-f14 .f14-am-body,
+    .Tpl-F14 .f14-am-body {
+        padding: 1.1rem;
+    }
+
+    .tpl-f14 .artist-card .artist-resena,
+    .Tpl-F14 .artist-card .artist-resena {
+        font-size: 0.72rem;
+    }
 }
 
 /* ==========================================================================

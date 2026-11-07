@@ -2952,5 +2952,265 @@ if (document.getElementById('db-poster-img')) {
 
         window.onload = initEvento;
     </script>
+
+    <!-- v1.6.0 (aditivo, exclusivo del silo .tpl-f14): resena corta con enlace
+         "mas info" en cada tarjeta del Line Up y ficha del artista en modal.
+         No toca el kernel del lineup, ni el lightbox global, ni el CSS. -->
+    <script>
+    (function () {
+        'use strict';
+
+        // Guarda por silo DIFERIDA (mismo patron que el bloque f9b del kernel).
+        // No se puede evaluar en parse-time: el body nace "tpl-init" y la clase
+        // tpl-f14 se asigna dentro de initEvento, invocado por window.onload.
+        function f14Silo() {
+            return !!document.body && document.body.className.indexOf('tpl-f14') !== -1;
+        }
+
+        var f14GridObs = null;
+
+        var modal = null;
+        var mPanel = null;
+        var mClose = null;
+        var mPhoto = null;
+        var mName = null;
+        var mBio = null;
+        var mSocial = null;
+        var lastFocus = null;
+        var prevOverflow = '';
+
+        // --- Helpers de texto (ASCII-safe: los acentos se escriben como escapes) ---
+        function f14Norm(txt) {
+            return String(txt == null ? '' : txt).replace(/\s+/g, ' ').trim();
+        }
+
+        function f14Short(txt) {
+            var t = f14Norm(txt);
+            if (!t) return '';
+            var parts = t.match(/[^.!?]+[.!?]+/g) || [];
+            for (var i = 0; i < parts.length; i++) {
+                var s = parts[i].trim();
+                if (s.length >= 40 && s.length <= 110) return s;
+            }
+            if (t.length <= 96) return t;
+            var cut = t.slice(0, 96);
+            var sp = cut.lastIndexOf(' ');
+            if (sp > 60) cut = cut.slice(0, sp);
+            cut = cut.replace(/[\s,;:.\-]+$/, '');
+            return cut + '...';
+        }
+
+        // --- Construccion unica del modal (estructura y clases que espera el CSS) ---
+        function f14Build() {
+            if (modal) return;
+
+            modal = document.createElement('div');
+            modal.className = 'f14-artist-modal';
+            modal.id = 'f14-artist-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', 'f14-am-name');
+
+            mPanel = document.createElement('div');
+            mPanel.className = 'f14-am-panel';
+
+            mClose = document.createElement('button');
+            mClose.type = 'button';
+            mClose.className = 'f14-am-close';
+            mClose.setAttribute('aria-label', 'Cerrar');
+            mClose.textContent = '\u00d7';
+
+            mPhoto = document.createElement('img');
+            mPhoto.className = 'f14-am-photo';
+            mPhoto.alt = '';
+            mPhoto.onerror = function () { this.onerror = null; };
+
+            var body = document.createElement('div');
+            body.className = 'f14-am-body';
+
+            mName = document.createElement('h3');
+            mName.className = 'f14-am-name';
+            mName.id = 'f14-am-name';
+
+            mBio = document.createElement('p');
+            mBio.className = 'f14-am-bio';
+
+            mSocial = document.createElement('div');
+            mSocial.className = 'f14-am-social';
+
+            body.appendChild(mName);
+            body.appendChild(mBio);
+            body.appendChild(mSocial);
+            mPanel.appendChild(mClose);
+            mPanel.appendChild(mPhoto);
+            mPanel.appendChild(body);
+            modal.appendChild(mPanel);
+            document.body.appendChild(modal);
+        }
+
+        // --- Recorte de la resena + enlace "mas info" (idempotente) ---
+        function f14Enhance() {
+            if (!f14Silo()) return;
+            var grid = document.getElementById('db-lineup');
+            if (!grid) return;
+            var cards = grid.querySelectorAll('.artist-card');
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                if (card.getAttribute('data-f14-ready') === '1') continue;
+                card.setAttribute('data-f14-ready', '1');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('role', 'button');
+
+                var nameEl = card.querySelector('.artist-name');
+                var nameTxt = nameEl ? f14Norm(nameEl.textContent) : '';
+                card.setAttribute('aria-label', (nameTxt ? nameTxt + '. ' : '') + 'Ver mas informacion');
+
+                var res = card.querySelector('.artist-resena');
+                if (!res) continue;
+                var full = f14Norm(res.textContent);
+                if (!full) continue;
+
+                card.setAttribute('data-f14-bio', full);
+                res.textContent = f14Short(full);
+
+                var more = document.createElement('span');
+                more.className = 'artist-more';
+                more.textContent = 'm\u00e1s info';
+                if (res.parentNode) res.parentNode.insertBefore(more, res.nextSibling);
+            }
+        }
+
+        function f14Open(card) {
+            if (!f14Silo()) return;
+            if (!card) return;
+            f14Build();
+
+            var pic = card.querySelector('img.artist-photo');
+            if (pic) {
+                // ADR-008 (Silent Fallback): si la foto grande falla, se cae a la
+                // miniatura de la propia tarjeta. onerror se anula primero para
+                // que no haya bucles de error.
+                mPhoto.onerror = function () {
+                    this.onerror = null;
+                    var fb = card.querySelector('img.artist-photo');
+                    this.src = fb ? fb.src : '';
+                };
+                mPhoto.src = pic.getAttribute('src') || '';
+                mPhoto.alt = pic.getAttribute('alt') || '';
+            } else {
+                mPhoto.onerror = function () { this.onerror = null; };
+                mPhoto.removeAttribute('src');
+                mPhoto.alt = '';
+            }
+
+            var nameEl = card.querySelector('.artist-name');
+            mName.textContent = nameEl ? f14Norm(nameEl.textContent) : '';
+
+            var bio = card.getAttribute('data-f14-bio') || '';
+            mBio.textContent = bio;
+            mBio.style.display = bio ? '' : 'none';
+
+            var soc = card.querySelector('.artist-social');
+            mSocial.innerHTML = '';
+            if (soc) {
+                mSocial.innerHTML = soc.innerHTML;
+                mSocial.style.display = '';
+            } else {
+                mSocial.style.display = 'none';
+            }
+
+            lastFocus = document.activeElement;
+            prevOverflow = document.body.style.overflow;
+            modal.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            try { mClose.focus(); } catch (e) { /* noop */ }
+        }
+
+        function f14Close() {
+            if (!modal || !modal.classList.contains('is-open')) return;
+            modal.classList.remove('is-open');
+            document.body.style.overflow = prevOverflow;
+            var back = lastFocus;
+            lastFocus = null;
+            if (back && back.focus) {
+                try { back.focus(); } catch (e) { /* noop */ }
+            }
+        }
+
+        // --- Delegacion (fase de burbuja) ---
+        document.addEventListener('click', function (e) {
+            var t = e.target;
+            if (!t || !t.nodeType) return;
+            if (t === modal || (t.closest && t.closest('.f14-am-close'))) {
+                f14Close();
+                return;
+            }
+            if (modal && modal.classList.contains('is-open') && t.closest && t.closest('.f14-am-panel')) return;
+            if (t.closest && t.closest('a')) return;
+            var card = t.closest ? t.closest('#db-lineup .artist-card') : null;
+            if (card) f14Open(card);
+        });
+
+        // --- Teclado: Escape, Enter/Espacio y foco atrapado ---
+        document.addEventListener('keydown', function (e) {
+            var key = e.key || '';
+            if (modal && modal.classList.contains('is-open')) {
+                if (key === 'Escape' || key === 'Esc') {
+                    e.preventDefault();
+                    f14Close();
+                    return;
+                }
+                if (key === 'Tab') {
+                    var f = modal.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (!f.length) return;
+                    var first = f[0];
+                    var last = f[f.length - 1];
+                    var act = document.activeElement;
+                    if (e.shiftKey && (act === first || !modal.contains(act))) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && (act === last || !modal.contains(act))) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+                return;
+            }
+            if (key === 'Enter' || key === ' ' || key === 'Spacebar') {
+                var t = e.target;
+                if (!t || !t.closest || t.closest('a')) return;
+                var card = t.closest('#db-lineup .artist-card');
+                if (card) {
+                    e.preventDefault();
+                    f14Open(card);
+                }
+            }
+        });
+
+        // --- Arranque diferido (el silo se activa dentro de initEvento) ---
+        function f14Start() {
+            if (!f14Silo()) return;
+            f14Enhance();
+            var grid = document.getElementById('db-lineup');
+            if (!grid || !window.MutationObserver) return;
+            if (f14GridObs) return;
+            f14GridObs = new MutationObserver(function () { f14Enhance(); });
+            f14GridObs.observe(grid, { childList: true });
+        }
+
+        if (f14Silo()) {
+            f14Start();
+        } else if (window.MutationObserver) {
+            // Espera la asignacion de tpl-f14 en document.body.className (initEvento).
+            var __f14W = new MutationObserver(function () {
+                if (f14Silo()) {
+                    __f14W.disconnect();
+                    f14Start();
+                }
+            });
+            __f14W.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        }
+    })();
+    </script>
 </body>
 </html>
