@@ -131,6 +131,7 @@
     grid-template-areas:
         "hero"
         "ctas"
+        "descripcion"
         "lineup"
         "cartel"
         "playlist"
@@ -1050,6 +1051,73 @@
 }
 
 /* ==========================================================================
+   10.c DESCRIPCION (#mod-descripcion) - rotulo de cartel + parrafo editorial
+   Atomo aditivo del kernel (evento-app.html L133-138): nace apagado por el
+   IoC y solo lo enciende el silo que lo referencia (patron de f9/f10/f12).
+   El titulo y el texto llegan de DATOS (#db-descripcion-titulo / -texto, con
+   fallback editorial en el kernel): aqui NO se inventa copy con content:.
+   Lenguaje visual calcado del rotulo de #mod-lineup (bloque 10): mismo stack
+   de cartel, mismo contorno cafe, mismo wrapper de 1180px. El aire vertical
+   no se repite: lo aporta la regla `section` del bloque 5 (L243-247).
+   ========================================================================== */
+.tpl-f14 #mod-descripcion,
+.Tpl-F14 #mod-descripcion {
+    display: block !important;
+    grid-area: descripcion;
+    width: 100%;
+    background-color: var(--f14-bg);
+    border-bottom: 1px solid var(--f14-line);
+}
+
+.tpl-f14 #mod-descripcion .descripcion-inner,
+.Tpl-F14 #mod-descripcion .descripcion-inner {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Rotulo: mismo tratamiento que #mod-lineup::before. Sin `white-space: nowrap`
+   para que un titulo largo pueda partir en dos lineas sin desbordar. */
+.tpl-f14 #db-descripcion-titulo,
+.Tpl-F14 #db-descripcion-titulo {
+    display: block;
+    margin: 0 auto clamp(1.1rem, 2.6vw, 1.9rem);
+    color: var(--f14-kraft);
+    font-family: var(--f14-poster);
+    font-size: clamp(1.9rem, 6.4vw, 4.6rem);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-align: center;
+    overflow-wrap: break-word;
+    -webkit-text-stroke: clamp(1px, 0.16vw, 2.4px) var(--f14-cafe);
+    paint-order: stroke fill;
+}
+
+/* Parrafo: 68ch de medida, interlineado 1.75 y la tinta del silo al 86%
+   (contraste sobre #0E0E0E muy por encima de AA). Centrado en movil; a partir
+   de 767px se alinea a la izquierda, como el resto del texto largo de f14. */
+.tpl-f14 #db-descripcion-texto,
+.Tpl-F14 #db-descripcion-texto {
+    max-width: 68ch;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.86);
+    font-family: var(--f14-font);
+    font-size: clamp(0.92rem, 1.6vw, 1.05rem);
+    line-height: 1.75;
+    text-align: center;
+}
+
+@media (min-width: 767px) {
+    .tpl-f14 #db-descripcion-texto,
+    .Tpl-F14 #db-descripcion-texto {
+        text-align: left;
+    }
+}
+
+/* ==========================================================================
    11. CARTEL / AFICHE (#mod-cartel)
    ========================================================================== */
 .tpl-f14 #mod-cartel,
@@ -1958,6 +2026,7 @@
         grid-template-areas:
             "hero hero"
             "ctas ctas"
+            "descripcion descripcion"
             "lineup lineup"
             "cartel playlist"
             "boletos form"
@@ -2180,6 +2249,7 @@
         grid-template-areas:
             "hero"
             "ctas"
+            "descripcion"
             "lineup"
             "cartel"
             "playlist"
@@ -2579,6 +2649,7 @@
     grid-template-areas:
         "hero"
         "ctas"
+        "descripcion"
         "lineup"
         "cartel"
         "playlist"
@@ -2597,6 +2668,7 @@
         grid-template-areas:
             "hero hero"
             "ctas ctas"
+            "descripcion descripcion"
             "lineup lineup"
             "cartel playlist"
             "boletos form"
