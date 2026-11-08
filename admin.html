@@ -1175,7 +1175,7 @@ tr:hover td{background:var(--surface)}
             <img id="ev-poster-thumb" style="max-height:120px;border-radius:6px;border:1px solid var(--border);object-fit:contain" src="">
             <button onclick="clearPoster()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:2px 8px;font-size:11px;cursor:pointer;color:var(--ink3)">✕ Quitar</button>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:.4rem;flex-wrap:wrap">
+          <div id="ev-poster-drop" style="display:flex;align-items:center;gap:8px;margin-top:.4rem;flex-wrap:wrap;border-radius:var(--rsm)">
             <input type="file" id="ev-poster-file" accept="image/*" style="display:none" onchange="handlePosterFile(event)">
             <button type="button" id="ev-poster-file-btn" onclick="document.getElementById('ev-poster-file').click()"
               style="padding:4px 10px;font-size:11px;font-weight:500;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);cursor:pointer;font-family:'DM Sans',sans-serif">
@@ -13505,16 +13505,15 @@ function _posterSlug() {
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
   return n || 'nuevo';
 }
-async function handlePosterFile(ev) {
-  const input = (ev && ev.target) || document.getElementById('ev-poster-file');
+async function _uploadPosterFile(file) {
+  const input = document.getElementById('ev-poster-file');
   const btn = document.getElementById('ev-poster-file-btn');
   const st = document.getElementById('ev-poster-file-status');
-  const file = input && input.files && input.files[0];
   if (!file) return;
   const setStatus = (msg, color) => { if (st) { st.textContent = msg; st.style.color = color || 'var(--ink3)'; } };
   const v = _imgValidateFile(file);
-  if (!v.ok) { setStatus(v.err, 'var(--red)'); input.value = ''; return; }
-  if (!SB) { setStatus('Conecta la base de datos primero.', 'var(--red)'); input.value = ''; return; }
+  if (!v.ok) { setStatus(v.err, 'var(--red)'); if (input) input.value = ''; return; }
+  if (!SB) { setStatus('Conecta la base de datos primero.', 'var(--red)'); if (input) input.value = ''; return; }
   if (btn) btn.disabled = true;
   setStatus('Subiendo...', 'var(--ink3)');
   try {
@@ -13532,6 +13531,31 @@ async function handlePosterFile(ev) {
     if (input) input.value = '';
   }
 }
+async function handlePosterFile(ev) {
+  const input = (ev && ev.target) || document.getElementById('ev-poster-file');
+  const file = input && input.files && input.files[0];
+  if (!file) return;
+  await _uploadPosterFile(file);
+}
+// Drag & drop del poster: mismo flujo que el clic (_uploadPosterFile).
+(function _initPosterDrop() {
+  const zone = document.getElementById('ev-poster-drop');
+  if (!zone) return;
+  const clearDrag = () => { zone.classList.remove('is-dragover'); zone.style.outline = ''; };
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('is-dragover');
+    zone.style.outline = '2px dashed #E35925';
+  });
+  zone.addEventListener('dragleave', clearDrag);
+  zone.addEventListener('dragend', clearDrag);
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    clearDrag();
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) _uploadPosterFile(f);
+  });
+})();
 
 // ── Cabezote del formulario de registro (ADR-034) ──
 let _cabezoteFormUrlTimer = null;

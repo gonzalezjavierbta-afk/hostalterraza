@@ -177,7 +177,7 @@
              visual real definido por grid-area en p5.css -->
         <section id="mod-cartel">
             <div class="cartel-inner" style="max-width:1100px; margin:0 auto; text-align:center;">
-                <div style="display:flex; justify-content:center;"><img id="db-poster-img" src="" style="border-radius:12px;" alt="Poster" onerror="this.onerror=null;var m=document.getElementById('mod-cartel');if(m){m.style.setProperty('display','none','important');m.setAttribute('data-hidden','true');}"></div>
+                <div style="display:flex; justify-content:center;"><img id="db-poster-img" src="" style="border-radius:12px;" alt="Poster"></div>
             </div>
         </section>
 
@@ -2132,9 +2132,14 @@ if (document.getElementById('db-poster-img')) {
         // Regla general módulos vacíos (v306): sin cartel configurado se oculta el módulo.
         __hideEmptyModule('mod-cartel', false);
     } else {
+        // v309: el modulo se limpia antes de asignar la URL; el onerror pasa a ser programatico
+        // porque un img con src="" dispara error al parsear y ocultaba la seccion.
+        __hideEmptyModule('mod-cartel', true);
+        document.getElementById('mod-cartel').style.removeProperty('display');
         document.getElementById('db-poster-img').src = posterUrl;
-        // LIGHTBOX GLOBAL: el cartel se abre ampliado al hacer clic (como la galería).
+        // LIGHTBOX GLOBAL: el cartel se abre ampliado al hacer clic (como la galeria).
         document.getElementById('db-poster-img').classList.add('lightbox-trigger');
+        document.getElementById('db-poster-img').onerror = function () { this.onerror = null; __hideEmptyModule('mod-cartel', false); };
     }
 }
 
