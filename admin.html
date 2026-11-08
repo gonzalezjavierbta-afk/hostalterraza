@@ -1175,6 +1175,15 @@ tr:hover td{background:var(--surface)}
             <img id="ev-poster-thumb" style="max-height:120px;border-radius:6px;border:1px solid var(--border);object-fit:contain" src="">
             <button onclick="clearPoster()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:var(--rsm);padding:2px 8px;font-size:11px;cursor:pointer;color:var(--ink3)">✕ Quitar</button>
           </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:.4rem;flex-wrap:wrap">
+            <input type="file" id="ev-poster-file" accept="image/*" style="display:none" onchange="handlePosterFile(event)">
+            <button type="button" id="ev-poster-file-btn" onclick="document.getElementById('ev-poster-file').click()"
+              style="padding:4px 10px;font-size:11px;font-weight:500;background:var(--gold);color:#fff;border:none;border-radius:var(--rsm);cursor:pointer;font-family:'DM Sans',sans-serif">
+              Subir archivo
+            </button>
+            <span id="ev-poster-file-status" style="font-size:11px;color:var(--ink3)"></span>
+            <span style="font-size:11px;color:var(--ink3)">JPG, PNG - Max. 5 MB</span>
+          </div>
         </div>
 
         <!-- Video (tráiler / URL embed) -->
@@ -13485,6 +13494,43 @@ function clearPoster() {
   document.getElementById('ev-poster-url').value = '';
   document.getElementById('ev-poster-thumb').src = '';
   document.getElementById('ev-poster-preview').style.display = 'none';
+}
+
+// Subida del poster del evento: reutiliza el uploader compartido (misma
+// validacion y mismo Storage que el hero). La fuente unica de verdad sigue
+// siendo #ev-poster-url; aqui solo se escribe la URL publica en ese input.
+function _posterSlug() {
+  const n = String((document.getElementById('ev-n') || {}).value || '')
+    .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+  return n || 'nuevo';
+}
+async function handlePosterFile(ev) {
+  const input = (ev && ev.target) || document.getElementById('ev-poster-file');
+  const btn = document.getElementById('ev-poster-file-btn');
+  const st = document.getElementById('ev-poster-file-status');
+  const file = input && input.files && input.files[0];
+  if (!file) return;
+  const setStatus = (msg, color) => { if (st) { st.textContent = msg; st.style.color = color || 'var(--ink3)'; } };
+  const v = _imgValidateFile(file);
+  if (!v.ok) { setStatus(v.err, 'var(--red)'); input.value = ''; return; }
+  if (!SB) { setStatus('Conecta la base de datos primero.', 'var(--red)'); input.value = ''; return; }
+  if (btn) btn.disabled = true;
+  setStatus('Subiendo...', 'var(--ink3)');
+  try {
+    const ext = _imgExtFromType(file);
+    const path = 'posters/' + _posterSlug() + '/' + Date.now() + '-' + Math.random().toString(36).substr(2,6) + '.' + ext;
+    const publicUrl = await _imgSharedUpload('eventos-imagenes', path, file);
+    const urlInp = document.getElementById('ev-poster-url');
+    if (urlInp) urlInp.value = publicUrl;
+    setStatus('Listo', 'var(--green-border)');
+    handlePosterUrl(publicUrl);
+  } catch(e) {
+    setStatus('Error: ' + ((e && e.message) || 'no se pudo subir (revisa RLS/403 del bucket eventos-imagenes).'), 'var(--red)');
+  } finally {
+    if (btn) btn.disabled = false;
+    if (input) input.value = '';
+  }
 }
 
 // ── Cabezote del formulario de registro (ADR-034) ──
