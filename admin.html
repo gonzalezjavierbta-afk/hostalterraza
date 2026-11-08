@@ -2806,7 +2806,7 @@ tr:hover td{background:var(--surface)}
           Descargar imagen invitación
         </button>
       </div>
-      <p style="font-size:11px;color:var(--ink3);margin-top:.4rem">Imagen 1080×1920 lista para WhatsApp · el QR lleva al formulario de registro</p>
+      <p style="font-size:11px;color:var(--ink3);margin-top:.4rem">Imagen lista para WhatsApp - el QR lleva al formulario de registro</p>
     </div>
 
     <!-- Fallback: solo QR + link cuando no hay imagen -->
@@ -9785,6 +9785,26 @@ function descargarQRInvitador() {
   }
 }
 
+// ADR-064 - base de la invitacion: el DISENO DE TICKET del evento manda sobre
+// ev.imagen_url. Solo lee config_landing.content.ticket_disenos (sin DOM,
+// sin storage, sin efectos secundarios). Devuelve '' si no hay nada usable.
+function _invBaseTicketUrl(ev, tipo) {
+  const arr = (ev && ev.config_landing && ev.config_landing.content)
+    ? ev.config_landing.content.ticket_disenos
+    : null;
+  if (!Array.isArray(arr)) return '';
+  const ok = arr.filter(d => d && typeof d.diseno_url === 'string' && d.diseno_url.trim());
+  if (!ok.length) return '';
+  // Prefiere las activas; si ninguna lo esta, usa todas las que tienen URL.
+  const activas = ok.filter(d => d.activo !== false);
+  const pool = activas.length ? activas : ok;
+  if (tipo) {
+    const m = pool.find(d => d.tipo === tipo) || ok.find(d => d.tipo === tipo);
+    if (m) return m.diseno_url.trim();
+  }
+  return pool[0].diseno_url.trim();
+}
+
 async function openMod(evId, nom, fecha, hora) {
   document.getElementById('mod-t').textContent = 'Invitación — ' + nom;
   document.getElementById('mod-s').textContent = fecha + (hora?' · '+hora:'');
@@ -9820,16 +9840,17 @@ async function openMod(evId, nom, fecha, hora) {
     </div>`;
   }).join('');
 
-  // Find event image
+  // Base: diseno de ticket del evento (Paso 3) o, si no hay, la imagen del evento.
   const ev = _eventos.find(e=>e.id===evId);
-  if (!ev?.imagen_url) {
-    document.getElementById('mod-gen-status').textContent='💡 Agrega una imagen al evento para generar la invitación automáticamente.';
+  const __baseInv = _invBaseTicketUrl(ev) || (ev && ev.imagen_url) || '';
+  if (!__baseInv) {
+    document.getElementById('mod-gen-status').textContent='Sube un diseno de ticket en el Paso 3 (o una imagen al evento) para generar la invitacion automaticamente.';
     return;
   }
 
   // Composite QR onto template
   document.getElementById('mod-gen-status').textContent='Generando imagen de invitación…';
-  await generarInvitacion(link, ev.imagen_url, nom);
+  await generarInvitacion(link, __baseInv, nom);
 }
 
 let _invitacionDataUrl = null;
@@ -9847,18 +9868,27 @@ async function generarInvitacion(registroLink, imgUrl, evNom) {
       img.src = imgUrl;
     });
 
-    const W = 1080, H = 1920;
-    const QR_SIZE    = 640;
-    const QR_RADIUS  = 28;
-    const QR_PADDING = 40;          // white box padding around QR modules
-    const QR_X = (W - QR_SIZE) / 2; // centered horizontally
+    // Proporcion REAL del diseno de ticket (fallback 1080x1920 historico).
+    const nw = templateImg.naturalWidth || templateImg.width || 1080;
+    const nh = templateImg.naturalHeight || templateImg.height || 1920;
+    const W = 1080;
+    const H = (nw > 0 && nh > 0) ? Math.max(1, Math.round(W * nh / nw)) : 1920;
+    // QR escalado al lienzo (identico a 640/40/28/220/1139 en 1080x1920).
+    const QR_SIZE    = Math.round(Math.min(W * 0.5926, H * 0.3333));
+    const QR_PADDING = Math.round(QR_SIZE * 0.0625); // white box padding around QR modules
+    const QR_RADIUS  = Math.max(2, Math.round(QR_SIZE * 0.04375));
+    const QR_X = Math.round((W - QR_SIZE) / 2);      // centered horizontally
     // Position: center of bottom third of image
     // We measure from top: place QR so its center is at ~76% of image height
-    const QR_Y = Math.round(H * 0.76) - Math.round(QR_SIZE / 2);
+    // (clamped so it never overflows the canvas on wide/tall designs).
+    const QR_Y = Math.max(0, Math.min(Math.round(H * 0.76) - Math.round(QR_SIZE / 2), H - QR_SIZE));
 
     const cv = document.getElementById('mod-inv-canvas');
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
+
+    // Fondo blanco: evita negro al exportar JPEG si el diseno es PNG transparente.
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
 
     // Draw template
     ctx.drawImage(templateImg, 0, 0, W, H);
@@ -9902,14 +9932,15 @@ function descargarInvitacion() {
 
 async function descargarInvitacionTipo(evId, tipo, registroLink) {
   const ev = _eventos.find(e=>e.id===evId);
-  if (!ev?.imagen_url) {
-    alert('Este evento no tiene imagen. Sube una imagen al evento primero.');
+  const __baseTipo = _invBaseTicketUrl(ev, tipo) || (ev && ev.imagen_url) || '';
+  if (!__baseTipo) {
+    alert('Este evento no tiene diseno de ticket ni imagen. Sube un diseno en el Paso 3.');
     return;
   }
   const btn = event.target;
   btn.disabled = true; btn.textContent = '…';
   try {
-    await generarInvitacion(registroLink, ev.imagen_url, ev.nombre + '-' + tipo);
+    await generarInvitacion(registroLink, __baseTipo, ev.nombre + '-' + tipo);
     await new Promise(r => setTimeout(r, 600));
     if (_invitacionDataUrl) {
       const a = document.createElement('a');
