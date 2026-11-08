@@ -50,6 +50,8 @@ estructura: indice-v1 (2026-10-01)
 
 > **ACTUALIZADO 2026-11-06 (aditivo; la linea de arriba se conserva):** el codigo **YA esta commiteado** en **`e3fb7ca`** ("feat(v223.2): Lineup con imagen por URL o archivo + fallback de avatares", **5 archivos, +141/-17**) y el alcance crecio: se elimino la URL muerta `assets/avatar-default.png` (bucket inexistente) de `admin.html:3928`, `evento-app.html` (banner, equipo y default de lineup), `eventologs.html` y `eventovenezuela.html`, y `api/evento-og.js:11` apunta el `og:image` por defecto al asset real. **TSK-129 pasa a CERRADA**; el **smoke manual en navegador** queda como seguimiento en `NEXT.md` -58. Delta efectivo del corte: **+1 cerrada / 0 abiertas**.
 
+> **Delta por LINE UP f14 con ficha de artista + MODULO DESCRIPCION f14 (2026-11-07, linea agregada, sin reescribir las de arriba):** **+2 entradas / +2 abiertas = TSK-130 (LINE UP f14: resena corta por tarjeta + ficha de artista en modal) + TSK-131 (modulo DESCRIPCION activado en el silo f14)**. Delta efectivo: **+2 abiertas / 0 cerradas**. TSK-130 toca el **kernel** (`evento-app.html:2955-3214`, bloque `<script>` aditivo, **0 lineas existentes modificadas**) y el CSS del silo (`css/templates/fiesta/f14.css` seccion 10.b); TSK-131 es **CSS-only** (`f14.css` seccion 10.c; `#mod-descripcion` ya existia en el DOM en `evento-app.html:133-138`). **0 cambios** en `admin.html`, `api/*.js`, SQL/RLS y los otros 13 silos. Evento afectado: `vinilos-inversos-c8yu` (`template_id='f14'`, theme `vinilos`). Verificado contra el archivo real (ADR-006): `f14.css` tiene **5** listas `grid-template-areas` (`:131`, `:2051`, `:2274`, `:2674`, `:2693`). Queda **smoke en navegador** y el **commit del CSS**: ambas nacen ABIERTAS. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -1013,6 +1015,36 @@ task:
 **6. Lo que NO cierra esta tarea:** el **smoke manual en navegador** (subir, pegar URL durante la subida, vaciar durante la subida, recargar un evento existente y validar la silueta en f8 y en un silo f9/f10 con `foto` roto) y el **commit**. La subida directa depende de que el bucket `eventos-imagenes` permita `INSERT` con la anon key: **no verificado en navegador real**. Pendientes heredados (URL muerta `avatar-default.png`, `eventologs.html:806` sin fallback) en `NEXT.md` hito **-58**, sin inflar alcance.
 
 **7. ACTUALIZADO 2026-11-06 - CIERRE CON COMMIT (`e3fb7ca`):** el codigo quedo commiteado como **`e3fb7ca`** ("feat(v223.2): Lineup con imagen por URL o archivo + fallback de avatares", **5 archivos, +141/-17**). **Alcance ampliado en el mismo commit:** se elimino la **URL muerta** `assets/avatar-default.png` (bucket `assets` inexistente) de `admin.html:3928` (muestra del ADN Visual), `evento-app.html` (banner, equipo y default del lineup), `eventologs.html` y `eventovenezuela.html`: todas usan ahora la **silueta data-URI** con `onerror` + guard. `api/evento-og.js:11` apunta el `og:image` por defecto al asset real `https://taquilladirecta.com/assets/og-taquilladirecta.png` (**HTTP 200 image/png verificado**). **Diffs finales:** `admin.html` **103/2**, `evento-app.html` **17/6**, `eventologs.html` **10/4**, `eventovenezuela.html` **10/4**, `api/evento-og.js` **1/1**. **Verificacion final:** QA **CERTIFICADO CON OBSERVACIONES** (sin bloqueadores); Escudo GOLD **4/4** sin regresion; `vm.Script` **6/6**; **0** no-ASCII; **0** `avatar-default` en paginas vivas; **7/7** `img` con `onerror` + guard + `this.src`; harness **linkedom 28/28**; backup `eventovenezuela backup.html` **intacto**. **Observaciones abiertas (no bloqueantes):** (H1) el admin tiene el mismo literal data-URI en `_IMG_MUESTRA` (`:3928`) y `_DJ_LINEUP_FALLBACK` (`:4975`): **duplicacion cosmetica**; (H3) `qc_edge.js` sin asserts estrictos (2 casos diagnosticos); (H4) el conteo ingenuo de `onerror=` da **2** por el guard. **El smoke manual en navegador sigue pendiente** (no bloquea el cierre del codigo): seguimiento en `NEXT.md` -58.
+
+### TSK-130 - LINE UP f14: resena corta por tarjeta + ficha de artista en modal (2026-11-07) - ABIERTA
+
+> **Fecha:** 2026-11-07. **Estado:** implementado y verificado en codigo; **ABIERTA** hasta el smoke en navegador y el commit del CSS del silo. **No nace ADR:** no cambia contrato de datos, esquema ni endpoints.
+
+**1. Alcance REAL (baseline = archivo real, ADR-006):** en el **LINE UP** del evento `vinilos-inversos-c8yu` (`template_id='f14'`, theme `vinilos`) cada tarjeta muestra ahora una **descripcion corta** derivada de `resena`, mas un enlace **"mas info"**, y el clic en la tarjeta completa abre un **modal de ficha de artista**. **2 archivos:** kernel `evento-app.html` (bloque `<script>` **aditivo** `:2955-3214`, guardado a `.tpl-f14`, **0 lineas existentes modificadas**) y `css/templates/fiesta/f14.css` (seccion **10.b MODAL FICHA DE ARTISTA**, desde `:900`). **0 cambios** en `admin.html`, `api/*.js`, SQL/RLS y los otros 13 silos. **0 IDs / 0 atomos eliminados** (Cero Borrado).
+
+**2. Descripcion corta + "mas info":** se deriva de `resena` en cliente: **primera frase** cuando mide entre **40 y 110 caracteres**; si no, **96 caracteres + "..."** (recorte idempotente, `:3051`). Se pinta a **0.8rem** con **clamp a 2 lineas** y enlace **"mas info"** dentro de la tarjeta.
+
+**3. Modal de ficha de artista:** clic en **toda la tarjeta** (no solo en el enlace) abre el modal con **foto a color**, **nombre**, **bio completa** y **los mismos iconos sociales** de la tarjeta. Cierre por **X / Escape / clic fuera**; **foco atrapado** dentro del modal (`:3164` recorre `a[href], button, input, select, textarea, [tabindex]`). Accesibilidad: las tarjetas reciben `tabindex` (`:3061`) y `aria-label` "... Ver mas informacion" (`:3066`).
+
+**4. Guarda diferida (ver E36):** el bloque se engancha con `MutationObserver` sobre `document.body` (`:3195`, `:3197`, `:3203-3205`) porque `tpl-f14` lo asigna `initEvento` en `window.onload` (`:1219`) y el script corre en **parse-time**.
+
+**5. Verificacion contra archivo real (2026-11-07):** `evento-app.html` **sin cambios en el working tree** (bloque ya commiteado); `f14.css` seccion 10.b presente (`:900`); 5 listas `grid-template-areas` contadas en `f14.css` (`:131`, `:2051`, `:2274`, `:2674`, `:2693`). **No se re-ejecutaron smokes en este pase documental.**
+
+**6. Lo que NO cierra esta tarea:** **smoke manual en navegador** (clamp de 2 lineas en movil, corte de la primera frase, foco atrapado, Escape, clic fuera, iconos sociales del modal) y el **commit** de `css/templates/fiesta/f14.css` (sigue modificado en el working tree). Seguimiento en `NEXT.md` hito **-59**.
+
+### TSK-131 - Modulo DESCRIPCION activado en el silo f14 (recuadro tipo boleteria, antes del Line Up) (2026-11-07) - ABIERTA
+
+> **Fecha:** 2026-11-07. **Estado:** implementado; **ABIERTA** hasta el smoke en navegador y el commit. **No nace ADR:** CSS-only, sin contrato nuevo.
+
+**1. Alcance REAL (baseline = archivo real, ADR-006):** `#mod-descripcion` **ya existia en el DOM** tras el hero (`evento-app.html:133-138`: `<section id="mod-descripcion">` con `.descripcion-inner`, `#db-descripcion-titulo` y `#db-descripcion-texto`); lo que se hizo fue **activarlo en el silo f14** y **colocarlo antes del Line Up**. Implementado **solo** en `css/templates/fiesta/f14.css`, seccion **10.c DESCRIPCION** (desde `:1054`; selectores `.tpl-f14 #mod-descripcion` / `.Tpl-F14 ...`, `:1064-1138`). **0 cambios** en el kernel, `admin.html`, `api/*.js`, SQL/RLS y los otros silos.
+
+**2. Orden en el layout:** la fila de descripcion se agrego **antes de Line Up** en las **5** declaraciones `grid-template-areas` de `f14.css` (**3 base** `:131`, `:2051`, `:2674` y **2 overrides** `:has(guestlist)` `:2274`, `:2693`). **Regla operativa:** cualquier fila nueva del silo debe agregarse a **las 5**, o el layout se rompe solo en la variante con guest list.
+
+**3. Vestido visual:** recuadro tipo **boleteria**, con la misma receta de `.boleto-inner` (fondo kraft, textura de papel, `clip-path` de diente, `drop-shadow` naranja); ancho **porcentual 90%** con **tope 1180px**; padding **2.8rem / 2.4rem**; titulo tipo **cartel** alimentado desde datos con **fallback "SOBRE EL EVENTO"**; parrafo **centrado**.
+
+**4. Verificacion contra archivo real (2026-11-07):** `#mod-descripcion` confirmado en `evento-app.html:133-138`; seccion 10.c presente en `f14.css` (`:1054`); 5 listas `grid-template-areas` contadas. **No se re-ejecutaron smokes en este pase documental.**
+
+**5. Lo que NO cierra esta tarea:** **smoke en navegador** (orden real respecto a Line Up en escritorio y movil, tope de 1180px, fallback del titulo cuando el dato viene vacio) y el **commit** del CSS. Seguimiento en `NEXT.md` hito **-59**.
 
 
 

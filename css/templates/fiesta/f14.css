@@ -1056,9 +1056,10 @@
    IoC y solo lo enciende el silo que lo referencia (patron de f9/f10/f12).
    El titulo y el texto llegan de DATOS (#db-descripcion-titulo / -texto, con
    fallback editorial en el kernel): aqui NO se inventa copy con content:.
-   Lenguaje visual calcado del rotulo de #mod-lineup (bloque 10): mismo stack
-   de cartel, mismo contorno cafe, mismo wrapper de 1180px. El aire vertical
-   no se repite: lo aporta la regla `section` del bloque 5 (L243-247).
+   Desde 2026-11-07 el modulo va envuelto en el MISMO recuadro kraft de la
+   boleteria (bloque 15, L1523-1541): papel texturado, borde diente y sombra
+   naranja solida, con ancho porcentual adaptativo (90% / tope 1180px). El aire
+   vertical no se repite: lo aporta la regla section del bloque 5 (L243-247).
    ========================================================================== */
 .tpl-f14 #mod-descripcion,
 .Tpl-F14 #mod-descripcion {
@@ -1069,23 +1070,43 @@
     border-bottom: 1px solid var(--f14-line);
 }
 
+/* Recuadro: receta del ticket de boleteria (bloque 15, L1523-1541):
+   papel kraft texturado, borde diente por clip-path y sombra naranja solida.
+   Ancho PORCENTUAL adaptativo: 90% del contenedor con tope 1180px (el mismo
+   cap del wrapper de Line Up); es un tope, no un ancho fijo. El filter
+   drop-shadow (y no box-shadow) es obligatorio para que la sombra siga el diente. */
 .tpl-f14 #mod-descripcion .descripcion-inner,
 .Tpl-F14 #mod-descripcion .descripcion-inner {
-    width: 100%;
-    max-width: 1180px;
-    margin: 0 auto;
+    position: relative;
+    width: 90% !important;
+    max-width: 1180px !important;
+    margin: 0 auto !important;
+    padding: 2.8rem 2.4rem 2.4rem !important;
+    color: #0E0E0E;
     text-align: center;
+    background-color: var(--f14-kraft);
+    background-image:
+        repeating-linear-gradient(0deg, rgba(14, 14, 14, 0.05) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, rgba(14, 14, 14, 0.035) 0 1px, transparent 1px 4px),
+        radial-gradient(120% 85% at 18% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 62%),
+        radial-gradient(95% 70% at 100% 100%, rgba(14, 14, 14, 0.13) 0%, rgba(14, 14, 14, 0) 66%);
+    clip-path: polygon(
+        0 0, 12.5% 2.2%, 25% 0, 37.5% 2.2%, 50% 0, 62.5% 2.2%, 75% 0, 87.5% 2.2%, 100% 0,
+        100% 100%, 87.5% 97.8%, 75% 100%, 62.5% 97.8%, 50% 100%, 37.5% 97.8%, 25% 100%, 12.5% 97.8%, 0 100%
+    );
+    filter: drop-shadow(9px 9px 0 rgba(227, 89, 37, 0.28));
 }
 
 /* Rotulo: mismo tratamiento que #mod-lineup::before. Sin `white-space: nowrap`
-   para que un titulo largo pueda partir en dos lineas sin desbordar. */
+   para que un titulo largo pueda partir en dos lineas sin desbordar. La tinta
+   pasa a negro porque el fondo ahora es kraft (como el h2 de boleteria). */
 .tpl-f14 #db-descripcion-titulo,
 .Tpl-F14 #db-descripcion-titulo {
     display: block;
-    margin: 0 auto clamp(1.1rem, 2.6vw, 1.9rem);
-    color: var(--f14-kraft);
+    margin: 0 auto clamp(0.9rem, 2vw, 1.4rem);
+    color: #0E0E0E;
     font-family: var(--f14-poster);
-    font-size: clamp(1.9rem, 6.4vw, 4.6rem);
+    font-size: clamp(1.7rem, 5.4vw, 3.4rem);
     font-weight: 900;
     line-height: 0.92;
     letter-spacing: -0.01em;
@@ -1096,24 +1117,28 @@
     paint-order: stroke fill;
 }
 
-/* Parrafo: 68ch de medida, interlineado 1.75 y la tinta del silo al 86%
-   (contraste sobre #0E0E0E muy por encima de AA). Centrado en movil; a partir
-   de 767px se alinea a la izquierda, como el resto del texto largo de f14. */
+/* Parrafo: tinta del silo sobre kraft al 86% (contraste sobrado sobre
+   #DBC8A8). Centrado SIEMPRE (movil y escritorio): el recuadro ya es ancho,
+   asi que la medida la fija el propio parrafo con 68ch. */
 .tpl-f14 #db-descripcion-texto,
 .Tpl-F14 #db-descripcion-texto {
     max-width: 68ch;
     margin: 0 auto;
-    color: rgba(255, 255, 255, 0.86);
+    color: rgba(14, 14, 14, 0.86);
     font-family: var(--f14-font);
     font-size: clamp(0.92rem, 1.6vw, 1.05rem);
     line-height: 1.75;
     text-align: center;
 }
 
-@media (min-width: 767px) {
-    .tpl-f14 #db-descripcion-texto,
-    .Tpl-F14 #db-descripcion-texto {
-        text-align: left;
+/* Movil: el recuadro pasa a ancho completo, conserva aire interior (1.2rem)
+   y una sombra mas corta para no rozar el borde del viewport. */
+@media (max-width: 640px) {
+    .tpl-f14 #mod-descripcion .descripcion-inner,
+    .Tpl-F14 #mod-descripcion .descripcion-inner {
+        width: 100% !important;
+        padding: 2.1rem 1.2rem 1.8rem !important;
+        filter: drop-shadow(6px 6px 0 rgba(227, 89, 37, 0.28));
     }
 }
 
