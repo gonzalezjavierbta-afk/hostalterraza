@@ -1154,6 +1154,33 @@ task:
 
 **6. Lo que NO cierra esta tarea:** el **commit** de `registroaforo.html` y de `supabase/functions/send-ticket-email/*`, y la **prueba con buzon**. Seguimiento en `NEXT.md` hito **-62**.
 
+### TSK-136 - Markdown-lite en descripciones de evento (ADR-092) (2026-11-10) - ABIERTA (codigo completo; datos y deploy pendientes)
+
+**0. Estado real (ADR-006, 2026-11-10):** el **codigo esta implementado y verificado en local**, pero la tarea queda **ABIERTA**: **sin commit ni push** (no esta en produccion) y con **1 UPDATE de datos pendiente** de ejecutar a mano en el SQL Editor de Supabase (RLS bloquea `anon`). Contrato normativo en `decisiones/ADR-092-contrato-markdown-lite-de-descripciones.md`; fila correspondiente en `DECISIONS.md`.
+
+**1. Archivos tocados (anclas verificadas con `Select-String` contra el archivo real; cifras absolutas NO recontadas en este pase):**
+
+*   `evento-app.html:1128-1163` (**nuevo**, motor publico): `esc(v)` en `:1128`, `_mdInline(s)` en `:1132` y `richText(v)` en `:1139`. Orden obligatorio: **escapar** (`&`, `<`, `>`) -> `***x***` -> `**x**` -> `*x*` -> **listas** `- ` / `* ` / bullet `\u2022` -> `<br>`. Acepta **string** o **objeto `{titulo,texto}`**.
+*   `evento-app.html:121-128` y `:133-138` (**cambio de tag**): `#db-historia-texto` y `#db-descripcion-texto` pasaron de `<p>` a `<div>` (verificado en `:126` y `:136`); un `<li>` dentro de `<p>` es **HTML invalido** y el parser lo rompe. Render con `innerHTML = richText(...)` en `:1903-1906` y `:1934`. **Ningun selector CSS dependia del tag `p`** (verificado en `css/templates/**`), por lo que el cambio es **visualmente neutro**.
+*   `admin.html:1009-1015` (**nuevo**, editor): toolbar de **5 botones** (`data-md` = `b`, `i`, `ul`, `br`, `clear`) sobre `#ev-d`, insertando por `selectionStart`/`selectionEnd`; parser en `:3299-3359` (`_mdEsc` / `_mdInline` / `richText` / `_mdApply`); preview `#pb-evds` (`:10063`) pasa a `innerHTML = richText(...)`.
+*   `api/evento-og.js:45-59` (**nuevo**): `cleanText(s)` despoja los marcadores markdown **antes** de meta/OG/twitter (los asteriscos sueltos y expresiones como `2 * 3` se conservan); `resolveDesc` queda intacto con `trimTo(...,200)`.
+*   `migrations/oneoff_descripcion_vinilos_markdown.sql` (**nuevo, NO EJECUTADO**): `UPDATE` del slug `vinilos-inversos-c8yu`; corrige `muisic` -> `music` y envuelve el cierre en `***` (negrita + cursiva).
+*   **FIX POST-QA (admin.html:6696) - perdida de datos:** si `ev.descripcion` viene como **objeto** (`{titulo,texto}`), el textarea del admin ahora usa `.texto`; antes imprimia `[object Object]` y ese string se **guardaba** en el siguiente save, destruyendo el contenido real.
+*   **FIX POST-QA (admin.html:3314) - paridad de listas:** la regex de listas del admin acepta tambien el bullet **U+2022** (`\u2022`), igual que el motor publico. Sin esto, el admin no reconocia como lista lo que el motor si renderiza.
+*   **0 cambios** en `index.html`, `registroaforo.html`, `scanner.html`, SQL/RLS y en el resto de `css/templates/**`.
+
+**2. Verificacion ejecutada (declarada; NO re-ejecutada en este pase documental):** **paridad 8/8** entre los dos `richText` (motor publico y admin) sobre los mismos casos; **XSS 48/48** payloads neutralizados (el escape va **primero**, antes de cualquier reemplazo); `node --check` OK en los **5 bloques** inline tocados y en `api/evento-og.js`; **ASCII-safety delta 0** en los 3 archivos; **balance de `div` delta 0**.
+
+**3. Pendiente que mantiene la tarea ABIERTA:**
+
+*   (i) Ejecutar `migrations/oneoff_descripcion_vinilos_markdown.sql` en el **SQL Editor de Supabase** (RLS bloquea `anon`; requiere sesion con permisos de escritura).
+*   (ii) **commit + push** y **smoke visual** en `hostalterraza.vercel.app/evento.html?slug=vinilos-inversos-c8yu`.
+*   (iii) **Decision abierta:** estilo `ul/li` en los silos **f9/f12** (hoy sin regla propia) y `columns: 2` de `css/templates/fiesta/f12.css:990` **fragmentando** las listas entre columnas.
+
+**4. Riesgo aceptado (declarado en ADR-092):** el markdown esta **siempre activo**, sin flag por evento; un `*` **literal** en descripciones antiguas pasara a **cursiva** (cosmetico, no destructivo: el texto sigue completo y el `*` desaparece solo en el render).
+
+**5. Lo que NO cierra esta tarea:** el deploy y el `UPDATE`. Seguimiento en `NEXT.md` hito **-63**.
+
 
 
 

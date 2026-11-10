@@ -42,9 +42,18 @@ function withTimeout(url, options, ms) {
   });
 }
 
+// Texto plano para meta description / og:description.
+// El motor publico interpreta markdown-lite en descripcion (***x***, **x**,
+// *x*, lineas de lista con guion o bullet); aqui solo sobrevive el texto.
+// Mismo orden que evento-app.html: tags -> prefijo de lista -> inline -> espacios.
+// Los asteriscos sueltos (sin pareja que envuelva texto) se dejan intactos.
 function cleanText(s) {
   return String(s == null ? '' : s)
     .replace(/<[^>]*>/g, ' ')
+    .replace(/^[ \t]*[-*\u2022][ \t]+/gm, ' ')
+    .replace(/\*\*\*([^*]+)\*\*\*/g, '$1')
+    .replace(/\*\*([^*\s][^*]*?)\*\*/g, '$1')
+    .replace(/\*([^*\s][^*]*?)\*/g, '$1')
     .replace(/\s+/g, ' ')
     .trim();
 }

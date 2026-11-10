@@ -123,7 +123,7 @@
             <div class="historia-inner" style="max-width:900px; margin:0 auto; text-align:center;">
                 <h2 id="db-historia-titulo" style="font-weight:900; text-transform:uppercase;">--</h2>
                 <img id="db-historia-img" alt="" style="width:100%; max-width:700px; border-radius:15px; margin:2rem auto; display:block;" onerror="this.style.display='none';">
-                <p id="db-historia-texto" style="line-height:1.8; opacity:0.85;">--</p>
+                <div id="db-historia-texto" style="line-height:1.8; opacity:0.85;">--</div>
             </div>
         </section>
 
@@ -133,7 +133,7 @@
         <section id="mod-descripcion">
             <div class="descripcion-inner">
                 <h2 id="db-descripcion-titulo">--</h2>
-                <p id="db-descripcion-texto">--</p>
+                <div id="db-descripcion-texto">--</div>
             </div>
         </section>
 
@@ -1117,6 +1117,49 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
             return hasForm && !hasLanding;
         }
 
+        // === TEXTO ENRIQUECIDO MARKDOWN-LITE (anti-XSS) ===
+        // Soporta **negrita**, *cursiva*, ***ambas***, saltos de linea y listas
+        // con guion / asterisco / bullet U+2022 en #db-descripcion-texto y
+        // #db-historia-texto. ORDEN OBLIGATORIO: escapar -> markdown inline ->
+        // bloques/saltos. Nunca al reves: si se escapa despues, las etiquetas
+        // propias del render quedan visibles como texto.
+        // Nota: los nodos destino son <div>, no <p> (un <ul> dentro de <p> es
+        // HTML invalido). Ningun CSS del repo los selecciona por tag.
+        function esc(v) {
+            return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        // s YA escapado. No re-escapa: solo re-inyecta <strong>/<em>.
+        function _mdInline(s) {
+            s = s.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+            s = s.replace(/\*\*([^*\s][^*]*?)\*\*/g, '<strong>$1</strong>');
+            s = s.replace(/\*([^*\s][^*]*?)\*/g, '<em>$1</em>');
+            return s;
+        }
+        // Acepta string u objeto {titulo, texto} / {text}. Devuelve HTML seguro.
+        function richText(v) {
+            if (v === null || v === undefined) return '';
+            if (typeof v === 'object') v = v.texto || v.text || '';
+            var s = (typeof v === 'string') ? v : String(v);
+            if (!s) return '';
+            var lines = esc(s).split(/\r?\n/);
+            var out = '';
+            var inList = false;
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                var m = line.match(/^[-*\u2022]\s+(.+)$/);
+                if (m) {
+                    if (!inList) { out += '<ul>'; inList = true; }
+                    out += '<li>' + _mdInline(m[1]) + '</li>';
+                } else {
+                    if (inList) { out += '</ul>'; inList = false; }
+                    out += (line === '' ? '' : _mdInline(line)) + '<br>';
+                }
+            }
+            if (inList) out += '</ul>';
+            return out.replace(/(<br>)+$/, '');
+        }
+        // === FIN TEXTO ENRIQUECIDO ===
+
         async function initEvento() {
             // Parseo unico de la query. `preview` viene de la bandera de sesion
             // (__HT_PREVIEW); sin ?preview=1 el comportamiento es el de siempre.
@@ -1858,7 +1901,8 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         document.getElementById('db-historia-titulo').innerText = histTitulo.toUpperCase();
     }
     if (document.getElementById('db-historia-texto')) {
-        document.getElementById('db-historia-texto').innerText = histTexto;
+        // markdown-lite: mismo formateador que #db-descripcion-texto.
+        document.getElementById('db-historia-texto').innerHTML = richText(histTexto);
     }
     const histImgEl = document.getElementById('db-historia-img');
     if (histImgEl) {
@@ -1887,7 +1931,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
     const __descTitulo = __descObj.titulo || __f9DescTituloDef;
     const __descTexto = __descObj.texto || (typeof __descRaw === 'string' ? __descRaw.trim() : '') || __f9DescTextoDef;
     if (document.getElementById('db-descripcion-titulo')) document.getElementById('db-descripcion-titulo').innerText = String(__descTitulo).toUpperCase();
-    if (document.getElementById('db-descripcion-texto')) document.getElementById('db-descripcion-texto').innerText = String(__descTexto);
+    if (document.getElementById('db-descripcion-texto')) document.getElementById('db-descripcion-texto').innerHTML = richText(__descTexto);
     // === FIN SEGMENTO DESCRIPCION ===
 
     // === INICIO SEGMENTO: OBJETIVO Y BARRA DE PROGRESO CON FALLBACK (v215) ===
