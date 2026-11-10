@@ -2915,3 +2915,93 @@
         transition: none;
     }
 }
+
+/* ==========================================================================
+   29. LAYOUT POR EVENTO - BOLETOS + GUEST LIST EN LA MISMA FILA
+   Contrato con el kernel (evento-app.html L1318-1326): si el evento trae
+   boletos_guestlist === true el body recibe data-mod-row="boleto-guest".
+   El kernel NO toca la rejilla: solo publica el gancho y el silo lo consume.
+   Sin el atributo nada de esta seccion aplica y los eventos f14 conservan la
+   rejilla de la seccion 4 (1 columna), la 18 (2 columnas) y la 28 (guest list
+   + anti-hueco).
+   Cero Borrado (Oro #2): son reglas nuevas, ninguna reescribe a las previas;
+   se gana por especificidad y por orden (esta seccion va al final del archivo).
+   Aislamiento Atomico (Oro #9): todo cuelga de .tpl-f14 / .Tpl-F14.
+   ========================================================================== */
+
+@media (min-width: 768px) {
+    /* --- 29.1 ESTADO (a) AMBOS VISIBLES: boletos | guest list --------------
+       La pareja base "boletos form" + "guestlist guestlist" pasa a
+       "boletos guestlist" + "form form"; el resto de areas y filas queda
+       igual. #mod-form baja a fila propia para no quedarse sin area nombrada:
+       ocupa las dos columnas, asi que no deja celda huerfana, y cuando llega
+       con data-hidden + display:none en linea la fila mide 0px porque
+       row-gap es 0 (L147). Igual para #mod-video en "video video". */
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow,
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow {
+        grid-template-areas:
+            "hero hero"
+            "ctas ctas"
+            "descripcion descripcion"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos guestlist"
+            "form form"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer";
+    }
+
+    /* --- 29.2 ESTADOS (b/c) GUEST LIST APAGADO: la fila queda para boletos.
+       Doble activador, igual que f9b (L2928-2933): data-hidden lo pone
+       __aplicaModulos y data-empty="true" lo pone la card vacia. */
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-hidden]),
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-hidden]),
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-empty="true"]),
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-empty="true"]) {
+        grid-template-areas:
+            "hero hero"
+            "ctas ctas"
+            "descripcion descripcion"
+            "lineup lineup"
+            "cartel playlist"
+            "boletos boletos"
+            "form form"
+            "video video"
+            "faq ubicacion"
+            "sponsors sponsors"
+            "footer footer";
+    }
+
+    /* --- 29.3 FORM APAGADO: la base (L234-238) estiraba #mod-boletos a 1/-1
+       porque form era su companero de fila. Aqui el companero es guest list:
+       ese estiron invadiria su celda, asi que boletos vuelve a su columna. */
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos,
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos {
+        grid-column: 1 / 2;
+    }
+
+    /* --- 29.4 Sin guest list no hay pareja: boletos recupera la fila entera
+       aunque 29.3 acabe de acotarlo. Va despues a proposito: mismo peso,
+       gana el orden de cascada. */
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-hidden]) #mod-boletos,
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-hidden]) #mod-boletos,
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-empty="true"]) #mod-boletos,
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-guestlist[data-empty="true"]) #mod-boletos {
+        grid-column: 1 / -1;
+    }
+
+    /* --- 29.5 Sin boletos: el guest list ocupa la fila entera en vez de
+       dejar la columna izquierda vacia. */
+    .tpl-f14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-boletos[data-hidden]) #mod-guestlist,
+    .Tpl-F14[data-mod-row="boleto-guest"] #main-content-flow:has(#mod-boletos[data-hidden]) #mod-guestlist {
+        grid-column: 1 / -1;
+    }
+}
+
+/* --- 29.6 <=767px: sin reglas. La rejilla de L2271-2289 ya es de una sola
+   columna y coloca boletos (L2281) antes que guest list (L2283), que es el
+   orden pedido en movil. El anti-hueco de L2672-2688 retira la fila guestlist
+   cuando la card nace vacia. No se anade nada aqui para no duplicar esa
+   rejilla ni mover el piso de 767px. */

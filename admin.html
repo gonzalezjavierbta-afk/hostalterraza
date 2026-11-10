@@ -688,6 +688,8 @@ tr:hover td{background:var(--surface)}
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-banner-1" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Banner 1</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-banner-2" style="width:13px;height:13px;accent-color:var(--gold)"> 🖼 Banner 2</label>
                 <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-whatsapp" style="width:13px;height:13px;accent-color:var(--gold)"> 💬 WhatsApp contacto</label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-form" style="width:13px;height:13px;accent-color:var(--gold)"> Comunidad / formulario</label>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--rsm)"><input type="checkbox" id="ld-mod-row-boletos" style="width:13px;height:13px;accent-color:var(--gold)"> Boletos + guestlist en una fila</label>
               </div>
             </div>
 
@@ -5619,6 +5621,15 @@ function _buildConfigLanding(slug) {
       // modules. La casilla nace marcada en su theme (ver openEditMod).
       banner_1:      chk('ld-mod-banner-1'),
       banner_2:      chk('ld-mod-banner-2'),
+      // Fiesta (f14) - feature nueva: comunidad/formulario propio y boletos +
+      // guestlist en una sola fila. Se emiten SOLO cuando la categoria activa es
+      // fiesta: en cine/campana la clave queda AUSENTE a proposito, porque el
+      // render es fail-open (sin clave el form sigue VISIBLE) y un false
+      // explicito apagaria el modulo de eventos que el admin nunca gobierno.
+      ...(suf === 'fiesta' ? {
+        form:              chk('ld-mod-form'),
+        boletos_guestlist: chk('ld-mod-row-boletos'),
+      } : {}),
       // Campaña
       historia:        chk('ld-mod-historia'),
       objetivo:        chk('ld-mod-objetivo'),
@@ -6648,6 +6659,9 @@ const _MOD_FIXED = {
   trailer:'ld-mod-trailer', sinopsis:'ld-mod-sinopsis', meet_director:'ld-mod-director',
   dj_lineup:'ld-mod-dj-lineup', playlist:'ld-mod-playlist', guest_list:'ld-mod-guest-list',
   ubicacion:'ld-mod-ubicacion', boletos:'ld-mod-boletos', whatsapp:'ld-mod-whatsapp',
+  // f14/fiesta - feature nueva: 'Comunidad / formulario' y 'Boletos + guestlist
+  // en una fila'. Ids fijos (sin sufijo) porque solo existen en #mods-fiesta.
+  form:'ld-mod-form', boletos_guestlist:'ld-mod-row-boletos',
   // Banners editoriales f9b (ids fijos, sin sufijo de categoria): el par
   // banner_1/banner_2 se restaura y se persiste como cualquier modulo fijo.
   banner_1:'ld-mod-banner-1', banner_2:'ld-mod-banner-2',
@@ -6869,7 +6883,24 @@ function openEditMod(evId) {
         chk.dispatchEvent(new Event('change', { bubbles: true }));
       }
     });
-    // ADR-035 — restaurar overrides de idioma FR/EN del config_landing.i18n
+    // Fiesta (f14) - feature nueva: form (comunidad/formulario) y boletos +
+    // guestlist en una fila. Mismo patron que banner_N: SOLO una clave PRESENTE
+    // en cfg.modules decide el estado (modules.form === false = apagado
+    // explicito). Sin clave no se toca: la caja nace desmarcada desde
+    // _limpiarWizardCompleto y el render fail-open mantiene el form VISIBLE,
+    // que es el default historico.
+    ['form','boletos_guestlist'].forEach(key => {
+      const chk = document.getElementById(_MOD_FIXED[key]);
+      if (!chk) return;
+      const exp = mods[key];
+      if (exp === undefined) return;
+      const on = (exp === false) ? false : !!exp;
+      if (chk.checked !== on) {
+        chk.checked = on;
+        chk.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    // ADR-035 - restaurar overrides de idioma FR/EN del config_landing.i18n
     if (typeof _poblarI18nEditor === 'function') _poblarI18nEditor(cfg.i18n);
 
     if (content.titulo_display) { const el = document.getElementById('ev-titulo-display'); if (el) el.value = content.titulo_display; }
@@ -7009,6 +7040,9 @@ function hideForeignModulesByType(tipo, suf) {
     'ld-mod-gallery-fiesta':'fiesta','ld-mod-faq-fiesta':'fiesta','ld-mod-sponsors-fiesta':'fiesta',
     'ld-mod-dresscode-fiesta':'fiesta','ld-mod-countdown-fiesta':'fiesta','ld-mod-aforo-fiesta':'fiesta',
     'ld-mod-banner-1':'fiesta','ld-mod-banner-2':'fiesta',
+    // f14/fiesta - feature nueva (solo panel fiesta): se aisla igual que el resto
+    // para que editar un evento de cine/campana no herede un check marcado.
+    'ld-mod-form':'fiesta','ld-mod-row-boletos':'fiesta',
     // Campaña
     'ld-mod-historia':'campana','ld-mod-objetivo':'campana','ld-mod-impacto':'campana',
     'ld-mod-gallery-campana':'campana','ld-mod-sponsors-campana':'campana','ld-mod-faq-campana':'campana',

@@ -1271,6 +1271,61 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 // el helper es no-op y el silo aplica sus defaults (fail-open, regla 4.4).
                 __aplicarEfectosLanding(ev);
 
+                // === INICIO SEGMENTO: CONTROL DE MODULOS (config_landing.modules) ===
+                // admin.html persiste config_landing.modules en _buildConfigLanding()
+                // (gallery, guest_list, whatsapp, boletos, ...). Hasta ahora el kernel
+                // solo leia cfg.modules dentro de __esSoloFormulario: apagar un toggle
+                // no ocultaba nada. Contrato de este segmento:
+                //   - AUSENTE o true  -> VISIBLE (los eventos viejos no traen la clave:
+                //     default visible, jamas se rompe una landing existente).
+                //   - false           -> OCULTO.
+                // Cero Borrado (Oro #2): se oculta con display:none !important +
+                // data-hidden; nunca se elimina el nodo ni su id.
+                // Se aplica justo despues de fijar document.body.className y ANTES de
+                // que cualquier modulo se poble, para que el silo pinte ya sin el
+                // modulo (cero parpadeo). Idempotente: se puede llamar N veces.
+                const __cfgLanding = ev.config_landing || {};
+                const M = (__cfgLanding && __cfgLanding.modules) || {};
+                // Helper de lectura: solo false apaga.
+                const modOn = function (k) { return M[k] !== false; };
+                // Registro de modulos apagados por admin. Lo consulta __hideEmptyModule
+                // para que el poblado del render no "re-encienda" un modulo apagado.
+                const __MOD_OFF = {};
+                const __modOff = function (id) { return __MOD_OFF[id] === true; };
+                const __aplicaModulos = function () {
+                    // Mapa id real del DOM -> clave real del JSONB. Los ids del
+                    // markup son la verdad (mod-guestlist, no mod-guest_list).
+                    const mapa = [
+                        ['mod-video', 'gallery'],
+                        ['mod-whatsapp', 'whatsapp'],
+                        ['mod-guestlist', 'guest_list'],
+                        ['mod-form', 'form']
+                    ];
+                    for (let i = 0; i < mapa.length; i++) {
+                        const id = mapa[i][0];
+                        const flag = mapa[i][1];
+                        if (modOn(flag)) { delete __MOD_OFF[id]; continue; }
+                        __MOD_OFF[id] = true;
+                        const el = document.getElementById(id);
+                        if (!el) continue;
+                        el.style.setProperty('display', 'none', 'important');
+                        // Valor '1': el CSS del silo selecciona por presencia
+                        // ([data-hidden]) y refluye su grid sin huecos.
+                        el.setAttribute('data-hidden', '1');
+                    }
+                };
+                __aplicaModulos();
+                // Layout por evento (fila boleto + guest list): el kernel NO toca el
+                // grid; solo publica el gancho que el CSS del silo consume con
+                // body[data-mod-row="boleto-guest"]. Si la clave no es true, el
+                // atributo NO existe (estado por defecto del silo).
+                if (M.boletos_guestlist === true) {
+                    document.body.setAttribute('data-mod-row', 'boleto-guest');
+                } else {
+                    document.body.removeAttribute('data-mod-row');
+                }
+                // === FIN SEGMENTO: CONTROL DE MODULOS ===
+
                 // v305 · PUENTE DE GAMAS CROMÁTICAS (regla general, aplica a silos que
                 // exponen tokens de paleta derivada, ej. .tpl-f8 TropiLove). A partir del
                 // --master-accent del evento se calculan complementario/análogos/tríada
@@ -1336,6 +1391,14 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const __hideEmptyModule = function (id, hasContent) {
                     const el = document.getElementById(id);
                     if (el) {
+                        // Prioridad del toggle de admin (config_landing.modules): si el
+                        // modulo esta apagado, el poblado del render no puede re-encenderlo.
+                        // Se re-aplica el estado (idempotente) y se ignora hasContent.
+                        if (__modOff(id)) {
+                            el.style.setProperty('display', 'none', 'important');
+                            el.setAttribute('data-hidden', '1');
+                            return false;
+                        }
                         if (hasContent) {
                             el.removeAttribute('data-hidden');
                         } else {
