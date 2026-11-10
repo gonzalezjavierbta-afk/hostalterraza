@@ -52,6 +52,10 @@ estructura: indice-v1 (2026-10-01)
 
 > **Delta por LINE UP f14 con ficha de artista + MODULO DESCRIPCION f14 (2026-11-07, linea agregada, sin reescribir las de arriba):** **+2 entradas / +2 abiertas = TSK-130 (LINE UP f14: resena corta por tarjeta + ficha de artista en modal) + TSK-131 (modulo DESCRIPCION activado en el silo f14)**. Delta efectivo: **+2 abiertas / 0 cerradas**. TSK-130 toca el **kernel** (`evento-app.html:2955-3214`, bloque `<script>` aditivo, **0 lineas existentes modificadas**) y el CSS del silo (`css/templates/fiesta/f14.css` seccion 10.b); TSK-131 es **CSS-only** (`f14.css` seccion 10.c; `#mod-descripcion` ya existia en el DOM en `evento-app.html:133-138`). **0 cambios** en `admin.html`, `api/*.js`, SQL/RLS y los otros 13 silos. Evento afectado: `vinilos-inversos-c8yu` (`template_id='f14'`, theme `vinilos`). Verificado contra el archivo real (ADR-006): `f14.css` tiene **5** listas `grid-template-areas` (`:131`, `:2051`, `:2274`, `:2674`, `:2693`). Queda **smoke en navegador** y el **commit del CSS**: ambas nacen ABIERTAS. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
 
+> **Delta por ADR-090 (validacion offline del scanner PWA) (2026-11-07, linea agregada, sin reescribir las de arriba):** **+2 entradas / +2 abiertas = TSK-006a (PWA instalable, desdoblada de TSK-006) + TSK-133 (validacion offline real: snapshot IndexedDB + outbox idempotente)**. Delta efectivo: **+2 abiertas / 0 cerradas**. La fila original de **TSK-006 se conserva** marcada como desdoblada (Cero Borrado), y el placeholder `TSK-XXXb` del ADR-090 (migracion `adr090`) **no abre ID propio: es la fase F2 de TSK-133**. **Nada se implemento en este pase:** es cierre documental de un ADR **ACEPTADO CON CAMBIOS** (305 lineas, D1-D11, F1-F5, V1-V12), con **0 archivos de codigo, 0 migraciones escritas o aplicadas, 0 commits**. **Bloqueo vigente:** el pre-chequeo de duplicados historicos en `logs` (D11) bloquea F1 y F2; sin ese reporte (evento, qr, punto, n) y la decision de Direccion caso por caso no se crea el indice UNIQUE parcial. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
+> **Delta por TICKET QR POR CORREO (ADR-091) (2026-11-10, linea agregada, sin reescribir las de arriba):** **+1 entrada = TSK-135** (ticket QR por correo: `email` obligatorio en `registroaforo.html` cuando el evento entrega QR + PNG del QR generado server-side en la Edge Function). Delta efectivo: **+1 abierta / 0 cerradas**, porque la **prueba funcional real con un buzon NO se ejecuto** y la tarea nace **ABIERTA** pese a estar **desplegada** (Edge Function `send-ticket-email` **v12 ACTIVE**). **Alcance real:** `registroaforo.html` **+186 / -17** y `supabase/functions/send-ticket-email/index.ts` **+121 / -18** (+ `deno.json` **nuevo**); **0 cambios** en `admin.html`, `api/*.js`, SQL/RLS, `BLUEPRINT.md` y motor de render. **Corrige H9** (`ERRORES_HISTORICOS.md` E33): la Edge Function ya **no** rechaza el codigo corto `QR-...` con `400`. Verificado: Escudo GOLD **8/8** (balance de `div` **54/54**, ASCII **0/0**, sintaxis de JS inline OK), smoke `scripts/smoke_registroaforo_wa.js` -> **77/77** y `deno check` con **solo** el `TS2345` **preexistente** de `verifySessionJwt`. Cifras absolutas NO recontadas en este cierre (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -100,13 +104,14 @@ estructura: indice-v1 (2026-10-01)
 *TRACE (2026-10-03, ADR-078 — cierre por cron de recordatorios):* **TSK-003 QUEDA CERRADA.** La parte de `pg_cron` **SI se implemento y se aplico**: `CREATE EXTENSION pg_cron` (version **1.6.4**; `pg_net` ya 0.20.0), funcion `public.fn_enviar_recordatorios_pendientes()` (SECURITY DEFINER, ejecutable solo por `service_role`), y job `recordatorios-horarios` con schedule **`5 * * * *`** ACTIVE y verificado en `cron.job`. Dry-run: `{"eventos":0,"enviados":0,"omitidos":0,"errores":0}`. Correccion ADR-006: el lugar del evento se toma de **`eventos.ubicacion`** (`eventos.lugar` NO existe -> error `42703`). Commit **`f3863fb`** (migracion `migrations/adr078_cron_recordatorios.sql` + ADR-078 + fila en `DECISIONS.md:92`). El TRACE del 2026-10-03 anterior (bajo la misma linea) queda **SUPERADO**: describia `pg_cron` como "SIN implementar" (estado previo a la aplicacion).
 | [TSK-010](TASKS-DETALLE.md#tsk-010) | Lead Developer | Verificar y crear columnas en tabla `inscritos` (whatsapp, tipo_ayuda, autorizacion) | Blindaje Campaña b5 (Emergencia) | L218-219 |
 | [TSK-012](TASKS-DETALLE.md#tsk-012) | Chief Architect | Implementar ADR-012 en `DECISIONS.md` para documentar la extensión del Contrato v110 | Blindaje Campaña b5 (Emergencia) | L221-222 |
+| [TSK-006a](#tsk-006a) | `@admin-dev` + `@frontend-tpl` (PAGO; `admin-dev` es dominio de riesgo: gate `AGENTS.md` sec. 2) | **PWA instalable del scanner (alcance reducido a ADR-090 D1/D8)** — `manifest.webmanifest` + `sw.js` con scope `/scanner.html` + iconos 192/512/maskable + registro del SW + banner de actualizacion | Refinamiento y UX (ADR-090 D1/D8) | **PENDIENTE — prioridad ALTA (habilitante de la instalacion en puerta, ADR-090 D1); depende de ADR-090** (es su fase F3). Ver "Apertura de TSK-006a y TSK-133" al final |
 
 #### 🟡 PRIORIDAD MEDIA
 
 | ID | Responsable | Título | Bloque | Detalle |
 |---|---|---|---|---|
 | [TSK-031](TASKS-DETALLE.md#tsk-031) | Chief Architect (deuda técnica aceptada — hallazgos H-3/H-4 de la… | (H-3) El FAQ de ejemplo de F9 está hardcodeado para CUALQUIER evento `tpl-f9` sin FAQ configurado, no solo… | Refinamiento y UX | L228-228 |
-| [TSK-006](TASKS-DETALLE.md#tsk-006) | Creative Director | Configurar manifest.json y Service Worker para hacer el scanner instalable (PWA) | Refinamiento y UX | L230-230 |
+| [TSK-006](TASKS-DETALLE.md#tsk-006) | Creative Director | Configurar manifest.json y Service Worker para hacer el scanner instalable (PWA) — (desdoblada en TSK-006a + TSK-133 de validacion offline por ADR-090; fila original conservada por Cero Borrado) | Refinamiento y UX | L230-230 |
 | [TSK-013](TASKS-DETALLE.md#tsk-013) | Creative AI | Desarrollar el módulo aditivo "08 Actualizaciones" y el desglose de tarjetas para la sección Historia de b5 | Refinamiento y UX | L232-232 |
 | [TSK-014](TASKS-DETALLE.md#tsk-014) | Documentation | Sincronizar permanentemente PROJECT.md y BLUEPRINT.md bajo el estándar v127-MASTER | Refinamiento y UX | L234-234 |
 | [TSK-039](TASKS-DETALLE.md#tsk-039) | Direccion / Lead Developer (deuda MENOR + decision futura derivada de… | (1) `#ld-form-redirect` usa `type="url"` sin normalizacion de esquema — normalizar (prefijar `https://` si… | Contratos de Configuracion Wizard/Landing (ADR-047) —… | L237-238 |
@@ -201,6 +206,23 @@ estructura: indice-v1 (2026-10-01)
 |---|---|---|---|---|
 | [TSK-129](#tsk-129) | `@admin-dev` (**PAGO**: es `admin.html`) + `@renderer-dev` (gate `AGENTS.md` seccion 2: es el motor `evento-app.html`) | **v223.2 - Foto del artista con URL manual o subida a Storage** - bucket `eventos-imagenes`, path `lineup/{slug}/{timestamp}-{rand}.{ext}`, reutilizando `_imgValidateFile` / `_imgExtFromType` / `_imgSharedUpload`; fallback ADR-008 con `onerror` en `artist-photo` (kernel `:2153`) y `f8-artist-photo` (`:2267`); eliminacion de la URL muerta `assets/avatar-default.png` en `evento-app.html`, `eventologs.html` y `eventovenezuela.html`; `og:image` por defecto al asset real en `api/evento-og.js:11`. **CERRADA en `e3fb7ca`** (5 archivos, `+141/-17`). | Sub-tab Lineup + motor `evento-app.html` + `eventologs.html` / `eventovenezuela.html` + `api/evento-og.js` | Ver "TSK-129" al final del archivo |
 | [TSK-132](#tsk-132) | `@backend-dev` / `@renderer-dev` (gate `AGENTS.md` seccion 2: es el motor `evento-app.html`) + `@admin-dev` (es `admin.html`) | **Playlist multi-proveedor (Spotify o YouTube) + poster por archivo y drag & drop** - `__resolvePlaylistEmbed(raw)` en el kernel (prioridad Spotify -> YouTube `list=` -> YouTube video) y URL invalida que ahora **oculta** el modulo; `_uploadPosterFile` / `handlePosterFile` en el admin reutilizando `_imgValidateFile` / `_imgSharedUpload` (bucket `eventos-imagenes`, `posters/{slug}/...`); zona `#ev-poster-drop` con drag & drop. **Contratos intactos:** `content.playlist_url` y `eventos.poster_url`. Incluye el fix de `onerror` inline con `src=""` que dejaba el cartel sin mostrar (E37). **ABIERTA** (smoke en navegador). | `evento-app.html` (kernel) + `admin.html` (poster y playlist) + `css/templates/fiesta/f14.css` (line up 4 columnas) | Ver "TSK-132" al final del archivo |
+
+#### VALIDACION OFFLINE DEL SCANNER (ADR-090) - 1 item NUEVO, BLOQUEADO por el pre-chequeo D11 (2026-11-07)
+
+> El ADR-090 esta **ACEPTADO CON CAMBIOS** (dictamen de `@architect-review`, D1-D11). **Nada esta implementado:** 0 `manifest.json`, 0 `sw.js`, 0 migracion escrita y 0 lineas de `scanner.html` tocadas. La PWA instalable vive en **TSK-006a** (seccion de prioridad media, junto a la fila original TSK-006 que se conserva). Esta tarea es la **validacion offline REAL** (snapshot + outbox). El placeholder `TSK-XXXb` de la sec. 9 del ADR (migracion `adr090`) **no abre ID propio: se absorbe como fase F2** de esta tarea.
+
+| ID | Responsable | Titulo | Bloque | Detalle |
+|---|---|---|---|---|
+| [TSK-133](#tsk-133) | `@sql-security` (F1, **PAGO**, gate sec. 2) + `@data-migration` (F2, **PAGO**, gate sec. 2) + `@admin-dev` + `@frontend-tpl` (F3/F4; `admin-dev` es dominio de riesgo) + `@qa-auditor` (F5, FREE) | **Validacion offline real del scanner (ADR-090): snapshot IndexedDB + outbox idempotente** — D1 SW solo `/scanner.html`, D2 snapshot en IndexedDB, D4 token caducado + offline, D5 `duplicado`, D6/D10 `op_id` + indice UNIQUE parcial, D7 sin PII, D9 ventana 12 h / fin del evento + 2 h, D11 pre-chequeo | Scanner de puerta (`scanner.html`) + `logs` (columnas `op_id`/`offline` + indice) | **PENDIENTE — prioridad ALTA; BLOQUEADA por el pre-chequeo de duplicados historicos en `logs` (D11)**, que es ademas bloqueante de F1. Sub-fases F1-F5 con agente y tier, criterios V1-V12 y los 3 riesgos abiertos en "Apertura de TSK-006a y TSK-133" al final del archivo. F1 completada en diseno: 2 SQL en migrations/ (pre-check + DDL), 0 ejecuciones |
+| [TSK-134](#tsk-134) | `@data-migration` (F2; **PAGO**, gate sec. 2) | **F2 - Migracion adr090: `op_id` + CHECK canonico de resultado + indice unico parcial** | Scanner de puerta (`scanner.html`) + `logs` (columnas `op_id`/`offline` + indices) | **PENDIENTE DE EJECUCION**. Prioridad ALTA. Depende de: pre-chequeo D11 sin duplicados (o adjudicacion). Artefactos ya escritos: `migrations/adr090_precheck_duplicados.sql` (solo lectura) y `migrations/adr090_idempotencia_logs.sql` (DDL propuesto, no aplicado) |
+
+#### TICKET QR POR CORREO (ADR-091) - 1 item NUEVO, ABIERTA por la prueba real con buzon (2026-11-10)
+
+> El contrato de diseno es `decisiones/ADR-091-correo-del-ticket-con-codigo-corto-y-qr-server-side.md`. La implementacion **esta hecha y desplegada** (Edge Function `send-ticket-email` **v12 ACTIVE**), pero **no esta certificada**: falta la cadena completa con un buzon real. La fila nace **ABIERTA** a proposito; **no** se marca completada la prueba real.
+
+| ID | Responsable | Titulo | Bloque | Detalle |
+|---|---|---|---|---|
+| [TSK-135](#tsk-135) | `@js-silo-dev` (`registroaforo.html`) + `@backend-dev` (**PAGO**, gate `AGENTS.md` seccion 2: es la Edge Function) | **Ticket QR por correo (ADR-091)** - `email` obligatorio en modo ticket (`__ctxCapturaPura === false`, flujo nuevo y "Ya estoy registrado") + `p_qr_code` con el codigo real `QR-...` + aviso de estado y reintento + Edge Function que genera el PNG del QR server-side (`npm:qrcode@1.5.3`) y lo manda inline (`cid:ticket-qr`), con fallback a codigo en texto | Canal de correos / ticket del asistente | **ABIERTA - implementada y desplegada; PENDIENTE la prueba funcional real con un buzon** (registro -> `email_envios_log` -> correo con QR inline -> escaneo con `scanner.html`). Cierre completo al final del archivo |
 
 #### 🟢 BACKLOG / LARGO PLAZO
 
@@ -1068,6 +1090,69 @@ task:
 **7. Verificacion de este pase documental (2026-11-07):** `grep` contra archivo real: `__resolvePlaylistEmbed` en `evento-app.html:1767`, `spotify-open-link` en `:1833`, `Abrir en YouTube` en `:1838`, fix del cartel en `:2135-2142`; en `admin.html`: `#ev-poster-file` `:1179`, `#ev-poster-drop` `:1178`, `_uploadPosterFile` `:13508`, `handlePosterFile` `:13534`, drag & drop `:13540-13558`, label de playlist `:784`; en `f14.css`: `@media (min-width: 992px)` `:2168` con `repeat(4, ...)` `:2171`. **No se re-ejecutaron smokes en este pase** (no se declara PASS alguno). `git status --porcelain` = `M admin.html`, `M evento-app.html` (working tree de la tarea; **este pase documental no toco codigo**).
 
 **8. Lo que NO cierra esta tarea:** **smoke en navegador** (playlist de Spotify y de YouTube en el landing, URL invalida que oculta el modulo, subida de poster por clic y por drop, poster visible en el landing tras recargar, line up a 4 columnas en >=992px y 3 en 640-991) y el **commit** de `admin.html` / `evento-app.html`. Seguimiento en `NEXT.md` hito **-60**.
+
+### Apertura de TSK-006a y TSK-133 - PWA acotada y validacion offline del scanner (ADR-090) (2026-11-07) - PENDIENTE / BLOQUEADA por D11
+
+**0. Origen y estado real (ADR-006, 2026-11-07):** el contrato de diseno es `decisiones/ADR-090-validacion-offline-del-scanner-pwa.md` (**305 lineas**, estado **ACEPTADO CON CAMBIOS**, D1-D11, F1-F5, V1-V12, 3 preguntas abiertas en su sec. 10). Verificado contra el archivo real: **no** existe `manifest.json`, **no** existe `sw.js`, **no** existe `migrations/adr090*`, y `scanner.html` **no se ha tocado** (1.330 lineas / 64,7 KB). Este pase es **documental**: 0 codigo, 0 migraciones, 0 commits, 0 PASS declarados.
+
+**1. TSK-006a - PWA instalable del scanner (fase F3 del ADR).** Alcance **reducido a D1/D8**: `manifest.webmanifest` (nombre, `start_url` de `/scanner.html`, `display: standalone`), iconos **192 / 512 / maskable**, `sw.js` en raiz registrado con **scope exacto `/scanner.html`** y guard en el handler `fetch` (todo lo que no sea esa ruta o un estatico de la allow-list se ignora), y **banner de actualizacion** cuando se detecta `CACHE_VERSION` nuevo. **Fuera de alcance:** push, app nativa, background sync, scope raiz con precache del sitio (rompe SEO y motor de render). **Riesgo asociado:** el token del staff **no puede viajar en la URL del icono instalado** (ver riesgo 3). Responsable `@admin-dev` + `@frontend-tpl`; `admin-dev` es dominio de riesgo: **gate `AGENTS.md` sec. 2**.
+
+**2. TSK-133 - Validacion offline real. Sub-fases (agente + tier):**
+
+| Fase | Agente | Tier / gate | Entregable | Criterio de salida |
+|---|---|---|---|---|
+| **F1** | `@sql-security` | **PAGO**; gate sec. 2 (esquema/RLS) | Columnas reales de `logs` + tabla canonica de `resultado` (`Ingreso`, `Ingreso + U+00B7 + <punto>`, `Denegado`, `duplicado`) + CHECK solo para valores nuevos (`NOT VALID`), DDL idempotente de `op_id`/`offline`, **pre-chequeo D11**, auditoria de la policy de INSERT anon, dictamen de cifrado | Reporte de pre-chequeo con lista (evento, qr, punto, n) y **0 cambios aplicados aun** |
+| **F2** | `@data-migration` | **PAGO**; gate sec. 2 (migraciones) | `migrations/adr090_<slug>.sql` (columnas) + **migracion no transaccional propia** del indice `uv_logs_entrada_idem` (D10) | Columnas existen; indice `(evento_id, qr_code, COALESCE(punto_acceso,'')) WHERE resultado LIKE 'Ingreso%' AND qr_code IS NOT NULL`; `NOTIFY pgrst, 'reload schema'` |
+| **F3** | `@admin-dev` + `@frontend-tpl` | heredado (ADR-069); `admin-dev` es dominio de riesgo: gate sec. 2 | Lo de **TSK-006a** + boton **"Preparar offline"** (solo UI) | SW activo con scope `/scanner.html`; `index.html` y `evento-app.html` **sin controlador** |
+| **F4** | `@admin-dev` | heredado (ADR-069); gate sec. 2 | Reescritura de `init()` (token local + snapshot), `processScan`/`confirmEntry`/`denyEntry`/drenaje con `op_id`, guard de `updateCounter`, **purga** | Flujo offline completo: sin doble contador y sin perdida de rechazos |
+| **F5** | `@qa-auditor` | **FREE** | Escudo GOLD (`node --check` de los bloques inline, ASCII-safety, balance de `div`) + `scripts/smoke_offline_scanner.js` + regresion de los smokes existentes | V1-V12 y **0 regresiones** |
+
+**Dependencias:** F3 puede correr en paralelo con F1/F2 (no toca datos); F4 depende de F1 (contrato de columnas) y de F3 (SW); F5 depende de F3 y F4.
+
+**3. Criterios de cierre (ADR-090 sec. 7):** V1 scope exacto, V2 `index.html`/`evento-app.html` sin controlador, V3 `/scanner.html` carga offline, V4 catalogo offline responde, V5 token caducado + offline valida y marca `offline = true`, V6 duplicado rechazado y auditado, V7 idempotencia real (1 fila + contador +1), V8 sin perdida de escritura online, V9 `denyEntry` encola, V10 purga, V11 cache versionada, V12 Escudo GOLD. **No negociable: V3, V4, V6 y V7.**
+
+**4. Riesgos abiertos (3):** (1) **Duplicados historicos en `logs`** bajo `LIKE 'Ingreso%'` (D11/R1): si el pre-chequeo devuelve filas, Direccion decide **caso por caso** y **no se borra ni fusiona nada en silencio**; es el bloqueo actual de F1 y F2. (2) **Cifrado en reposo del snapshot** (R5, pregunta abierta 2): WebCrypto (clave derivada del token por HKDF, AES-GCM) frente a minimizacion + purga; lo dictamina `@sql-security` en F1. (3) **Token en el icono instalado** (pregunta abierta 3): o se guarda el enlace una sola vez por sesion, o el icono abre sin token y muestra instrucciones; sin decision de UX, la PWA instalada no sirve en la puerta.
+
+**5. Lo que NO cierra estas tareas:** ninguna fase se ejecuto. Hasta que F1 entregue el pre-chequeo y Direccion decida, **F2 no arranca** y el cliente queda en "mejor esfuerzo" (la idempotencia real depende del indice en base). Seguimiento en `NEXT.md` hito **-61**.
+
+### Apertura de TSK-134 - F2 migracion adr090 (2026-11-07) - PENDIENTE DE EJECUCION
+
+**Estado real (ADR-006):** F1 cerrada en diseno; los 2 SQL existen en `migrations/` y **ninguno se ejecuto en base**. Gate `AGENTS.md` sec. 2 vigente.
+
+*   (i) Ejecutar `migrations/adr090_precheck_duplicados.sql` (solo lectura) y adjuntar los bloques (a)(b)(c)(e)(f) del reporte.
+*   (ii) Si duplicados = 0: aplicar `migrations/adr090_idempotencia_logs.sql` (DDL no transaccional; CHECK `NOT VALID`).
+*   (iii) Si duplicados > 0: crear primero SOLO el indice unico por `op_id` y esperar la adjudicacion de Direccion para el indice natural.
+*   (iv) Rollback documentado en el propio SQL (sin drops destructivos ni borrado de filas).
+*   (v) Criterio de cierre: indice creado + prechequeo archivado + `logs` con `op_id`/`offline`.
+
+### TSK-135 - Ticket QR por correo (ADR-091) (2026-11-10) - ABIERTA
+
+**0. Estado real (ADR-006, 2026-11-10):** **implementada y desplegada**, pero **ABIERTA**: la prueba funcional real con un buzon **no se ejecuto**. Contrato completo en `decisiones/ADR-091-correo-del-ticket-con-codigo-corto-y-qr-server-side.md`; fila correspondiente en `DECISIONS.md`.
+
+**1. Archivos tocados (delta declarado; cifras absolutas NO recontadas en este pase):**
+
+*   `registroaforo.html` **+186 / -17**: `email` obligatorio cuando el evento entrega ticket QR (modo ticket, `__ctxCapturaPura === false`) **tanto en el flujo nuevo como en "Ya estoy registrado"**; `p_qr_code: qr` con el **codigo real** `QR-...`; aviso de estado y **reintento**; y `ok:false` de la RPC pinta **error** (nunca el estado verde).
+*   `supabase/functions/send-ticket-email/index.ts` **+121 / -18**: acepta un codigo `QR-...` **o** una URL http(s) legado; genera el **PNG del QR server-side** y lo manda **inline** con `content_id: "ticket-qr"`; **fallback a texto** con el codigo si el PNG falla.
+*   `supabase/functions/send-ticket-email/deno.json` (**nuevo**): dependencia `npm:qrcode@1.5.3`.
+*   **0 cambios** en `admin.html`, `api/*.js`, SQL/RLS, `BLUEPRINT.md` y motor de render.
+
+**2. Criterios A1-A7:**
+
+*   **A1** - `email` **obligatorio** con `captura_pura = false` (modo ticket).
+*   **A2** - `p_qr_code` recibe el **codigo real** `QR-...` (no la URL).
+*   **A3** - PNG del QR **inline** en el correo (`cid:ticket-qr`).
+*   **A4** - **Fallback de texto** (el codigo en el cuerpo) si falla el PNG.
+*   **A5** - `ok:false` de la RPC pinta **error**, nunca verde.
+*   **A6** - **Reintento** con clave de idempotencia `...:retry:`.
+*   **A7** - `captura_pura = true` **no** exige email.
+
+**3. Verificacion ejecutada:** Escudo GOLD **8/8** (balance de `div` OK, ASCII-safety OK, sintaxis de los bloques JS inline OK); smoke `scripts/smoke_registroaforo_wa.js` -> **77/77**; `deno check` con **solo** el `TS2345` **preexistente** de `verifySessionJwt` (no lo introduce esta tarea).
+
+**4. Despliegue:** Edge Function `send-ticket-email` **v12 ACTIVE** en el proyecto `ctgyvydzshueemlelkzv` (2026-11-10 13:38 UTC), desplegada con `--no-verify-jwt`.
+
+**5. Pendiente que mantiene la tarea ABIERTA:** prueba real **extremo a extremo**: registro -> fila en `email_envios_log` -> correo recibido con el **QR inline** -> escaneo con `scanner.html` -> `logs.resultado='Ingreso'`. Sin ese ciclo verificado **no se declara cierre** (ADR-006: un despliegue no es un PASS; el efecto es la prueba).
+
+**6. Lo que NO cierra esta tarea:** el **commit** de `registroaforo.html` y de `supabase/functions/send-ticket-email/*`, y la **prueba con buzon**. Seguimiento en `NEXT.md` hito **-62**.
 
 
 

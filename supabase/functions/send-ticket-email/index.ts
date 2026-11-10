@@ -4,13 +4,27 @@
 // PROPOSITO
 //   Envia el correo con el ticket / codigo QR de un evento usando el proveedor
 //   Resend, con adjunto opcional (PNG del ticket alojado en Supabase Storage).
+//   Si el payload trae un codigo corto QR-..., el PNG del QR se genera en el
+//   propio servidor (dependencia npm qrcode, ver deno.json de esta funcion) y
+//   viaja inline en el HTML mediante content_id "ticket-qr".
 //   Reemplaza la version no versionada que hoy existe solo en produccion.
 //
 // PAYLOAD DE ENTRADA (JSON)
 //   { email, nombre, qrCode, eventoNombre, eventoFecha, eventoHora,
 //     eventoLugar, tipo?, ticketUrl?, idempotencyKey? }
-//   - qrCode: URL de entrada. En registro.html es origin + "/admin.html"
-//     (caso onboarding de superadmin: se renderiza como boton, no como imagen).
+//   - qrCode: obligatorio, admite dos formas:
+//       1) URL http(s): comportamiento historico intacto. En registro.html es
+//          origin + "/admin.html" (onboarding de superadmin: se renderiza como
+//          boton, no como imagen).
+//       2) Codigo corto que empieza con "QR-" (maximo 600 caracteres, sin
+//          caracteres de control): el codigo es la credencial y el PNG del QR
+//          se genera aqui. El correo lo pinta como <img src="cid:ticket-qr"> y
+//          repite el codigo en texto pequeno como fallback (clientes que
+//          bloquean imagenes). Si la generacion falla el correo NO se rompe:
+//          se manda el codigo en texto grande.
+//     Cualquier otra forma se rechaza con qrCode_invalido.
+//   - qrIsCode: flag interno derivado de qrCode. No se acepta ni se valida
+//     como campo del payload.
 //   - eventoFecha / eventoHora pueden llegar vacios.
 //   - ticketUrl: PNG del ticket en Supabase Storage (opcional, TSK-088).
 //   - idempotencyKey: evita reenvios duplicados (opcional, mejor esfuerzo).
@@ -93,6 +107,10 @@
 //   - No se lee ni se escribe base de datos. No hay PII mas alla del payload.
 // ============================================================================
 
+// QR server-side: unica dependencia npm de la funcion (deno.json de la carpeta).
+// @deno-types="npm:@types/qrcode@1.5.5"
+import QRCode from "qrcode";
+
 const PROJECT_REF = "ctgyvydzshueemlelkzv";
 
 const MAX_BODY_BYTES = 65536;
@@ -102,6 +120,10 @@ const MAX_TIPO_LEN = 40;
 const MAX_EVENTO_LEN = 300;
 const MAX_URL_LEN = 2000;
 const MAX_IDEM_LEN = 120;
+const MAX_QR_CODE_LEN = 600;
+
+// Prefijo del codigo corto de ticket que se genera server-side.
+const QR_CODE_PREFIX = "QR-";
 
 const DEFAULT_MAX_TICKET_BYTES = 2097152;
 const DEFAULT_TICKET_TIMEOUT_MS = 8000;
@@ -243,6 +265,8 @@ interface TicketData {
   email: string;
   nombre: string;
   qrCode: string;
+  // Derivado de qrCode: true si es codigo corto QR-... (PNG server-side).
+  qrIsCode: boolean;
   eventoNombre: string;
   eventoFecha: string;
   eventoHora: string;
@@ -273,10 +297,14 @@ function parsePayload(raw: string): TicketData {
   const nombre = cleanOptional(p.nombre, MAX_NOMBRE_LEN, "nombre", false);
   if (!nombre) throw new Error("nombre es obligatorio");
 
+  // qrCode acepta dos formas: URL http(s) (historico) o codigo corto QR-...
   const qrCode = cleanOptional(p.qrCode, MAX_URL_LEN, "qrCode", false);
   if (!qrCode) throw new Error("qrCode es obligatorio");
-  if (!HTTPS_RE.test(qrCode) && !/^https?:\/\//i.test(qrCode)) {
-    throw new Error("qrCode debe ser una URL http o https");
+  const qrIsUrl = /^https?:\/\//i.test(qrCode);
+  const qrIsCode = !qrIsUrl && qrCode.startsWith(QR_CODE_PREFIX);
+  if (!qrIsUrl && !qrIsCode) throw new Error("qrCode_invalido");
+  if (qrIsCode && qrCode.length > MAX_QR_CODE_LEN) {
+    throw new Error("qrCode excede la longitud maxima");
   }
 
   // Presentacion: se permite LF porque registro.html une lineas con \n.
@@ -302,6 +330,7 @@ function parsePayload(raw: string): TicketData {
     email,
     nombre,
     qrCode,
+    qrIsCode,
     eventoNombre,
     eventoFecha,
     eventoHora,
@@ -567,6 +596,29 @@ async function readCapped(res: Response, max: number): Promise<Uint8Array> {
 }
 
 // ---------------------------------------------------------------------------
+// QR inline generado en el servidor (npm qrcode, fail-open)
+// ---------------------------------------------------------------------------
+// Devuelve el PNG en base64 listo para Resend (content_id "ticket-qr") o ""
+// si la generacion falla. Nunca lanza: el envio del correo no depende del QR.
+async function buildQrPng(code: string): Promise<string> {
+  try {
+    const dataUrl = await QRCode.toDataURL(code, {
+      errorCorrectionLevel: "H",
+      margin: 1,
+      width: 320,
+      color: { dark: "#0F0F0F", light: "#FFFFFF" },
+    });
+    if (typeof dataUrl !== "string") return "";
+    const comma = dataUrl.indexOf(",");
+    if (comma < 0) return "";
+    const base64 = dataUrl.slice(comma + 1);
+    return base64.length > 0 ? base64 : "";
+  } catch (_e) {
+    return "";
+  }
+}
+
+// ---------------------------------------------------------------------------
 // HTML del correo
 // ---------------------------------------------------------------------------
 function esc(value: string): string {
@@ -591,7 +643,7 @@ function buildSubject(data: TicketData): string {
   return "Tu entrada para " + base.slice(0, 120);
 }
 
-function buildHtml(data: TicketData): string {
+function buildHtml(data: TicketData, qrInline: string): string {
   const rows: string[] = [];
   const addRow = (label: string, value: string) => {
     if (!value) return;
@@ -609,12 +661,28 @@ function buildHtml(data: TicketData): string {
   addRow("Lugar", data.eventoLugar);
   addRow("Tipo", data.tipo);
 
-  const qrBlock = looksLikeImage(data.qrCode)
-    ? '<img src="' + esc(data.qrCode) + '" alt="Codigo QR" width="300" ' +
-      'style="display:block;border:0;border-radius:12px;" />'
-    : '<a href="' + esc(data.qrCode) + '" style="display:inline-block;padding:14px 22px;' +
-      'background:#2d6a4f;color:#ffffff;text-decoration:none;border-radius:10px;' +
-      'font-weight:600;font-size:15px;">Abrir mi panel</a>';
+  // Rama prioritaria: codigo corto con PNG generado server-side.
+  // qrInline solo trae contenido si la generacion del PNG fue exitosa.
+  let qrBlock: string;
+  if (data.qrIsCode) {
+    qrBlock = qrInline
+      ? '<img src="cid:ticket-qr" alt="Codigo QR" width="300" ' +
+        'style="display:block;border:0;border-radius:12px;margin:0 auto;" />' +
+        '<div style="margin:10px 0 0;font-size:12px;color:#6b6b6b;' +
+        'letter-spacing:1px;word-break:break-all;">' + esc(data.qrCode) + "</div>"
+      : '<div style="font-size:22px;font-weight:700;letter-spacing:1px;' +
+        'color:#1a1a1a;word-break:break-all;">' + esc(data.qrCode) + "</div>" +
+        '<p style="margin:12px 0 0;font-size:13px;color:#6b6b6b;">' +
+        "Presenta este codigo en la entrada.</p>";
+  } else {
+    // Ramas URL historicas, intactas.
+    qrBlock = looksLikeImage(data.qrCode)
+      ? '<img src="' + esc(data.qrCode) + '" alt="Codigo QR" width="300" ' +
+        'style="display:block;border:0;border-radius:12px;" />'
+      : '<a href="' + esc(data.qrCode) + '" style="display:inline-block;padding:14px 22px;' +
+        'background:#2d6a4f;color:#ffffff;text-decoration:none;border-radius:10px;' +
+        'font-weight:600;font-size:15px;">Abrir mi panel</a>';
+  }
 
   return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8" />' +
     '<meta name="viewport" content="width=device-width, initial-scale=1" />' +
@@ -641,7 +709,7 @@ function buildHtml(data: TicketData): string {
 }
 
 // ---------------------------------------------------------------------------
-// Envio via Resend (fetch nativo, sin dependencias npm)
+// Envio via Resend (fetch nativo; unica dependencia npm: qrcode, para el QR)
 // ---------------------------------------------------------------------------
 interface ResendResult {
   ok: boolean;
@@ -649,9 +717,18 @@ interface ResendResult {
   id: string;
 }
 
+// Adjunto tal como lo espera la API de Resend (snake_case en el JSON).
+interface ResendAttachment {
+  filename: string;
+  content: string;
+  content_id?: string;
+  content_type?: string;
+}
+
 async function sendViaResend(
   data: TicketData,
   attachment: Attachment | null,
+  qrInline: string,
 ): Promise<ResendResult> {
   const apiKey = env("RESEND_API_KEY");
   if (!apiKey) return { ok: false, status: 0, id: "" };
@@ -660,12 +737,28 @@ async function sendViaResend(
     from: env("MAIL_FROM") || "Taquilla Directa <no-reply@tickets.taquilladirecta.com>",
     to: [data.email],
     subject: buildSubject(data),
-    html: buildHtml(data),
+    html: buildHtml(data, qrInline),
   };
+
+  // Adjuntos: primero el QR inline (referenciado como cid:ticket-qr) y luego,
+  // si existe, el PNG del ticket alojado en Storage.
+  const attachments: ResendAttachment[] = [];
+  if (qrInline) {
+    attachments.push({
+      filename: "ticket-qr.png",
+      content: qrInline,
+      content_id: "ticket-qr",
+      content_type: "image/png",
+    });
+  }
   if (attachment) {
-    payload.attachments = [
-      { filename: attachment.filename, content: attachment.content },
-    ];
+    attachments.push({
+      filename: attachment.filename,
+      content: attachment.content,
+    });
+  }
+  if (attachments.length > 0) {
+    payload.attachments = attachments;
   }
 
   const res = await fetch(RESEND_ENDPOINT, {
@@ -747,9 +840,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
   }
 
+  // QR server-side best effort: si falla, el correo sigue con el codigo en texto.
+  let qrInline = "";
+  if (data.qrIsCode) {
+    qrInline = await buildQrPng(data.qrCode);
+    if (!qrInline) {
+      console.warn("send-ticket-email: QR inline omitido, fail-open (generacion)");
+    }
+  }
+
   let result: ResendResult;
   try {
-    result = await sendViaResend(data, attachment);
+    result = await sendViaResend(data, attachment, qrInline);
   } catch (e) {
     // Error de red: se registra la categoria, nunca el detalle interno.
     const reason = e instanceof Error ? e.name : "error_desconocido";
@@ -767,7 +869,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   console.log(
     "send-ticket-email: enviado. canal=" + auth.channel +
-    " adjunto=" + (attachment ? "si" : "no"),
+    " adjunto=" + (attachment ? "si" : "no") +
+    " qr_inline=" + (qrInline ? "si" : "no"),
   );
   const body: Record<string, unknown> = { ok: true };
   if (result.id) body.id = result.id;
