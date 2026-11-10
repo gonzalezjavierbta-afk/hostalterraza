@@ -12,7 +12,7 @@
 // PAYLOAD DE ENTRADA (JSON)
 //   { email, nombre, qrCode, eventoNombre, eventoFecha, eventoHora,
 //     eventoLugar, tipo?, ticketUrl?, idempotencyKey? }
-//   - qrCode: obligatorio, admite dos formas:
+//   - qrCode: obligatorio, admite tres formas:
 //       1) URL http(s): comportamiento historico intacto. En registro.html es
 //          origin + "/admin.html" (onboarding de superadmin: se renderiza como
 //          boton, no como imagen).
@@ -22,9 +22,16 @@
 //          repite el codigo en texto pequeno como fallback (clientes que
 //          bloquean imagenes). Si la generacion falla el correo NO se rompe:
 //          se manda el codigo en texto grande.
+//       3) URL publica de Supabase Storage que apunta al PNG del ticket
+//          completo (540x960, bucket "tickets"). Se detecta porque la URL
+//          termina en .png/.jpg/.gif/.webp: se pinta inline como imagen del
+//          ticket y, ademas, se adjunta al correo (best effort).
 //     Cualquier otra forma se rechaza con qrCode_invalido.
 //   - qrIsCode: flag interno derivado de qrCode. No se acepta ni se valida
 //     como campo del payload.
+//   - qrIsImageUrl: flag interno derivado de qrCode. True solo si qrCode es
+//     una URL http(s) con extension de imagen (caso 3). Si llega sin
+//     ticketUrl, el handler descarga ese PNG y lo adjunta (fail-open).
 //   - eventoFecha / eventoHora pueden llegar vacios.
 //   - ticketUrl: PNG del ticket en Supabase Storage (opcional, TSK-088).
 //   - idempotencyKey: evita reenvios duplicados (opcional, mejor esfuerzo).
@@ -267,6 +274,9 @@ interface TicketData {
   qrCode: string;
   // Derivado de qrCode: true si es codigo corto QR-... (PNG server-side).
   qrIsCode: boolean;
+  // Derivado de qrCode: true si es URL http(s) de una imagen (PNG del ticket
+  // completo en Storage). Se usa para adjuntar ese PNG al correo.
+  qrIsImageUrl: boolean;
   eventoNombre: string;
   eventoFecha: string;
   eventoHora: string;
@@ -306,6 +316,9 @@ function parsePayload(raw: string): TicketData {
   if (qrIsCode && qrCode.length > MAX_QR_CODE_LEN) {
     throw new Error("qrCode excede la longitud maxima");
   }
+  // Flag derivado: qrCode es la URL publica del PNG del ticket en Storage.
+  // looksLikeImage es hoisted, por eso se puede usar antes de su definicion.
+  const qrIsImageUrl = qrIsUrl && looksLikeImage(qrCode);
 
   // Presentacion: se permite LF porque registro.html une lineas con \n.
   const eventoNombre = cleanOptional(p.eventoNombre, MAX_EVENTO_LEN, "eventoNombre", true);
@@ -331,6 +344,7 @@ function parsePayload(raw: string): TicketData {
     nombre,
     qrCode,
     qrIsCode,
+    qrIsImageUrl,
     eventoNombre,
     eventoFecha,
     eventoHora,
@@ -829,10 +843,20 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   // Adjunto best effort: cualquier fallo degrada a envio sin adjunto.
+  // Prioridad 1: ticketUrl explicito (TSK-088). Prioridad 2: qrCode trae la
+  // URL publica del PNG del ticket completo en Storage (qrIsImageUrl).
   let attachment: Attachment | null = null;
   if (data.ticketUrl) {
     try {
       attachment = await fetchTicketAttachment(data.ticketUrl);
+    } catch (e) {
+      const reason = e instanceof Error ? e.message : "adjunto_no_disponible";
+      console.warn("send-ticket-email: adjunto omitido, fail-open (" + reason + ")");
+      attachment = null;
+    }
+  } else if (data.qrIsImageUrl) {
+    try {
+      attachment = await fetchTicketAttachment(data.qrCode);
     } catch (e) {
       const reason = e instanceof Error ? e.message : "adjunto_no_disponible";
       console.warn("send-ticket-email: adjunto omitido, fail-open (" + reason + ")");

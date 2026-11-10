@@ -842,8 +842,11 @@
                 const tabsEl = document.getElementById('reg-tabs');
                 if (tabsEl) tabsEl.style.display = 'none';
                 if (entregaQR) {
-                    mostrarTicket(nombre, qrCode, ev, whatsapp, cedula);
-                    await enviarNotificacionesReg(nombre, qrCode, email, cedula);
+                    const ticketCanvas = await mostrarTicket(nombre, qrCode, ev, whatsapp, cedula);
+                    // Sin subida (o si falla) el correo lleva el codigo corto: nunca
+                    // se bloquea el registro por Storage (fail-open).
+                    const ticketUrl = await _subirTicketReg(qrCode, ticketCanvas);
+                    await enviarNotificacionesReg(nombre, qrCode, email, cedula, null, ticketUrl);
                 } else {
                     const ok = document.getElementById('form-success-msg');
                     ok.style.display = 'block';
@@ -1023,12 +1026,15 @@
                 document.getElementById('modo-existe').style.display = 'none';
                 const tabsIns = document.getElementById('reg-tabs');
                 if (tabsIns) tabsIns.style.display = 'none';
-                mostrarTicket(_existenteReg.nombre, qrCode, ev, _existenteReg.telefono, _existenteReg.cedula);
+                const ticketCanvas = await mostrarTicket(_existenteReg.nombre, qrCode, ev, _existenteReg.telefono, _existenteReg.cedula);
                 // El correo viaja como 3er argumento: antes iba null y el envio
                 // se cortaba en el guard de enviarNotificacionesReg (sin email
                 // no hay destinatario). En captura_pura emailEx es '' y el guard
-                // sigue devolviendo sin despachar nada.
-                await enviarNotificacionesReg(_existenteReg.nombre, qrCode, emailEx, _existenteReg.cedula);
+                // sigue devolviendo sin despachar nada; por eso la subida a
+                // Storage solo ocurre cuando el evento entrega QR.
+                let ticketUrl = null;
+                if (entregaQR) ticketUrl = await _subirTicketReg(qrCode, ticketCanvas);
+                await enviarNotificacionesReg(_existenteReg.nombre, qrCode, emailEx, _existenteReg.cedula, null, ticketUrl);
             } catch (err) {
                 log("ERROR: " + err.message, "ERROR");
                 btn.disabled = false; btn.textContent = T('serie.inscribir_btn');
@@ -1121,7 +1127,7 @@
         }
 
         // ── Ticket (render reutilizable) ────────────────────────────────────
-        function mostrarTicket(nombre, qr, ev, telefono, cedula) {
+        async function mostrarTicket(nombre, qr, ev, telefono, cedula) {
             const tkEv = document.getElementById('tk-ev');
             const tkName = document.getElementById('tk-name');
             const tkCode = document.getElementById('tk-code');
@@ -1145,34 +1151,97 @@
             const tipoTicket = window.__ctxRol || 'invitado';
             window.__ticketData = { nombre: nombre, qr: qr, ev: ev, telefono: telefono || (_existenteReg && _existenteReg.telefono) || '', cedula: cedula || (_existenteReg && _existenteReg.cedula) || '', tipo: tipoTicket };
             log("INFO: QR generado y ticket mostrado (" + qr + ").", "INFO");
-            // Asincrono con fail-open (ADR-008): el QR plano 180x180 queda como
-            // placeholder inmediato; cuando el lienzo 1080x1920 esta listo, se
-            // reemplaza #reg-qr por un <img> con su dataURL. Si algo falla, el
-            // QR plano se conserva.
-            _generarTicketCanvasReg(qr, nombre, ev || window.__ctxEv || null, '#reg-qr', tipoTicket, cedula || (_existenteReg && _existenteReg.cedula) || '').then(function (cv) {
-                const box = document.getElementById('reg-qr');
-                if (!box || !cv) return;
-                try {
-                    const url = cv.toDataURL('image/png');
-                    const img = document.createElement('img');
-                    img.alt = 'Ticket';
-                    img.src = url;
-                    img.style.display = 'block';
-                    img.style.width = '100%';
-                    img.style.height = 'auto';
-                    img.style.borderRadius = '10px';
-                    box.innerHTML = '';
-                    box.style.background = 'transparent';
-                    box.style.padding = '0';
-                    box.style.display = 'block';
-                    box.appendChild(img);
-                    log("INFO: Ticket 1080x1920 renderizado y mostrado.", "INFO");
-                } catch (e) {
-                    log("ERROR: " + e.message, "ERROR");
-                }
-            }).catch(function (e) {
+            // Awaitable y con fail-open (ADR-008): se espera el lienzo 1080x1920
+            // para poder devolverlo (lo sube _subirTicketReg al Storage). Si el
+            // render falla, se resuelve null y el QR plano 180x180 se conserva.
+            let cvTicket = null;
+            try {
+                cvTicket = await _generarTicketCanvasReg(qr, nombre, ev || window.__ctxEv || null, '#reg-qr', tipoTicket, cedula || (_existenteReg && _existenteReg.cedula) || '');
+            } catch (e) {
                 log("ERROR: " + e.message, "ERROR");
+                cvTicket = null;
+            }
+            _ticketCanvasReg = cvTicket || null;
+            if (cvTicket) {
+                const box = document.getElementById('reg-qr');
+                if (box) {
+                    try {
+                        const url = cvTicket.toDataURL('image/png');
+                        const img = document.createElement('img');
+                        img.alt = 'Ticket';
+                        img.src = url;
+                        img.style.display = 'block';
+                        img.style.width = '100%';
+                        img.style.height = 'auto';
+                        img.style.borderRadius = '10px';
+                        box.innerHTML = '';
+                        box.style.background = 'transparent';
+                        box.style.padding = '0';
+                        box.style.display = 'block';
+                        box.appendChild(img);
+                        log("INFO: Ticket 1080x1920 renderizado y mostrado.", "INFO");
+                    } catch (e) {
+                        log("ERROR: " + e.message, "ERROR");
+                    }
+                }
+            }
+            return cvTicket;
+        }
+
+        // -- Subida del ticket a Storage (PNG real del correo) ---------------
+        // Bucket 'tickets': publico, limite 2 MB, solo INSERT (no hay politicas
+        // de UPDATE). Por eso upsert:false y, si el archivo ya existe, se
+        // reutiliza la URL publica. Todo fallo devuelve null (fail-open): el
+        // flujo sigue con el codigo corto QR-... como hasta ahora.
+        function _canvasABlobReg(cv, w, h) {
+            const aux = document.createElement('canvas');
+            aux.width = w; aux.height = h;
+            const ctx = aux.getContext('2d');
+            if (!ctx) return Promise.resolve(null);
+            try {
+                ctx.imageSmoothingEnabled = true;
+                ctx.drawImage(cv, 0, 0, w, h);
+            } catch (e) {
+                return Promise.resolve(null);
+            }
+            return new Promise(function (resolve) {
+                try { aux.toBlob(resolve, 'image/png'); } catch (e) { resolve(null); }
             });
+        }
+
+        async function _subirTicketReg(qr, canvas) {
+            if (!qr || !canvas) return null;
+            const LIMITE_BYTES = 1900000;
+            try {
+                let blob = await _canvasABlobReg(canvas, 540, 960);
+                if (blob && blob.size > LIMITE_BYTES) {
+                    const menor = await _canvasABlobReg(canvas, 405, 720);
+                    if (menor && menor.size < blob.size) blob = menor;
+                }
+                if (blob && blob.size > LIMITE_BYTES) {
+                    const minima = await _canvasABlobReg(canvas, 360, 640);
+                    if (minima && minima.size < blob.size) blob = minima;
+                }
+                if (!blob) return null;
+                const ruta = qr + '.png';
+                const bucket = getClient().storage.from('tickets');
+                const { error } = await bucket.upload(ruta, blob, { contentType: 'image/png', upsert: false });
+                if (error) {
+                    const msg = String(error.message || '');
+                    if (!/duplicate|already exists/i.test(msg)) {
+                        log("ERROR: No se pudo subir el ticket al Storage (" + msg + ").", "ERROR");
+                        return null;
+                    }
+                }
+                const pub = bucket.getPublicUrl(ruta);
+                const url = pub && pub.data ? pub.data.publicUrl : null;
+                if (!url || String(url).indexOf('https') !== 0) return null;
+                log("INFO: Ticket PNG disponible para el correo.", "INFO");
+                return url;
+            } catch (e) {
+                log("ERROR: " + e.message, "ERROR");
+                return null;
+            }
         }
 
         // ── Notificaciones post-registro (correo) ───────────────────────────
@@ -1182,6 +1251,10 @@
         let _ticketQrReg = null;
         let _ticketNombreReg = null;
         let _ticketCedulaReg = null;
+        // Ultimo lienzo 1080x1920 y ultima URL publica del PNG en Storage: el
+        // reintento manual los reutiliza sin volver a renderizar ni subir.
+        let _ticketCanvasReg = null;
+        let _ticketUrlReg = null;
 
         // Estado del envio junto al ticket. Es informativo: el registro y el
         // ticket ya existen cuando esto se pinta, asi que nunca bloquea.
@@ -1217,7 +1290,7 @@
             }
         }
 
-        function reenviarTicketEmailReg() {
+        async function reenviarTicketEmailReg() {
             if (!_ticketEmailReg || !_ticketQrReg) return;
             const btn = document.getElementById('btn-email-retry-reg');
             if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
@@ -1225,24 +1298,33 @@
             // chocar con la idempotencia que ya uso la RPC en el registro.
             const key = 'aforo-registro:' + _ticketQrReg + ':retry:' + Date.now();
             _setEmailStatusReg('pending', _ticketEmailReg);
-            enviarNotificacionesReg(_ticketNombreReg, _ticketQrReg, _ticketEmailReg, _ticketCedulaReg, key);
+            // Si la primera subida fallo, se reintenta antes de la RPC: el correo
+            // necesita la URL del PNG. Si vuelve a fallar, va el codigo corto.
+            let ticketUrl = _ticketUrlReg || null;
+            if (!ticketUrl && _ticketCanvasReg) {
+                ticketUrl = await _subirTicketReg(_ticketQrReg, _ticketCanvasReg);
+            }
+            await enviarNotificacionesReg(_ticketNombreReg, _ticketQrReg, _ticketEmailReg, _ticketCedulaReg, key, ticketUrl);
         }
 
-        async function enviarNotificacionesReg(nombre, qr, emailAddr, cedula, idemKey) {
+        async function enviarNotificacionesReg(nombre, qr, emailAddr, cedula, idemKey, ticketUrl) {
             if (!emailAddr) return;
             const ev = window.__ctxEv;
             _ticketEmailReg = emailAddr;
             _ticketQrReg = qr;
             _ticketNombreReg = nombre;
             _ticketCedulaReg = cedula || null;
+            // URL publica del PNG subido (si la hubo). Sin ella, el 3er camino
+            // del correo cae al codigo corto, igual que antes.
+            _ticketUrlReg = ticketUrl || null;
             _setEmailStatusReg('pending', emailAddr);
             try {
                 // ADR-077 FASE 2B: camino unico via RPC; anon key ya no es credencial de envio.
-                // La Edge Function send-ticket-email genera el PNG inline a partir del
-                // codigo corto 'QR-...': la RPC propaga p_qr_code tal cual, asi que
-                // aqui viaja el codigo real de inscritos.qr_code, nunca la URL del evento.
+                // La Edge Function send-ticket-email muestra inline y adjunta el PNG
+                // del ticket: si hay URL publica en Storage viaja esa; si la subida
+                // fallo se envia el codigo corto 'QR-...' y la funcion lo regenera.
                 const { data: rpcData, error: rpcErr } = await getClient().rpc('enviar_email_registro', {
-                    p_email: emailAddr, p_nombre: nombre, p_qr_code: qr,
+                    p_email: emailAddr, p_nombre: nombre, p_qr_code: ticketUrl || qr,
                     p_evento_nombre: ev ? (ev.nombre||'') : '',
                     p_evento_fecha: ev ? (ev.fecha||'') : '',
                     p_evento_hora: ev ? (ev.hora||'') : '',
