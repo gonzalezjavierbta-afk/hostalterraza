@@ -58,6 +58,8 @@ estructura: indice-v1 (2026-10-01)
 
 > **Delta por CONTROL DE MODULOS (ADR-093) (2026-11-10, linea agregada, sin reescribir las de arriba):** **+1 entrada / +1 cerrada = TSK-137** (el kernel ignoraba `config_landing.modules`: apagar "galeria" o "whatsapp" en el admin **no hacia nada** en la pagina publica, y `#mod-form` no tenia control alguno). Delta efectivo: **+1 cerrada / +0 abiertas**, porque el fix esta **commiteado y desplegado** (commit `9fd2081` en `main`) y verificado en el `evento-app.html` servido por `hostalterraza.vercel.app` (contiene `data-mod-row`). **Alcance real:** `evento-app.html` (segmento CONTROL DE MODULOS `:1287-1327` + guarda de `__hideEmptyModule` `:1391-1411`), `admin.html` (checkboxes `:691-692`, emision `:5629-5632`, restauracion `:6892-6896`, mapa `:7045`), `css/templates/fiesta/f14.css` (seccion 29, `:2919-3007`) y `migrations/oneoff_vinilos_modules_flags.sql` (**nueva**, idempotente, 1 fila); **0 cambios** en `api/*.js`, `index.html`, `registroaforo.html`, `scanner.html`, SQL/RLS y los otros 13 silos. **Anclas re-verificadas contra el archivo real (ADR-006):** difieren en varias lineas del reporte de la sesion (el admin esta en `:691-692`, `:5629-5632`, `:6892-6896`, `:7045`; el kernel en `:1287-1327`), y aqui se registran las del archivo. **DELTA ADITIVO (2026-11-10, verificacion del hito -64):** **+1 entrada / +1 abierta = TSK-138**: la verificacion del grid f14 en **navegador real** (Chrome 141 + CDP, 8 escenarios x 4 anchos exactos 1200/768/767/390 = **32/32 PASS**) y la **auditoria R1** de `config_landing.modules` (**21 de 26 flags muertos**, las 8 pedidas en **8/8**) en un solo pase de **0 cambios de codigo, 0 migraciones, 0 cambios de datos y 0 commits**. **Cifras absolutas NO recontadas en este pase (ADR-006): se declaran como delta. Las lineas de totales anteriores se conservan intactas por Cero Borrado documental (Oro #2/#3).**
 
+> **Delta por TSK-141: admin.html +31/-14 (2026-11-11)**
+
 #### 🔴 ALTA PRIORIDAD / EN COLA INMEDIATA
 
 | ID | Responsable | Título | Bloque | Detalle |
@@ -1317,6 +1319,19 @@ task:
 * `(2)` **Pruebas V5 en navegador (5 casos):** (a) paso 2 con muestra elegida; (b) cambio de theme **dentro del mismo silo**; (c) **"Sin muestra"** -> estado vacio sin datos sinteticos; (d) **cancelar edicion** no persiste la muestra; (e) **paso 5 sin boton** "Vista previa".
 
 **6. Riesgo residual:** `(i)` resuelto: la tabla existe y el preview opera; sin fila para un silo, el estado vacio es el comportamiento esperado; `(ii)` el trigger impide sembrar una muestra de otra org, y el `ON DELETE CASCADE` limpia la muestra si se borra el evento; `(iii)` la ficha del ADR se actualizo a **IMPLEMENTADO Y MIGRACION APLICADA** (historial conservado). Seguimiento en `NEXT.md` hito **-65**.
+
+### TSK-141 - Fix dominio en links publicos del admin (aforo/QR/invitacion) (2026-11-11) - CERRADA PENDIENTE DE COMMIT
+
+* **Sintoma:** los links publicos que emite el admin (aforo, QR, invitacion, scanner, serie) heredaban el host del panel (`hostalterraza.vercel.app`) porque se construian con `window.location.origin`.
+* **Causa raiz:** `window.location.origin` refleja el host que sirve el panel, no el dominio canonico (ADR-053:24) que debe llevar todo link absoluto que consume un tercero (ADR-082:65); en preview/localhost el link salia con el host equivocado.
+* **Fix:** `PUBLIC_BASE` (`admin.html:2945`) + `publicUrl()` (`:2946-2952`) + 13 call sites (`:3941`, `:6840`, `:6887`, `:7534`, `:8658`, `:8689`, `:8757`, `:9220`, `:9568`, `:10169`, `:10183`, `:13702`, `:13736`) + 1 uso directo (`:8631`) = 14 lineas; `window.location.origin` queda solo en el comentario `:2943`. `git diff --numstat`: +31/-14.
+* **Persistencia relativa intacta (cero SQL):** los paths guardados siguen siendo relativos (`admin.html:5808-5811` y `:6035`) y el input `#ev-form-solo-url` (`:1290/1291/7260/7528/7534`) no cambia de contrato; 0 migraciones, 0 cambios de datos.
+* **Verificacion:** `node --check` 2/2 OK; divs 1628/1625 (diff 3 = baseline); ASCII bytes>127 24086 -> 24398 (+312, 104 chars U+2550 del encabezado); `express_check` 52 PASS / 1 FAIL preexistente (`evento-app.html` diff 2 vs baseline 1); `smoke_ticket_diseno` 264/265 con S11 preexistente.
+* **Deuda (sin abrir bugs nuevos):**
+    * (a) `admin.html:10080` conserva el literal `https://taquilladirecta.com/` sin `PUBLIC_BASE`.
+    * (b) `serie.html:997` y `registro.html:676/713` siguen con `window.location.origin`.
+    * (c) `publicUrl()` descarta el path si recibe `//host` (`admin.html:2949`, no alcanzable hoy).
+    * (d) rojos preexistentes: `express_check` `evento-app` diff 1->2 y `smoke` S11 async/await.
 
 
 

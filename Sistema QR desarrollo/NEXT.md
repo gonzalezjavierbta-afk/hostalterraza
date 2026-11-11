@@ -15,6 +15,11 @@ Este documento define el punto de control estratégico y las directrices para la
 
 > **Hitos archivados:** los hitos antiguos (de -32 a 0b) y el -39 (canal de correos) están íntegros en [HISTORIA-NEXT.md](HISTORIA-NEXT.md) (con tabla de líneas por hito). Aquí quedan los hitos recientes (-47 a -33) y las secciones vigentes 1-4.
 
+#### -66. Hito Mas Reciente - FIX DOMINIO EN LINKS PUBLICOS DEL ADMIN: `PUBLIC_BASE` + `publicUrl()` en 14 lineas de `admin.html` (2026-11-11)
+
+*   fix dominio links publicos (aforo/QR/scanner/serie) con PUBLIC_BASE/publicUrl; canonico forzado tambien en preview/localhost
+*   siguiente: unificar admin.html:10080 y evaluar serie.html:997 y registro.html:676/713 en sesion aparte
+
 #### -65. Hito Mas Reciente - EVENTO DE MUESTRA REAL POR SILO EN EL PREVIEW DE ADN VISUAL (ADR-094): codigo completo en `admin.html`, smoke 74/74 y migracion APLICADA en hostal-terraza (2a corrida idempotente); las pruebas V5 en navegador siguen pendientes (2026-11-10)
 
 *   **Que se estaba haciendo:** que el preview del paso 2 del wizard (`#ld-adn-preview`) y la ficha del theme dejen de mostrar un evento **sintetico** (`_SAMPLE_EVENTS`, poster SVG inline, DJs ficticios) y usen un **evento REAL** elegido por el operador y persistido por org. Se retira el segundo preview del paso 5 (el `<button>` "Vista previa") para que exista **un solo punto** de preview.

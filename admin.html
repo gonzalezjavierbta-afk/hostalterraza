@@ -2935,6 +2935,23 @@ async function _ensureXLSX() {
 <!-- ADR-080: el motor cromatico de la paleta es HSL puro en Vanilla JS (sin CDN, CSP-safe). -->
 <script>
 // ════════════════════════════════════════════════════
+// DOMINIO PUBLICO - fuente unica de verdad (PUBLIC_BASE)
+// ════════════════════════════════════════════════════
+// Los links que consume un TERCERO (cliente final, QR, correo, link compartido)
+// SIEMPRE apuntan al dominio publico, nunca al host donde vive el panel: en un
+// deploy de preview el admin corre en hostalterraza.vercel.app y el link saldria
+// con ese host. Prohibido usar window.location.origin para links publicos.
+// Uso: publicUrl('/registroaforo.html?slug=x') -> https://taquilladirecta.com/registroaforo.html?slug=x
+var PUBLIC_BASE = 'https://taquilladirecta.com';
+function publicUrl(path) {
+  var p = String(path == null ? '' : path).trim();
+  p = p.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^\/]*/, ''); // quita esquema + host si llega absoluta
+  p = p.replace(/^\/\/[^\/]*/, '');                        // quita host protocol-relative
+  p = p.replace(/^\/+/, '').replace(/\/+$/, '');           // recorta slash inicial y final
+  return PUBLIC_BASE + '/' + p;
+}
+
+// ════════════════════════════════════════════════════
 // SUPABASE CONFIG
 // ════════════════════════════════════════════════════
 let SB = null;
@@ -3921,7 +3938,7 @@ function landingUrl(ev) {
   const cfgTheme = ev.config_landing && ev.config_landing.theme;
   const via = (cfgTheme && _THEME_TPL[cfgTheme]) || '';
   const base = (tpl === 'f7' || via === 'f7') ? '/f7.html' : '/evento.html';
-  return window.location.origin + base + '?' + (ev.slug ? 'slug=' + ev.slug : 'id=' + ev.id);
+  return publicUrl(base + '?' + (ev.slug ? 'slug=' + ev.slug : 'id=' + ev.id));
 }
 
 // === Ficha de plantilla (ADN Visual) - capa de lectura, sin duplicar mapas ===
@@ -6820,7 +6837,7 @@ function renderEventos() {
     const sesiones = eventosVisibles.filter(e => e.serie_id === serie.id)
       .sort((a,b) => (a.sesion_num||0)-(b.sesion_num||0));
     if (!sesiones.length) return;
-    const serieLink = window.location.origin + '/serie.html?slug=' + (serie.slug||serie.id);
+    const serieLink = publicUrl('/serie.html?slug=' + (serie.slug||serie.id));
     html.push(`<div style="background:#fff;border:2px solid var(--gold-border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.6rem">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.6rem">
         <div style="width:10px;height:10px;border-radius:2px;background:${serie.color||'var(--gold)'};flex-shrink:0"></div>
@@ -6867,7 +6884,7 @@ function renderEventos() {
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0" class="ev-actions">
           <button class="btn btn-gold btn-sm" onclick="openMod('${e.id}','${(e.nombre||'').replace(/'/g,"\\'")}','${e.fecha||''}','${e.hora||''}')">Invitación QR</button>
           ${hayLanding ? `<button class="btn btn-ghost btn-sm" onclick="window.open('${pubLink}','_blank','noopener,noreferrer')">Página pública</button>` : ''}
-          ${hayForm ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${window.location.origin}/registroaforo.html?slug=${encodeURIComponent(e.slug||'')}',this)">Formulario aforo</button>` : ''}
+          ${hayForm ? `<button class="btn btn-ghost btn-sm" onclick="copyLink('${publicUrl('/registroaforo.html?slug=' + encodeURIComponent(e.slug||''))}',this)">Formulario aforo</button>` : ''}
           <button class="btn btn-ghost btn-sm" onclick="openPuntosEvento('${e.id}')">Puntos</button>
           <button class="btn btn-ghost btn-sm" onclick="openEditMod('${e.id}')">✏ Editar</button>
           <button class="btn btn-ghost btn-sm btn-red" onclick="delEvento('${e.id}')">Eliminar</button>
@@ -7514,7 +7531,7 @@ function _poblarContenidoWizard(content, suf) {
   if (sistDualEl) sistDualEl.checked = dualActivo;
   if (dualCfg) dualCfg.style.display = dualActivo ? 'block' : 'none';
   if (comunEl) comunEl.value = content.comunidad_whatsapp || '';
-  if (urlEl) urlEl.value = (formSolo && formSolo.url) ? formSolo.url.replace(window.location.origin, '') : '';
+  if (urlEl) urlEl.value = (formSolo && formSolo.url) ? publicUrl(formSolo.url) : '';
 }
 
 // ADR-056 (punto 7) - vista previa del landing. Serializa el BORRADOR en memoria
@@ -8611,7 +8628,7 @@ function qrtGenCodigo() {
 
 function qrtUpdatePreview() {
   const codigo = document.getElementById('qrt-codigo')?.value || '';
-  const base = window.location.origin;
+  const base = PUBLIC_BASE;
   document.getElementById('qrt-preview-url').textContent = codigo
     ? `${base}/qr.html?c=${codigo}` : '';
 }
@@ -8638,7 +8655,7 @@ async function crearQRLink() {
     return;
   }
 
-  const trackLink = window.location.origin + '/qr.html?c=' + codigo;
+  const trackLink = publicUrl('/qr.html?c=' + codigo);
 
   // Mostrar resultado
   document.getElementById('qrt-res-nombre').textContent  = nombre;
@@ -8669,7 +8686,7 @@ function descargarQR() {
 
 function descargarQRLink(codigo) {
   if (!codigo) return;
-  const trackLink = window.location.origin + '/qr.html?c=' + codigo;
+  const trackLink = publicUrl('/qr.html?c=' + codigo);
   _descargarQrAltaRes(trackLink, 'qr-' + codigo + '.png');
 }
 
@@ -8737,7 +8754,7 @@ async function renderQRLinks() {
 
   cont.innerHTML = _qrLinks.map(link => {
     const n    = scanCount[link.id] || 0;
-    const tUrl = window.location.origin + '/qr.html?c=' + link.codigo;
+    const tUrl = publicUrl('/qr.html?c=' + link.codigo);
     return `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.6rem">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
@@ -9200,7 +9217,7 @@ async function generarLinkInvitador() {
   }
   const targetId = ev?.id || refId;
   const qs = (ev?.slug ? 'slug='+ev.slug : 'id='+targetId) + '&tipo=' + tipo + '&ref=' + codigo;
-  const link = window.location.origin + (esComunidad ? '/evento.html?' : '/registroaforo.html?') + qs;
+  const link = publicUrl((esComunidad ? '/evento.html?' : '/registroaforo.html?') + qs);
 
   // ADR-062 — `invitadores.codigo` ya NO es unico por si solo (constraint compuesto
   // `invitadores_codigo_link_key` = (codigo, link_generado)). Un invitador puede tener
@@ -9548,7 +9565,7 @@ puntos_acceso: getPuntosAcceso(),
 
   if (sesErr) { alrt('ev-alert','Serie creada pero error en sesiones: '+sesErr.message,'err'); return; }
 
-  const pubLink = window.location.origin + '/serie.html?slug=' + slug;
+  const pubLink = publicUrl('/serie.html?slug=' + slug);
   alrt('ev-alert',`✓ Serie "${n}" creada con ${nSes} sesiones. <a href="${pubLink}" target="_blank" style="color:var(--teal)">Ver página de la serie →</a>`,'ok');
 
   ['ev-n','ev-h','ev-d','ev-ubic','ev-img','ev-lat','ev-lng'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -10149,7 +10166,7 @@ function _invBaseTicketUrl(ev, tipo) {
 async function openMod(evId, nom, fecha, hora) {
   document.getElementById('mod-t').textContent = 'Invitación — ' + nom;
   document.getElementById('mod-s').textContent = fecha + (hora?' · '+hora:'');
-  const link = window.location.origin + '/index.html?evento=' + evId;
+  const link = publicUrl('/index.html?evento=' + evId);
   document.getElementById('mod-lnk').value = link;
 
   // Always show fallback QR
@@ -10163,7 +10180,7 @@ async function openMod(evId, nom, fecha, hora) {
   document.getElementById('mod-gen-status').textContent='';
 
   // Links por tipo + descarga de invitación por tipo
-  const base = window.location.origin + '/evento.html?id=' + evId;
+  const base = publicUrl('/evento.html?id=' + evId);
   const tipos = [
     {key:'invitado',   label:'◎ Invitado',    color:'var(--teal)'},
     {key:'artista',    label:'🎵 Artista',     color:'#3C3489'},
@@ -13682,7 +13699,7 @@ async function generarToken() {
 
   if (error) { alrt('tok-alert','Error: ' + error.message,'err'); return; }
 
-  const link = window.location.origin + '/scanner.html?token=' + data.token;
+  const link = publicUrl('/scanner.html?token=' + data.token);
   document.getElementById('tok-link').value = link;
 
   const expStr   = expira.toLocaleDateString('es-CO') + ' a las ' +
@@ -13716,7 +13733,7 @@ async function loadTokens() {
     if (!data||!data.length) { cont.innerHTML='<div class="empty">Sin links activos</div>'; return; }
     cont.innerHTML = data.map(t=>{
       const ev = _eventos.find(e=>e.id===t.evento_id);
-      const link = window.location.origin + '/scanner.html?token=' + t.token;
+      const link = publicUrl('/scanner.html?token=' + t.token);
       const expHr = new Date(t.expira_en).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
       const puntoBadge = t.punto_acceso
         ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--gold-bg);color:var(--gold-d);border:1px solid var(--gold-border);font-weight:500;margin-left:6px">📍 ${t.punto_acceso}</span>`
