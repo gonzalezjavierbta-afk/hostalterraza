@@ -1295,11 +1295,27 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const __aplicaModulos = function () {
                     // Mapa id real del DOM -> clave real del JSONB. Los ids del
                     // markup son la verdad (mod-guestlist, no mod-guest_list).
+                    // ADR-093 / TSK-138: el admin persiste 26 claves en
+                    // config_landing.modules y el kernel solo leia 4. El bloque
+                    // de ampliacion agrega 11 pares mas, sin tocar la semantica
+                    // R2 (modOn(k) = M[k] !== false: ausente o true = VISIBLE).
                     const mapa = [
                         ['mod-video', 'gallery'],
                         ['mod-whatsapp', 'whatsapp'],
                         ['mod-guestlist', 'guest_list'],
-                        ['mod-form', 'form']
+                        ['mod-form', 'form'],
+                        // --- Ampliacion ADR-093: id real del DOM -> clave JSONB ---
+                        ['mod-historia', 'historia'],
+                        ['mod-ubicacion', 'ubicacion'],
+                        ['mod-objetivo', 'objetivo'],
+                        ['mod-impacto', 'impacto'],
+                        ['mod-equipo', 'equipo'],
+                        ['mod-playlist', 'playlist'],
+                        ['mod-faq', 'faq'],
+                        ['mod-sponsors', 'sponsors'],
+                        ['mod-boletos', 'boletos'],
+                        ['mod-banner-1', 'banner_1'],
+                        ['mod-banner-2', 'banner_2']
                     ];
                     for (let i = 0; i < mapa.length; i++) {
                         const id = mapa[i][0];
@@ -1309,9 +1325,11 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                         const el = document.getElementById(id);
                         if (!el) continue;
                         el.style.setProperty('display', 'none', 'important');
-                        // Valor '1': el CSS del silo selecciona por presencia
-                        // ([data-hidden]) y refluye su grid sin huecos.
-                        el.setAttribute('data-hidden', '1');
+                        // Valor 'true': mismo serializado que escribe
+                        // __hideEmptyModule y el que prueban los selectores de
+                        // silo ([data-hidden="true"] en f9/f9b/f10/f14); los
+                        // demas refluyen por presencia ([data-hidden]).
+                        el.setAttribute('data-hidden', 'true');
                     }
                 };
                 __aplicaModulos();
@@ -1396,7 +1414,9 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                         // Se re-aplica el estado (idempotente) y se ignora hasContent.
                         if (__modOff(id)) {
                             el.style.setProperty('display', 'none', 'important');
-                            el.setAttribute('data-hidden', '1');
+                            // Mismo serializado que __aplicaModulos ('true'): un
+                            // unico valor para el estado apagado por admin.
+                            el.setAttribute('data-hidden', 'true');
                             return false;
                         }
                         if (hasContent) {
@@ -1920,7 +1940,12 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
         // v306: sin playlist configurada (o URL no reconocida) el modulo NO queda
         // visible-vacio; se oculta con la regla general de modulos vacios.
         __hideEmptyModule('mod-playlist', false);
-    } else if (sContainer) {
+    } else if (sContainer && !__modOff('mod-playlist')) {
+        // Anti-re-encendido (ADR-093/R2): si el admin apago el modulo,
+        // __aplicaModulos ya dejo display:none !important + data-hidden="true" y
+        // este bloque NO debe quitarlos (era el unico punto del render que
+        // re-encendia un modulo apagado). Se omite el embed: cero red y estado
+        // identico al toggle.
         const plSection = document.getElementById('mod-playlist');
         if (plSection) {
             plSection.removeAttribute('data-hidden');

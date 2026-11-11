@@ -2557,3 +2557,15 @@
     padding: 0 2rem !important;
  }
 
+/* ==========================================================================
+   TSK-139 - ANTI-HUECO de la rejilla de 20 columnas de campana.
+   #mod-historia/#mod-impacto comparten fila, igual que #mod-faq/#mod-ubicacion.
+   Si uno se apaga desde el admin (modules.*), el hermano ocupa toda la fila.
+   ========================================================================== */
+.tpl-b5 #main-content-flow:has(#mod-historia[data-hidden]) #mod-impacto,
+.tpl-b5 #main-content-flow:has(#mod-impacto[data-hidden]) #mod-historia,
+.tpl-b5 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.tpl-b5 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq {
+    grid-column: 1 / -1;
+}
+

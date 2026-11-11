@@ -2569,3 +2569,23 @@
    |         |            | flor siempre por DEBAJO del contenido (z-index    |
    |         |            | negativo + pointer-events:none).                  |
    ============================================================================ */
+
+/* ==========================================================================
+   TSK-139 - ANTI-HUECO de la rejilla de 2 columnas (silo sin reglas :has)
+   Modulos cableados a config_landing.modules: si uno se apaga desde el admin,
+   su hermano de fila ocupa las dos columnas. En 1 columna es no-op.
+   ========================================================================== */
+.tpl-f12 #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist,
+.Tpl-F12 #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist,
+.tpl-f12 #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel,
+.Tpl-F12 #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel,
+.tpl-f12 #main-content-flow:has(#mod-boletos[data-hidden]) #mod-form,
+.Tpl-F12 #main-content-flow:has(#mod-boletos[data-hidden]) #mod-form,
+.tpl-f12 #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos,
+.Tpl-F12 #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos,
+.tpl-f12 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.Tpl-F12 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.tpl-f12 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq,
+.Tpl-F12 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq {
+    grid-column: 1 / -1;
+}

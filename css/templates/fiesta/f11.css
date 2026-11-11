@@ -1642,3 +1642,24 @@
     letter-spacing: 0.2em;
     text-transform: uppercase;
 }
+
+/* ==========================================================================
+   TSK-139 - ANTI-HUECO de la rejilla de 2 columnas (silo sin reglas :has)
+   Los modulos cableados a config_landing.modules pueden apagarse desde el
+   admin. Si el hermano de fila queda visible, ocupa las dos columnas en vez
+   de dejar la celda vacia. En 1 columna grid-column 1/-1 es no-op.
+   ========================================================================== */
+.tpl-f11 #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist,
+.Tpl-F11 #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist,
+.tpl-f11 #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel,
+.Tpl-F11 #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel,
+.tpl-f11 #main-content-flow:has(#mod-boletos[data-hidden]) #mod-form,
+.Tpl-F11 #main-content-flow:has(#mod-boletos[data-hidden]) #mod-form,
+.tpl-f11 #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos,
+.Tpl-F11 #main-content-flow:has(#mod-form[data-hidden]) #mod-boletos,
+.tpl-f11 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.Tpl-F11 #main-content-flow:has(#mod-faq[data-hidden]) #mod-ubicacion,
+.tpl-f11 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq,
+.Tpl-F11 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq {
+    grid-column: 1 / -1;
+}

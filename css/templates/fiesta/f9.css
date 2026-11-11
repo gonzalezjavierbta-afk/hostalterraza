@@ -2002,3 +2002,12 @@
    |         |            | expande con grid-column: 1 / -1, plantilla unica (sec. 3).  |        |
    |         |            | min-width:0 en los hijos del grid (anti blowout).           |        |
    ============================================================================ */
+
+/* TSK-139 - anti-hueco (direccion que faltaba): #mod-ubicacion puede apagarse
+   desde el admin (modules.ubicacion === false). El par faq|ubicacion ya tenia
+   la direccion faq -> ubicacion; esta cubre la contraria. En 1 columna,
+   grid-column 1/-1 es no-op. */
+.tpl-f9 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq,
+.Tpl-F9 #main-content-flow:has(#mod-ubicacion[data-hidden]) #mod-faq {
+    grid-column: 1 / -1;
+}

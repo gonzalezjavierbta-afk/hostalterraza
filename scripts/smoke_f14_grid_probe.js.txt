@@ -1,0 +1,85 @@
+<script>
+/* Probe de scripts/smoke_f14_grid.js - mide la reja real de #main-content-flow.
+   No se sirve en produccion: solo lo inyecta el smoke en un harness temporal. */
+function rect(el){var r=el.getBoundingClientRect();return [Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height)];}
+function frect(el){var r=el.getBoundingClientRect();return [r.left,r.top,r.width,r.height];}
+function inter(a,b){var x=Math.max(0,Math.min(a[0]+a[2],b[0]+b[2])-Math.max(a[0],b[0]));var y=Math.max(0,Math.min(a[1]+a[3],b[1]+b[3])-Math.max(a[1],b[1]));return x*y;}
+function areaNames(str){var s={};str.replace(/[\"]/g,' ').split(/\s+/).forEach(function(t){if(t)s[t]=1;});return s;}
+function probe(state){
+  var flow=document.getElementById('main-content-flow');
+  var cs=getComputedStyle(flow);
+  var tmpl=cs.gridTemplateAreas||'none';
+  var tset=areaNames(tmpl);
+  var kids=[].slice.call(flow.children);
+  var rects={},vis=[],autoPlaced=[],claimed={};
+  kids.forEach(function(el){
+    var id=el.id||el.tagName.toLowerCase();
+    var rc=getComputedStyle(el);
+    var r=rect(el);
+    var shown=rc.display!=='none'&&r[2]>0&&r[3]>0;
+    var ga=rc.gridArea||'';
+    rects[id]={r:r,display:rc.display,ga:ga,vis:shown};
+    if(shown){
+      vis.push({id:id,r:r,fr:frect(el)});
+      var key=ga.split('/')[0].trim();
+      if(tset[key]||tset[ga.trim()]){claimed[key]=1;if(tset[ga.trim()])claimed[ga.trim()]=1;}
+      else autoPlaced.push(id+':'+(ga||'none'));
+    }
+  });
+  var orphans=Object.keys(tset).filter(function(k){return !claimed[k];});
+  var ov=[];
+  for(var i=0;i<vis.length;i++)for(var j=i+1;j<vis.length;j++){
+    var a=vis[i],b=vis[j];
+    var inA=(a.r[0]>=b.r[0]&&a.r[1]>=b.r[1]&&a.r[0]+a.r[2]<=b.r[0]+b.r[2]&&a.r[1]+a.r[3]<=b.r[1]+b.r[3]);
+    var inB=(b.r[0]>=a.r[0]&&b.r[1]>=a.r[1]&&b.r[0]+b.r[2]<=a.r[0]+a.r[2]&&b.r[1]+b.r[3]<=a.r[1]+a.r[3]);
+    if(inA||inB)continue;
+    var o=inter(a.fr,b.fr);
+    if(o>1)ov.push(a.id+'x'+b.id+':'+Math.round(o));
+  }
+  // Bandas horizontales: mide huecos reales entre items de la misma franja.
+  var bands=[],sorted=vis.slice().sort(function(a,b){return a.fr[1]-b.fr[1];}),used={};
+  sorted.forEach(function(it){
+    if(used[it.id])return;
+    var band=[it];used[it.id]=1;
+    sorted.forEach(function(o){
+      if(used[o.id])return;
+      var yOverlap=Math.min(it.fr[1]+it.fr[3],o.fr[1]+o.fr[3])-Math.max(it.fr[1],o.fr[1]);
+      if(yOverlap>2){band.push(o);used[o.id]=1;}
+    });
+    band.sort(function(a,b){return a.fr[0]-b.fr[0];});
+    var segs=band.map(function(v){return [Math.round(v.fr[0]),Math.round(v.fr[0]+v.fr[2])];});
+    var holes=[];
+    for(var k=1;k<segs.length;k++){var g=segs[k][0]-segs[k-1][1];if(g>2)holes.push(g+'@'+band[k].id);}
+    bands.push({ids:band.map(function(v){return v.id;}),holes:holes});
+  });
+  return {s:state,vw:window.innerWidth,cols:cs.gridTemplateColumns.split(' ').filter(Boolean).length,
+    gcols:cs.gridTemplateColumns,gap:cs.columnGap+'/'+cs.rowGap,
+    tmpl:tmpl.replace(/"/g,'').replace(/\s+/g,' ').trim(),
+    orphans:orphans,autoPlaced:autoPlaced,overlaps:ov,bands:bands,rects:rects};
+}
+function reset(){
+  var flow=document.getElementById('main-content-flow');
+  [].slice.call(flow.children).forEach(function(el){
+    el.removeAttribute('data-hidden');el.removeAttribute('data-empty');el.style.removeProperty('display');
+  });
+  document.body.setAttribute('data-mod-row','boleto-guest');
+}
+function hide(id){var el=document.getElementById(id);if(!el)return;el.setAttribute('data-hidden','true');el.style.setProperty('display','none','important');}
+function empty(id){var el=document.getElementById(id);if(el)el.setAttribute('data-empty','true');}
+var STATES={
+  '0-sin-gancho':function(){document.body.removeAttribute('data-mod-row');},
+  'a-ambos':function(){},
+  'b-guestlist-hidden':function(){hide('mod-guestlist');},
+  'c-guestlist-empty':function(){empty('mod-guestlist');},
+  'd-form-hidden':function(){hide('mod-form');},
+  'e-form-hidden+gl-empty':function(){hide('mod-form');empty('mod-guestlist');},
+  'f-gl+form+video-hidden':function(){hide('mod-guestlist');hide('mod-form');hide('mod-video');},
+  'g-boletos-hidden':function(){hide('mod-boletos');}
+};
+window.__probeAll=function(){
+  var out=[];
+  Object.keys(STATES).forEach(function(k){reset();STATES[k]();out.push(probe(k));});
+  reset();
+  return out;
+};
+</script>

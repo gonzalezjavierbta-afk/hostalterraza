@@ -2687,7 +2687,7 @@
         "footer";
 }
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
     .tpl-f14 #main-content-flow:has(#mod-guestlist[data-empty="true"]),
     .Tpl-F14 #main-content-flow:has(#mod-guestlist[data-empty="true"]) {
         grid-template-areas:
@@ -3000,8 +3000,23 @@
     }
 }
 
-/* --- 29.6 <=767px: sin reglas. La rejilla de L2271-2289 ya es de una sola
+/* --- 29.6 <=767px: sin reglas. La rejilla movil (L2265-2289) es de una sola
    columna y coloca boletos (L2281) antes que guest list (L2283), que es el
    orden pedido en movil. El anti-hueco de L2672-2688 retira la fila guestlist
-   cuando la card nace vacia. No se anade nada aqui para no duplicar esa
-   rejilla ni mover el piso de 767px. */
+   cuando la card nace vacia. Limite real: por debajo de 768px esta seccion no
+   aplica; en 768-1023 se usa la rejilla de 2 columnas de la seccion 28.
+   TSK-139: el bloque anti-hueco de la seccion 28 se subio a min-width:768px
+   para que el piso coincida con esta seccion (antes 767px provocaba, en ese
+   unico pixel, una segunda columna implicita sobre grid-template-columns:1fr). */
+
+/* --- 29.7 PAR CARTEL / PLAYLIST (TSK-139): #mod-playlist puede apagarse desde
+   el admin (modules.playlist === false) y #mod-cartel ya se auto-oculta cuando
+   falla el poster (L2240-2249). Sin regla, el hermano quedaba a media fila con
+   la celda derecha vacia. grid-column 1/-1 es no-op en la rejilla de 1 columna,
+   asi que no altera movil ni los silos de una sola columna. */
+.tpl-f14 #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel,
+.Tpl-F14 #main-content-flow:has(#mod-playlist[data-hidden]) #mod-cartel,
+.tpl-f14 #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist,
+.Tpl-F14 #main-content-flow:has(#mod-cartel[data-hidden]) #mod-playlist {
+    grid-column: 1 / -1;
+}

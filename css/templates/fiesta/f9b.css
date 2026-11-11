@@ -3745,3 +3745,11 @@
     font-size: clamp(0.75rem, 1.6vw, 0.875rem);
     line-height: 1.7;
 }
+
+/* TSK-139 - anti-hueco: #mod-boletos puede apagarse desde el admin
+   (modules.boletos === false); el guest list ocupa entonces la fila completa.
+   La direccion guestlist -> boletos ya existia. */
+.tpl-f9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-guestlist,
+.Tpl-F9b #main-content-flow:has(#mod-boletos[data-hidden]) #mod-guestlist {
+    grid-column: 1 / -1;
+}
