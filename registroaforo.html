@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title data-i18n="reg.title">Registro · Hostal Terraza</title>
+    <title data-i18n="reg.title">Registro · Taquilla Directa</title>
     <link rel="preconnect" href="https://ctgyvydzshueemlelkzv.supabase.co" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="js/i18n.js"></script>
+    <!-- Corte de promo: unico punto de verdad en cliente (fail-closed). -->
+    <script src="js/promo-cutoff.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
@@ -113,6 +115,11 @@
         body.page-registro #ticket-card .tk-name { margin-top: .9rem; font-size: 15px; font-weight: 600; color: #fff; }
         body.page-registro #ticket-card .tk-code { margin-top: .35rem; font-size: 11px; letter-spacing: .14em; color: rgba(255,255,255,.5); }
         body.page-registro #ticket-card .tk-note { margin-top: .9rem; font-size: 11px; color: rgba(255,255,255,.35); }
+        /* Promo del evento: vive FUERA de la tarjeta (entre la confirmacion y
+           el ticket). Mismo ancho maximo que #ticket-card y centrada. El nodo
+           solo existe si HT.getPromo devuelve objeto (fail-closed). */
+        body.page-registro #tk-promo { max-width: 340px; margin: .6rem auto 0; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.09); font-size: 11px; line-height: 1.45; color: rgba(255,255,255,.6); text-align: center; }
+        body.page-registro #tk-promo .tk-promo-tag { color: var(--gold, #ff9f1c); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
         /* Modo existente: estilos propios (el silo externo no garantiza cubrir estos elementos) */
         body.page-registro #modo-existe .form-input,
         body.page-registro #ex-cedula,
@@ -323,7 +330,7 @@
                     <div id="ticket-card">
                         <div class="tk-top"></div>
                         <div class="tk-body">
-                            <div class="tk-brand">HOSTAL TERRAZA</div>
+                            <div class="tk-brand">TAQUILLA DIRECTA</div>
                             <div class="tk-event" id="tk-ev"></div>
                             <div id="reg-qr"></div>
                             <div class="tk-name" id="tk-name"></div>
@@ -354,7 +361,7 @@
                       <div style="background:#0F0F0F;border-radius:16px;overflow:hidden;max-width:340px;margin:0 auto 1rem">
                         <div style="height:6px;background:var(--gold,#ff9f1c)"></div>
                         <div style="padding:1.25rem">
-                          <div style="font-weight:700;font-size:13px;color:var(--gold,#ff9f1c)">HOSTAL TERRAZA</div>
+                          <div style="font-weight:700;font-size:13px;color:var(--gold,#ff9f1c)">TAQUILLA DIRECTA</div>
                           <div id="dup-ev-nombre" style="font-size:13px;color:rgba(255,255,255,.6);margin:4px 0 1rem"></div>
                           <div id="dup-qr-box" style="display:inline-block;background:#fff;padding:10px;border-radius:10px"></div>
                           <div id="dup-nombre" style="margin-top:.9rem;font-size:15px;font-weight:600;color:#fff"></div>
@@ -1126,6 +1133,40 @@
             window.open(waUrl, '_blank');
         }
 
+        // Promo del evento dentro del ticket (config_landing.content.promo).
+        // Fail-closed (ADR-008): si HT.getPromo devuelve null no se crea ningun
+        // nodo, para no dejar contenedores vacios ni comentarios con el dato.
+        // El texto entra SIEMPRE por textContent: viene de config_landing y no
+        // se interpreta como HTML (sin negritas ni etiquetas desde el dato).
+        function _promoTicketReg(ev) {
+            const prev = document.getElementById('tk-promo');
+            if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+            const prom = (window.HT && typeof window.HT.getPromo === 'function')
+                ? window.HT.getPromo(ev && ev.config_landing)
+                : null;
+            if (!prom) return;
+            const box = document.createElement('div');
+            box.id = 'tk-promo';
+            box.className = 'tk-promo';
+            const sponsor = String(prom.sponsor || '').trim();
+            if (sponsor && prom.texto.indexOf(sponsor) === -1) {
+                const tag = document.createElement('span');
+                tag.className = 'tk-promo-tag';
+                tag.textContent = sponsor + ' \u00b7 ';
+                box.appendChild(tag);
+            }
+            const txt = document.createElement('span');
+            txt.textContent = prom.texto;
+            box.appendChild(txt);
+            // Unico punto de insercion: primer hijo de #ticket-wrap, o sea
+            // entre el mensaje de confirmacion y la tarjeta. Va DENTRO de
+            // #ticket-wrap para que se oculte junto al ticket en el flujo de
+            // duplicado (mismo orden visual, sin nodo huerfano).
+            const ancla = document.getElementById('ticket-card');
+            if (!ancla || !ancla.parentNode) return;
+            ancla.parentNode.insertBefore(box, ancla);
+        }
+
         // ── Ticket (render reutilizable) ────────────────────────────────────
         async function mostrarTicket(nombre, qr, ev, telefono, cedula) {
             const tkEv = document.getElementById('tk-ev');
@@ -1134,6 +1175,7 @@
             if (tkEv) tkEv.textContent = (ev && ev.nombre ? ev.nombre : '') + (ev && ev.fecha ? ' · ' + ev.fecha : '');
             if (tkName) tkName.textContent = nombre;
             if (tkCode) tkCode.textContent = qr;
+            try { _promoTicketReg(ev || window.__ctxEv); } catch (e) {}
             const qrBox = document.getElementById('reg-qr');
             if (qrBox) {
                 qrBox.innerHTML = '';
@@ -1328,7 +1370,7 @@
                     p_evento_nombre: ev ? (ev.nombre||'') : '',
                     p_evento_fecha: ev ? (ev.fecha||'') : '',
                     p_evento_hora: ev ? (ev.hora||'') : '',
-                    p_evento_lugar: ev ? (ev.ubicacion||'Terraza Hostal') : 'Terraza Hostal',
+                    p_evento_lugar: ev ? (ev.ubicacion||'Taquilla Directa') : 'Taquilla Directa',
                     p_idempotency_key: idemKey || ('aforo-registro:' + qr),
                     p_tipo: 'registro', p_cedula: cedula || null, p_evento_id: ev ? ev.id : null
                 });
@@ -1741,11 +1783,13 @@
             const btn = document.getElementById('btn-wa-ticket-reg');
             if (btn) { btn.disabled = true; btn.textContent = T('serie.preparando'); }
             const restore = () => { if (btn) { btn.disabled = false; btn.textContent = T('serie.enviar_wa'); } };
-            const texto = 'Entrada - ' + (ev.nombre || '') + '\n' +
+            let texto = 'Entrada - ' + (ev.nombre || '') + '\n' +
                 ((ev.fecha) ? 'Fecha: ' + ev.fecha + '\n' : '') +
                 'Codigo QR: ' + qr + '\n' +
-                'Muestra este QR en la puerta.\n' +
-                '_Terraza Hostal_';
+                'Muestra este QR en la puerta.';
+            var _pr = (window.HT && typeof HT.getPromo === 'function' && ev) ? HT.getPromo(ev.config_landing) : null;
+            if (_pr && _pr.texto) texto += '\n\n' + _pr.texto;
+            texto += '\n\n_Taquilla Directa_';
             const tel = String(d.telefono || (window.__dupData && window.__dupData.telefono) || '').replace(/\D/g, '');
             const waUrl = tel
                 ? 'https://wa.me/' + tel + '?text=' + encodeURIComponent(texto)

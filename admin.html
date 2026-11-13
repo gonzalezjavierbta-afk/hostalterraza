@@ -843,6 +843,21 @@ tr:hover td{background:var(--surface)}
                 <div class="fg" style="grid-column:1/-1"><label style="font-size:11px">URL video</label><input id="ld-banner-2-video" type="url" placeholder="https://..." style="font-family:monospace;font-size:12px"></div>
               </div>
             </div>
+            <!-- PROMOCION POR EVENTO (content.promo) - contrato congelado:
+                 { activa, sponsor, texto, fin } dentro de config_landing.content.
+                 La consumen el ticket y el correo de confirmacion. -->
+            <div class="cont-tab-panel" data-cont-tab="promo" style="margin-top:.5rem">
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:.5rem;font-weight:500">🎁 Promoción</div>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-bottom:.6rem">
+                <input type="checkbox" id="ld-promo-activa" style="width:14px;height:14px;accent-color:var(--gold)"> Promoción activa
+              </label>
+              <div class="grid2">
+                <div class="fg"><label style="font-size:11px">Patrocinador</label><input id="ld-promo-sponsor" placeholder="ANCESTRAL" style="font-size:12px"></div>
+                <div class="fg"><label style="font-size:11px">Vigente hasta</label><input id="ld-promo-fin" type="datetime-local" style="font-size:12px"></div>
+              </div>
+              <div class="fg"><label style="font-size:11px">Texto de la promoción</label><textarea id="ld-promo-texto" rows="3" placeholder="Escanea tu entrada en el stand de ANCESTRAL y reclama un cóctel de bienvenida." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;background:var(--surface);color:var(--ink1);resize:vertical"></textarea></div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:3px">Se mostrará en el ticket y en el correo de confirmación hasta la fecha indicada. Si está desactivada, no se muestra.</div>
+            </div>
             <div class="fg cont-tab-panel" data-cont-tab="form-redirect" style="margin-top:.5rem">
               <label style="font-size:12px">Link de redireccion del formulario (WhatsApp / grupo / comunidad)</label>
               <input id="ld-form-redirect" type="url" placeholder="https://wa.me/57... o https://chat.whatsapp.com/..." style="font-family:monospace;font-size:12px">
@@ -5206,6 +5221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'whatsapp',        label: '💬 WhatsApp',       mods: ['ld-mod-whatsapp'] },
     { id: 'banners',         label: '📰 Banners',        mods: ['ld-mod-banner-1','ld-mod-banner-2'] },
     { id: 'form-redirect',   label: '🔗 Formulario' },
+    { id: 'promo',           label: '🎁 Promoción' },
     { id: 'historia',        label: '📖 Historia',       mods: ['ld-mod-historia'] },
     { id: 'objetivo',        label: '💰 Objetivo',       mods: ['ld-mod-objetivo'] },
     { id: 'impacto',         label: '✨ Impacto',        mods: ['ld-mod-impacto'] },
@@ -5782,6 +5798,30 @@ function _limpiarI18nEditor() {
   ldI18nSetLang('fr');
 }
 
+// ADR-080 / BUG-016 - lectura canonica de la promocion por evento
+// (config_landing.content.promo). Forma congelada del dato:
+//   { activa:boolean, sponsor:string, texto:string, fin:string ISO con offset }
+// Devuelve null cuando no hay NADA capturado: asi el sweep de nulls elimina la
+// clave y activar/desactivar una promo vacia no escribe objetos basura.
+function _leerPromoForm() {
+  const chk     = document.getElementById('ld-promo-activa');
+  const activa  = chk ? chk.checked === true : false;
+  const sponsor = (document.getElementById('ld-promo-sponsor')?.value || '').trim();
+  const texto   = (document.getElementById('ld-promo-texto')?.value || '').trim();
+  const finRaw  = (document.getElementById('ld-promo-fin')?.value || '').trim();
+  // datetime-local entrega 'YYYY-MM-DDTHH:mm'; el contrato exige segundos y el
+  // offset de Colombia (-05:00, sin DST). Un valor ya guardado con otro formato
+  // se conserva si Date lo parsea; si no parsea queda '' (nunca rompe).
+  let fin = '';
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(finRaw)) fin = finRaw + ':00-05:00';
+  else if (finRaw) {
+    const d = new Date(finRaw);
+    if (!isNaN(d.getTime())) fin = finRaw;
+  }
+  if (!activa && !sponsor && !texto && !fin) return null;
+  return { activa: activa, sponsor: sponsor, texto: texto, fin: fin };
+}
+
 function _buildConfigLanding(slug) {
   const activa = document.getElementById('ev-landing-activa')?.checked;
   const sistDual = document.getElementById('ev-sist-dual')?.checked;
@@ -5793,10 +5833,14 @@ function _buildConfigLanding(slug) {
   // Fail-open: solo se devuelve un cfg minimo cuando HAY disenos que preservar; sin
   // ellos se mantiene el null original para no exponer una landing inexistente.
   const _disenosPrevias = window._ticketDisenosGetEntries ? window._ticketDisenosGetEntries() : [];
+  // ADR-080 - la promocion tampoco puede perderse por los retornos tempranos:
+  // se lee ANTES y se re-inyecta solo si existe.
+  const _promoActual = _leerPromoForm();
   if (!hayLanding && !hayForm) {
-    if (!_disenosPrevias.length) return null;
+    if (!_disenosPrevias.length && !_promoActual) return null;
     const cfgSinLanding = { content: {} };
     cfgSinLanding.content.ticket_disenos = _disenosPrevias; // BUG-016
+    if (_promoActual) cfgSinLanding.content.promo = _promoActual; // ADR-080
     return cfgSinLanding;
   }
 
@@ -5812,6 +5856,7 @@ function _buildConfigLanding(slug) {
     const comun = (document.getElementById('ev-comunidad-whatsapp')?.value || '').trim();
     if (comun) cfg.content.comunidad_whatsapp = comun;
     cfg.content.ticket_disenos = _disenosPrevias; // BUG-016 (rama b)
+    if (_promoActual) cfg.content.promo = _promoActual; // ADR-080 (rama b)
     return cfg;
   }
 
@@ -6020,6 +6065,11 @@ function _buildConfigLanding(slug) {
       // Tipos: invitado | frecuente | artista | produccion | pago. Maximo un
       // objeto por tipo, sin campo `default`. Se escribe SIEMPRE (array vacio
       // incluido) y ANTES de los spreads finales, que no tocan esta clave.
+      // ADR-080 - promocion por evento (ticket + correo de confirmacion).
+      // _buildConfigLanding RECONSTRUYE content desde esta whitelist literal:
+      // si la clave no se escribe aqui, el overwrite total la BORRA EN SILENCIO
+      // (clase BUG-016). Forma congelada: { activa, sponsor, texto, fin }.
+      promo: _promoActual,
       ticket_disenos: disenos,
       // 4d · Segundo escaneo en el ticket (paso 4 Registro + QR). Objeto aditivo y
       // opcional: si el checkbox esta apagado se emite null y el sweep de nulls lo
@@ -7236,9 +7286,13 @@ function _limpiarWizardCompleto() {
    'ld-impacto-historico-val','ld-impacto-historico-frase','ld-equipo-val','ld-testimonios-val',
    'ld-actualizaciones-val','ld-contacto-email','ld-contacto-tel','ld-contacto-dir',
    'ld-banner-1-frase','ld-banner-1-autor','ld-banner-1-etiqueta','ld-banner-1-imagen','ld-banner-1-video','ld-banner-1-alt',
-   'ld-banner-2-frase','ld-banner-2-autor','ld-banner-2-etiqueta','ld-banner-2-imagen','ld-banner-2-video','ld-banner-2-alt'].forEach(i => {
+   'ld-banner-2-frase','ld-banner-2-autor','ld-banner-2-etiqueta','ld-banner-2-imagen','ld-banner-2-video','ld-banner-2-alt',
+   'ld-promo-sponsor','ld-promo-texto','ld-promo-fin'].forEach(i => {
     const el = document.getElementById(i); if (el) el.value = '';
   });
+  // ADR-080 - la promocion vuelve a su default: desactivada y sin datos.
+  const _promoChkClear = document.getElementById('ld-promo-activa');
+  if (_promoChkClear) _promoChkClear.checked = false;
   document.querySelectorAll('[id^="ld-mod-"]').forEach(chk => { chk.checked = false; chk.disabled = false; });
   // ADR-080 - los 5 slots de la paleta vuelven al default canonico.
   _evResetPaleta('#c9a84c');
@@ -7463,6 +7517,22 @@ function _poblarContenidoWizard(content, suf) {
   }
   if (content.sponsors && (Array.isArray(content.sponsors) || typeof content.sponsors === 'string')) {
     if (window._sponsorsSetEntries) window._sponsorsSetEntries(content.sponsors);
+  }
+  // ADR-080 - read-back de content.promo. Defensivo: si la clave no existe, no
+  // es objeto o `fin` no parsea, los campos quedan vacios y la casilla
+  // desmarcada (activa === true estricto); nunca rompe.
+  const _promoGuardada = (content.promo && typeof content.promo === 'object') ? content.promo : {};
+  const _promoChkEl = document.getElementById('ld-promo-activa');
+  if (_promoChkEl) _promoChkEl.checked = _promoGuardada.activa === true;
+  const _promoSponsorEl = document.getElementById('ld-promo-sponsor');
+  if (_promoSponsorEl) _promoSponsorEl.value = typeof _promoGuardada.sponsor === 'string' ? _promoGuardada.sponsor : '';
+  const _promoTextoEl = document.getElementById('ld-promo-texto');
+  if (_promoTextoEl) _promoTextoEl.value = typeof _promoGuardada.texto === 'string' ? _promoGuardada.texto : '';
+  const _promoFinEl = document.getElementById('ld-promo-fin');
+  if (_promoFinEl) {
+    const _finRaw = typeof _promoGuardada.fin === 'string' ? _promoGuardada.fin.trim() : '';
+    // 'YYYY-MM-DDTHH:mm:00-05:00' -> 'YYYY-MM-DDTHH:mm' (16 primeros chars).
+    _promoFinEl.value = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(_finRaw) ? _finRaw.slice(0, 16) : '';
   }
   // ADR-064 — read-back de content.ticket_disenos. Las 5 filas se reconstruyen
   // siempre: SetEntries([]) deja el estado inicial y con el array guardado

@@ -11,7 +11,13 @@
 //
 // PAYLOAD DE ENTRADA (JSON)
 //   { email, nombre, qrCode, eventoNombre, eventoFecha, eventoHora,
-//     eventoLugar, tipo?, ticketUrl?, idempotencyKey? }
+//     eventoLugar, tipo?, ticketUrl?, idempotencyKey?, eventoId?, slug? }
+//   - eventoId / slug: OPCIONALES. Hoy la RPC enviar_email_registro NO los
+//     manda (migraciones/adr076, v_body), asi que se aceptan para cuando el
+//     contrato crezca. Si llegan, identifican el evento sin consultar la base.
+//   - Sin eventoId ni slug el evento del ticket se resuelve en solo lectura:
+//     public.inscritos (email -> evento_id) y public.eventos (config_landing).
+//     Es unicamente para la promocion del correo; ver PROMOCION abajo.
 //   - qrCode: obligatorio, admite tres formas:
 //       1) URL http(s): comportamiento historico intacto. En registro.html es
 //          origin + "/admin.html" (onboarding de superadmin: se renderiza como
@@ -51,10 +57,30 @@
 //                           Si se define, jamas se responde "*".
 //   TICKET_ALLOWED_HOSTS   CSV de hosts permitidos para ticketUrl (anti SSRF).
 //                           Default: host de SUPABASE_URL + PROJECT_REF.supabase.co
-//   SUPABASE_URL           Solo para derivar el host permitido del ticket.
+//   SUPABASE_URL           Base de PostgREST para leer la promocion del evento.
+//                           Si falta se usa https://PROJECT_REF.supabase.co.
+//                           Tambien deriva el host permitido del ticket.
+//   SUPABASE_SERVICE_ROLE_KEY  Lectura de solo lectura de public.inscritos y
+//                           public.eventos para la promocion. Sin ella el
+//                           correo sale sin bloque de promocion (fail-closed).
+//                           Nunca autoriza peticiones HTTP entrantes.
 //   MAX_TICKET_BYTES       Max bytes del adjunto. Default: 2097152 (2 MB).
 //   TICKET_FETCH_TIMEOUT_MS Timeout del fetch del adjunto. Default: 8000.
 //   El runtime necesita permisos Deno de red y de entorno.
+//
+// PROMOCION DEL EVENTO (eventos.config_landing.content.promo)
+//   Bloque aditivo dentro de la tabla de datos del correo. Contrato del dato
+//   (admin.html, ADR-080): { activa, sponsor, texto, fin } con fin ISO y offset
+//   de Colombia, ej. "2026-11-20T23:59:59-05:00".
+//   Regla canonica (js/promo-cutoff.js), fail-closed: se muestra sii
+//     activa === true && texto es string no vacio && Date.parse(fin) finito
+//     && Date.now() < Date.parse(fin).
+//   Cualquier otro caso (config ausente, evento no resuelto, fin corrupto) deja
+//   el HTML sin bloque de promocion. La lectura es solo lectura y nunca lanza:
+//   si falla, el correo sale sin promocion.
+//   PROMO_FIN_CEILING es un techo duro: la promo del correo nunca se muestra
+//   despues de esa fecha aunque la config declare un fin posterior. Solo puede
+//   cerrar la promo antes, nunca abrirla.
 //
 // DUAL AUTENTICACION (lo mas importante de esta funcion)
 //   Dos canales validos, resueltos en este orden:
@@ -111,7 +137,11 @@
 //   - El adjunto nunca rompe el envio: si algo falla se envia sin adjunto y se
 //     registra el motivo (fail-open).
 //   - No se devuelven stack traces, claves ni credenciales: solo { ok, id?, error? }.
-//   - No se lee ni se escribe base de datos. No hay PII mas alla del payload.
+//   - Base de datos: SOLO LECTURA (service-role) de public.inscritos y
+//     public.eventos.config_landing para la promocion. Nunca escribe. Si esa
+//     lectura falla el correo sale igual, sin bloque de promocion.
+//   - No hay PII mas alla del payload: el email se usa en el filtro de la
+//     consulta y nunca se registra en logs.
 // ============================================================================
 
 // QR server-side: unica dependencia npm de la funcion (deno.json de la carpeta).
@@ -128,6 +158,15 @@ const MAX_EVENTO_LEN = 300;
 const MAX_URL_LEN = 2000;
 const MAX_IDEM_LEN = 120;
 const MAX_QR_CODE_LEN = 600;
+const MAX_EVENTO_ID_LEN = 120;
+const MAX_SLUG_LEN = 200;
+
+// Promocion del evento. Techo duro de seguridad (ver cabecera): solo puede
+// cerrar la promocion antes, nunca mantenerla abierta de mas.
+const PROMO_FIN_CEILING = "2026-11-20T12:00:00-05:00";
+const PROMO_TEXT_MAX = 400;
+const PROMO_SPONSOR_MAX = 80;
+const PROMO_FETCH_TIMEOUT_MS = 4000;
 
 // Prefijo del codigo corto de ticket que se genera server-side.
 const QR_CODE_PREFIX = "QR-";
@@ -284,6 +323,10 @@ interface TicketData {
   tipo: string;
   ticketUrl: string;
   idempotencyKey: string;
+  // Opcionales: identifican el evento sin consultar la base (hoy la RPC no
+  // los manda; se aceptan para cuando el contrato crezca).
+  eventoId: string;
+  eventoSlug: string;
 }
 
 function parsePayload(raw: string): TicketData {
@@ -339,6 +382,10 @@ function parsePayload(raw: string): TicketData {
     false,
   );
 
+  // Opcionales: la RPC actual no los envia; si faltan quedan en "".
+  const eventoId = cleanOptional(p.eventoId ?? p.evento_id, MAX_EVENTO_ID_LEN, "eventoId", false);
+  const eventoSlug = cleanOptional(p.slug ?? p.evento_slug, MAX_SLUG_LEN, "slug", false);
+
   return {
     email,
     nombre,
@@ -352,6 +399,8 @@ function parsePayload(raw: string): TicketData {
     tipo,
     ticketUrl,
     idempotencyKey,
+    eventoId,
+    eventoSlug,
   };
 }
 
@@ -633,6 +682,118 @@ async function buildQrPng(code: string): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
+// Promocion del evento (eventos.config_landing.content.promo)
+// ---------------------------------------------------------------------------
+const PROMO_CEILING_MS = Date.parse(PROMO_FIN_CEILING);
+
+interface PromoDecision {
+  sponsor: string;
+  texto: string;
+}
+
+function promoOf(cfg: unknown): unknown {
+  let c: any = cfg;
+  if (typeof c === "string") {
+    try {
+      c = JSON.parse(c);
+    } catch (_e) {
+      return null;
+    }
+  }
+  if (!c || typeof c !== "object") return null;
+  const content = c.content;
+  if (!content || typeof content !== "object") return null;
+  return content.promo ?? null;
+}
+
+function decidePromo(promo: unknown, nowMs: number): PromoDecision | null {
+  const p: any = promo;
+  if (!p || typeof p !== "object") return null;
+  if (p.activa !== true) return null;
+  if (typeof p.texto !== "string") return null;
+  const texto = p.texto.trim();
+  if (!texto) return null;
+  const finMs = Date.parse(String(p.fin));
+  if (!isFinite(finMs)) return null;
+  if (nowMs >= finMs) return null;
+  if (isFinite(PROMO_CEILING_MS) && nowMs >= PROMO_CEILING_MS) return null;
+  const sponsor = typeof p.sponsor === "string"
+    ? p.sponsor.trim().slice(0, PROMO_SPONSOR_MAX)
+    : "";
+  return { sponsor, texto: texto.slice(0, PROMO_TEXT_MAX) };
+}
+
+function promoBaseUrl(): string {
+  const configured = env("SUPABASE_URL");
+  if (configured) return configured.replace(/\/+$/, "");
+  return "https://" + PROJECT_REF + ".supabase.co";
+}
+
+// Lectura de solo lectura contra PostgREST. Fail-closed: ante cualquier
+// problema (sin clave, red, status distinto de 200, JSON invalido) devuelve
+// undefined. Sin reintentos y sin registrar datos personales.
+async function promoGet(path: string): Promise<unknown> {
+  const key = env("SUPABASE_SERVICE_ROLE_KEY");
+  if (!key) return undefined;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PROMO_FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(promoBaseUrl() + "/rest/v1/" + path, {
+      method: "GET",
+      headers: {
+        apikey: key,
+        authorization: "Bearer " + key,
+        accept: "application/json",
+      },
+      signal: controller.signal,
+    });
+    if (res.status !== 200) return undefined;
+    return await res.json();
+  } catch (_e) {
+    return undefined;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function configLandingByFilter(filter: string): Promise<unknown> {
+  const rows = await promoGet("eventos?" + filter + "&select=config_landing&limit=1");
+  if (!Array.isArray(rows) || rows.length === 0) return undefined;
+  const row = rows[0] as Record<string, unknown>;
+  return row.config_landing;
+}
+
+async function resolvePromo(data: TicketData): Promise<PromoDecision | null> {
+  // Solo los correos de registro llevan promocion. El correo de bienvenida de
+  // creacion de cuenta no pertenece a ningun evento: sin esta guarda el
+  // fallback por inscritos.email le pegaria la promo de un evento anterior.
+  if (data.tipo === "bienvenida") return null;
+  try {
+    let cfg: unknown;
+    if (data.eventoId) {
+      cfg = await configLandingByFilter("id=eq." + encodeURIComponent(data.eventoId));
+    } else if (data.eventoSlug) {
+      cfg = await configLandingByFilter("slug=eq." + encodeURIComponent(data.eventoSlug));
+    } else {
+      const rows = await promoGet(
+        "inscritos?email=eq." + encodeURIComponent(data.email) +
+          "&select=evento_id,created_at&order=created_at.desc&limit=1",
+      );
+      if (Array.isArray(rows) && rows.length > 0) {
+        const row = rows[0] as Record<string, unknown>;
+        const eventoId = typeof row.evento_id === "string" ? row.evento_id.trim() : "";
+        if (eventoId) {
+          cfg = await configLandingByFilter("id=eq." + encodeURIComponent(eventoId));
+        }
+      }
+    }
+    return decidePromo(promoOf(cfg), Date.now());
+  } catch (_e) {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // HTML del correo
 // ---------------------------------------------------------------------------
 function esc(value: string): string {
@@ -653,11 +814,30 @@ function looksLikeImage(url: string): boolean {
 }
 
 function buildSubject(data: TicketData): string {
-  const base = data.eventoNombre || "Hostal Terraza";
+  const base = data.eventoNombre || "Taquilla Directa";
   return "Tu entrada para " + base.slice(0, 120);
 }
 
-function buildHtml(data: TicketData, qrInline: string): string {
+function buildPromoBlock(promo: PromoDecision | null): string {
+  if (!promo) return "";
+  const showSponsor = promo.sponsor.length > 0 &&
+    promo.texto.toLowerCase().indexOf(promo.sponsor.toLowerCase()) < 0;
+  return '<div style="margin:20px 0 0;padding:14px 16px;background:#f6f5f2;' +
+    'border-top:3px solid #2d6a4f;border-radius:8px;color:#1a1a1a;' +
+    'font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;">' +
+    (showSponsor
+      ? '<div style="margin:0 0 6px;font-size:12px;font-weight:700;' +
+        'letter-spacing:1px;text-transform:uppercase;color:#2d6a4f;">' +
+        esc(promo.sponsor) + "</div>"
+      : "") +
+    '<div style="margin:0;">' + escMultiline(promo.texto) + "</div></div>";
+}
+
+function buildHtml(
+  data: TicketData,
+  qrInline: string,
+  promo: PromoDecision | null = null,
+): string {
   const rows: string[] = [];
   const addRow = (label: string, value: string) => {
     if (!value) return;
@@ -707,7 +887,7 @@ function buildHtml(data: TicketData, qrInline: string): string {
     'overflow:hidden;border:1px solid #e8e8e8;">' +
     '<div style="padding:24px 16px;background:#2d6a4f;color:#ffffff;">' +
     '<div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;opacity:0.85;">' +
-    "Hostal Terraza</div>" +
+    "Taquilla Directa</div>" +
     '<div style="font-size:20px;font-weight:700;margin-top:6px;">' +
     escMultiline(data.eventoNombre || "Tu evento") + "</div></div>" +
     '<div style="padding:24px 16px;">' +
@@ -717,6 +897,7 @@ function buildHtml(data: TicketData, qrInline: string): string {
     "confirmado. Presenta este codigo en la entrada.</p>" +
     '<div style="text-align:center;margin:0 0 20px;">' + qrBlock + "</div>" +
     '<table style="width:100%;border-collapse:collapse;">' + rows.join("") + "</table>" +
+    buildPromoBlock(promo) +
     '<p style="margin:24px 0 0;font-size:12px;color:#8a8a8a;line-height:1.5;">' +
     "Si no hiciste esta reserva, ignora este mensaje.</p>" +
     "</div></div></body></html>";
@@ -743,6 +924,7 @@ async function sendViaResend(
   data: TicketData,
   attachment: Attachment | null,
   qrInline: string,
+  promo: PromoDecision | null = null,
 ): Promise<ResendResult> {
   const apiKey = env("RESEND_API_KEY");
   if (!apiKey) return { ok: false, status: 0, id: "" };
@@ -751,7 +933,7 @@ async function sendViaResend(
     from: env("MAIL_FROM") || "Taquilla Directa <no-reply@tickets.taquilladirecta.com>",
     to: [data.email],
     subject: buildSubject(data),
-    html: buildHtml(data, qrInline),
+    html: buildHtml(data, qrInline, promo),
   };
 
   // Adjuntos: primero el QR inline (referenciado como cid:ticket-qr) y luego,
@@ -873,9 +1055,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
   }
 
+  // Promocion del evento: solo lectura y best effort. Si algo falla, el
+  // correo se envia igual sin bloque de promocion.
+  const promo = await resolvePromo(data);
+
   let result: ResendResult;
   try {
-    result = await sendViaResend(data, attachment, qrInline);
+    result = await sendViaResend(data, attachment, qrInline, promo);
   } catch (e) {
     // Error de red: se registra la categoria, nunca el detalle interno.
     const reason = e instanceof Error ? e.name : "error_desconocido";
@@ -894,7 +1080,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
   console.log(
     "send-ticket-email: enviado. canal=" + auth.channel +
     " adjunto=" + (attachment ? "si" : "no") +
-    " qr_inline=" + (qrInline ? "si" : "no"),
+    " qr_inline=" + (qrInline ? "si" : "no") +
+    " promo=" + (promo ? "si" : "no"),
   );
   const body: Record<string, unknown> = { ok: true };
   if (result.id) body.id = result.id;

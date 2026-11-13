@@ -1333,6 +1333,26 @@ task:
     * (c) `publicUrl()` descarta el path si recibe `//host` (`admin.html:2949`, no alcanzable hoy).
     * (d) rojos preexistentes: `express_check` `evento-app` diff 1->2 y `smoke` S11 async/await.
 
+### TSK-142 - Promocion por evento en ticket y correo (2026-11-13) - CERRADA - DESPLEGADA A PRODUCCION
+
+**0. Estado real (ADR-006, 2026-11-13):** **CERRADA y DESPLEGADA**. La promo vive en `eventos.config_landing.content.promo` y se renderiza en ticket, tarjeta de duplicado, texto de WhatsApp, mensaje de exito y correo transaccional. **0 DDL, 0 migraciones, 0 endpoints de Vercel nuevos**: el unico artefacto de servidor es la Edge Function `send-ticket-email` re-desplegada. Decision registrada en **ADR-095** (`DECISIONS.md`).
+
+**1. Contrato (un objeto unico, no un array):** `{ activa:boolean, sponsor:string, texto:string, fin:string ISO con offset -05:00 }`.
+* Regla de visualizacion **identica** en cliente (`js/promo-cutoff.js`) y en servidor (`supabase/functions/send-ticket-email/index.ts`): `activa === true` **estricto** && `texto.trim() !== ''` && `Date.parse(fin)` finito && `Date.now() < Date.parse(fin)` && `Date.now() < Date.parse('2026-11-20T12:00:00-05:00')` (**techo duro**).
+* **Fail-closed:** error de lectura, fecha corrupta o config ausente = el bloque **no se muestra**.
+* **El corte NO bloquea registro ni venta:** solo oculta el bloque.
+* Default `activa:false`: se enciende manualmente en el admin (`Contenido > Promocion`).
+
+**2. Superficies tocadas:** ticket de `registroaforo.html`; ticket y tarjeta de duplicado de `serie.html`; texto de WhatsApp; mensaje de exito de `evento-app.html`; correo transaccional (`send-ticket-email`).
+
+**3. Operacion (deploy):** Edge Function `send-ticket-email` desplegada el **2026-11-13** al proyecto `hostal-terraza` (`ctgyvydzshueemlelkzv`) con `--no-verify-jwt` (la funcion hace su propia verificacion JWT interna). `deno check` sigue fallando por **1 error de tipos PREEXISTENTE** en `b64urlToBytes(sig)` (~L447), ajeno a esta feature: decision del usuario **no tocar cripto**; Supabase bundlea sin type-check.
+
+**4. Rebranding aplicado:** `Hostal Terraza` / `HOSTAL TERRAZA` / `Terraza Hostal` -> `Taquilla Directa` en `admin.html`, `registroaforo.html`, `serie.html`, `evento-app.html`, `js/i18n.js` y `api/evento-og.js`. El dominio de produccion **NO cambio** (`taquilladirecta.com`). `css/templates/fiesta/f12.css` auditado: **0** referencias a hostalterraza, no se modifico.
+
+**5. Deuda tecnica conocida (registrada, NO reparada en esta tarea):**
+* (a) El RPC `enviar_email_registro` **NO envia `evento_id`** en el payload (`migrations/adr076_enviar_email_seguro.sql`). La Edge Function resuelve el evento por `inscripcion.eventoId` -> `eventoSlug` -> fallback `inscritos.email` (registro mas reciente): con un email registrado en varios eventos, el correo podria tomar la promo del **evento equivocado**. Fix futuro: anadir `evento_id` al jsonb del RPC (requiere migracion, **gate §2**).
+* (b) `api/evento-og.js:107` construye `og:url` con el host del request: accedido por un host de preview, se emite tal cual. Requiere normalizacion a dominio canonico (tarea aparte).
+
 
 
 

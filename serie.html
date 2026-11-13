@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-i18n="serie.title">Serie · Terraza Hostal</title>
+<title data-i18n="serie.title">Serie · Taquilla Directa</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/i18n.js"></script>
+<!-- Corte de promo: unico punto de verdad en cliente (fail-closed). -->
+<script src="js/promo-cutoff.js"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -84,6 +86,11 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 .tk-hostal{font-weight:700;font-size:14px;color:var(--gold);letter-spacing:.04em}
 .tk-terraza{font-weight:300;font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.06em;margin-top:1px}
 .tk-badge{background:var(--gold);border-radius:5px;padding:3px 10px;font-weight:700;font-size:10px;color:#0F0F0F;letter-spacing:.06em}
+/* Promo del evento en el ticket: una linea sobria, acento del template.
+   El nodo solo existe si HT.getPromo devuelve objeto (fail-closed). */
+.tk-promo{width:100%;max-width:370px;margin:0 auto 1rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.09);font-size:11px;line-height:1.45;color:rgba(255,255,255,.6);text-align:center}
+.tk-promo-tag{color:var(--gold);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+#ticket-card .tk-promo{margin-left:20px;margin-right:20px}
 .tk-divider{height:1px;background:#2D2D2A;margin:10px 20px 0}
 .tk-event{padding:10px 20px 0}
 .tk-ev-lbl{font-size:9px;font-weight:500;color:#646460;letter-spacing:.1em;margin-bottom:2px}
@@ -129,7 +136,7 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
 
   <div class="hero">
     <div class="hero-content">
-      <div class="hero-brand">Terraza · Hostal</div>
+      <div class="hero-brand">Taquilla Directa</div>
       <div class="hero-eyebrow" data-i18n="serie.hero_eyebrow">Serie de eventos</div>
       <h1 class="hero-title" id="s-titulo"></h1>
       <div class="hero-divider"></div>
@@ -245,7 +252,7 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
   <div id="ticket-card">
     <div class="tk-strip"></div>
     <div class="tk-header">
-      <div><div class="tk-hostal">HOSTAL</div><div class="tk-terraza">TERRAZA</div></div>
+      <div><div class="tk-hostal">TAQUILLA</div><div class="tk-terraza">DIRECTA</div></div>
       <div class="tk-badge" data-i18n="serie.badge_entrada">ENTRADA</div>
     </div>
     <div class="tk-divider"></div>
@@ -304,7 +311,7 @@ body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:
         <div style="height:7px;background:#c8a96e"></div>
         <div style="padding:16px 20px">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-            <div><div style="font-weight:700;font-size:13px;color:#c8a96e">HOSTAL</div><div style="font-weight:300;font-size:11px;color:rgba(255,255,255,.4)">TERRAZA</div></div>
+            <div><div style="font-weight:700;font-size:13px;color:#c8a96e">TAQUILLA</div><div style="font-weight:300;font-size:11px;color:rgba(255,255,255,.4)">DIRECTA</div></div>
             <div style="background:#c8a96e;border-radius:5px;padding:3px 10px;font-weight:700;font-size:10px;color:#0F0F0F">ENTRADA</div>
           </div>
           <div style="height:1px;background:#2D2D2A;margin-bottom:10px"></div>
@@ -395,6 +402,7 @@ async function cargarQRRecuperadoSerie() {
   document.getElementById('dup-nombre').textContent      = data.nombre.toUpperCase();
   document.getElementById('dup-ev-nombre').textContent   = (serieActual?.nombre||'').toUpperCase();
   document.getElementById('dup-sesion-nombre').textContent = sesionSeleccionada?.nombre||'';
+  try { _promoTicketSerie(sesionSeleccionada, '#dup-ticket-card', 'tk-promo-dup'); } catch (e) {}
   document.getElementById('dup-fecha').textContent       = formatFechaCorta(sesionSeleccionada?.fecha);
   document.getElementById('dup-hora').textContent        = sesionSeleccionada?.hora || '—';
 
@@ -474,7 +482,7 @@ async function init() {
   if (org?.nombre_app) {
     document.title = serie.nombre + ' · ' + org.nombre_app;
   } else {
-    document.title = serie.nombre + ' · Terraza';
+    document.title = serie.nombre + ' · Taquilla Directa';
   }
   if (refCodigo) {
     const { data: inv } = await SB.from('invitadores')
@@ -776,6 +784,37 @@ function resetVerif() {
   document.getElementById('paso-noencontrado').style.display='none';
 }
 
+// Promo del evento ARRIBA del ticket de serie (config_landing.content.promo).
+// Fail-closed (ADR-008): si HT.getPromo devuelve null no se crea ningun
+// nodo, para no dejar contenedores vacios ni comentarios con el dato.
+// El texto entra SIEMPRE por textContent: viene de config_landing y no
+// se interpreta como HTML (sin negritas ni etiquetas desde el dato).
+function _promoTicketSerie(ev, anclaSel, boxId) {
+  const ancla = document.querySelector(anclaSel || '#ticket-card');
+  if (!ancla || !ancla.parentNode) return;
+  const host = ancla.parentNode;
+  const prev = boxId ? document.getElementById(boxId) : null;
+  if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+  const prom = (window.HT && typeof window.HT.getPromo === 'function')
+    ? window.HT.getPromo(ev && ev.config_landing)
+    : null;
+  if (!prom) return;
+  const box = document.createElement('div');
+  box.id = boxId || 'tk-promo';
+  box.className = 'tk-promo';
+  const sponsor = String(prom.sponsor || '').trim();
+  if (sponsor && prom.texto.indexOf(sponsor) === -1) {
+    const tag = document.createElement('span');
+    tag.className = 'tk-promo-tag';
+    tag.textContent = sponsor + ' \u00b7 ';
+    box.appendChild(tag);
+  }
+  const txt = document.createElement('span');
+  txt.textContent = prom.texto;
+  box.appendChild(txt);
+  host.insertBefore(box, ancla);
+}
+
 async function llenarTicket(nombre, qr, tipo) {
   const ev  = serieActual?.nombre || '';
   const words = ev.split(' ');
@@ -784,6 +823,7 @@ async function llenarTicket(nombre, qr, tipo) {
   document.getElementById('tk-ev2').textContent = (words.slice(mid).join(' ')||ev).toUpperCase();
   document.getElementById('tk-session').textContent =
     sesionSeleccionada?.nombre ? sesionSeleccionada.nombre.toUpperCase() : '';
+  try { _promoTicketSerie(sesionSeleccionada, '#ticket-card', 'tk-promo'); } catch (e) {}
   document.getElementById('tk-fecha').textContent = formatFechaCorta(sesionSeleccionada?.fecha);
   document.getElementById('tk-hora').textContent  = sesionSeleccionada?.hora || '—';
   document.getElementById('tk-num').textContent   = 'N°'+( sesionSeleccionada?.sesion_num||'?');
@@ -860,8 +900,8 @@ async function _generarTicketCanvasSerie(qr) {
   ctx.fillStyle=DARK; _roundRectS(ctx,0,0,W,H,18); ctx.fill();
   ctx.fillStyle=GOLD; _roundRectS(ctx,0,0,W,10,{tl:18,tr:18,bl:0,br:0}); ctx.fill();
 
-  ctx.fillStyle=GOLD; ctx.font='bold 22px sans-serif'; ctx.fillText('HOSTAL',PAD,52);
-  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='300 13px sans-serif'; ctx.fillText('TERRAZA',PAD,70);
+  ctx.fillStyle=GOLD; ctx.font='bold 22px sans-serif'; ctx.fillText('TAQUILLA',PAD,52);
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='300 13px sans-serif'; ctx.fillText('DIRECTA',PAD,70);
   ctx.fillStyle=DARK; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
   _roundRectS(ctx,W-PAD-90,36,90,26,5); ctx.fillStyle=GOLD; ctx.fill();
   ctx.fillStyle=DARK; ctx.fillText(T('serie.canvas_entrada'),W-PAD-45,54); ctx.textAlign='left';
@@ -931,14 +971,16 @@ async function enviarTicketWASerie() {
   const btn = document.getElementById('btn-wa-ticket');
   if (btn) { btn.disabled=true; btn.textContent=T('serie.preparando'); }
 
-  const texto = [
+  let texto = [
     T('serie.wa_titulo', { serie: serieActual?.nombre || '' }),
     T('serie.wa_sesion', { nombre: sesionSeleccionada?.nombre || '' }),
     `📅 ${formatFechaCorta(sesionSeleccionada?.fecha)}${sesionSeleccionada?.hora?' · '+sesionSeleccionada.hora:''}`,
     T('serie.wa_qr', { qr }),
     T('serie.wa_muestra'),
-    `_Terraza Hostal_`,
   ].filter(Boolean).join('\n');
+  var _pr = (window.HT && typeof HT.getPromo === 'function' && sesionSeleccionada) ? HT.getPromo(sesionSeleccionada.config_landing) : null;
+  if (_pr && _pr.texto) texto += '\n\n' + _pr.texto;
+  texto += '\n\n_Taquilla Directa_';
 
   const tel = (telefono||'').replace(/\D/g,'');
   const waUrl = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : `https://wa.me/?text=${encodeURIComponent(texto)}`;
@@ -1006,7 +1048,7 @@ async function enviarNotificacionesSerie(nombre, qr, emailAddr) {
       p_evento_nombre:   (serieActual?.nombre || '') + (sesionSeleccionada?.nombre ? ' — ' + sesionSeleccionada.nombre : ''),
       p_evento_fecha:    sesionSeleccionada.fecha,
       p_evento_hora:     sesionSeleccionada.hora || '',
-      p_evento_lugar:    sesionSeleccionada.ubicacion || 'Terraza Hostal',
+      p_evento_lugar:    sesionSeleccionada.ubicacion || 'Taquilla Directa',
       p_idempotency_key: 'serie-registro:' + qr,
       p_tipo:            'registro',
       p_cedula:          (document.getElementById('f-cedula')?.value || '').trim() || null,

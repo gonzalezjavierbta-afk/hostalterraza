@@ -8,6 +8,9 @@
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/i18n.js"></script>
+    <!-- v311 · Promo del evento (config_landing.content.promo) con corte por fecha.
+         Helper puro sin DOM: HT.getPromo(cfgLanding) -> {sponsor,texto,fin}|null. -->
+    <script src="js/promo-cutoff.js"></script>
     <!-- Tailwind Play CDN (v1.6.0) - utilidades para el card de Guest List (f9b).
          preflight OFF: se usan las utilidades pero NO el reset global, para no
          alterar el runtime de la pagina existente (ADR-001 + Escudo GOLD). -->
@@ -1230,14 +1233,14 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                 const effNombre = __i18nLayer.nombre || ev.nombre;
                 const effOrgNombre = (__i18nLayer.org_nombre || (ev.organizaciones && ev.organizaciones.nombre)) || '';
                 // v216 · PLAN DE LA ORGANIZACION: gobierna el limite freemium (60
-                // inscritos/evento) y el badge "Powered by Hostal Terraza QR". Si la
+                // inscritos/evento) y el badge "Powered by Taquilla Directa QR". Si la
                 // org no existe o su plan llega null (ADR-024) se asume 'freemium':
                 // default conservador que nunca regala cupo ni oculta marca a un plan pago.
                 const orgPlan = (ev.organizaciones && ev.organizaciones.plan) || 'freemium';
                 const effUbicacion = __i18nLayer.ubicacion || ev.ubicacion;
 
                 // Título de pestaña del navegador con el nombre real del evento.
-                document.title = (effNombre || 'Hostal Terraza') + ' · Hostal Terraza';
+                document.title = (effNombre || 'Taquilla Directa') + ' · Taquilla Directa';
 
                 // ESCUDO ANALYTICS: contextualiza y emite el pageview del landing.
                 __ANALYTICS.setContext(ev);
@@ -1487,7 +1490,7 @@ onclick="switchForm('ya')">RECUPERAR</button></div>
                     const vidUrl = __bannerSafeUrl(it.video_url);
                     // alt: obligatorio si hay imagen_url. Nunca cadena vacia: cae a la
                     // frase truncada a 120 y, en ultimo termino, a un texto generico.
-                    const altTxt = __bannerText(it.alt, 320) || (frase ? frase.slice(0, 120) : 'Hostal Terraza');
+                    const altTxt = __bannerText(it.alt, 320) || (frase ? frase.slice(0, 120) : 'Taquilla Directa');
                     // ---- .banner-media (siempre presente; el silo pinta su gradiente) ----
                     const media = document.createElement('div');
                     media.className = 'banner-media';
@@ -3038,6 +3041,48 @@ if (document.getElementById('db-poster-img')) {
                                     ? T('landing.form_ok_comunidad')
                                     : T('landing.form_ok_guardado');
                                 msgBox.style.borderColor = (formRedirect && unirComunidad) ? 'rgba(37,211,102,0.4)' : 'rgba(241,196,15,0.5)';
+                                // v311 - PROMO DEL EVENTO EN EL MENSAJE DE EXITO (aditivo).
+                                // Mismo criterio que el ticket de registroaforo.html: HT.getPromo
+                                // exige promo.activa === true estricto y Date.now() < Date.parse(fin),
+                                // por lo que un corte vencido degrada a null sin tocar el mensaje.
+                                // El texto entra SIEMPRE por textContent: viene de config_landing y
+                                // no se interpreta como HTML. Sin imagen y sin CTA: el bloque solo
+                                // agrega 1-2 lineas dentro del contenedor ya existente. Si el helper
+                                // no cargo (red, cache) o devuelve null no se crea ningun nodo, asi
+                                // que no quedan contenedores fantasma ni comentarios con el dato.
+                                try {
+                                    var prevPromoMsg = document.getElementById('reg-promo-msg');
+                                    if (prevPromoMsg && prevPromoMsg.parentNode) prevPromoMsg.parentNode.removeChild(prevPromoMsg);
+                                    var promLanding = (window.HT && typeof window.HT.getPromo === 'function')
+                                        ? window.HT.getPromo(ev && ev.config_landing)
+                                        : null;
+                                    if (promLanding) {
+                                        var promoBoxMsg = document.createElement('div');
+                                        promoBoxMsg.id = 'reg-promo-msg';
+                                        promoBoxMsg.style.marginTop = '0.6rem';
+                                        promoBoxMsg.style.paddingTop = '0.55rem';
+                                        promoBoxMsg.style.borderTop = '1px solid rgba(255,255,255,0.18)';
+                                        promoBoxMsg.style.fontSize = '0.85rem';
+                                        promoBoxMsg.style.lineHeight = '1.45';
+                                        promoBoxMsg.style.color = 'rgba(255,255,255,0.85)';
+                                        var promSponsorMsg = String(promLanding.sponsor || '').trim();
+                                        if (promSponsorMsg && promLanding.texto.indexOf(promSponsorMsg) === -1) {
+                                            var promTagMsg = document.createElement('span');
+                                            promTagMsg.style.color = '#f1c40f';
+                                            promTagMsg.style.fontWeight = '600';
+                                            promTagMsg.style.textTransform = 'uppercase';
+                                            promTagMsg.style.letterSpacing = '0.04em';
+                                            promTagMsg.textContent = promSponsorMsg + ' \u00b7 ';
+                                            promoBoxMsg.appendChild(promTagMsg);
+                                        }
+                                        var promTextoMsg = document.createElement('span');
+                                        promTextoMsg.textContent = promLanding.texto;
+                                        promoBoxMsg.appendChild(promTextoMsg);
+                                        msgBox.appendChild(promoBoxMsg);
+                                    }
+                                } catch (promoErr) {
+                                    console.warn('Promo landing -> omitida:', promoErr);
+                                }
                             }
                             regForm.querySelectorAll('input').forEach(i => i.style.display = 'none');
                             regForm.querySelector('button[type=submit]').style.display = 'none';

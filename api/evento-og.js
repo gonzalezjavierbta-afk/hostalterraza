@@ -11,8 +11,8 @@
 var FALLBACK_IMG = 'https://taquilladirecta.com/assets/og-taquilladirecta.png';
 var SB_URL = process.env.SUPABASE_URL || 'https://ctgyvydzshueemlelkzv.supabase.co';
 var SB_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0Z3l2eWR6c2h1ZWVtbGVsa3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTc1NzAsImV4cCI6MjA4OTIzMzU3MH0.3pMA-VZLV2Kfyl6BD-x8v79P7UuXSfMgtIwnfoP_VuY';
-var DEFAULT_DESC = 'Eventos, musica y cultura en Hostal Terraza.';
-var MIN_HTML = '<html><head></head><body>Hostal Terraza</body></html>';
+var DEFAULT_DESC = 'Eventos, musica y cultura en Taquilla Directa.';
+var MIN_HTML = '<html><head></head><body>Taquilla Directa</body></html>';
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -103,7 +103,7 @@ async function loadShell(req) {
 }
 
 function buildMeta(nombre, desc, imagen, host, slug, isProx) {
-  var ogTitle = isProx ? (nombre + ' - Pr\u00f3ximamente - Hostal Terraza') : (nombre + ' - Hostal Terraza');
+  var ogTitle = isProx ? (nombre + ' - Pr\u00f3ximamente - Taquilla Directa') : (nombre + ' - Taquilla Directa');
   var url = 'https://' + host + '/evento.html?slug=' + slug;
   var lines = [
     '<meta name="description" content="' + esc(desc) + '">',
@@ -112,7 +112,7 @@ function buildMeta(nombre, desc, imagen, host, slug, isProx) {
     '<meta property="og:description" content="' + esc(desc) + '">',
     '<meta property="og:image" content="' + esc(imagen) + '">',
     '<meta property="og:url" content="' + esc(url) + '">',
-    '<meta property="og:site_name" content="Hostal Terraza">',
+    '<meta property="og:site_name" content="Taquilla Directa">',
     '<meta name="twitter:card" content="summary_large_image">',
     '<meta name="twitter:title" content="' + esc(ogTitle) + '">',
     '<meta name="twitter:description" content="' + esc(desc) + '">',
@@ -123,7 +123,7 @@ function buildMeta(nombre, desc, imagen, host, slug, isProx) {
 
 function inject(html, nombre, desc, imagen, host, slug, isProx) {
   var h = String(html || '');
-  var title = isProx ? ('<title>' + esc(nombre) + ' - Pr\u00f3ximamente - Hostal Terraza</title>') : ('<title>' + esc(nombre) + ' - Hostal Terraza</title>');
+  var title = isProx ? ('<title>' + esc(nombre) + ' - Pr\u00f3ximamente - Taquilla Directa</title>') : ('<title>' + esc(nombre) + ' - Taquilla Directa</title>');
   h = h.replace(/<title>[\s\S]*?<\/title>/i, title);
   var meta = buildMeta(nombre, desc, imagen, host, slug, isProx);
   var idx = h.indexOf('</head>');
@@ -170,7 +170,7 @@ function resolveDesc(nombre, ev, content, isProx) {
     var sub = content && content.subtitulo;
     var sd = (typeof sub === 'string') ? sub : '';
     var sc = trimTo(cleanText(sd), 200);
-    return sc || (nombre + ' - Muy pronto en Hostal Terraza');
+    return sc || (nombre + ' - Muy pronto en Taquilla Directa');
   }
   var raw = content.descripcion || ev.descripcion || '';
   var d = '';
@@ -189,7 +189,7 @@ function resolveDesc(nombre, ev, content, isProx) {
     if (nombre) parts.push(nombre);
     if (ev.fecha) parts.push(String(ev.fecha));
     if (ev.ubicacion) parts.push(String(ev.ubicacion));
-    parts.push('Hostal Terraza');
+    parts.push('Taquilla Directa');
     d = parts.join(' - ');
   }
   var clean = trimTo(cleanText(d), 200);
@@ -227,12 +227,12 @@ module.exports = async function handler(req, res) {
     var host = getHost(req);
     var ev = await loadEvento(slug);
 
-    var nombre = 'Hostal Terraza';
+    var nombre = 'Taquilla Directa';
     var desc = DEFAULT_DESC;
     var imagen = FALLBACK_IMG;
 
     if (ev) {
-      nombre = ev.nombre || 'Hostal Terraza';
+      nombre = ev.nombre || 'Taquilla Directa';
       var content = (ev.config_landing && ev.config_landing.content) || {};
       var isProx = !!(ev && String(ev.fase_landing || '') === 'proximamente');
       desc = resolveDesc(nombre, ev, content, isProx);
